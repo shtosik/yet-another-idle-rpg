@@ -1,18 +1,20 @@
+@let currentZone = ZONES_DATA[currentZoneId()];
+
 <div
-    [style]="{ 'background-image': currentZone.url | url }"
     class="battle"
+    [style]="{ 'background-image': currentZone.url | url }"
 >
     <app-battle-nav-bar-container
-        [currentEnemy]="currentEnemy"
+        [currentEnemy]="currentEnemy()"
         [currentZone]="currentZone"
     />
     <div class="battle-pane">
-        @if (!isInCombat) {
+        @if (!isInCombat()) {
             <app-spinner/>
         } @else {
             <app-enemy-container
                 #enemyElement
-                [currentEnemy]="currentEnemy"
+                [currentEnemy]="currentEnemy()"
             />
         }
         <app-damage-popup

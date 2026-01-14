@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common'
-import { AfterViewChecked, ChangeDetectionStrategy, Component, Input, ViewChild } from '@angular/core'
+import { AfterViewChecked, ChangeDetectionStrategy, Component, inject, ViewChild } from '@angular/core'
 import { UrlPipe } from 'app/pipes/url.pipe'
-import { Enemy } from 'interfaces/enemy.interface'
-import { Zone } from 'interfaces/zone.interface'
-import { SpinnerComponent } from "app/components/shared/spinner/spinner.component"
+import { SpinnerComponent } from 'app/components/shared/spinner/spinner.component'
 import { BattleNavBarContainer } from './battle-nav-bar/battle-nav-bar.container'
 import { DamagePopupComponent } from '../damage-popup/damage-popup.component'
 import { EnemyContainer } from './enemy/enemy.container'
+import { BattleStore } from '../../../store/battle/battle.store'
+import ZONES_DATA from '../../../../data/zones-data'
 
 @Component({
     selector: 'app-battle',
@@ -20,19 +20,18 @@ import { EnemyContainer } from './enemy/enemy.container'
 })
 
 export class BattleComponent implements AfterViewChecked {
+    battleStore = inject(BattleStore)
+
     @ViewChild('enemyElement') enemyContainerContainer: EnemyContainer
 
-    @Input() currentZone: Zone
-    @Input() isInCombat: boolean
-    @Input() currentEnemy: Enemy
+    currentZoneId = this.battleStore.currentZone
+    isInCombat = this.battleStore.isInCombat
+    currentEnemy = this.battleStore.enemy
 
     enemyX = 0
     enemyY = 0
+    protected readonly ZONES_DATA = ZONES_DATA
     private coordsSet = false
-
-    constructor() {
-    }
-
 
     ngAfterViewChecked() {
         const nativeEl = this.enemyContainerContainer?.getEnemyNativeElement()
@@ -44,5 +43,4 @@ export class BattleComponent implements AfterViewChecked {
             this.enemyY = rect.top + rect.height / 2
         }
     }
-
 }

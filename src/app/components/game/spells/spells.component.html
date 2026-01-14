@@ -5,9 +5,6 @@
                 <app-spell-slot
                     [spellId]="equippedSpells[$index].spellId"
                     [equippedSpell]="equippedSpells[$index]"
-                    [playerStats]="playerStats"
-                    [isInCombat]="isInCombat"
-                    (castSpell)="castSpell.emit($event)"
                 />
             }
         </app-slot>

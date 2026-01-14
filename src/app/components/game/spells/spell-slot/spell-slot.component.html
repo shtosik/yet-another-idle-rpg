@@ -1,5 +1,5 @@
-@let spellData = SPELLS_DATA[spellId];
-@let spellCooldown = spellData.baseCooldown - playerStats.spellCooldownReduction;
+@let spellData = SPELLS_DATA[spellId()];
+@let spellCooldown = spellData.baseCooldown - playerStats().spellCooldownReduction;
 @let timeLeftUntilReady = equippedSpell.cooldown / spellCooldown * 360;
 
 <div
@@ -11,7 +11,7 @@
     [style.--time-left]="timeLeftUntilReady + 'deg'"
     [tooltipContext]="{ spellData }"
     [tooltipTemplate]="tooltip"
-    (click)="handleCastSpell(spellId, equippedSpell)"
+    (click)="handleCastSpell(spellId(), equippedSpell)"
 >
     @if (equippedSpell.cooldown) {
         <span class="spell__counter">{{ equippedSpell.cooldown }}</span>
@@ -31,7 +31,7 @@
             <span class="mana">{{ 'spells:manaCost' | i18next: { cost: spellData.baseManaCost } }}</span>
             <span class="cooldown">{{ 'spells:cooldown' | i18next: { cooldown: spellCooldown } }}</span>
             @if (spellData.effect.type === SpellType.buff) {
-                <span class="duration">{{ 'spells:duration' | i18next: { duration: (spellData.effect.duration + playerStats.increasedSpellDuration) } }}</span>
+                <span class="duration">{{ 'spells:duration' | i18next: { duration: (spellData.effect.duration + playerStats().increasedSpellDuration) } }}</span>
             }
         </div>
         <span class="spell__desc">{{ ('spells:names.' + SpellID[spell.id] + '.desc')  | i18next }}</span>

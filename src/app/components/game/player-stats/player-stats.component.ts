@@ -1,9 +1,9 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core'
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { AbbreviatePipe } from 'app/pipes/abbreviate.pipe'
 import { CalculateXpPipe } from 'app/pipes/calculate-xp.pipe'
 import { TranslatePipe } from 'app/pipes/i18next.pipe'
-import { PlayerStatsType } from 'app/store/player/player.reducer'
+import { PlayerStore } from 'app/store/player/player.store'
 import { StatToPercentagePipe } from '../../../pipes/stat-to-percentage.pipe'
 
 @Component({
@@ -15,7 +15,6 @@ import { StatToPercentagePipe } from '../../../pipes/stat-to-percentage.pipe'
 })
 
 export class PlayerStatsComponent {
-    @Input() playerStats: PlayerStatsType
-
-    readonly PlayerStatsType: PlayerStatsType
+    playerStore = inject(PlayerStore)
+    playerStats = this.playerStore.stats
 }

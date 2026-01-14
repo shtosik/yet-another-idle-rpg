@@ -7,5 +7,5 @@ export interface DialogueOption<T> {
     conditions?: DialogueCondition[]
     effects?: DialogueEffect
     closeDialogue?: boolean
-    nextIfQuestStarted?: number
+    alternativeDialogueNext?: DialogueCondition & { next: number }
 }

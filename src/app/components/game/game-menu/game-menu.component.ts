@@ -1,7 +1,8 @@
 import { CommonModule } from '@angular/common'
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
+import { ChangeDetectionStrategy, Component, EventEmitter, inject, Output } from '@angular/core'
 import { GameTab } from 'enums/ids/game-tab.enum'
 import { TranslatePipe } from '../../../pipes/i18next.pipe'
+import { PlayerStore } from '../../../store/player/player.store'
 
 @Component({
     selector: 'app-game-menu',
@@ -11,17 +12,12 @@ import { TranslatePipe } from '../../../pipes/i18next.pipe'
     imports: [CommonModule, TranslatePipe],
 })
 
-export class GameMenuComponent implements OnInit {
-    @Input() skillPoints: number
-    @Input() level: number
+export class GameMenuComponent {
+    playerStore = inject(PlayerStore)
+    skillPoints = this.playerStore.stats.unspentSkillPoints
+    level = this.playerStore.stats.level
 
     @Output() changeTab = new EventEmitter<GameTab>()
 
     readonly GameTab = GameTab
-
-    constructor() {
-    }
-
-    ngOnInit() {
-    }
 }

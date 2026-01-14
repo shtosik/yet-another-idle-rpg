@@ -1,16 +1,16 @@
-@if (!selectedTownId) {
+@if (!selectedTownId()) {
     <ul>
-        <li (click)="selectTown.emit(TownID.laHarpar)">{{ 'map:towns.' + TownID[TownID.laHarpar] | i18next }}</li>
+        <li (click)="selectTown(TownID.laHarpar)">{{ 'map:towns.' + TownID[TownID.laHarpar] | i18next }}</li>
     </ul>
-} @else if (!selectedTownBuilding) {
-    @let town = TOWNS_DATA[selectedTownId];
-    <app-close-button (onClose)="selectTown.emit(null)"/>
+} @else if (!selectedTownBuilding()) {
+    @let town = TOWNS_DATA[selectedTownId()];
+    <app-close-button (onClose)="selectTown(null)"/>
     <ul>
         @for (building of town.buildings; track building.tabId) {
-            <li (click)="selectTownBuilding.emit(building)">{{ 'map:townTabs.' + TownBuildingID[building.tabId] | i18next }}</li>
+            <li (click)="selectTownBuilding(building)">{{ 'map:townTabs.' + TownBuildingID[building.tabId] | i18next }}</li>
         }
     </ul>
 } @else {
-    <app-close-button (onClose)="selectTownBuilding.emit(null)"/>
-    <app-town-building-container [building]="selectedTownBuilding"/>
+    <app-close-button (onClose)="selectTownBuilding(null)"/>
+    <app-town-building [building]="selectedTownBuilding()"/>
 }

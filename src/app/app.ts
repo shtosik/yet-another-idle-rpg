@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, inject, OnInit } from '@angular/core'
 import { GameIntervalService } from './services/game-interval.service'
 import { GameComponent } from './components/game/game.component'
 
@@ -11,12 +11,9 @@ import { GameComponent } from './components/game/game.component'
     styleUrl: './app.sass',
 })
 export class App implements OnInit {
-    constructor(
-        private gameService: GameIntervalService,
-    ) {
-    }
+    private gameService = inject(GameIntervalService)
 
     async ngOnInit() {
-        this.gameService.initInterval()
+        this.gameService.initGameLoop()
     }
 }

@@ -1,9 +1,7 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core'
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core'
 import { SpellSlotComponent } from './spell-slot/spell-slot.component'
 import { SlotComponent } from '../../shared/slot/slot.component'
-import { EquippedSpell } from '../../../../interfaces/spells/equipped-spell.interface'
-import { PlayerStatsType } from '../../../store/player/player.reducer'
-import { SpellID } from '../../../../enums/ids/spell-id.enum'
+import { BattleStore } from '../../../store/battle/battle.store'
 
 @Component({
     selector: 'app-spells',
@@ -16,11 +14,8 @@ import { SpellID } from '../../../../enums/ids/spell-id.enum'
     ],
 })
 export class SpellsComponent {
-    @Input() equippedSpells: EquippedSpell[]
-    @Input() playerStats: PlayerStatsType
-    @Input() isInCombat: boolean
-
-    @Output() castSpell = new EventEmitter<SpellID>()
+    battleStore = inject(BattleStore)
+    equippedSpells = this.battleStore.equippedSpells
 
     readonly slots = new Array(5).fill(null)
 }

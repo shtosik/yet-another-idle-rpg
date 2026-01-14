@@ -19,5 +19,9 @@
         "skillTree": "Skill tree",
         "crafting": "Crafting",
         "towns": "Towns"
-    }
+    },
+    "starts": "Starts",
+    "requires": "Requires",
+    "costs": "Costs",
+    "quest": "Quest"
 }

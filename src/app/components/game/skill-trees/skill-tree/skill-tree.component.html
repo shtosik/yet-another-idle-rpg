@@ -16,7 +16,7 @@
                     (click)="handleBuySkillPoint(skill, $event)"
                 >
                     <div class="skill-tree__info">
-                        <span>{{ unlockedSkillPoints[skill] || 0 }} / {{ skillData.maxLevel }}</span>
+                        <span>{{ unlockedSkillPoints()[skill] || 0 }} / {{ skillData.maxLevel }}</span>
                         <span>{{ 'skill-tree:cost' | i18next: { amount: skillData.skillPointCost } }}</span>
                     </div>
                 </div>

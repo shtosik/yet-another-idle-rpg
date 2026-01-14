@@ -8,57 +8,46 @@ import {
 } from '@angular/core'
 import { provideRouter } from '@angular/router'
 import { routes } from './app.routes'
-import { ActionReducer, provideState, provideStore } from '@ngrx/store'
-import { gameFeature } from './store/game/game.reducer'
 import { provideStoreDevtools } from '@ngrx/store-devtools'
-import { localStorageSync } from 'ngrx-store-localstorage'
-import { playerFeature } from './store/player/player.reducer'
 import { provideHttpClient } from '@angular/common/http'
 import i18next from 'i18next'
 import HttpBackend from 'i18next-http-backend'
-import { battleFeature } from './store/battle/battle.reducer'
-import { BattleEffects } from './store/battle/battle.effects'
-import { provideEffects } from '@ngrx/effects'
-import { PlayerEffects } from './store/player/player.effects'
-import { initialStates } from './store/store'
 import { TranslatePipe } from './pipes/i18next.pipe'
 import { AsyncPipe } from '@angular/common'
 import { UrlPipe } from './pipes/url.pipe'
 import { CalculateXpPipe } from './pipes/calculate-xp.pipe'
-import { TownsEffects } from './store/towns/towns.effects'
-import { townsFeature } from './store/towns/towns.reducer'
 
-export function ensureStateShapeMetaReducer(
-    reducer: ActionReducer<any>,
-): ActionReducer<any> {
-    return (state, action) => {
-        const nextState = reducer(state, action)
+// export function ensureStateShapeMetaReducer(
+//     reducer: ActionReducer<any>,
+// ): ActionReducer<any> {
+//     return (state, action) => {
+//         const nextState = reducer(state, action)
+//
+//         if (!nextState) return nextState
+//
+//         const patchedState = { ...nextState }
+//
+//         for (const key of Object.keys(initialStates)) {
+//             if (nextState[key]) {
+//                 patchedState[key] = {
+//                     ...initialStates[key],
+//                     ...nextState[key],
+//                 }
+//             }
+//         }
+//
+//         return patchedState
+//     }
+// }
 
-        if (!nextState) return nextState
-
-        const patchedState = { ...nextState }
-
-        for (const key of Object.keys(initialStates)) {
-            if (nextState[key]) {
-                patchedState[key] = {
-                    ...initialStates[key],
-                    ...nextState[key],
-                }
-            }
-        }
-
-        return patchedState
-    }
-}
-
-export function localStorageSyncReducer(
-    reducer: ActionReducer<any>,
-): ActionReducer<any> {
-    return localStorageSync({ keys: ['game', 'player', 'battle'], rehydrate: true })(reducer)
-}
+// export function localStorageSyncReducer(
+//     reducer: ActionReducer<any>,
+// ): ActionReducer<any> {
+//     return localStorageSync({ keys: ['game', 'player', 'battle'], rehydrate: true })(reducer)
+// }
 
 const translations = [
-    'app', 'enemies', 'zones', 'skill-tree', 'items', 'spells', 'map', 'crafting', 'npc',
+    'app', 'enemies', 'zones', 'skill-tree', 'items', 'spells', 'map', 'crafting', 'npc', 'quests',
     'dialogues/laHarparBartender',
     'dialogues/laHarparJosh',
     'dialogues/laHarparTrader',
@@ -90,16 +79,7 @@ export const appConfig: ApplicationConfig = {
         provideBrowserGlobalErrorListeners(),
         provideZonelessChangeDetection(),
         provideRouter(routes),
-        provideStore([], { metaReducers: [localStorageSyncReducer, ensureStateShapeMetaReducer] }),
-        provideEffects([
-            BattleEffects,
-            PlayerEffects,
-            TownsEffects,
-        ]),
-        provideState(gameFeature),
-        provideState(playerFeature),
-        provideState(battleFeature),
-        provideState(townsFeature),
+        // provideStore([], { metaReducers: [localStorageSyncReducer, ensureStateShapeMetaReducer] }),
         provideStoreDevtools({
             maxAge: 25, // Retains last 25 states
             logOnly: !isDevMode(), // Restrict extension to log-only mode

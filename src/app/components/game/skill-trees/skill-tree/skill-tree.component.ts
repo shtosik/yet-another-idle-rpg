@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common'
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core'
+import { ChangeDetectionStrategy, Component, inject, Input } from '@angular/core'
 import { TranslatePipe } from 'app/pipes/i18next.pipe'
 import { ALL_SKILLS } from 'data/skill-tree-data'
 import { SkillTreeID } from 'enums/ids/skill-tree-id.enum'
 import { SkillPointID } from 'enums/ids/skill-tree-node-id.enum'
 import { UrlPipe } from '../../../../pipes/url.pipe'
 import { TooltipTemplateDirective } from 'ngx-tooltip-directives'
+import { PlayerManagerService } from '../../../../services/player-manager.service'
 
 @Component({
     selector: 'app-skill-tree',
@@ -16,20 +17,17 @@ import { TooltipTemplateDirective } from 'ngx-tooltip-directives'
 })
 
 export class SkillTreeComponent {
+    playerManagerService = inject(PlayerManagerService)
+    unlockedSkillPoints = this.playerManagerService.unlockedSkillPoints
+
     @Input() skillPoints: SkillPointID[][]
     @Input() skillTreeId: SkillTreeID
-    @Input() unlockedSkillPoints: Partial<Record<SkillPointID, number>>
-
-    @Output() buySkillPoint = new EventEmitter<{ id: SkillPointID, max: boolean }>()
 
     readonly AllSkills = ALL_SKILLS
     readonly SkillTreeID = SkillTreeID
     readonly SkillPointID = SkillPointID
 
-    constructor() {
-    }
-
     handleBuySkillPoint(skillPoint: SkillPointID, event: MouseEvent) {
-        this.buySkillPoint.emit({ id: skillPoint, max: event.ctrlKey })
+        this.playerManagerService.buySkillPoint(skillPoint, event.ctrlKey)
     }
 }

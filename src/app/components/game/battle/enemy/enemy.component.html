@@ -1,5 +1,5 @@
 <div class="enemy">
-    @let percentage = (currentEnemyHp / currentEnemy.maxHp) * 100;
+    @let percentage = (currentEnemyHp() / currentEnemy().maxHp) * 100;
     @let background = 'linear-gradient(90deg, rgba(255, 0, 0, 1) ' + percentage + '%, rgba(0, 0, 0, 1)' + percentage +
         '%)';
 
@@ -7,10 +7,10 @@
         [style]="{ 'background': [[background]] }  "
         class="hp-bar"
     >
-        <span>{{ currentEnemyHp }} / {{ currentEnemy.maxHp }}</span>
+        <span>{{ currentEnemyHp() }} / {{ currentEnemy().maxHp }}</span>
     </div>
     <img
-        [ngSrc]="currentEnemy.url"
+        [ngSrc]="currentEnemy().url"
         alt=""
         disableOptimizedSrcset
         height="128"

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core'
+import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core'
 import { TownBuilding } from '../../../../../data/towns-data'
 import { UrlPipe } from '../../../../pipes/url.pipe'
 import { NpmFrameComponent } from '../npc-frame/npc-frame.component'
@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common'
 import { TranslatePipe } from '../../../../pipes/i18next.pipe'
 import { TownBuildingID } from '../../../../../enums/map/town-tab-id.enum'
 import { NpcID } from '../../../../../enums/map/npc-id.enum'
+import { ModalService } from '../../../../services/modal.service'
 
 @Component({
     selector: 'app-town-building',
@@ -20,9 +21,11 @@ import { NpcID } from '../../../../../enums/map/npc-id.enum'
     ],
 })
 export class TownBuildingComponent {
-    @Input() building: TownBuilding
-
-    @Output() openDialogue = new EventEmitter<NpcID>()
-
+    building = input<TownBuilding>(null)
     protected readonly TownBuildingID = TownBuildingID
+    private modalService = inject(ModalService)
+
+    openDialogue(id: NpcID) {
+        this.modalService.openDialogue(id)
+    }
 }

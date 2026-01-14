@@ -1,14 +1,17 @@
 <section class="skill-tree-window">
-    <app-skill-tree-container
-        [skillTreeId]="SkillTreeID.damage"
+    <app-skill-tree
         class="skill-tree damage-tree"
+        [skillTreeId]="SkillTreeID.damage"
+        [skillPoints]="SkillTreeData[SkillTreeID.damage].skills"
     />
-    <app-skill-tree-container
-        [skillTreeId]="SkillTreeID.exploration"
+    <app-skill-tree
         class="skill-tree exploration-tree"
+        [skillTreeId]="SkillTreeID.exploration"
+        [skillPoints]="SkillTreeData[SkillTreeID.exploration].skills"
     />
-    <app-skill-tree-container
-        [skillTreeId]="SkillTreeID.magic"
+    <app-skill-tree
         class="skill-tree magic-tree"
+        [skillTreeId]="SkillTreeID.magic"
+        [skillPoints]="SkillTreeData[SkillTreeID.magic].skills"
     />
 </section>

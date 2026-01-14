@@ -20,11 +20,31 @@
 
         <ul class="dialogue-modal__options">
             @for (option of $any(currentDialogue.options); track $index) {
-                <li
-                    class="dialogue-modal__option"
-                    (click)="currentDialogueId = option.next"
-                >{{ option.responseKey | i18next }}
-                </li>
+                @let conditions = option.conditions;
+                @let meetsConditions = checkIfMeetsRequirements(conditions);
+
+                @if (!option.conditions || meetsConditions) {
+                    <li
+                        class="dialogue-modal__option"
+                        (click)="handleOptionClicked(option)"
+                    >{{ option.responseKey | i18next }}
+                        @if (option.effects) {
+                            @let effect = option.effects;
+                            @if (effect.type === 'quest' && effect.action === 'start' && meetsConditions) {
+                                <span class="quest-start">{{ 'starts' | i18next }} {{ ('quests:names.' + QuestID[effect.questId]) | i18next }} {{ 'quest' | i18next }}</span>
+                            }
+                            @if (conditions?.length) {
+                                @for (condition of conditions; track $index) {
+                                    <span class="quest-condition">
+<!--                                        @switch (condition.type) {-->
+                                        <!--                                            @case ('')-->
+                                        <!--                                        }-->
+                                    </span>
+                                }
+                            }
+                        }
+                    </li>
+                }
             }
         </ul>
 

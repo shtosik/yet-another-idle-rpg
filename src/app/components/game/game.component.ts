@@ -1,58 +1,60 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core'
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core'
 import { PanelComponent } from '../shared/panel/panel.component'
-import { Store } from '@ngrx/store'
-import { resetStateAction } from 'app/store/actions'
 import { BehaviorSubject } from 'rxjs'
 import { GameTab } from 'enums/ids/game-tab.enum'
 import { AsyncPipe, CommonModule } from '@angular/common'
-import { updatePlayerStatsAction } from '../../store/player/player.actions'
 import { PlayerStat } from '../../../types/player/player-stat.type'
-import { BattleContainer } from './battle/battle.container'
-import { GameMenuContainer } from './game-menu/game-menu.container'
-import { InventoryContainer } from './inventory/inventory.container'
-import { EquipmentContainer } from './equipment/equipment.container'
-import { PlayerStatsContainer } from './player-stats/player-stats.container'
-import { SkillTreesContainer } from './skill-trees/skill-trees.container'
-import { SpellsContainer } from './spells/spells.container'
-import { CraftingContainer } from './crafting/crafting.container'
-import { TownsContainer } from './town/towns.container'
+import { TownsComponent } from './town/towns.component'
+import { InventoryWindow } from './inventory/inventory.component'
+import { EquipmentComponent } from './equipment/equipment.component'
+import { CraftingComponent } from './crafting/crafting.component'
+import { PlayerStore } from '../../store/player/player.store'
+import { PlayerStatsComponent } from './player-stats/player-stats.component'
+import { GameMenuComponent } from './game-menu/game-menu.component'
+import { SpellsComponent } from './spells/spells.component'
+import { BattleComponent } from './battle/battle.component'
+import { SkillTreesComponent } from './skill-trees/skill-trees.component'
+import { BattleStore } from '../../store/battle/battle.store'
+import { QuestsStore } from '../../store/quests/quests.store'
+import { TownsStore } from '../../store/towns/towns.store'
 
 const imports = [
     PanelComponent,
-    BattleContainer,
-    GameMenuContainer,
-    InventoryContainer,
-    EquipmentContainer,
-    PlayerStatsContainer,
     AsyncPipe,
     CommonModule,
-    SkillTreesContainer,
-    SpellsContainer,
+    TownsComponent,
+    InventoryWindow,
+    EquipmentComponent,
+    CraftingComponent,
+    PlayerStatsComponent,
+    GameMenuComponent,
+    SpellsComponent,
+    BattleComponent,
+    SkillTreesComponent,
 ]
 
 @Component({
     selector: 'app-game',
     templateUrl: 'game.component.html',
     styleUrls: ['./game.component.sass'],
-    imports: [
-        imports,
-        CraftingContainer,
-        TownsContainer,
-    ],
+    imports,
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
 export class GameComponent {
+    playerStore = inject(PlayerStore)
+    battleStore = inject(BattleStore)
+    questsStore = inject(QuestsStore)
+    townsStore = inject(TownsStore)
     gameTab = new BehaviorSubject<GameTab>(GameTab.main)
 
-    GameTab = GameTab
-
-    constructor(private store: Store) {
-    }
-
+    readonly GameTab = GameTab
 
     resetState() {
-        this.store.dispatch(resetStateAction())
+        this.playerStore.resetState()
+        this.battleStore.resetState()
+        this.questsStore.resetState()
+        this.townsStore.resetState()
     }
 
     changeTab(tab: GameTab) {
@@ -60,6 +62,6 @@ export class GameComponent {
     }
 
     giveStat(stat: PlayerStat) {
-        this.store.dispatch(updatePlayerStatsAction({ stats: [{ stat, amount: 1000 }] }))
+        this.playerStore.updatePlayerStats([{ stat, amount: 1000 }])
     }
 }

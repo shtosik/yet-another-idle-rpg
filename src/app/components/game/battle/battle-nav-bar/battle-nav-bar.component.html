@@ -5,28 +5,28 @@
                 - {{ 'enemies:names.' + EnemyID[currentEnemy.id] | i18next }}
             }
         </h2>
-        <h3 class="killcount"> {{ 'killCount' | i18next }}: {{ currentWaveKillCount }}
-            / {{ currentWave === currentZone.maxWave ? 1 : currentZone.enemiesPerWave }}</h3>
+        <h3 class="killcount"> {{ 'killCount' | i18next }}: {{ currentWaveKillCount() }}
+            / {{ currentWave() === currentZone.maxWave ? 1 : currentZone.enemiesPerWave }}</h3>
     </div>
     <div class="right-side">
         <div class="buttons">
-            @if (currentZone.previousZoneId || currentWave !== 1) {
-                <button (click)="onPreviousWave.emit()">&lt;</button>
+            @if (currentZone.previousZoneId || currentWave() !== 1) {
+                <button (click)="onPreviousWave()">&lt;</button>
             }
-            <span>{{ 'wave' | i18next }}: {{ currentWave }}/{{ currentZone.maxWave }}</span>
-            @if (currentZone.nextZoneId || currentWave !== currentZone.maxWave) {
+            <span>{{ 'wave' | i18next }}: {{ currentWave() }}/{{ currentZone.maxWave }}</span>
+            @if (currentZone.nextZoneId || currentWave() !== currentZone.maxWave) {
                 <button
                     class="next"
-                    (click)="onNextWave.emit()"
+                    (click)="onNextWave()"
                 >&gt;
                 </button>
             }
         </div>
-        @if (hasAutoWaveProgressionUnlocked) {
+        @if (hasAutoWaveProgressionUnlocked()) {
             <div
                 class="auto-wave"
-                (click)="enableAutoWaveProgressionAction.emit(!hasAutoWaveProgressionEnabled)"
-            >{{ hasAutoWaveProgressionEnabled }}
+                (click)="enableAutoWaveProgressionAction(!hasAutoWaveProgressionEnabled())"
+            >{{ hasAutoWaveProgressionEnabled() }}
             </div>
         }
     </div>

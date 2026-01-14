@@ -1,8 +1,8 @@
 <section class="equipment">
-    @for (slot of equipmentArray; track slot.name) {
+    @for (slot of equipmentArray(); track slot.name) {
         <app-slot>
             <app-equipment-slot
-                (unequipItem)="unequipItem.emit($event)"
+                (unequipItem)="unequipItem($event)"
                 [item]="Items[slot.item?.id]"
                 [slotName]="slot.name"
                 [tier]="slot.item?.tier"

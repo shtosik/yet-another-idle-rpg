@@ -5,15 +5,15 @@
             class="game-menu__tab"
         >{{ ('gameTabs.' + GameTab[GameTab.main]) | i18next }}
         </li>
-        @if (level > 1) {
+        @if (level() > 1) {
             <li
                 class="game-menu__tab"
                 (click)="changeTab.emit(GameTab.skillTree)"
             >{{ ('gameTabs.' + GameTab[GameTab.skillTree]) | i18next }}
-                @if (skillPoints) {
+                @if (skillPoints()) {
                     <span
                         class="skill-point"
-                    >({{ skillPoints }})</span>
+                    >({{ skillPoints() }})</span>
                 }
             </li>
         }

@@ -1,133 +1,134 @@
-// import {PlayerStatsProps} from "../gameState/storeSlices/playerStats";
-// import {ItemNames} from "./itemsData";
-// import {SkillNames} from "./skillTreesData";
-//
-// export type QuestProps = {
-//     id: number;
-//     name: string;
-//     rewards: Array<StatReward | ItemReward | SkillReward>;
-//     steps: QuestStepProps[];
-// };
-//
-// export type QuestStepProps = {
-//     description: string;
-//     requirement: RequirementProps;
-// };
-//
-// export type RequirementProps = ItemRequirement | WaveKillCountRequirement | EnemyKillCountRequirement | QuestRequirement | StatRequirement;
-//
-// export type StatRequirement = {
-//     type: "stat";
-//     key: keyof PlayerStatsProps;
-//     amount: number;
-//     label: string;
-// };
-// export type QuestRequirement = {
-//     type: "quest";
-//     id: number;
-//     step?: number;
-// };
-//
-// export type ItemRequirement = {
-//     type: "item";
-//     name: ItemNames;
-//     amount: number;
-// };
-//
-// export type WaveKillCountRequirement = {
-//     type: "wave";
-//     zoneId: number;
-//     wave: number;
-//     amount: number;
-// };
-//
-// export type EnemyKillCountRequirement = {
-//     type: "enemy";
-//     id: number;
-//     amount: number;
-// };
-//
-// type StatReward = {
-//     type: "stat";
-//     key: keyof PlayerStatsProps;
-//     amount: number;
-//     label: string;
-// };
-//
-// type ItemReward = {
-//     type: "item";
-//     name: ItemNames;
-//     amount: number;
-// };
-//
-// type SkillReward = {
-//     type: "skill";
-//     name: SkillNames;
-// };
-//
-// // {description: "", requirement: {type: "stat", key: "level", amount:1 }}, first step if no requirements needed to start the quest
-//
-// const QUEST_DATA: QuestProps[] = [
-//     {
-//         id: 0,
-//         name: "Meat shortage",
-//         steps: [
-//             {description: "", requirement: {type: "stat", key: "level", amount: 1, label: "Level"}},
-//             {
-//                 description: "Bartender in La Harpar tavern asked me to bring her 30 crab meat.",
-//                 requirement: {type: "item", name: "Crab Meat", amount: 30},
-//             },
-//         ],
-//         rewards: [
-//             {type: "stat", key: "unspentSkillPoints", amount: 1, label: "Skill Point"},
-//             {type: "stat", key: "experience", amount: 1000, label: "Experience"},
-//             {type: "stat", key: "goldCoins", amount: 200, label: "Gold Coins"},
-//         ],
-//     },
-//     {
-//         id: 1,
-//         name: "Clearing out the beach",
-//         steps: [
-//             {description: "", requirement: {type: "stat", key: "level", amount: 1, label: "Level"}},
-//             {
-//                 description: "I'm supposed to kill 50 enemies on wave 7 on Horseshoe Beach.",
-//                 requirement: {type: "wave", zoneId: 1, wave: 7, amount: 50},
-//             },
-//         ],
-//         rewards: [
-//             {type: "stat", key: "experience", amount: 1500, label: "Experience"},
-//             {type: "stat", key: "goldCoins", amount: 250, label: "Gold Coins"},
-//             {type: "item", name: "Josh's Heirloom", amount: 1},
-//         ],
-//     },
-//     {
-//         id: 2,
-//         name: "Rats, we're rats",
-//         steps: [
-//             {description: "", requirement: {type: "stat", key: "level", amount: 1, label: "Level"}},
-//             {
-//                 description: "La Harpar's trader asked me to get rid of pests in his basement. 50 should be enough.",
-//                 requirement: {type: "enemy", id: 8, amount: 50},
-//             },
-//         ],
-//         rewards: [
-//             {type: "stat", key: "unspentSkillPoints", amount: 1, label: "Skill Point"},
-//             {type: "stat", key: "experience", amount: 1500, label: "Experience"},
-//             {type: "stat", key: "goldCoins", amount: 300, label: "Gold Coins"},
-//         ],
-//     },
-//     {
-//         id: 3,
-//         name: "A tale of a captain",
-//         steps: [
-//             {description: "", requirement: {type: "stat", key: "level", amount: 1, label: "Level"}},
-//             {
-//                 description: "Elara is looking for her father, Captain Theron Tidecaller. I need to find some clues",
-//                 requirement: {type: "item", name: "Captain's letter", amount: 1},
-//             },
-//         ],
-//         rewards: [],
-//     },
-// ];
-//
-// export default QUEST_DATA;
+import { QuestID } from '../enums/ids/quest-id.enum'
+import { PlayerStat } from '../types/player/player-stat.type'
+import { ItemID } from '../enums/ids/item-id.enum'
+import { ZoneID } from '../enums/ids/zone-id.enum'
+import { EnemyID } from '../enums/ids/enemy-id.enum'
+
+export interface QuestProps {
+    questId: QuestID
+    rewards: Array<StatReward | ItemReward>
+    steps: QuestStepProps[]
+}
+
+export type QuestStepProps = {
+    description: string;
+    requirement: RequirementProps;
+};
+
+export type RequirementProps =
+    ItemRequirement
+    | WaveKillCountRequirement
+    | EnemyKillCountRequirement
+    | QuestRequirement
+    | StatRequirement;
+
+export interface StatRequirement {
+    type: 'stat'
+    key: PlayerStat
+    amount: number
+}
+
+export interface QuestRequirement {
+    type: 'quest'
+    questId: QuestID
+    step?: number
+}
+
+export interface ItemRequirement {
+    type: 'item'
+    itemId: ItemID
+    amount: number
+}
+
+export interface WaveKillCountRequirement {
+    type: 'wave'
+    zoneId: ZoneID
+    wave: number
+    amount: number
+}
+
+export interface EnemyKillCountRequirement {
+    type: 'enemy'
+    enemyId: EnemyID
+    amount: number
+}
+
+interface StatReward {
+    type: 'stat'
+    key: PlayerStat
+    amount: number
+}
+
+interface ItemReward {
+    type: 'item'
+    itemId: ItemID
+    amount: number
+}
+
+// interface SkillReward {
+//     type: 'skill'
+//     name: SkillNames
+// }
+
+// {description: "", requirement: {type: "stat", key: "level", amount:1 }}, first step if no requirements needed to start the quest
+
+const QUEST_DATA: Record<QuestID, QuestProps> = {
+    [QuestID.meatShortage]: {
+        questId: QuestID.meatShortage,
+        steps: [
+            { description: '', requirement: { type: 'stat', key: 'level', amount: 1 } },
+            {
+                description: 'Bartender in La Harpar tavern asked me to bring her 30 crab meat.',
+                requirement: { type: 'item', itemId: ItemID.crabMeat, amount: 30 },
+            },
+        ],
+        rewards: [
+            { type: 'stat', key: 'unspentSkillPoints', amount: 1 },
+            { type: 'stat', key: 'experience', amount: 1000 },
+            { type: 'stat', key: 'goldCoins', amount: 200 },
+        ],
+    },
+    [QuestID.clearingOutTheBeach]: {
+        questId: QuestID.clearingOutTheBeach,
+        steps: [
+            { description: '', requirement: { type: 'stat', key: 'level', amount: 1 } },
+            {
+                description: 'I\'m supposed to kill 50 enemies on wave 7 on Horseshoe Beach.',
+                requirement: { type: 'wave', zoneId: 1, wave: 7, amount: 50 },
+            },
+        ],
+        rewards: [
+            { type: 'stat', key: 'experience', amount: 1500 },
+            { type: 'stat', key: 'goldCoins', amount: 250 },
+            { type: 'item', itemId: ItemID.joshsHeirloom, amount: 1 },
+        ],
+    },
+    [QuestID.ratsWereRats]: {
+        questId: QuestID.ratsWereRats,
+        steps: [
+            { description: '', requirement: { type: 'stat', key: 'level', amount: 1 } },
+            {
+                description: 'La Harpar\'s trader asked me to get rid of pests in his basement. 50 should be enough.',
+                requirement: { type: 'enemy', enemyId: EnemyID.rat, amount: 50 },
+            },
+        ],
+        rewards: [
+            { type: 'stat', key: 'unspentSkillPoints', amount: 1 },
+            { type: 'stat', key: 'experience', amount: 1500 },
+            { type: 'stat', key: 'goldCoins', amount: 300 },
+        ],
+    },
+    [QuestID.aTaleOfACaptain]: {
+        questId: QuestID.aTaleOfACaptain,
+        steps: [
+            { description: '', requirement: { type: 'stat', key: 'level', amount: 1 } },
+            {
+                description: 'Elara is looking for her father, Captain Theron Tidecaller. I need to find some clues',
+                requirement: { type: 'item', itemId: ItemID.captainsLetter, amount: 1 },
+            },
+        ],
+        rewards: [],
+    },
+}
+
+export default QUEST_DATA

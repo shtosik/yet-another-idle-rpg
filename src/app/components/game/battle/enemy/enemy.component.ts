@@ -1,5 +1,5 @@
 import { NgOptimizedImage } from '@angular/common'
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core'
+import { ChangeDetectionStrategy, Component, input } from '@angular/core'
 import { Enemy } from 'interfaces/enemy.interface'
 
 @Component({
@@ -11,6 +11,6 @@ import { Enemy } from 'interfaces/enemy.interface'
 })
 
 export class EnemyComponent {
-    @Input() currentEnemy: Enemy
-    @Input() currentEnemyHp: number
+    currentEnemyHp = input<number>()
+    currentEnemy = input<Enemy>()
 }
