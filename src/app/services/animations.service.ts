@@ -1,5 +1,4 @@
-import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Injectable, signal } from '@angular/core'
 
 export interface DamageEvent {
     damage: number;
@@ -8,10 +7,9 @@ export interface DamageEvent {
 
 @Injectable({ providedIn: 'root' })
 export class AnimationsService {
-    private damageEventSubject = new Subject<DamageEvent>();
-    damageEvent$ = this.damageEventSubject.asObservable();
+    damageEvent = signal<DamageEvent>(null)
 
     showDamage(damage: number, isCriticalHit: boolean = false) {
-        this.damageEventSubject.next({ damage, isCriticalHit });
+        this.damageEvent.set({ damage, isCriticalHit })
     }
 }

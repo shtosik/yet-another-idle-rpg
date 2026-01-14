@@ -1,4 +1,4 @@
-import { patchState, signalStore, withMethods, withState } from '@ngrx/signals'
+import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals'
 import { ZoneID } from 'enums/ids/zone-id.enum'
 import { Enemy } from 'interfaces/enemy.interface'
 import { EquippedSpell } from '../../../interfaces/spells/equipped-spell.interface'
@@ -13,12 +13,13 @@ import SPELLS_DATA, { SpellSupportStatBuffEffectProps } from '../../../data/spel
 import { inject } from '@angular/core'
 import { PlayerStore } from '../player/player.store'
 import { withStorageSync } from '@angular-architects/ngrx-toolkit'
+import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
 
 export interface BattleState {
     isInCombat: boolean;
     enemy: Enemy | null;
     currentEnemyHp: number;
-    currentZone: ZoneID;
+    currentZoneId: ZoneID;
     currentWave: number;
     autoWaveProgressionEnabled: boolean;
     equippedSpells: EquippedSpell[];
@@ -29,7 +30,7 @@ export const initialState: BattleState = {
     isInCombat: false,
     enemy: null,
     currentEnemyHp: 0,
-    currentZone: ZoneID.horseshoeBeach,
+    currentZoneId: ZoneID.horseshoeBeach,
     currentWave: 1,
     autoWaveProgressionEnabled: false,
     equippedSpells: [],
@@ -39,14 +40,21 @@ export const initialState: BattleState = {
 export const BattleStore = signalStore(
     { providedIn: 'root' },
     withState(initialState),
+    withGameStateSync('battleStore', initialState),
     withStorageSync({
         key: 'battleStore',
         autoSync: true,
     }),
+    withComputed((store) => ({
+        currentZoneData: () => ZONES_DATA[store.currentZoneId()],
+    })),
+    withComputed((store) => ({
+        requiredKillCountOnCurrentWave: () => store.currentWave() === store.currentZoneData().maxWave ? 1 : store.currentZoneData().enemiesPerWave,
+    })),
     withMethods((store) => ({
         startBattle(): void {
             patchState(store, (state) => {
-                const zoneData = ZONES_DATA[state.currentZone]
+                const zoneData = store.currentZoneData()
                 let enemy: Enemy
 
                 if (state.currentWave !== zoneData.maxWave) {
@@ -57,8 +65,6 @@ export const BattleStore = signalStore(
                 } else {
                     enemy = ENEMIES_DATA[zoneData.bossEnemyId]
                 }
-
-                console.log(enemy)
 
                 return {
                     isInCombat: true,
@@ -74,22 +80,22 @@ export const BattleStore = signalStore(
 
         changeWave(next: boolean): void {
             patchState(store, (state) => {
-                const zoneData = ZONES_DATA[state.currentZone]
+                const zoneData = store.currentZoneData()
 
                 if (next) {
                     const nextZone = zoneData.nextZoneId
                     const isMaxWave = state.currentWave === zoneData.maxWave
-                    const shouldGoNextZone = !!(nextZone && isMaxWave)
+                    const shouldGoNextZone = nextZone && isMaxWave
 
                     const wave = shouldGoNextZone ? 1 : (isMaxWave ? zoneData.maxWave : state.currentWave + 1)
-                    const zone = shouldGoNextZone ? nextZone : state.currentZone
+                    const zone = shouldGoNextZone ? nextZone : state.currentZoneId
 
                     return {
                         currentEnemyHp: 0,
                         enemy: null,
                         isInCombat: false,
                         currentWave: wave,
-                        currentZone: zone,
+                        currentZoneId: zone,
                     }
                 } else {
                     const previousZoneId = zoneData.previousZoneId
@@ -98,14 +104,14 @@ export const BattleStore = signalStore(
                     const shouldGoPreviousZone = !!(previousZoneId && isFirstWave)
 
                     const wave = shouldGoPreviousZone ? previousZoneData.maxWave : (isFirstWave ? state.currentWave : state.currentWave - 1)
-                    const zone = shouldGoPreviousZone ? previousZoneId : state.currentZone
+                    const zone = shouldGoPreviousZone ? previousZoneId : state.currentZoneId
 
                     return {
                         currentEnemyHp: 0,
                         enemy: null,
                         isInCombat: false,
                         currentWave: wave,
-                        currentZone: zone,
+                        currentZoneId: zone,
                     }
                 }
             })

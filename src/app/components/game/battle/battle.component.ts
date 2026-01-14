@@ -1,46 +1,48 @@
 import { CommonModule } from '@angular/common'
-import { AfterViewChecked, ChangeDetectionStrategy, Component, inject, ViewChild } from '@angular/core'
+import { ChangeDetectionStrategy, Component, effect, inject, signal, viewChild } from '@angular/core'
 import { UrlPipe } from 'app/pipes/url.pipe'
 import { SpinnerComponent } from 'app/components/shared/spinner/spinner.component'
-import { BattleNavBarContainer } from './battle-nav-bar/battle-nav-bar.container'
-import { DamagePopupComponent } from '../damage-popup/damage-popup.component'
-import { EnemyContainer } from './enemy/enemy.container'
 import { BattleStore } from '../../../store/battle/battle.store'
 import ZONES_DATA from '../../../../data/zones-data'
+import { BattleNavBarComponent } from './battle-nav-bar/battle-nav-bar.component'
+import { EnemyComponent } from './enemy/enemy.component'
+import { DamagePopupComponent } from '../damage-popup/damage-popup.component'
 
 @Component({
     selector: 'app-battle',
     templateUrl: 'battle.component.html',
     styleUrls: ['./battle.component.sass'],
     imports: [
-        CommonModule, UrlPipe, SpinnerComponent, BattleNavBarContainer,
-        DamagePopupComponent, EnemyContainer,
+        CommonModule, UrlPipe, SpinnerComponent,
+        BattleNavBarComponent, EnemyComponent, DamagePopupComponent,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
-export class BattleComponent implements AfterViewChecked {
+export class BattleComponent {
     battleStore = inject(BattleStore)
+    enemyContainerContainer = viewChild<EnemyComponent>('enemyElement')
 
-    @ViewChild('enemyElement') enemyContainerContainer: EnemyContainer
-
-    currentZoneId = this.battleStore.currentZone
+    currentZoneId = this.battleStore.currentZoneId
     isInCombat = this.battleStore.isInCombat
-    currentEnemy = this.battleStore.enemy
+    currentZoneData = this.battleStore.currentZoneData
 
-    enemyX = 0
-    enemyY = 0
+    enemyPosition = signal({ x: 0, y: 0 })
     protected readonly ZONES_DATA = ZONES_DATA
-    private coordsSet = false
 
-    ngAfterViewChecked() {
-        const nativeEl = this.enemyContainerContainer?.getEnemyNativeElement()
+    constructor() {
+        effect(() => {
+            const enemy = this.enemyContainerContainer()
+            const el = enemy?.getEnemyNativeElement()
 
-        if (!this.coordsSet && nativeEl) {
-            this.coordsSet = true
-            const rect = nativeEl.getBoundingClientRect()
-            this.enemyX = rect.left + rect.width + 10
-            this.enemyY = rect.top + rect.height / 2
-        }
+            if (!el) return
+
+            const rect = el.getBoundingClientRect()
+
+            this.enemyPosition.set({
+                x: rect.left + window.scrollX + rect.width + 10,
+                y: rect.top + window.scrollY + rect.height / 2,
+            })
+        })
     }
 }

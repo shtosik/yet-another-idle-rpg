@@ -1,4 +1,7 @@
-<div class="enemy">
+<div
+    #enemy
+    class="enemy"
+>
     @let percentage = (currentEnemyHp() / currentEnemy().maxHp) * 100;
     @let background = 'linear-gradient(90deg, rgba(255, 0, 0, 1) ' + percentage + '%, rgba(0, 0, 0, 1)' + percentage +
         '%)';

@@ -1,6 +1,6 @@
 import { NgOptimizedImage } from '@angular/common'
-import { ChangeDetectionStrategy, Component, input } from '@angular/core'
-import { Enemy } from 'interfaces/enemy.interface'
+import { ChangeDetectionStrategy, Component, ElementRef, inject, viewChild } from '@angular/core'
+import { BattleStore } from '../../../../store/battle/battle.store'
 
 @Component({
     imports: [NgOptimizedImage],
@@ -11,6 +11,13 @@ import { Enemy } from 'interfaces/enemy.interface'
 })
 
 export class EnemyComponent {
-    currentEnemyHp = input<number>()
-    currentEnemy = input<Enemy>()
+    battleStore = inject(BattleStore)
+    currentEnemyHp = this.battleStore.currentEnemyHp
+    currentEnemy = this.battleStore.enemy
+
+    enemyWindowRef = viewChild<ElementRef>('enemy')
+
+    getEnemyNativeElement(): HTMLElement | null {
+        return this.enemyWindowRef()?.nativeElement || null
+    }
 }

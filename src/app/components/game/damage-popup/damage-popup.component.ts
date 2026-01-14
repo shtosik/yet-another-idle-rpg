@@ -1,5 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core'
-import { Subscription } from 'rxjs'
+import { ChangeDetectionStrategy, Component, effect, inject, Input, signal } from '@angular/core'
 import { AnimationsService } from '../../../services/animations.service'
 
 interface FloatingDamage {
@@ -12,35 +11,38 @@ interface FloatingDamage {
     selector: 'app-damage-popup',
     templateUrl: './damage-popup.component.html',
     styleUrls: ['./damage-popup.component.sass'],
+    changeDetection: ChangeDetectionStrategy.Default,
 })
-export class DamagePopupComponent implements OnInit, OnDestroy {
+export class DamagePopupComponent {
     @Input() x: number
     @Input() y: number
 
-    floatingDamages: FloatingDamage[] = []
-    private sub: Subscription
+    floatingDamages = signal<FloatingDamage[]>([])
     private idCounter = 0
+    private animationsService = inject(AnimationsService)
 
-    constructor(private animationsService: AnimationsService) {
-    }
 
-    ngOnInit() {
-        this.sub = this.animationsService.damageEvent$.subscribe(event => {
+    constructor() {
+        effect(() => {
+            const damageEvent = this.animationsService.damageEvent()
+            if (!damageEvent) return
+
             const id = this.idCounter++
-            this.floatingDamages.push({
+            const newDamage = {
                 id,
-                damage: event.damage,
-                isCriticalHit: !!event.isCriticalHit,
-            })
+                damage: damageEvent.damage,
+                isCriticalHit: !!damageEvent.isCriticalHit,
+            }
 
-            // Remove after animation duration
+            // 2. Use .update() to trigger change detection
+            this.floatingDamages.update(current => [...current, newDamage])
+
+            // 3. Cleanup logic using .update()
             setTimeout(() => {
-                this.floatingDamages = this.floatingDamages.filter(d => d.id !== id)
+                this.floatingDamages.update(current =>
+                    current.filter(d => d.id !== id),
+                )
             }, 1000)
         })
-    }
-
-    ngOnDestroy() {
-        this.sub.unsubscribe()
     }
 }

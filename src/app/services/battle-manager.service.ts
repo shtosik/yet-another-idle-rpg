@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core'
+import { computed, inject, Injectable } from '@angular/core'
 import { BattleStore } from '../store/battle/battle.store'
 import { PlayerStore } from '../store/player/player.store'
 import { AnimationsService } from './animations.service'
@@ -13,6 +13,10 @@ import { Enemy } from '../../interfaces/enemy.interface'
 export class BattleManagerService {
     private battleStore = inject(BattleStore)
     private playerStore = inject(PlayerStore)
+    currentWaveKillCount = computed(() => {
+        const zoneProgression = this.playerStore.zonesProgression()[this.battleStore.currentZoneId()] || {}
+        return zoneProgression[this.battleStore.currentWave()] || 0
+    })
     private animations = inject(AnimationsService)
 
     doDamage(magicDamage = 0, isDoubleAttack = false) {
@@ -85,17 +89,18 @@ export class BattleManagerService {
     }
 
     private handleEnemyDeath(enemy: Enemy) {
-        const zoneId = this.battleStore.currentZone()
+        const zoneId = this.battleStore.currentZoneId()
         const wave = this.battleStore.currentWave()
-
-        console.log(zoneId, wave)
+        const currentKillCount = this.currentWaveKillCount()
 
         this.battleStore.endBattle()
         this.playerStore.processBattleEnd(enemy.id, zoneId, wave)
 
         const isAutoEnabled = this.battleStore.autoWaveProgressionEnabled()
+        const zoneData = this.battleStore.currentZoneData()
+        const isEnoughKillCountToProgress = currentKillCount >= zoneData.enemiesPerWave
 
-        if (isAutoEnabled) {
+        if (isAutoEnabled && isEnoughKillCountToProgress) {
             this.battleStore.changeWave(true)
         }
     }

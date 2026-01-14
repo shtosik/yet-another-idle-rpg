@@ -22,6 +22,7 @@ import { SkillPointID } from '../../../enums/ids/skill-tree-node-id.enum'
 import { SpellID } from '../../../enums/ids/spell-id.enum'
 import { ZoneID } from '../../../enums/ids/zone-id.enum'
 import { withStorageSync } from '@angular-architects/ngrx-toolkit'
+import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
 
 export type PlayerStatsType = Record<PlayerStat, number>;
 
@@ -80,6 +81,7 @@ const calculateEnemyDrops = (enemy: Enemy) => {
 export const PlayerStore = signalStore(
     { providedIn: 'root' },
     withState(initialState),
+    withGameStateSync('playerStore', initialState),
     withStorageSync({
         key: 'playerStore',
         autoSync: true,

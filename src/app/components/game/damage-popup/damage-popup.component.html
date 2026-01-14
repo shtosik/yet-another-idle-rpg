@@ -3,7 +3,8 @@
     [style.left.px]="x"
     [style.top.px]="y"
 >
-    @for (dmg of floatingDamages; track dmg.id) {
+    <!--    {{ floatingDamages[0]?.id }}-->
+    @for (dmg of floatingDamages(); track dmg.id) {
         <div
             class="damage-number"
             [class.critical]="dmg.isCriticalHit"

@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common'
-import { ChangeDetectionStrategy, Component, inject, Input } from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core'
 import { TranslatePipe } from 'app/pipes/i18next.pipe'
-import { ALL_SKILLS } from 'data/skill-tree-data'
+import SkillTreeData, { ALL_SKILLS } from 'data/skill-tree-data'
 import { SkillTreeID } from 'enums/ids/skill-tree-id.enum'
 import { SkillPointID } from 'enums/ids/skill-tree-node-id.enum'
 import { UrlPipe } from '../../../../pipes/url.pipe'
@@ -19,9 +19,8 @@ import { PlayerManagerService } from '../../../../services/player-manager.servic
 export class SkillTreeComponent {
     playerManagerService = inject(PlayerManagerService)
     unlockedSkillPoints = this.playerManagerService.unlockedSkillPoints
-
-    @Input() skillPoints: SkillPointID[][]
-    @Input() skillTreeId: SkillTreeID
+    skillTreeId = input<SkillTreeID>()
+    skillPoints = computed(() => SkillTreeData[this.skillTreeId()].skills)
 
     readonly AllSkills = ALL_SKILLS
     readonly SkillTreeID = SkillTreeID

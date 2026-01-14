@@ -1,6 +1,6 @@
 <section class="skill-tree">
-    <h3 class="skill-tree__title">{{ ('skill-tree:skillTreesNames.' + SkillTreeID[skillTreeId]) | i18next }}</h3>
-    @for (skillRow of skillPoints; track $index) {
+    <h3 class="skill-tree__title">{{ ('skill-tree:skillTreesNames.' + SkillTreeID[skillTreeId()]) | i18next }}</h3>
+    @for (skillRow of skillPoints(); track $index) {
         <div class="skill-tree__row">
             @for (skill of skillRow; track skill) {
                 @let skillData = AllSkills[skill];

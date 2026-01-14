@@ -2,6 +2,7 @@ import { QuestProgression } from '../../../types/quests/quest-progression.type'
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { withStorageSync } from '@angular-architects/ngrx-toolkit'
+import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
 
 export interface QuestState {
     questStepProgression: QuestProgression
@@ -14,6 +15,7 @@ export const initialState: QuestState = {
 export const QuestsStore = signalStore(
     { providedIn: 'root' },
     withState(initialState),
+    withGameStateSync('questsStore', initialState),
     withStorageSync({
         key: 'questsStore',
         autoSync: true,
