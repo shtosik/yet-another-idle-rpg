@@ -12,7 +12,7 @@ import { SpellType } from '../../../enums/spell-type.enum'
 import SPELLS_DATA, { SpellSupportStatBuffEffectProps } from '../../../data/spells-data'
 import { inject } from '@angular/core'
 import { PlayerStore } from '../player/player.store'
-import { withStorageSync } from '@angular-architects/ngrx-toolkit'
+import { withDevtools, withStorageSync } from '@angular-architects/ngrx-toolkit'
 import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
 
 export interface BattleState {
@@ -37,12 +37,15 @@ export const initialState: BattleState = {
     attackInterval: 0,
 }
 
+const STORE_KEY = 'battleStore'
+
 export const BattleStore = signalStore(
     { providedIn: 'root' },
     withState(initialState),
-    withGameStateSync('battleStore', initialState),
+    withGameStateSync(STORE_KEY, initialState),
+    withDevtools(STORE_KEY),
     withStorageSync({
-        key: 'battleStore',
+        key: STORE_KEY,
         autoSync: true,
     }),
     withComputed((store) => ({

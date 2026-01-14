@@ -1,7 +1,7 @@
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals'
 import { TownID } from '../../../enums/map/town-id.enum'
 import { TownBuilding } from '../../../data/towns-data'
-import { withStorageSync } from '@angular-architects/ngrx-toolkit'
+import { withDevtools, withStorageSync } from '@angular-architects/ngrx-toolkit'
 import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
 
 export interface TownsState {
@@ -14,12 +14,15 @@ const initialState: TownsState = {
     selectedTownBuilding: null,
 }
 
+const STORE_KEY = 'townsStore'
+
 export const TownsStore = signalStore(
     { providedIn: 'root' },
     withState(initialState),
-    withGameStateSync('townsStore', initialState),
+    withGameStateSync(STORE_KEY, initialState),
+    withDevtools(STORE_KEY),
     withStorageSync({
-        key: 'townsStore',
+        key: STORE_KEY,
         autoSync: true,
     }),
     withMethods((store) => ({
