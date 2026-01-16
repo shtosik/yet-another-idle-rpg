@@ -3,40 +3,34 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core'
 import { TranslatePipe } from 'app/pipes/i18next.pipe'
 import { EnemyID } from 'enums/ids/enemy-id.enum'
 import { ZoneID } from 'enums/ids/zone-id.enum'
-import { PlayerStore } from '../../../../store/player/player.store'
 import { BattleStore } from '../../../../store/battle/battle.store'
 import { BattleManagerService } from '../../../../services/battle-manager.service'
 
 @Component({
-    selector: 'app-battle-nav-bar',
-    templateUrl: 'battle-nav-bar.component.html',
-    styleUrls: ['./battle-nav-bar.component.sass'],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [CommonModule, TranslatePipe],
+  selector: 'app-battle-nav-bar',
+  templateUrl: 'battle-nav-bar.component.html',
+  styleUrls: ['./battle-nav-bar.component.sass'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [CommonModule, TranslatePipe],
 })
-
 export class BattleNavBarComponent {
-    playerStore = inject(PlayerStore)
-    battleStore = inject(BattleStore)
-    battleManagerService = inject(BattleManagerService)
+  private battleStore = inject(BattleStore)
+  private battleManagerService = inject(BattleManagerService)
 
-    currentWave = this.battleStore.currentWave
-    currentEnemy = this.battleStore.enemy
-    requiredKillCount = this.battleStore.requiredKillCountOnCurrentWave
-    currentZone = this.battleStore.currentZoneData
+  currentWave = this.battleStore.currentWave
+  currentEnemy = this.battleStore.enemy
+  requiredKillCount = this.battleStore.requiredKillCountOnCurrentWave
+  currentZone = this.battleStore.currentZoneData
+  currentKillCount = this.battleManagerService.currentWaveKillCount
 
-    readonly ZoneID = ZoneID
-    readonly EnemyID = EnemyID
+  readonly ZoneID = ZoneID
+  readonly EnemyID = EnemyID
 
-    onNextWave() {
-        this.battleStore.changeWave(true)
-    }
+  onNextWave() {
+    this.battleStore.changeWave(true)
+  }
 
-    onPreviousWave() {
-        this.battleStore.changeWave(false)
-    }
-
-    enableAutoWaveProgressionAction(checked: boolean) {
-        this.battleStore.toggleAutoWave(checked)
-    }
+  onPreviousWave() {
+    this.battleStore.changeWave(false)
+  }
 }

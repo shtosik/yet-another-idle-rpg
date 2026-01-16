@@ -1,5 +1,12 @@
 <footer>
-  <div></div>
+  <div class="active-spells">
+    @for (spell of activeSpells(); track spell.spellId) {
+      @let spellData = SPELLS_DATA[spell.spellId];
+      <div [style]="{ 'background-image': spellData.url | url }">
+        {{ spell.duration }}
+      </div>
+    }
+  </div>
   <div>
     @if (hasAutoWaveProgressionUnlocked()) {
       <button
