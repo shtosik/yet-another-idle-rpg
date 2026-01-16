@@ -1,0 +1,19 @@
+<footer>
+  <div></div>
+  <div>
+    @if (hasAutoWaveProgressionUnlocked()) {
+      <button
+        [class.active]="hasAutoWaveProgressionEnabled()"
+        [class.disabled]="!hasAutoWaveProgressionEnabled()"
+        (click)="enableAutoWaveProgressionAction(!hasAutoWaveProgressionEnabled())"
+      >
+        <img
+          [ngSrc]="'./assets/img/skills/autoWaveProgression.png'"
+          width="32"
+          height="32"
+          alt=""
+          loading="lazy"
+        ></button>
+    }
+  </div>
+</footer>

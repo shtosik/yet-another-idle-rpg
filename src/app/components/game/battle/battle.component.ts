@@ -7,6 +7,7 @@ import ZONES_DATA from '../../../../data/zones-data'
 import { BattleNavBarComponent } from './battle-nav-bar/battle-nav-bar.component'
 import { EnemyComponent } from './enemy/enemy.component'
 import { DamagePopupComponent } from '../damage-popup/damage-popup.component'
+import { BattleFooterComponent } from './battle-footer/battle-footer.component'
 
 @Component({
     selector: 'app-battle',
@@ -14,7 +15,7 @@ import { DamagePopupComponent } from '../damage-popup/damage-popup.component'
     styleUrls: ['./battle.component.sass'],
     imports: [
         CommonModule, UrlPipe, SpinnerComponent,
-        BattleNavBarComponent, EnemyComponent, DamagePopupComponent,
+        BattleNavBarComponent, EnemyComponent, DamagePopupComponent, BattleFooterComponent,
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })

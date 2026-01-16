@@ -8,54 +8,55 @@ import { BattleManagerService } from './battle-manager.service'
 
 @Injectable({ providedIn: 'root' })
 export class PlayerManagerService {
-    private battleStore = inject(BattleStore)
-    private playerStore = inject(PlayerStore)
+  private battleStore = inject(BattleStore)
+  private playerStore = inject(PlayerStore)
 
-    private battleManagerService = inject(BattleManagerService)
+  private battleManagerService = inject(BattleManagerService)
 
-    get playerStats() {
-        return this.playerStore.stats
+  get playerStats() {
+    return this.playerStore.stats
+  }
+
+  get unlockedSkillPoints() {
+    return this.playerStore.unlockedSkillPoints
+  }
+
+  buySkillPoint(id: SkillPointID, buyMax: boolean) {
+    const skillData = ALL_SKILLS[id]
+    const stats = this.playerStore.stats()
+    const unlocked = this.playerStore.unlockedSkillPoints()
+    const currentEquippedSpells = this.battleStore.equippedSpells()
+
+    const currentLevel = unlocked[id] || 0
+    if (stats.unspentSkillPoints < skillData.skillPointCost || currentLevel >= skillData.maxLevel) {
+      return
     }
 
-    get unlockedSkillPoints() {
-        return this.playerStore.unlockedSkillPoints
+    const pointsToBuy = buyMax
+      ? Math.min(skillData.maxLevel - currentLevel, Math.floor(stats.unspentSkillPoints / skillData.skillPointCost))
+      : 1
+
+    this.playerStore.updatePlayerStats([
+      { stat: 'unspentSkillPoints', amount: -(pointsToBuy * skillData.skillPointCost) },
+    ])
+
+    if (skillData.type === SkillPointType.stat) {
+      this.playerStore.updatePlayerStats([
+        { stat: skillData.stat, amount: skillData.statAmount * pointsToBuy },
+      ])
     }
 
-    buySkillPoint(id: SkillPointID, buyMax: boolean) {
-        const skillData = ALL_SKILLS[id]
-        const stats = this.playerStore.stats()
-        const unlocked = this.playerStore.unlockedSkillPoints()
-        const currentEquippedSpells = this.battleStore.equippedSpells()
+    this.playerStore.updateUnlockedSkillPoints(id, pointsToBuy)
 
-        const currentLevel = unlocked[id] || 0
-        if (stats.unspentSkillPoints < skillData.skillPointCost || currentLevel >= skillData.maxLevel) {
-            return
-        }
+    console.log(skillData)
 
-        const pointsToBuy = buyMax
-            ? Math.min(skillData.maxLevel - currentLevel, Math.floor(stats.unspentSkillPoints / skillData.skillPointCost))
-            : 1
+    if (skillData.type === SkillPointType.spell) {
+      this.playerStore.levelUpSpell(skillData.spellId)
 
-        // 3. Orchestrate changes across multiple stores
-        this.playerStore.updatePlayerStats([
-            { stat: 'unspentSkillPoints', amount: -(pointsToBuy * skillData.skillPointCost) },
-        ])
-
-        if (skillData.type === SkillPointType.stat) {
-            this.playerStore.updatePlayerStats([
-                { stat: skillData.stat, amount: skillData.statAmount * pointsToBuy },
-            ])
-        }
-
-        this.playerStore.updateUnlockedSkillPoints(id, pointsToBuy)
-
-        if (skillData.type === SkillPointType.spell) {
-            this.playerStore.levelUpSpell(skillData.spellId)
-
-            const alreadyEquipped = currentEquippedSpells.some(s => s.spellId === skillData.spellId)
-            if (!alreadyEquipped && currentEquippedSpells.length < 5) {
-                this.battleManagerService.equipSpell(skillData.spellId)
-            }
-        }
+      const alreadyEquipped = currentEquippedSpells.some(s => s.spellId === skillData.spellId)
+      if (!alreadyEquipped && currentEquippedSpells.length < 5) {
+        this.battleManagerService.equipSpell(skillData.spellId)
+      }
     }
+  }
 }

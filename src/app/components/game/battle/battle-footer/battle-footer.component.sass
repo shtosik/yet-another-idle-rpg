@@ -1,0 +1,35 @@
+@use 'variables' as variables
+
+footer
+  display: flex
+  justify-content: space-between
+  padding: 0 1rem
+
+  button
+    padding: 0
+    margin: 0
+    width: 40px
+    height: 40px
+    border: 1px solid #1a1a1a
+    border-radius: 4px
+    cursor: pointer
+    transition: background-color 0.2s ease
+    box-shadow: variables.$panelShadow
+    background-color: #39383f
+    display: flex
+    align-items: center
+    justify-content: center
+
+    &:hover
+      filter: brightness(0.9)
+
+    &.active
+      background-color: #2c7528
+
+    img
+      object-fit: contain
+      transition: transform 0.15s ease
+
+    &:active
+      img
+        transform: scale(0.9)

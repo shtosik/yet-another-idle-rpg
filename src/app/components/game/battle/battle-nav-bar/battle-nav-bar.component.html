@@ -24,12 +24,5 @@
                 </button>
             }
         </div>
-        @if (hasAutoWaveProgressionUnlocked()) {
-            <div
-                class="auto-wave"
-                (click)="enableAutoWaveProgressionAction(!hasAutoWaveProgressionEnabled())"
-            >{{ hasAutoWaveProgressionEnabled() }}
-            </div>
-        }
     </div>
 </div>
