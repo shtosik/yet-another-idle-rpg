@@ -42,11 +42,11 @@ const SPELLS_DATA: Record<SpellID, SpellProps> = {
   [SpellID.haste]: {
     id: 1,
     baseManaCost: 5,
-    baseCooldown: 10,
+    baseCooldown: 300,
     url: './assets/img/skills/haste.png',
     effect: {
       type: SpellType.buff,
-      duration: 5,
+      duration: 60,
       stat: 'attackSpeed',
       amount: 0.3,
     },

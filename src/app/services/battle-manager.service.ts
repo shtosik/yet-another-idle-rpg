@@ -26,9 +26,14 @@ export class BattleManagerService {
 
   canMoveToNextWave = computed(() => {
     const zoneData = this.battleStore.currentZoneData()
-    const requiredKillCount = this.battleStore.currentWave() === zoneData.maxWave ? 1 : zoneData.enemiesPerWave
+    const isCurrentWaveLast = this.battleStore.currentWave() === zoneData.maxWave
+    const requiredKillCount = isCurrentWaveLast ? 1 : zoneData.enemiesPerWave
 
-    return zoneData.nextZoneId && this.currentWaveKillCount() >= requiredKillCount
+    if (isCurrentWaveLast) {
+      return zoneData.nextZoneId && this.currentWaveKillCount() >= requiredKillCount
+    }
+
+    return this.currentWaveKillCount() >= requiredKillCount
   })
 
   doDamage(magicDamage = 0, isDoubleAttack = false) {
@@ -103,11 +108,12 @@ export class BattleManagerService {
   private handleEnemyDeath(enemy: Enemy) {
     const zoneId = this.battleStore.currentZoneId()
     const wave = this.battleStore.currentWave()
-    const currentKillCount = this.currentWaveKillCount()
 
     this.battleStore.endBattle()
     this.playerStore.processBattleEnd(enemy.id, zoneId, wave)
 
+
+    const currentKillCount = this.currentWaveKillCount()
     const isAutoEnabled = this.battleStore.autoWaveProgressionEnabled()
     const zoneData = this.battleStore.currentZoneData()
     const isEnoughKillCountToProgress = currentKillCount >= zoneData.enemiesPerWave

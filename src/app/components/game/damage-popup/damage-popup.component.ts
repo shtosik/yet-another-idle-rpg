@@ -2,47 +2,48 @@ import { ChangeDetectionStrategy, Component, effect, inject, Input, signal } fro
 import { AnimationsService } from '../../../services/animations.service'
 
 interface FloatingDamage {
-    id: number;
-    damage: number;
-    isCriticalHit: boolean;
+  id: number // for tracking in template loop
+  damage: number;
+  isCriticalHit: boolean;
 }
 
 @Component({
-    selector: 'app-damage-popup',
-    templateUrl: './damage-popup.component.html',
-    styleUrls: ['./damage-popup.component.sass'],
-    changeDetection: ChangeDetectionStrategy.Default,
+  selector: 'app-damage-popup',
+  templateUrl: './damage-popup.component.html',
+  styleUrls: ['./damage-popup.component.sass'],
+  changeDetection: ChangeDetectionStrategy.Default,
 })
 export class DamagePopupComponent {
-    @Input() x: number
-    @Input() y: number
+  @Input() x: number
+  @Input() y: number
 
-    floatingDamages = signal<FloatingDamage[]>([])
-    private idCounter = 0
-    private animationsService = inject(AnimationsService)
+  floatingDamages = signal<FloatingDamage[]>([])
+  private animationsService = inject(AnimationsService)
+  private idCounter: number = 0
 
+  constructor() {
+    effect(() => {
+      const damageEvent = this.animationsService.damageEvent()
+      if (!damageEvent) return
 
-    constructor() {
-        effect(() => {
-            const damageEvent = this.animationsService.damageEvent()
-            if (!damageEvent) return
+      const newDamage = {
+        id: this.idCounter,
+        damage: damageEvent.damage,
+        isCriticalHit: !!damageEvent.isCriticalHit,
+      }
 
-            const id = this.idCounter++
-            const newDamage = {
-                id,
-                damage: damageEvent.damage,
-                isCriticalHit: !!damageEvent.isCriticalHit,
-            }
+      this.idCounter++
 
-            // 2. Use .update() to trigger change detection
-            this.floatingDamages.update(current => [...current, newDamage])
+      if (this.idCounter >= 100) this.idCounter = 0
 
-            // 3. Cleanup logic using .update()
-            setTimeout(() => {
-                this.floatingDamages.update(current =>
-                    current.filter(d => d.id !== id),
-                )
-            }, 1000)
+      this.floatingDamages.update(current => [...current, newDamage])
+
+      setTimeout(() => {
+        this.floatingDamages.update(current => {
+          current.shift()
+          return current
         })
-    }
+      }, 1000)
+    })
+  }
 }

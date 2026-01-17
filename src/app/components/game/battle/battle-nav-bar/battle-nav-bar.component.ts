@@ -18,19 +18,10 @@ export class BattleNavBarComponent {
   private battleManagerService = inject(BattleManagerService)
 
   currentWave = this.battleStore.currentWave
-  currentEnemy = this.battleStore.enemy
   requiredKillCount = this.battleStore.requiredKillCountOnCurrentWave
   currentZone = this.battleStore.currentZoneData
   currentKillCount = this.battleManagerService.currentWaveKillCount
 
   readonly ZoneID = ZoneID
   readonly EnemyID = EnemyID
-
-  onNextWave() {
-    this.battleStore.changeWave(true)
-  }
-
-  onPreviousWave() {
-    this.battleStore.changeWave(false)
-  }
 }
