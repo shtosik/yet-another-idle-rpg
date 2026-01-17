@@ -2,22 +2,28 @@ import { QuestID } from '../../enums/ids/quest-id.enum'
 import { PlayerStat } from '../player/player-stat.type'
 
 export type DialogueEffect =
-    | QuestEffect
-    | StatEffect
-    | ShopEffect
+  | QuestEffect
+  | StatEffect
+  | ShopEffect
+  | DialogueFlagEffect
 
-interface QuestEffect {
-    type: 'quest'
-    questId: QuestID
-    action: 'start' | 'advance' | 'end'
+export interface QuestEffect {
+  type: 'quest'
+  questId: QuestID
+  action: 'start' | 'advance' | 'end'
 }
 
-interface StatEffect {
-    type: 'stat'
-    stats: { key: PlayerStat, amount: number }[]
+export interface StatEffect {
+  type: 'stat'
+  stats: { stat: PlayerStat, amount: number }[]
 }
 
-interface ShopEffect {
-    type: 'shop'
-    shopId: number
+export interface ShopEffect {
+  type: 'shop'
+  shopId: number
+}
+
+export interface DialogueFlagEffect {
+  type: 'flag'
+  name: string
 }

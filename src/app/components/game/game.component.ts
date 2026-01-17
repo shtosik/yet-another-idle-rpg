@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core'
 import { PanelComponent } from '../shared/panel/panel.component'
 import { BehaviorSubject } from 'rxjs'
 import { GameTab } from 'enums/ids/game-tab.enum'
@@ -17,51 +17,59 @@ import { SkillTreesComponent } from './skill-trees/skill-trees.component'
 import { BattleStore } from '../../store/battle/battle.store'
 import { QuestsStore } from '../../store/quests/quests.store'
 import { TownsStore } from '../../store/towns/towns.store'
+import { DialogueManagerService } from '../../services/dialogue-manager.service'
+import { DialogueComponent } from './dialogue/dialogue.component'
 
 const imports = [
-    PanelComponent,
-    AsyncPipe,
-    CommonModule,
-    TownsComponent,
-    InventoryWindow,
-    EquipmentComponent,
-    CraftingComponent,
-    PlayerStatsComponent,
-    GameMenuComponent,
-    SpellsComponent,
-    BattleComponent,
-    SkillTreesComponent,
+  PanelComponent,
+  AsyncPipe,
+  CommonModule,
+  TownsComponent,
+  InventoryWindow,
+  EquipmentComponent,
+  CraftingComponent,
+  PlayerStatsComponent,
+  GameMenuComponent,
+  SpellsComponent,
+  BattleComponent,
+  SkillTreesComponent,
 ]
 
 @Component({
-    selector: 'app-game',
-    templateUrl: 'game.component.html',
-    styleUrls: ['./game.component.sass'],
+  selector: 'app-game',
+  templateUrl: 'game.component.html',
+  styleUrls: ['./game.component.sass'],
+  imports: [
     imports,
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    DialogueComponent,
+  ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 
 export class GameComponent {
-    playerStore = inject(PlayerStore)
-    battleStore = inject(BattleStore)
-    questsStore = inject(QuestsStore)
-    townsStore = inject(TownsStore)
-    gameTab = new BehaviorSubject<GameTab>(GameTab.main)
+  playerStore = inject(PlayerStore)
+  battleStore = inject(BattleStore)
+  questsStore = inject(QuestsStore)
+  townsStore = inject(TownsStore)
+  dialogueManagerService = inject(DialogueManagerService)
+  gameTab = new BehaviorSubject<GameTab>(GameTab.main)
 
-    readonly GameTab = GameTab
+  hasDialogueActive = computed(() => this.dialogueManagerService.activeNpc())
 
-    resetState() {
-        this.playerStore.resetState()
-        this.battleStore.resetState()
-        this.questsStore.resetState()
-        this.townsStore.resetState()
-    }
+  readonly GameTab = GameTab
 
-    changeTab(tab: GameTab) {
-        this.gameTab.next(tab)
-    }
+  resetState() {
+    this.playerStore.resetState()
+    this.battleStore.resetState()
+    this.questsStore.resetState()
+    this.townsStore.resetState()
+  }
 
-    giveStat(stat: PlayerStat) {
-        this.playerStore.updatePlayerStats([{ stat, amount: 1000 }])
-    }
+  changeTab(tab: GameTab) {
+    this.gameTab.next(tab)
+  }
+
+  giveStat(stat: PlayerStat) {
+    this.playerStore.updatePlayerStats([{ stat, amount: 1000 }])
+  }
 }

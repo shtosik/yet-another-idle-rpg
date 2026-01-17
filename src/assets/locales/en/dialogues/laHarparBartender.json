@@ -1,41 +1,41 @@
 {
-    "introduction1": {
-        "message": "Oi, you! Quick, what do you want?! Can't you see how busy this place is?",
-        "opt1": "Looks quite empty to me.",
-        "opt2": "I'm sorry, I have a few questions, if you may."
-    },
-    "introduction2": {
-        "message": "I'll remember your face, smartass. Next order is gonna cost you more.",
-        "opt1": "I'm sorry, I have a few questions, if you may."
-    },
-    "default": {
-        "message": "Ask away, my answers have prices though.",
-        "beer": "I'm going to need a beer to forget what I did.",
-        "whatIsThisPlace": "What is this place?",
-        "anyWork": "Do you have any work for me?",
-        "anyTrainer": "Do you know anyone who could train me?",
-        "goodbye": "That's all for now. Have a good day."
-    },
-    "whatIsThisPlace1": {
-        "message": "A tavern. Are you blind? That will be 20 coins well spent.",
-        "opt1": "Well, can't argue with that."
-    },
-    "anyWorkForMe1": {
-        "message": "Yes! All those lazy rats hanging out here made me run out of crab meat...",
-        "accept": "I'm on it, boss.",
-        "decline": "I think I'll pass. (You will have to pay again if you change your mind)"
-    },
-    "anyoneWhoCanTrainMe1": {
-        "message": "I think Marvin specializes in combat training...",
-        "opt1": "Thanks. I'll look for him.",
-        "opt2": "More gold hungry than you? I don't think that's possible."
-    },
-    "anyoneWhoCanTrainMe2": {
-        "message": "Hmmph. Go away.",
-        "opt1": "..."
-    },
-    "anyWorkForMe2": {
-        "message": "Nothing new currently. Check again later.",
-        "opt1": "Cheers."
-    }
+  "introduction1": {
+    "message": "Oi, you! Quick, what do you want?! Can't you see how busy this place is?",
+    "opt1": "Looks quite empty to me.",
+    "opt2": "My apologies. I have a few questions, if you don't mind."
+  },
+  "introduction2": {
+    "message": "I'll remember your face, smartass. Your next order is going to cost you double.",
+    "opt1": "I'm sorry. I have a few questions, if you're available."
+  },
+  "default": {
+    "message": "Ask away, though my answers aren't free.",
+    "meatShortage": "Here is the meat you requested.",
+    "whatIsThisPlace": "What is this place exactly?",
+    "anyWork": "Do you have any work for me?",
+    "anyTrainer": "Do you know anyone who could train me?",
+    "goodbye": "That's all for now. Have a good day."
+  },
+  "whatIsThisPlace1": {
+    "message": "A tavern. Are you blind? That'll be 20 coins for the enlightenment. Money well spent, I'd say.",
+    "opt1": "Well, I can't argue with that."
+  },
+  "anyWorkForMe1": {
+    "message": "Actually, yes! All those lazy rats hanging out here made me run out of crab meat. Bring me some and I'll make it worth your while.",
+    "accept": "I'm on it, boss.",
+    "decline": "I think I'll pass. (You will have to pay again if you change your mind)"
+  },
+  "anyoneWhoCanTrainMe1": {
+    "message": "I believe Marvin specializes in combat training. You can usually find him nearby.",
+    "opt1": "Thanks. I'll go look for him.",
+    "opt2": "Is he more gold-hungry than you? I don't think that's possible."
+  },
+  "anyoneWhoCanTrainMe2": {
+    "message": "Hmph. Just get out of my sight.",
+    "opt1": "..."
+  },
+  "anyWorkForMe2": {
+    "message": "Nothing new at the moment. Check back with me later.",
+    "opt1": "Cheers."
+  }
 }

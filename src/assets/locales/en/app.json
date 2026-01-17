@@ -1,27 +1,27 @@
 {
-    "playerStats": {
-        "attackSpeed": "Attack Speed",
-        "attackPower": "Attack Power",
-        "mana": "Mana",
-        "critChance": "Crit Chance",
-        "critMulti": "Crit Multiplier",
-        "experience": "XP",
-        "level": "Level",
-        "xpMultiplier": "XP Multiplier",
-        "gold": "Gold",
-        "goldCoinsMultiplier": "Gold Multiplier",
-        "skillPoints": "Skill points"
-    },
-    "wave": "Wave",
-    "killCount": "Kill count",
-    "gameTabs": {
-        "main": "Battle",
-        "skillTree": "Skill tree",
-        "crafting": "Crafting",
-        "towns": "Towns"
-    },
-    "starts": "Starts",
-    "requires": "Requires",
-    "costs": "Costs",
-    "quest": "Quest"
+  "playerStats": {
+    "attackSpeed": "Attack Speed",
+    "attackPower": "Attack Power",
+    "mana": "Mana",
+    "critChance": "Crit Chance",
+    "critMulti": "Crit Multiplier",
+    "experience": "XP",
+    "level": "Level",
+    "xpMultiplier": "XP Multiplier",
+    "goldCoins": "Gold",
+    "goldCoinsMultiplier": "Gold Multiplier",
+    "skillPoints": "Skill points"
+  },
+  "wave": "Wave",
+  "killCount": "Kill count",
+  "gameTabs": {
+    "main": "Battle",
+    "skillTree": "Skill tree",
+    "crafting": "Crafting",
+    "towns": "Towns"
+  },
+  "starts": "Starts",
+  "requires": "Requires",
+  "costs": "Costs",
+  "quest": "Quest"
 }

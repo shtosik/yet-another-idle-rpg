@@ -1,0 +1,65 @@
+@use 'variables'
+
+:host
+  position: absolute
+  top: 47%
+  right: 1rem
+  transform: translateY(-50%)
+
+  aside
+    display: flex
+    flex-direction: column
+    gap: 0.5rem
+
+  .wave-button
+    border: none
+    background: none
+    cursor: pointer
+    transition: filter 0.2s ease-in-out
+
+    &:hover
+      filter: brightness(90%)
+
+    &:active
+      img
+        transform: scale(0.8)
+
+    img
+      object-fit: contain
+      transition: transform .2s ease-in-out
+
+    &.hidden
+      visibility: hidden
+
+  .auto-button
+    padding: 0
+    margin: 0
+    width: 32px
+    height: 32px
+    border: 1px solid #1a1a1a
+    border-radius: 4px
+    cursor: pointer
+    transition: background-color, filter 0.2s ease
+    box-shadow: variables.$panelShadow
+    background-color: #39383f
+    display: flex
+    align-items: center
+    justify-content: center
+    filter: brightness(0.7)
+
+    &:hover
+      filter: brightness(0.9)
+
+    &.active
+      background-color: #2c7528
+
+      &:not(:hover)
+        filter: none
+
+    img
+      object-fit: contain
+      transition: transform 0.15s ease
+
+    &:active
+      img
+        transform: scale(0.9)

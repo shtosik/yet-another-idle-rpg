@@ -2,31 +2,32 @@
 @use 'variables' as vars
 
 .damage-container
-    position: absolute
+  position: absolute
+  top: 50%
+  right: 25%
 
 @keyframes floatMove
-    0%
-        transform: translateX(-50%) translate(0, 0) scale(1)
-    100%
-        transform: translateX(-50%) translate(40px, -80px) scale(1.2)
+  0%
+    transform: translateX(-50%) translate(0, 0) scale(1)
+  100%
+    transform: translateX(-50%) translate(20px, -100px) scale(1.2)
 
 @keyframes fadeOut
-    0%
-        opacity: 1
-    75%
-        opacity: 1
-    100%
-        opacity: 0
+  0%
+    opacity: 1
+  75%
+    opacity: 1
+  100%
+    opacity: 0
 
 .damage-number
-    position: absolute
-    font-size: 20px
-    font-weight: bold
-    pointer-events: none
-    animation: floatMove 1s ease-out forwards, fadeOut 1s ease-out forwards
-    color: palette.$yellow
-    text-shadow: vars.$textShadow
+  font-size: 24px
+  font-weight: bold
+  pointer-events: none
+  animation: floatMove 1s ease-out forwards, fadeOut 1s ease-out forwards
+  color: palette.$yellow
+  text-shadow: vars.$textShadow
 
-    &.critical
-        font-size: 28px
-        color: #ff4444
+  &.critical
+    font-size: 28px
+    color: #ff4444

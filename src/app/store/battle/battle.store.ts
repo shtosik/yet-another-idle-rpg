@@ -166,7 +166,6 @@ export const BattleStore = signalStore(
       const statsToDecrement: { stat: PlayerStat, amount: number }[] = []
 
       const updatedSpells = spells.map(spell => {
-        console.log(spell)
         const s = { ...spell }
         if (s.cooldown > 0) s.cooldown--
 

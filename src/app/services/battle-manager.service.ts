@@ -11,97 +11,109 @@ import { Enemy } from '../../interfaces/enemy.interface'
 
 @Injectable({ providedIn: 'root' })
 export class BattleManagerService {
-    private battleStore = inject(BattleStore)
-    private playerStore = inject(PlayerStore)
-    currentWaveKillCount = computed(() => {
-        const zoneProgression = this.playerStore.zonesProgression()[this.battleStore.currentZoneId()] || {}
-        return zoneProgression[this.battleStore.currentWave()] || 0
-    })
-    private animations = inject(AnimationsService)
+  private battleStore = inject(BattleStore)
+  private playerStore = inject(PlayerStore)
+  private animations = inject(AnimationsService)
 
-    doDamage(magicDamage = 0, isDoubleAttack = false) {
-        const stats = this.playerStore.stats()
-        const enemyHp = this.battleStore.currentEnemyHp()
-        const enemy = this.battleStore.enemy()
-        const hasSpellCritUnlocked = this.playerStore.hasSkillUnlocked(SkillPointID.spellCrit) // Generic getter we made earlier
+  currentWaveKillCount = computed(() => {
+    const zoneProgression = this.playerStore.zonesProgression()[this.battleStore.currentZoneId()] || {}
+    return zoneProgression[this.battleStore.currentWave()] || 0
+  })
 
-        if (!enemy) return
+  canMoveToPreviousWave = computed(() => {
+    return this.battleStore.currentZoneData().previousZoneId || this.battleStore.currentWave() !== 1
+  })
 
-        let damage = magicDamage > 0 ? (magicDamage + stats.magicDamage) : stats.attackPower
+  canMoveToNextWave = computed(() => {
+    const zoneData = this.battleStore.currentZoneData()
+    const requiredKillCount = this.battleStore.currentWave() === zoneData.maxWave ? 1 : zoneData.enemiesPerWave
 
-        const isMagic = magicDamage > 0
-        const shouldRollCrit = stats.critChance > 0 && (!isMagic || hasSpellCritUnlocked)
-        let isCrit = false
+    return zoneData.nextZoneId && this.currentWaveKillCount() >= requiredKillCount
+  })
 
-        if (shouldRollCrit && (Math.random() * 100 <= stats.critChance)) {
-            isCrit = true
-            damage = Math.ceil(damage * stats.critMulti)
-        }
+  doDamage(magicDamage = 0, isDoubleAttack = false) {
+    const stats = this.playerStore.stats()
+    const enemyHp = this.battleStore.currentEnemyHp()
+    const enemy = this.battleStore.enemy()
+    const hasSpellCritUnlocked = this.playerStore.hasSkillUnlocked(SkillPointID.spellCrit) // Generic getter we made earlier
 
-        if (isDoubleAttack) damage *= 2
+    if (!enemy) return
 
-        const newHp = Math.max(0, enemyHp - damage)
-        this.battleStore.updateEnemyHp(newHp)
-        this.animations.showDamage(damage, isCrit)
+    let damage = magicDamage > 0 ? (magicDamage + stats.magicDamage) : stats.attackPower
 
-        if (newHp === 0) {
-            this.handleEnemyDeath(enemy)
-        }
+    const isMagic = magicDamage > 0
+    const shouldRollCrit = stats.critChance > 0 && (!isMagic || hasSpellCritUnlocked)
+    let isCrit = false
+
+    if (shouldRollCrit && (Math.random() * 100 <= stats.critChance)) {
+      isCrit = true
+      damage = Math.ceil(damage * stats.critMulti)
     }
 
-    castSpell(spellId: SpellID) {
-        const spellData = SPELLS_DATA[spellId]
-        const stats = this.playerStore.stats()
+    if (isDoubleAttack) damage *= 2
 
-        const cooldown = spellData.baseCooldown - stats.spellCooldownReduction
-        const duration = spellData.effect.type === SpellType.buff
-            ? (spellData.effect.duration + stats.increasedSpellDuration)
-            : 0
+    const newHp = Math.max(0, enemyHp - damage)
+    this.battleStore.updateEnemyHp(newHp)
+    this.animations.showDamage(damage, isCrit)
 
-        this.battleStore.updateSpellCooldown(spellId, cooldown, duration)
+    if (newHp === 0) {
+      this.handleEnemyDeath(enemy)
+    }
+  }
 
-        if (spellId === SpellID.doubleAttack) {
-            this.doDamage(0, true)
-        } else if (spellData.effect.type === SpellType.buff) {
-            this.playerStore.updatePlayerStats([{ stat: spellData.effect.stat, amount: spellData.effect.amount }])
-        } else if (spellData.effect.type === SpellType.magic) {
-            this.doDamage(spellData.effect.baseDamage)
-        }
+  castSpell(spellId: SpellID) {
+    const spellData = SPELLS_DATA[spellId]
+    const stats = this.playerStore.stats()
+
+    const cooldown = spellData.baseCooldown - stats.spellCooldownReduction
+    const duration = spellData.effect.type === SpellType.buff
+      ? (spellData.effect.duration + stats.increasedSpellDuration)
+      : 0
+
+    this.battleStore.updateSpellCooldown(spellId, cooldown, duration)
+
+    if (spellId === SpellID.doubleAttack) {
+      this.doDamage(0, true)
+    } else if (spellData.effect.type === SpellType.buff) {
+      this.playerStore.updatePlayerStats([{ stat: spellData.effect.stat, amount: spellData.effect.amount }])
+    } else if (spellData.effect.type === SpellType.magic) {
+      this.doDamage(spellData.effect.baseDamage)
+    }
+  }
+
+  equipSpell(spellId: SpellID) {
+    const spellData = SPELLS_DATA[spellId]
+
+    const currentSpells = this.battleStore.equippedSpells()
+    if (currentSpells.find(s => s.spellId === spellId)) return
+
+    const spellToEquip: EquippedSpell = {
+      spellId,
+      spellType: spellData.effect.type,
+      cooldown: 0,
     }
 
-    equipSpell(spellId: SpellID) {
-        const spellData = SPELLS_DATA[spellId]
-
-        const currentSpells = this.battleStore.equippedSpells()
-        if (currentSpells.find(s => s.spellId === spellId)) return
-
-        const spellToEquip: EquippedSpell = {
-            spellId,
-            spellType: spellData.effect.type,
-            cooldown: 0,
-        }
-
-        if (spellData.effect.type === SpellType.buff) {
-            spellToEquip.duration = 0
-        }
-
-        this.battleStore.addSpell(spellToEquip)
+    if (spellData.effect.type === SpellType.buff) {
+      spellToEquip.duration = 0
     }
 
-    private handleEnemyDeath(enemy: Enemy) {
-        const zoneId = this.battleStore.currentZoneId()
-        const wave = this.battleStore.currentWave()
-        const currentKillCount = this.currentWaveKillCount()
+    this.battleStore.addSpell(spellToEquip)
+  }
 
-        this.battleStore.endBattle()
-        this.playerStore.processBattleEnd(enemy.id, zoneId, wave)
+  private handleEnemyDeath(enemy: Enemy) {
+    const zoneId = this.battleStore.currentZoneId()
+    const wave = this.battleStore.currentWave()
+    const currentKillCount = this.currentWaveKillCount()
 
-        const isAutoEnabled = this.battleStore.autoWaveProgressionEnabled()
-        const zoneData = this.battleStore.currentZoneData()
-        const isEnoughKillCountToProgress = currentKillCount >= zoneData.enemiesPerWave
+    this.battleStore.endBattle()
+    this.playerStore.processBattleEnd(enemy.id, zoneId, wave)
 
-        if (isAutoEnabled && isEnoughKillCountToProgress) {
-            this.battleStore.changeWave(true)
-        }
+    const isAutoEnabled = this.battleStore.autoWaveProgressionEnabled()
+    const zoneData = this.battleStore.currentZoneData()
+    const isEnoughKillCountToProgress = currentKillCount >= zoneData.enemiesPerWave
+
+    if (isAutoEnabled && isEnoughKillCountToProgress) {
+      this.battleStore.changeWave(true)
     }
+  }
 }

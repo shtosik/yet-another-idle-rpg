@@ -1,0 +1,66 @@
+@let npc = activeNpc();
+@let currentNode = activeNode();
+
+<section class="dialogue-modal">
+  <!--  <app-close-button (onClose)="dialogueService.closeDialogue()"/>-->
+
+  @if (npc && currentNode) {
+    <div class="dialogue-modal__wrapper">
+      <div class="dialogue-modal__content">
+        <h2 class="dialogue-modal__npc-name">
+          {{ 'npc:names.' + NpcID[npc.id] | i18next }}
+        </h2>
+        <p class="dialogue-modal__npc-message">
+          {{ currentNode.messageKey | i18next }}
+        </p>
+      </div>
+
+      <img
+        class="dialogue-modal__npc-image"
+        alt="NPC Portrait"
+        height="100"
+        width="100"
+        loading="lazy"
+        [ngSrc]="npc.url"
+      >
+    </div>
+
+    <ul class="dialogue-modal__options">
+      @for (option of currentNode.options; track option.responseKey) {
+        @if (isOptionVisible(option)) {
+          <li
+            class="dialogue-modal__option-btn"
+            (click)="handleOptionClicked(option)"
+          >
+            <span class="option-text">{{ option.responseKey | i18next }}</span>
+
+            <div class="option-meta">
+              @let result = getActiveResult(option);
+
+              @if (result?.requirementsNeeded) {
+                @for (cond of result.requirementsNeeded; track $index) {
+                  <span class="meta-tag requirement">[{{ getConditionLabel(cond) }}]</span>
+                }
+              }
+
+              @if (result?.effects) {
+                @for (eff of result.effects; track $index) {
+                  @let label = getEffectLabel(eff);
+                  @if (label) {
+                    <span
+                      class="meta-tag"
+                      [class.effect-quest]="eff.type === 'quest'"
+                      [class.effect-stat]="eff.type === 'stat'"
+                    >
+           [{{ label }}]
+         </span>
+                  }
+                }
+              }
+            </div>
+          </li>
+        }
+      }
+    </ul>
+  }
+</section>

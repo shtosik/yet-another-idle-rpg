@@ -1,69 +1,70 @@
 {
-    "greeting": {
-        "message": "What do you want? Don't bother me.",
-        "opt1": "Just wanted to ask few questions about this place.",
-        "opt2": "Nothing..."
-    },
-    "beerRequest": {
-        "message": "Pay for my next beer and I'll talk to you.",
-        "opt1": "Okay, here is 20 gold coins.",
-        "opt2": "I'll pass, you can buy one yourself."
-    },
-    "talkIntro": {
-        "message": "Haha, that's what I'm talking about! Now we can talk.",
-        "opt1": "The beach is safe for now.",
-        "opt2": "Who are you?",
-        "opt3": "What can you tell me about this place?",
-        "opt4": "Do you have any work for me?",
-        "opt5": "I don't have any more questions, enjoy your drink."
-    },
-    "whoAreYou": {
-        "message": "My name is Josh and I'm a local fisherman, my hobby is drinking free beer.",
-        "opt1": "I see, a drunk and beggar then.",
-        "opt2": "You're welcome."
-    },
-    "placeInfo": {
-        "message": "This a tavern. Duh. Buy seriously seems like you're a new one here. This is La Harpar, a fisherman village located on Horseshoe Beach.",
-        "opt1": "Horseshoe Beach? I didn't see any horses on the way here.",
-        "opt2": "Thanks."
-    },
-    "workRequest": {
-        "message": "Work? Here? There is always work to do. We had some animal overpopulation issues on our beach lately. Come back when you kill 50 enemies on Wave 7 in Beach.",
-        "opt1": "On my way."
-    },
-    "warning": {
-        "message": "Oi, mate. You don't want to make enemies here, you're a new face and new faces can disappear overnight here.",
-        "opt1": "I'm sorry, I got carried away.",
-        "opt2": "Don't care, you will trip over those chairs before you could catch me, bye..."
-    },
-    "beachTradeInfo": {
-        "message": "The name comes from the shape of the beach, you donkey. Horseshoe Beach and La Harpar are important trade partners to North Lirold, capital of this region.",
-        "opt1": "What exactly is La Harpar providing?",
-        "opt2": "This region? How many regions there are?"
-    },
-    "goodsInfo": {
-        "message": "We mainly provide various fish and seafood. Also lately we have been overstocked on turtle shells, please go do some work and clear the beach.",
-        "opt1": "Got it."
-    },
-    "regionsInfo": {
-        "message": "There are 4 known regions to us: Southback, Port Stocksmar, Greefic Hill and Saint Nestroud. La Harpas resides in Port Stocksmar.",
-        "opt1": "Known? Are there unknown regions?"
-    },
-    "mountainInfo": {
-        "message": "Well, beyond Greefic Hill there is an uncrossable mountain. Some magical force and unpredictable weather conditions make that place impossible to survive.",
-        "opt1": "Impossible? Did anyone try?"
-    },
-    "failedExplorers": {
-        "message": "Yes, no one who tried came back. Then friends or family members tried to search for those people and they also didn't come back.",
-        "opt1": "Interesting. What do you think could be there?",
-        "opt2": "Heard enough, I want to sleep tonight."
-    },
-    "forestRumors": {
-        "message": "Beats me! People who got close said they could hear chants and howls from the forest that's surrounding the mountain. My feet won't set there anytime soon.",
-        "opt1": "Understandable..."
-    },
-    "coastClear": {
-        "message": "No. For now the coast is clear.",
-        "opt1": "Good."
-    }
+  "greeting": {
+    "message": "What do you want? Don't bother me.",
+    "opt1": "I just wanted to ask a few questions about this place.",
+    "opt2": "Nothing..."
+  },
+  "payBeer": {
+    "message": "Pay for my next beer and I'll talk to you.",
+    "opt1": "Okay, here are 20 gold coins.",
+    "opt2": "I'll pass. You can buy one yourself."
+  },
+  "talkReady": {
+    "message": "Haha, that's what I'm talking about! Now we can talk.",
+    "opt1": "The beach is safe for now.",
+    "opt2": "Who are you?",
+    "opt3": "What can you tell me about this place?",
+    "opt4": "Do you have any work for me?",
+    "opt5": "I don't have any more questions. Enjoy your drink."
+  },
+  "intro": {
+    "message": "My name is Josh. I'm a local fisherman, and my hobby is drinking free beer.",
+    "opt1": "I see. A drunk and a beggar, then.",
+    "opt2": "You're welcome."
+  },
+  "placeInfo": {
+    "message": "This is a tavern. Duh. But seriously, it seems like you're new here. This is La Harpar, a fishing village located on Horseshoe Beach.",
+    "opt1": "Horseshoe Beach? I didn't see any horses on the way here.",
+    "opt2": "Thanks."
+  },
+  "workInfo": {
+    "message": "Work? Here? There is always work to do. We've had some animal overpopulation issues on our beach lately. Come back when you've killed 50 enemies on Wave 7 at the Beach.",
+    "opt1": "On my way."
+  },
+  "warning": {
+    "message": "Oi, mate. You don't want to make enemies here. You're a new face, and new faces can disappear overnight in these parts.",
+    "opt1": "I'm sorry, I got carried away.",
+    "opt2": "Don't care. You'll trip over those chairs before you could catch me. Bye..."
+  },
+  "beachName": {
+    "message": "The name comes from the shape of the beach, you donkey. Horseshoe Beach and La Harpar are important trade partners to North Lirold, the capital of this region.",
+    "opt1": "What exactly is La Harpar providing?",
+    "opt2": "This region? How many regions are there?"
+  },
+  "tradeInfo": {
+    "message": "We mainly provide various fish and seafood. Lately, we've been overstocked on turtle shells; please go do some work and clear the beach.",
+    "opt1": "Got it."
+  },
+  "regionsInfo": {
+    "message": "There are 4 known regions to us: Southback, Port Stocksmar, Greefic Hill, and Saint Nestroud. La Harpar resides in Port Stocksmar.",
+    "opt1": "Known? Are there unknown regions?"
+  },
+  "unknownRegions": {
+    "message": "Well, beyond Greefic Hill, there is an uncrossable mountain. Some magical force and unpredictable weather conditions make that place impossible to survive.",
+    "opt1": "Impossible? Has anyone tried?",
+    "opt2": "Fair enough."
+  },
+  "dangerMountain": {
+    "message": "Yes, and no one who tried ever came back. Then friends or family members tried to search for those people, and they didn't come back either.",
+    "opt1": "Interesting. What do you think could be there?",
+    "opt2": "I've heard enough. I want to sleep tonight."
+  },
+  "mountainRumors": {
+    "message": "Beats me! People who got close said they could hear chants and howls from the forest surrounding the mountain. My feet won't be stepping there anytime soon.",
+    "opt1": "Understandable..."
+  },
+  "missionCheck": {
+    "message": "No. For now, the coast is clear.",
+    "opt1": "Good."
+  }
 }

@@ -1,0 +1,43 @@
+<aside>
+  <button
+    class="wave-button"
+    [class.hidden]="!canMoveToPreviousWave()"
+    (click)="onPreviousWave()"
+  ><img
+    [ngSrc]="'./assets/img/icons/arrow-prev.png'"
+    height="32"
+    width="32"
+    alt=""
+    loading="lazy"
+  >
+  </button>
+  <button
+    class="wave-button"
+    [class.hidden]="!canMoveToNextWave()"
+    (click)="onNextWave()"
+  >
+    <img
+      [ngSrc]="'./assets/img/icons/arrow-next.png'"
+      height="32"
+      width="32"
+      alt=""
+      loading="lazy"
+    >
+  </button>
+
+  @if (hasAutoWaveProgressionUnlocked()) {
+    <button
+      class="auto-button"
+      [class.active]="hasAutoWaveProgressionEnabled()"
+      [class.disabled]="!hasAutoWaveProgressionEnabled()"
+      (click)="enableAutoWaveProgressionAction(!hasAutoWaveProgressionEnabled())"
+    >
+      <img
+        [ngSrc]="'./assets/img/skills/autoWaveProgression.png'"
+        width="26"
+        height="26"
+        alt=""
+        loading="lazy"
+      ></button>
+  }
+</aside>

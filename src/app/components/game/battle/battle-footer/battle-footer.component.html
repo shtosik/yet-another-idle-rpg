@@ -1,26 +1,11 @@
 <footer>
-  <div class="active-spells">
-    @for (spell of activeSpells(); track spell.spellId) {
-      @let spellData = SPELLS_DATA[spell.spellId];
-      <div [style]="{ 'background-image': spellData.url | url }">
-        {{ spell.duration }}
-      </div>
-    }
-  </div>
-  <div>
-    @if (hasAutoWaveProgressionUnlocked()) {
-      <button
-        [class.active]="hasAutoWaveProgressionEnabled()"
-        [class.disabled]="!hasAutoWaveProgressionEnabled()"
-        (click)="enableAutoWaveProgressionAction(!hasAutoWaveProgressionEnabled())"
-      >
-        <img
-          [ngSrc]="'./assets/img/skills/autoWaveProgression.png'"
-          width="32"
-          height="32"
-          alt=""
-          loading="lazy"
-        ></button>
-    }
-  </div>
+  @for (spell of activeSpells(); track spell.spellId) {
+    @let spellData = SPELLS_DATA[spell.spellId];
+    <div
+      class="spell"
+      [style]="{ 'background-image': spellData.url | url }"
+    >
+      {{ spell.duration }}
+    </div>
+  }
 </footer>

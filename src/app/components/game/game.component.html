@@ -1,32 +1,37 @@
 <app-game-menu (changeTab)="changeTab($event)"/>
 <div class="game">
-    @let tab = gameTab | async;
-    <app-player-stats class="stats"/>
-    <app-panel class="resources">
+  @let tab = gameTab | async;
+  <app-battle class="battle"/>
+  <app-player-stats class="stats"/>
+  <app-panel class="resources">
 
-    </app-panel>
-    @if (tab === GameTab.main || tab === GameTab.crafting || tab === GameTab.towns) {
-        @switch (tab) {
-            @case (GameTab.main) {
-                <app-battle class="battle"/>
-                <app-spells class="spells"/>
-                <app-panel class="buff-items"/>
-            }
-            @case (GameTab.crafting) {
-                <app-crafting class="crafting"/>
-            }
-            @case (GameTab.towns) {
-                <app-towns class="towns"/>
-            }
-        }
+  </app-panel>
+  @if (tab === GameTab.main || tab === GameTab.crafting || tab === GameTab.towns) {
+    @switch (tab) {
+      @case (GameTab.main) {
+        <app-spells class="spells"/>
+        <app-panel class="buff-items"/>
+      }
+      @case (GameTab.crafting) {
+        <app-crafting class="crafting"/>
+      }
+      @case (GameTab.towns) {
+        <app-towns class="towns"/>
+      }
+    }
 
-        <app-equipment class="equipment"/>
-        <app-inventory class="inventory"/>
-        <app-panel class="quests"/>
+    <app-equipment class="equipment"/>
+
+    @if (!hasDialogueActive()) {
+      <app-inventory class="inventory"/>
+    } @else {
+      <app-dialogue class="dialogue"/>
     }
-    @if (tab === GameTab.skillTree) {
-        <app-skill-trees class="skill-tree"/>
-    }
+    <app-panel class="quests"/>
+  }
+  @if (tab === GameTab.skillTree) {
+    <app-skill-trees class="skill-tree"/>
+  }
 </div>
 <button (click)="resetState()">reset state</button>
 <button (click)="giveStat('unspentSkillPoints')">give skill points</button>

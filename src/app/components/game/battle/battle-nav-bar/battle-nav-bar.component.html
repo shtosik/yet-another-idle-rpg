@@ -2,27 +2,11 @@
 
 <div class="battle-nav-bar">
   <div>
-    <h2 class="zone">{{ 'zones:names.' + ZoneID[currentZoneData?.id] | i18next }}
-      @if (currentEnemy()) {
-        - {{ 'enemies:names.' + EnemyID[currentEnemy().id] | i18next }}
-      }
-    </h2>
+    <h2 class="zone">{{ 'zones:names.' + ZoneID[currentZoneData?.id] | i18next }}</h2>
     <h3 class="killcount"> {{ 'killCount' | i18next }}: {{ currentKillCount() }}
       / {{ requiredKillCount() }}</h3>
   </div>
   <div class="right-side">
-    <div class="buttons">
-      @if (currentZoneData.previousZoneId || currentWave() !== 1) {
-        <button (click)="onPreviousWave()">&lt;</button>
-      }
-      <span>{{ 'wave' | i18next }}: {{ currentWave() }}/{{ currentZoneData.maxWave }}</span>
-      @if (currentZoneData.nextZoneId || currentWave() !== currentZoneData.maxWave) {
-        <button
-          class="next"
-          (click)="onNextWave()"
-        >&gt;
-        </button>
-      }
-    </div>
+    <span>{{ 'wave' | i18next }}: {{ currentWave() }}/{{ currentZoneData.maxWave }}</span>
   </div>
 </div>

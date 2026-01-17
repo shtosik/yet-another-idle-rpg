@@ -8,29 +8,29 @@ import { TownsStore } from '../../../store/towns/towns.store'
 import { TownBuildingComponent } from './town-building/town-building.component'
 
 @Component({
-    selector: 'app-towns',
-    templateUrl: './towns.component.html',
-    styleUrls: ['./towns.component.sass'],
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [
-        TranslatePipe,
-        CloseButtonComponent,
-        TownBuildingComponent,
-    ],
+  selector: 'app-towns',
+  templateUrl: './towns.component.html',
+  styleUrls: ['./towns.component.sass'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [
+    TranslatePipe,
+    CloseButtonComponent,
+    TownBuildingComponent,
+  ],
 })
 export class TownsComponent {
-    protected readonly TownID = TownID
-    protected readonly TOWNS_DATA = TOWNS_DATA
-    protected readonly TownBuildingID = TownBuildingID
-    private townsStore = inject(TownsStore)
-    selectedTownId = this.townsStore.selectedTownId
-    selectedTownBuilding = this.townsStore.selectedTownBuilding
+  protected readonly TownID = TownID
+  protected readonly TOWNS_DATA = TOWNS_DATA
+  protected readonly TownBuildingID = TownBuildingID
+  private townsStore = inject(TownsStore)
+  selectedTownId = this.townsStore.selectedTownId
+  selectedTownBuilding = this.townsStore.selectedTownBuilding
 
-    selectTown(townId: TownID) {
-        this.townsStore.selectTown(townId)
-    }
+  selectTown(townId: TownID) {
+    this.townsStore.selectTown(townId)
+  }
 
-    selectTownBuilding(townBuilding: TownBuilding) {
-        this.townsStore.selectTownBuilding(townBuilding)
-    }
+  selectTownBuilding(townBuilding: TownBuilding) {
+    this.townsStore.selectTownBuilding(townBuilding)
+  }
 }

@@ -1,80 +1,80 @@
 {
-    "greeting": {
-        "message": "Can you stop staring, yes, those are my ears. I'm an elf.",
-        "opt1": "I wasn't staring! (Lie)",
-        "opt2": "I was just admiring your beauty, didn't mean to offend",
-        "opt3": "I'll be going now."
-    },
-    "apology": {
-        "message": "Oh okay, I'm sorry, even though I moved in here years ago some people still look at me weirdly.",
-        "opt1": "Was there any reason for you to move here?",
-        "opt2": "What's your opinion on local villagers?"
-    },
-    "fatherIntro": {
-        "message": "I'm looking for my father. He is a captain and a treasure seeker. He went missing 5 years ago. Since this is the most known fishing village I thought that this would be the best place to gather information.",
-        "opt1": "A captain?",
-        "opt2": "A treasure seeker?",
-        "opt3": "Any clue what happened to him?"
-    },
-    "captainInfo": {
-        "message": "Captain Theron Tidecaller, was quite famous for his discoveries and uncanny ability to predict weather conditions.",
-        "opt1": "Was he a pirate?",
-        "opt2": "You also said he was a treasure seeker?"
-    },
-    "pirateInfo": {
-        "message": "No, not like that. He was more about the thrill of an adventure than plundering and murdering people.",
-        "opt1": "If I find any clues I'll let you know.",
-        "opt2": "Well, hope you can find him."
-    },
-    "treasureInfo": {
-        "message": "Treasure seeks to dedicate their lives to search for ancient artifacts and valuable items. My dad is in possession of some of the rarest jewels. Though I have no idea where he keeps them.",
-        "opt1": "Do you need some kind of permit to become a treasure seeker?",
-        "opt2": "That must be a good way to earn some money. Your dad was probably quite rich."
-    },
-    "permitInfo": {
-        "message": "Permit? Ha! Of course not, all you have to do is go to the most dangerous places and hope no one was there before.",
-        "opt1": "I see, I'm something of an adventurer myself."
-    },
-    "richnessInfo": {
-        "message": "IS rich. That I would like to say, but no. Money never stuck to him. He would always spend it on new gear, ship parts, or give it away.",
-        "opt1": "Surely he has something hidden away, right?"
-    },
-    "hiddenJewelsInfo": {
-        "message": "I don't know, we can ask him when I find him.",
-        "opt1": "Of course."
-    },
-    "rumorSceptre": {
-        "message": "Last rumour I heard is that he was looking for Primula's Sceptre.",
-        "opt1": "Primula's?"
-    },
-    "primulaInfo": {
-        "message": "Queen Primula, ruled over an ancient civilization called Messatan, believed to be long gone. It's probably just another fairytale.",
-        "opt1": "Why do you think it's a fairytale?",
-        "opt2": "Interesting, not surprising that your father would be interested."
-    },
-    "fairytaleInfo": {
-        "message": "There is no known proof. All is just tales and rumors spread from ear to ear.",
-        "opt1": "You never know, there are a lot of mysteries in our world."
-    },
-    "fatherPersonality": {
-        "message": "He is the best at his job, but he can be naive.",
-        "opt1": "He seems to be quite a man, hopefully, you can find him"
-    },
-    "villagersOpinion": {
-        "message": "Useless, all they do is hang out in that stinky tavern. The only decent person living here is Marvin.",
-        "opt1": "Marvin?",
-        "opt2": "They can't be all that bad."
-    },
-    "marvinInfo": {
-        "message": "An adventure like my father. Heard he came back a few days ago. He is a skilled warrior.",
-        "opt1": "Where could I find him?"
-    },
-    "marvinLocation": {
-        "message": "He is probably training people in the local exploration guild.",
-        "opt1": "Thanks, I'll look for him."
-    },
-    "villagersComment": {
-        "message": "Believe, you will have enough of every one of them after spending here significant amount of time here.",
-        "opt1": "Seems to me that you're just venting your frustrations."
-    }
+  "greeting": {
+    "message": "Can you stop staring? Yes, those are my ears. I'm an elf.",
+    "opt1": "I wasn't staring! (Lie)",
+    "opt2": "I was just admiring your beauty; I didn't mean to offend.",
+    "opt3": "I'll be going now."
+  },
+  "apology": {
+    "message": "Oh, okay. I'm sorry. Even though I moved here years ago, some people still look at me strangely.",
+    "opt1": "Was there a specific reason you moved here?",
+    "opt2": "What's your opinion of the local villagers?"
+  },
+  "fatherIntro": {
+    "message": "I'm looking for my father. He is a captain and a treasure seeker who went missing five years ago. Since this is the most well-known fishing village in the area, I thought it would be the best place to gather information.",
+    "opt1": "A captain?",
+    "opt2": "A treasure seeker?",
+    "opt3": "Any clues as to what happened to him?"
+  },
+  "captainInfo": {
+    "message": "Captain Theron Tidecaller. He was quite famous for his discoveries and an uncanny ability to predict weather conditions.",
+    "opt1": "Was he a pirate?",
+    "opt2": "You also mentioned he was a treasure seeker?"
+  },
+  "pirateInfo": {
+    "message": "No, not like that. For him, it was more about the thrill of adventure than plundering or murdering people.",
+    "opt1": "If I find any clues, I'll let you know.",
+    "opt2": "Well, I hope you can find him."
+  },
+  "treasureInfo": {
+    "message": "Treasure seekers dedicate their lives to searching for ancient artifacts and valuable items. My father is in possession of some of the rarest jewels—though I have no idea where he keeps them.",
+    "opt1": "Do you need some kind of permit to become a treasure seeker?",
+    "opt2": "That must be a good way to earn a living. Your father was probably quite wealthy."
+  },
+  "permitInfo": {
+    "message": "A permit? Ha! Of course not. All you have to do is travel to the most dangerous places and hope no one else got there first.",
+    "opt1": "I see. I'm something of an adventurer myself."
+  },
+  "richnessInfo": {
+    "message": "Is rich? I wish I could say that, but no. Money never stuck to him. He would always spend it on new gear, ship parts, or simply give it away.",
+    "opt1": "Surely he has something hidden away, right?"
+  },
+  "hiddenJewelsInfo": {
+    "message": "I don't know. We can ask him ourselves when I find him.",
+    "opt1": "Of course."
+  },
+  "rumorSceptre": {
+    "message": "The last rumor I heard was that he was looking for Primula's Sceptre.",
+    "opt1": "Primula's?"
+  },
+  "primulaInfo": {
+    "message": "Queen Primula. She ruled over an ancient civilization called Messatan, believed to be long gone. It's probably just another fairytale, though.",
+    "opt1": "Why do you think it's a fairytale?",
+    "opt2": "Interesting. It's not surprising your father would be interested."
+  },
+  "fairytaleInfo": {
+    "message": "There is no known proof. It's all just tales and rumors spread from ear to ear.",
+    "opt1": "You never know; there are many mysteries in our world."
+  },
+  "fatherPersonality": {
+    "message": "He is the best at what he does, but he can be terribly naive.",
+    "opt1": "He seems like quite a man. Hopefully, you can find him."
+  },
+  "villagersOpinion": {
+    "message": "Useless. All they do is hang out in that stinky tavern. The only decent person living here is Marvin.",
+    "opt1": "Marvin?",
+    "opt2": "They can't all be that bad."
+  },
+  "marvinInfo": {
+    "message": "An adventurer, like my father. I heard he came back a few days ago. He is a very skilled warrior.",
+    "opt1": "Where could I find him?"
+  },
+  "marvinLocation": {
+    "message": "He is probably training people at the local exploration guild.",
+    "opt1": "Thanks, I'll look for him."
+  },
+  "villagersComment": {
+    "message": "Believe me, you'll have had quite enough of every last one of them after you've spent a significant amount of time here.",
+    "opt1": "It seems to me you're just venting your frustrations."
+  }
 }

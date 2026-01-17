@@ -1,20 +1,21 @@
 <div
-    class="battle"
-    [style]="{ 'background-image': currentZoneData()?.url | url }"
+  class="battle"
+  [style]="{ 'background-image': currentZoneData()?.url | url }"
 >
-    <app-battle-nav-bar/>
-    <div class="battle-pane">
-        @if (!isInCombat()) {
-            <app-spinner/>
-        } @else {
-            <app-enemy #enemyElement/>
-        }
+  <app-battle-nav-bar/>
+  <div class="battle-pane">
+    @if (!isInCombat()) {
+      <app-spinner/>
+    } @else {
+      <app-enemy #enemyElement/>
+    }
 
-        @let enemyPositionVal = this.enemyPosition();
-        <app-damage-popup
-            [x]="enemyPositionVal.x"
-            [y]="enemyPositionVal.y"
-        />
-    </div>
-    <app-battle-footer/>
+    @let enemyPositionVal = this.enemyPosition();
+    <app-damage-popup
+      [x]="enemyPositionVal.x"
+      [y]="enemyPositionVal.y"
+    />
+    <app-battle-side-buttons/>
+  </div>
+  <app-battle-footer/>
 </div>

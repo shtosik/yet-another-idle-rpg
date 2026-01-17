@@ -1,22 +1,23 @@
 <div
-    #enemy
-    class="enemy"
+  #enemy
+  class="enemy"
 >
-    @let percentage = (currentEnemyHp() / currentEnemy().maxHp) * 100;
-    @let background = 'linear-gradient(90deg, rgba(255, 0, 0, 1) ' + percentage + '%, rgba(0, 0, 0, 1)' + percentage +
-        '%)';
+  @let percentage = (currentEnemyHp() / currentEnemy().maxHp) * 100;
+  @let background = 'linear-gradient(90deg, rgba(255, 0, 0, 1) ' + percentage + '%, rgba(0, 0, 0, 1)' + percentage +
+    '%)';
 
-    <div
-        [style]="{ 'background': [[background]] }  "
-        class="hp-bar"
-    >
-        <span>{{ currentEnemyHp() }} / {{ currentEnemy().maxHp }}</span>
-    </div>
-    <img
-        [ngSrc]="currentEnemy().url"
-        alt=""
-        disableOptimizedSrcset
-        height="128"
-        width="128"
-    >
+  <h2>{{ 'enemies:names.' + EnemyID[currentEnemy().id] | i18next }}</h2>
+  <div
+    [style]="{ 'background': [[background]] }  "
+    class="hp-bar"
+  >
+    <span>{{ currentEnemyHp() }} / {{ currentEnemy().maxHp }}</span>
+  </div>
+  <img
+    [ngSrc]="currentEnemy().url"
+    alt=""
+    disableOptimizedSrcset
+    height="128"
+    width="128"
+  >
 </div>

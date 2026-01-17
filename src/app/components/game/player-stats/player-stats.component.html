@@ -2,33 +2,33 @@
 
 <h3></h3>
 <ul>
-    <li class="level">
-        {{ 'playerStats.level' | i18next }}: {{ playerStatsData.level }}
-        @if (playerStatsData.unspentSkillPoints) {
-            <span> - {{ 'playerStats.skillPoints' | i18next }}: {{ playerStatsData.unspentSkillPoints }}</span>
-        }
-    </li>
-    <li class="cyan">
-        {{ 'playerStats.experience' | i18next }}: {{ playerStatsData.experience.toLocaleString('en-US') }} /
-        {{ (((playerStatsData.level || 0) + 1) | calculateXp).toLocaleString('en-US') }}
-    </li>
-    <li class="cyan">{{ 'playerStats.xpMultiplier' | i18next }}
-        : {{ 'xpMultiplier' | statToPercentage:playerStatsData.xpMultiplier }}
-    </li>
-    <li class="yellow">{{ 'playerStats.gold' | i18next }}: {{ playerStatsData.goldCoins | abbr }}</li>
-    <li class="yellow">{{ 'playerStats.goldCoinsMultiplier' | i18next }}:
-        {{ 'goldCoinsMultiplier' | statToPercentage: playerStatsData.goldCoinsMultiplier }}
-    </li>
-    <li>
-        {{ 'playerStats.mana' | i18next }}: {{ playerStatsData.mana }}/{{ playerStatsData.maxMana }}
-        <span class="blue">{{ playerStatsData.currentManaRegenTimer }}</span>
-    </li>
-    <li>{{ 'playerStats.attackPower' | i18next }}: {{ playerStatsData.attackPower }}</li>
-    <li>{{ 'playerStats.attackSpeed' | i18next }}: {{ playerStatsData.attackSpeed.toFixed(1) }}</li>
-    @if (playerStatsData.critChance) {
-        <li>{{ 'playerStats.critChance' | i18next }}: {{ 'critChance' | statToPercentage:(playerStatsData.critChance) }}
-        </li>
-        <li>{{ 'playerStats.critMulti' | i18next }}: {{ 'critMulti' | statToPercentage:(playerStatsData.critMulti) }}
-        </li>
+  <li class="level">
+    {{ 'playerStats.level' | i18next }}: {{ playerStatsData.level }}
+    @if (playerStatsData.unspentSkillPoints) {
+      <span> - {{ 'playerStats.skillPoints' | i18next }}: {{ playerStatsData.unspentSkillPoints }}</span>
     }
+  </li>
+  <li class="cyan">
+    {{ 'playerStats.experience' | i18next }}: {{ playerStatsData.experience.toLocaleString('en-US') }} /
+    {{ (((playerStatsData.level || 0) + 1) | calculateXp).toLocaleString('en-US') }}
+  </li>
+  <li class="cyan">{{ 'playerStats.xpMultiplier' | i18next }}
+    : {{ 'xpMultiplier' | statToPercentage:playerStatsData.xpMultiplier }}
+  </li>
+  <li class="yellow">{{ 'playerStats.goldCoins' | i18next }}: {{ playerStatsData.goldCoins | abbr }}</li>
+  <li class="yellow">{{ 'playerStats.goldCoinsMultiplier' | i18next }}:
+    {{ 'goldCoinsMultiplier' | statToPercentage: playerStatsData.goldCoinsMultiplier }}
+  </li>
+  <li>
+    {{ 'playerStats.mana' | i18next }}: {{ playerStatsData.mana }}/{{ playerStatsData.maxMana }}
+    <span class="blue">{{ playerStatsData.currentManaRegenTimer }}</span>
+  </li>
+  <li>{{ 'playerStats.attackPower' | i18next }}: {{ playerStatsData.attackPower }}</li>
+  <li>{{ 'playerStats.attackSpeed' | i18next }}: {{ playerStatsData.attackSpeed.toFixed(1) }}</li>
+  @if (playerStatsData.critChance) {
+    <li>{{ 'playerStats.critChance' | i18next }}: {{ 'critChance' | statToPercentage:(playerStatsData.critChance) }}
+    </li>
+    <li>{{ 'playerStats.critMulti' | i18next }}: {{ 'critMulti' | statToPercentage:(playerStatsData.critMulti) }}
+    </li>
+  }
 </ul>

@@ -1,8 +1,9 @@
 {
-    "names": {
-        "laHarparBartender": "Bartender",
-        "laHarparJosh": "Josh",
-        "laHarparMarvin": "Marvin",
-        "laHarparElara": "Elara"
-    }
+  "names": {
+    "laHarparBartender": "Bartender",
+    "laHarparJosh": "Josh",
+    "laHarparMarvin": "Marvin",
+    "laHarparElara": "Elara",
+    "laHarparTrader": "Trader"
+  }
 }

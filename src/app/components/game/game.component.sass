@@ -1,47 +1,55 @@
 .game
-    display: grid
-    gap: 0.5rem
-    grid-template-rows: 20rem 5rem 20rem
-    grid-template-columns: 1fr 24rem 24rem 1fr
+  display: grid
+  gap: 0.5rem
+  grid-template-rows: 20rem 5rem 20rem
+  grid-template-columns: 1fr 24rem 24rem 1fr
 
-    .stats,
-    .resources
-        grid-column: 1 / 1
+  .battle
+    grid-column: 1 / 1
+    grid-row: 1 / span 3
 
-    .battle,
-    .inventory,
-    .crafting,
-    .towns
-        grid-column: 2 / span 2
+  .stats
+    grid-column: 2 / 2
+    grid-row: 1 / span 1
 
-    .crafting,
-    .towns
-        grid-row: 1 / span 2
+  .resources
+    grid-column: 3 / 3
+    grid-row: 1 / span 1
 
-    .equipment,
-    .quests
-        grid-column: 4 / 4
+  .inventory,
+  .crafting,
+  .towns,
+  .dialogue
+    grid-column: 2 / span 2
 
-    .battle,
-    .crafting,
-    .towns
-        padding: 0
+  .crafting,
+  .towns
+    grid-row: 1 / span 2
 
-    .inventory
-        grid-row: 3 / 3
+  .equipment,
+  .quests
+    grid-column: 4 / 4
 
-    .resources,
-    .quests
-        grid-row: 2 / span 2
+  .battle,
+  .crafting,
+  .towns
+    padding: 0
 
-    .spells
-        grid-row: 2 / 2
-        grid-column: 2 / 2
+  .inventory,
+  .dialogue
+    grid-row: 3 / 3
 
-    .skill-tree
-        grid-column: 2 / span 3
-        grid-row: 1 / span 3
+  .quests
+    grid-row: 2 / span 2
 
-    .buff-items
-        grid-row: 2 / 2
-        grid-column: 3 / 3
+  .spells
+    grid-row: 2 / 2
+    grid-column: 2 / 2
+
+  .skill-tree
+    grid-column: 2 / span 3
+    grid-row: 1 / span 3
+
+  .buff-items
+    grid-row: 2 / 2
+    grid-column: 3 / 3
