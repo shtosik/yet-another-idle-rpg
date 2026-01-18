@@ -2,6 +2,7 @@ import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { DialogueNode } from '../../../interfaces/dialogues/dialogue-node.interface'
 import { NpcID } from '../../../enums/map/npc-id.enum'
 import { ItemID } from '../../../enums/ids/item-id.enum'
+import { QuestState } from '../../../enums/quest-state.enum'
 
 export enum laHarparBartenderConversationID {
   default = 0, // Explicitly set to 0 for returning players
@@ -47,7 +48,14 @@ const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
         responseKey: `${NS}:default.meatShortage`,
         results: [
           {
-            visibilityConditions: [{ type: 'questStep', questId: QuestID.meatShortage, step: 1, hidden: true }],
+            visibilityConditions: [
+              {
+                type: 'quest',
+                questId: QuestID.meatShortage,
+                step: 1,
+                questState: QuestState.active,
+              },
+            ],
             next: laHarparBartenderConversationID.default,
             requirementsNeeded: [{ type: 'item', itemId: ItemID.crabMeat, amount: 50 }],
             effects: [{ type: 'quest', action: 'end', questId: QuestID.meatShortage }],
@@ -67,7 +75,14 @@ const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
         responseKey: `${NS}:default.anyWork`,
         results: [
           {
-            visibilityConditions: [{ type: 'questStep', questId: QuestID.meatShortage, step: 1 }],
+            visibilityConditions: [
+              {
+                type: 'quest',
+                questId: QuestID.meatShortage,
+                questState: QuestState.active,
+                step: 1,
+              },
+            ],
             next: laHarparBartenderConversationID.anyWorkForMe2,
           },
           {

@@ -1,16 +1,16 @@
 @let inventoryData = inventory();
 
 <div class="inventory">
-    @for (_ of slots; track $index; let i = $index) {
-        <app-slot>
-            @if (inventoryData[i]?.id) {
-                <app-inventory-slot
-                    [amount]="inventoryData[i].amount"
-                    [item]="Items[inventoryData[i].id]"
-                    [tier]="inventoryData[i].tier"
-                    (equipItem)="equipItem(inventoryData[i])"
-                />
-            }
-        </app-slot>
-    }
+  @for (_ of slots; track $index; let i = $index) {
+    <app-slot>
+      @if (inventoryData[i]?.id || inventoryData[i]?.id === 0) {
+        <app-inventory-slot
+          [amount]="inventoryData[i].amount"
+          [item]="Items[inventoryData[i].id]"
+          [tier]="inventoryData[i].tier"
+          (equipItem)="equipItem(inventoryData[i])"
+        />
+      }
+    </app-slot>
+  }
 </div>

@@ -8,42 +8,42 @@ import { ItemID } from '../../../../enums/ids/item-id.enum'
 import { PlayerStore } from '../../../store/player/player.store'
 
 @Component({
-    selector: 'app-crafting',
-    templateUrl: './crafting.component.html',
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    styleUrls: ['./crafting.component.sass'],
-    imports: [
-        RecipeSlot,
-        SlotComponent,
-        TranslatePipe,
-    ],
+  selector: 'app-crafting',
+  templateUrl: './crafting.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  styleUrls: ['./crafting.component.sass'],
+  imports: [
+    RecipeSlot,
+    SlotComponent,
+    TranslatePipe,
+  ],
 })
 export class CraftingComponent {
-    playerStore = inject(PlayerStore)
-    playerResources = this.playerStore.resources
+  playerStore = inject(PlayerStore)
+  playerInventory = this.playerStore.inventory
 
-    recipesArray: CraftingRecipe[] = Object.values(RECIPES_DATA)
-    recipeToCraft: RecipeID
+  recipesArray: CraftingRecipe[] = Object.values(RECIPES_DATA)
+  recipeToCraft: RecipeID
 
-    protected readonly RECIPES_DATA = RECIPES_DATA
-    protected readonly ItemID = ItemID
+  protected readonly RECIPES_DATA = RECIPES_DATA
+  protected readonly ItemID = ItemID
 
-    selectItemToCraft(recipe: RecipeID) {
-        this.recipeToCraft = recipe
-    }
+  selectItemToCraft(recipe: RecipeID) {
+    this.recipeToCraft = recipe
+  }
 
-    handleCraftItem(recipe: CraftingRecipe) {
-        let cantCraft = false
+  handleCraftItem(recipe: CraftingRecipe) {
+    let cantCraft = false
 
-        recipe.itemsNeeded.forEach((itemNeeded) => {
-            const ownedResource = this.playerResources()[itemNeeded.id]
+    recipe.itemsNeeded.forEach((itemNeeded) => {
+      const ownedResource = this.playerInventory().find(item => item.id === itemNeeded.id)
 
-            if (!ownedResource || ownedResource.amount < itemNeeded.amount) cantCraft = true
-        })
+      if (!ownedResource || ownedResource.amount < itemNeeded.amount) cantCraft = true
+    })
 
-        if (cantCraft) return
+    if (cantCraft) return
 
-        this.playerStore.craftItem(recipe.id)
-    }
+    this.playerStore.craftItem(recipe.id)
+  }
 
 }

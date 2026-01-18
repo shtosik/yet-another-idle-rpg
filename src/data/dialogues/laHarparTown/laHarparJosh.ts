@@ -1,5 +1,6 @@
 import { DialogueNode } from '../../../interfaces/dialogues/dialogue-node.interface'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
+import { QuestState } from '../../../enums/quest-state.enum'
 
 export enum JoshDialogue {
   default,
@@ -64,7 +65,14 @@ const LA_HARPAR_JOSH: LaHarparJoshDialogueType = {
         responseKey: `${NS}:talkReady.opt1`,
         results: [
           {
-            visibilityConditions: [{ type: 'questStep', questId: QuestID.clearingOutTheBeach, step: 1 }],
+            visibilityConditions: [
+              {
+                type: 'quest',
+                questId: QuestID.clearingOutTheBeach,
+                questState: QuestState.active,
+                step: 1,
+              },
+            ],
             next: JoshDialogue.talkReady,
             effects: [{ type: 'quest', questId: QuestID.clearingOutTheBeach, action: 'end' }],
           },

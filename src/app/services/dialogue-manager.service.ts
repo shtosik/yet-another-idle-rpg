@@ -7,6 +7,8 @@ import { DialogueOption, DialogueResult } from '../../interfaces/dialogues/dialo
 import { DialogueCondition } from '../../types/dialogues/dialogue-condition.type'
 import { NpcID } from '../../enums/map/npc-id.enum'
 import npcData, { NPCProps } from '../../data/npc-data'
+import { QuestState } from '../../enums/quest-state.enum'
+import QUEST_DATA, { QUEST_STEP_AFTER_COMPLETED, RequirementProps } from '../../data/quests-data'
 
 @Injectable({ providedIn: 'root' })
 export class DialogueManagerService {
@@ -90,13 +92,61 @@ export class DialogueManagerService {
       case 'stat':
         const stats = this.playerStore.stats()
         const val = stats[c.key as keyof typeof stats]
+
         return c.comparison === 'gte' ? (val as number) >= c.amount : (val as number) <= c.amount
-      case 'questStep':
-        return this.questStore.hasQuestStarted(c.questId)
-      case 'questCompleted':
-      // return this.questStore.isQuestCompleted(c.questId)()
+      case 'quest':
+        const questData = QUEST_DATA[c.questId]
+        const currentProgress = this.questStore.getQuestStep(c.questId)
+
+        switch (c.questState) {
+          case QuestState.active:
+            if (!!currentProgress || currentProgress === QUEST_STEP_AFTER_COMPLETED) return false
+
+            if (c.step !== undefined && currentProgress !== c.step) return false
+
+            const currentStep = questData.steps[currentProgress]
+
+            return currentStep.requirements.every(req => this.checkRequirement(req))
+          case QuestState.available:
+            if (currentProgress) return false
+
+            return questData.startRequirements.every(req => this.checkRequirement(req))
+
+          case QuestState.completed:
+            return currentProgress === QUEST_STEP_AFTER_COMPLETED
+          default:
+            return true
+        }
       default:
         return true
+    }
+  }
+
+  private checkRequirement(req: RequirementProps): boolean {
+    switch (req.type) {
+      case 'stat':
+        const stats = this.playerStore.stats()
+        return (stats[req.key] as number) >= req.amount
+
+      case 'item':
+        // Check player inventory for specific item ID and quantity
+        // return this.inventoryStore.hasItem(req.itemId, req.amount)
+        return false
+
+      case 'enemy':
+        // Check the quest progress tracker for kill counts
+        // return this.questStore.getKillCount(req.enemyId) >= req.amount
+        return false
+
+      case 'quest':
+        const currentProgress = this.questStore.getQuestStep(req.questId)
+
+        if (!currentProgress) return false
+
+        return req.step !== undefined ? currentProgress === req.step : true
+
+      default:
+        return false
     }
   }
 

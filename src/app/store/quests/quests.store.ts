@@ -36,6 +36,10 @@ export const QuestsStore = signalStore(
         }))
       },
 
+      getQuestStep(questId: QuestID) {
+        return store.questStepProgression()[questId]
+      },
+
       setDialogueFlag(flag: string) {
         patchState(store, (state) => ({
           dialogueFlags: { ...state.dialogueFlags, [flag]: true },
@@ -44,6 +48,16 @@ export const QuestsStore = signalStore(
 
       hasQuestStarted(questId: QuestID) {
         return !!store.questStepProgression()[questId]
+      },
+
+      checkStep(questId: QuestID, step?: number) {
+        const isQuestActive = store.questStepProgression()[questId]
+
+        if (step) {
+          return isQuestActive && isQuestActive === step
+        }
+
+        return !!isQuestActive
       },
     }),
   ),

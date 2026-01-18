@@ -2,33 +2,33 @@ import { QuestID } from '../../enums/ids/quest-id.enum'
 import { PlayerStat } from '../player/player-stat.type'
 import { EnemyID } from '../../enums/ids/enemy-id.enum'
 import { ItemID } from '../../enums/ids/item-id.enum'
+import { QuestState } from '../../enums/quest-state.enum'
 
 export type DialogueCondition = { hidden?: boolean } & (
-  | QuestCompletedCondition
-  | QuestStepCondition
+  | QuestCondition
   | StatCondition
   | KillCountCondition
   | ManyKillCountCondition
   | ItemCondition
   | ManyItemsCondition
   | ManyStatsCondition
-  | ManyQuestsCompletedCondition
+  | ManyQuestsCondition
   )
 
-interface QuestCompletedCondition {
-  type: 'questCompleted'
+interface QuestCondition {
+  type: 'quest'
   questId: QuestID
+  questState: QuestState
+  step?: number // only QuestState.active
 }
 
-interface ManyQuestsCompletedCondition {
+interface ManyQuestsCondition {
   type: 'manyQuestCompleted'
-  questIds: QuestID[]
-}
-
-interface QuestStepCondition {
-  type: 'questStep'
-  questId: QuestID
-  step: number
+  questsRequired: {
+    questId: QuestID
+    questState: QuestState
+    step?: number  // only QuestState.active
+  }[]
 }
 
 interface StatCondition {

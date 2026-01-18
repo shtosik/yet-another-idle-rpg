@@ -2,17 +2,15 @@ import { patchState, signalStore, withMethods, withState } from '@ngrx/signals'
 import { PlayerStat } from '../../../types/player/player-stat.type'
 import { calculateXp } from 'app/pipes/calculate-xp.pipe'
 import { initialEquipmentState, statsInitialState } from './player'
-import { EquipmentItem, InventoryItem, ResourceInventoryItem } from 'interfaces/item.interface'
+import { EquipmentItem, InventoryItem } from 'interfaces/item.interface'
 import { ItemID } from 'enums/ids/item-id.enum'
 import { ItemTier } from 'enums/items/item-tier.enum'
 import { EquipmentType } from 'interfaces/player/equipment.type'
 import { ZonesProgression } from '../../../types/player/zones-progression.type'
 import { UnlockedSkillPoints } from '../../../types/player/unlocked-skill-points.type'
 import { UnlockedSpellsType } from '../../../types/player/unlocked-spells.type'
-import { PlayerResourceInventoryType } from '../../../types/player/player-resource-inventory.type'
 import { Enemy } from '../../../interfaces/enemy.interface'
 import ITEM_DATA from '../../../data/items-data'
-import { ItemType } from '../../../enums/items/item-type.enum'
 import ENEMIES_DATA from '../../../data/enemies-data'
 import { EquipmentSlot, EquipmentSlotKey } from '../../../enums/equipment-slot.enum'
 import RECIPES_DATA from '../../../data/recipes-data'
@@ -30,7 +28,6 @@ interface PlayerState {
   stats: PlayerStatsType;
   zonesProgression: ZonesProgression;
   enemyKillCounts: Partial<Record<EnemyID, number>>
-  resources: PlayerResourceInventoryType;
   inventory: (InventoryItem | null)[];
   equipment: EquipmentType;
   unlockedSkillPoints: UnlockedSkillPoints;
@@ -40,7 +37,6 @@ interface PlayerState {
 export const initialState: PlayerState = {
   stats: statsInitialState,
   zonesProgression: {},
-  resources: {},
   inventory: new Array(40).fill(null),
   equipment: initialEquipmentState,
   unlockedSkillPoints: {},
@@ -64,20 +60,19 @@ const handleExperience = (stats: PlayerStatsType) => {
 
 const calculateEnemyDrops = (enemy: Enemy) => {
   const itemsToUpdate: InventoryItem[] = []
-  const resourcesToUpdate: ResourceInventoryItem[] = []
+
   enemy.drops.forEach(drop => {
     const roll = Math.ceil(Math.random() * drop.chance)
+
     if (roll === drop.chance) {
       const amount = Math.floor(Math.random() * (drop.maxAmount - drop.minAmount + 1) + drop.minAmount)
       const { type, tier } = ITEM_DATA[drop.id]
-      if (type === ItemType.resource) {
-        resourcesToUpdate.push({ id: drop.id, type, amount })
-      } else {
-        itemsToUpdate.push({ id: drop.id, type, tier, amount })
-      }
+      console.log(drop.id, amount)
+      itemsToUpdate.push({ id: drop.id, type, tier, amount })
     }
   })
-  return { itemsToUpdate, resourcesToUpdate }
+
+  return itemsToUpdate
 }
 
 const STORE_KEY = 'playerStore'
@@ -142,6 +137,7 @@ export const PlayerStore = signalStore(
     updatePlayerInventory(items: InventoryItem[]) {
       patchState(store, (state) => {
         const inventory = [...state.inventory]
+
         items.forEach((item) => {
           const itemIndex = itemIndexFromInventory(inventory, item.id, item.tier)
           const emptySlotIndex = inventory.findIndex(i => i === null)
@@ -153,20 +149,8 @@ export const PlayerStore = signalStore(
             inventory[itemIndex] = { ...item, amount: existing.amount + item.amount }
           }
         })
-        return { inventory }
-      })
-    },
 
-    updatePlayerResources(resources: ResourceInventoryItem[]) {
-      patchState(store, (state) => {
-        const resourcesState = { ...state.resources }
-        resources.forEach((item) => {
-          resourcesState[item.id] = {
-            ...item,
-            amount: (resourcesState[item.id]?.amount || 0) + item.amount,
-          }
-        })
-        return { resources: resourcesState }
+        return { inventory }
       })
     },
 
@@ -211,7 +195,7 @@ export const PlayerStore = signalStore(
       const stats = store.stats()
 
       const xpGained = Math.ceil(enemy.experience * stats.xpMultiplier)
-      const { itemsToUpdate, resourcesToUpdate } = calculateEnemyDrops(enemy)
+      const itemsToUpdate = calculateEnemyDrops(enemy)
 
       store.updatePlayerStats([
         { stat: 'experience', amount: xpGained },
@@ -222,7 +206,6 @@ export const PlayerStore = signalStore(
       store.updateEnemyKillCount(enemyId)
 
       if (itemsToUpdate.length) store.updatePlayerInventory(itemsToUpdate)
-      if (resourcesToUpdate.length) store.updatePlayerResources(resourcesToUpdate)
     },
 
     equipItem(item: InventoryItem) {
@@ -287,39 +270,32 @@ export const PlayerStore = signalStore(
 
     craftItem(recipeId: RecipeID) {
       const recipeData = RECIPES_DATA[recipeId]
-      const playerResources = store.resources()
-      const resourcesToUpdate: ResourceInventoryItem[] = []
+      const playerResources = store.inventory()
+      const itemsToUpdate: InventoryItem[] = []
 
       const canCraft = recipeData.itemsNeeded.every(req => {
-        const owned = playerResources[req.id]
+        const owned = playerResources.find(i => i.id === req.id)
         return owned && owned.amount >= req.amount
       })
 
       if (!canCraft) return
 
       recipeData.itemsNeeded.forEach(req => {
-        resourcesToUpdate.push({ id: req.id, amount: -req.amount, type: ItemType.resource })
+        const itemData = ITEM_DATA[req.id]
+
+        itemsToUpdate.push({ id: req.id, amount: -req.amount, type: itemData.type, tier: itemData.tier })
       })
 
       const itemData = ITEM_DATA[recipeData.itemId]
-      if (itemData.type === ItemType.equipment) {
-        store.updatePlayerInventory([
-          {
-            id: itemData.id,
-            tier: itemData.tier,
-            amount: recipeData.createsAmount,
-            type: itemData.type,
-          },
-        ])
-      } else if (itemData.type === ItemType.resource) {
-        resourcesToUpdate.push({
-          id: itemData.id,
-          type: ItemType.resource,
-          amount: recipeData.createsAmount,
-        })
-      }
 
-      store.updatePlayerResources(resourcesToUpdate)
+      itemsToUpdate.push({
+        id: itemData.id,
+        type: itemData.type,
+        amount: recipeData.createsAmount,
+        tier: itemData.tier,
+      })
+
+      store.updatePlayerInventory(itemsToUpdate)
     },
   })),
   withMethods((store) => ({

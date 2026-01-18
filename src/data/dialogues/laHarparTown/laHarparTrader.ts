@@ -2,6 +2,7 @@ import { DialogueNode } from '../../../interfaces/dialogues/dialogue-node.interf
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { NpcID } from '../../../enums/map/npc-id.enum'
 import { EnemyID } from '../../../enums/ids/enemy-id.enum'
+import { QuestState } from '../../../enums/quest-state.enum'
 
 export enum TraderConversationId {
   default = 0,
@@ -68,7 +69,14 @@ const LA_HARPAR_TRADER: LaHarparTraderDialogueType = {
         responseKey: `${NS}:default.opt1`,
         results: [
           {
-            visibilityConditions: [{ type: 'questStep', questId: QuestID.ratsWereRats, step: 1 }],
+            visibilityConditions: [
+              {
+                type: 'quest',
+                questId: QuestID.ratsWereRats,
+                questState: QuestState.active,
+                step: 1,
+              },
+            ],
             next: TraderConversationId.default,
             effects: [{ type: 'quest', action: 'end', questId: QuestID.ratsWereRats }],
           },
@@ -172,7 +180,14 @@ const LA_HARPAR_TRADER: LaHarparTraderDialogueType = {
         responseKey: `${NS}:questOffer.opt1`,
         results: [
           {
-            visibilityConditions: [{ type: 'questStep', questId: QuestID.ratsWereRats, step: 1, hidden: true }],
+            visibilityConditions: [
+              {
+                type: 'quest',
+                questId: QuestID.ratsWereRats,
+                questState: QuestState.available,
+                hidden: true,
+              },
+            ],
             next: TraderConversationId.questCompleted,
             requirementsNeeded: [{ type: 'killCount', enemyId: EnemyID.rat, amount: 50 }],
           },
