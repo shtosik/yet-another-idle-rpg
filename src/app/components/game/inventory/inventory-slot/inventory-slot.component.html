@@ -1,38 +1,38 @@
 <div
-    (click)="equipItem.emit()"
-    [attr.data-tier]="ItemTier[tier]"
-    [tooltipContext]="{ item, tier }"
-    [tooltipTemplate]="tooltip"
-    class="item"
-    placement="bottom"
-    tooltipClass="tooltip-override"
+  [attr.data-tier]="ItemTier[tier]"
+  [tooltipContext]="{ item, tier }"
+  [tooltipTemplate]="tooltip"
+  class="item"
+  placement="bottom"
+  tooltipClass="tooltip-override"
+  (click)="clickable ? equipItem.emit() : null"
 >
-    <img
-        [ngSrc]="item.url"
-        alt=""
-        disableOptimizedSrcset
-        height="32"
-        width="32"
-    >
-    <span>{{ amount }}</span>
+  <img
+    [ngSrc]="item.url"
+    alt=""
+    disableOptimizedSrcset
+    height="32"
+    width="32"
+  >
+  <span>{{ amount }}</span>
 </div>
 
 <ng-template
-    #tooltip
-    let-item="item"
-    let-tier="tier"
+  #tooltip
+  let-item="item"
+  let-tier="tier"
 >
-    <div class="item__tooltip">
-        <span>{{ ('items:names.' + ItemID[item.id]) | i18next }}</span>
-        <span
-            [attr.data-tier]="ItemTier[tier]"
-            class="tier"
-        >{{ ('items:tiers.' + ItemTier[tier]) | i18next }}</span>
-        @if (item.type === ItemType.equipment) {
-            @for (stat of $any(item.stats); track stat.id) {
-                <span class="stat">{{ stat.id | statToPercentage:stat.amount }} {{ ('app:playerStats.' + stat.id) | i18next }}</span>
-            }
-            <span class="click">{{ 'items:clickToEquip' | i18next }}</span>
-        }
-    </div>
+  <div class="item__tooltip">
+    <span>{{ ('items:names.' + ItemID[item.id]) | i18next }}</span>
+    <span
+      [attr.data-tier]="ItemTier[tier]"
+      class="tier"
+    >{{ ('items:tiers.' + ItemTier[tier]) | i18next }}</span>
+    @if (item.type === ItemType.equipment) {
+      @for (stat of $any(item.stats); track stat.id) {
+        <span class="stat">{{ stat.id | statToPercentage:stat.amount }} {{ ('app:playerStats.' + stat.id) | i18next }}</span>
+      }
+      <span class="click">{{ 'items:clickToEquip' | i18next }}</span>
+    }
+  </div>
 </ng-template>

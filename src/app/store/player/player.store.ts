@@ -67,7 +67,6 @@ const calculateEnemyDrops = (enemy: Enemy) => {
     if (roll === drop.chance) {
       const amount = Math.floor(Math.random() * (drop.maxAmount - drop.minAmount + 1) + drop.minAmount)
       const { type, tier } = ITEM_DATA[drop.id]
-      console.log(drop.id, amount)
       itemsToUpdate.push({ id: drop.id, type, tier, amount })
     }
   })
@@ -301,6 +300,10 @@ export const PlayerStore = signalStore(
   withMethods((store) => ({
     hasSkillUnlocked(skillId: SkillPointID): boolean {
       return !!store.unlockedSkillPoints()[skillId]
+    },
+
+    getKillCountByZoneAndWave(zoneId: ZoneID, wave: number) {
+      return (store.zonesProgression()[zoneId] || {})[wave] || 0
     },
   })),
 )

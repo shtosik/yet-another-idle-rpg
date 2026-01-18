@@ -6,6 +6,10 @@ import { NgOptimizedImage } from '@angular/common'
 import { TranslatePipe } from '../../../pipes/i18next.pipe'
 import { QuestID } from '../../../../enums/ids/quest-id.enum'
 import { NpcID } from '../../../../enums/map/npc-id.enum'
+import { ItemID } from '../../../../enums/ids/item-id.enum'
+import { DialogueEffect } from '../../../../types/dialogues/dialogue-effect.type'
+import { DialogueCondition } from '../../../../types/dialogues/dialogue-condition.type'
+import { ZoneID } from '../../../../enums/ids/zone-id.enum'
 
 @Component({
   selector: 'app-dialogue',
@@ -34,23 +38,41 @@ export class DialogueComponent {
     )
   }
 
-  getConditionLabel(condition: any): string {
+  getConditionLabel(condition: DialogueCondition): string {
     if (condition.type === 'stat') {
-      const statName = i18next.t(`app:playerStats.${condition.stat}`)
+      const statName = i18next.t(`app:playerStats.${condition.key}`)
       return `${statName}: ${condition.amount}`
     }
 
-    if (condition.type === 'questStep') {
+    if (condition.type === 'quest') {
       const questName = i18next.t(`quests:names.${QuestID[condition.questId]}`)
-      return `${questName} required`
+      const required = i18next.t('required')
+      return `${questName} ${required}`
     }
+
+    if (condition.type === 'item') {
+      const itemName = i18next.t(`items:names.${ItemID[condition.itemId]}`)
+
+      return `${itemName}: ${condition.amount}`
+    }
+
+    if (condition.type === 'waveKillCount') {
+      const zone = i18next.t(`zones:names.${ZoneID[condition.zoneId]}`)
+
+      return i18next.t('quests:requirements.waveKillCount', {
+        amount: condition.amount,
+        wave: condition.waveNumber,
+        zone,
+      })
+    }
+
     return ''
   }
 
-  getEffectLabel(effect: any): string {
-    if (effect.type === 'quest') {
+  getEffectLabel(effect: DialogueEffect): string {
+    if (effect.type === 'quest' && effect.action === 'start') {
       const questName = i18next.t(`quests:names.${QuestID[effect.questId]}`)
-      return effect.action === 'start' ? `New Quest: ${questName}` : `Complete: ${questName}`
+      return `New Quest: ${questName}`
     }
 
     if (effect.type === 'stat' && effect.stats) {
@@ -66,7 +88,9 @@ export class DialogueComponent {
   isOptionVisible(option: DialogueOption<any>): boolean {
     const result = this.dialogueService.getActiveResult(option)
 
-    if (!result || !result.visibilityConditions) return true
+    if (!result) return false
+
+    if (!result.visibilityConditions) return true
 
     return result.visibilityConditions.every(cond =>
       this.dialogueService.checkCondition(cond),

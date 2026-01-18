@@ -26,11 +26,6 @@ export class DialogueManagerService {
 
   activeNpc = signal<NPCProps | null>(null)
 
-  availableOptions = computed(() => {
-    const node = this.activeNode()
-    return node ? node.options : []
-  })
-
   getActiveResult<T>(option: DialogueOption<T>): DialogueResult<T> | undefined {
     if (!option.results || option.results.length === 0) return undefined
 
@@ -64,6 +59,7 @@ export class DialogueManagerService {
 
   checkConditions(conditions?: DialogueCondition[]): boolean {
     if (!conditions || conditions.length === 0) return true
+
     return conditions.every(c => this.checkCondition(c))
   }
 
@@ -100,11 +96,13 @@ export class DialogueManagerService {
 
         switch (c.questState) {
           case QuestState.active:
-            if (!!currentProgress || currentProgress === QUEST_STEP_AFTER_COMPLETED) return false
+            if (!currentProgress || currentProgress === QUEST_STEP_AFTER_COMPLETED) return false
 
             if (c.step !== undefined && currentProgress !== c.step) return false
 
-            const currentStep = questData.steps[currentProgress]
+            const currentStep = this.questStore.getQuestStepData(c.questId, currentProgress)
+
+            if (!currentStep.requirements) return true
 
             return currentStep.requirements.every(req => this.checkRequirement(req))
           case QuestState.available:
@@ -126,25 +124,22 @@ export class DialogueManagerService {
     switch (req.type) {
       case 'stat':
         const stats = this.playerStore.stats()
+
         return (stats[req.key] as number) >= req.amount
-
       case 'item':
-        // Check player inventory for specific item ID and quantity
-        // return this.inventoryStore.hasItem(req.itemId, req.amount)
-        return false
+        const item = this.playerStore.inventory().find(i => i.id === req.itemId)
 
+        return item && item.amount >= req.amount
       case 'enemy':
-        // Check the quest progress tracker for kill counts
-        // return this.questStore.getKillCount(req.enemyId) >= req.amount
-        return false
-
+        return this.playerStore.enemyKillCounts()[req.enemyId] >= req.amount
       case 'quest':
         const currentProgress = this.questStore.getQuestStep(req.questId)
 
         if (!currentProgress) return false
 
         return req.step !== undefined ? currentProgress === req.step : true
-
+      case 'wave':
+        return this.playerStore.getKillCountByZoneAndWave(req.zoneId, req.wave) >= req.amount
       default:
         return false
     }
@@ -162,10 +157,8 @@ export class DialogueManagerService {
               this.questStore.startQuest(effect.questId)
               break
             case 'advance':
+              this.questStore.advanceQuest(effect.questId)
               break
-            case 'end':
-              break
-
           }
           break
         case 'shop':

@@ -3,6 +3,12 @@ import { patchState, signalStore, withMethods, withState } from '@ngrx/signals'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { withDevtools, withStorageSync } from '@angular-architects/ngrx-toolkit'
 import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
+import QUEST_DATA, { QUEST_STEP_AFTER_COMPLETED, QuestProps } from '../../../data/quests-data'
+import { inject } from '@angular/core'
+import { ModalService } from '../../services/modal.service'
+import { PlayerStore } from '../player/player.store'
+import { InventoryItem } from '../../../interfaces/item.interface'
+import ITEM_DATA from '../../../data/items-data'
 
 export interface QuestState {
   questStepProgression: QuestProgression
@@ -25,6 +31,32 @@ export const QuestsStore = signalStore(
     key: STORE_KEY,
     autoSync: true,
   }),
+  withMethods((
+    store,
+    modalService = inject(ModalService),
+    playerStore = inject(PlayerStore),
+  ) => ({
+    handleQuestCompleted(data: QuestProps) {
+      const statsToUpdate = []
+      const itemsToUpdate: InventoryItem[] = []
+
+      data.rewards.forEach((reward) => {
+        switch (reward.type) {
+          case 'stat':
+            statsToUpdate.push({ stat: reward.key, amount: reward.amount })
+            break
+          case 'item':
+            const itemData = ITEM_DATA[reward.itemId]
+            itemsToUpdate.push({ id: reward.itemId, amount: reward.amount, tier: itemData.tier, type: itemData.type })
+            break
+        }
+      })
+      
+      modalService.openQuestCompleted(data)
+      playerStore.updatePlayerStats(statsToUpdate)
+      playerStore.updatePlayerInventory(itemsToUpdate)
+    },
+  })),
   withMethods((store) => ({
       resetState(): void {
         patchState(store, initialState)
@@ -40,9 +72,28 @@ export const QuestsStore = signalStore(
         return store.questStepProgression()[questId]
       },
 
+      getQuestStepData(questId: QuestID, step: number) {
+        return QUEST_DATA[questId].steps[step - 1] // -1 because its 0-indexed, but saved steps start from 1
+      },
+
       setDialogueFlag(flag: string) {
         patchState(store, (state) => ({
           dialogueFlags: { ...state.dialogueFlags, [flag]: true },
+        }))
+      },
+
+      advanceQuest(questId: QuestID) {
+        let currentProgress = store.questStepProgression()[questId]
+        const questData = QUEST_DATA[questId]
+        currentProgress++
+
+        if (currentProgress > questData.steps.length) {
+          currentProgress = QUEST_STEP_AFTER_COMPLETED
+          store.handleQuestCompleted(questData)
+        }
+
+        patchState(store, (state) => ({
+          questStepProgression: { ...state.questStepProgression, [questId]: currentProgress },
         }))
       },
 

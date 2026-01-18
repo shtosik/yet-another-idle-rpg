@@ -58,7 +58,7 @@ const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
             ],
             next: laHarparBartenderConversationID.default,
             requirementsNeeded: [{ type: 'item', itemId: ItemID.crabMeat, amount: 50 }],
-            effects: [{ type: 'quest', action: 'end', questId: QuestID.meatShortage }],
+            effects: [{ type: 'quest', action: 'advance', questId: QuestID.meatShortage }],
           },
         ],
       },

@@ -22,6 +22,8 @@
   },
   "starts": "Starts",
   "requires": "Requires",
+  "required": "required",
   "costs": "Costs",
-  "quest": "Quest"
+  "quest": "Quest",
+  "completed": "completed"
 }

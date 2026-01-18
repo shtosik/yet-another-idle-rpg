@@ -1,6 +1,7 @@
 import { DialogueNode } from '../../../interfaces/dialogues/dialogue-node.interface'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
+import { ZoneID } from '../../../enums/ids/zone-id.enum'
 
 export enum JoshDialogue {
   default,
@@ -74,7 +75,8 @@ const LA_HARPAR_JOSH: LaHarparJoshDialogueType = {
               },
             ],
             next: JoshDialogue.talkReady,
-            effects: [{ type: 'quest', questId: QuestID.clearingOutTheBeach, action: 'end' }],
+            requirementsNeeded: [{ type: 'waveKillCount', zoneId: ZoneID.horseshoeBeach, waveNumber: 7, amount: 50 }],
+            effects: [{ type: 'quest', questId: QuestID.clearingOutTheBeach, action: 'advance' }],
           },
         ],
       },

@@ -3,16 +3,19 @@ import { PlayerStat } from '../player/player-stat.type'
 import { EnemyID } from '../../enums/ids/enemy-id.enum'
 import { ItemID } from '../../enums/ids/item-id.enum'
 import { QuestState } from '../../enums/quest-state.enum'
+import { ZoneID } from '../../enums/ids/zone-id.enum'
 
 export type DialogueCondition = { hidden?: boolean } & (
   | QuestCondition
   | StatCondition
-  | KillCountCondition
-  | ManyKillCountCondition
+  | EnemyKillCountCondition
+  | ManyEnemiesKillCountCondition
   | ItemCondition
   | ManyItemsCondition
   | ManyStatsCondition
   | ManyQuestsCondition
+  | WaveKillCountCondition
+  | ManyWavesKillCountCondition
   )
 
 interface QuestCondition {
@@ -45,16 +48,34 @@ interface ManyStatsCondition {
   amounts: number
 }
 
-interface KillCountCondition {
+interface EnemyKillCountCondition {
   type: 'killCount'
   enemyId: EnemyID
   amount: number
 }
 
-interface ManyKillCountCondition {
-  type: 'manyKillCount',
-  enemyIds: EnemyID[]
-  amounts: Partial<Record<EnemyID, number>>
+interface ManyEnemiesKillCountCondition {
+  type: 'manyKillCount'
+  enemiesRequired: {
+    enemyId: EnemyID
+    amount: number
+  }[]
+}
+
+interface WaveKillCountCondition {
+  type: 'waveKillCount'
+  zoneId: ZoneID
+  waveNumber: number
+  amount: number
+}
+
+interface ManyWavesKillCountCondition {
+  type: 'manyWaveKillCount'
+  wavesRequired: {
+    zoneId: ZoneID
+    waveNumber: number
+    amount: number
+  }
 }
 
 interface ItemCondition {

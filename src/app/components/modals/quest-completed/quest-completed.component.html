@@ -1,0 +1,23 @@
+<h2>{{ 'quests:names.' + QuestID[questData().questId] | i18next }} {{ 'completed' | i18next }}</h2>
+
+@if (statsToDisplay()) {
+  <ul>
+    @for (stat of statsToDisplay(); track stat.key) {
+      <li>{{ stat.amount }} {{ 'playerStats.' + stat.key | i18next }}</li>
+    }
+  </ul>
+}
+
+@if (itemsToDisplay()) {
+  <div>
+    @for (item of itemsToDisplay(); track item.itemId) {
+      @let itemData = ITEM_DATA[item.itemId];
+
+      <app-inventory-slot
+        [item]="itemData"
+        [tier]="itemData.tier"
+        [amount]="item.amount"
+      />
+    }
+  </div>
+}

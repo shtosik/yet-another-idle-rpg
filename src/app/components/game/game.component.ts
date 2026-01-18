@@ -63,6 +63,10 @@ export class GameComponent {
     this.townsStore.resetState()
   }
 
+  resetQuests() {
+    this.questsStore.resetState()
+  }
+
   changeTab(tab: GameTab) {
     this.gameTab.next(tab)
   }

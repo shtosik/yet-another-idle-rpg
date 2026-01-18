@@ -1,8 +1,11 @@
 {
-    "names": {
-        "meatShortage": "Meat shortage",
-        "clearingOutTheBeach": "Clearing out the beach",
-        "ratsWereRats": "Rats, We are rats",
-        "aTaleOfACaptain": "A tale of a captain"
-    }
+  "names": {
+    "meatShortage": "Meat shortage",
+    "clearingOutTheBeach": "Clearing out the beach",
+    "ratsWereRats": "Rats, We are rats",
+    "aTaleOfACaptain": "A tale of a captain"
+  },
+  "requirements": {
+    "waveKillCount": "{{ amount }} KC on wave {{ wave }} in {{ zone }}"
+  }
 }
