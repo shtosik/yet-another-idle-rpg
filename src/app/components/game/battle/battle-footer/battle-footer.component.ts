@@ -2,11 +2,15 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { BattleStore } from '../../../../store/battle/battle.store'
 import { UrlPipe } from '../../../../pipes/url.pipe'
 import SPELLS_DATA from '../../../../../data/spells-data'
+import { SlotComponent } from '../../../shared/slot/slot.component'
+import { SpellSlotComponent } from './spell-slot/spell-slot.component'
 
 @Component({
   selector: 'app-battle-footer',
   imports: [
     UrlPipe,
+    SlotComponent,
+    SpellSlotComponent,
   ],
   templateUrl: './battle-footer.component.html',
   styleUrl: './battle-footer.component.sass',
@@ -14,6 +18,10 @@ import SPELLS_DATA from '../../../../../data/spells-data'
 })
 export class BattleFooterComponent {
   private battleStore = inject(BattleStore)
+
+  equippedSpells = this.battleStore.equippedSpells
+
+  readonly slots = new Array(5).fill(null)
   protected readonly SPELLS_DATA = SPELLS_DATA
 
   activeSpells = computed(() => {

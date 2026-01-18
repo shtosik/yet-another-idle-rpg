@@ -1,0 +1,40 @@
+@let spellData = SPELLS_DATA[spellId()];
+@let spellCooldown = spellData.baseCooldown - playerStats().spellCooldownReduction;
+@let timeLeftUntilReady = equippedSpell.cooldown / spellCooldown * 360;
+
+<div
+  class="spell"
+  placement="top"
+  tooltipClass="tooltip-override"
+  [autoPlacement]="false"
+  [style]="{ 'background-image': spellData.url | url }"
+  [style.--time-left]="timeLeftUntilReady + 'deg'"
+  [tooltipContext]="{ spellData }"
+  [tooltipTemplate]="tooltip"
+  (click)="handleCastSpell(spellId(), equippedSpell)"
+>
+  @if (equippedSpell.cooldown) {
+    <span class="spell__counter">{{ equippedSpell.cooldown }}</span>
+  }
+</div>
+
+<ng-template
+  #tooltip
+  let-spell="spellData"
+>
+  <div class="spell__tooltip">
+    <div class="spell__header">
+      <span>{{ ('spells:names.' + SpellID[spell.id] + '.name')  | i18next }}</span>
+      <span [class]="SpellType[spell.effect?.type]">{{ ('spells:types.' + SpellType[spell.effect?.type])  | i18next }}</span>
+    </div>
+    <div class="spell__info">
+      <span class="mana">{{ 'spells:manaCost' | i18next: { cost: spellData.baseManaCost } }}</span>
+      <span class="cooldown">{{ 'spells:cooldown' | i18next: { cooldown: spellCooldown } }}</span>
+      @if (spellData.effect.type === SpellType.buff) {
+        <span class="duration">{{ 'spells:duration' | i18next: { duration: (spellData.effect.duration + playerStats().increasedSpellDuration) } }}</span>
+      }
+    </div>
+    <span class="spell__desc">{{ ('spells:names.' + SpellID[spell.id] + '.desc')  | i18next }}</span>
+
+  </div>
+</ng-template>

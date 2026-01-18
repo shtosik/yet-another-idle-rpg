@@ -1,11 +1,26 @@
 <footer>
-  @for (spell of activeSpells(); track spell.spellId) {
-    @let spellData = SPELLS_DATA[spell.spellId];
-    <div
-      class="spell"
-      [style]="{ 'background-image': spellData.url | url }"
-    >
-      {{ spell.duration }}
-    </div>
-  }
+  <div class="active-buffs">
+    @for (spell of activeSpells(); track spell.spellId) {
+      @let spellData = SPELLS_DATA[spell.spellId];
+      <div
+        class="buff"
+        [style]="{ 'background-image': spellData.url | url }"
+      >
+        {{ spell.duration }}
+      </div>
+    }
+  </div>
+  <div class="spell-bar">
+    @for (_ of slots; track $index) {
+      <app-slot>
+        @if (equippedSpells()[$index]) {
+          <app-spell-slot
+            [spellId]="equippedSpells()[$index].spellId"
+            [equippedSpell]="equippedSpells()[$index]"
+          />
+        }
+      </app-slot>
+    }
+  </div>
+
 </footer>

@@ -11,7 +11,6 @@ import { CraftingComponent } from './crafting/crafting.component'
 import { PlayerStore } from '../../store/player/player.store'
 import { PlayerStatsComponent } from './player-stats/player-stats.component'
 import { GameMenuComponent } from './game-menu/game-menu.component'
-import { SpellsComponent } from './spells/spells.component'
 import { BattleComponent } from './battle/battle.component'
 import { SkillTreesComponent } from './skill-trees/skill-trees.component'
 import { BattleStore } from '../../store/battle/battle.store'
@@ -30,7 +29,6 @@ const imports = [
   CraftingComponent,
   PlayerStatsComponent,
   GameMenuComponent,
-  SpellsComponent,
   BattleComponent,
   SkillTreesComponent,
 ]

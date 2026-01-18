@@ -2,14 +2,29 @@
 
 footer
   display: flex
-  justify-content: space-between
-  padding: 0 1rem
+  flex-direction: column
+  padding: 0.5rem 0.5rem
+  width: 100%
+  align-items: center
+  justify-content: flex-end
+  height: 100%
+  gap: 1rem
 
-  .spell
-    width: 40px
-    height: 40px
-    background-size: contain
+  .active-buffs
     display: flex
-    align-items: center
-    justify-content: center
-    text-shadow: variables.$textShadow
+    gap: 0.5rem
+    width: 100%
+
+    .buff
+      width: 40px
+      height: 40px
+      background-size: contain
+      display: flex
+      align-items: center
+      justify-content: center
+      text-shadow: variables.$textShadow
+
+  .spell-bar
+    width: 100%
+    display: flex
+    justify-content: space-between
