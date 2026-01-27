@@ -1,5 +1,5 @@
 import { NgOptimizedImage } from '@angular/common'
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core'
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core'
 import { ItemTier } from 'enums/items/item-tier.enum'
 import { Item } from 'interfaces/item.interface'
 import { TranslatePipe } from '../../../../pipes/i18next.pipe'
@@ -18,7 +18,7 @@ import { ItemType } from '../../../../../enums/items/item-type.enum'
   imports: [NgOptimizedImage, TranslatePipe, TooltipTemplateDirective, StatToPercentagePipe],
 })
 
-export class InventoryItemComponent implements OnInit {
+export class InventoryItemComponent {
   @Input() item: Item
   @Input() amount: number
   @Input() tier: ItemTier
@@ -32,9 +32,9 @@ export class InventoryItemComponent implements OnInit {
   protected readonly ItemID = ItemID
   protected readonly ItemType = ItemType
 
-  constructor() {
-  }
+  handleClick() {
+    if (!this.clickable) return
 
-  ngOnInit() {
+    this.equipItem.emit()
   }
 }

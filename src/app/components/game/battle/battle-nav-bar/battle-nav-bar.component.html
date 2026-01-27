@@ -3,8 +3,7 @@
 <div class="battle-nav-bar">
   <div>
     <h2 class="zone">{{ 'zones:names.' + ZoneID[currentZoneData?.id] | i18next }}</h2>
-    <h3 class="killcount"> {{ 'killCount' | i18next }}: {{ currentKillCount() }}
-      / {{ requiredKillCount() }}</h3>
+    <h3 class="killcount"> {{ 'killCount' | i18next }}: {{ this.killCountToShow() }}</h3>
   </div>
   <div class="right-side">
     <span>{{ 'wave' | i18next }}: {{ currentWave() }}/{{ currentZoneData.maxWave }}</span>

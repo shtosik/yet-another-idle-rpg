@@ -5,7 +5,7 @@
   class="item"
   placement="bottom"
   tooltipClass="tooltip-override"
-  (click)="clickable ? equipItem.emit() : null"
+  (click)="handleClick()"
 >
   <img
     [ngSrc]="item.url"

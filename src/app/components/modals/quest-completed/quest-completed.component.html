@@ -1,23 +1,31 @@
-<h2>{{ 'quests:names.' + QuestID[questData().questId] | i18next }} {{ 'completed' | i18next }}</h2>
+<app-close-button (onClose)="close()"/>
+<div class="modal">
+  <h2>
+    <span class="modal__quest-name">{{ 'quests:names.' + QuestID[questData().questId] | i18next }}</span> {{ 'completed' | i18next }}
+  </h2>
 
-@if (statsToDisplay()) {
-  <ul>
-    @for (stat of statsToDisplay(); track stat.key) {
-      <li>{{ stat.amount }} {{ 'playerStats.' + stat.key | i18next }}</li>
-    }
-  </ul>
-}
+  @if (statsToDisplay()) {
+    <ul class="modal__stats">
+      @for (stat of statsToDisplay(); track stat.key) {
+        <li>{{ stat.amount }} {{ 'playerStats.' + stat.key | i18next }}</li>
+      }
+    </ul>
+  }
 
-@if (itemsToDisplay()) {
-  <div>
-    @for (item of itemsToDisplay(); track item.itemId) {
-      @let itemData = ITEM_DATA[item.itemId];
+  @if (itemsToDisplay()) {
+    <div class="modal__items">
+      @for (item of itemsToDisplay(); track item.itemId) {
+        @let itemData = ITEM_DATA[item.itemId];
+        <app-slot>
+          <app-inventory-slot
+            [item]="itemData"
+            [tier]="itemData.tier"
+            [amount]="item.amount"
+            [clickable]="false"
+          />
+        </app-slot>
+      }
+    </div>
+  }
 
-      <app-inventory-slot
-        [item]="itemData"
-        [tier]="itemData.tier"
-        [amount]="item.amount"
-      />
-    }
-  </div>
-}
+</div>

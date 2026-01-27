@@ -12,11 +12,13 @@ import ITEM_DATA from '../../../data/items-data'
 
 export interface QuestState {
   questStepProgression: QuestProgression
+  completedQuests: Partial<Record<QuestID, boolean>>
   dialogueFlags: Record<string, boolean>
 }
 
 export const initialState: QuestState = {
   questStepProgression: {},
+  completedQuests: {},
   dialogueFlags: {},
 }
 
@@ -51,7 +53,11 @@ export const QuestsStore = signalStore(
             break
         }
       })
-      
+
+      patchState(store, (state) => ({
+        completedQuests: { ...state.completedQuests, [data.questId]: true },
+      }))
+
       modalService.openQuestCompleted(data)
       playerStore.updatePlayerStats(statsToUpdate)
       playerStore.updatePlayerInventory(itemsToUpdate)

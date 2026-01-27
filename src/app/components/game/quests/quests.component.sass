@@ -1,0 +1,19 @@
+@use 'mixins'
+@use 'palette'
+
+:host
+  @include mixins.panel
+  width: 100%
+
+.quests
+  li
+    margin-bottom: 0.5rem
+
+    h3
+      color: palette.$yellow
+      margin-bottom: 0.5rem
+      cursor: pointer
+
+      &.completed
+        color: palette.$green
+        cursor: default

@@ -19,6 +19,9 @@ export class ModalService {
 
   openQuestCompleted(data: QuestProps) {
     const config: MatDialogConfig = {
+      enterAnimationDuration: '300ms',
+      hasBackdrop: true,
+      panelClass: 'modal',
       minWidth: '800px',
       position: { top: '250px' },
       data,

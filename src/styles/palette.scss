@@ -2,34 +2,35 @@
 
 .yellow {
 
-    color: #eab308;
+  color: #eab308;
 }
 
 .cyan {
-    color: #06b6d4;
+  color: #06b6d4;
 }
 
 .blue {
-    color: #3b82f6;
+  color: #3b82f6;
 }
 
 
 $yellow: #eab308;
 $cyan: #06b6d4;
 $blue: #3b82f6;
+$green: #2dab28;
 
 $itemPalette: (
-    "trash": rgb(180, 180, 180),
-    "normal": rgb(255, 255, 255),
-    "uncommon": rgb(60, 179, 113),
-    "rare": rgb(0, 118, 255),
-    "epic": rgb(179, 64, 255),
-    "legendary": rgb(255, 152, 25),
-    "quest": rgb(147, 12, 51),
+  "trash": rgb(180, 180, 180),
+  "normal": rgb(255, 255, 255),
+  "uncommon": rgb(60, 179, 113),
+  "rare": rgb(0, 118, 255),
+  "epic": rgb(179, 64, 255),
+  "legendary": rgb(255, 152, 25),
+  "quest": rgb(147, 12, 51),
 );
 
 $spellTypePalette: (
-    "melee": rgb(147, 12, 51),
-    "magic": rgb(0, 118, 255),
-    "buff": rgb(60, 179, 113)
+  "melee": rgb(147, 12, 51),
+  "magic": rgb(0, 118, 255),
+  "buff": rgb(60, 179, 113)
 )

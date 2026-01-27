@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common'
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core'
 import { TranslatePipe } from 'app/pipes/i18next.pipe'
 import { EnemyID } from 'enums/ids/enemy-id.enum'
 import { ZoneID } from 'enums/ids/zone-id.enum'
@@ -21,6 +21,17 @@ export class BattleNavBarComponent {
   requiredKillCount = this.battleStore.requiredKillCountOnCurrentWave
   currentZone = this.battleStore.currentZoneData
   currentKillCount = this.battleManagerService.currentWaveKillCount
+
+  killCountToShow = computed(() => {
+    const current = this.currentKillCount()
+    const required = this.requiredKillCount()
+
+    if (current < required) {
+      return `${current} / ${required}`
+    }
+
+    return `${current}`
+  })
 
   readonly ZoneID = ZoneID
   readonly EnemyID = EnemyID

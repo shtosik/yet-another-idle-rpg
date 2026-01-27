@@ -1,0 +1,10 @@
+<ul class="quests">
+  @for (quest of questsArray(); track quest[0]) {
+    <li (click)="setActiveDescription(quest[0], quest[1])">
+      <h3 [class.completed]="quest[1] === QUEST_STEP_AFTER_COMPLETED">{{ 'quests:names.' + QuestID[quest[0]] | i18next }}</h3>
+      @if (clickedQuest() && quest[0] === clickedQuest()) {
+        <p>{{ questDescription() }}</p>
+      }
+    </li>
+  }
+</ul>
