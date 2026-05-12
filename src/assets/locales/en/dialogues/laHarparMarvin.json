@@ -1,0 +1,29 @@
+{
+  "introduction1": {
+    "message": "Ah, a fresh face! You look like the adventuring type. I'm Marvin, head of the Exploration Guild.",
+    "opt1": "Tell me more about this guild.",
+    "opt2": "I'll figure it out myself. Just show me the tasks."
+  },
+  "introduction2": {
+    "message": "The Exploration Guild assigns hunting contracts to capable adventurers. Slay the target, earn Explorer Tokens. Simple as that. The more tasks you complete, the further I'll send you — new territories unlock every 5 completions.",
+    "opt1": "Sounds good. Let's get started."
+  },
+  "default": {
+    "message": "Back for more work, or just browsing? The guild always has contracts available.",
+    "whatIsThisPlace": "What is the Exploration Guild?",
+    "taskIntro": "I'd like to take on a task.",
+    "goodbye": "See you around, Marvin."
+  },
+  "whatIsThisPlace1": {
+    "message": "We map the unknown and thin out the dangers. Every monster you hunt under our contract earns you Explorer Tokens. Complete enough tasks and I'll authorize expeditions into deeper, more dangerous territories.",
+    "opt1": "Got it. Thanks, Marvin."
+  },
+  "taskIntro": {
+    "message": "Pick a contract length and I'll assign you a target from the regions you've unlocked. The longer the contract, the bigger the token payout.",
+    "opt1": "Let me check the board."
+  },
+  "taskClaimed": {
+    "message": "Fine work out there! Your tokens have been added. Keep this up and I'll have new territories for you before long.",
+    "opt1": "Thanks, Marvin."
+  }
+}

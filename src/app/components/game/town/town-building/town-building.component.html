@@ -1,14 +1,17 @@
 @let buildingData = building();
 
 <section
-    class="building"
-    [style.background-image]="buildingData.url | url"
+  class="building"
+  [style.background-image]="buildingData.url | url"
 >
-    <h2 class="building__title">{{ 'map:townTabs.' + TownBuildingID[buildingData.tabId] | i18next }}</h2>
-    @for (npc of buildingData.npcIds; track npc.id) {
-        <app-npc-frame
-            [npc]="npc"
-            (openDialogue)="openDialogue($event)"
-        />
-    }
+  <h2 class="building__title">{{ 'map:townTabs.' + TownBuildingID[buildingData.tabId] | i18next }}</h2>
+  @for (npc of buildingData.npcIds; track npc.id) {
+    <app-npc-frame
+      [npc]="npc"
+      (openDialogue)="openDialogue($event)"
+    />
+  }
+  @if (buildingData.tabId === TownBuildingID.explorationGuild) {
+    <app-exploration-guild class="exploration-guild-panel"/>
+  }
 </section>

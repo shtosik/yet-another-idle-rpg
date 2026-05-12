@@ -7,6 +7,7 @@ import { TranslatePipe } from '../../../../pipes/i18next.pipe'
 import { TownBuildingID } from '../../../../../enums/map/town-tab-id.enum'
 import { NpcID } from '../../../../../enums/map/npc-id.enum'
 import { DialogueManagerService } from '../../../../services/dialogue-manager.service'
+import { ExplorationGuildComponent } from '../exploration-guild/exploration-guild.component'
 
 @Component({
   selector: 'app-town-building',
@@ -18,6 +19,7 @@ import { DialogueManagerService } from '../../../../services/dialogue-manager.se
     NpmFrameComponent,
     CommonModule,
     TranslatePipe,
+    ExplorationGuildComponent,
   ],
 })
 export class TownBuildingComponent {

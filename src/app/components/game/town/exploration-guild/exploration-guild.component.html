@@ -1,0 +1,99 @@
+@let task = activeTask();
+@let hasSlot = hasAvailableTaskSlot();
+@let complete = isTaskComplete();
+@let tokens = explorerTokens();
+@let completed = totalTasksCompleted();
+@let zones = unlockedZoneCount();
+
+<div class="exploration-guild">
+  <!-- Header Stats -->
+  <div class="exploration-guild__header">
+    <div class="exploration-guild__stat">
+      <span class="exploration-guild__stat-label">Explorer Tokens</span>
+      <span class="exploration-guild__stat-value">{{ tokens }}</span>
+    </div>
+    <div class="exploration-guild__stat">
+      <span class="exploration-guild__stat-label">Tasks Completed</span>
+      <span class="exploration-guild__stat-value">{{ completed }}</span>
+    </div>
+    <div class="exploration-guild__stat">
+      <span class="exploration-guild__stat-label">Zones Unlocked</span>
+      <span class="exploration-guild__stat-value">{{ zones }}</span>
+    </div>
+  </div>
+
+  <!-- State A: No active task, slot available → Show task length buttons -->
+  @if (hasSlot && !task) {
+    <div class="exploration-guild__task-selection">
+      <h3 class="exploration-guild__title">Ask Marvin for a Task</h3>
+      <p class="exploration-guild__description">Choose a contract length:</p>
+      <div class="exploration-guild__buttons">
+        <button
+          class="exploration-guild__btn exploration-guild__btn--short"
+          (click)="selectTaskLength('short')"
+        >
+          <span class="btn__label">Short</span>
+          <span class="btn__detail">25–50 kills</span>
+          <span class="btn__reward">1 Token</span>
+        </button>
+        <button
+          class="exploration-guild__btn exploration-guild__btn--medium"
+          (click)="selectTaskLength('medium')"
+        >
+          <span class="btn__label">Medium</span>
+          <span class="btn__detail">50–200 kills</span>
+          <span class="btn__reward">2 Tokens</span>
+        </button>
+        <button
+          class="exploration-guild__btn exploration-guild__btn--long"
+          (click)="selectTaskLength('long')"
+        >
+          <span class="btn__label">Long</span>
+          <span class="btn__detail">200–400 kills</span>
+          <span class="btn__reward">3 Tokens</span>
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- State B: Active task in progress → Show progress bar -->
+  @if (task && !complete) {
+    <div class="exploration-guild__task-progress">
+      <div class="exploration-guild__task-info">
+        <h3 class="exploration-guild__title">Current Task</h3>
+        <p class="exploration-guild__monster-name">{{ getEnemyName(task.monsterId) }}</p>
+        <span class="exploration-guild__count">{{ task.currentCount }} / {{ task.targetCount }}</span>
+        <span class="exploration-guild__reward-info">Reward: {{ task.rewardTokens }} Token{{ task.rewardTokens > 1 ? 's' : '' }}</span>
+      </div>
+      <div class="exploration-guild__progress-bar">
+        <div
+          class="exploration-guild__progress-fill"
+          [style.width.%]="getProgressPercent(task) * 100"
+        ></div>
+      </div>
+      <button
+        class="exploration-guild__btn exploration-guild__btn--abandon"
+        (click)="abandonTask()"
+      >
+        Abandon Task
+      </button>
+    </div>
+  }
+
+  <!-- State C: Task complete → Show claim button -->
+  @if (task && complete) {
+    <div class="exploration-guild__task-complete">
+      <h3 class="exploration-guild__title">Task Complete!</h3>
+      <p class="exploration-guild__monster-name">{{ getEnemyName(task.monsterId) }}</p>
+      <span class="exploration-guild__count">{{ task.currentCount }} / {{ task.targetCount }}</span>
+      <div class="exploration-guild__claim-reward">
+        <button
+          class="exploration-guild__btn exploration-guild__btn--claim"
+          (click)="claimReward()"
+        >
+          Claim {{ task.rewardTokens }} Token{{ task.rewardTokens > 1 ? 's' : '' }}
+        </button>
+      </div>
+    </div>
+  }
+</div>

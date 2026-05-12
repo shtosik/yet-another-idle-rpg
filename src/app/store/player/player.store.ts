@@ -1,4 +1,4 @@
-import { patchState, signalStore, withMethods, withState } from '@ngrx/signals'
+import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals'
 import { PlayerStat } from '../../../types/player/player-stat.type'
 import { calculateXp } from 'app/pipes/calculate-xp.pipe'
 import { initialEquipmentState, statsInitialState } from './player'
@@ -24,6 +24,15 @@ import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
 
 export type PlayerStatsType = Record<PlayerStat, number>;
 
+export interface Task {
+  id: string
+  monsterId: EnemyID
+  targetCount: number
+  currentCount: number
+  rewardTokens: number
+  zoneId: ZoneID
+}
+
 interface PlayerState {
   stats: PlayerStatsType;
   zonesProgression: ZonesProgression;
@@ -32,6 +41,9 @@ interface PlayerState {
   equipment: EquipmentType;
   unlockedSkillPoints: UnlockedSkillPoints;
   unlockedSpells: UnlockedSpellsType;
+  activeTasks: Task[];
+  totalTasksCompleted: number;
+  explorerTokens: number;
 }
 
 export const initialState: PlayerState = {
@@ -42,6 +54,9 @@ export const initialState: PlayerState = {
   unlockedSkillPoints: {},
   unlockedSpells: {},
   enemyKillCounts: {},
+  activeTasks: [],
+  totalTasksCompleted: 0,
+  explorerTokens: 0,
 }
 
 const itemIndexFromInventory = (inventory: (InventoryItem | null)[], id: ItemID, tier: ItemTier): number =>
@@ -85,6 +100,15 @@ export const PlayerStore = signalStore(
     key: STORE_KEY,
     autoSync: true,
   }),
+  withComputed((store) => ({
+    maxTaskSlots: () => 1,
+    hasAvailableTaskSlot: () => store.activeTasks().length < 1,
+    activeTask: () => store.activeTasks()[0] ?? null,
+    isTaskComplete: () => {
+      const task = store.activeTasks()[0]
+      return task ? task.currentCount >= task.targetCount : false
+    },
+  })),
   withMethods((store) => ({
     resetState() {
       patchState(store, initialState)
@@ -207,6 +231,41 @@ export const PlayerStore = signalStore(
         },
       }))
     },
+
+    acceptTask(task: Task) {
+      patchState(store, (state) => ({
+        activeTasks: [...state.activeTasks, task],
+      }))
+    },
+
+    updateTaskProgress(monsterId: EnemyID) {
+      patchState(store, (state) => {
+        const updatedTasks = state.activeTasks.map(task => {
+          if (task.monsterId === monsterId && task.currentCount < task.targetCount) {
+            return { ...task, currentCount: task.currentCount + 1 }
+          }
+          return task
+        })
+        return { activeTasks: updatedTasks }
+      })
+    },
+
+    claimTaskReward(taskId: string) {
+      const task = store.activeTasks().find(t => t.id === taskId)
+      if (!task || task.currentCount < task.targetCount) return
+
+      patchState(store, (state) => ({
+        activeTasks: state.activeTasks.filter(t => t.id !== taskId),
+        totalTasksCompleted: state.totalTasksCompleted + 1,
+        explorerTokens: state.explorerTokens + task.rewardTokens,
+      }))
+    },
+
+    abandonTask(taskId: string) {
+      patchState(store, (state) => ({
+        activeTasks: state.activeTasks.filter(t => t.id !== taskId),
+      }))
+    },
   })),
   withMethods((store) => ({
     processBattleEnd(enemyId: EnemyID, zoneId: ZoneID, currentWave: number) {
@@ -223,6 +282,7 @@ export const PlayerStore = signalStore(
 
       store.updateZoneProgression(zoneId, currentWave)
       store.updateEnemyKillCount(enemyId)
+      store.updateTaskProgress(enemyId)
 
       if (itemsToUpdate.length) store.updatePlayerInventory(itemsToUpdate)
     },
