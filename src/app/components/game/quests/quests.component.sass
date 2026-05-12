@@ -4,16 +4,31 @@
 :host
   @include mixins.panel
   width: 100%
+  flex-direction: column
 
 .quests
-  li
-    margin-bottom: 0.5rem
+  &__filters
+    margin-bottom: 1rem
+    display: flex
+    gap: 1rem
 
-    h3
-      color: palette.$yellow
+    button
+      @include mixins.button
+      margin: 0
+
+      &.active
+        color: palette.$cyan
+        border: 1px solid palette.$cyan
+
+  &__list
+    li
       margin-bottom: 0.5rem
-      cursor: pointer
 
-      &.completed
-        color: palette.$green
-        cursor: default
+      h3
+        color: palette.$yellow
+        margin-bottom: 0.5rem
+        cursor: pointer
+
+        &.completed
+          color: palette.$green
+          cursor: default

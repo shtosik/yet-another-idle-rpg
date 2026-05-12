@@ -7,5 +7,9 @@
   },
   "requirements": {
     "waveKillCount": "{{ amount }} KC on wave {{ wave }} in {{ zone }}"
+  },
+  "filters": {
+    "all": "All",
+    "completed": "Completed"
   }
 }

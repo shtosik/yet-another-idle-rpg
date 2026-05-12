@@ -8,10 +8,10 @@
   </app-panel>
   @if (tab === GameTab.main || tab === GameTab.crafting || tab === GameTab.towns) {
     @switch (tab) {
-      @case (GameTab.main) {
-        <app-panel class="spells"/>
-        <app-panel class="buff-items"/>
-      }
+      <!--      @case (GameTab.main) {-->
+        <!--        <app-panel class="spells"/>-->
+        <!--        <app-panel class="buff-items"/>-->
+        <!--      }-->
       @case (GameTab.crafting) {
         <app-crafting class="crafting"/>
       }
@@ -33,7 +33,9 @@
     <app-skill-trees class="skill-tree"/>
   }
 </div>
-<button (click)="resetState()">reset state</button>
-<button (click)="giveStat('unspentSkillPoints')">give skill points</button>
-<button (click)="giveStat('experience')">give xp</button>
-<button (click)="resetQuests()">reset quests</button>
+<div style="margin-top: 1rem; display: flex; gap: 0.2rem;">
+  <button (click)="resetState()">reset state</button>
+  <button (click)="giveStat('unspentSkillPoints')">give skill points</button>
+  <button (click)="giveStat('experience')">give xp</button>
+  <button (click)="resetQuests()">reset quests</button>
+</div>

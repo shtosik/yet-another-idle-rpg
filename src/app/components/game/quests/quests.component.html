@@ -1,4 +1,18 @@
-<ul class="quests">
+@let filters = questFilters();
+
+<div class="quests__filters">
+  <button
+    [class.active]="filters === 'all'"
+    (click)="changeFilter('all')"
+  >{{ 'quests:filters.all' | i18next }}
+  </button>
+  <button
+    [class.active]="filters === 'completed'"
+    (click)="changeFilter('completed')"
+  >{{ 'quests:filters.completed' | i18next }}
+  </button>
+</div>
+<ul class="quests__list">
   @for (quest of questsArray(); track quest[0]) {
     <li (click)="setActiveDescription(quest[0], quest[1])">
       <h3 [class.completed]="quest[1] === QUEST_STEP_AFTER_COMPLETED">{{ 'quests:names.' + QuestID[quest[0]] | i18next }}</h3>

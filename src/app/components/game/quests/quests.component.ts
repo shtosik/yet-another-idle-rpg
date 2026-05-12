@@ -26,14 +26,19 @@ export class QuestsComponent {
   clickedQuest = signal<QuestID>(null)
   questFilters = signal<QuestFilters>('all')
 
-  questsArray: Signal<[QuestID, number]> = computed(() => {
-    return Object.entries(this.questProgression()) as any as [QuestID, number]
+  questsArray: Signal<[QuestID, number][]> = computed(() => {
+    const questsArray = Object.entries(this.questProgression()) as any as [QuestID, number][]
+    const filters = this.questFilters()
+
+    if (filters === 'completed') return questsArray.filter(([_, step]) => step === QUEST_STEP_AFTER_COMPLETED)
+
+    return questsArray
   })
 
   questDescription = computed(() => {
     const quest = this.clickedQuest()
 
-    if (quest === null) return ''
+    if (quest === null) return null
 
     const questProgress = this.questProgression()[quest]
 
@@ -48,5 +53,10 @@ export class QuestsComponent {
     } else {
       this.clickedQuest.set(questId)
     }
+  }
+
+  changeFilter(filter: QuestFilters) {
+    this.questFilters.set(filter)
+    this.clickedQuest.set(null)
   }
 }

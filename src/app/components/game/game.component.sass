@@ -1,20 +1,20 @@
 .game
   display: grid
   gap: 0.5rem
-  grid-template-rows: 20rem 5rem 20rem
+  grid-template-rows: 20rem 25rem
   grid-template-columns: 1fr 24rem 24rem 1fr
 
   .battle
     grid-column: 1 / 1
-    grid-row: 1 / span 3
+    grid-row: 1 / span 2
 
   .stats
     grid-column: 2 / 2
-    grid-row: 1 / span 1
+    grid-row: 1 / 1
 
   .resources
     grid-column: 3 / 3
-    grid-row: 1 / span 1
+    grid-row: 1 / 1
 
   .inventory,
   .crafting,
@@ -24,7 +24,7 @@
 
   .crafting,
   .towns
-    grid-row: 1 / span 2
+    grid-row: 1 / 2
 
   .equipment,
   .quests
@@ -37,18 +37,18 @@
 
   .inventory,
   .dialogue
-    grid-row: 3 / 3
+    grid-row: 2 / 2
 
   .quests
-    grid-row: 2 / span 2
+    grid-row: 2 / 2
 
   .spells
     grid-row: 2 / 2
     grid-column: 2 / 2
 
   .skill-tree
-    grid-column: 2 / span 3
-    grid-row: 1 / span 3
+    grid-column: 2 / 3
+    grid-row: 1 / span 2
 
   .buff-items
     grid-row: 2 / 2

@@ -3,57 +3,45 @@
 @use 'palette' as palette
 
 :host
-    @include mixins.panel
-    width: 100%
-    height: 100%
-    padding: 0
+  @include mixins.panel
+  width: 100%
+  height: 100%
+  padding: 0
 
 .crafting
-    display: grid
-    grid-template-columns: 65% 35%
+  display: grid
+  grid-template-columns: 65% 35%
+  gap: 0.8rem
+  background-size: cover
+  background: url('/assets/img/backgrounds/crafting-background.webp') no-repeat right
+  height: 100%
+  padding: 0.8rem
+  border-radius: vars.$panelBorderRadius
+  width: 100%
+
+  &__recipes
+    display: flex
     gap: 0.8rem
-    background-size: cover
-    background: url('/assets/img/backgrounds/crafting-background.webp') no-repeat right
+    flex-wrap: wrap
+    align-self: baseline
+
+  &__cost
+    padding: 1.5rem 2.5rem 1.5rem 1rem
+    font-size: 0.9rem
+    display: flex
+    flex-direction: column
+
+  h3
+    text-shadow: vars.$textShadow
+    text-align: center
+    height: 67px
+    color: palette.$cyan
+
+  &__items-needed
+    margin-top: 1rem
     height: 100%
-    padding: 0.8rem
-    border-radius: vars.$panelBorderRadius
-    width: 100%
+    text-shadow: vars.$textShadow
+    font-size: 1rem
 
-    &__recipes
-        display: flex
-        gap: 0.8rem
-        flex-wrap: wrap
-        align-self: baseline
-
-    &__cost
-        padding: 1.5rem 2.5rem 1.5rem 1rem
-        font-size: 0.9rem
-        display: flex
-        flex-direction: column
-
-    h3
-        text-shadow: vars.$textShadow
-        text-align: center
-        height: 67px
-        color: palette.$cyan
-
-    &__items-needed
-        margin-top: 1rem
-        height: 100%
-        text-shadow: vars.$textShadow
-        font-size: 1rem
-
-    &__craft-button
-        background: vars.$panelBackgroundColor
-        border: 1px solid palette.$yellow
-        border-radius: vars.$panelBorderRadius
-        width: fit-content
-        padding: 0.2rem 0.4rem
-        cursor: pointer
-        color: palette.$yellow
-        font-size: 1.2rem
-        margin: 0 auto
-        transition: background-color 0.33s ease-in-out
-
-        &:hover
-            background: vars.$hoverBackground
+  &__craft-button
+    @include mixins.button
