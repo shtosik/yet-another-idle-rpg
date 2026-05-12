@@ -3,7 +3,6 @@ import { DialogueEffect } from '../../types/dialogues/dialogue-effect.type'
 
 export interface DialogueOption<T> {
   responseKey: string // i18n key
-  next?: T
   results: DialogueResult<T>[]
 }
 

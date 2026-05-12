@@ -48,7 +48,7 @@ const LA_HARPAR_JOSH: LaHarparJoshDialogueType = {
         results: [
           {
             next: JoshDialogue.talkReady,
-            effects: [{ type: 'stat', stats: [{ amount: -20, stat: 'goldCoins' }] }],
+            effects: [{ type: 'stat', action: 'deduct', stats: [{ stat: 'goldCoins', amount: 20 }] }],
           },
         ],
       },

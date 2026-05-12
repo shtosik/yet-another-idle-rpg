@@ -36,16 +36,18 @@ interface ManyQuestsCondition {
 
 interface StatCondition {
   type: 'stat'
-  key: PlayerStat
+  stat: PlayerStat
   comparison: 'gte' | 'lte'
   amount: number
 }
 
 interface ManyStatsCondition {
   type: 'manyStat'
-  key: PlayerStat[]
-  comparisons: Partial<Record<PlayerStat, 'gte' | 'lte'>>
-  amounts: number
+  statsRequired: {
+    stat: PlayerStat
+    comparison: 'gte' | 'lte'
+    amount: number
+  }[]
 }
 
 interface EnemyKillCountCondition {
@@ -75,7 +77,7 @@ interface ManyWavesKillCountCondition {
     zoneId: ZoneID
     waveNumber: number
     amount: number
-  }
+  }[]
 }
 
 interface ItemCondition {

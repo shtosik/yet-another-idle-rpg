@@ -8,7 +8,13 @@ import { DialogueCondition } from '../../types/dialogues/dialogue-condition.type
 import { NpcID } from '../../enums/map/npc-id.enum'
 import npcData, { NPCProps } from '../../data/npc-data'
 import { QuestState } from '../../enums/quest-state.enum'
-import QUEST_DATA, { QUEST_STEP_AFTER_COMPLETED, RequirementProps } from '../../data/quests-data'
+import QUEST_DATA, {
+  QUEST_STEP_AFTER_COMPLETED,
+  QUEST_STEP_AFTER_FAILED,
+  RequirementProps,
+} from '../../data/quests-data'
+import ITEM_DATA from '../../data/items-data'
+import { InventoryItem } from '../../interfaces/item.interface'
 
 @Injectable({ providedIn: 'root' })
 export class DialogueManagerService {
@@ -86,10 +92,15 @@ export class DialogueManagerService {
   checkCondition(c: DialogueCondition): boolean {
     switch (c.type) {
       case 'stat':
-        const stats = this.playerStore.stats()
-        const val = stats[c.key as keyof typeof stats]
-
-        return c.comparison === 'gte' ? (val as number) >= c.amount : (val as number) <= c.amount
+        return c.comparison === 'gte'
+          ? (this.playerStore.stats()[c.stat] as number) >= c.amount
+          : (this.playerStore.stats()[c.stat] as number) <= c.amount
+      case 'manyStat':
+        return c.statsRequired.every(req =>
+          req.comparison === 'gte'
+            ? (this.playerStore.stats()[req.stat] as number) >= req.amount
+            : (this.playerStore.stats()[req.stat] as number) <= req.amount,
+        )
       case 'quest':
         const questData = QUEST_DATA[c.questId]
         const currentProgress = this.questStore.getQuestStep(c.questId)
@@ -112,6 +123,8 @@ export class DialogueManagerService {
 
           case QuestState.completed:
             return currentProgress === QUEST_STEP_AFTER_COMPLETED
+          case QuestState.failed:
+            return currentProgress === QUEST_STEP_AFTER_FAILED
           default:
             return true
         }
@@ -149,7 +162,11 @@ export class DialogueManagerService {
     effects.forEach(effect => {
       switch (effect.type) {
         case 'stat':
-          this.playerStore.updatePlayerStats(effect.stats)
+          const signedStats = effect.stats.map(s => ({
+            stat: s.stat,
+            amount: effect.action === 'deduct' ? -s.amount : s.amount,
+          }))
+          this.playerStore.updatePlayerStats(signedStats)
           break
         case 'quest':
           switch (effect.action) {
@@ -159,14 +176,27 @@ export class DialogueManagerService {
             case 'advance':
               this.questStore.advanceQuest(effect.questId)
               break
+            case 'fail':
+              this.questStore.failQuest(effect.questId)
+              break
           }
           break
         case 'shop':
           this.openShop(effect.shopId)
           break
         case 'flag':
-          console.log('test')
           this.questStore.setDialogueFlag(effect.name)
+          break
+        case 'item':
+          if (effect.action === 'take') {
+            this.playerStore.removeItemsFromInventory(effect.items.map(i => ({ id: i.itemId, amount: i.amount })))
+          } else if (effect.action === 'give') {
+            const itemsToUpdate: InventoryItem[] = effect.items.map(i => {
+              const itemData = ITEM_DATA[i.itemId]
+              return { id: i.itemId, amount: i.amount, type: itemData.type, tier: itemData.tier }
+            })
+            this.playerStore.updatePlayerInventory(itemsToUpdate)
+          }
           break
       }
     })

@@ -153,6 +153,26 @@ export const PlayerStore = signalStore(
       })
     },
 
+    removeItemsFromInventory(items: { id: ItemID; amount: number }[]) {
+      patchState(store, (state) => {
+        const inventory = [...state.inventory]
+
+        for (const { id, amount } of items) {
+          const itemIndex = inventory.findIndex(i => i?.id === id)
+          if (itemIndex === -1) continue
+
+          const existing = inventory[itemIndex]!
+          if (existing.amount <= amount) {
+            inventory[itemIndex] = null
+          } else {
+            inventory[itemIndex] = { ...existing, amount: existing.amount - amount }
+          }
+        }
+
+        return { inventory }
+      })
+    },
+
     removeItemFromInventory(id: ItemID, tier: ItemTier) {
       patchState(store, (state) => {
         const itemIndex = itemIndexFromInventory(state.inventory, id, tier)

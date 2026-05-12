@@ -40,7 +40,7 @@ export class DialogueComponent {
 
   getConditionLabel(condition: DialogueCondition): string {
     if (condition.type === 'stat') {
-      const statName = i18next.t(`app:playerStats.${condition.key}`)
+      const statName = i18next.t(`app:playerStats.${condition.stat}`)
       return `${statName}: ${condition.amount}`
     }
 

@@ -58,7 +58,10 @@ const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
             ],
             next: laHarparBartenderConversationID.default,
             requirementsNeeded: [{ type: 'item', itemId: ItemID.crabMeat, amount: 50 }],
-            effects: [{ type: 'quest', action: 'advance', questId: QuestID.meatShortage }],
+            effects: [
+              { type: 'quest', action: 'advance', questId: QuestID.meatShortage },
+              { type: 'item', action: 'take', items: [{ itemId: ItemID.crabMeat, amount: 50 }] },
+            ],
           },
         ],
       },
@@ -67,7 +70,7 @@ const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
         results: [
           {
             next: laHarparBartenderConversationID.whatIsThisPlace1,
-            effects: [{ type: 'stat', stats: [{ stat: 'goldCoins', amount: -20 }] }],
+            effects: [{ type: 'stat', action: 'deduct', stats: [{ stat: 'goldCoins', amount: 20 }] }],
           },
         ],
       },
@@ -87,7 +90,7 @@ const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
           },
           {
             next: laHarparBartenderConversationID.anyWorkForMe1,
-            effects: [{ type: 'stat', stats: [{ stat: 'goldCoins', amount: -40 }] }],
+            effects: [{ type: 'stat', action: 'deduct', stats: [{ stat: 'goldCoins', amount: 40 }] }],
           },
         ],
       },
@@ -96,7 +99,7 @@ const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
         results: [
           {
             next: laHarparBartenderConversationID.anyoneWhoCanTrainMe1,
-            effects: [{ type: 'stat', stats: [{ stat: 'goldCoins', amount: -60 }] }],
+            effects: [{ type: 'stat', action: 'deduct', stats: [{ stat: 'goldCoins', amount: 60 }] }],
           },
         ],
       },

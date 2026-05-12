@@ -5,6 +5,7 @@ import { ZoneID } from '../enums/ids/zone-id.enum'
 import { EnemyID } from '../enums/ids/enemy-id.enum'
 
 export const QUEST_STEP_AFTER_COMPLETED = 9999
+export const QUEST_STEP_AFTER_FAILED = 8888
 
 export interface QuestProps {
   questId: QuestID

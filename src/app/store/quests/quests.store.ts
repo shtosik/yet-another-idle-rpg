@@ -3,7 +3,7 @@ import { patchState, signalStore, withMethods, withState } from '@ngrx/signals'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { withDevtools, withStorageSync } from '@angular-architects/ngrx-toolkit'
 import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
-import QUEST_DATA, { QUEST_STEP_AFTER_COMPLETED, QuestProps } from '../../../data/quests-data'
+import QUEST_DATA, { QUEST_STEP_AFTER_COMPLETED, QUEST_STEP_AFTER_FAILED, QuestProps } from '../../../data/quests-data'
 import { inject } from '@angular/core'
 import { ModalService } from '../../services/modal.service'
 import { PlayerStore } from '../player/player.store'
@@ -100,6 +100,12 @@ export const QuestsStore = signalStore(
 
         patchState(store, (state) => ({
           questStepProgression: { ...state.questStepProgression, [questId]: currentProgress },
+        }))
+      },
+
+      failQuest(questId: QuestID) {
+        patchState(store, (state) => ({
+          questStepProgression: { ...state.questStepProgression, [questId]: QUEST_STEP_AFTER_FAILED },
         }))
       },
 
