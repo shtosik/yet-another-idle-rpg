@@ -23,6 +23,7 @@ const translations = [
     'dialogues/laHarparJosh',
     'dialogues/laHarparTrader',
     'dialogues/laHarparElara',
+    'dialogues/laHarparMarvin',
 ]
 
 export function i18nextInitializer() {

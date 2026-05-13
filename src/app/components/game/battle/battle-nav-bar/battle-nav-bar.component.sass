@@ -23,6 +23,39 @@
     align-items: flex-end
     gap: 0.3rem
 
+.task-indicator
+    display: flex
+    align-items: center
+    gap: 0.5rem
+    padding: 0.25rem 0.5rem
+    background: rgba(0, 0, 0, 0.6)
+    border-top: 1px solid rgba(255, 255, 255, 0.06)
+
+    &--complete
+        border-top-color: rgba(46, 204, 113, 0.4)
+
+    &__icon
+        object-fit: contain
+        image-rendering: pixelated
+        flex-shrink: 0
+
+    &__info
+        display: flex
+        gap: 0.4rem
+        align-items: baseline
+
+    &__label
+        font-size: 0.8rem
+        opacity: 0.85
+
+    &__count
+        font-size: 0.75rem
+        opacity: 0.65
+
+        &--done
+            opacity: 1
+            color: #2ecc71
+
 .buttons
     display: flex
     align-items: center

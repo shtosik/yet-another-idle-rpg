@@ -2,12 +2,15 @@ import { QuestID } from '../../enums/ids/quest-id.enum'
 import { ItemID } from '../../enums/ids/item-id.enum'
 import { PlayerStat } from '../player/player-stat.type'
 
+export type TaskLength = 'short' | 'medium' | 'long'
+
 export type DialogueEffect =
   | QuestEffect
   | StatEffect
   | ItemEffect
   | ShopEffect
   | DialogueFlagEffect
+  | GuildEffect
 
 export interface QuestEffect {
   type: 'quest'
@@ -35,4 +38,10 @@ export interface ShopEffect {
 export interface DialogueFlagEffect {
   type: 'flag'
   name: string
+}
+
+export interface GuildEffect {
+  type: 'guild'
+  action: 'acceptTask' | 'abandonTask' | 'claimTask'
+  taskLength?: TaskLength
 }

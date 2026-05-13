@@ -1,4 +1,5 @@
 @let currentZoneData = currentZone();
+@let task = taskIndicator();
 
 <div class="battle-nav-bar">
   <div>
@@ -9,3 +10,23 @@
     <span>{{ 'wave' | i18next }}: {{ currentWave() }}/{{ currentZoneData.maxWave }}</span>
   </div>
 </div>
+
+@if (task) {
+  <div class="task-indicator" [class.task-indicator--complete]="task.complete">
+    <img
+      class="task-indicator__icon"
+      [ngSrc]="task.enemyUrl"
+      [alt]="task.enemyName"
+      width="28"
+      height="28"
+    />
+    <div class="task-indicator__info">
+      <span class="task-indicator__label">{{ 'enemies:names.' + task.enemyName | i18next }}</span>
+      @if (task.complete) {
+        <span class="task-indicator__count task-indicator__count--done">Ready to claim!</span>
+      } @else {
+        <span class="task-indicator__count">{{ task.remaining }} remaining</span>
+      }
+    </div>
+  </div>
+}

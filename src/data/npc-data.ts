@@ -16,6 +16,8 @@ export interface NPCProps {
   id: NpcID
   url: string
   dialogue: DialogueType
+  startNodeId?: number
+  firstMeetNodeId?: number
 }
 
 const NPC_Data: Record<number, NPCProps> = {
@@ -23,6 +25,7 @@ const NPC_Data: Record<number, NPCProps> = {
     id: NpcID.laHarparBartender,
     url: './assets/img/avatars/laHarpar/laHarparBartender.png',
     dialogue: LA_HARPAR_BARTENDER,
+    firstMeetNodeId: 1,
   },
   [NpcID.laHarparJosh]: {
     id: NpcID.laHarparJosh,
@@ -33,6 +36,7 @@ const NPC_Data: Record<number, NPCProps> = {
     id: NpcID.laHarparTrader,
     url: './assets/img/avatars/laHarpar/laHarparTrader.png',
     dialogue: LA_HARPAR_TRADER,
+    firstMeetNodeId: 1,
   },
   [NpcID.laHarparElara]: {
     id: NpcID.laHarparElara,
@@ -43,6 +47,7 @@ const NPC_Data: Record<number, NPCProps> = {
     id: NpcID.laHarparMarvin,
     url: './assets/img/avatars/laHarpar/laHarparMarvin.png',
     dialogue: LA_HARPAR_MARVIN,
+    firstMeetNodeId: 1,
   },
 }
 export default NPC_Data

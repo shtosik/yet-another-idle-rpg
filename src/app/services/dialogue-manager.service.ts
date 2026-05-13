@@ -15,11 +15,13 @@ import QUEST_DATA, {
 } from '../../data/quests-data'
 import ITEM_DATA from '../../data/items-data'
 import { InventoryItem } from '../../interfaces/item.interface'
+import { ExplorationGuildService } from './exploration-guild.service'
 
 @Injectable({ providedIn: 'root' })
 export class DialogueManagerService {
   private playerStore = inject(PlayerStore)
   private questStore = inject(QuestsStore)
+  private guildService = inject(ExplorationGuildService)
 
   private currentConversation = signal<Record<any, DialogueNode<any>> | null>(null)
   private currentNodeId = signal<any>(null)
@@ -52,6 +54,10 @@ export class DialogueManagerService {
       return
     }
 
+    if (!this.checkConditions(validResult.requirementsNeeded)) {
+      return
+    }
+
     if (validResult.effects) {
       this.applyEffects(validResult.effects)
     }
@@ -77,8 +83,9 @@ export class DialogueManagerService {
     this.activeNpc.set(data)
     this.currentConversation.set(data.dialogue)
 
-    const hasMet = this.questStore.dialogueFlags()[`met_${npcId}`]
-    const startId = hasMet ? 0 : 1
+    const hasMet = !!this.questStore.dialogueFlags()[`met_${npcId}`]
+    const useFirstMeet = !hasMet && data.firstMeetNodeId !== undefined
+    const startId = useFirstMeet ? data.firstMeetNodeId : (data.startNodeId ?? 0)
 
     this.currentNodeId.set(startId)
   }
@@ -101,7 +108,7 @@ export class DialogueManagerService {
             ? (this.playerStore.stats()[req.stat] as number) >= req.amount
             : (this.playerStore.stats()[req.stat] as number) <= req.amount,
         )
-      case 'quest':
+      case 'quest': {
         const questData = QUEST_DATA[c.questId]
         const currentProgress = this.questStore.getQuestStep(c.questId)
 
@@ -126,10 +133,59 @@ export class DialogueManagerService {
           case QuestState.failed:
             return currentProgress === QUEST_STEP_AFTER_FAILED
           default:
-            return true
+            return false
         }
+      }
+      case 'item': {
+        const item = this.playerStore.inventory().find(i => i.id === c.itemId)
+        return !!item && item.amount >= c.amount
+      }
+      case 'manyItems':
+        return c.itemIds.every(itemId => {
+          const required = c.amounts[itemId] ?? 1
+          const item = this.playerStore.inventory().find(i => i.id === itemId)
+          return !!item && item.amount >= required
+        })
+      case 'killCount':
+        return (this.playerStore.enemyKillCounts()[c.enemyId] ?? 0) >= c.amount
+      case 'manyKillCount':
+        return c.enemiesRequired.every(
+          req => (this.playerStore.enemyKillCounts()[req.enemyId] ?? 0) >= req.amount,
+        )
+      case 'waveKillCount':
+        return this.playerStore.getKillCountByZoneAndWave(c.zoneId, c.waveNumber) >= c.amount
+      case 'manyWaveKillCount':
+        return c.wavesRequired.every(
+          req => this.playerStore.getKillCountByZoneAndWave(req.zoneId, req.waveNumber) >= req.amount,
+        )
+      case 'manyQuestCompleted':
+        return c.questsRequired.every(req => {
+          const progress = this.questStore.getQuestStep(req.questId)
+          switch (req.questState) {
+            case QuestState.active:
+              if (!progress || progress === QUEST_STEP_AFTER_COMPLETED) return false
+              return req.step === undefined || progress === req.step
+            case QuestState.available:
+              if (progress) return false
+              return QUEST_DATA[req.questId].startRequirements.every(r => this.checkRequirement(r))
+            case QuestState.completed:
+              return progress === QUEST_STEP_AFTER_COMPLETED
+            case QuestState.failed:
+              return progress === QUEST_STEP_AFTER_FAILED
+            default:
+              return false
+          }
+        })
+      case 'guild': {
+        const task = this.playerStore.activeTask()
+        switch (c.condition) {
+          case 'hasActiveTask':  return !!task && task.currentCount < task.targetCount
+          case 'taskComplete':   return !!task && task.currentCount >= task.targetCount
+          case 'noActiveTask':   return !task
+        }
+      }
       default:
-        return true
+        return false
     }
   }
 
@@ -176,6 +232,9 @@ export class DialogueManagerService {
             case 'advance':
               this.questStore.advanceQuest(effect.questId)
               break
+            case 'end':
+              this.questStore.endQuest(effect.questId)
+              break
             case 'fail':
               this.questStore.failQuest(effect.questId)
               break
@@ -196,6 +255,23 @@ export class DialogueManagerService {
               return { id: i.itemId, amount: i.amount, type: itemData.type, tier: itemData.tier }
             })
             this.playerStore.updatePlayerInventory(itemsToUpdate)
+          }
+          break
+        case 'guild':
+          switch (effect.action) {
+            case 'acceptTask':
+              this.guildService.acceptTask(effect.taskLength)
+              break
+            case 'abandonTask': {
+              const task = this.playerStore.activeTask()
+              if (task) this.playerStore.abandonTask(task.id)
+              break
+            }
+            case 'claimTask': {
+              const task = this.playerStore.activeTask()
+              if (task) this.playerStore.claimTaskReward(task.id)
+              break
+            }
           }
           break
       }

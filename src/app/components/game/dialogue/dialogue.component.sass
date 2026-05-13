@@ -57,8 +57,9 @@ app-close-button
 
 .dialogue-modal__option-btn
   display: flex
-  justify-content: space-between
-  align-items: center
+  flex-direction: column
+  align-items: flex-start
+  gap: 4px
   padding: 10px 15px
   margin-bottom: 8px
   border: 1px solid #ffcc00
@@ -70,17 +71,22 @@ app-close-button
   &:hover
     background: rgba(255, 204, 0, 0.1)
 
+  &.disabled
+    opacity: 0.45
+    cursor: not-allowed
+    pointer-events: none
+
   .option-text
-    flex: 1
+    width: 100%
     text-align: left
     font-size: 14px
     text-transform: uppercase
 
   .option-meta
     display: flex
-    gap: 10px
-    font-size: 12px
-    white-space: nowrap
+    flex-wrap: wrap
+    gap: 6px
+    font-size: 13px
     pointer-events: none
 
     .meta-tag
@@ -92,3 +98,9 @@ app-close-button
 
       &.effect-stat
         color: #2ecc71
+
+      &.effect-item
+        color: #f39c12
+
+      &.effect-guild
+        color: #9b59b6

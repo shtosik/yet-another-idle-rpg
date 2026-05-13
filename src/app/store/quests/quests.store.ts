@@ -109,6 +109,14 @@ export const QuestsStore = signalStore(
         }))
       },
 
+      endQuest(questId: QuestID) {
+        const questData = QUEST_DATA[questId]
+        patchState(store, (state) => ({
+          questStepProgression: { ...state.questStepProgression, [questId]: QUEST_STEP_AFTER_COMPLETED },
+        }))
+        store.handleQuestCompleted(questData)
+      },
+
       hasQuestStarted(questId: QuestID) {
         return !!store.questStepProgression()[questId]
       },

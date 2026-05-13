@@ -11,7 +11,7 @@
   "default": {
     "message": "Back for more work, or just browsing? The guild always has contracts available.",
     "whatIsThisPlace": "What is the Exploration Guild?",
-    "taskIntro": "I'd like to take on a task.",
+    "taskIntro": "I'd like a hunt task.",
     "goodbye": "See you around, Marvin."
   },
   "whatIsThisPlace1": {
@@ -20,10 +20,19 @@
   },
   "taskIntro": {
     "message": "Pick a contract length and I'll assign you a target from the regions you've unlocked. The longer the contract, the bigger the token payout.",
-    "opt1": "Let me check the board."
+    "short": "Short contract — 25 to 50 kills, 1 Token.",
+    "medium": "Medium contract — 50 to 200 kills, 2 Tokens.",
+    "long": "Long contract — 200 to 400 kills, 3 Tokens.",
+    "back": "Actually, never mind."
+  },
+  "taskInProgress": {
+    "message": "You're still on your current contract. Keep at it — finish the hunt and come back to collect your tokens.",
+    "cancel": "Cancel my current task.",
+    "back": "Right, I'll keep going."
   },
   "taskClaimed": {
     "message": "Fine work out there! Your tokens have been added. Keep this up and I'll have new territories for you before long.",
-    "opt1": "Thanks, Marvin."
+    "claim": "Claim my reward.",
+    "back": "Actually, not yet."
   }
 }

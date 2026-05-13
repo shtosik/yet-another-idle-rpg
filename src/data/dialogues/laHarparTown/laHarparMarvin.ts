@@ -3,11 +3,12 @@ import { NpcID } from '../../../enums/map/npc-id.enum'
 
 export enum LaHarparMarvinConversationID {
   default = 0,
-  introduction1,
+  introduction1 = 1,
   introduction2,
   whatIsThisPlace1,
   taskIntro,
-  taskClaimed,
+  taskClaimed,      // kept at id 5 — used as task-complete node
+  taskInProgress,   // id 6
 }
 
 export type LaHarparMarvinDialogueType = Record<LaHarparMarvinConversationID, DialogueNode<LaHarparMarvinConversationID>>
@@ -57,21 +58,27 @@ const LA_HARPAR_MARVIN: LaHarparMarvinDialogueType = {
     options: [
       {
         responseKey: `${NS}:default.whatIsThisPlace`,
-        results: [
-          { next: LaHarparMarvinConversationID.whatIsThisPlace1 },
-        ],
+        results: [{ next: LaHarparMarvinConversationID.whatIsThisPlace1 }],
       },
       {
         responseKey: `${NS}:default.taskIntro`,
         results: [
-          { next: LaHarparMarvinConversationID.taskIntro },
+          {
+            visibilityConditions: [{ type: 'guild', condition: 'taskComplete' }],
+            next: LaHarparMarvinConversationID.taskClaimed,
+          },
+          {
+            visibilityConditions: [{ type: 'guild', condition: 'hasActiveTask' }],
+            next: LaHarparMarvinConversationID.taskInProgress,
+          },
+          {
+            next: LaHarparMarvinConversationID.taskIntro,
+          },
         ],
       },
       {
         responseKey: `${NS}:default.goodbye`,
-        results: [
-          { next: LaHarparMarvinConversationID.default, closeDialogue: true },
-        ],
+        results: [{ next: LaHarparMarvinConversationID.default, closeDialogue: true }],
       },
     ],
   },
@@ -92,8 +99,35 @@ const LA_HARPAR_MARVIN: LaHarparMarvinDialogueType = {
     messageKey: `${NS}:taskIntro.message`,
     options: [
       {
-        responseKey: `${NS}:taskIntro.opt1`,
-        results: [{ next: LaHarparMarvinConversationID.default, closeDialogue: true }],
+        responseKey: `${NS}:taskIntro.short`,
+        results: [
+          {
+            next: LaHarparMarvinConversationID.default,
+            effects: [{ type: 'guild', action: 'acceptTask', taskLength: 'short' }],
+          },
+        ],
+      },
+      {
+        responseKey: `${NS}:taskIntro.medium`,
+        results: [
+          {
+            next: LaHarparMarvinConversationID.default,
+            effects: [{ type: 'guild', action: 'acceptTask', taskLength: 'medium' }],
+          },
+        ],
+      },
+      {
+        responseKey: `${NS}:taskIntro.long`,
+        results: [
+          {
+            next: LaHarparMarvinConversationID.default,
+            effects: [{ type: 'guild', action: 'acceptTask', taskLength: 'long' }],
+          },
+        ],
+      },
+      {
+        responseKey: `${NS}:taskIntro.back`,
+        results: [{ next: LaHarparMarvinConversationID.default }],
       },
     ],
   },
@@ -103,8 +137,37 @@ const LA_HARPAR_MARVIN: LaHarparMarvinDialogueType = {
     messageKey: `${NS}:taskClaimed.message`,
     options: [
       {
-        responseKey: `${NS}:taskClaimed.opt1`,
-        results: [{ next: LaHarparMarvinConversationID.default, closeDialogue: true }],
+        responseKey: `${NS}:taskClaimed.claim`,
+        results: [
+          {
+            next: LaHarparMarvinConversationID.default,
+            effects: [{ type: 'guild', action: 'claimTask' }],
+          },
+        ],
+      },
+      {
+        responseKey: `${NS}:taskClaimed.back`,
+        results: [{ next: LaHarparMarvinConversationID.default }],
+      },
+    ],
+  },
+
+  [LaHarparMarvinConversationID.taskInProgress]: {
+    id: LaHarparMarvinConversationID.taskInProgress,
+    messageKey: `${NS}:taskInProgress.message`,
+    options: [
+      {
+        responseKey: `${NS}:taskInProgress.cancel`,
+        results: [
+          {
+            next: LaHarparMarvinConversationID.default,
+            effects: [{ type: 'guild', action: 'abandonTask' }],
+          },
+        ],
+      },
+      {
+        responseKey: `${NS}:taskInProgress.back`,
+        results: [{ next: LaHarparMarvinConversationID.default }],
       },
     ],
   },

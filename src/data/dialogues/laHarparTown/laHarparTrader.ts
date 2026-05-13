@@ -184,12 +184,14 @@ const LA_HARPAR_TRADER: LaHarparTraderDialogueType = {
               {
                 type: 'quest',
                 questId: QuestID.ratsWereRats,
-                questState: QuestState.available,
+                questState: QuestState.active,
+                step: 1,
                 hidden: true,
               },
             ],
             next: TraderConversationId.questCompleted,
             requirementsNeeded: [{ type: 'killCount', enemyId: EnemyID.rat, amount: 50 }],
+            effects: [{ type: 'quest', action: 'end', questId: QuestID.ratsWereRats }],
           },
           {
             next: TraderConversationId.default,

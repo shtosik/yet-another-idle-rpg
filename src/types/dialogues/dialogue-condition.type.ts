@@ -16,6 +16,7 @@ export type DialogueCondition = { hidden?: boolean } & (
   | ManyQuestsCondition
   | WaveKillCountCondition
   | ManyWavesKillCountCondition
+  | GuildCondition
   )
 
 interface QuestCondition {
@@ -84,6 +85,11 @@ interface ItemCondition {
   type: 'item'
   itemId: ItemID
   amount: number
+}
+
+interface GuildCondition {
+  type: 'guild'
+  condition: 'hasActiveTask' | 'taskComplete' | 'noActiveTask'
 }
 
 interface ManyItemsCondition {

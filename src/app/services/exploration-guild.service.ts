@@ -3,8 +3,9 @@ import { PlayerStore, Task } from '../store/player/player.store'
 import { EnemyID } from '../../enums/ids/enemy-id.enum'
 import { ZoneID } from '../../enums/ids/zone-id.enum'
 import ZONES_DATA from '../../data/zones-data'
+import { TaskLength } from '../../types/dialogues/dialogue-effect.type'
 
-export type TaskLength = 'short' | 'medium' | 'long'
+export type { TaskLength }
 
 @Injectable({ providedIn: 'root' })
 export class ExplorationGuildService {
