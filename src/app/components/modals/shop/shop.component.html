@@ -1,0 +1,52 @@
+<app-close-button (onClose)="close()"/>
+
+<div class="shop">
+  <div class="shop__header">
+    <h2 class="shop__name">{{ staticShop.nameKey | i18next }}</h2>
+    <span class="shop__cooldown">{{ 'shop:ui.nextRefresh' | i18next: { time: cooldownLabel() } }}</span>
+  </div>
+
+  <div class="shop__grid">
+    @for (entry of items(); track entry.staticItem.itemId; let i = $index) {
+      @let reason = buyBlockReason(i);
+      @let soldOut = isNonRefreshableSoldOut(i);
+
+      <div
+        class="shop__item"
+        [class.shop__item--disabled]="reason === 'stock'"
+        [class.shop__item--no-gold]="reason === 'gold'"
+        [class.shop__item--full]="reason === 'inventory'"
+        (click)="buyItem(i)"
+      >
+        <app-slot>
+          <app-inventory-slot
+            [item]="entry.itemData"
+            [tier]="entry.staticItem.tier"
+            [amount]="entry.runtime.currentStock"
+            [clickable]="false"
+          />
+        </app-slot>
+
+        <div class="shop__item-info">
+          <span class="shop__item-name">{{ 'items:names.' + ItemID[entry.staticItem.itemId] | i18next }}</span>
+          <span class="shop__item-price" [class.shop__item-price--unaffordable]="reason === 'gold'">
+            {{ 'shop:ui.price' | i18next: { amount: entry.staticItem.price } }}
+          </span>
+          <span class="shop__item-stock">
+            @if (soldOut) {
+              {{ 'shop:ui.soldOut' | i18next }}
+            } @else if (reason === 'stock') {
+              {{ 'shop:ui.restocking' | i18next }}
+            } @else {
+              {{ 'shop:ui.stock' | i18next: { current: entry.runtime.currentStock, max: entry.staticItem.maxStock } }}
+            }
+          </span>
+        </div>
+
+        @if (reason === 'inventory') {
+          <div class="shop__badge shop__badge--full">{{ 'shop:ui.inventoryFull' | i18next }}</div>
+        }
+      </div>
+    }
+  </div>
+</div>

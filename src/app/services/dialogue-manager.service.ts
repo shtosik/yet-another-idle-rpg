@@ -16,12 +16,14 @@ import QUEST_DATA, {
 import ITEM_DATA from '../../data/items-data'
 import { InventoryItem } from '../../interfaces/item.interface'
 import { ExplorationGuildService } from './exploration-guild.service'
+import { ModalService } from './modal.service'
 
 @Injectable({ providedIn: 'root' })
 export class DialogueManagerService {
   private playerStore = inject(PlayerStore)
   private questStore = inject(QuestsStore)
   private guildService = inject(ExplorationGuildService)
+  private modalService = inject(ModalService)
 
   private currentConversation = signal<Record<any, DialogueNode<any>> | null>(null)
   private currentNodeId = signal<any>(null)
@@ -279,7 +281,6 @@ export class DialogueManagerService {
   }
 
   private openShop(shopId: number) {
-    // Logic to trigger your Shop Component/Store
-    console.log('Opening shop:', shopId)
+    this.modalService.openShop(shopId)
   }
 }

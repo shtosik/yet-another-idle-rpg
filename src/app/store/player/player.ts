@@ -35,7 +35,7 @@ export const statsInitialState: PlayerStatsType = {
     extraLightDamage: 0,
     extraPhysicalDamage: 0,
     // shop?
-    shopRefreshCooldown: 1000 * 60 * 10, // 10 minutes
+    shopRefreshCooldown: 1000 * 60 * 60, // 1 hour (base, reducible by items/skills)
     currentShopRefreshCooldown: 0,
 }
 

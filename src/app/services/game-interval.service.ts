@@ -3,6 +3,7 @@ import { setInterval } from 'worker-timers'
 import { PlayerStore } from '../store/player/player.store'
 import { BattleStore } from '../store/battle/battle.store'
 import { BattleManagerService } from './battle-manager.service'
+import { ShopStore } from '../store/shop/shop.store'
 
 const TICK_DURATION_IN_MS = 100
 const TICK_DURATION_IN_SECONDS = 1000
@@ -12,6 +13,7 @@ export class GameIntervalService {
     playerStore = inject(PlayerStore)
     battleStore = inject(BattleStore)
     battleManagerService = inject(BattleManagerService)
+    shopStore = inject(ShopStore)
 
 
     private timePerAttack = computed(() => this.playerStore.stats().attackSpeed * TICK_DURATION_IN_SECONDS)
@@ -44,6 +46,7 @@ export class GameIntervalService {
         if (this.tickCounter >= 1000) {
             this.tickCounter = 0
             this.battleStore.updateTick()
+            this.shopStore.tickCooldowns(1000)
         }
     }
 }

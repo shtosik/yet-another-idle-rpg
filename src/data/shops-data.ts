@@ -1,51 +1,19 @@
-// import {ItemNames} from "./itemsData";
-//
-// export type ShopProps = {
-//     townId: number;
-//     items: ShopItemProps[];
-// };
-// export type ShopItemProps = {
-//     name: ItemNames;
-//     maxStock: number;
-//     currentStock: number;
-//     refreshable?: true;
-//     price: number;
-// };
-//
-// //                  number = townId
-// const SHOPS_DATA: Record<number, ShopProps> = {
-//     0: {
-//         townId: 0,
-//         items: [
-//             {
-//                 name: "Skill Point Book",
-//                 maxStock: 1,
-//                 currentStock: 1,
-//                 price: 5000,
-//             },
-//             {
-//                 name: "Fish Meat",
-//                 maxStock: 99,
-//                 currentStock: 99,
-//                 refreshable: true,
-//                 price: 10,
-//             },
-//             {
-//                 name: "Apple",
-//                 maxStock: 99,
-//                 currentStock: 99,
-//                 refreshable: true,
-//                 price: 25,
-//             },
-//             {
-//                 name: "Wooden Bow",
-//                 maxStock: 1,
-//                 currentStock: 1,
-//                 refreshable: true,
-//                 price: 2500,
-//             },
-//         ],
-//     },
-// };
-//
-// export default SHOPS_DATA;
+import { ShopID } from '../enums/ids/shop-id.enum'
+import { ItemID } from '../enums/ids/item-id.enum'
+import { ItemTier } from '../enums/items/item-tier.enum'
+import { Shop } from '../types/shop/shop.type'
+
+const SHOPS_DATA: Record<ShopID, Shop> = {
+  [ShopID.laHarparShop]: {
+    id: ShopID.laHarparShop,
+    nameKey: 'shop:names.laHarparShop',
+    items: [
+      { itemId: ItemID.skillPointBook, tier: ItemTier.legendary, price: 5000, maxStock: 1,  refreshable: false },
+      { itemId: ItemID.fishMeat,       tier: ItemTier.normal,    price: 10,   maxStock: 99, refreshable: true  },
+      { itemId: ItemID.apple,          tier: ItemTier.normal,    price: 25,   maxStock: 99, refreshable: true  },
+      { itemId: ItemID.woodenBow,      tier: ItemTier.uncommon,  price: 2500, maxStock: 1,  refreshable: true  },
+    ],
+  },
+}
+
+export default SHOPS_DATA

@@ -1,0 +1,92 @@
+@use 'palette' as palette
+@use 'variables' as vars
+
+app-close-button
+  position: absolute
+  right: 1rem
+  top: 1rem
+
+.shop
+  padding: 2rem
+  min-width: 480px
+
+  &__header
+    margin-bottom: 1.5rem
+
+  &__name
+    font-size: 1.4rem
+    color: palette.$yellow
+    margin-bottom: 0.25rem
+
+  &__cooldown
+    font-size: 0.8rem
+    opacity: 0.6
+
+  &__grid
+    display: grid
+    grid-template-columns: repeat(4, 1fr)
+    gap: 1rem
+
+  &__item
+    display: flex
+    flex-direction: column
+    align-items: center
+    gap: 0.4rem
+    cursor: pointer
+    position: relative
+    border-radius: vars.$panelBorderRadius
+    padding: 0.5rem
+    transition: background 0.15s
+
+    &:hover:not(&--disabled)
+      background: rgba(255, 255, 255, 0.05)
+
+    &--disabled
+      opacity: 0.45
+      cursor: not-allowed
+
+    &--no-gold
+      app-slot
+        outline: 1px solid rgba(231, 76, 60, 0.5)
+
+    &--full
+      app-slot
+        outline: 1px solid rgba(243, 156, 18, 0.5)
+
+  &__item-info
+    display: flex
+    flex-direction: column
+    align-items: center
+    gap: 0.15rem
+    text-align: center
+
+  &__item-name
+    font-size: 0.7rem
+    opacity: 0.85
+    line-height: 1.2
+
+  &__item-price
+    font-size: 0.8rem
+    color: palette.$yellow
+    font-weight: 600
+
+    &--unaffordable
+      color: #e74c3c
+
+  &__item-stock
+    font-size: 0.7rem
+    opacity: 0.55
+
+  &__badge
+    position: absolute
+    top: 0.25rem
+    right: 0.25rem
+    font-size: 0.6rem
+    padding: 0.1rem 0.3rem
+    border-radius: 3px
+    pointer-events: none
+
+    &--full
+      background: rgba(243, 156, 18, 0.25)
+      color: #f39c12
+      border: 1px solid rgba(243, 156, 18, 0.4)

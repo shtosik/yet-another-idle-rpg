@@ -1,0 +1,15 @@
+{
+  "names": {
+    "laHarparShop": "Trader's Wares"
+  },
+  "ui": {
+    "nextRefresh": "Next refresh in {{time}}",
+    "soldOut": "Sold Out",
+    "restocking": "Restocking…",
+    "inventoryFull": "Inventory Full",
+    "notEnoughGold": "Need {{amount}}g",
+    "price": "{{amount}}g",
+    "stock": "{{current}} / {{max}}",
+    "buy": "Buy"
+  }
+}

@@ -18,7 +18,7 @@ import { UrlPipe } from './pipes/url.pipe'
 import { CalculateXpPipe } from './pipes/calculate-xp.pipe'
 
 const translations = [
-    'app', 'enemies', 'zones', 'skill-tree', 'items', 'spells', 'map', 'crafting', 'npc', 'quests',
+    'app', 'enemies', 'zones', 'skill-tree', 'items', 'spells', 'map', 'crafting', 'npc', 'quests', 'shop',
     'dialogues/laHarparBartender',
     'dialogues/laHarparJosh',
     'dialogues/laHarparTrader',
