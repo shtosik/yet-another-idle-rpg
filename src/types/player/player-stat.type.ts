@@ -25,6 +25,7 @@ export type PlayerStat =
     | 'extraDarkDamage'
     | 'extraPhysicalDamage'
     | 'increasedSpellDuration'
+    | 'shinyChance'
 
 export const multiplierStats: PlayerStat[] = [
     'critMulti',

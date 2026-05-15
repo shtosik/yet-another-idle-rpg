@@ -72,6 +72,10 @@
         "spellCooldown": {
             "name": "Spell Cooldown",
             "desc": "Reduces your spell cooldowns by 2 seconds."
+        },
+        "shinyHunter": {
+            "name": "Shiny Hunter",
+            "desc": "Enemies have a 1% chance to be shiny, granting 10x drops, 5x XP, and 10x gold."
         }
     },
     "cost": "{{ amount }} SP",

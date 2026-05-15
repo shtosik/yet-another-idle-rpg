@@ -5,6 +5,7 @@ export enum SkillPointID {
     goldGain = 2,
     knowledge = 3,
     weaknesses = 4,
+    shinyHunter = 5,
 
     // Damage Skill Tree
     attackPower = 205,

@@ -37,6 +37,8 @@ export const statsInitialState: PlayerStatsType = {
     // shop?
     shopRefreshCooldown: 1000 * 60 * 60, // 1 hour (base, reducible by items/skills)
     currentShopRefreshCooldown: 0,
+    // shiny
+    shinyChance: 0,
 }
 
 export const initialEquipmentState: Record<EquipmentSlotKey, { id: ItemID, tier: ItemTier } | null> = {

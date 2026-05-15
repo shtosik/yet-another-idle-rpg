@@ -1,16 +1,18 @@
 @if (!selectedTownId()) {
-    <ul>
-        <li (click)="selectTown(TownID.laHarpar)">{{ 'map:towns.' + TownID[TownID.laHarpar] | i18next }}</li>
-    </ul>
+  <ul>
+    <li (click)="selectTown(TownID.laHarpar)">{{ 'map:towns.' + TownID[TownID.laHarpar] | i18next }}</li>
+  </ul>
 } @else if (!selectedTownBuilding()) {
-    @let town = TOWNS_DATA[selectedTownId()];
+  @let town = TOWNS_DATA[selectedTownId()];
+  <div class="town-view" [style.backgroundImage]="'url(' + town.url + ')'">
     <app-close-button (onClose)="selectTown(null)"/>
     <ul>
-        @for (building of town.buildings; track building.tabId) {
-            <li (click)="selectTownBuilding(building)">{{ 'map:townTabs.' + TownBuildingID[building.tabId] | i18next }}</li>
-        }
+      @for (building of town.buildings; track building.tabId) {
+        <li (click)="selectTownBuilding(building)">{{ 'map:townTabs.' + TownBuildingID[building.tabId] | i18next }}</li>
+      }
     </ul>
+  </div>
 } @else {
-    <app-close-button (onClose)="selectTownBuilding(null)"/>
-    <app-town-building [building]="selectedTownBuilding()"/>
+  <app-close-button (onClose)="selectTownBuilding(null)"/>
+  <app-town-building [building]="selectedTownBuilding()"/>
 }

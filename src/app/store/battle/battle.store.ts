@@ -24,6 +24,7 @@ export interface BattleState {
   autoWaveProgressionEnabled: boolean;
   equippedSpells: EquippedSpell[];
   attackInterval: number;
+  isShinyEnemy: boolean;
 }
 
 export const initialState: BattleState = {
@@ -35,6 +36,11 @@ export const initialState: BattleState = {
   autoWaveProgressionEnabled: false,
   equippedSpells: [],
   attackInterval: 0,
+  isShinyEnemy: false,
+}
+
+function toShinyUrl(url: string): string {
+  return url.replace(/\.png$/i, '-shiny.png')
 }
 
 const STORE_KEY = 'battleStore'
@@ -69,10 +75,14 @@ export const BattleStore = signalStore(
           enemy = ENEMIES_DATA[zoneData.bossEnemyId]
         }
 
+        const shinyChance = playerStore.stats().shinyChance ?? 0
+        const isShiny = shinyChance > 0 && Math.random() * 100 < shinyChance
+
         return {
           isInCombat: true,
-          enemy,
+          enemy: isShiny ? { ...enemy, url: toShinyUrl(enemy.url) } : enemy,
           currentEnemyHp: enemy.maxHp,
+          isShinyEnemy: isShiny,
         }
       })
     },
@@ -97,6 +107,7 @@ export const BattleStore = signalStore(
             currentEnemyHp: 0,
             enemy: null,
             isInCombat: false,
+            isShinyEnemy: false,
             currentWave: wave,
             currentZoneId: zone,
           }
@@ -113,6 +124,7 @@ export const BattleStore = signalStore(
             currentEnemyHp: 0,
             enemy: null,
             isInCombat: false,
+            isShinyEnemy: false,
             currentWave: wave,
             currentZoneId: zone,
           }
@@ -129,6 +141,7 @@ export const BattleStore = signalStore(
         currentEnemyHp: 0,
         enemy: null,
         isInCombat: false,
+        isShinyEnemy: false,
       })
     },
 

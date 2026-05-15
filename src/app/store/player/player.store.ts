@@ -73,20 +73,27 @@ const handleExperience = (stats: PlayerStatsType) => {
   handleExperience(stats)
 }
 
-const calculateEnemyDrops = (enemy: Enemy) => {
-  const itemsToUpdate: InventoryItem[] = []
+const calculateEnemyDrops = (enemy: Enemy, rolls: number): InventoryItem[] => {
+  const accumulator = new Map<string, InventoryItem>()
 
-  enemy.drops.forEach(drop => {
-    const roll = Math.ceil(Math.random() * drop.chance)
+  for (let r = 0; r < rolls; r++) {
+    enemy.drops.forEach(drop => {
+      const roll = Math.ceil(Math.random() * drop.chance)
+      if (roll !== drop.chance) return
 
-    if (roll === drop.chance) {
       const amount = Math.floor(Math.random() * (drop.maxAmount - drop.minAmount + 1) + drop.minAmount)
       const { type, tier } = ITEM_DATA[drop.id]
-      itemsToUpdate.push({ id: drop.id, type, tier, amount })
-    }
-  })
+      const key = `${drop.id}:${tier}`
+      const existing = accumulator.get(key)
+      if (existing) {
+        existing.amount += amount
+      } else {
+        accumulator.set(key, { id: drop.id, type, tier, amount })
+      }
+    })
+  }
 
-  return itemsToUpdate
+  return [...accumulator.values()]
 }
 
 const STORE_KEY = 'playerStore'
@@ -268,16 +275,21 @@ export const PlayerStore = signalStore(
     },
   })),
   withMethods((store) => ({
-    processBattleEnd(enemyId: EnemyID, zoneId: ZoneID, currentWave: number) {
+    processBattleEnd(enemyId: EnemyID, zoneId: ZoneID, currentWave: number, isShiny: boolean) {
       const enemy = ENEMIES_DATA[enemyId]
       const stats = store.stats()
 
-      const xpGained = Math.ceil(enemy.experience * stats.xpMultiplier)
-      const itemsToUpdate = calculateEnemyDrops(enemy)
+      const xpMultiplier = isShiny ? 5 : 1
+      const goldMultiplier = isShiny ? 10 : 1
+      const dropRolls = isShiny ? 10 : 1
+
+      const xpGained = Math.ceil(enemy.experience * stats.xpMultiplier * xpMultiplier)
+      const goldGained = 1 * goldMultiplier
+      const itemsToUpdate = calculateEnemyDrops(enemy, dropRolls)
 
       store.updatePlayerStats([
         { stat: 'experience', amount: xpGained },
-        { stat: 'goldCoins', amount: 1 },
+        { stat: 'goldCoins', amount: goldGained },
       ])
 
       store.updateZoneProgression(zoneId, currentWave)

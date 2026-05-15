@@ -109,8 +109,9 @@ export class BattleManagerService {
     const zoneId = this.battleStore.currentZoneId()
     const wave = this.battleStore.currentWave()
 
+    const isShiny = this.battleStore.isShinyEnemy()
     this.battleStore.endBattle()
-    this.playerStore.processBattleEnd(enemy.id, zoneId, wave)
+    this.playerStore.processBattleEnd(enemy.id, zoneId, wave, isShiny)
 
 
     const currentKillCount = this.currentWaveKillCount()

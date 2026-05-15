@@ -2,16 +2,14 @@
 <div class="game">
   @let tab = gameTab | async;
   <app-battle class="battle"/>
-  <app-player-stats class="stats"/>
-  <app-panel class="resources">
 
-  </app-panel>
+  @if (tab === GameTab.main) {
+    <app-player-stats class="stats"/>
+    <app-panel class="resources"></app-panel>
+  }
+
   @if (tab === GameTab.main || tab === GameTab.crafting || tab === GameTab.towns) {
     @switch (tab) {
-      <!--      @case (GameTab.main) {-->
-        <!--        <app-panel class="spells"/>-->
-        <!--        <app-panel class="buff-items"/>-->
-        <!--      }-->
       @case (GameTab.crafting) {
         <app-crafting class="crafting"/>
       }
