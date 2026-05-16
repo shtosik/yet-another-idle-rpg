@@ -16,6 +16,7 @@
   "killCount": "Kill count",
   "gameTabs": {
     "main": "Battle",
+    "map": "Map",
     "skillTree": "Skill tree",
     "crafting": "Crafting",
     "towns": "Towns"

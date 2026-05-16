@@ -43,3 +43,18 @@ app-close-button
   background-size: cover
   background-position: center
   position: relative
+
+.building-btn
+  position: absolute
+  transform: translate(-50%, -50%)
+  background-color: rgba(0, 0, 0, 0.2)
+  color: white
+  border: none
+  border-radius: vars.$panelBorderRadius
+  padding: 0.6rem 1rem
+  cursor: pointer
+  font-size: 0.9rem
+  transition: background-color 0.2s ease
+
+  &:hover
+    background-color: rgba(0, 0, 0, 0.7)

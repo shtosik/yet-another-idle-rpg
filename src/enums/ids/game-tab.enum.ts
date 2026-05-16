@@ -3,4 +3,5 @@ export enum GameTab {
     skillTree = 2,
     crafting = 3,
     towns = 4,
+    map = 5,
 }

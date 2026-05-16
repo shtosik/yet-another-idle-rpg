@@ -1,20 +1,21 @@
 {
-    "regions": {
-        "southback": "Southback",
-        "portStocksmar": "Port Stocksmar",
-        "greeficHill": "Greefic Hill",
-        "saintNestroud": "Saint Nestroud"
-    },
-    "towns": {
-        "laHarpar": "La Harpar",
-        "northLirold": "North Lirold"
-    },
-    "townTabs": {
-        "main": "Main",
-        "tavern": "Tavern",
-        "shop": "Shop",
-        "market": "Market",
-        "explorationGuild": "Exploration Guild",
-        "back": "Back"
-    }
+  "regions": {
+    "southback": "Southback",
+    "portStocksmar": "Port Stocksmar",
+    "greeficHill": "Greefic Hill",
+    "saintNestroud": "Saint Nestroud"
+  },
+  "towns": {
+    "laHarpar": "La Harpar",
+    "northLirold": "North Lirold"
+  },
+  "townTabs": {
+    "main": "Main",
+    "tavern": "Tavern",
+    "shop": "Shop",
+    "market": "Market",
+    "explorationGuild": "Exploration Guild",
+    "tradersBasement": "Basement",
+    "back": "Back"
+  }
 }

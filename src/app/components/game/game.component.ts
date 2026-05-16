@@ -19,6 +19,7 @@ import { TownsStore } from '../../store/towns/towns.store'
 import { DialogueManagerService } from '../../services/dialogue-manager.service'
 import { DialogueComponent } from './dialogue/dialogue.component'
 import { QuestsComponent } from './quests/quests.component'
+import { WorldMapComponent } from './world-map/world-map.component'
 
 const imports = [
   PanelComponent,
@@ -42,6 +43,7 @@ const imports = [
     imports,
     DialogueComponent,
     QuestsComponent,
+    WorldMapComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -6,6 +6,8 @@ import { TownBuildingID } from '../../../../enums/map/town-tab-id.enum'
 import { CloseButtonComponent } from '../../shared/close-button/close-button.component'
 import { TownsStore } from '../../../store/towns/towns.store'
 import { TownBuildingComponent } from './town-building/town-building.component'
+import { BattleStore } from '../../../store/battle/battle.store'
+import { QuestsStore } from '../../../store/quests/quests.store'
 
 @Component({
   selector: 'app-towns',
@@ -23,6 +25,8 @@ export class TownsComponent {
   protected readonly TOWNS_DATA = TOWNS_DATA
   protected readonly TownBuildingID = TownBuildingID
   private townsStore = inject(TownsStore)
+  private battleStore = inject(BattleStore)
+  private questsStore = inject(QuestsStore)
   selectedTownId = this.townsStore.selectedTownId
   selectedTownBuilding = this.townsStore.selectedTownBuilding
 
@@ -30,7 +34,16 @@ export class TownsComponent {
     this.townsStore.selectTown(townId)
   }
 
+  isBuildingAvailable(building: TownBuilding): boolean {
+    if (building.questRequirement == null) return true
+    return this.questsStore.hasQuestStarted(building.questRequirement)
+  }
+
   selectTownBuilding(townBuilding: TownBuilding) {
+    if (townBuilding?.zoneId) {
+      this.battleStore.setZone(townBuilding.zoneId)
+      return
+    }
     this.townsStore.selectTownBuilding(townBuilding)
   }
 }

@@ -4,13 +4,29 @@
   </ul>
 } @else if (!selectedTownBuilding()) {
   @let town = TOWNS_DATA[selectedTownId()];
-  <div class="town-view" [style.backgroundImage]="'url(' + town.url + ')'">
+  <div
+    class="town-view"
+    [style.backgroundImage]="'url(' + town.url + ')'"
+  >
     <app-close-button (onClose)="selectTown(null)"/>
-    <ul>
-      @for (building of town.buildings; track building.tabId) {
-        <li (click)="selectTownBuilding(building)">{{ 'map:townTabs.' + TownBuildingID[building.tabId] | i18next }}</li>
+    <!--    <ul>-->
+    <!--      @for (building of town.buildings; track building.tabId) {-->
+    <!--        @if (!building.position) {-->
+    <!--          <li (click)="selectTownBuilding(building)">{{ 'map:townTabs.' + TownBuildingID[building.tabId] | i18next }}</li>-->
+    <!--        }-->
+    <!--      }-->
+    <!--    </ul>-->
+    @for (building of town.buildings; track building.tabId) {
+      @if (isBuildingAvailable(building)) {
+        <button
+          class="building-btn"
+          [style.left.%]="building.position.x"
+          [style.top.%]="building.position.y"
+          (click)="selectTownBuilding(building)"
+        >{{ 'map:townTabs.' + TownBuildingID[building.tabId] | i18next }}
+        </button>
       }
-    </ul>
+    }
   </div>
 } @else {
   <app-close-button (onClose)="selectTownBuilding(null)"/>

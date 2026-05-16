@@ -168,6 +168,17 @@ export const BattleStore = signalStore(
       patchState(store, { equippedSpells })
     },
 
+    setZone(zoneId: ZoneID): void {
+      patchState(store, {
+        currentZoneId: zoneId,
+        currentWave: 1,
+        currentEnemyHp: 0,
+        enemy: null,
+        isInCombat: false,
+        isShinyEnemy: false,
+      })
+    },
+
     resetState(): void {
       patchState(store, initialState)
     },

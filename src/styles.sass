@@ -39,3 +39,29 @@ body
 .modal
   .mat-mdc-dialog-surface
     border: 1px solid palette.$yellow
+
+// Leaflet's bundled `position: absolute` rule (leaflet.css line 4–16)
+// somehow isn't winning against the host page's cascade for these
+// elements, so they stay in normal flow and their translate3d offsets
+// compound with inline-flow strides — producing one-tile gaps between
+// tiles, and tile containers that shift during zoom animations as a new
+// container takes over from the previous one. Force the rule explicitly.
+.leaflet-pane,
+.leaflet-tile,
+.leaflet-marker-icon,
+.leaflet-marker-shadow,
+.leaflet-tile-container,
+.leaflet-pane > svg,
+.leaflet-pane > canvas,
+.leaflet-zoom-box,
+.leaflet-image-layer,
+.leaflet-layer
+  position: absolute !important
+  left: 0 !important
+  top: 0 !important
+
+img.leaflet-tile
+  width: 256px !important
+  height: 256px !important
+  max-width: none !important
+  max-height: none !important
