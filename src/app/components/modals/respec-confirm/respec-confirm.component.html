@@ -1,0 +1,23 @@
+<app-close-button (onClose)="cancel()"/>
+<div class="respec">
+    <h2 class="respec__title">{{ 'skill-tree:respec.title' | i18next }}</h2>
+    <p class="respec__line">
+        {{ 'skill-tree:respec.refundLine' | i18next: { points: preview().skillPointsToReturn } }}
+    </p>
+    <p class="respec__line">
+        {{ 'skill-tree:respec.costLine' | i18next: { gold: preview().goldCost } }}
+    </p>
+    @if (preview().allocatedLevels === 0) {
+        <p class="respec__warning">{{ 'skill-tree:respec.nothingToReset' | i18next }}</p>
+    } @else if (!preview().canAfford) {
+        <p class="respec__warning">{{ 'skill-tree:respec.insufficientGold' | i18next }}</p>
+    }
+    <div class="respec__actions">
+        <button class="respec__btn" (click)="cancel()">
+            {{ 'skill-tree:respec.cancel' | i18next }}
+        </button>
+        <button class="respec__btn respec__btn--confirm" [disabled]="!canExecute()" (click)="confirm()">
+            {{ 'skill-tree:respec.confirm' | i18next }}
+        </button>
+    </div>
+</div>

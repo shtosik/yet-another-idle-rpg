@@ -1,0 +1,51 @@
+@use 'palette'
+@use 'variables' as vars
+
+.respec
+    padding: 2.5rem 2.5rem 2rem
+    display: flex
+    flex-direction: column
+    gap: 0.75rem
+
+    &__title
+        color: palette.$yellow
+        margin: 0 0 0.5rem
+
+    &__line
+        font-size: 0.95rem
+
+    &__warning
+        color: #d36e6e
+        font-size: 0.85rem
+        margin-top: 0.25rem
+
+    &__actions
+        display: flex
+        gap: 0.75rem
+        justify-content: flex-end
+        margin-top: 1rem
+
+    &__btn
+        padding: 0.55rem 1.25rem
+        background: rgba(vars.$panelBackgroundColor, 0.85)
+        border: 1px solid rgba(180, 140, 60, 0.5)
+        color: #ddd
+        cursor: pointer
+        font-family: inherit
+        font-size: 0.9rem
+
+        &:hover:not([disabled])
+            border-color: palette.$yellow
+
+        &[disabled]
+            opacity: 0.45
+            cursor: not-allowed
+
+        &--confirm
+            color: palette.$yellow
+            border-color: palette.$yellow
+
+app-close-button
+    position: absolute
+    right: 1rem
+    top: 1rem

@@ -1,4 +1,7 @@
 export enum SkillPointID {
+    // Hub
+    origin = 1000,
+
     // Exploration Skill Tree
     autoWaveProgression = 0,
     haste = 1,

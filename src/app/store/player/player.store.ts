@@ -230,11 +230,24 @@ export const PlayerStore = signalStore(
       }))
     },
 
+    resetUnlockedSkillPoints() {
+      patchState(store, { unlockedSkillPoints: {} })
+    },
+
     levelUpSpell(id: SpellID) {
       patchState(store, (state) => ({
         unlockedSpells: {
           ...state.unlockedSpells,
           [id]: (state.unlockedSpells[id] || 0) + 1,
+        },
+      }))
+    },
+
+    levelDownSpell(id: SpellID, amount: number) {
+      patchState(store, (state) => ({
+        unlockedSpells: {
+          ...state.unlockedSpells,
+          [id]: Math.max(0, (state.unlockedSpells[id] || 0) - amount),
         },
       }))
     },

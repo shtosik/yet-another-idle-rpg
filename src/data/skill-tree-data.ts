@@ -1,24 +1,45 @@
-import { SkillTreeID } from 'enums/ids/skill-tree-id.enum'
+import { SkillRegion } from 'enums/ids/skill-region.enum'
 import { SkillPointID } from 'enums/ids/skill-tree-node-id.enum'
 import { SpellID } from 'enums/ids/spell-id.enum'
 import { SkillPointType } from 'enums/skill-point-type.enum'
 import { SkillPoint } from 'interfaces/skill-tree/skill-point.interface'
 import { SkillTree } from 'interfaces/skill-tree/skill-tree.inteface'
 
+// Positions are resolved at module load by skill-tree-graph.ts.
+// Only the origin (and any unconnected special node) carries an explicit
+// `position`; every other node grows out of its prerequisite via the
+// chain-inheritance layout, with optional `turn` to fan siblings.
+
+const HUB_SKILL: SkillPoint = {
+  id: SkillPointID.origin,
+  region: SkillRegion.damage,
+  position: { x: 700, y: 400 },
+  skillPointCost: 0,
+  unlockRequirements: null,
+  maxLevel: 1,
+  url: './assets/img/skills/origin.png',
+  type: SkillPointType.stat,
+  stat: 'attackPower',
+  statAmount: 0,
+}
+
 const EXPLORATION_SKILLS_DATA: Partial<Record<SkillPointID, SkillPoint>> = {
   [SkillPointID.autoWaveProgression]: {
     id: SkillPointID.autoWaveProgression,
+    region: SkillRegion.exploration,
     skillPointCost: 1,
-    unlockRequirements: null,
+    unlockRequirements: { kind: 'node', id: SkillPointID.origin, minLevel: 1 },
     maxLevel: 1,
     url: './assets/img/skills/autoWaveProgression.png',
     type: SkillPointType.battle,
   },
   [SkillPointID.haste]: {
     id: SkillPointID.haste,
+    region: SkillRegion.exploration,
+    turn: -45,
     skillPointCost: 2,
     special: true,
-    unlockRequirements: null,
+    unlockRequirements: { kind: 'node', id: SkillPointID.autoWaveProgression, minLevel: 1 },
     maxLevel: 1,
     url: './assets/img/skills/haste.png',
     type: SkillPointType.spell,
@@ -26,8 +47,9 @@ const EXPLORATION_SKILLS_DATA: Partial<Record<SkillPointID, SkillPoint>> = {
   },
   [SkillPointID.goldGain]: {
     id: SkillPointID.goldGain,
+    region: SkillRegion.exploration,
     skillPointCost: 1,
-    unlockRequirements: null,
+    unlockRequirements: { kind: 'node', id: SkillPointID.autoWaveProgression, minLevel: 1 },
     maxLevel: 5,
     url: './assets/img/skills/goldGain.png',
     type: SkillPointType.stat,
@@ -36,8 +58,10 @@ const EXPLORATION_SKILLS_DATA: Partial<Record<SkillPointID, SkillPoint>> = {
   },
   [SkillPointID.knowledge]: {
     id: SkillPointID.knowledge,
+    region: SkillRegion.exploration,
+    turn: 45,
     skillPointCost: 1,
-    unlockRequirements: null,
+    unlockRequirements: { kind: 'node', id: SkillPointID.autoWaveProgression, minLevel: 1 },
     maxLevel: 5,
     url: './assets/img/skills/knowledge.png',
     type: SkillPointType.stat,
@@ -46,16 +70,18 @@ const EXPLORATION_SKILLS_DATA: Partial<Record<SkillPointID, SkillPoint>> = {
   },
   [SkillPointID.weaknesses]: {
     id: SkillPointID.weaknesses,
+    region: SkillRegion.exploration,
     skillPointCost: 2,
-    unlockRequirements: null,
+    unlockRequirements: { kind: 'node', id: SkillPointID.goldGain, minLevel: 5 },
     maxLevel: 1,
     url: './assets/img/skills/weaknesses.png',
     type: SkillPointType.battle,
   },
   [SkillPointID.shinyHunter]: {
     id: SkillPointID.shinyHunter,
+    region: SkillRegion.exploration,
     skillPointCost: 10,
-    unlockRequirements: null,
+    unlockRequirements: { kind: 'node', id: SkillPointID.weaknesses, minLevel: 1 },
     maxLevel: 1,
     special: true,
     url: './assets/img/skills/shinyHunter.png',
@@ -68,8 +94,9 @@ const EXPLORATION_SKILLS_DATA: Partial<Record<SkillPointID, SkillPoint>> = {
 const DAMAGE_SKILLS_DATA: Partial<Record<SkillPointID, SkillPoint>> = {
   [SkillPointID.attackPower]: {
     id: SkillPointID.attackPower,
+    region: SkillRegion.damage,
     skillPointCost: 1,
-    unlockRequirements: null,
+    unlockRequirements: { kind: 'node', id: SkillPointID.origin, minLevel: 1 },
     maxLevel: 10,
     url: './assets/img/skills/attackPower.png',
     type: SkillPointType.stat,
@@ -78,8 +105,10 @@ const DAMAGE_SKILLS_DATA: Partial<Record<SkillPointID, SkillPoint>> = {
   },
   [SkillPointID.attackSpeed]: {
     id: SkillPointID.attackSpeed,
+    region: SkillRegion.damage,
+    turn: -45,
     skillPointCost: 1,
-    unlockRequirements: null,
+    unlockRequirements: { kind: 'node', id: SkillPointID.attackPower, minLevel: 1 },
     maxLevel: 5,
     url: './assets/img/skills/attackSpeed.png',
     type: SkillPointType.stat,
@@ -88,16 +117,19 @@ const DAMAGE_SKILLS_DATA: Partial<Record<SkillPointID, SkillPoint>> = {
   },
   [SkillPointID.overkill]: {
     id: SkillPointID.overkill,
+    region: SkillRegion.damage,
     skillPointCost: 1,
-    unlockRequirements: null,
+    unlockRequirements: { kind: 'node', id: SkillPointID.attackPower, minLevel: 1 },
     maxLevel: 4,
     url: './assets/img/skills/overkill.png',
     type: SkillPointType.battle,
   },
   [SkillPointID.critChance]: {
     id: SkillPointID.critChance,
+    region: SkillRegion.damage,
+    turn: 45,
     skillPointCost: 1,
-    unlockRequirements: null,
+    unlockRequirements: { kind: 'node', id: SkillPointID.attackPower, minLevel: 1 },
     maxLevel: 5,
     url: './assets/img/skills/critChance.png',
     type: SkillPointType.stat,
@@ -106,8 +138,9 @@ const DAMAGE_SKILLS_DATA: Partial<Record<SkillPointID, SkillPoint>> = {
   },
   [SkillPointID.critMulti]: {
     id: SkillPointID.critMulti,
+    region: SkillRegion.damage,
     skillPointCost: 1,
-    unlockRequirements: null,
+    unlockRequirements: { kind: 'node', id: SkillPointID.overkill, minLevel: 4 },
     maxLevel: 5,
     url: './assets/img/skills/critMulti.png',
     type: SkillPointType.stat,
@@ -116,8 +149,9 @@ const DAMAGE_SKILLS_DATA: Partial<Record<SkillPointID, SkillPoint>> = {
   },
   [SkillPointID.doubleAttack]: {
     id: SkillPointID.doubleAttack,
+    region: SkillRegion.damage,
     skillPointCost: 2,
-    unlockRequirements: null,
+    unlockRequirements: { kind: 'node', id: SkillPointID.critMulti, minLevel: 5 },
     maxLevel: 1,
     special: true,
     url: './assets/img/skills/doubleAttack.png',
@@ -129,8 +163,9 @@ const DAMAGE_SKILLS_DATA: Partial<Record<SkillPointID, SkillPoint>> = {
 const MAGIC_SKILLS_DATA: Partial<Record<SkillPointID, SkillPoint>> = {
   [SkillPointID.fireStrike]: {
     id: SkillPointID.fireStrike,
+    region: SkillRegion.magic,
     skillPointCost: 2,
-    unlockRequirements: null,
+    unlockRequirements: { kind: 'node', id: SkillPointID.origin, minLevel: 1 },
     special: true,
     maxLevel: 1,
     url: './assets/img/skills/fireStrike.png',
@@ -139,8 +174,10 @@ const MAGIC_SKILLS_DATA: Partial<Record<SkillPointID, SkillPoint>> = {
   },
   [SkillPointID.maxMana]: {
     id: SkillPointID.maxMana,
+    region: SkillRegion.magic,
+    turn: -45,
     skillPointCost: 1,
-    unlockRequirements: null,
+    unlockRequirements: { kind: 'node', id: SkillPointID.fireStrike, minLevel: 1 },
     maxLevel: 5,
     url: './assets/img/skills/maxMana.png',
     type: SkillPointType.stat,
@@ -149,8 +186,9 @@ const MAGIC_SKILLS_DATA: Partial<Record<SkillPointID, SkillPoint>> = {
   },
   [SkillPointID.manaRegen]: {
     id: SkillPointID.manaRegen,
+    region: SkillRegion.magic,
     skillPointCost: 1,
-    unlockRequirements: null,
+    unlockRequirements: { kind: 'node', id: SkillPointID.fireStrike, minLevel: 1 },
     maxLevel: 5,
     url: './assets/img/skills/manaRegen.png',
     type: SkillPointType.stat,
@@ -159,8 +197,10 @@ const MAGIC_SKILLS_DATA: Partial<Record<SkillPointID, SkillPoint>> = {
   },
   [SkillPointID.magicDamage]: {
     id: SkillPointID.magicDamage,
+    region: SkillRegion.magic,
+    turn: 45,
     skillPointCost: 1,
-    unlockRequirements: null,
+    unlockRequirements: { kind: 'node', id: SkillPointID.fireStrike, minLevel: 1 },
     maxLevel: 10,
     url: './assets/img/skills/magicDamage.png',
     type: SkillPointType.stat,
@@ -169,8 +209,9 @@ const MAGIC_SKILLS_DATA: Partial<Record<SkillPointID, SkillPoint>> = {
   },
   [SkillPointID.spellCrit]: {
     id: SkillPointID.spellCrit,
+    region: SkillRegion.magic,
     skillPointCost: 2,
-    unlockRequirements: null,
+    unlockRequirements: { kind: 'node', id: SkillPointID.manaRegen, minLevel: 5 },
     special: true,
     maxLevel: 1,
     url: './assets/img/skills/spellCrit.png',
@@ -178,8 +219,9 @@ const MAGIC_SKILLS_DATA: Partial<Record<SkillPointID, SkillPoint>> = {
   },
   [SkillPointID.spellCooldown]: {
     id: SkillPointID.spellCooldown,
+    region: SkillRegion.magic,
     skillPointCost: 1,
-    unlockRequirements: null,
+    unlockRequirements: { kind: 'node', id: SkillPointID.spellCrit, minLevel: 1 },
     maxLevel: 5,
     url: './assets/img/skills/spellCooldown.png',
     type: SkillPointType.stat,
@@ -188,43 +230,18 @@ const MAGIC_SKILLS_DATA: Partial<Record<SkillPointID, SkillPoint>> = {
   },
 }
 
-const SKILL_TREES_DATA: Record<SkillTreeID, SkillTree> = {
-  [SkillTreeID.damage]: {
-    id: SkillTreeID.damage,
-    skills: [
-      [SkillPointID.attackPower],
-      [SkillPointID.attackSpeed, SkillPointID.overkill, SkillPointID.critChance],
-      [SkillPointID.critMulti],
-      [SkillPointID.doubleAttack],
-    ],
-    unlockRequirement: null,
-  },
-  [SkillTreeID.exploration]: {
-    id: SkillTreeID.exploration,
-    skills: [
-      [SkillPointID.autoWaveProgression],
-      [SkillPointID.haste, SkillPointID.goldGain, SkillPointID.knowledge],
-      [SkillPointID.weaknesses],
-      [SkillPointID.shinyHunter],
-    ],
-    unlockRequirement: null,
-  },
-  [SkillTreeID.magic]: {
-    id: SkillTreeID.magic,
-    skills: [
-      [SkillPointID.fireStrike],
-      [SkillPointID.maxMana, SkillPointID.manaRegen, SkillPointID.magicDamage],
-      [SkillPointID.spellCrit],
-      [SkillPointID.spellCooldown],
-    ],
-    unlockRequirement: null,
-  },
-}
-
-export default SKILL_TREES_DATA
-
 export const ALL_SKILLS: Partial<Record<SkillPointID, SkillPoint>> = {
+  [SkillPointID.origin]: HUB_SKILL,
   ...EXPLORATION_SKILLS_DATA,
   ...DAMAGE_SKILLS_DATA,
   ...MAGIC_SKILLS_DATA,
+}
+
+export const SKILL_TREE_DATA: SkillTree = {
+  rootNodeId: SkillPointID.origin,
+  nodes: Object.keys(ALL_SKILLS).map(k => Number(k) as SkillPointID),
+  respec: {
+    perPointGoldCost: 100,
+    fullResetGoldCost: ({ allocatedPointCount }) => 500 + allocatedPointCount * 50,
+  },
 }

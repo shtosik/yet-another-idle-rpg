@@ -27,11 +27,16 @@
     }
     <app-quests class="quests"/>
   }
+
   @if (tab === GameTab.skillTree) {
-    <app-skill-trees class="skill-tree"/>
+    <app-skill-tree class="skill-tree"/>
   }
+
   @if (tab === GameTab.map) {
-    <app-world-map class="map" (changeTab)="changeTab($event)"/>
+    <app-world-map
+      class="map"
+      (changeTab)="changeTab($event)"
+    />
   }
 </div>
 <div style="margin-top: 1rem; display: flex; gap: 0.2rem;">

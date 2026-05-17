@@ -1,0 +1,8 @@
+<div class="skill-tree__container"
+     leaflet
+     [leafletOptions]="mapOptions"
+     (leafletMapReady)="onMapReady($event)">
+</div>
+<button class="skill-tree__reset" (click)="openResetConfirm()">
+    {{ 'skill-tree:respec.trigger' | i18next }}
+</button>

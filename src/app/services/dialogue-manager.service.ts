@@ -1,7 +1,7 @@
 import { DialogueNode } from '../../interfaces/dialogues/dialogue-node.interface'
 import { computed, inject, Injectable, signal } from '@angular/core'
 import { PlayerStore } from '../store/player/player.store'
-import { DialogueEffect } from '../../types/dialogues/dialogue-effect.type'
+import { DialogueEffect, QuestEffect } from '../../types/dialogues/dialogue-effect.type'
 import { QuestsStore } from '../store/quests/quests.store'
 import { DialogueOption, DialogueResult } from '../../interfaces/dialogues/dialogue-option.type'
 import { DialogueCondition } from '../../types/dialogues/dialogue-condition.type'
@@ -40,6 +40,13 @@ export class DialogueManagerService {
     if (!option.results || option.results.length === 0) return undefined
 
     return option.results.find(result => {
+      const questStart = result.effects?.find(
+        (e): e is QuestEffect => e.type === 'quest' && e.action === 'start',
+      )
+      if (questStart && this.questStore.getQuestStep(questStart.questId) !== undefined) {
+        return false
+      }
+
       if (!result.visibilityConditions || result.visibilityConditions.length === 0) return true
 
       return result.visibilityConditions.every(condition => this.checkCondition(condition))
@@ -126,7 +133,7 @@ export class DialogueManagerService {
 
             return currentStep.requirements.every(req => this.checkRequirement(req))
           case QuestState.available:
-            if (currentProgress) return false
+            if (currentProgress !== undefined) return false
 
             return questData.startRequirements.every(req => this.checkRequirement(req))
 
@@ -168,7 +175,7 @@ export class DialogueManagerService {
               if (!progress || progress === QUEST_STEP_AFTER_COMPLETED) return false
               return req.step === undefined || progress === req.step
             case QuestState.available:
-              if (progress) return false
+              if (progress !== undefined) return false
               return QUEST_DATA[req.questId].startRequirements.every(r => this.checkRequirement(r))
             case QuestState.completed:
               return progress === QUEST_STEP_AFTER_COMPLETED

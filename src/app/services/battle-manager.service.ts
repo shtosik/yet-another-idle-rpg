@@ -105,6 +105,11 @@ export class BattleManagerService {
     this.battleStore.addSpell(spellToEquip)
   }
 
+  unequipSpell(spellId: SpellID) {
+    const remaining = this.battleStore.equippedSpells().filter(s => s.spellId !== spellId)
+    this.battleStore.setAllEquippedSpells(remaining)
+  }
+
   private handleEnemyDeath(enemy: Enemy) {
     const zoneId = this.battleStore.currentZoneId()
     const wave = this.battleStore.currentWave()

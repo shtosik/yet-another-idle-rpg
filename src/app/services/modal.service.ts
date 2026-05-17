@@ -4,6 +4,7 @@ import { QuestProps } from '../../data/quests-data'
 import { QuestCompletedComponent } from '../components/modals/quest-completed/quest-completed.component'
 import { ShopComponent } from '../components/modals/shop/shop.component'
 import { ShopID } from '../../enums/ids/shop-id.enum'
+import { RespecConfirmComponent } from '../components/modals/respec-confirm/respec-confirm.component'
 
 @Injectable({ providedIn: 'root' })
 export class ModalService {
@@ -43,5 +44,17 @@ export class ModalService {
     }
 
     return this.dialog.open(QuestCompletedComponent, config)
+  }
+
+  openRespecConfirm() {
+    const config: MatDialogConfig = {
+      panelClass: 'modal',
+      minWidth: '420px',
+      position: { top: '180px' },
+      hasBackdrop: true,
+      disableClose: false,
+    }
+
+    return this.dialog.open(RespecConfirmComponent, config)
   }
 }

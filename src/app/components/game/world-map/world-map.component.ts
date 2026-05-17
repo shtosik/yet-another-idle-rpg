@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, inject, OnDestroy, Output } from '@angular/core'
+import { ChangeDetectionStrategy, Component, EventEmitter, inject, Output } from '@angular/core'
 import { LeafletModule } from '@bluehalo/ngx-leaflet'
 import * as L from 'leaflet'
 import { GameTab } from 'enums/ids/game-tab.enum'
@@ -11,7 +11,7 @@ import { WORLD_MAP_DATA, WorldMapMarker } from 'data/world-map-data'
 // raw image-pixel coords while still using the standard z=0-is-overview pyramid.
 const PIXEL_CRS: L.CRS = L.Util.extend({}, L.CRS.Simple, {
   scale: (zoom: number) => Math.pow(2, zoom - WORLD_MAP_DATA.manifest.maxZoom),
-  zoom:  (scale: number) => Math.log2(scale) + WORLD_MAP_DATA.manifest.maxZoom,
+  zoom: (scale: number) => Math.log2(scale) + WORLD_MAP_DATA.manifest.maxZoom,
 })
 
 @Component({
@@ -21,7 +21,7 @@ const PIXEL_CRS: L.CRS = L.Util.extend({}, L.CRS.Simple, {
   imports: [LeafletModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class WorldMapComponent implements OnDestroy {
+export class WorldMapComponent {
   @Output() changeTab = new EventEmitter<GameTab>()
 
   private readonly townsStore = inject(TownsStore)
@@ -44,6 +44,8 @@ export class WorldMapComponent implements OnDestroy {
       WORLD_MAP_DATA.defaultView.center.x,
     ),
     zoom: WORLD_MAP_DATA.defaultView.zoom,
+    doubleClickZoom: false,
+    zoomAnimation: true,
   }
 
   onMapReady(map: L.Map): void {
@@ -111,9 +113,5 @@ export class WorldMapComponent implements OnDestroy {
     for (const { marker, minZoom } of this.activeMarkers) {
       marker.setOpacity(zoom >= minZoom ? 1 : 0)
     }
-  }
-
-  ngOnDestroy(): void {
-    this.map?.remove()
   }
 }

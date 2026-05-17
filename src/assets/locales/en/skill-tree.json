@@ -5,6 +5,10 @@
         "magic": "Magic"
     },
     "skillPoints": {
+        "origin": {
+            "name": "Genesis",
+            "desc": "The starting point of your skill tree."
+        },
         "attackPower": {
             "name": "Attack Power",
             "desc": "Increases attack power by 1."
@@ -79,5 +83,15 @@
         }
     },
     "cost": "{{ amount }} SP",
-    "add": "Click to add 1 or Ctrl + Click to add max"
+    "add": "Click to add 1 or Ctrl + Click to add max",
+    "respec": {
+        "trigger": "Reset Tree",
+        "title": "Reset Skill Tree?",
+        "refundLine": "This will refund {{ points }} skill points.",
+        "costLine": "Cost: {{ gold }} gold.",
+        "nothingToReset": "Nothing allocated yet.",
+        "insufficientGold": "Not enough gold.",
+        "confirm": "Reset",
+        "cancel": "Cancel"
+    }
 }

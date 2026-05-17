@@ -12,7 +12,7 @@ import { PlayerStore } from '../../store/player/player.store'
 import { PlayerStatsComponent } from './player-stats/player-stats.component'
 import { GameMenuComponent } from './game-menu/game-menu.component'
 import { BattleComponent } from './battle/battle.component'
-import { SkillTreesComponent } from './skill-trees/skill-trees.component'
+import { SkillTreeComponent } from './skill-tree/skill-tree.component'
 import { BattleStore } from '../../store/battle/battle.store'
 import { QuestsStore } from '../../store/quests/quests.store'
 import { TownsStore } from '../../store/towns/towns.store'
@@ -32,7 +32,7 @@ const imports = [
   PlayerStatsComponent,
   GameMenuComponent,
   BattleComponent,
-  SkillTreesComponent,
+  SkillTreeComponent,
 ]
 
 @Component({
