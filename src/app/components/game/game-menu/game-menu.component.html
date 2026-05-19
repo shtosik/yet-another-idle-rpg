@@ -1,38 +1,37 @@
 <nav class="game-menu">
-    <ul class="game-menu__tabs">
-        <li
-            (click)="changeTab.emit(GameTab.main)"
-            class="game-menu__tab"
-        >{{ ('gameTabs.' + GameTab[GameTab.main]) | i18next }}
-        </li>
-        <li
-            class="game-menu__tab"
-            (click)="changeTab.emit(GameTab.map)"
-        >{{ ('gameTabs.' + GameTab[GameTab.map]) | i18next }}
-        </li>
-        @if (level() > 1) {
-            <li
-                class="game-menu__tab"
-                (click)="changeTab.emit(GameTab.skillTree)"
-            >{{ ('gameTabs.' + GameTab[GameTab.skillTree]) | i18next }}
-                @if (skillPoints()) {
-                    <span
-                        class="skill-point"
-                    >({{ skillPoints() }})</span>
-                }
-            </li>
+  <ul class="game-menu__tabs">
+    <li
+      (click)="changeTab.emit(GameTab.main)"
+      class="game-menu__tab"
+    >{{ ('gameTabs.' + GameTab[GameTab.main]) | i18next }}
+    </li>
+    <li
+      class="game-menu__tab"
+      (click)="changeTab.emit(GameTab.map)"
+    >{{ ('gameTabs.' + GameTab[GameTab.map]) | i18next }}
+    </li>
+    @if (level() > 1) {
+      <li
+        class="game-menu__tab"
+        (click)="changeTab.emit(GameTab.skillTree)"
+      >{{ ('gameTabs.' + GameTab[GameTab.skillTree]) | i18next }}
+        @if (skillPoints()) {
+          <span
+            class="skill-point"
+          >({{ skillPoints() }})</span>
         }
-        <li
-            class="game-menu__tab"
-            (click)="changeTab.emit(GameTab.crafting)"
-        >
-            {{ ('gameTabs.' + GameTab[GameTab.crafting]) | i18next }}
-        </li>
-        <li
-            class="game-menu__tab"
-            (click)="changeTab.emit(GameTab.towns)"
-        >
-            {{ ('gameTabs.' + GameTab[GameTab.towns]) | i18next }}
-        </li>
-    </ul>
+      </li>
+    }
+    <li
+      class="game-menu__tab"
+      (click)="changeTab.emit(GameTab.crafting)"
+    >
+      {{ ('gameTabs.' + GameTab[GameTab.crafting]) | i18next }}
+    </li>
+    <li
+      class="game-menu__tab"
+      (click)="changeTab.emit(GameTab.bestiary)"
+    >{{ ('gameTabs.' + GameTab[GameTab.bestiary]) | i18next }}
+    </li>
+  </ul>
 </nav>

@@ -1,0 +1,8 @@
+{
+  "baseHp": "Base HP",
+  "foundIn": "Found in",
+  "dropTable": "Drop Table",
+  "selectPrompt": "Select a monster to view details",
+  "noDrops": "No known drops.",
+  "noZone": "Unknown"
+}

@@ -19,7 +19,8 @@
     "map": "Map",
     "skillTree": "Skill tree",
     "crafting": "Crafting",
-    "towns": "Towns"
+    "towns": "Towns",
+    "bestiary": "Bestiary"
   },
   "starts": "Starts",
   "requires": "Requires",

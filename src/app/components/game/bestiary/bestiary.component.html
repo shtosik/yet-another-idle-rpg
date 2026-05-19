@@ -1,0 +1,72 @@
+<section class="bestiary">
+  <ul class="bestiary__list">
+    @for (monster of monsters(); track monster.id) {
+      <li
+        class="bestiary__item"
+        [class.bestiary__item--locked]="!monster.isUnlocked"
+        [class.bestiary__item--selected]="selectedId() === monster.id"
+        (click)="selectMonster(monster)"
+      >
+        @if (monster.isUnlocked) {
+          <img
+            class="bestiary__sprite"
+            [src]="monster.url"
+            [alt]="('enemies:names.' + EnemyID[monster.id]) | i18next"
+          />
+          <span class="bestiary__name">
+            {{ ('enemies:names.' + EnemyID[monster.id]) | i18next }}
+          </span>
+          <span class="bestiary__kills">x{{ monster.killCount }}</span>
+        } @else {
+          <img
+            class="bestiary__sprite bestiary__sprite--locked"
+            [src]="LOCKED_SPRITE"
+            alt="???"
+          />
+          <span class="bestiary__name bestiary__name--locked">???</span>
+        }
+      </li>
+    }
+  </ul>
+
+  <div class="bestiary__details">
+    @if (selectedMonster(); as m) {
+      <h2 class="bestiary__title">
+        {{ ('enemies:names.' + EnemyID[m.id]) | i18next }}
+      </h2>
+      <img class="bestiary__detail-sprite" [src]="m.url" alt="" />
+
+      <dl class="bestiary__stats">
+        <dt>{{ 'bestiary:baseHp' | i18next }}</dt>
+        <dd>{{ m.maxHp }}</dd>
+
+        <dt>{{ 'bestiary:foundIn' | i18next }}</dt>
+        <dd>
+          @if (m.zones.length) {
+            @for (zone of m.zones; track zone; let last = $last) {
+              {{ ('zones:names.' + ZoneID[zone]) | i18next }}{{ last ? '' : ', ' }}
+            }
+          } @else {
+            {{ 'bestiary:noZone' | i18next }}
+          }
+        </dd>
+      </dl>
+
+      <h3 class="bestiary__drops-title">{{ 'bestiary:dropTable' | i18next }}</h3>
+      @if (m.drops.length) {
+        <ul class="bestiary__drops">
+          @for (drop of m.drops; track drop.id) {
+            <li class="bestiary__drop">
+              <span>{{ ('items:names.' + ItemID[drop.id]) | i18next }}</span>
+              <span>{{ (100 / drop.chance) | number:'1.0-1' }}%</span>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="bestiary__no-drops">{{ 'bestiary:noDrops' | i18next }}</p>
+      }
+    } @else {
+      <p class="bestiary__placeholder">{{ 'bestiary:selectPrompt' | i18next }}</p>
+    }
+  </div>
+</section>

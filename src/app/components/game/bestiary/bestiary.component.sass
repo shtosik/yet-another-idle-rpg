@@ -1,0 +1,124 @@
+@use '../../../../styles/variables' as vars
+
+:host
+  display: block
+  width: 100%
+  height: 100%
+
+.bestiary
+  display: grid
+  grid-template-columns: 50% 50%
+  gap: 0.8rem
+  height: 100%
+  padding: 0.8rem
+  border-radius: vars.$panelBorderRadius
+  background: rgba(0, 0, 0, 0.35)
+
+  &__list
+    list-style: none
+    margin: 0
+    padding: 0.4rem
+    overflow-y: auto
+    display: grid
+    grid-template-columns: repeat(auto-fill, minmax(4.5rem, 1fr))
+    gap: 0.5rem
+    align-content: start
+
+  &__item
+    display: flex
+    flex-direction: column
+    align-items: center
+    gap: 0.25rem
+    padding: 0.4rem
+    border-radius: 0.4rem
+    background: rgba(255, 255, 255, 0.04)
+    cursor: pointer
+    user-select: none
+    transition: background 0.15s ease
+
+    &:hover
+      background: rgba(255, 255, 255, 0.10)
+
+    &--selected
+      background: rgba(255, 215, 0, 0.18)
+      outline: 1px solid rgba(255, 215, 0, 0.6)
+
+    &--locked
+      cursor: not-allowed
+      pointer-events: none
+      opacity: 0.85
+
+  &__sprite
+    width: 3.5rem
+    height: 3.5rem
+    object-fit: contain
+    image-rendering: pixelated
+
+    &--locked
+      filter: brightness(0)
+
+  &__name
+    font-size: 0.75rem
+    text-align: center
+    line-height: 1
+
+    &--locked
+      color: #888
+
+  &__kills
+    font-size: 0.65rem
+    color: #aaa
+
+  &__details
+    display: flex
+    flex-direction: column
+    gap: 0.6rem
+    padding: 0.8rem
+    overflow-y: auto
+
+  &__title
+    margin: 0
+    font-size: 1.2rem
+
+  &__detail-sprite
+    width: 6rem
+    height: 6rem
+    object-fit: contain
+    image-rendering: pixelated
+    align-self: center
+
+  &__stats
+    display: grid
+    grid-template-columns: max-content 1fr
+    gap: 0.3rem 0.8rem
+    margin: 0
+
+    dt
+      color: #bbb
+
+    dd
+      margin: 0
+
+  &__drops-title
+    margin: 0
+
+  &__drops
+    list-style: none
+    margin: 0
+    padding: 0
+    display: flex
+    flex-direction: column
+    gap: 0.2rem
+
+  &__drop
+    display: flex
+    justify-content: space-between
+    padding: 0.2rem 0.4rem
+    background: rgba(255, 255, 255, 0.04)
+    border-radius: 0.25rem
+
+  &__no-drops,
+  &__placeholder
+    margin: auto
+    color: #888
+    font-style: italic

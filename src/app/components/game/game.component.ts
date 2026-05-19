@@ -20,6 +20,7 @@ import { DialogueManagerService } from '../../services/dialogue-manager.service'
 import { DialogueComponent } from './dialogue/dialogue.component'
 import { QuestsComponent } from './quests/quests.component'
 import { WorldMapComponent } from './world-map/world-map.component'
+import { BestiaryComponent } from './bestiary/bestiary.component'
 
 const imports = [
   PanelComponent,
@@ -44,6 +45,7 @@ const imports = [
     DialogueComponent,
     QuestsComponent,
     WorldMapComponent,
+    BestiaryComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

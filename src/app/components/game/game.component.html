@@ -8,7 +8,7 @@
     <app-panel class="resources"></app-panel>
   }
 
-  @if (tab === GameTab.main || tab === GameTab.crafting || tab === GameTab.towns) {
+  @if (tab === GameTab.main || tab === GameTab.crafting || tab === GameTab.towns || tab === GameTab.bestiary || tab === GameTab.map) {
     @switch (tab) {
       @case (GameTab.crafting) {
         <app-crafting class="crafting"/>
@@ -37,6 +37,10 @@
       class="map"
       (changeTab)="changeTab($event)"
     />
+  }
+
+  @if (tab === GameTab.bestiary) {
+    <app-bestiary class="bestiary"/>
   }
 </div>
 <div style="margin-top: 1rem; display: flex; gap: 0.2rem;">

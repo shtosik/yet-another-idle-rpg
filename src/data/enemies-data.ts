@@ -1,6 +1,7 @@
 import { DamageElement } from 'enums/damage-element.enum'
 import { EnemyID } from 'enums/ids/enemy-id.enum'
 import { ItemID } from 'enums/ids/item-id.enum'
+import { ZoneID } from 'enums/ids/zone-id.enum'
 import { Enemy } from 'interfaces/enemy.interface'
 
 const generateItem = (id: ItemID, minAmount: number, maxAmount: number, chance: number) => ({
@@ -18,6 +19,7 @@ const ENEMIES_DATA: Record<EnemyID, Enemy> = {
     experience: 5,
     drops: [generateItem(ItemID.slimeResidue, 1, 2, 3)],
     url: './assets/img/enemies/greenSlime.png',
+    zones: [ZoneID.plains],
   },
   [EnemyID.redSlime]: {
     id: EnemyID.redSlime,
@@ -26,6 +28,7 @@ const ENEMIES_DATA: Record<EnemyID, Enemy> = {
     experience: 5,
     drops: [generateItem(ItemID.slimeResidue, 1, 2, 3)],
     url: './assets/img/enemies/redSlime.png',
+    zones: [ZoneID.plains],
   },
   [EnemyID.blueSlime]: {
     id: EnemyID.blueSlime,
@@ -34,6 +37,7 @@ const ENEMIES_DATA: Record<EnemyID, Enemy> = {
     experience: 5,
     drops: [generateItem(ItemID.slimeResidue, 1, 2, 3)],
     url: './assets/img/enemies/blueSlime.png',
+    zones: [ZoneID.plains],
   },
   [EnemyID.kingSlime]: {
     id: EnemyID.kingSlime,
@@ -45,6 +49,7 @@ const ENEMIES_DATA: Record<EnemyID, Enemy> = {
       generateItem(ItemID.slimeResidue, 1, 10, 1),
     ],
     url: './assets/img/enemies/kingSlime.png',
+    zones: [ZoneID.plains],
     isBossEnemy: true,
   },
   [EnemyID.crab]: {
@@ -57,6 +62,7 @@ const ENEMIES_DATA: Record<EnemyID, Enemy> = {
       generateItem(ItemID.stick, 1, 1, 4),
     ],
     url: './assets/img/enemies/crab.png',
+    zones: [ZoneID.horseshoeBeach],
   },
   [EnemyID.seagull]: {
     id: EnemyID.seagull,
@@ -69,6 +75,7 @@ const ENEMIES_DATA: Record<EnemyID, Enemy> = {
       generateItem(ItemID.machete, 1, 1, 1),
     ],
     url: './assets/img/enemies/seagull.png',
+    zones: [ZoneID.horseshoeBeach],
   },
   [EnemyID.turtle]: {
     id: EnemyID.turtle,
@@ -80,6 +87,7 @@ const ENEMIES_DATA: Record<EnemyID, Enemy> = {
       generateItem(ItemID.stick, 1, 1, 4),
     ],
     url: './assets/img/enemies/turtle.png',
+    zones: [ZoneID.horseshoeBeach],
   },
   [EnemyID.gangsterCrab]: {
     id: EnemyID.gangsterCrab,
@@ -91,6 +99,7 @@ const ENEMIES_DATA: Record<EnemyID, Enemy> = {
       generateItem(ItemID.crabMeat, 1, 3, 1),
     ],
     url: './assets/img/enemies/gangsterCrab.png',
+    zones: [ZoneID.horseshoeBeach],
     isBossEnemy: true,
   },
   [EnemyID.rat]: {
@@ -103,6 +112,7 @@ const ENEMIES_DATA: Record<EnemyID, Enemy> = {
       generateItem(ItemID.cheese, 1, 1, 8),
     ],
     url: './assets/img/enemies/rat.png',
+    zones: [ZoneID.tradersBasement],
   },
   [EnemyID.giantRat]: {
     id: EnemyID.giantRat,
@@ -115,6 +125,7 @@ const ENEMIES_DATA: Record<EnemyID, Enemy> = {
       generateItem(ItemID.ratCatcher, 1, 1, 40),
     ],
     url: './assets/img/enemies/giantRat.png',
+    zones: [ZoneID.tradersBasement],
     isBossEnemy: true,
   },
   [EnemyID.wolf]: {
@@ -124,6 +135,7 @@ const ENEMIES_DATA: Record<EnemyID, Enemy> = {
     experience: 30,
     drops: [generateItem(ItemID.wolfFangs, 1, 3, 2)],
     url: './assets/img/enemies/wolf.png',
+    zones: [ZoneID.theLongPath],
   },
   [EnemyID.deer]: {
     id: EnemyID.deer,
@@ -132,6 +144,7 @@ const ENEMIES_DATA: Record<EnemyID, Enemy> = {
     experience: 20,
     drops: [generateItem(ItemID.deerPelt, 1, 1, 4)],
     url: './assets/img/enemies/deer.png',
+    zones: [ZoneID.theLongPath],
   },
   [EnemyID.bandit]: {
     id: EnemyID.bandit,
@@ -144,6 +157,7 @@ const ENEMIES_DATA: Record<EnemyID, Enemy> = {
       generateItem(ItemID.machete, 1, 1, 80),
     ],
     url: './assets/img/enemies/bandit.png',
+    zones: [ZoneID.theLongPath],
   },
   [EnemyID.goblinScout]: {
     id: EnemyID.goblinScout,
@@ -152,6 +166,7 @@ const ENEMIES_DATA: Record<EnemyID, Enemy> = {
     experience: 25,
     drops: [],
     url: './assets/img/enemies/goblinScout.png',
+    zones: [ZoneID.theLongPath],
   },
   [EnemyID.troll]: {
     id: EnemyID.troll,
@@ -160,6 +175,7 @@ const ENEMIES_DATA: Record<EnemyID, Enemy> = {
     experience: 500,
     drops: [],
     url: './assets/img/enemies/troll.png',
+    zones: [ZoneID.theLongPath],
     isBossEnemy: true,
   },
 }
