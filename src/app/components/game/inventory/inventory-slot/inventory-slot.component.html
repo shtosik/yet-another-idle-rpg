@@ -6,6 +6,7 @@
   placement="bottom"
   tooltipClass="tooltip-override"
   (click)="handleClick()"
+  (contextmenu)="handleRightClick($event)"
 >
   <img
     [ngSrc]="item.url"
@@ -33,6 +34,15 @@
         <span class="stat">{{ stat.id | statToPercentage:stat.amount }} {{ ('app:playerStats.' + stat.id) | i18next }}</span>
       }
       <span class="click">{{ 'items:clickToEquip' | i18next }}</span>
+    }
+    @if (item.type === ItemType.rewardsStats) {
+      @for (stat of $any(item.stats); track stat.id) {
+        <span class="stat">+{{ stat.id | statToPercentage:stat.amount }} {{ ('app:playerStats.' + stat.id) | i18next }}</span>
+      }
+      <span class="click">{{ 'items:rightClickToUse' | i18next }}</span>
+    }
+    @if (item.type === ItemType.food || item.type === ItemType.potion || item.type === ItemType.book) {
+      <span class="click">{{ 'items:rightClickToUse' | i18next }}</span>
     }
   </div>
 </ng-template>

@@ -13,6 +13,7 @@ import { Enemy } from '../../../interfaces/enemy.interface'
 import ITEM_DATA from '../../../data/items-data'
 import ENEMIES_DATA from '../../../data/enemies-data'
 import { EquipmentSlot, EquipmentSlotKey } from '../../../enums/equipment-slot.enum'
+import { ItemType } from '../../../enums/items/item-type.enum'
 import RECIPES_DATA from '../../../data/recipes-data'
 import { RecipeID } from '../../../enums/ids/recipe-id.enum'
 import { EnemyID } from '../../../enums/ids/enemy-id.enum'
@@ -370,6 +371,15 @@ export const PlayerStore = signalStore(
       }))
 
       store.updatePlayerStats(statsToUpdate)
+    },
+
+    useItem(item: InventoryItem) {
+      const itemData = ITEM_DATA[item.id]
+      if (itemData.type !== ItemType.rewardsStats) return
+
+      const statsToUpdate = itemData.stats.map(s => ({ stat: s.id, amount: s.amount }))
+      store.updatePlayerStats(statsToUpdate)
+      store.removeItemFromInventory(item.id, item.tier)
     },
 
     craftItem(recipeId: RecipeID) {

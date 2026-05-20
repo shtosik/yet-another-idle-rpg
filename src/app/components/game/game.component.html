@@ -14,7 +14,10 @@
         <app-crafting class="crafting"/>
       }
       @case (GameTab.towns) {
-        <app-towns class="towns"/>
+        <app-towns
+          class="towns"
+          (changeTab)="changeTab($event)"
+        />
       }
     }
 
@@ -48,4 +51,5 @@
   <button (click)="giveStat('unspentSkillPoints')">give skill points</button>
   <button (click)="giveStat('experience')">give xp</button>
   <button (click)="resetQuests()">reset quests</button>
+  <button (click)="resetShops()">reset shops</button>
 </div>

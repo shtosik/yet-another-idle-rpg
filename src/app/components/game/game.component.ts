@@ -21,6 +21,7 @@ import { DialogueComponent } from './dialogue/dialogue.component'
 import { QuestsComponent } from './quests/quests.component'
 import { WorldMapComponent } from './world-map/world-map.component'
 import { BestiaryComponent } from './bestiary/bestiary.component'
+import { ShopStore } from '../../store/shop/shop.store'
 
 const imports = [
   PanelComponent,
@@ -55,6 +56,7 @@ export class GameComponent {
   battleStore = inject(BattleStore)
   questsStore = inject(QuestsStore)
   townsStore = inject(TownsStore)
+  shopStore = inject(ShopStore)
   dialogueManagerService = inject(DialogueManagerService)
   gameTab = new BehaviorSubject<GameTab>(GameTab.main)
 
@@ -67,10 +69,15 @@ export class GameComponent {
     this.battleStore.resetState()
     this.questsStore.resetState()
     this.townsStore.resetState()
+    this.shopStore.resetState()
   }
 
   resetQuests() {
     this.questsStore.resetState()
+  }
+
+  resetShops() {
+    this.shopStore.resetState()
   }
 
   changeTab(tab: GameTab) {

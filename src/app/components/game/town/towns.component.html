@@ -8,7 +8,7 @@
     class="town-view"
     [style.backgroundImage]="'url(' + town.url + ')'"
   >
-    <app-close-button (onClose)="selectTown(null)"/>
+    <app-close-button (onClose)="goToMap()"/>
     <!--    <ul>-->
     <!--      @for (building of town.buildings; track building.tabId) {-->
     <!--        @if (!building.position) {-->

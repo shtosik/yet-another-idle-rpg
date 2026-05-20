@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core'
+import { ChangeDetectionStrategy, Component, DestroyRef, EventEmitter, inject, Output } from '@angular/core'
 import { TownID } from '../../../../enums/map/town-id.enum'
 import { TranslatePipe } from '../../../pipes/i18next.pipe'
 import TOWNS_DATA, { TownBuilding } from '../../../../data/towns-data'
@@ -8,6 +8,7 @@ import { TownsStore } from '../../../store/towns/towns.store'
 import { TownBuildingComponent } from './town-building/town-building.component'
 import { BattleStore } from '../../../store/battle/battle.store'
 import { QuestsStore } from '../../../store/quests/quests.store'
+import { GameTab } from '../../../../enums/ids/game-tab.enum'
 
 @Component({
   selector: 'app-towns',
@@ -27,11 +28,25 @@ export class TownsComponent {
   private townsStore = inject(TownsStore)
   private battleStore = inject(BattleStore)
   private questsStore = inject(QuestsStore)
+  private destroyRef = inject(DestroyRef)
   selectedTownId = this.townsStore.selectedTownId
   selectedTownBuilding = this.townsStore.selectedTownBuilding
 
+  @Output() changeTab = new EventEmitter<GameTab>()
+
+  constructor() {
+    this.destroyRef.onDestroy(() => {
+      this.selectTownBuilding(null)
+      this.selectTown(null)
+    })
+  }
+
   selectTown(townId: TownID) {
     this.townsStore.selectTown(townId)
+  }
+
+  goToMap() {
+    this.changeTab.emit(GameTab.map)
   }
 
   isBuildingAvailable(building: TownBuilding): boolean {

@@ -25,6 +25,7 @@ export class InventoryItemComponent {
   @Input() clickable = true
 
   @Output() equipItem = new EventEmitter<void>()
+  @Output() useItem = new EventEmitter<void>()
 
   readonly ItemTier = ItemTier
   protected readonly EnemyID = EnemyID
@@ -32,9 +33,23 @@ export class InventoryItemComponent {
   protected readonly ItemID = ItemID
   protected readonly ItemType = ItemType
 
+  get isUsable(): boolean {
+    return this.item.type === ItemType.rewardsStats
+      || this.item.type === ItemType.food
+      || this.item.type === ItemType.potion
+      || this.item.type === ItemType.book
+  }
+
   handleClick() {
     if (!this.clickable) return
 
     this.equipItem.emit()
+  }
+
+  handleRightClick(event: MouseEvent) {
+    event.preventDefault()
+    if (!this.clickable || !this.isUsable) return
+
+    this.useItem.emit()
   }
 }

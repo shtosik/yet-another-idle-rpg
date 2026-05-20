@@ -10,7 +10,8 @@
     "xpMultiplier": "XP Multiplier",
     "goldCoins": "Gold",
     "goldCoinsMultiplier": "Gold Multiplier",
-    "skillPoints": "Skill points"
+    "skillPoints": "Skill points",
+    "unspentSkillPoints": "Skill points"
   },
   "wave": "Wave",
   "killCount": "Kill count",

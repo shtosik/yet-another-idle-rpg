@@ -25,4 +25,8 @@ export class InventoryWindow {
   equipItem(item: InventoryItem) {
     if (item.type === ItemType.equipment) this.playerStore.equipItem(item)
   }
+
+  useItem(item: InventoryItem) {
+    this.playerStore.useItem(item)
+  }
 }

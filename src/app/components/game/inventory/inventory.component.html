@@ -9,6 +9,7 @@
           [item]="Items[inventoryData[i].id]"
           [tier]="inventoryData[i].tier"
           (equipItem)="equipItem(inventoryData[i])"
+          (useItem)="useItem(inventoryData[i])"
         />
       }
     </app-slot>

@@ -40,5 +40,6 @@
         "quest": "Quest"
     },
     "clickToEquip": "Click to equip",
-    "clickToUnequip": "Click to unequip"
+    "clickToUnequip": "Click to unequip",
+    "rightClickToUse": "Right-click to use"
 }
