@@ -5,6 +5,8 @@ import { QuestCompletedComponent } from '../components/modals/quest-completed/qu
 import { ShopComponent } from '../components/modals/shop/shop.component'
 import { ShopID } from '../../enums/ids/shop-id.enum'
 import { RespecConfirmComponent } from '../components/modals/respec-confirm/respec-confirm.component'
+import { UnlockNotificationComponent } from '../components/modals/unlock-notification/unlock-notification.component'
+import { UnlockNotification } from '../../data/unlock-conditions'
 
 @Injectable({ providedIn: 'root' })
 export class ModalService {
@@ -44,6 +46,18 @@ export class ModalService {
     }
 
     return this.dialog.open(QuestCompletedComponent, config)
+  }
+
+  openUnlockNotification(notification: UnlockNotification) {
+    return this.dialog.open(UnlockNotificationComponent, {
+      enterAnimationDuration: '300ms',
+      panelClass: 'modal',
+      minWidth: '480px',
+      position: { top: '200px' },
+      hasBackdrop: true,
+      disableClose: false,
+      data: notification,
+    })
   }
 
   openRespecConfirm() {

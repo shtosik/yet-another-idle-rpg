@@ -9,12 +9,15 @@ import { SpellType } from '../../enums/spell-type.enum'
 import { EquippedSpell } from '../../interfaces/spells/equipped-spell.interface'
 import { Enemy } from '../../interfaces/enemy.interface'
 import { ItemID } from '../../enums/ids/item-id.enum'
+import { UNLOCK_RULES, ZONE_UNLOCK_NOTIFICATIONS } from '../../data/unlock-conditions'
+import { ModalService } from './modal.service'
 
 @Injectable({ providedIn: 'root' })
 export class BattleManagerService {
   private battleStore = inject(BattleStore)
   private playerStore = inject(PlayerStore)
   private animations = inject(AnimationsService)
+  private modalService = inject(ModalService)
 
   currentWaveKillCount = computed(() => {
     const zoneProgression = this.playerStore.zonesProgression()[this.battleStore.currentZoneId()] || {}
@@ -136,10 +139,38 @@ export class BattleManagerService {
 
     if (isBossWave && zoneData.nextZoneId && !this.playerStore.isZoneUnlocked(zoneData.nextZoneId)) {
       this.playerStore.unlockZone(zoneData.nextZoneId)
+      const notification = ZONE_UNLOCK_NOTIFICATIONS[zoneData.nextZoneId]
+      if (notification) this.modalService.openUnlockNotification(notification)
     }
 
     if (!this.playerStore.craftingUnlocked() && this.playerStore.inventory().some(i => i?.id === ItemID.turtleShell)) {
       this.playerStore.unlockCrafting()
+      this.modalService.openUnlockNotification({ titleKey: 'unlocks:crafting.title', bodyKey: 'unlocks:crafting.body' })
+    }
+
+    if (!this.playerStore.skillTreeUnlocked() && this.playerStore.stats().level >= 2) {
+      this.playerStore.unlockSkillTree()
+      this.modalService.openUnlockNotification({ titleKey: 'unlocks:skillTree.title', bodyKey: 'unlocks:skillTree.body' })
+    }
+
+    this.checkProgressionUnlocks(wave)
+  }
+
+  private checkProgressionUnlocks(wave: number): void {
+    const currentZoneId = this.battleStore.currentZoneId()
+
+    for (const rule of UNLOCK_RULES) {
+      const { condition, target } = rule
+
+      if (condition.type === 'waveReached') {
+        if (currentZoneId !== condition.zoneId) continue
+        if (wave < condition.wave) continue
+
+        if (target.type === 'town' && !this.playerStore.isTownUnlocked(target.townId)) {
+          this.playerStore.unlockTown(target.townId)
+          if (rule.notification) this.modalService.openUnlockNotification(rule.notification)
+        }
+      }
     }
   }
 }

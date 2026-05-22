@@ -1,0 +1,8 @@
+<app-close-button (onClose)="close()"/>
+<div class="unlock-notification">
+  <h2 class="unlock-notification__title">{{ data.titleKey | i18next }}</h2>
+  <p class="unlock-notification__body">{{ data.bodyKey | i18next }}</p>
+  <button class="unlock-notification__cta" (click)="close()">
+    {{ 'unlocks:ui.gotIt' | i18next }}
+  </button>
+</div>

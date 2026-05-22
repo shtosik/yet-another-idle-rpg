@@ -1,4 +1,4 @@
-import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals'
+import { patchState, signalStore, withComputed, withHooks, withMethods, withState } from '@ngrx/signals'
 import { PlayerStat } from '../../../types/player/player-stat.type'
 import { calculateXp } from 'app/pipes/calculate-xp.pipe'
 import { initialEquipmentState, statsInitialState } from './player'
@@ -21,8 +21,10 @@ import { EnemyID } from '../../../enums/ids/enemy-id.enum'
 import { SkillPointID } from '../../../enums/ids/skill-tree-node-id.enum'
 import { SpellID } from '../../../enums/ids/spell-id.enum'
 import { ZoneID } from '../../../enums/ids/zone-id.enum'
-import { withDevtools, withStorageSync } from '@angular-architects/ngrx-toolkit'
+import { TownID } from '../../../enums/map/town-id.enum'
+import { withDevtools } from '@angular-architects/ngrx-toolkit'
 import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
+import { UNLOCK_RULES } from '../../../data/unlock-conditions'
 
 export type PlayerStatsType = Record<PlayerStat, number>;
 
@@ -48,6 +50,7 @@ interface PlayerState {
   explorerTokens: number;
   unlockedContent: UnlockedContent;
   craftingUnlocked: boolean;
+  skillTreeUnlocked: boolean;
 }
 
 export const initialState: PlayerState = {
@@ -63,8 +66,10 @@ export const initialState: PlayerState = {
   explorerTokens: 0,
   unlockedContent: {
     zones: [ZoneID.horseshoeBeach],
+    towns: [],
   },
   craftingUnlocked: false,
+  skillTreeUnlocked: false,
 }
 
 const itemIndexFromInventory = (inventory: (InventoryItem | null)[], id: ItemID, tier: ItemTier): number =>
@@ -111,10 +116,6 @@ export const PlayerStore = signalStore(
   withState(initialState),
   withGameStateSync(STORE_KEY, initialState),
   withDevtools(STORE_KEY),
-  withStorageSync({
-    key: STORE_KEY,
-    autoSync: true,
-  }),
   withComputed((store) => ({
     maxTaskSlots: () => 1,
     hasAvailableTaskSlot: () => store.activeTasks().length < 1,
@@ -430,17 +431,46 @@ export const PlayerStore = signalStore(
 
     unlockZone(id: ZoneID): void {
       patchState(store, (state) => {
-        if (state.unlockedContent.zones.includes(id)) return {}
-        return { unlockedContent: { ...state.unlockedContent, zones: [...state.unlockedContent.zones, id] } }
+        const zones = state.unlockedContent.zones ?? [ZoneID.horseshoeBeach]
+        if (zones.includes(id)) return {}
+        return { unlockedContent: { ...state.unlockedContent, zones: [...zones, id] } }
       })
     },
 
     isZoneUnlocked(id: ZoneID): boolean {
-      return store.unlockedContent().zones.includes(id)
+      return (store.unlockedContent().zones ?? [ZoneID.horseshoeBeach]).includes(id)
+    },
+
+    unlockTown(id: TownID): void {
+      patchState(store, (state) => {
+        const towns = state.unlockedContent.towns ?? []
+        if (towns.includes(id)) return {}
+        return { unlockedContent: { ...state.unlockedContent, towns: [...towns, id] } }
+      })
+    },
+
+    isTownUnlocked(id: TownID): boolean {
+      return (store.unlockedContent().towns ?? []).includes(id)
     },
 
     unlockCrafting(): void {
       patchState(store, { craftingUnlocked: true })
+    },
+
+    unlockSkillTree(): void {
+      patchState(store, { skillTreeUnlocked: true })
+    },
+  })),
+  withHooks((store) => ({
+    onInit() {
+      for (const rule of UNLOCK_RULES) {
+        if (rule.condition.type !== 'waveReached') continue
+        const killCount = store.getKillCountByZoneAndWave(rule.condition.zoneId, rule.condition.wave)
+        if (killCount <= 0) continue
+        if (rule.target.type === 'town') {
+          store.unlockTown(rule.target.townId)
+        }
+      }
     },
   })),
 )

@@ -1,0 +1,25 @@
+{
+  "ui": {
+    "gotIt": "Got it!"
+  },
+  "towns": {
+    "laHarpar": {
+      "title": "La Harpar Discovered!",
+      "body": "A bustling port town lies nearby. Visit the Tavern for rumors and company, browse the Market for supplies, and seek out the Exploration Guild to pick up bounty tasks."
+    }
+  },
+  "zones": {
+    "plains": {
+      "title": "New Area: The Plains",
+      "body": "Beyond the beach stretches open grassland. Strange slimes roam the fields — and something much larger lurks at wave 10. Survive long enough to face the boss."
+    }
+  },
+  "crafting": {
+    "title": "Crafting Unlocked!",
+    "body": "You've found a turtle shell — sturdy enough to forge into real gear. The Crafting tab is now available. Combine the materials you've gathered to craft powerful equipment."
+  },
+  "skillTree": {
+    "title": "Level Up! Skill Tree Unlocked",
+    "body": "You've grown stronger. The Skill Tree tab is now available — spend your skill points to unlock passive bonuses and sharpen your fighting style."
+  }
+}

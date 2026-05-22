@@ -1,7 +1,7 @@
 import { QuestProgression } from '../../../types/quests/quest-progression.type'
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
-import { withDevtools, withStorageSync } from '@angular-architects/ngrx-toolkit'
+import { withDevtools } from '@angular-architects/ngrx-toolkit'
 import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
 import QUEST_DATA, { QUEST_STEP_AFTER_COMPLETED, QUEST_STEP_AFTER_FAILED, QuestProps } from '../../../data/quests-data'
 import { inject } from '@angular/core'
@@ -29,10 +29,6 @@ export const QuestsStore = signalStore(
   withState(initialState),
   withGameStateSync(STORE_KEY, initialState),
   withDevtools(STORE_KEY),
-  withStorageSync({
-    key: STORE_KEY,
-    autoSync: true,
-  }),
   withMethods((
     store,
     modalService = inject(ModalService),

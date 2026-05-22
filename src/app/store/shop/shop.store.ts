@@ -1,6 +1,6 @@
 import { inject } from '@angular/core'
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals'
-import { withDevtools, withStorageSync } from '@angular-architects/ngrx-toolkit'
+import { withDevtools } from '@angular-architects/ngrx-toolkit'
 import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
 import { ShopID } from '../../../enums/ids/shop-id.enum'
 import { ShopInstanceState, ShopRuntimeItem } from '../../../types/shop/shop-state.type'
@@ -22,10 +22,6 @@ export const ShopStore = signalStore(
   withState(initialState),
   withGameStateSync(STORE_KEY, initialState),
   withDevtools(STORE_KEY),
-  withStorageSync({
-    key: STORE_KEY,
-    autoSync: true,
-  }),
   withMethods((store, playerStore = inject(PlayerStore)) => ({
     ensureShop(shopId: ShopID): void {
       if (store.shops()[shopId]) return

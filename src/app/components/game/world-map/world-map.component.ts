@@ -7,6 +7,7 @@ import { BattleStore } from 'app/store/battle/battle.store'
 import { PlayerStore } from 'app/store/player/player.store'
 import { WORLD_MAP_DATA, WorldMapMarker } from 'data/world-map-data'
 import { ZoneID } from 'enums/ids/zone-id.enum'
+import { TownID } from 'enums/map/town-id.enum'
 
 // CRS units = source pixels. scale(z=maxZoom) = 1 (native), scale(z=0) = 1/2^maxZoom
 // (whole image fits in a single tile). This keeps marker positions authorable in
@@ -33,12 +34,18 @@ export class WorldMapComponent {
   private map!: L.Map
   private activeMarkers: { marker: L.Marker; minZoom: number }[] = []
   private zoneMarkerMap = new Map<ZoneID, L.Marker>()
+  private townMarkerMap = new Map<TownID, L.Marker>()
 
   constructor() {
     effect(() => {
       const unlockedZones = this.playerStore.unlockedContent().zones
       if (!this.map) return
       this.syncZoneMarkers(unlockedZones)
+    })
+    effect(() => {
+      const unlockedTowns = this.playerStore.unlockedContent().towns
+      if (!this.map) return
+      this.syncTownMarkers(unlockedTowns)
     })
   }
 
@@ -88,11 +95,13 @@ export class WorldMapComponent {
   private placeMarkers(): void {
     for (const data of WORLD_MAP_DATA.markers) {
       if (data.type === 'zone') continue
+      if (data.type === 'town') continue
       const marker = this.buildMarker(data)
       marker.addTo(this.map)
       this.activeMarkers.push({ marker, minZoom: data.minZoom ?? 0 })
     }
     this.syncZoneMarkers(this.playerStore.unlockedContent().zones)
+    this.syncTownMarkers(this.playerStore.unlockedContent().towns)
   }
 
   private syncZoneMarkers(unlockedZones: ZoneID[]): void {
@@ -109,6 +118,26 @@ export class WorldMapComponent {
       } else if (!isUnlocked && existing) {
         existing.remove()
         this.zoneMarkerMap.delete(data.zoneId)
+        this.activeMarkers = this.activeMarkers.filter(m => m.marker !== existing)
+      }
+    }
+    this.syncMarkerVisibility()
+  }
+
+  private syncTownMarkers(unlockedTowns: TownID[]): void {
+    for (const data of WORLD_MAP_DATA.markers) {
+      if (data.type !== 'town') continue
+      const isUnlocked = unlockedTowns.includes(data.townId)
+      const existing = this.townMarkerMap.get(data.townId)
+
+      if (isUnlocked && !existing) {
+        const marker = this.buildMarker(data)
+        marker.addTo(this.map)
+        this.townMarkerMap.set(data.townId, marker)
+        this.activeMarkers.push({ marker, minZoom: data.minZoom ?? 0 })
+      } else if (!isUnlocked && existing) {
+        existing.remove()
+        this.townMarkerMap.delete(data.townId)
         this.activeMarkers = this.activeMarkers.filter(m => m.marker !== existing)
       }
     }
