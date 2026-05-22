@@ -8,6 +8,7 @@ import SPELLS_DATA from '../../data/spells-data'
 import { SpellType } from '../../enums/spell-type.enum'
 import { EquippedSpell } from '../../interfaces/spells/equipped-spell.interface'
 import { Enemy } from '../../interfaces/enemy.interface'
+import { ItemID } from '../../enums/ids/item-id.enum'
 
 @Injectable({ providedIn: 'root' })
 export class BattleManagerService {
@@ -27,13 +28,12 @@ export class BattleManagerService {
   canMoveToNextWave = computed(() => {
     const zoneData = this.battleStore.currentZoneData()
     const isCurrentWaveLast = this.battleStore.currentWave() === zoneData.maxWave
-    const requiredKillCount = isCurrentWaveLast ? 1 : zoneData.enemiesPerWave
 
     if (isCurrentWaveLast) {
-      return zoneData.nextZoneId && this.currentWaveKillCount() >= requiredKillCount
+      return !!(zoneData.nextZoneId && this.playerStore.isZoneUnlocked(zoneData.nextZoneId))
     }
 
-    return this.currentWaveKillCount() >= requiredKillCount
+    return this.currentWaveKillCount() >= zoneData.enemiesPerWave
   })
 
   doDamage(magicDamage = 0, isDoubleAttack = false) {
@@ -118,14 +118,28 @@ export class BattleManagerService {
     this.battleStore.endBattle()
     this.playerStore.processBattleEnd(enemy.id, zoneId, wave, isShiny)
 
+    this.checkUnlocks(wave)
 
     const currentKillCount = this.currentWaveKillCount()
     const isAutoEnabled = this.battleStore.autoWaveProgressionEnabled()
-    const zoneData = this.battleStore.currentZoneData()
-    const isEnoughKillCountToProgress = currentKillCount >= zoneData.enemiesPerWave
+    const requiredKills = this.battleStore.requiredKillCountOnCurrentWave()
+    const isEnoughKillCountToProgress = currentKillCount >= requiredKills
 
     if (isAutoEnabled && isEnoughKillCountToProgress) {
       this.battleStore.changeWave(true)
+    }
+  }
+
+  private checkUnlocks(wave: number): void {
+    const zoneData = this.battleStore.currentZoneData()
+    const isBossWave = wave === zoneData.maxWave
+
+    if (isBossWave && zoneData.nextZoneId && !this.playerStore.isZoneUnlocked(zoneData.nextZoneId)) {
+      this.playerStore.unlockZone(zoneData.nextZoneId)
+    }
+
+    if (!this.playerStore.craftingUnlocked() && this.playerStore.inventory().some(i => i?.id === ItemID.turtleShell)) {
+      this.playerStore.unlockCrafting()
     }
   }
 }

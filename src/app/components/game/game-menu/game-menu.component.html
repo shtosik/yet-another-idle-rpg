@@ -22,12 +22,14 @@
         }
       </li>
     }
-    <li
-      class="game-menu__tab"
-      (click)="changeTab.emit(GameTab.crafting)"
-    >
-      {{ ('gameTabs.' + GameTab[GameTab.crafting]) | i18next }}
-    </li>
+    @if (playerStore.craftingUnlocked()) {
+      <li
+        class="game-menu__tab"
+        (click)="changeTab.emit(GameTab.crafting)"
+      >
+        {{ ('gameTabs.' + GameTab[GameTab.crafting]) | i18next }}
+      </li>
+    }
     <li
       class="game-menu__tab"
       (click)="changeTab.emit(GameTab.bestiary)"

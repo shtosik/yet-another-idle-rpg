@@ -1,5 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, OnInit } from '@angular/core'
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
+import { ChangeDetectionStrategy, Component, computed, inject, input, OnInit, output } from '@angular/core'
 import { ShopStore } from '../../../store/shop/shop.store'
 import { PlayerStore } from '../../../store/player/player.store'
 import { ShopID } from '../../../../enums/ids/shop-id.enum'
@@ -23,19 +22,21 @@ type BuyBlockReason = 'stock' | 'gold' | 'inventory' | null
   imports: [TranslatePipe, SlotComponent, InventoryItemComponent, CloseButtonComponent],
 })
 export class ShopComponent implements OnInit {
-  private modalRef = inject(MatDialogRef)
   private shopStore = inject(ShopStore)
   private playerStore = inject(PlayerStore)
-  readonly shopId = inject<{ shopId: ShopID }>(MAT_DIALOG_DATA).shopId
 
-  readonly staticShop = SHOPS_DATA[this.shopId]
+  shopId = input.required<ShopID>()
+  closed = output<void>()
+
+  get staticShop() { return SHOPS_DATA[this.shopId()] }
   protected readonly ITEM_DATA = ITEM_DATA
 
   items = computed(() => {
-    const runtime = this.shopStore.shops()[this.shopId]
+    const id = this.shopId()
+    const runtime = this.shopStore.shops()[id]
     if (!runtime) return []
 
-    return this.staticShop.items.map((staticItem, index) => ({
+    return SHOPS_DATA[id].items.map((staticItem, index) => ({
       staticItem,
       runtime: runtime.items[index],
       itemData: ITEM_DATA[staticItem.itemId],
@@ -43,13 +44,13 @@ export class ShopComponent implements OnInit {
   })
 
   cooldownLabel = computed(() => {
-    const runtime = this.shopStore.shops()[this.shopId]
+    const runtime = this.shopStore.shops()[this.shopId()]
     const ms = runtime?.cooldownRemainingMs ?? 0
     return this.formatMs(ms)
   })
 
   ngOnInit(): void {
-    this.shopStore.ensureShop(this.shopId)
+    this.shopStore.ensureShop(this.shopId())
   }
 
   buyBlockReason(index: number): BuyBlockReason {
@@ -87,7 +88,7 @@ export class ShopComponent implements OnInit {
       type: ITEM_DATA[itemId].type as ItemType,
       amount: 1,
     }])
-    this.shopStore.buyItem(this.shopId, index)
+    this.shopStore.buyItem(this.shopId(), index)
   }
 
   isNonRefreshableSoldOut(index: number): boolean {
@@ -96,7 +97,7 @@ export class ShopComponent implements OnInit {
   }
 
   close(): void {
-    this.modalRef.close()
+    this.closed.emit()
   }
 
   protected readonly ItemTier = ItemTier

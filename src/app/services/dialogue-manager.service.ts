@@ -16,14 +16,14 @@ import QUEST_DATA, {
 import ITEM_DATA from '../../data/items-data'
 import { InventoryItem } from '../../interfaces/item.interface'
 import { ExplorationGuildService } from './exploration-guild.service'
-import { ModalService } from './modal.service'
+import { TownsStore } from '../store/towns/towns.store'
 
 @Injectable({ providedIn: 'root' })
 export class DialogueManagerService {
   private playerStore = inject(PlayerStore)
   private questStore = inject(QuestsStore)
   private guildService = inject(ExplorationGuildService)
-  private modalService = inject(ModalService)
+  private townsStore = inject(TownsStore)
 
   private currentConversation = signal<Record<any, DialogueNode<any>> | null>(null)
   private currentNodeId = signal<any>(null)
@@ -288,6 +288,6 @@ export class DialogueManagerService {
   }
 
   private openShop(shopId: number) {
-    this.modalService.openShop(shopId)
+    this.townsStore.openShop(shopId)
   }
 }

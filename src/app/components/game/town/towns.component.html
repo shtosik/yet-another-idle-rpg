@@ -9,13 +9,6 @@
     [style.backgroundImage]="'url(' + town.url + ')'"
   >
     <app-close-button (onClose)="goToMap()"/>
-    <!--    <ul>-->
-    <!--      @for (building of town.buildings; track building.tabId) {-->
-    <!--        @if (!building.position) {-->
-    <!--          <li (click)="selectTownBuilding(building)">{{ 'map:townTabs.' + TownBuildingID[building.tabId] | i18next }}</li>-->
-    <!--        }-->
-    <!--      }-->
-    <!--    </ul>-->
     @for (building of town.buildings; track building.tabId) {
       @if (isBuildingAvailable(building)) {
         <button
@@ -28,6 +21,8 @@
       }
     }
   </div>
+} @else if (activeShopId() !== null) {
+  <app-shop [shopId]="activeShopId()" (closed)="closeShop()"/>
 } @else {
   <app-close-button (onClose)="selectTownBuilding(null)"/>
   <app-town-building [building]="selectedTownBuilding()"/>

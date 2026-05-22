@@ -7,6 +7,7 @@ import { ItemID } from 'enums/ids/item-id.enum'
 import { ItemTier } from 'enums/items/item-tier.enum'
 import { EquipmentType } from 'interfaces/player/equipment.type'
 import { ZonesProgression } from '../../../types/player/zones-progression.type'
+import { UnlockedContent } from '../../../types/player/unlocked-content.type'
 import { UnlockedSkillPoints } from '../../../types/player/unlocked-skill-points.type'
 import { UnlockedSpellsType } from '../../../types/player/unlocked-spells.type'
 import { Enemy } from '../../../interfaces/enemy.interface'
@@ -45,6 +46,8 @@ interface PlayerState {
   activeTasks: Task[];
   totalTasksCompleted: number;
   explorerTokens: number;
+  unlockedContent: UnlockedContent;
+  craftingUnlocked: boolean;
 }
 
 export const initialState: PlayerState = {
@@ -58,6 +61,10 @@ export const initialState: PlayerState = {
   activeTasks: [],
   totalTasksCompleted: 0,
   explorerTokens: 0,
+  unlockedContent: {
+    zones: [ZoneID.horseshoeBeach],
+  },
+  craftingUnlocked: false,
 }
 
 const itemIndexFromInventory = (inventory: (InventoryItem | null)[], id: ItemID, tier: ItemTier): number =>
@@ -419,6 +426,21 @@ export const PlayerStore = signalStore(
 
     getKillCountByZoneAndWave(zoneId: ZoneID, wave: number) {
       return (store.zonesProgression()[zoneId] || {})[wave] || 0
+    },
+
+    unlockZone(id: ZoneID): void {
+      patchState(store, (state) => {
+        if (state.unlockedContent.zones.includes(id)) return {}
+        return { unlockedContent: { ...state.unlockedContent, zones: [...state.unlockedContent.zones, id] } }
+      })
+    },
+
+    isZoneUnlocked(id: ZoneID): boolean {
+      return store.unlockedContent().zones.includes(id)
+    },
+
+    unlockCrafting(): void {
+      patchState(store, { craftingUnlocked: true })
     },
   })),
 )

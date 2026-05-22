@@ -9,6 +9,7 @@ import { TownBuildingComponent } from './town-building/town-building.component'
 import { BattleStore } from '../../../store/battle/battle.store'
 import { QuestsStore } from '../../../store/quests/quests.store'
 import { GameTab } from '../../../../enums/ids/game-tab.enum'
+import { ShopComponent } from '../../modals/shop/shop.component'
 
 @Component({
   selector: 'app-towns',
@@ -19,6 +20,7 @@ import { GameTab } from '../../../../enums/ids/game-tab.enum'
     TranslatePipe,
     CloseButtonComponent,
     TownBuildingComponent,
+    ShopComponent,
   ],
 })
 export class TownsComponent {
@@ -31,6 +33,7 @@ export class TownsComponent {
   private destroyRef = inject(DestroyRef)
   selectedTownId = this.townsStore.selectedTownId
   selectedTownBuilding = this.townsStore.selectedTownBuilding
+  activeShopId = this.townsStore.activeShopId
 
   @Output() changeTab = new EventEmitter<GameTab>()
 
@@ -47,6 +50,10 @@ export class TownsComponent {
 
   goToMap() {
     this.changeTab.emit(GameTab.map)
+  }
+
+  closeShop() {
+    this.townsStore.closeShop()
   }
 
   isBuildingAvailable(building: TownBuilding): boolean {

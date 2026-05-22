@@ -1,10 +1,12 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, inject, Output } from '@angular/core'
+import { ChangeDetectionStrategy, Component, effect, EventEmitter, inject, Output } from '@angular/core'
 import { LeafletModule } from '@bluehalo/ngx-leaflet'
 import * as L from 'leaflet'
 import { GameTab } from 'enums/ids/game-tab.enum'
 import { TownsStore } from 'app/store/towns/towns.store'
 import { BattleStore } from 'app/store/battle/battle.store'
+import { PlayerStore } from 'app/store/player/player.store'
 import { WORLD_MAP_DATA, WorldMapMarker } from 'data/world-map-data'
+import { ZoneID } from 'enums/ids/zone-id.enum'
 
 // CRS units = source pixels. scale(z=maxZoom) = 1 (native), scale(z=0) = 1/2^maxZoom
 // (whole image fits in a single tile). This keeps marker positions authorable in
@@ -26,9 +28,19 @@ export class WorldMapComponent {
 
   private readonly townsStore = inject(TownsStore)
   private readonly battleStore = inject(BattleStore)
+  private readonly playerStore = inject(PlayerStore)
 
   private map!: L.Map
   private activeMarkers: { marker: L.Marker; minZoom: number }[] = []
+  private zoneMarkerMap = new Map<ZoneID, L.Marker>()
+
+  constructor() {
+    effect(() => {
+      const unlockedZones = this.playerStore.unlockedContent().zones
+      if (!this.map) return
+      this.syncZoneMarkers(unlockedZones)
+    })
+  }
 
   // center/zoom give Leaflet a valid initial view; tile layer is added later
   // (inside setTimeout) so it fires GridLayer.onAdd() only after the grid
@@ -75,10 +87,32 @@ export class WorldMapComponent {
 
   private placeMarkers(): void {
     for (const data of WORLD_MAP_DATA.markers) {
+      if (data.type === 'zone') continue
       const marker = this.buildMarker(data)
       marker.addTo(this.map)
       this.activeMarkers.push({ marker, minZoom: data.minZoom ?? 0 })
     }
+    this.syncZoneMarkers(this.playerStore.unlockedContent().zones)
+  }
+
+  private syncZoneMarkers(unlockedZones: ZoneID[]): void {
+    for (const data of WORLD_MAP_DATA.markers) {
+      if (data.type !== 'zone') continue
+      const isUnlocked = unlockedZones.includes(data.zoneId)
+      const existing = this.zoneMarkerMap.get(data.zoneId)
+
+      if (isUnlocked && !existing) {
+        const marker = this.buildMarker(data)
+        marker.addTo(this.map)
+        this.zoneMarkerMap.set(data.zoneId, marker)
+        this.activeMarkers.push({ marker, minZoom: data.minZoom ?? 0 })
+      } else if (!isUnlocked && existing) {
+        existing.remove()
+        this.zoneMarkerMap.delete(data.zoneId)
+        this.activeMarkers = this.activeMarkers.filter(m => m.marker !== existing)
+      }
+    }
+    this.syncMarkerVisibility()
   }
 
   private buildMarker(data: WorldMapMarker): L.Marker {
