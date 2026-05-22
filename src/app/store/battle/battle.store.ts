@@ -1,19 +1,14 @@
 import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals'
 import { ZoneID } from 'enums/ids/zone-id.enum'
 import { Enemy } from 'interfaces/enemy.interface'
-import { EquippedSpell } from '../../../interfaces/spells/equipped-spell.interface'
+import { ActiveBuff, EquippedSpell } from '../../../interfaces/spells/equipped-spell.interface'
 import ZONES_DATA from 'data/zones-data'
 import ENEMIES_DATA from 'data/enemies-data'
 import { SpellID } from '../../../enums/ids/spell-id.enum'
-import { rxMethod } from '@ngrx/signals/rxjs-interop'
-import { pipe, tap } from 'rxjs'
-import { PlayerStat } from '../../../types/player/player-stat.type'
-import { SpellType } from '../../../enums/spell-type.enum'
-import SPELLS_DATA, { SpellSupportStatBuffEffectProps } from '../../../data/spells-data'
-import { inject } from '@angular/core'
-import { PlayerStore } from '../player/player.store'
 import { withDevtools } from '@angular-architects/ngrx-toolkit'
 import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
+import { PlayerStore } from '../player/player.store'
+import { inject } from '@angular/core'
 
 export interface BattleState {
   isInCombat: boolean;
@@ -23,6 +18,7 @@ export interface BattleState {
   currentWave: number;
   autoWaveProgressionEnabled: boolean;
   equippedSpells: EquippedSpell[];
+  activeBuffs: ActiveBuff[];
   attackInterval: number;
   isShinyEnemy: boolean;
 }
@@ -35,6 +31,7 @@ export const initialState: BattleState = {
   currentWave: 1,
   autoWaveProgressionEnabled: false,
   equippedSpells: [],
+  activeBuffs: [],
   attackInterval: 0,
   isShinyEnemy: false,
 }
@@ -151,17 +148,46 @@ export const BattleStore = signalStore(
       }))
     },
 
-    updateSpellCooldown(spellId: SpellID, cooldown: number, duration: number): void {
-      patchState(store, (state) => {
-        const spells = state.equippedSpells.map(s =>
-          s.spellId === spellId ? { ...s, cooldown, duration } : s,
-        )
-        return { equippedSpells: spells }
-      })
+    setSpellCooldown(spellId: SpellID, cooldown: number): void {
+      patchState(store, (state) => ({
+        equippedSpells: state.equippedSpells.map(s =>
+          s.spellId === spellId ? { ...s, cooldownRemaining: cooldown } : s,
+        ),
+      }))
     },
 
     setAllEquippedSpells(equippedSpells: EquippedSpell[]): void {
       patchState(store, { equippedSpells })
+    },
+
+    addActiveBuff(buff: ActiveBuff): void {
+      patchState(store, (state) => ({
+        activeBuffs: [...state.activeBuffs.filter(b => b.spellId !== buff.spellId), buff],
+      }))
+    },
+
+    tickCooldowns(): void {
+      patchState(store, (state) => ({
+        equippedSpells: state.equippedSpells.map(s =>
+          s.cooldownRemaining > 0 ? { ...s, cooldownRemaining: s.cooldownRemaining - 1 } : s,
+        ),
+      }))
+    },
+
+    tickBuffs(): SpellID[] {
+      const expired: SpellID[] = []
+      const remaining: ActiveBuff[] = []
+
+      for (const buff of store.activeBuffs()) {
+        if (buff.ticksRemaining <= 1) {
+          expired.push(buff.spellId)
+        } else {
+          remaining.push({ ...buff, ticksRemaining: buff.ticksRemaining - 1 })
+        }
+      }
+
+      patchState(store, { activeBuffs: remaining })
+      return expired
     },
 
     setZone(zoneId: ZoneID): void {
@@ -179,39 +205,5 @@ export const BattleStore = signalStore(
       patchState(store, initialState)
     },
 
-    updateSpellDuration() {
-      const spells = store.equippedSpells()
-      if (spells.length === 0) return
-
-      const statsToDecrement: { stat: PlayerStat, amount: number }[] = []
-
-      const updatedSpells = spells.map(spell => {
-        const s = { ...spell }
-        if (s.cooldown > 0) s.cooldown--
-
-        if (s.spellType === SpellType.buff && s.duration > 0) {
-          s.duration--
-
-          if (s.duration === 0) {
-            const data = SPELLS_DATA[s.spellId].effect as SpellSupportStatBuffEffectProps
-            statsToDecrement.push({ stat: data.stat, amount: -data.amount })
-          }
-        }
-        return s
-      })
-
-      patchState(store, { equippedSpells: updatedSpells })
-
-      if (statsToDecrement.length > 0) {
-        playerStore.updatePlayerStats(statsToDecrement)
-      }
-    },
-  })),
-  withMethods((store) => ({
-    updateTick: rxMethod<void>(pipe(
-      tap(() => {
-        store.updateSpellDuration()
-      }),
-    )),
   })),
 )

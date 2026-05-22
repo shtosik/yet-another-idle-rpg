@@ -6,7 +6,7 @@ import { SkillPointID } from '../../enums/ids/skill-tree-node-id.enum'
 import { SpellID } from '../../enums/ids/spell-id.enum'
 import SPELLS_DATA from '../../data/spells-data'
 import { SpellType } from '../../enums/spell-type.enum'
-import { EquippedSpell } from '../../interfaces/spells/equipped-spell.interface'
+import { SpellSupportStatBuffEffectProps } from '../../data/spells-data'
 import { Enemy } from '../../interfaces/enemy.interface'
 import { ItemID } from '../../enums/ids/item-id.enum'
 import { UNLOCK_RULES, ZONE_UNLOCK_NOTIFICATIONS } from '../../data/unlock-conditions'
@@ -72,45 +72,45 @@ export class BattleManagerService {
   castSpell(spellId: SpellID) {
     const spellData = SPELLS_DATA[spellId]
     const stats = this.playerStore.stats()
-
     const cooldown = spellData.baseCooldown - stats.spellCooldownReduction
-    const duration = spellData.effect.type === SpellType.buff
-      ? (spellData.effect.duration + stats.increasedSpellDuration)
-      : 0
 
-    this.battleStore.updateSpellCooldown(spellId, cooldown, duration)
+    this.battleStore.setSpellCooldown(spellId, cooldown)
 
-    if (spellId === SpellID.doubleAttack) {
-      this.doDamage(0, true)
-    } else if (spellData.effect.type === SpellType.buff) {
-      this.playerStore.updatePlayerStats([{ stat: spellData.effect.stat, amount: spellData.effect.amount }])
-    } else if (spellData.effect.type === SpellType.magic) {
-      this.doDamage(spellData.effect.baseDamage)
+    switch (spellData.effect.type) {
+      case SpellType.melee:
+        this.doDamage(0, true)
+        break
+      case SpellType.magic:
+        this.doDamage(spellData.effect.baseDamage)
+        break
+      case SpellType.buff: {
+        const alreadyActive = this.battleStore.activeBuffs().some(b => b.spellId === spellId)
+        if (alreadyActive) break
+        const ticks = spellData.effect.duration + stats.increasedSpellDuration
+        this.battleStore.addActiveBuff({ spellId, ticksRemaining: ticks })
+        this.playerStore.updatePlayerStats([{ stat: spellData.effect.stat, amount: spellData.effect.amount }])
+        break
+      }
     }
   }
 
   equipSpell(spellId: SpellID) {
-    const spellData = SPELLS_DATA[spellId]
-
-    const currentSpells = this.battleStore.equippedSpells()
-    if (currentSpells.find(s => s.spellId === spellId)) return
-
-    const spellToEquip: EquippedSpell = {
-      spellId,
-      spellType: spellData.effect.type,
-      cooldown: 0,
-    }
-
-    if (spellData.effect.type === SpellType.buff) {
-      spellToEquip.duration = 0
-    }
-
-    this.battleStore.addSpell(spellToEquip)
+    if (this.battleStore.equippedSpells().some(s => s.spellId === spellId)) return
+    this.battleStore.addSpell({ spellId, cooldownRemaining: 0 })
   }
 
   unequipSpell(spellId: SpellID) {
     const remaining = this.battleStore.equippedSpells().filter(s => s.spellId !== spellId)
     this.battleStore.setAllEquippedSpells(remaining)
+  }
+
+  tickSpells(): void {
+    this.battleStore.tickCooldowns()
+    const expired = this.battleStore.tickBuffs()
+    for (const spellId of expired) {
+      const effect = SPELLS_DATA[spellId].effect as SpellSupportStatBuffEffectProps
+      this.playerStore.updatePlayerStats([{ stat: effect.stat, amount: -effect.amount }])
+    }
   }
 
   private handleEnemyDeath(enemy: Enemy) {
@@ -168,6 +168,7 @@ export class BattleManagerService {
 
         if (target.type === 'town' && !this.playerStore.isTownUnlocked(target.townId)) {
           this.playerStore.unlockTown(target.townId)
+          this.playerStore.unlockMap()
           if (rule.notification) this.modalService.openUnlockNotification(rule.notification)
         }
       }

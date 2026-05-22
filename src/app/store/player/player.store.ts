@@ -51,6 +51,7 @@ interface PlayerState {
   unlockedContent: UnlockedContent;
   craftingUnlocked: boolean;
   skillTreeUnlocked: boolean;
+  mapUnlocked: boolean;
 }
 
 export const initialState: PlayerState = {
@@ -70,6 +71,7 @@ export const initialState: PlayerState = {
   },
   craftingUnlocked: false,
   skillTreeUnlocked: false,
+  mapUnlocked: false,
 }
 
 const itemIndexFromInventory = (inventory: (InventoryItem | null)[], id: ItemID, tier: ItemTier): number =>
@@ -460,6 +462,10 @@ export const PlayerStore = signalStore(
     unlockSkillTree(): void {
       patchState(store, { skillTreeUnlocked: true })
     },
+
+    unlockMap(): void {
+      patchState(store, { mapUnlocked: true })
+    },
   })),
   withHooks((store) => ({
     onInit() {
@@ -469,6 +475,7 @@ export const PlayerStore = signalStore(
         if (killCount <= 0) continue
         if (rule.target.type === 'town') {
           store.unlockTown(rule.target.townId)
+          store.unlockMap()
         }
       }
     },

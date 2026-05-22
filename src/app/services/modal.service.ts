@@ -14,7 +14,7 @@ export class ModalService {
 
   openDialogue() {
     const config: MatDialogConfig = {
-      minWidth: '800px',
+      minWidth: '1200px',
       position: { top: '250px' },
       disableClose: false,
     }
@@ -40,7 +40,7 @@ export class ModalService {
       hasBackdrop: true,
       panelClass: 'modal',
       minWidth: '800px',
-      position: { top: '250px' },
+      position: { top: '200px' },
       data,
       disableClose: false,
     }
@@ -52,7 +52,7 @@ export class ModalService {
     return this.dialog.open(UnlockNotificationComponent, {
       enterAnimationDuration: '300ms',
       panelClass: 'modal',
-      minWidth: '480px',
+      minWidth: '800px',
       position: { top: '200px' },
       hasBackdrop: true,
       disableClose: false,
@@ -63,8 +63,8 @@ export class ModalService {
   openRespecConfirm() {
     const config: MatDialogConfig = {
       panelClass: 'modal',
-      minWidth: '420px',
-      position: { top: '180px' },
+      minWidth: '800px',
+      position: { top: '200px' },
       hasBackdrop: true,
       disableClose: false,
     }

@@ -45,7 +45,7 @@ export class GameIntervalService {
         this.tickCounter += TICK_DURATION_IN_MS
         if (this.tickCounter >= 1000) {
             this.tickCounter = 0
-            this.battleStore.updateTick()
+            this.battleManagerService.tickSpells()
             this.shopStore.tickCooldowns(1000)
         }
     }

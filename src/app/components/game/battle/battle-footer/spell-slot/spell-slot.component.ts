@@ -39,7 +39,7 @@ export class SpellSlotComponent {
   protected readonly SpellType = SpellType
 
   handleCastSpell(spellId: SpellID, equippedSpell: EquippedSpell) {
-    if (equippedSpell.cooldown > 0 || !this.isInCombat) return
+    if (equippedSpell.cooldownRemaining > 0 || !this.isInCombat) return
 
     this.battleManagerService.castSpell(spellId)
   }

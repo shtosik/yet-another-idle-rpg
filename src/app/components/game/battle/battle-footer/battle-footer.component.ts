@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core'
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core'
 import { BattleStore } from '../../../../store/battle/battle.store'
 import { UrlPipe } from '../../../../pipes/url.pipe'
 import SPELLS_DATA from '../../../../../data/spells-data'
@@ -24,7 +24,5 @@ export class BattleFooterComponent {
   readonly slots = new Array(5).fill(null)
   protected readonly SPELLS_DATA = SPELLS_DATA
 
-  activeSpells = computed(() => {
-    return this.battleStore.equippedSpells().filter(s => s.duration > 0)
-  })
+  activeSpells = this.battleStore.activeBuffs
 }

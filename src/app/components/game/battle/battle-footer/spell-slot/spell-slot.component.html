@@ -1,6 +1,6 @@
 @let spellData = SPELLS_DATA[spellId()];
 @let spellCooldown = spellData.baseCooldown - playerStats().spellCooldownReduction;
-@let timeLeftUntilReady = equippedSpell.cooldown / spellCooldown * 360;
+@let timeLeftUntilReady = equippedSpell.cooldownRemaining / spellCooldown * 360;
 
 <div
   class="spell"
@@ -13,8 +13,8 @@
   [tooltipTemplate]="tooltip"
   (click)="handleCastSpell(spellId(), equippedSpell)"
 >
-  @if (equippedSpell.cooldown) {
-    <span class="spell__counter">{{ equippedSpell.cooldown }}</span>
+  @if (equippedSpell.cooldownRemaining) {
+    <span class="spell__counter">{{ equippedSpell.cooldownRemaining }}</span>
   }
 </div>
 

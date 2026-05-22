@@ -5,11 +5,13 @@
       class="game-menu__tab"
     >{{ ('gameTabs.' + GameTab[GameTab.main]) | i18next }}
     </li>
-    <li
-      class="game-menu__tab"
-      (click)="changeTab.emit(GameTab.map)"
-    >{{ ('gameTabs.' + GameTab[GameTab.map]) | i18next }}
-    </li>
+    @if (playerStore.mapUnlocked()) {
+      <li
+        class="game-menu__tab"
+        (click)="changeTab.emit(GameTab.map)"
+      >{{ ('gameTabs.' + GameTab[GameTab.map]) | i18next }}
+      </li>
+    }
     @if (level() > 1) {
       <li
         class="game-menu__tab"

@@ -1,9 +1,11 @@
-import { SpellID } from '../../enums/ids/spell-id.enum';
-import { SpellType } from '../../enums/spell-type.enum';
+import { SpellID } from '../../enums/ids/spell-id.enum'
 
 export interface EquippedSpell {
-    spellId: SpellID
-    spellType: SpellType
-    cooldown: number
-    duration?: number
+  spellId: SpellID
+  cooldownRemaining: number
+}
+
+export interface ActiveBuff {
+  spellId: SpellID
+  ticksRemaining: number
 }
