@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core'
-import { multiplierStats, percentageState, PlayerStat } from '../../types/player/player-stat.type';
+import { additivePercentStats, multiplierStats, percentageState, PlayerStat } from '../../types/player/player-stat.type';
 
 @Pipe({
     name: 'statToPercentage',
@@ -10,6 +10,8 @@ export class StatToPercentagePipe implements PipeTransform {
         if (multiplierStats.includes(stat)) return `${Math.floor(amount * 100)}%`
 
         if (percentageState.includes(stat)) return `${amount}%`
+
+        if (additivePercentStats.includes(stat)) return `+${Math.floor(amount * 100)}%`
 
         return amount
     }

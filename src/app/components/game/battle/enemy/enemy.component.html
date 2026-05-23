@@ -16,6 +16,8 @@
   <app-monster-debuff-bar />
   <img
     [ngSrc]="currentEnemy().url"
+    [class.enemy__sprite--shiny]="battleStore.isShinyEnemy()"
+    class="enemy__sprite"
     alt=""
     disableOptimizedSrcset
     height="128"

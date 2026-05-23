@@ -13,6 +13,7 @@ import { UNLOCK_RULES, ZONE_UNLOCK_NOTIFICATIONS } from '../../data/unlock-condi
 import { ModalService } from './modal.service'
 import { DamageElement } from '../../enums/damage-element.enum'
 import { PlayerStat } from '../../types/player/player-stat.type'
+import { EnemyType } from '../../enums/enemy-type.enum'
 
 @Injectable({ providedIn: 'root' })
 export class BattleManagerService {
@@ -70,6 +71,13 @@ export class BattleManagerService {
       const multiplierStat = `extra${elementName.charAt(0).toUpperCase() + elementName.slice(1)}DamageMultiplier` as PlayerStat
       damage = Math.ceil(damage * (stats[multiplierStat] as number))
     }
+
+    const typeBonus = enemy.enemyTypes.reduce((sum, type) => {
+      const typeName = EnemyType[type]
+      const statName = `damageVs${typeName.charAt(0).toUpperCase() + typeName.slice(1)}` as PlayerStat
+      return sum + (stats[statName] as number)
+    }, 0)
+    if (typeBonus > 0) damage = Math.floor(damage * (1 + typeBonus))
 
     const newHp = Math.max(0, enemyHp - damage)
     this.battleStore.updateEnemyHp(newHp)

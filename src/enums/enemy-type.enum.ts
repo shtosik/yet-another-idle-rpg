@@ -1,0 +1,16 @@
+export enum EnemyType {
+  crab,
+  bird,
+  human,
+  dog,
+  mammal,
+  reptile,
+  crustacean,
+  goblin,
+  humanoid,
+  troll,
+  slime,
+  rodent,
+  rat,
+  bandit,
+}

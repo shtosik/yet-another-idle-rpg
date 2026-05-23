@@ -10,6 +10,8 @@ import { MonsterEntry } from 'interfaces/bestiary/monster-entry.interface'
 
 const LOCKED_SPRITE = './assets/img/enemies/unknown.png'
 
+const toShinyUrl = (url: string): string => url.replace(/\.png$/i, '-shiny.png')
+
 @Component({
     selector: 'app-bestiary',
     templateUrl: './bestiary.component.html',
@@ -26,6 +28,7 @@ export class BestiaryComponent {
     readonly LOCKED_SPRITE = LOCKED_SPRITE
 
     selectedId = signal<EnemyID | null>(null)
+    showShiny = signal(false)
 
     monsters = computed<MonsterEntry[]>(() => {
         const kills = this.playerStore.enemyKillCounts()
@@ -37,6 +40,7 @@ export class BestiaryComponent {
                 maxHp: e.maxHp,
                 zones: e.zones,
                 drops: e.drops,
+                shinyDrops: e.shinyDrops ?? [],
                 killCount,
                 isUnlocked: killCount > 0,
             }
@@ -49,8 +53,21 @@ export class BestiaryComponent {
         return this.monsters().find(m => m.id === id) ?? null
     })
 
+    displayUrl = computed<string>(() => {
+        const m = this.selectedMonster()
+        if (!m) return ''
+        return this.showShiny() ? toShinyUrl(m.url) : m.url
+    })
+
+    shinyUnlocked = computed<boolean>(() => (this.playerStore.stats().shinyChance ?? 0) > 0)
+
     selectMonster(entry: MonsterEntry) {
         if (!entry.isUnlocked) return
         this.selectedId.set(entry.id)
+        this.showShiny.set(false)
+    }
+
+    toggleShiny() {
+        this.showShiny.update(v => !v)
     }
 }

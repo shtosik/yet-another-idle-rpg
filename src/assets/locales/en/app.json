@@ -18,7 +18,21 @@
     "extraEarthDamageMultiplier": "Earth Damage",
     "extraLightDamageMultiplier": "Light Damage",
     "extraDarkDamageMultiplier": "Dark Damage",
-    "extraPhysicalDamageMultiplier": "Physical Damage"
+    "extraPhysicalDamageMultiplier": "Physical Damage",
+    "damageVsCrab": "Damage vs Crabs",
+    "damageVsBird": "Damage vs Birds",
+    "damageVsHuman": "Damage vs Humans",
+    "damageVsDog": "Damage vs Dogs",
+    "damageVsMammal": "Damage vs Mammals",
+    "damageVsReptile": "Damage vs Reptiles",
+    "damageVsCrustacean": "Damage vs Crustaceans",
+    "damageVsGoblin": "Damage vs Goblins",
+    "damageVsHumanoid": "Damage vs Humanoids",
+    "damageVsTroll": "Damage vs Trolls",
+    "damageVsSlime": "Damage vs Slimes",
+    "damageVsRodent": "Damage vs Rodents",
+    "damageVsRat": "Damage vs Rats",
+    "damageVsBandit": "Damage vs Bandits"
   },
   "damage": {
     "strong": "(strong)"

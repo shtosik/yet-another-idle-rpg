@@ -2,6 +2,9 @@
   "baseHp": "Base HP",
   "foundIn": "Found in",
   "dropTable": "Drop Table",
+  "shinyDropTable": "Shiny Drop Table",
+  "showShiny": "Show Shiny",
+  "showNormal": "Show Normal",
   "selectPrompt": "Select a monster to view details",
   "noDrops": "No known drops.",
   "noZone": "Unknown"

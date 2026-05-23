@@ -11,6 +11,7 @@ import { UnlockedContent } from '../../../types/player/unlocked-content.type'
 import { UnlockedSkillPoints } from '../../../types/player/unlocked-skill-points.type'
 import { UnlockedSpellsType } from '../../../types/player/unlocked-spells.type'
 import { Enemy } from '../../../interfaces/enemy.interface'
+import { EnemyDrop } from '../../../interfaces/enemy-drop.interface'
 import ITEM_DATA from '../../../data/items-data'
 import ENEMIES_DATA from '../../../data/enemies-data'
 import { EquipmentSlot, EquipmentSlotKey } from '../../../enums/equipment-slot.enum'
@@ -89,11 +90,9 @@ const handleExperience = (stats: PlayerStatsType) => {
   handleExperience(stats)
 }
 
-const calculateEnemyDrops = (enemy: Enemy, rolls: number): InventoryItem[] => {
-  const accumulator = new Map<string, InventoryItem>()
-
+const rollDropList = (drops: EnemyDrop[], rolls: number, accumulator: Map<string, InventoryItem>) => {
   for (let r = 0; r < rolls; r++) {
-    enemy.drops.forEach(drop => {
+    drops.forEach(drop => {
       const roll = Math.ceil(Math.random() * drop.chance)
       if (roll !== drop.chance) return
 
@@ -101,14 +100,16 @@ const calculateEnemyDrops = (enemy: Enemy, rolls: number): InventoryItem[] => {
       const { type, tier } = ITEM_DATA[drop.id]
       const key = `${drop.id}:${tier}`
       const existing = accumulator.get(key)
-      if (existing) {
-        existing.amount += amount
-      } else {
-        accumulator.set(key, { id: drop.id, type, tier, amount })
-      }
+      if (existing) existing.amount += amount
+      else accumulator.set(key, { id: drop.id, type, tier, amount })
     })
   }
+}
 
+const calculateEnemyDrops = (enemy: Enemy, rolls: number, isShiny = false): InventoryItem[] => {
+  const accumulator = new Map<string, InventoryItem>()
+  rollDropList(enemy.drops, rolls, accumulator)
+  if (isShiny && enemy.shinyDrops?.length) rollDropList(enemy.shinyDrops, 1, accumulator)
   return [...accumulator.values()]
 }
 
@@ -315,7 +316,7 @@ export const PlayerStore = signalStore(
 
       const xpGained = Math.ceil(enemy.experience * stats.xpMultiplier * xpMultiplier)
       const goldGained = 1 * goldMultiplier
-      const itemsToUpdate = calculateEnemyDrops(enemy, dropRolls)
+      const itemsToUpdate = calculateEnemyDrops(enemy, dropRolls, isShiny)
 
       store.updatePlayerStats([
         { stat: 'experience', amount: xpGained },

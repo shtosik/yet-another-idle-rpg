@@ -15,8 +15,8 @@
           />
           <span class="bestiary__name">
             {{ ('enemies:names.' + EnemyID[monster.id]) | i18next }}
+            <span class="bestiary__kills">x{{ monster.killCount }}</span>
           </span>
-          <span class="bestiary__kills">x{{ monster.killCount }}</span>
         } @else {
           <img
             class="bestiary__sprite bestiary__sprite--locked"
@@ -33,8 +33,25 @@
     @if (selectedMonster(); as m) {
       <h2 class="bestiary__title">
         {{ ('enemies:names.' + EnemyID[m.id]) | i18next }}
+        <span class="bestiary__title-kills">x{{ m.killCount }}</span>
       </h2>
-      <img class="bestiary__detail-sprite" [src]="m.url" alt="" />
+      <img
+        class="bestiary__detail-sprite"
+        [class.bestiary__detail-sprite--shiny]="showShiny()"
+        [src]="displayUrl()"
+        alt=""
+      />
+
+      @if (shinyUnlocked() && m.shinyDrops.length) {
+        <button
+          type="button"
+          class="bestiary__shiny-toggle"
+          [class.bestiary__shiny-toggle--active]="showShiny()"
+          (click)="toggleShiny()"
+        >
+          {{ (showShiny() ? 'bestiary:showNormal' : 'bestiary:showShiny') | i18next }}
+        </button>
+      }
 
       <dl class="bestiary__stats">
         <dt>{{ 'bestiary:baseHp' | i18next }}</dt>
@@ -64,6 +81,20 @@
         </ul>
       } @else {
         <p class="bestiary__no-drops">{{ 'bestiary:noDrops' | i18next }}</p>
+      }
+
+      @if (showShiny() && m.shinyDrops.length) {
+        <h3 class="bestiary__drops-title bestiary__drops-title--shiny">
+          {{ 'bestiary:shinyDropTable' | i18next }}
+        </h3>
+        <ul class="bestiary__drops">
+          @for (drop of m.shinyDrops; track drop.id) {
+            <li class="bestiary__drop bestiary__drop--shiny">
+              <span>{{ ('items:names.' + ItemID[drop.id]) | i18next }}</span>
+              <span>{{ (100 / drop.chance) | number:'1.0-1' }}%</span>
+            </li>
+          }
+        </ul>
       }
     } @else {
       <p class="bestiary__placeholder">{{ 'bestiary:selectPrompt' | i18next }}</p>

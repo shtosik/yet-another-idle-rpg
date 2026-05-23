@@ -39,6 +39,21 @@ export const statsInitialState: PlayerStatsType = {
     currentShopRefreshCooldown: 0,
     // shiny
     shinyChance: 0,
+    // damage vs enemy type (additive, fraction: 0.2 = +20% of total damage)
+    damageVsCrab: 0,
+    damageVsBird: 0,
+    damageVsHuman: 0,
+    damageVsDog: 0,
+    damageVsMammal: 0,
+    damageVsReptile: 0,
+    damageVsCrustacean: 0,
+    damageVsGoblin: 0,
+    damageVsHumanoid: 0,
+    damageVsTroll: 0,
+    damageVsSlime: 0,
+    damageVsRodent: 0,
+    damageVsRat: 0,
+    damageVsBandit: 0,
 }
 
 export const initialEquipmentState: Record<EquipmentSlotKey, { id: ItemID, tier: ItemTier } | null> = {
@@ -52,4 +67,5 @@ export const initialEquipmentState: Record<EquipmentSlotKey, { id: ItemID, tier:
     boots: null,
     amulet: null,
     ring: null,
+    pet: null,
 }

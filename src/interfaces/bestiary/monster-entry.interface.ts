@@ -8,6 +8,7 @@ export interface MonsterEntry {
     maxHp: number
     zones: ZoneID[]
     drops: EnemyDrop[]
+    shinyDrops: EnemyDrop[]
     killCount: number
     isUnlocked: boolean
 }
