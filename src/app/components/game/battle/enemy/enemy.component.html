@@ -13,6 +13,7 @@
   >
     <span>{{ currentEnemyHp() }} / {{ currentEnemy().maxHp }}</span>
   </div>
+  <app-monster-debuff-bar />
   <img
     [ngSrc]="currentEnemy().url"
     alt=""

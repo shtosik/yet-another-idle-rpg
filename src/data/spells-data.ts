@@ -1,3 +1,4 @@
+import { DamageElement } from '../enums/damage-element.enum'
 import { SpellID } from '../enums/ids/spell-id.enum'
 import { SpellType } from '../enums/spell-type.enum'
 import { PlayerStat } from '../types/player/player-stat.type'
@@ -19,6 +20,7 @@ export type SpellMeleeEffectProps = {
 export type SpellMagicEffectProps = {
   type: SpellType.magic;
   baseDamage: number;
+  damageType: DamageElement;
 };
 
 export type SpellSupportStatBuffEffectProps = {
@@ -37,6 +39,7 @@ const SPELLS_DATA: Record<SpellID, SpellProps> = {
     effect: {
       type: SpellType.magic,
       baseDamage: 15,
+      damageType: DamageElement.fire,
     },
   },
   [SpellID.haste]: {

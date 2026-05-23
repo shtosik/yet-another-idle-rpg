@@ -1,3 +1,4 @@
+import { DamageElement } from 'enums/damage-element.enum'
 import { EquipmentSlot } from 'enums/equipment-slot.enum'
 import { ItemID } from 'enums/ids/item-id.enum'
 import { ItemTier } from 'enums/items/item-tier.enum'
@@ -23,6 +24,7 @@ export interface EquipmentItem extends ItemData {
     type: ItemType.equipment
     stats: EquipmentItemPossibleStat[]
     slot: EquipmentSlot
+    damageType?: DamageElement
 }
 
 export interface ResourceItem extends ItemData {

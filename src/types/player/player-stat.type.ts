@@ -17,13 +17,13 @@ export type PlayerStat =
     | 'xpMultiplier'
     | 'shopRefreshCooldown'
     | 'currentShopRefreshCooldown'
-    | 'extraFireDamage'
-    | 'extraAirDamage'
-    | 'extraWaterDamage'
-    | 'extraEarthDamage'
-    | 'extraLightDamage'
-    | 'extraDarkDamage'
-    | 'extraPhysicalDamage'
+    | 'extraFireDamageMultiplier'
+    | 'extraAirDamageMultiplier'
+    | 'extraWaterDamageMultiplier'
+    | 'extraEarthDamageMultiplier'
+    | 'extraLightDamageMultiplier'
+    | 'extraDarkDamageMultiplier'
+    | 'extraPhysicalDamageMultiplier'
     | 'increasedSpellDuration'
     | 'shinyChance'
 
@@ -31,6 +31,13 @@ export const multiplierStats: PlayerStat[] = [
     'critMulti',
     'xpMultiplier',
     'goldCoinsMultiplier',
+    'extraFireDamageMultiplier',
+    'extraAirDamageMultiplier',
+    'extraWaterDamageMultiplier',
+    'extraEarthDamageMultiplier',
+    'extraLightDamageMultiplier',
+    'extraDarkDamageMultiplier',
+    'extraPhysicalDamageMultiplier',
 ]
 
 export const percentageState: PlayerStat[] = [

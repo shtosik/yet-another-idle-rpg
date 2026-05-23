@@ -4,5 +4,11 @@
       "Bash(node *)",
       "Bash(find C:\\\\Users\\\\marek\\\\WebstormProjects\\\\yet-another-idle-rpg *)"
     ]
+  },
+  "skillOverrides": {
+    "audit-dialogue": "off",
+    "fix-dialogue-bugs": "off",
+    "fix-leaflet-tile-gaps": "off",
+    "update-shiny-enemy-visuals": "off"
   }
 }

@@ -26,14 +26,14 @@ export const statsInitialState: PlayerStatsType = {
     // crit
     critChance: 0,
     critMulti: 1.2,
-    // damage type increases
-    extraFireDamage: 0,
-    extraAirDamage: 0,
-    extraWaterDamage: 0,
-    extraDarkDamage: 0,
-    extraEarthDamage: 0,
-    extraLightDamage: 0,
-    extraPhysicalDamage: 0,
+    // damage type multipliers (applied when player hits an enemy's weakness)
+    extraFireDamageMultiplier: 1.2,
+    extraAirDamageMultiplier: 1.2,
+    extraWaterDamageMultiplier: 1.2,
+    extraDarkDamageMultiplier: 1.2,
+    extraEarthDamageMultiplier: 1.2,
+    extraLightDamageMultiplier: 1.2,
+    extraPhysicalDamageMultiplier: 1.2,
     // shop?
     shopRefreshCooldown: 1000 * 60 * 60, // 1 hour (base, reducible by items/skills)
     currentShopRefreshCooldown: 0,

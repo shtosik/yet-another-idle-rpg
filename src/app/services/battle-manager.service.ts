@@ -11,6 +11,8 @@ import { Enemy } from '../../interfaces/enemy.interface'
 import { ItemID } from '../../enums/ids/item-id.enum'
 import { UNLOCK_RULES, ZONE_UNLOCK_NOTIFICATIONS } from '../../data/unlock-conditions'
 import { ModalService } from './modal.service'
+import { DamageElement } from '../../enums/damage-element.enum'
+import { PlayerStat } from '../../types/player/player-stat.type'
 
 @Injectable({ providedIn: 'root' })
 export class BattleManagerService {
@@ -39,7 +41,7 @@ export class BattleManagerService {
     return this.currentWaveKillCount() >= zoneData.enemiesPerWave
   })
 
-  doDamage(magicDamage = 0, isDoubleAttack = false) {
+  doDamage(magicDamage = 0, isDoubleAttack = false, damageType?: DamageElement) {
     const stats = this.playerStore.stats()
     const enemyHp = this.battleStore.currentEnemyHp()
     const enemy = this.battleStore.enemy()
@@ -60,9 +62,18 @@ export class BattleManagerService {
 
     if (isDoubleAttack) damage *= 2
 
+    const effectiveDamageType = damageType ?? this.playerStore.equippedWeaponDamageType()
+    const hasWeaknessSkill = this.playerStore.hasSkillUnlocked(SkillPointID.weaknesses)
+    const isStrong = hasWeaknessSkill && enemy.weakness === effectiveDamageType
+    if (isStrong) {
+      const elementName = DamageElement[effectiveDamageType]
+      const multiplierStat = `extra${elementName.charAt(0).toUpperCase() + elementName.slice(1)}DamageMultiplier` as PlayerStat
+      damage = Math.ceil(damage * (stats[multiplierStat] as number))
+    }
+
     const newHp = Math.max(0, enemyHp - damage)
     this.battleStore.updateEnemyHp(newHp)
-    this.animations.showDamage(damage, isCrit)
+    this.animations.showDamage(damage, isCrit, isStrong)
 
     if (newHp === 0) {
       this.handleEnemyDeath(enemy)
@@ -81,7 +92,7 @@ export class BattleManagerService {
         this.doDamage(0, true)
         break
       case SpellType.magic:
-        this.doDamage(spellData.effect.baseDamage)
+        this.doDamage(spellData.effect.baseDamage, false, spellData.effect.damageType)
         break
       case SpellType.buff: {
         const alreadyActive = this.battleStore.activeBuffs().some(b => b.spellId === spellId)

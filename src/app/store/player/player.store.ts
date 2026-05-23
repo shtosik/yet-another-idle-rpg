@@ -22,6 +22,7 @@ import { SkillPointID } from '../../../enums/ids/skill-tree-node-id.enum'
 import { SpellID } from '../../../enums/ids/spell-id.enum'
 import { ZoneID } from '../../../enums/ids/zone-id.enum'
 import { TownID } from '../../../enums/map/town-id.enum'
+import { DamageElement } from '../../../enums/damage-element.enum'
 import { withDevtools } from '@angular-architects/ngrx-toolkit'
 import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
 import { UNLOCK_RULES } from '../../../data/unlock-conditions'
@@ -125,6 +126,11 @@ export const PlayerStore = signalStore(
     isTaskComplete: () => {
       const task = store.activeTasks()[0]
       return task ? task.currentCount >= task.targetCount : false
+    },
+    equippedWeaponDamageType: () => {
+      const weapon = store.equipment().weapon
+      if (!weapon) return DamageElement.physical
+      return (ITEM_DATA[weapon.id] as EquipmentItem).damageType ?? DamageElement.physical
     },
   })),
   withMethods((store) => ({

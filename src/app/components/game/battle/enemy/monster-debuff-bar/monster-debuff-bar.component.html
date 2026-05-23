@@ -1,0 +1,14 @@
+@let w = weakness();
+@if (w) {
+  <div class="monster-debuff-bar">
+    <img
+      [ngSrc]="w.icon"
+      [title]="w.nameKey | i18next"
+      [alt]="w.nameKey | i18next"
+      class="weakness-icon"
+      disableOptimizedSrcset
+      height="24"
+      width="24"
+    >
+  </div>
+}

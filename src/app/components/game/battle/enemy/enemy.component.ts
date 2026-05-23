@@ -4,9 +4,10 @@ import { BattleStore } from '../../../../store/battle/battle.store'
 import ENEMIES_DATA from '../../../../../data/enemies-data'
 import { EnemyID } from '../../../../../enums/ids/enemy-id.enum'
 import { TranslatePipe } from '../../../../pipes/i18next.pipe'
+import { MonsterDebuffBarComponent } from './monster-debuff-bar/monster-debuff-bar.component'
 
 @Component({
-  imports: [NgOptimizedImage, TranslatePipe],
+  imports: [NgOptimizedImage, TranslatePipe, MonsterDebuffBarComponent],
   selector: 'app-enemy',
   templateUrl: 'enemy.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

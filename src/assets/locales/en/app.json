@@ -11,7 +11,26 @@
     "goldCoins": "Gold",
     "goldCoinsMultiplier": "Gold Multiplier",
     "skillPoints": "Skill points",
-    "unspentSkillPoints": "Skill points"
+    "unspentSkillPoints": "Skill points",
+    "extraFireDamageMultiplier": "Fire Damage",
+    "extraAirDamageMultiplier": "Air Damage",
+    "extraWaterDamageMultiplier": "Water Damage",
+    "extraEarthDamageMultiplier": "Earth Damage",
+    "extraLightDamageMultiplier": "Light Damage",
+    "extraDarkDamageMultiplier": "Dark Damage",
+    "extraPhysicalDamageMultiplier": "Physical Damage"
+  },
+  "damage": {
+    "strong": "(strong)"
+  },
+  "elements": {
+    "fire": "Weak to Fire",
+    "water": "Weak to Water",
+    "air": "Weak to Air",
+    "earth": "Weak to Earth",
+    "light": "Weak to Light",
+    "dark": "Weak to Dark",
+    "physical": "Weak to Physical"
   },
   "wave": "Wave",
   "killCount": "Kill count",

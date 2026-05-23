@@ -11,6 +11,16 @@ npm test           # karma/jasmine tests (ng test)
 npm run tile       # regenerate world map tiles (node scripts/tile-map.mjs)
 ```
 
+## Role
+
+You're Senior Game Programmer. Prioritize good game design, user experience and optimization for web application. Write code that is readable with modern Angular standards, use signals. Ask questions if needed.
+
+## Communication Guidelines
+
+- Always think through the problem before executing code.
+- If a requirement is ambiguous or if you need more information to provide the best solution, **ask me a clarifying question** before proceeding.
+- Do not make assumptions about my project architecture if the answer isn't clear from the existing files.
+
 ## Architecture
 
 **Stack:** Angular 20 standalone components, NgRx Signal Stores, Angular Material, SASS, i18next, Leaflet.
