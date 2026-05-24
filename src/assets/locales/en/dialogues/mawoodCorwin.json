@@ -1,0 +1,75 @@
+{
+  "intro1": {
+    "message": "Stranger. You came down from the Mountain Pass, didn't you? I can smell the rock-dust on you. Welcome to Mawood. I am Corwin — elder of this town, for what that's worth these days. And before you ask: yes, the bark is part of me. A long story.",
+    "opt1": "How did this happen to you?",
+    "opt2": "Good to meet you. Tell me about Mawood."
+  },
+  "intro2": {
+    "message": "A foolish ritual, decades ago. I tried to commune with one of the great Spires — to become its voice, its guardian. Instead, it became mine. The bark spreads slowly. The Spire is patient. So am I.",
+    "opt1": "That's remarkable. And unsettling."
+  },
+  "default": {
+    "message": "The forest breathes slow today. That means something is listening. What do you need, traveler?",
+    "aboutForest": "Tell me about the Elderwood.",
+    "corruption": "What is happening to the trees?",
+    "work": "Do you have any work for me?",
+    "goodbye": "Goodbye, Elder."
+  },
+  "aboutMawood": {
+    "message": "Mawood has stood for three hundred years. Not on the ground — that would have been foolish. The forest floor belongs to roots and rot and things older than memory. So we built up, in the light. It has always worked. Until two years ago, when the black sap first appeared.",
+    "opt1": "What is the black sap?",
+    "opt2": "Three hundred years. Impressive."
+  },
+  "aboutForest": {
+    "message": "The Silverwood Spires are older than any kingdom that ever stood in this region. Their roots run deeper than you can dig. Some say they think — not in words, but in slow pulses you feel in the soles of your feet. Whatever they think, something has been poisoning those thoughts for two years now.",
+    "opt1": "Can the corruption be stopped?",
+    "opt2": "Back to the main topic."
+  },
+  "corruptionLore": {
+    "message": "Black sap. It spreads through root contact — saplings first, then the old trees. The corrupted ones rot from inside and turn feral. Animals drink from the seeping pools and lose their minds. I've traced it as far as the outer Wilds, but not further. Not safely.",
+    "opt1": "Can I help investigate?",
+    "opt2": "Where does it come from?"
+  },
+  "corruptionDetails": {
+    "message": "If I knew the source, I would have stopped it years ago. My best guess: something deep in the Deepwood, something ancient. But first things first — the corrupted saplings carry samples I can analyze. That's where you come in.",
+    "opt1": "Tell me what to do."
+  },
+  "questSignsOfRot": {
+    "message": "The corrupted saplings in the outer Wilds — they carry a black resin in their heartwood when they die. Three samples. That's all I need to trace the blight's origin. I cannot walk that far anymore. But you can.",
+    "accept": "I'll get you the samples.",
+    "decline": "I'll come back to this."
+  },
+  "questSignsOfRotProgress": {
+    "message": "Three corrupted resin pods. The saplings in the outer Wilds will have them. You'll know the right ones — the bark is black, and they smell of burnt wood.",
+    "opt1": "I'll keep looking."
+  },
+  "questSignsOfRotComplete": {
+    "message": "These samples... they're worse than I feared. More virulent than two years ago. The gnolls are involved — they've been planting infected root-bundles at their camp boundaries. Whether they know what they're spreading or are simply being used... either way, it has to stop. Talk to Finn. He has tracked them longer than I have.",
+    "opt1": "I'll talk to Finn."
+  },
+  "questTheSap": {
+    "message": "Finn confirmed my suspicion — the gnolls were carriers, not the source. The source is something ancient. A Silverwood Spire consumed by the failed ritual of a druid long dead. His corruption has been seeping outward for centuries. To kill it permanently, I need cursed sap from the younger treants it spawned. Five vials.",
+    "accept": "I'll gather the sap.",
+    "decline": "Give me more time."
+  },
+  "questTheSapProgress": {
+    "message": "Five vials of cursed sap. The treant sprouts in the Deepwood will have it. Harvest quickly after you fell one — the earth absorbs the sap fast.",
+    "opt1": "Understood."
+  },
+  "questTheSapComplete": {
+    "message": "Five vials. Perfect. I've brewed it into something that will weaken the Treant's regeneration — enough to kill it permanently, not just fell it. Go to the heart of the Deepwood. You will recognize the Gnarled Treant by its size and by the silence around it. Nothing grows near it. Nothing lives there willingly.",
+    "opt1": "I'm ready."
+  },
+  "questBlightedHeart": {
+    "message": "The Gnarled Treant waits in the deepest part of the Deepwood. It is ancient and malevolent and very, very patient. Kill it. Bring me its heartwood — the core where the old druid's soul still clings. I'll do what needs to be done with it.",
+    "opt1": "It will be done."
+  },
+  "questBlightedHeartComplete": {
+    "message": "...The pulse in this wood is quiet. I haven't felt quiet in the Spires for two years. Not a sound. It's done. Thank you, traveler. Take this — it's all I have, but it's yours. And if you find yourself climbing higher... Milo has been talking about something in the Upper Canopy. He doesn't know what it is, which means it's probably dangerous.",
+    "opt1": "Is the forest safe now?"
+  },
+  "postQuestLore": {
+    "message": "Safer. The gnolls will scatter without the blight driving them. The Deepwood will recover over years, perhaps decades. The Spires will outlast all of us. Go rest, traveler. You've earned it. Or don't rest — that also seems to be your nature.",
+    "opt1": "Thank you, Elder."
+  }
+}

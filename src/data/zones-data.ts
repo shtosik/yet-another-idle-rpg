@@ -33,11 +33,21 @@ const ZONES_DATA: Record<ZoneID, Zone> = {
   [ZoneID.theLongPath]: {
     id: ZoneID.theLongPath,
     url: './assets/img/backgrounds/the-long-path-vertical.png',
-    enemies: [EnemyID.bandit, EnemyID.deer, EnemyID.wolf, EnemyID.goblinScout],
+    enemies: [EnemyID.deer, EnemyID.wolf, EnemyID.goblinScout],
     maxWave: 20,
     enemiesPerWave: 8,
-    bossEnemyId: EnemyID.troll,
+    bossEnemyId: EnemyID.bandit,
     previousZoneId: ZoneID.plains,
+    nextZoneId: ZoneID.mountainPass,
+  },
+  [ZoneID.mountainPass]: {
+    id: ZoneID.theLongPath,
+    url: './assets/img/backgrounds/the-mountain-pass-vertical.png',
+    enemies: [EnemyID.goat, EnemyID.mountainBat, EnemyID.goblinScavenger],
+    maxWave: 15,
+    enemiesPerWave: 10,
+    bossEnemyId: EnemyID.troll,
+    previousZoneId: ZoneID.theLongPath,
   },
 }
 

@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core'
-import { TownBuildingNpcProps } from '../../../../../data/towns-data'
+import { TownBuildingNpcProps } from '../../../../../interfaces/town.interface'
 import NPC_Data from '../../../../../data/npc-data'
 import { NgOptimizedImage } from '@angular/common'
 import { NpcID } from '../../../../../enums/map/npc-id.enum'

@@ -1,0 +1,83 @@
+{
+  "intro1": {
+    "message": "Whoa, you're new! Nobody new ever comes here — well, sometimes merchants, but they just go straight to Sylvie's and leave. You look like you're actually staying. Are you staying? I live on the top platforms, by the way. You can see everything from up there.",
+    "opt1": "Looks like I'm staying, yes.",
+    "opt2": "Maybe. What's up on the top platforms?"
+  },
+  "intro1Short": {
+    "message": "The canopy. Or close to it. The harpies live above that, but I can get high enough to see where they nest. Nobody else goes up there. Finn says I'll fall one day. I haven't yet.",
+    "opt1": "Sounds like it's only a matter of time."
+  },
+  "default": {
+    "message": "Hey! You hear that thing in the Upper Canopy last night?",
+    "aboutMilo": "Tell me about yourself.",
+    "aboutCanopy": "What's up in the canopy?",
+    "work": "Do you have anything for me?",
+    "goodbye": "See you around."
+  },
+  "aboutMilo": {
+    "message": "I've lived in Mawood my whole life. Eight years, which is my whole life. My parents were traders who came through and then didn't leave, which happens. Then they left without me, which also happens. Corwin lets me stay on the high platforms because nobody else uses them. Best deal I've ever made.",
+    "opt1": "You're not bothered by the heights?",
+    "opt2": "What do you do up there?"
+  },
+  "aboutMiloHeights": {
+    "message": "Heights? I love heights. The higher you go, the further you can see. The further you can see, the more of a head start you get on anything coming. That's just logic.",
+    "opt1": "Hard to argue with that."
+  },
+  "aboutMiloActivities": {
+    "message": "I watch stuff. Mostly the harpies. They're fascinating when they're not trying to eat you. I count their nesting cycles, figure out their patrol patterns. Finn says that's useless. I say: when was the last time Finn knew where the harpies were before they arrived?",
+    "opt1": "Sounds like useful intelligence, actually."
+  },
+  "aboutCanopy": {
+    "message": "The harpies have been weird lately. More aggressive than usual. And there's something bigger up there — I can hear it at night when the wind dies. The harpies go quiet when it moves. Something that makes harpies quiet is either very smart or very large. Probably both.",
+    "opt1": "Have you tried to get a closer look?",
+    "opt2": "That sounds dangerous."
+  },
+  "aboutCanopyCloser": {
+    "message": "Obviously. I got to about forty metres below the nest cluster before the wind shifted and one of them spotted me. I ran. She didn't follow past the platform edge — they don't like the ropes, I think. But I saw the nest. It's really big.",
+    "opt1": "How big?",
+    "opt2": "You should tell Corwin about this."
+  },
+  "aboutCanopyBig": {
+    "message": "Big enough that the thirty-odd harpies I've been tracking all fit on one side of it. I think whatever I'm hearing is whoever built that nest. And I want to see it up close. I just need someone to, you know. Come with me. Or go ahead of me. Mostly ahead of me.",
+    "opt1": "Is that what you need help with?"
+  },
+  "aboutCanopyDangerous": {
+    "message": "Probably. But the gnolls are dangerous and you've been in the Wilds. The corruption is dangerous and Corwin's fighting that. Everything here is dangerous. At least the canopy is also beautiful.",
+    "opt1": "Fair point."
+  },
+  "questFeathers": {
+    "message": "Okay so. I'm building a kite. A real one, not a toy. I need harpy feathers — five big ones, the primary flight feathers from the wing. They're up in the canopy. I'd get them myself but last time I went up there I almost got grabbed. Your arms are longer than mine.",
+    "accept": "Five harpy feathers. Sure.",
+    "decline": "Maybe later."
+  },
+  "questFeathersProgress": {
+    "message": "Five primary feathers from the wing — the big ones. Don't bring me the small chest feathers, they won't work for the kite. Please.",
+    "opt1": "I'll find the right ones."
+  },
+  "questFeathersComplete": {
+    "message": "These are perfect! Look at the size of these. The kite is going to be incredible. Here — I found this near one of the old nests last week. Eagle talon, I think. I figured you'd have more use for it than me.",
+    "opt1": "What's next for the kite project?"
+  },
+  "questWhatLurks": {
+    "message": "The big thing in the canopy. I've been calling her the Matriarch because that's what she is — the one all the other harpies answer to. I want to go up there and see her nest properly. But I need you to, uh. Deal with her first. And about fifty of her friends. Then I can go up safely.",
+    "accept": "So you want me to fight through the canopy and kill the Harpy Matriarch.",
+    "decline": "That's quite a lot to ask."
+  },
+  "questWhatLurksAccept": {
+    "message": "When you say it like that it sounds like a lot. It IS a lot. But you've handled worse. Probably. And the view from up there — I'm telling you, it's worth it. I'll go up after you clear the way.",
+    "opt1": "All right. For the view."
+  },
+  "questWhatLurksProgress": {
+    "message": "The Matriarch is at the top. Her guards will be everywhere on the high waves. Clear them out, then go for her. She has a crown of real feathers — huge ones. You'll know her.",
+    "opt1": "I'll find her."
+  },
+  "questWhatLurksComplete": {
+    "message": "I went all the way up after you cleared them out and the nest — it IS incredible. She left her crown behind too. Here. You earned this more than I did. I found something else up there as well. Something old. Corwin should probably know about it.",
+    "opt1": "What did you find?"
+  },
+  "questWhatLurksPostQuest": {
+    "message": "A door. Set into the bark of the tallest Spire, way up in the canopy. Old wood, old iron. I couldn't open it. Maybe nobody can. Maybe that's the point. I'll keep looking, though. That's what I do.",
+    "opt1": "Keep me posted."
+  }
+}

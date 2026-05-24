@@ -1,0 +1,76 @@
+{
+  "intro1": {
+    "message": "Oh! A new face! Nobody new ever comes through the Pass this time of year. Welcome to Mawood! I'm Sylvie — I run the apothecary here. Carved into Spire four, if you count from the east side. Come in anytime.",
+    "opt1": "Nice to meet you, Sylvie.",
+    "opt2": "I'll keep that in mind."
+  },
+  "intro2": {
+    "message": "I know I talk a lot. Finn keeps reminding me. But there haven't been many travelers lately and I have so many questions — where did you come from? Have you been to La Harpar? I grew up near there, actually.",
+    "opt1": "I've passed through La Harpar, yes."
+  },
+  "default": {
+    "message": "What can I help you with? I have medicines, salves, and more questions than you probably want to answer.",
+    "aboutSylvie": "Tell me about yourself.",
+    "aboutElara": "Do you know someone called Elara?",
+    "aboutCorruption": "What do you know about the corruption?",
+    "work": "Do you have any work for me?",
+    "goodbye": "Take care of yourself."
+  },
+  "aboutSylvie": {
+    "message": "I studied herbal medicine in the coastal settlements — La Harpar, mostly. Apprenticed under an old herbalist who smelled permanently of pine resin and had opinions about everything. When I heard about the Elderwood, I had to come. The plants here are extraordinary. Or they were, before the blight started.",
+    "opt1": "What brought you to Mawood specifically?",
+    "opt2": "Tell me about the blight."
+  },
+  "aboutSylvieMawood": {
+    "message": "The spider silk here has medicinal properties unlike anything from the coast. And the fungi in the Deepwood — well, before the corruption — were spectacular. I came to study them. I stayed because someone has to keep this place supplied with medicine, and Finn's idea of a remedy is 'walk it off'.",
+    "opt1": "That sounds familiar."
+  },
+  "aboutElara": {
+    "message": "Elara! Yes, of course — she was in La Harpar when I left, searching for her father. A sea captain, missing somewhere past Horseshoe. She's clever and brave and probably fine... I just hope she found what she was looking for. Do you know her? Is she all right?",
+    "opt1": "I met her briefly. She seemed well.",
+    "opt2": "I'm afraid I didn't get to know her."
+  },
+  "aboutElaraResponse1": {
+    "message": "Oh, thank goodness. I've thought about her often — out there searching on her own. You'd tell me if something had happened, yes? ...Yes, I'm sure she's fine. She had that look about her. Resourceful.",
+    "opt1": "I'm sure she's managing."
+  },
+  "aboutElaraResponse2": {
+    "message": "That's all right. She was always self-sufficient. I just — the forest has a way of making you think about the people you left behind. I hope someone's looking out for her.",
+    "opt1": "I'll keep an eye out for her."
+  },
+  "aboutCorruption": {
+    "message": "The black sap is the worst thing I've seen in my medical career, and I once treated a man stung by a swarm of cave hornets. The infected creatures don't just go feral — their tissue changes. The gnolls who breathe the spores develop a kind of madness. I've been working on an antidote, but without clean samples it's slow going.",
+    "opt1": "Is it spreading?",
+    "opt2": "Can you do anything about it?"
+  },
+  "aboutCorruptionSpreading": {
+    "message": "Slowly, yes. The outer Wilds are the worst. Corwin keeps saying it's containable if we act, but he's been saying that for two years. I believe him, mostly. I just need spider silk and clean vials to keep working. The silk is remarkably resistant to the blight's spores — strange property, but useful.",
+    "opt1": "I'll help how I can."
+  },
+  "questSilkWater": {
+    "message": "Actually — since you're heading out anyway — I desperately need spider silk. Fifteen bundles should last a few weeks. And ten vials of clean water; the spring near platform three has been contaminated. You'd be doing me a genuine favour.",
+    "accept": "I'll bring it back.",
+    "decline": "I'll see what I can do later."
+  },
+  "questSilkWaterProgress": {
+    "message": "Fifteen bundles of spider silk and ten vials of clean water. I've started rationing my last supplies, so whenever you're ready.",
+    "opt1": "Working on it."
+  },
+  "questSilkWaterComplete": {
+    "message": "Oh, perfect! This silk is wonderful — look at the tensile strength. And clean water, finally. Thank you. Genuinely. Here, take this for your trouble — and if you have time to spare, I have another problem that's been keeping me up at night.",
+    "opt1": "What's the other problem?"
+  },
+  "questInfestation": {
+    "message": "The spiders have found their way up to the lower platforms. I've set traps, but for every three I catch, five more arrive. If you could push them back — really push them back, not just cull the ones near the apothecary — I would be deeply in your debt.",
+    "accept": "Consider it done.",
+    "decline": "Maybe later."
+  },
+  "questInfestationProgress": {
+    "message": "The spiders are still everywhere. I found one in my supply cabinet this morning. The outer Wilds, the later waves — that's where the nests are.",
+    "opt1": "I'll handle it."
+  },
+  "questInfestationComplete": {
+    "message": "I haven't seen a spider in two days. That's the longest stretch in months. You have my eternal gratitude. And this — I've been saving it. Don't ask me where I got it.",
+    "opt1": "Thank you, Sylvie."
+  }
+}

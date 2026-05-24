@@ -1,0 +1,58 @@
+{
+  "intro1": {
+    "message": "Careful where you step — I've got shavings everywhere and the Spire-bark gets slippery when it's fresh-cut. I'm Brenna. I make things. Good things, if you're lucky, and I usually am.",
+    "opt1": "What sort of things do you make?",
+    "opt2": "I'll watch my step."
+  },
+  "default": {
+    "message": "I'm in the middle of three projects. What do you need?",
+    "aboutBrenn": "Tell me about your craft.",
+    "aboutCorruption": "What do you make of the corruption?",
+    "work": "Do you have any work for me?",
+    "goodbye": "Right, I'm getting back to it."
+  },
+  "aboutBrenn": {
+    "message": "I carve armor from Silverwood bark. Sounds flimsy — it isn't. The bark calcifies as the tree ages, layer by layer. The oldest sections are harder than iron and lighter than leather, and they smell like rain for years after cutting. I've been trying to figure out if the corruption changes the mechanical properties. So far: yes, and badly.",
+    "opt1": "How did you learn this craft?",
+    "opt2": "What do you mean, it changes the properties?"
+  },
+  "aboutBrennOrigin": {
+    "message": "Self-taught, mostly. There's no school for Silverwood carving because there's nowhere else Silverwood grows. I apprenticed as a regular smith in the south, but metal always felt wrong to me. Too final. Wood remembers what it was. You can feel where the growth rings ran, which way the tree leaned toward the light.",
+    "opt1": "That's an unusual way to look at it."
+  },
+  "aboutBrennCorruption": {
+    "message": "Corrupted bark becomes brittle and porous. Structurally worthless. I've had to turn down commissions because I can't source clean material anymore — the Wilds are contaminated and even some inner Spires are showing early signs. If the corruption reaches the old-growth heartwood, everything I make here becomes impossible. This craft dies with the forest.",
+    "opt1": "That's a good reason to stop it."
+  },
+  "aboutCorruption": {
+    "message": "You're asking a woodcarver about corruption. That's like asking a fisherman about fire. But yes, I know about it — I live with it every day when I try to source material. The gnolls are making it worse. And whatever's in the Deepwood is making the gnolls worse. It's a chain. Someone needs to break it.",
+    "opt1": "I'm working on it.",
+    "opt2": "Back to other topics."
+  },
+  "questRawMaterials": {
+    "message": "Here's work: I need ancient wood — twenty pieces from the Deepwood. The old-growth stuff, not the infected saplings. And five bear pelts for the padding and lining. You bring me those, I'll make you something worth wearing. Better than anything you're carrying now, I'd wager.",
+    "accept": "Twenty ancient wood, five bear pelts. Done.",
+    "decline": "I'll get to it when I can."
+  },
+  "questRawMaterialsProgress": {
+    "message": "Twenty pieces of ancient wood and five bear pelts. The wood has to be clean — no black sap, or the whole piece will be compromised. I can tell the difference, so don't try to pass contaminated timber.",
+    "opt1": "Understood."
+  },
+  "questRawMaterialsComplete": {
+    "message": "Now we're talking. Look at this grain — see how the rings run? This piece remembers three hundred years. I'm going to enjoy working with this. Your chestplate will be ready before you can miss it. Here, take this for now — payment for the work. The armor comes later.",
+    "opt1": "Looking forward to seeing what you make."
+  },
+  "questWarTrophies": {
+    "message": "The gnolls have been raiding my lumber stocks. Three times this month. I want their Warchief brought down — three times over. Send a message they'll remember. Scrap metal from their weapons would be a bonus, but the kills are what count.",
+    "accept": "Three Warchief kills. Done.",
+    "decline": "Give me time."
+  },
+  "questWarTrophiesProgress": {
+    "message": "Three times over. The Warchief respawns eventually — they always do. Come back when you have what I asked for.",
+    "opt1": "I'll be back."
+  },
+  "questWarTrophiesComplete": {
+    "message": "Three times. I'd say they'll think twice now, but gnolls don't really do thinking, do they? Here — take this. I was saving it for someone worth giving it to. That's you, apparently.",
+    "opt1": "Cheers, Brenna."
+  }
+}

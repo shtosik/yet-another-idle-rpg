@@ -1,6 +1,6 @@
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals'
 import { TownID } from '../../../enums/map/town-id.enum'
-import { TownBuilding } from '../../../data/towns-data'
+import { TownBuilding } from '../../../interfaces/town.interface'
 import { withDevtools } from '@angular-architects/ngrx-toolkit'
 import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
 import { ShopID } from '../../../enums/ids/shop-id.enum'

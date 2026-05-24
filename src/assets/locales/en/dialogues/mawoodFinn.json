@@ -1,0 +1,86 @@
+{
+  "intro1": {
+    "message": "You armed? Good. Lost travelers are trouble I don't have time for. Name's Finn. I trap, I scout, I know every inch of this forest that hasn't turned black yet. What do you want?",
+    "opt1": "Just arrived. Figured I'd introduce myself.",
+    "opt2": "I heard you know the forest well. I need information."
+  },
+  "default": {
+    "message": "Make it quick. I've got traps to check.",
+    "aboutFinn": "How did you end up in Mawood?",
+    "aboutLeg": "What happened to your leg?",
+    "corruption": "What do you know about the gnolls and the corruption?",
+    "work": "Got any work for me?",
+    "goodbye": "I'll leave you to it."
+  },
+  "aboutFinn": {
+    "message": "Followed game trails north out of the plains when I was seventeen. Found the Elderwood. Stayed. Simple as that. The forest feeds you if you know how to ask. Most people don't know how to ask.",
+    "opt1": "And now there's a corruption spreading through it.",
+    "opt2": "What about the town?"
+  },
+  "aboutFinnTown": {
+    "message": "I don't live in the town. I sleep in the lower Wilds, near the roots. The town's fine — Corwin keeps it together — but I prefer ground level. Fewer people asking me things.",
+    "opt1": "Fair enough."
+  },
+  "aboutLeg": {
+    "message": "Treant. Eight years ago. Before the corruption — that one just didn't like me. I was too close to its nesting roots. My own fault. I know that. Left the leg behind and walked out on a carved oak branch. Still getting the balance right.",
+    "opt1": "Sounds like you got lucky.",
+    "opt2": "Do you still go into the Deepwood?"
+  },
+  "aboutLegLuck": {
+    "message": "Didn't feel lucky at the time. But yes. Lucky.",
+    "opt1": "..."
+  },
+  "aboutLegDeepwood": {
+    "message": "Of course. Carefully. The treants are worse since the corruption started — faster, less predictable. But the traps still work. Animals are animals, even when they're angry.",
+    "opt1": "Noted."
+  },
+  "aboutCorruption": {
+    "message": "The gnolls have been planting root-bundles at their camp edges for months. I thought it was territory marking at first. Then I saw what those bundles were doing to the ground around them. Black sap spreading from every point. They're carrying the blight deliberately — or following someone's orders. Their Warchief runs it all.",
+    "opt1": "Can we stop them?",
+    "opt2": "Do you think they know what they're doing?"
+  },
+  "aboutCorruptionGnolls": {
+    "message": "Doesn't matter if they know. They're doing it. The Warchief has to go, and the bundles have to be destroyed. I've been waiting for someone capable enough to take him on. You look like you might be. Might.",
+    "opt1": "Let me prove it first.",
+    "opt2": "I'll deal with the Warchief."
+  },
+  "questFetishes": {
+    "message": "The gnoll fetishes — the root-bundles. The Warchief carries the master bundle. Kill him, bring me the fetish. Corwin can analyze it. I'd have done it myself, but —",
+    "accept": "I'll bring you the fetish.",
+    "decline": "Not yet."
+  },
+  "questFetchesProgress": {
+    "message": "The Warchief moves camps regularly. Check the deeper sections of the outer Wilds. He won't come to you.",
+    "opt1": "I'll find him."
+  },
+  "questFetchesComplete": {
+    "message": "That's it. That's the source bundle. Filthy thing. Take it to Corwin — he'll know what to do with it. And you came through. I'll remember that.",
+    "opt1": "Glad to help."
+  },
+  "questProveYourAim": {
+    "message": "Ten gnoll scouts. If you can drop ten of them, I'll know you're worth working with. I don't give work to people who can't handle themselves in the Wilds.",
+    "accept": "Ten scouts. Understood.",
+    "decline": "Maybe another time."
+  },
+  "questProveYourAimProgress": {
+    "message": "Ten gnoll scouts. Come back when you've handled them.",
+    "opt1": "Working on it."
+  },
+  "questProveYourAimComplete": {
+    "message": "Good. You didn't come back with any pieces missing. That's the bar. Here's what I've got — and there's more work if you want it.",
+    "opt1": "What's the next job?"
+  },
+  "questBigGame": {
+    "message": "There's a bear in the Deepwood. Been there as long as I can remember — old, missing an ear, mine to leave alone. But the other bears are fair game. I need three pelts from the elder ones. Personal reasons on the old one. Don't ask.",
+    "accept": "Three pelts. I'll leave the old one.",
+    "decline": "I'll come back to this."
+  },
+  "questBigGameProgress": {
+    "message": "Three pelts from the elder bears in the Deepwood. Leave the old one. You'll know him by the missing ear.",
+    "opt1": "Understood."
+  },
+  "questBigGameComplete": {
+    "message": "Three pelts. And the old bear's still walking — you found your way around him. Good instincts. Here. I carved this myself. Been sitting in my pack for years waiting for someone who might actually use it right.",
+    "opt1": "Thank you, Finn."
+  }
+}

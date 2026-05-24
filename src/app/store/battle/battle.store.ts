@@ -9,6 +9,7 @@ import { withDevtools } from '@angular-architects/ngrx-toolkit'
 import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
 import { PlayerStore } from '../player/player.store'
 import { inject } from '@angular/core'
+import { toShinyUrl } from 'utils/shiny-url'
 
 export interface BattleState {
   isInCombat: boolean;
@@ -34,10 +35,6 @@ export const initialState: BattleState = {
   activeBuffs: [],
   attackInterval: 0,
   isShinyEnemy: false,
-}
-
-function toShinyUrl(url: string): string {
-  return url.replace(/\.png$/i, '-shiny.png')
 }
 
 const STORE_KEY = 'battleStore'

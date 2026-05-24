@@ -1,9 +1,9 @@
 import { DamageElement } from 'enums/damage-element.enum'
 import { EnemyID } from 'enums/ids/enemy-id.enum'
 import { ItemID } from 'enums/ids/item-id.enum'
-import { ZoneID } from 'enums/ids/zone-id.enum'
 import { Enemy } from 'interfaces/enemy.interface'
 import { EnemyType } from '../enums/enemy-type.enum'
+import { petDrop, shinyPetDrops } from './items/pet-items.data'
 
 const generateItem = (id: ItemID, minAmount: number, maxAmount: number, chance: number) => ({
   id,
@@ -12,7 +12,7 @@ const generateItem = (id: ItemID, minAmount: number, maxAmount: number, chance: 
   chance,
 })
 
-const ENEMIES_DATA: Record<EnemyID, Enemy> = {
+const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   [EnemyID.greenSlime]: {
     id: EnemyID.greenSlime,
     maxHp: 2,
@@ -20,11 +20,10 @@ const ENEMIES_DATA: Record<EnemyID, Enemy> = {
     experience: 5,
     drops: [
       generateItem(ItemID.slimeResidue, 1, 2, 3),
-      generateItem(ItemID.petGreenSlime, 1, 1, 2000),
+      petDrop(EnemyID.greenSlime),
     ],
-    shinyDrops: [generateItem(ItemID.shinyPetGreenSlime, 1, 1, 10)],
+    shinyDrops: shinyPetDrops(EnemyID.greenSlime),
     url: './assets/img/enemies/greenSlime.png',
-    zones: [ZoneID.plains],
     enemyTypes: [EnemyType.slime],
   },
   [EnemyID.redSlime]: {
@@ -34,11 +33,10 @@ const ENEMIES_DATA: Record<EnemyID, Enemy> = {
     experience: 5,
     drops: [
       generateItem(ItemID.slimeResidue, 1, 2, 3),
-      generateItem(ItemID.petRedSlime, 1, 1, 2000),
+      petDrop(EnemyID.redSlime),
     ],
-    shinyDrops: [generateItem(ItemID.shinyPetRedSlime, 1, 1, 10)],
+    shinyDrops: shinyPetDrops(EnemyID.redSlime),
     url: './assets/img/enemies/redSlime.png',
-    zones: [ZoneID.plains],
     enemyTypes: [EnemyType.slime],
   },
   [EnemyID.blueSlime]: {
@@ -48,11 +46,10 @@ const ENEMIES_DATA: Record<EnemyID, Enemy> = {
     experience: 5,
     drops: [
       generateItem(ItemID.slimeResidue, 1, 2, 3),
-      generateItem(ItemID.petBlueSlime, 1, 1, 2000),
+      petDrop(EnemyID.blueSlime),
     ],
-    shinyDrops: [generateItem(ItemID.shinyPetBlueSlime, 1, 1, 10)],
+    shinyDrops: shinyPetDrops(EnemyID.blueSlime),
     url: './assets/img/enemies/blueSlime.png',
-    zones: [ZoneID.plains],
     enemyTypes: [EnemyType.slime],
   },
   [EnemyID.kingSlime]: {
@@ -63,11 +60,10 @@ const ENEMIES_DATA: Record<EnemyID, Enemy> = {
     drops: [
       generateItem(ItemID.slimeGoldenCrown, 1, 1, 10),
       generateItem(ItemID.slimeResidue, 1, 10, 1),
-      generateItem(ItemID.petKingSlime, 1, 1, 2000),
+      petDrop(EnemyID.kingSlime),
     ],
-    shinyDrops: [generateItem(ItemID.shinyPetKingSlime, 1, 1, 10)],
+    shinyDrops: shinyPetDrops(EnemyID.kingSlime),
     url: './assets/img/enemies/kingSlime.png',
-    zones: [ZoneID.plains],
     isBossEnemy: true,
     enemyTypes: [EnemyType.slime],
   },
@@ -79,11 +75,10 @@ const ENEMIES_DATA: Record<EnemyID, Enemy> = {
     drops: [
       generateItem(ItemID.crabMeat, 1, 1, 2),
       generateItem(ItemID.stick, 1, 1, 4),
-      generateItem(ItemID.petCrab, 1, 1, 2000),
+      petDrop(EnemyID.crab),
     ],
-    shinyDrops: [generateItem(ItemID.shinyPetCrab, 1, 1, 10)],
+    shinyDrops: shinyPetDrops(EnemyID.crab),
     url: './assets/img/enemies/crab.png',
-    zones: [ZoneID.horseshoeBeach],
     enemyTypes: [EnemyType.crustacean, EnemyType.crab],
   },
   [EnemyID.seagull]: {
@@ -95,11 +90,10 @@ const ENEMIES_DATA: Record<EnemyID, Enemy> = {
       generateItem(ItemID.feather, 1, 2, 2),
       generateItem(ItemID.stick, 1, 1, 4),
       generateItem(ItemID.machete, 1, 1, 1),
-      generateItem(ItemID.petSeagull, 1, 1, 2000),
+      petDrop(EnemyID.seagull),
     ],
-    shinyDrops: [generateItem(ItemID.shinyPetSeagull, 1, 1, 10)],
+    shinyDrops: shinyPetDrops(EnemyID.seagull),
     url: './assets/img/enemies/seagull.png',
-    zones: [ZoneID.horseshoeBeach],
     enemyTypes: [EnemyType.bird],
   },
   [EnemyID.turtle]: {
@@ -110,11 +104,10 @@ const ENEMIES_DATA: Record<EnemyID, Enemy> = {
     drops: [
       generateItem(ItemID.turtleShell, 1, 1, 3),
       generateItem(ItemID.stick, 1, 1, 4),
-      generateItem(ItemID.petTurtle, 1, 1, 2000),
+      petDrop(EnemyID.turtle),
     ],
-    shinyDrops: [generateItem(ItemID.shinyPetTurtle, 1, 1, 10)],
+    shinyDrops: shinyPetDrops(EnemyID.turtle),
     url: './assets/img/enemies/turtle.png',
-    zones: [ZoneID.horseshoeBeach],
     enemyTypes: [EnemyType.reptile],
   },
   [EnemyID.gangsterCrab]: {
@@ -125,11 +118,10 @@ const ENEMIES_DATA: Record<EnemyID, Enemy> = {
     drops: [
       generateItem(ItemID.knife, 1, 1, 10),
       generateItem(ItemID.crabMeat, 1, 3, 1),
-      generateItem(ItemID.petGangsterCrab, 1, 1, 2000),
+      petDrop(EnemyID.gangsterCrab),
     ],
-    shinyDrops: [generateItem(ItemID.shinyPetGangsterCrab, 1, 1, 10)],
+    shinyDrops: shinyPetDrops(EnemyID.gangsterCrab),
     url: './assets/img/enemies/gangsterCrab.png',
-    zones: [ZoneID.horseshoeBeach],
     isBossEnemy: true,
     enemyTypes: [EnemyType.crustacean, EnemyType.crab],
   },
@@ -141,11 +133,10 @@ const ENEMIES_DATA: Record<EnemyID, Enemy> = {
     drops: [
       generateItem(ItemID.ratTail, 1, 1, 1),
       generateItem(ItemID.cheese, 1, 1, 8),
-      generateItem(ItemID.petRat, 1, 1, 2000),
+      petDrop(EnemyID.rat),
     ],
-    shinyDrops: [generateItem(ItemID.shinyPetRat, 1, 1, 10)],
+    shinyDrops: shinyPetDrops(EnemyID.rat),
     url: './assets/img/enemies/rat.png',
-    zones: [ZoneID.tradersBasement],
     enemyTypes: [EnemyType.rodent, EnemyType.rat],
   },
   [EnemyID.giantRat]: {
@@ -157,11 +148,10 @@ const ENEMIES_DATA: Record<EnemyID, Enemy> = {
       generateItem(ItemID.ratTail, 1, 1, 1),
       generateItem(ItemID.cheese, 1, 3, 2),
       generateItem(ItemID.ratCatcher, 1, 1, 40),
-      generateItem(ItemID.petGiantRat, 1, 1, 2000),
+      petDrop(EnemyID.giantRat),
     ],
-    shinyDrops: [generateItem(ItemID.shinyPetGiantRat, 1, 1, 10)],
+    shinyDrops: shinyPetDrops(EnemyID.giantRat),
     url: './assets/img/enemies/giantRat.png',
-    zones: [ZoneID.tradersBasement],
     isBossEnemy: true,
     enemyTypes: [EnemyType.rodent, EnemyType.rat],
   },
@@ -172,11 +162,10 @@ const ENEMIES_DATA: Record<EnemyID, Enemy> = {
     experience: 30,
     drops: [
       generateItem(ItemID.wolfFangs, 1, 3, 2),
-      generateItem(ItemID.petWolf, 1, 1, 2000),
+      petDrop(EnemyID.wolf),
     ],
-    shinyDrops: [generateItem(ItemID.shinyPetWolf, 1, 1, 10)],
+    shinyDrops: shinyPetDrops(EnemyID.wolf),
     url: './assets/img/enemies/wolf.png',
-    zones: [ZoneID.theLongPath],
     enemyTypes: [EnemyType.dog, EnemyType.mammal],
   },
   [EnemyID.deer]: {
@@ -186,11 +175,10 @@ const ENEMIES_DATA: Record<EnemyID, Enemy> = {
     experience: 20,
     drops: [
       generateItem(ItemID.deerPelt, 1, 1, 4),
-      generateItem(ItemID.petDeer, 1, 1, 2000),
+      petDrop(EnemyID.deer),
     ],
-    shinyDrops: [generateItem(ItemID.shinyPetDeer, 1, 1, 10)],
+    shinyDrops: shinyPetDrops(EnemyID.deer),
     url: './assets/img/enemies/deer.png',
-    zones: [ZoneID.theLongPath],
     enemyTypes: [EnemyType.mammal],
   },
   [EnemyID.bandit]: {
@@ -202,11 +190,10 @@ const ENEMIES_DATA: Record<EnemyID, Enemy> = {
       generateItem(ItemID.vialOfWater, 1, 1, 6),
       generateItem(ItemID.trophyNecklace, 1, 1, 100),
       generateItem(ItemID.machete, 1, 1, 80),
-      generateItem(ItemID.petBandit, 1, 1, 2000),
+      petDrop(EnemyID.bandit),
     ],
-    shinyDrops: [generateItem(ItemID.shinyPetBandit, 1, 1, 10)],
+    shinyDrops: shinyPetDrops(EnemyID.bandit),
     url: './assets/img/enemies/bandit.png',
-    zones: [ZoneID.theLongPath],
     enemyTypes: [EnemyType.bandit, EnemyType.human],
   },
   [EnemyID.goblinScout]: {
@@ -214,10 +201,9 @@ const ENEMIES_DATA: Record<EnemyID, Enemy> = {
     maxHp: 30,
     weakness: DamageElement.fire,
     experience: 25,
-    drops: [generateItem(ItemID.petGoblinScout, 1, 1, 2000)],
-    shinyDrops: [generateItem(ItemID.shinyPetGoblinScout, 1, 1, 10)],
+    drops: [petDrop(EnemyID.goblinScout)],
+    shinyDrops: shinyPetDrops(EnemyID.goblinScout),
     url: './assets/img/enemies/goblinScout.png',
-    zones: [ZoneID.theLongPath],
     enemyTypes: [EnemyType.goblin, EnemyType.humanoid],
   },
   [EnemyID.troll]: {
@@ -225,10 +211,9 @@ const ENEMIES_DATA: Record<EnemyID, Enemy> = {
     maxHp: 200,
     weakness: DamageElement.water,
     experience: 500,
-    drops: [generateItem(ItemID.petTroll, 1, 1, 2000)],
-    shinyDrops: [generateItem(ItemID.shinyPetTroll, 1, 1, 10)],
+    drops: [petDrop(EnemyID.troll)],
+    shinyDrops: shinyPetDrops(EnemyID.troll),
     url: './assets/img/enemies/troll.png',
-    zones: [ZoneID.theLongPath],
     isBossEnemy: true,
     enemyTypes: [EnemyType.troll, EnemyType.humanoid],
   },

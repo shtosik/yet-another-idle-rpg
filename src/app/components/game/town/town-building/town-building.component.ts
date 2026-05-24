@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, input } from '@angular/core'
-import { TownBuilding } from '../../../../../data/towns-data'
+import { TownBuilding } from '../../../../../interfaces/town.interface'
 import { UrlPipe } from '../../../../pipes/url.pipe'
 import { NpmFrameComponent } from '../npc-frame/npc-frame.component'
 import { CommonModule } from '@angular/common'

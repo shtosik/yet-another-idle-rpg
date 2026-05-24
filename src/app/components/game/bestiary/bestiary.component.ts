@@ -7,10 +7,10 @@ import { ItemID } from 'enums/ids/item-id.enum'
 import { ZoneID } from 'enums/ids/zone-id.enum'
 import ENEMIES_DATA from '../../../../data/enemies-data'
 import { MonsterEntry } from 'interfaces/bestiary/monster-entry.interface'
+import { toShinyUrl } from 'utils/shiny-url'
+import { ZONES_BY_ENEMY } from '../../../../data/helpers/enemy-zones'
 
 const LOCKED_SPRITE = './assets/img/enemies/unknown.png'
-
-const toShinyUrl = (url: string): string => url.replace(/\.png$/i, '-shiny.png')
 
 @Component({
     selector: 'app-bestiary',
@@ -38,7 +38,7 @@ export class BestiaryComponent {
                 id: e.id,
                 url: e.url,
                 maxHp: e.maxHp,
-                zones: e.zones,
+                zones: ZONES_BY_ENEMY[e.id] ?? [],
                 drops: e.drops,
                 shinyDrops: e.shinyDrops ?? [],
                 killCount,

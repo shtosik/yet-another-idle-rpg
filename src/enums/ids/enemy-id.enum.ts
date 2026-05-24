@@ -11,7 +11,10 @@ export enum EnemyID {
   giantRat = 9,
   wolf = 10,
   deer = 11,
-  bandit = 12,
-  goblinScout = 13,
-  troll = 14,
+  goblinScout = 12,
+  bandit = 13,
+  mountainBat = 14,
+  goat = 15,
+  goblinScavenger = 16,
+  troll = 17,
 }
