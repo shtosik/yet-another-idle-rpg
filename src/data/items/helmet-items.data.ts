@@ -37,4 +37,26 @@ export const HelmetItemsData: Partial<Record<ItemID, Item>> = {
       },
     ],
   },
+  [ItemID.harpyCrown]: {
+    id: ItemID.harpyCrown,
+    tier: ItemTier.rare,
+    url: './assets/img/items/harpyCrown.png',
+    value: 5000,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.helmet,
+    stats: [
+      {
+        id: 'attackPower',
+        amount: 5,
+      },
+      {
+        id: 'critChance',
+        amount: 3,
+      },
+      {
+        id: 'damageVsHarpy',
+        amount: 0.3,
+      },
+    ],
+  },
 }

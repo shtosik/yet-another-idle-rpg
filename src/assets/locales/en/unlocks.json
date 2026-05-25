@@ -6,12 +6,20 @@
     "laHarpar": {
       "title": "La Harpar Discovered!",
       "body": "A bustling port town lies nearby. The Map tab is now available — use it to travel there. Once inside, visit the Tavern for rumors, browse the Market for supplies, and seek out the Exploration Guild for bounty tasks."
+    },
+    "mawood": {
+      "title": "Mawood Discovered!",
+      "body": "Smoke and lantern-light flicker between the towering Silverwood Spires — a town built on platforms high above the forest floor. Travel there from the Map. Elder Corwin will want a word, and Sylvie, Finn and Brenna all have work for a capable fighter."
     }
   },
   "zones": {
     "plains": {
       "title": "New Area: The Plains",
       "body": "Beyond the beach stretches open grassland. Strange slimes roam the fields — and something much larger lurks at wave 10. Survive long enough to face the boss."
+    },
+    "elderwoodWilds": {
+      "title": "New Area: Elderwood Wilds",
+      "body": "Past the Mountain Pass the trees close in and the sky disappears. Forest spiders, gnoll war-bands and blighted saplings prowl the outer rim. Push deeper — the town of Mawood lies just ahead."
     }
   },
   "crafting": {

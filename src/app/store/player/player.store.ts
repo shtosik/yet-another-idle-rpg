@@ -19,6 +19,7 @@ import { ItemType } from '../../../enums/items/item-type.enum'
 import RECIPES_DATA from '../../../data/recipes-data'
 import { RecipeID } from '../../../enums/ids/recipe-id.enum'
 import { EnemyID } from '../../../enums/ids/enemy-id.enum'
+import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { SkillPointID } from '../../../enums/ids/skill-tree-node-id.enum'
 import { SpellID } from '../../../enums/ids/spell-id.enum'
 import { ZoneID } from '../../../enums/ids/zone-id.enum'
@@ -90,9 +91,16 @@ const handleExperience = (stats: PlayerStatsType) => {
   handleExperience(stats)
 }
 
-const rollDropList = (drops: EnemyDrop[], rolls: number, accumulator: Map<string, InventoryItem>) => {
+const rollDropList = (
+  drops: EnemyDrop[],
+  rolls: number,
+  accumulator: Map<string, InventoryItem>,
+  activeQuestIds?: Set<QuestID>,
+) => {
   for (let r = 0; r < rolls; r++) {
     drops.forEach(drop => {
+      if (drop.requiredActiveQuestId !== undefined && !activeQuestIds?.has(drop.requiredActiveQuestId)) return
+
       const roll = Math.ceil(Math.random() * drop.chance)
       if (roll !== drop.chance) return
 
@@ -106,10 +114,10 @@ const rollDropList = (drops: EnemyDrop[], rolls: number, accumulator: Map<string
   }
 }
 
-const calculateEnemyDrops = (enemy: Enemy, rolls: number, isShiny = false): InventoryItem[] => {
+const calculateEnemyDrops = (enemy: Enemy, rolls: number, isShiny = false, activeQuestIds?: Set<QuestID>): InventoryItem[] => {
   const accumulator = new Map<string, InventoryItem>()
-  rollDropList(enemy.drops, rolls, accumulator)
-  if (isShiny && enemy.shinyDrops?.length) rollDropList(enemy.shinyDrops, 1, accumulator)
+  rollDropList(enemy.drops, rolls, accumulator, activeQuestIds)
+  if (isShiny && enemy.shinyDrops?.length) rollDropList(enemy.shinyDrops, 1, accumulator, activeQuestIds)
   return [...accumulator.values()]
 }
 
@@ -306,7 +314,7 @@ export const PlayerStore = signalStore(
     },
   })),
   withMethods((store) => ({
-    processBattleEnd(enemyId: EnemyID, zoneId: ZoneID, currentWave: number, isShiny: boolean) {
+    processBattleEnd(enemyId: EnemyID, zoneId: ZoneID, currentWave: number, isShiny: boolean, activeQuestIds?: Set<QuestID>) {
       const enemy = ENEMIES_DATA[enemyId]
       const stats = store.stats()
 
@@ -316,7 +324,7 @@ export const PlayerStore = signalStore(
 
       const xpGained = Math.ceil(enemy.experience * stats.xpMultiplier * xpMultiplier)
       const goldGained = 1 * goldMultiplier
-      const itemsToUpdate = calculateEnemyDrops(enemy, dropRolls, isShiny)
+      const itemsToUpdate = calculateEnemyDrops(enemy, dropRolls, isShiny, activeQuestIds)
 
       store.updatePlayerStats([
         { stat: 'experience', amount: xpGained },

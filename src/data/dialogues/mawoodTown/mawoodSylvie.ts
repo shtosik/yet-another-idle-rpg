@@ -2,6 +2,8 @@ import { DialogueNode } from '../../../interfaces/dialogues/dialogue-node.interf
 import { NpcID } from '../../../enums/map/npc-id.enum'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
+import { ItemID } from '../../../enums/ids/item-id.enum'
+import { ZoneID } from '../../../enums/ids/zone-id.enum'
 
 export enum SylvieDialogue {
   default = 0,
@@ -86,7 +88,7 @@ const MAWOOD_SYLVIE: MawoodSylvieDialogueType = {
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.theInfestation, questState: QuestState.active, step: 1 }],
             next: SylvieDialogue.questInfestationComplete,
-            // TODO: requirementsNeeded: [{ type: 'waveKillCount', zoneId: ZoneID.elderwoodWilds, waveNumber: 10, amount: 60 }]
+            requirementsNeeded: [{ type: 'waveKillCount', zoneId: ZoneID.elderwoodWilds, waveNumber: 10, amount: 60 }],
           },
           // Quest 9 — in progress
           {
@@ -102,16 +104,21 @@ const MAWOOD_SYLVIE: MawoodSylvieDialogueType = {
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.silkAndWater, questState: QuestState.active, step: 1 }],
             next: SylvieDialogue.questSilkWaterComplete,
-            // TODO: requirementsNeeded: [{ type: 'manyItems', itemIds: [ItemID.spiderSilk, ItemID.vialOfWater], amounts: { [ItemID.spiderSilk]: 15, [ItemID.vialOfWater]: 10 } }]
+            requirementsNeeded: [{ type: 'manyItems', itemIds: [ItemID.spiderSilk, ItemID.vialOfWater], amounts: { [ItemID.spiderSilk]: 15, [ItemID.vialOfWater]: 10 } }],
           },
           // Quest 8 — in progress
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.silkAndWater, questState: QuestState.active }],
             next: SylvieDialogue.questSilkWaterProgress,
           },
-          // Default — offer Silk and Water
+          // Silk and Water: offer (only once available — after The Sap That Burns)
           {
+            visibilityConditions: [{ type: 'quest', questId: QuestID.silkAndWater, questState: QuestState.available }],
             next: SylvieDialogue.questSilkWater,
+          },
+          // Nothing for the player yet — keep the conversation on the default node
+          {
+            next: SylvieDialogue.default,
           },
         ],
       },
@@ -254,8 +261,7 @@ const MAWOOD_SYLVIE: MawoodSylvieDialogueType = {
             next: SylvieDialogue.questInfestation,
             effects: [
               { type: 'quest', action: 'end', questId: QuestID.silkAndWater },
-              { type: 'stat', action: 'award', stats: [{ stat: 'unspentSkillPoints', amount: 1 }, { stat: 'experience', amount: 800 }, { stat: 'goldCoins', amount: 150 }] },
-              // TODO: { type: 'item', action: 'take', items: [{ itemId: ItemID.spiderSilk, amount: 15 }, { itemId: ItemID.vialOfWater, amount: 10 }] }
+              { type: 'item', action: 'take', items: [{ itemId: ItemID.spiderSilk, amount: 15 }, { itemId: ItemID.vialOfWater, amount: 10 }] },
             ],
           },
         ],
@@ -306,7 +312,6 @@ const MAWOOD_SYLVIE: MawoodSylvieDialogueType = {
             next: SylvieDialogue.default,
             effects: [
               { type: 'quest', action: 'end', questId: QuestID.theInfestation },
-              { type: 'stat', action: 'award', stats: [{ stat: 'experience', amount: 2000 }, { stat: 'goldCoins', amount: 400 }] },
             ],
           },
         ],

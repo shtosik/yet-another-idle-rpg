@@ -14,6 +14,22 @@
         "deer": "Deer",
         "bandit": "Bandit",
         "goblinScout": "Goblin Scout",
-        "troll": "Troll"
+        "mountainBat": "Mountain Bat",
+        "goat": "Goat",
+        "goblinScavenger": "Goblin Scavenger",
+        "troll": "Troll",
+        "forestSpider": "Forest Spider",
+        "gnollScout": "Gnoll Scout",
+        "corruptedSapling": "Corrupted Sapling",
+        "gnollWarchief": "Gnoll Warchief",
+        "elderSpider": "Elder Spider",
+        "forestBear": "Forest Bear",
+        "bogSkeleton": "Bog Skeleton",
+        "treantSprout": "Treant Sprout",
+        "gnarledTreant": "Gnarled Treant",
+        "harpy": "Harpy",
+        "giantEagle": "Giant Eagle",
+        "canopyBandit": "Canopy Bandit",
+        "harpyMatriarch": "Harpy Matriarch"
     }
 }

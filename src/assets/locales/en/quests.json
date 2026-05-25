@@ -3,7 +3,19 @@
     "meatShortage": "Meat shortage",
     "clearingOutTheBeach": "Clearing out the beach",
     "ratsWereRats": "Rats, We are rats",
-    "aTaleOfACaptain": "A tale of a captain"
+    "aTaleOfACaptain": "A tale of a captain",
+    "signsOfRot": "Signs of Rot",
+    "fetchesAndFangs": "Fetishes and Fangs",
+    "theSapThatBurns": "The Sap That Burns",
+    "theBlightedHeart": "The Blighted Heart",
+    "silkAndWater": "Silk and Water",
+    "theInfestation": "The Infestation",
+    "proveYourAim": "Prove Your Aim",
+    "bigGame": "Big Game",
+    "rawMaterials": "Raw Materials",
+    "warTrophies": "War Trophies",
+    "feathersForAKite": "Feathers for a Kite",
+    "whatLurksAtTheTop": "What Lurks at the Top"
   },
   "requirements": {
     "waveKillCount": "{{ amount }} KC on wave {{ wave }} in {{ zone }}"

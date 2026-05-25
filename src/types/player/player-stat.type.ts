@@ -40,6 +40,14 @@ export type PlayerStat =
     | 'damageVsRodent'
     | 'damageVsRat'
     | 'damageVsBandit'
+    | 'damageVsSpider'
+    | 'damageVsArachnid'
+    | 'damageVsGnoll'
+    | 'damageVsPlant'
+    | 'damageVsTreant'
+    | 'damageVsBear'
+    | 'damageVsUndead'
+    | 'damageVsHarpy'
 
 export const multiplierStats: PlayerStat[] = [
     'critMulti',
@@ -73,4 +81,12 @@ export const additivePercentStats: PlayerStat[] = [
     'damageVsRodent',
     'damageVsRat',
     'damageVsBandit',
+    'damageVsSpider',
+    'damageVsArachnid',
+    'damageVsGnoll',
+    'damageVsPlant',
+    'damageVsTreant',
+    'damageVsBear',
+    'damageVsUndead',
+    'damageVsHarpy',
 ]

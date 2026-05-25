@@ -2,6 +2,8 @@ import { DialogueNode } from '../../../interfaces/dialogues/dialogue-node.interf
 import { NpcID } from '../../../enums/map/npc-id.enum'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
+import { ItemID } from '../../../enums/ids/item-id.enum'
+import { EnemyID } from '../../../enums/ids/enemy-id.enum'
 
 export enum FinnDialogue {
   default = 0,
@@ -77,7 +79,7 @@ const MAWOOD_FINN: MawoodFinnDialogueType = {
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.bigGame, questState: QuestState.active, step: 1 }],
             next: FinnDialogue.questBigGameComplete,
-            // TODO: requirementsNeeded: [{ type: 'item', itemId: ItemID.bearPelt, amount: 3 }]
+            requirementsNeeded: [{ type: 'item', itemId: ItemID.bearPelt, amount: 3 }],
           },
           // Big Game: in progress
           {
@@ -93,7 +95,7 @@ const MAWOOD_FINN: MawoodFinnDialogueType = {
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.fetchesAndFangs, questState: QuestState.active, step: 1 }],
             next: FinnDialogue.questFetchesComplete,
-            // TODO: requirementsNeeded: [{ type: 'item', itemId: ItemID.blightedFetish, amount: 1 }]
+            requirementsNeeded: [{ type: 'item', itemId: ItemID.blightedFetish, amount: 1 }],
           },
           // Fetches and Fangs: in progress
           {
@@ -104,7 +106,7 @@ const MAWOOD_FINN: MawoodFinnDialogueType = {
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.proveYourAim, questState: QuestState.active, step: 1 }],
             next: FinnDialogue.questProveYourAimComplete,
-            // TODO: requirementsNeeded: [{ type: 'killCount', enemyId: EnemyID.gnollScout, amount: 10 }]
+            requirementsNeeded: [{ type: 'killCount', enemyId: EnemyID.gnollScout, amount: 10 }],
           },
           // Prove Your Aim: in progress
           {
@@ -260,8 +262,7 @@ const MAWOOD_FINN: MawoodFinnDialogueType = {
             next: FinnDialogue.default,
             effects: [
               { type: 'quest', action: 'end', questId: QuestID.fetchesAndFangs },
-              { type: 'stat', action: 'award', stats: [{ stat: 'experience', amount: 2500 }, { stat: 'goldCoins', amount: 500 }] },
-              // TODO: { type: 'item', action: 'take', items: [{ itemId: ItemID.blightedFetish, amount: 1 }] }
+              { type: 'item', action: 'take', items: [{ itemId: ItemID.blightedFetish, amount: 1 }] },
             ],
           },
         ],
@@ -312,7 +313,6 @@ const MAWOOD_FINN: MawoodFinnDialogueType = {
             next: FinnDialogue.questBigGame,
             effects: [
               { type: 'quest', action: 'end', questId: QuestID.proveYourAim },
-              { type: 'stat', action: 'award', stats: [{ stat: 'experience', amount: 1200 }, { stat: 'goldCoins', amount: 300 }] },
             ],
           },
         ],
@@ -363,9 +363,7 @@ const MAWOOD_FINN: MawoodFinnDialogueType = {
             next: FinnDialogue.default,
             effects: [
               { type: 'quest', action: 'end', questId: QuestID.bigGame },
-              { type: 'stat', action: 'award', stats: [{ stat: 'experience', amount: 3500 }, { stat: 'goldCoins', amount: 700 }, { stat: 'unspentSkillPoints', amount: 1 }] },
-              // TODO: { type: 'item', action: 'give', items: [{ itemId: ItemID.ashwoodBow, amount: 1 }] }
-              // TODO: { type: 'item', action: 'take', items: [{ itemId: ItemID.bearPelt, amount: 3 }] }
+              { type: 'item', action: 'take', items: [{ itemId: ItemID.bearPelt, amount: 3 }] },
             ],
           },
         ],

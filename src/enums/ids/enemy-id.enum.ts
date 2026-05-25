@@ -17,4 +17,20 @@ export enum EnemyID {
   goat = 15,
   goblinScavenger = 16,
   troll = 17,
+  // Mawood — Elderwood Wilds (Zone 6)
+  forestSpider = 18,
+  gnollScout = 19,
+  corruptedSapling = 20,
+  gnollWarchief = 21,
+  // Mawood — Deepwood (Zone 7)
+  elderSpider = 22,
+  forestBear = 23,
+  bogSkeleton = 24,
+  treantSprout = 25,
+  gnarledTreant = 26,
+  // Mawood — Upper Canopy (Zone 8)
+  harpy = 27,
+  giantEagle = 28,
+  canopyBandit = 29,
+  harpyMatriarch = 30,
 }

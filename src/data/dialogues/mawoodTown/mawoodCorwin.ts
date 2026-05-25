@@ -2,6 +2,7 @@ import { DialogueNode } from '../../../interfaces/dialogues/dialogue-node.interf
 import { NpcID } from '../../../enums/map/npc-id.enum'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
+import { ItemID } from '../../../enums/ids/item-id.enum'
 
 export enum CorwinDialogue {
   default = 0,
@@ -82,7 +83,7 @@ const MAWOOD_CORWIN: MawoodCorwinDialogueType = {
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.theBlightedHeart, questState: QuestState.active, step: 1 }],
             next: CorwinDialogue.questBlightedHeartComplete,
-            // TODO: requirementsNeeded: [{ type: 'item', itemId: ItemID.blightedHeartwood, amount: 1 }]
+            requirementsNeeded: [{ type: 'item', itemId: ItemID.blightedHeartwood, amount: 1 }],
           },
           // Quest 7 — in progress
           {
@@ -93,7 +94,7 @@ const MAWOOD_CORWIN: MawoodCorwinDialogueType = {
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.theSapThatBurns, questState: QuestState.active, step: 1 }],
             next: CorwinDialogue.questTheSapComplete,
-            // TODO: requirementsNeeded: [{ type: 'item', itemId: ItemID.cursedSap, amount: 5 }]
+            requirementsNeeded: [{ type: 'item', itemId: ItemID.cursedSap, amount: 5 }],
           },
           // Quest 6 — in progress
           {
@@ -109,7 +110,7 @@ const MAWOOD_CORWIN: MawoodCorwinDialogueType = {
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.signsOfRot, questState: QuestState.active, step: 1 }],
             next: CorwinDialogue.questSignsOfRotComplete,
-            // TODO: requirementsNeeded: [{ type: 'item', itemId: ItemID.corruptedResin, amount: 3 }]
+            requirementsNeeded: [{ type: 'item', itemId: ItemID.corruptedResin, amount: 3 }],
           },
           // Quest 4 — in progress
           {
@@ -228,7 +229,7 @@ const MAWOOD_CORWIN: MawoodCorwinDialogueType = {
             next: CorwinDialogue.default,
             effects: [
               { type: 'quest', action: 'end', questId: QuestID.signsOfRot },
-              // TODO: { type: 'item', action: 'take', items: [{ itemId: ItemID.corruptedResin, amount: 3 }] }
+              { type: 'item', action: 'take', items: [{ itemId: ItemID.corruptedResin, amount: 3 }] },
             ],
           },
         ],
@@ -280,7 +281,7 @@ const MAWOOD_CORWIN: MawoodCorwinDialogueType = {
             effects: [
               { type: 'quest', action: 'end', questId: QuestID.theSapThatBurns },
               { type: 'quest', action: 'start', questId: QuestID.theBlightedHeart },
-              // TODO: { type: 'item', action: 'take', items: [{ itemId: ItemID.cursedSap, amount: 5 }] }
+              { type: 'item', action: 'take', items: [{ itemId: ItemID.cursedSap, amount: 5 }] },
             ],
           },
         ],
@@ -310,8 +311,7 @@ const MAWOOD_CORWIN: MawoodCorwinDialogueType = {
             next: CorwinDialogue.postQuestLore,
             effects: [
               { type: 'quest', action: 'end', questId: QuestID.theBlightedHeart },
-              { type: 'stat', action: 'award', stats: [{ stat: 'unspentSkillPoints', amount: 1 }] },
-              // TODO: { type: 'item', action: 'take', items: [{ itemId: ItemID.blightedHeartwood, amount: 1 }] }
+              { type: 'item', action: 'take', items: [{ itemId: ItemID.blightedHeartwood, amount: 1 }] },
             ],
           },
         ],

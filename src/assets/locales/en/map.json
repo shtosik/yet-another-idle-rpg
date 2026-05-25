@@ -7,15 +7,22 @@
   },
   "towns": {
     "laHarpar": "La Harpar",
-    "northLirold": "North Lirold"
+    "northLirold": "North Lirold",
+    "mawood": "Mawood"
   },
   "townTabs": {
-    "main": "Main",
+    "main": "Elder's Tree",
     "tavern": "Tavern",
     "shop": "Shop",
     "market": "Market",
     "explorationGuild": "Exploration Guild",
     "tradersBasement": "Basement",
+    "mawoodApothecary": "Apothecary",
+    "mawoodHunterLodge": "Hunter's Lodge",
+    "mawoodCarversShop": "Carver's Shop",
+    "mawoodHighPlatform": "High Platform",
+    "deepwoodEntrance": "To the Deepwood",
+    "upperCanopyEntrance": "Rope-Lift",
     "back": "Back"
   }
 }

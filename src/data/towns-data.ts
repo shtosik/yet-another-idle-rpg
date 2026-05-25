@@ -112,6 +112,75 @@ export const TOWNS_DATA: Record<TownID, Town> = {
     url: '',
     buildings: [],
   },
+  [TownID.mawood]: {
+    id: TownID.mawood,
+    regionId: RegionID.portStocksmar,
+    url: './assets/img/backgrounds/mawood.png',
+    buildings: [
+      {
+        tabId: TownBuildingID.main,
+        position: { x: 50, y: 55 },
+        npcIds: [
+          { id: NpcID.mawoodCorwin, position: { x: 50, y: 50 } },
+        ],
+        url: './assets/img/backgrounds/mawoodElderTree.png',
+      },
+      {
+        tabId: TownBuildingID.mawoodApothecary,
+        position: { x: 20, y: 70 },
+        npcIds: [
+          { id: NpcID.mawoodSylvie, position: { x: 50, y: 50 } },
+        ],
+        url: './assets/img/backgrounds/mawoodApothecary.png',
+      },
+      {
+        tabId: TownBuildingID.mawoodHunterLodge,
+        position: { x: 80, y: 70 },
+        npcIds: [
+          { id: NpcID.mawoodFinn, position: { x: 50, y: 50 } },
+        ],
+        url: './assets/img/backgrounds/mawoodHunterLodge.png',
+      },
+      {
+        tabId: TownBuildingID.mawoodCarversShop,
+        position: { x: 30, y: 40 },
+        npcIds: [
+          { id: NpcID.mawoodBrenn, position: { x: 50, y: 50 } },
+        ],
+        url: './assets/img/backgrounds/mawoodCarversShop.png',
+      },
+      {
+        tabId: TownBuildingID.mawoodHighPlatform,
+        position: { x: 70, y: 20 },
+        npcIds: [
+          { id: NpcID.mawoodMilo, position: { x: 50, y: 50 } },
+        ],
+        url: './assets/img/backgrounds/mawoodHighPlatform.png',
+      },
+      {
+        tabId: TownBuildingID.deepwoodEntrance,
+        position: { x: 15, y: 90 },
+        zoneId: ZoneID.deepwood,
+        // Opens once Corwin sends the player into the Deepwood (Q3).
+        // Corwin only offers theSapThatBurns after fetchesAndFangs is completed,
+        // so this entrance can never appear before the player has earned it.
+        questRequirement: QuestID.theSapThatBurns,
+        npcIds: [],
+        url: '',
+      },
+      {
+        tabId: TownBuildingID.upperCanopyEntrance,
+        position: { x: 85, y: 10 },
+        zoneId: ZoneID.upperCanopy,
+        // Opens once Milo sends the player up (Q10). His feathersForAKite offer is
+        // gated on theBlightedHeart being completed (the Gnarled Treant must be dead),
+        // so the rope-lift only appears after the corruption questline is finished.
+        questRequirement: QuestID.feathersForAKite,
+        npcIds: [],
+        url: '',
+      },
+    ],
+  },
 }
 
 export default TOWNS_DATA

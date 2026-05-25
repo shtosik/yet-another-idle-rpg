@@ -36,11 +36,25 @@ export const UNLOCK_RULES: UnlockRule[] = [
       bodyKey:  'unlocks:towns.laHarpar.body',
     },
   },
+  {
+    // Mawood is revealed once the player pushes 4 waves deep into the Elderwood Wilds
+    // (not the boss wave) — the town sits just past the outer rim of the forest.
+    condition: { type: 'waveReached', zoneId: ZoneID.elderwoodWilds, wave: 4 },
+    target:    { type: 'town', townId: TownID.mawood },
+    notification: {
+      titleKey: 'unlocks:towns.mawood.title',
+      bodyKey:  'unlocks:towns.mawood.body',
+    },
+  },
 ]
 
 export const ZONE_UNLOCK_NOTIFICATIONS: Partial<Record<ZoneID, UnlockNotification>> = {
   [ZoneID.plains]: {
     titleKey: 'unlocks:zones.plains.title',
     bodyKey:  'unlocks:zones.plains.body',
+  },
+  [ZoneID.elderwoodWilds]: {
+    titleKey: 'unlocks:zones.elderwoodWilds.title',
+    bodyKey:  'unlocks:zones.elderwoodWilds.body',
   },
 }

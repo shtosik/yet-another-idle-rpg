@@ -54,6 +54,14 @@ export const statsInitialState: PlayerStatsType = {
     damageVsRodent: 0,
     damageVsRat: 0,
     damageVsBandit: 0,
+    damageVsSpider: 0,
+    damageVsArachnid: 0,
+    damageVsGnoll: 0,
+    damageVsPlant: 0,
+    damageVsTreant: 0,
+    damageVsBear: 0,
+    damageVsUndead: 0,
+    damageVsHarpy: 0,
 }
 
 export const initialEquipmentState: Record<EquipmentSlotKey, { id: ItemID, tier: ItemTier } | null> = {

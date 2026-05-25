@@ -19,4 +19,22 @@ export const ChestItemsData: Partial<Record<ItemID, Item>> = {
       },
     ],
   },
+  [ItemID.silverwoodChestplate]: {
+    id: ItemID.silverwoodChestplate,
+    tier: ItemTier.rare,
+    url: './assets/img/items/silverwoodChestplate.png',
+    value: 2500,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.chest,
+    stats: [
+      {
+        id: 'attackPower',
+        amount: 4,
+      },
+      {
+        id: 'goldCoinsMultiplier',
+        amount: 0.3,
+      },
+    ],
+  },
 }

@@ -13,4 +13,12 @@ export enum EnemyType {
   rodent,
   rat,
   bandit,
+  spider,
+  arachnid,
+  gnoll,
+  plant,
+  treant,
+  bear,
+  undead,
+  harpy,
 }

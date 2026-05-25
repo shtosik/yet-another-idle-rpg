@@ -92,4 +92,23 @@ export const WeaponsItemsData: Partial<Record<ItemID, Item>> = {
       },
     ],
   },
+  [ItemID.ashwoodBow]: {
+    id: ItemID.ashwoodBow,
+    tier: ItemTier.uncommon,
+    url: './assets/img/items/ashwoodBow.png',
+    value: 1200,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.weapon,
+    damageType: DamageElement.physical,
+    stats: [
+      {
+        id: 'attackPower',
+        amount: 6,
+      },
+      {
+        id: 'critChance',
+        amount: 5,
+      },
+    ],
+  },
 }

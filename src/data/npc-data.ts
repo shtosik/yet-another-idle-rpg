@@ -11,6 +11,11 @@ import LA_HARPAR_JOSH from './dialogues/laHarparTown/laHarparJosh'
 import LA_HARPAR_TRADER from './dialogues/laHarparTown/laHarparTrader'
 import LA_HARPAR_ELARA from './dialogues/laHarparTown/laHarparElara'
 import LA_HARPAR_MARVIN from './dialogues/laHarparTown/laHarparMarvin'
+import MAWOOD_CORWIN from './dialogues/mawoodTown/mawoodCorwin'
+import MAWOOD_SYLVIE from './dialogues/mawoodTown/mawoodSylvie'
+import MAWOOD_FINN from './dialogues/mawoodTown/mawoodFinn'
+import MAWOOD_BRENN from './dialogues/mawoodTown/mawoodBrenn'
+import MAWOOD_MILO from './dialogues/mawoodTown/mawoodMilo'
 
 export interface NPCProps {
   id: NpcID
@@ -47,6 +52,36 @@ const NPC_Data: Record<number, NPCProps> = {
     id: NpcID.laHarparMarvin,
     url: './assets/img/avatars/laHarpar/laHarparMarvin.png',
     dialogue: LA_HARPAR_MARVIN,
+    firstMeetNodeId: 1,
+  },
+  [NpcID.mawoodCorwin]: {
+    id: NpcID.mawoodCorwin,
+    url: './assets/img/avatars/mawood/mawoodCorwin.png',
+    dialogue: MAWOOD_CORWIN,
+    firstMeetNodeId: 1,
+  },
+  [NpcID.mawoodSylvie]: {
+    id: NpcID.mawoodSylvie,
+    url: './assets/img/avatars/mawood/mawoodSylvie.png',
+    dialogue: MAWOOD_SYLVIE,
+    firstMeetNodeId: 1,
+  },
+  [NpcID.mawoodFinn]: {
+    id: NpcID.mawoodFinn,
+    url: './assets/img/avatars/mawood/mawoodFinn.png',
+    dialogue: MAWOOD_FINN,
+    firstMeetNodeId: 1,
+  },
+  [NpcID.mawoodBrenn]: {
+    id: NpcID.mawoodBrenn,
+    url: './assets/img/avatars/mawood/mawoodBrenn.png',
+    dialogue: MAWOOD_BRENN,
+    firstMeetNodeId: 1,
+  },
+  [NpcID.mawoodMilo]: {
+    id: NpcID.mawoodMilo,
+    url: './assets/img/avatars/mawood/mawoodMilo.png',
+    dialogue: MAWOOD_MILO,
     firstMeetNodeId: 1,
   },
 }

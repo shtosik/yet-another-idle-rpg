@@ -2,6 +2,8 @@ import { DialogueNode } from '../../../interfaces/dialogues/dialogue-node.interf
 import { NpcID } from '../../../enums/map/npc-id.enum'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
+import { ItemID } from '../../../enums/ids/item-id.enum'
+import { EnemyID } from '../../../enums/ids/enemy-id.enum'
 
 export enum MiloDialogue {
   default = 0,
@@ -89,7 +91,7 @@ const MAWOOD_MILO: MawoodMiloDialogueType = {
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.whatLurksAtTheTop, questState: QuestState.active, step: 1 }],
             next: MiloDialogue.questWhatLurksComplete,
-            // TODO: requirementsNeeded: [{ type: 'killCount', enemyId: EnemyID.harpyMatriarch, amount: 1 }]
+            requirementsNeeded: [{ type: 'killCount', enemyId: EnemyID.harpyMatriarch, amount: 1 }],
           },
           // What Lurks: in progress
           {
@@ -105,16 +107,23 @@ const MAWOOD_MILO: MawoodMiloDialogueType = {
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.feathersForAKite, questState: QuestState.active, step: 1 }],
             next: MiloDialogue.questFeathersComplete,
-            // TODO: requirementsNeeded: [{ type: 'item', itemId: ItemID.harpyFeather, amount: 5 }]
+            requirementsNeeded: [{ type: 'item', itemId: ItemID.harpyFeather, amount: 5 }],
           },
           // Feathers: in progress
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.feathersForAKite, questState: QuestState.active }],
             next: MiloDialogue.questFeathersProgress,
           },
-          // Default — offer Feathers first
+          // Feathers: offer (only once available — after The Blighted Heart).
+          // This also gates the Upper Canopy entrance, which keys off feathersForAKite
+          // having started, so it must never be offerable before the Treant is dead.
           {
+            visibilityConditions: [{ type: 'quest', questId: QuestID.feathersForAKite, questState: QuestState.available }],
             next: MiloDialogue.questFeathers,
+          },
+          // Nothing for the player yet — keep the conversation on the default node
+          {
+            next: MiloDialogue.default,
           },
         ],
       },
@@ -257,9 +266,7 @@ const MAWOOD_MILO: MawoodMiloDialogueType = {
             next: MiloDialogue.questWhatLurks,
             effects: [
               { type: 'quest', action: 'end', questId: QuestID.feathersForAKite },
-              { type: 'stat', action: 'award', stats: [{ stat: 'experience', amount: 1000 }, { stat: 'goldCoins', amount: 200 }] },
-              // TODO: { type: 'item', action: 'give', items: [{ itemId: ItemID.eagleTalon, amount: 1 }] }
-              // TODO: { type: 'item', action: 'take', items: [{ itemId: ItemID.harpyFeather, amount: 5 }] }
+              { type: 'item', action: 'take', items: [{ itemId: ItemID.harpyFeather, amount: 5 }] },
             ],
           },
         ],
@@ -321,8 +328,6 @@ const MAWOOD_MILO: MawoodMiloDialogueType = {
             next: MiloDialogue.questWhatLurksPostQuest,
             effects: [
               { type: 'quest', action: 'end', questId: QuestID.whatLurksAtTheTop },
-              { type: 'stat', action: 'award', stats: [{ stat: 'experience', amount: 5000 }, { stat: 'goldCoins', amount: 1000 }, { stat: 'unspentSkillPoints', amount: 1 }] },
-              // TODO: { type: 'item', action: 'give', items: [{ itemId: ItemID.harpyCrown, amount: 1 }] }
             ],
           },
         ],

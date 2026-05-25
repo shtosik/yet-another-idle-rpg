@@ -32,7 +32,15 @@
     "damageVsSlime": "Damage vs Slimes",
     "damageVsRodent": "Damage vs Rodents",
     "damageVsRat": "Damage vs Rats",
-    "damageVsBandit": "Damage vs Bandits"
+    "damageVsBandit": "Damage vs Bandits",
+    "damageVsSpider": "Damage vs Spiders",
+    "damageVsArachnid": "Damage vs Arachnids",
+    "damageVsGnoll": "Damage vs Gnolls",
+    "damageVsPlant": "Damage vs Plants",
+    "damageVsTreant": "Damage vs Treants",
+    "damageVsBear": "Damage vs Bears",
+    "damageVsUndead": "Damage vs Undead",
+    "damageVsHarpy": "Damage vs Harpies"
   },
   "damage": {
     "strong": "(strong)"

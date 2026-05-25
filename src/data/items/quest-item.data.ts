@@ -11,4 +11,32 @@ export const QuestItemsData: Partial<Record<ItemID, Item>> = {
     value: -1,
     type: ItemType.quest,
   },
+  [ItemID.corruptedResin]: {
+    id: ItemID.corruptedResin,
+    tier: ItemTier.normal,
+    url: './assets/img/items/corruptedResin.png',
+    value: -1,
+    type: ItemType.quest,
+  },
+  [ItemID.blightedFetish]: {
+    id: ItemID.blightedFetish,
+    tier: ItemTier.normal,
+    url: './assets/img/items/blightedFetish.png',
+    value: -1,
+    type: ItemType.quest,
+  },
+  [ItemID.cursedSap]: {
+    id: ItemID.cursedSap,
+    tier: ItemTier.normal,
+    url: './assets/img/items/cursedSap.png',
+    value: -1,
+    type: ItemType.quest,
+  },
+  [ItemID.blightedHeartwood]: {
+    id: ItemID.blightedHeartwood,
+    tier: ItemTier.rare,
+    url: './assets/img/items/blightedHeartwood.png',
+    value: -1,
+    type: ItemType.quest,
+  },
 }

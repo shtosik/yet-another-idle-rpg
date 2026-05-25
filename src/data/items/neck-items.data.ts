@@ -23,4 +23,26 @@ export const NeckItemsData: Partial<Record<ItemID, Item>> = {
       },
     ],
   },
+  [ItemID.heartwoodAmulet]: {
+    id: ItemID.heartwoodAmulet,
+    tier: ItemTier.rare,
+    url: './assets/img/items/heartwoodAmulet.png',
+    value: 4000,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.amulet,
+    stats: [
+      {
+        id: 'attackPower',
+        amount: 4,
+      },
+      {
+        id: 'extraFireDamageMultiplier',
+        amount: 0.25,
+      },
+      {
+        id: 'damageVsPlant',
+        amount: 0.3,
+      },
+    ],
+  },
 }

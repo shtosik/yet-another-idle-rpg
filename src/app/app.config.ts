@@ -24,6 +24,11 @@ const translations = [
     'dialogues/laHarparTrader',
     'dialogues/laHarparElara',
     'dialogues/laHarparMarvin',
+    'dialogues/mawoodCorwin',
+    'dialogues/mawoodSylvie',
+    'dialogues/mawoodFinn',
+    'dialogues/mawoodBrenn',
+    'dialogues/mawoodMilo',
 ]
 
 export function i18nextInitializer() {
