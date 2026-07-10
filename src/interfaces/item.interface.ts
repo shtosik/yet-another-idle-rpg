@@ -5,6 +5,7 @@ import { ItemTier } from 'enums/items/item-tier.enum'
 import { ItemType } from 'enums/items/item-type.enum'
 import { UsableItemType } from 'enums/usable-item-type.enum'
 import { PlayerStat } from 'types/player/player-stat.type'
+import { RecipeID } from 'enums/ids/recipe-id.enum'
 
 export interface ItemData {
     id: ItemID
@@ -55,7 +56,12 @@ export interface PotionItem extends ItemData {
     type: ItemType.potion
 }
 
-export type Item = EquipmentItem | ResourceItem | RewardsStatsItem | QuestItem | FoodItem | BookItem | PotionItem
+export interface RecipeItem extends ItemData {
+    type: ItemType.recipe
+    recipeId: RecipeID
+}
+
+export type Item = EquipmentItem | ResourceItem | RewardsStatsItem | QuestItem | FoodItem | BookItem | PotionItem | RecipeItem
 
 export type UseItemProps = UseItemStatProps
 

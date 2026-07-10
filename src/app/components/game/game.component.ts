@@ -22,6 +22,7 @@ import { QuestsComponent } from './quests/quests.component'
 import { WorldMapComponent } from './world-map/world-map.component'
 import { BestiaryComponent } from './bestiary/bestiary.component'
 import { ShopStore } from '../../store/shop/shop.store'
+import { SpellbookComponent } from './spellbook/spellbook.component'
 
 const imports = [
   PanelComponent,
@@ -47,6 +48,7 @@ const imports = [
     QuestsComponent,
     WorldMapComponent,
     BestiaryComponent,
+    SpellbookComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

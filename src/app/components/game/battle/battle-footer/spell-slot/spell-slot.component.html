@@ -7,6 +7,7 @@
   placement="top"
   tooltipClass="tooltip-override"
   [autoPlacement]="false"
+  [class.spell--disabled]="!canAfford()"
   [style]="{ 'background-image': spellData.url | url }"
   [style.--time-left]="timeLeftUntilReady + 'deg'"
   [tooltipContext]="{ spellData }"

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, input, Input } from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, inject, input, Input } from '@angular/core'
 import { TooltipTemplateDirective } from 'ngx-tooltip-directives'
 import { TranslatePipe } from '../../../../../pipes/i18next.pipe'
 import { UrlPipe } from '../../../../../pipes/url.pipe'
@@ -31,6 +31,12 @@ export class SpellSlotComponent {
   playerStats = this.playerStore.stats
   isInCombat = this.battleStore.isInCombat
 
+  canAfford = computed(() => {
+    const id = this.spellId()
+    if (id === null) return true
+    return this.battleManagerService.canAffordSpell(id)
+  })
+
   @Input() equippedSpell: EquippedSpell
   @Input() spellLevel: number
 
@@ -39,11 +45,7 @@ export class SpellSlotComponent {
   protected readonly SpellType = SpellType
 
   handleCastSpell(spellId: SpellID, equippedSpell: EquippedSpell) {
-    if (equippedSpell.cooldownRemaining > 0 || !this.isInCombat) return
-
+    if (equippedSpell.cooldownRemaining > 0 || !this.isInCombat() || !this.canAfford()) return
     this.battleManagerService.castSpell(spellId)
   }
-
-  // const passedTime = (spell.currentCooldown / getSpellCooldown(cooldown, playerStats.cooldownReduction)) * 100;
-  // if (refs.reference.current) (refs.reference.current as HTMLElement).style.setProperty("--time-left", `${passedTime}%`);
 }

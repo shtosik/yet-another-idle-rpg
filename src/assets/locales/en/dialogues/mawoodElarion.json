@@ -1,0 +1,31 @@
+{
+  "intro1": {
+    "message": "Oh! A visitor. How delightful — most folks in Mawood see the glowing runes on the door and keep walking. I'm Elarion. I collect curiosities, refine essences, and occasionally set things on fire by accident. The shop is fully intentional, though.",
+    "opt1": "What sort of shop is this?",
+    "opt2": "Those runes looked dangerous."
+  },
+  "default": {
+    "message": "The wards are holding, the stock is restocked, and I've only knocked over one reagent bottle today. What can I do for you?",
+    "aboutElarion": "Tell me about yourself.",
+    "aboutMagic": "How does magic work here in Mawood?",
+    "browseWares": "Let me see your wares.",
+    "goodbye": "I'll leave you to your runes."
+  },
+  "aboutElarion": {
+    "message": "I was a court mage in Drenhollow — lovely city, terrible politics. I came to Mawood following reports of ambient magical resonance in the old-growth roots. Turns out corrupted heartwood conducts arcane energy like copper conducts heat. Fascinating and alarming in equal measure. I stayed to study it. Then I ran out of funds and opened the shop.",
+    "opt1": "Tell me about the runes.",
+    "opt2": "What about the spellbook?"
+  },
+  "aboutMagic": {
+    "message": "Magic here is earthbound. The deep roots carry it up — you can feel it in the soil after rain. The corruption hasn't destroyed that, oddly. It's changed the resonance, made certain elements more volatile. Earth magic especially. Hence the recipes. Some things you really shouldn't improvise.",
+    "opt1": "Good to know."
+  },
+  "aboutRunes": {
+    "message": "Runes are crystallised elemental intent — the spoken word of a spell made solid and storable. Earth runes are peculiar here; the local stone absorbs ambient magic and changes composition. I've written up the process. You'll find it in the shop if you're interested in making your own.",
+    "opt1": "Interesting. I'll keep it in mind."
+  },
+  "aboutSpellbook": {
+    "message": "It's a personal grimoire, bound with pages that remember. When you acquire it, it attunes to your magical signature and begins cataloguing your spells automatically. More practically: it gives you a proper place to organise which spells you cast and in what order, rather than relying on reflexes alone. Most adventurers find it invaluable.",
+    "opt1": "That does sound useful."
+  }
+}

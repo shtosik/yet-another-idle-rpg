@@ -5,5 +5,6 @@ export enum ItemType {
     food = 3,
     potion = 4,
     rewardsStats = 5,
+    recipe = 6,
     quest = 999,
 }

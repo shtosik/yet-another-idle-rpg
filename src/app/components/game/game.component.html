@@ -8,7 +8,7 @@
     <app-panel class="resources"></app-panel>
   }
 
-  @if (tab === GameTab.main || tab === GameTab.crafting || tab === GameTab.towns || tab === GameTab.bestiary || tab === GameTab.map) {
+  @if (tab === GameTab.main || tab === GameTab.crafting || tab === GameTab.towns || tab === GameTab.bestiary || tab === GameTab.map || tab === GameTab.spellbook) {
     @switch (tab) {
       @case (GameTab.crafting) {
         <app-crafting class="crafting"/>
@@ -44,6 +44,10 @@
 
   @if (tab === GameTab.bestiary) {
     <app-bestiary class="bestiary"/>
+  }
+
+  @if (tab === GameTab.spellbook) {
+    <app-spellbook class="spellbook"/>
   }
 </div>
 <div style="margin-top: 1rem; display: flex; gap: 0.2rem;">

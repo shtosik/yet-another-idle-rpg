@@ -8,7 +8,7 @@ export enum TownBuildingID {
     // Mawood
     mawoodApothecary = 7,
     mawoodHunterLodge = 8,
-    mawoodCarversShop = 9,
+    mawoodMagicShop = 9,
     mawoodHighPlatform = 10,
     deepwoodEntrance = 11,
     upperCanopyEntrance = 12,

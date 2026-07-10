@@ -1,0 +1,27 @@
+<section class="spellbook">
+  <h2 class="spellbook__title">{{ 'gameTabs.spellbook' | i18next }}</h2>
+  <p class="spellbook__hint">Drag spells onto the spell bar to equip them</p>
+
+  <div
+    cdkDropList
+    id="spellbook-palette"
+    class="spellbook__palette"
+    [cdkDropListData]="availableSpells()"
+    [cdkDropListConnectedTo]="slotDropIds"
+    (cdkDropListDropped)="onPaletteDrop($event)"
+  >
+    @for (spellId of availableSpells(); track spellId) {
+      @let spellData = SPELLS_DATA[spellId];
+      <div
+        class="spellbook__spell"
+        cdkDrag
+        [cdkDragData]="spellId"
+        [style.background-image]="spellData.url | url"
+        [title]="('spells:names.' + SpellID[spellId] + '.name') | i18next"
+      ></div>
+    }
+    @if (!availableSpells().length) {
+      <p class="spellbook__empty">All known spells are equipped</p>
+    }
+  </div>
+</section>

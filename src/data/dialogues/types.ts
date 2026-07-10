@@ -11,6 +11,7 @@ import { MawoodSylvieDialogueType } from './mawoodTown/mawoodSylvie'
 import { MawoodFinnDialogueType } from './mawoodTown/mawoodFinn'
 import { MawoodBrennDialogueType } from './mawoodTown/mawoodBrenn'
 import { MawoodMiloDialogueType } from './mawoodTown/mawoodMilo'
+import { MawoodElarionDialogueType } from './mawoodTown/mawoodElarion'
 
 export interface DialogueProps {
   message: string
@@ -64,3 +65,4 @@ export type DialogueType =
   | MawoodFinnDialogueType
   | MawoodBrennDialogueType
   | MawoodMiloDialogueType
+  | MawoodElarionDialogueType

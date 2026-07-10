@@ -21,6 +21,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     experience: 5,
     drops: [
       generateItem(ItemID.slimeResidue, 1, 2, 3),
+      generateItem(ItemID.waterRune, 1, 1, 5),
       petDrop(EnemyID.greenSlime),
     ],
     shinyDrops: shinyPetDrops(EnemyID.greenSlime),
@@ -34,6 +35,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     experience: 5,
     drops: [
       generateItem(ItemID.slimeResidue, 1, 2, 3),
+      generateItem(ItemID.waterRune, 1, 1, 5),
       petDrop(EnemyID.redSlime),
     ],
     shinyDrops: shinyPetDrops(EnemyID.redSlime),
@@ -47,6 +49,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     experience: 5,
     drops: [
       generateItem(ItemID.slimeResidue, 1, 2, 3),
+      generateItem(ItemID.waterRune, 1, 1, 5),
       petDrop(EnemyID.blueSlime),
     ],
     shinyDrops: shinyPetDrops(EnemyID.blueSlime),
@@ -61,6 +64,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     drops: [
       generateItem(ItemID.slimeGoldenCrown, 1, 1, 10),
       generateItem(ItemID.slimeResidue, 1, 10, 1),
+      generateItem(ItemID.waterRune, 2, 4, 2),
       petDrop(EnemyID.kingSlime),
     ],
     shinyDrops: shinyPetDrops(EnemyID.kingSlime),
@@ -91,6 +95,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
       generateItem(ItemID.feather, 1, 2, 2),
       generateItem(ItemID.stick, 1, 1, 4),
       generateItem(ItemID.machete, 1, 1, 1),
+      generateItem(ItemID.airRune, 1, 1, 5),
       petDrop(EnemyID.seagull),
     ],
     shinyDrops: shinyPetDrops(EnemyID.seagull),
@@ -191,6 +196,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
       generateItem(ItemID.vialOfWater, 1, 1, 6),
       generateItem(ItemID.trophyNecklace, 1, 1, 100),
       generateItem(ItemID.machete, 1, 1, 80),
+      generateItem(ItemID.fireRune, 1, 1, 5),
       petDrop(EnemyID.bandit),
     ],
     shinyDrops: shinyPetDrops(EnemyID.bandit),
@@ -272,6 +278,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     drops: [
       generateItem(ItemID.wolfFangs, 1, 1, 3),
       generateItem(ItemID.stick, 1, 1, 4),
+      generateItem(ItemID.fireRune, 1, 1, 5),
       petDrop(EnemyID.gnollScout),
     ],
     shinyDrops: shinyPetDrops(EnemyID.gnollScout),
@@ -301,6 +308,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     drops: [
       generateItem(ItemID.gnollTrophy, 1, 1, 2),
       generateItem(ItemID.wolfFangs, 1, 3, 1),
+      generateItem(ItemID.fireRune, 2, 4, 2),
       { id: ItemID.blightedFetish, minAmount: 1, maxAmount: 1, chance: 1, requiredActiveQuestId: QuestID.fetchesAndFangs },
       petDrop(EnemyID.gnollWarchief),
     ],
@@ -331,6 +339,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     experience: 90,
     drops: [
       generateItem(ItemID.bearPelt, 1, 1, 4),
+      generateItem(ItemID.earthRune, 1, 1, 5),
       petDrop(EnemyID.forestBear),
     ],
     shinyDrops: shinyPetDrops(EnemyID.forestBear),
@@ -344,6 +353,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     experience: 45,
     drops: [
       generateItem(ItemID.boneFragment, 1, 2, 3),
+      generateItem(ItemID.earthRune, 1, 1, 5),
       petDrop(EnemyID.bogSkeleton),
     ],
     shinyDrops: shinyPetDrops(EnemyID.bogSkeleton),
@@ -357,6 +367,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     experience: 40,
     drops: [
       generateItem(ItemID.ancientWood, 1, 1, 3),
+      generateItem(ItemID.earthRune, 1, 1, 5),
       { id: ItemID.cursedSap, minAmount: 1, maxAmount: 1, chance: 3, requiredActiveQuestId: QuestID.theSapThatBurns },
       petDrop(EnemyID.treantSprout),
     ],
@@ -372,6 +383,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     drops: [
       generateItem(ItemID.ancientWood, 1, 5, 1),
       generateItem(ItemID.heartwoodAmulet, 1, 1, 40),
+      generateItem(ItemID.earthRune, 2, 4, 2),
       { id: ItemID.blightedHeartwood, minAmount: 1, maxAmount: 1, chance: 1, requiredActiveQuestId: QuestID.theBlightedHeart },
       petDrop(EnemyID.gnarledTreant),
     ],
@@ -388,6 +400,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     experience: 55,
     drops: [
       generateItem(ItemID.harpyFeather, 1, 2, 3),
+      generateItem(ItemID.airRune, 1, 1, 5),
       petDrop(EnemyID.harpy),
     ],
     shinyDrops: shinyPetDrops(EnemyID.harpy),
@@ -401,6 +414,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     experience: 75,
     drops: [
       generateItem(ItemID.eagleTalon, 1, 1, 4),
+      generateItem(ItemID.airRune, 1, 1, 5),
       petDrop(EnemyID.giantEagle),
     ],
     shinyDrops: shinyPetDrops(EnemyID.giantEagle),
@@ -430,6 +444,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
       generateItem(ItemID.matriarchPlume, 1, 1, 1),
       generateItem(ItemID.stoneArrow, 2, 5, 1),
       generateItem(ItemID.harpyCrown, 1, 1, 10),
+      generateItem(ItemID.airRune, 2, 4, 2),
       petDrop(EnemyID.harpyMatriarch),
     ],
     shinyDrops: shinyPetDrops(EnemyID.harpyMatriarch),

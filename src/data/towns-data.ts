@@ -137,17 +137,18 @@ export const TOWNS_DATA: Record<TownID, Town> = {
         tabId: TownBuildingID.mawoodHunterLodge,
         position: { x: 80, y: 70 },
         npcIds: [
-          { id: NpcID.mawoodFinn, position: { x: 50, y: 50 } },
+          { id: NpcID.mawoodFinn, position: { x: 35, y: 50 } },
+          { id: NpcID.mawoodBrenn, position: { x: 65, y: 50 } },
         ],
         url: './assets/img/backgrounds/mawoodHunterLodge.png',
       },
       {
-        tabId: TownBuildingID.mawoodCarversShop,
+        tabId: TownBuildingID.mawoodMagicShop,
         position: { x: 30, y: 40 },
         npcIds: [
-          { id: NpcID.mawoodBrenn, position: { x: 50, y: 50 } },
+          { id: NpcID.mawoodElarion, position: { x: 50, y: 50 } },
         ],
-        url: './assets/img/backgrounds/mawoodCarversShop.png',
+        url: './assets/img/backgrounds/mawoodMagicShop.png',
       },
       {
         tabId: TownBuildingID.mawoodHighPlatform,

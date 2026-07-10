@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core'
 import RECIPES_DATA, { CraftingRecipe } from '../../../../data/recipes-data'
 import { RecipeSlot } from './recipe-slot/recipe-slot.component'
 import { SlotComponent } from '../../shared/slot/slot.component'
@@ -22,7 +22,10 @@ export class CraftingComponent {
   playerStore = inject(PlayerStore)
   playerInventory = this.playerStore.inventory
 
-  recipesArray: CraftingRecipe[] = Object.values(RECIPES_DATA)
+  recipesArray = computed(() => {
+    const unlocked = this.playerStore.unlockedRecipes()
+    return Object.values(RECIPES_DATA).filter(r => !r.requiresUnlock || unlocked.includes(r.id))
+  })
   recipeToCraft: RecipeID
 
   protected readonly RECIPES_DATA = RECIPES_DATA

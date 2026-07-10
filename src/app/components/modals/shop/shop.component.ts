@@ -82,13 +82,20 @@ export class ShopComponent implements OnInit {
     const { itemId, tier, price } = entry.staticItem
 
     this.playerStore.updatePlayerStats([{ stat: 'goldCoins', amount: -price }])
+    this.shopStore.buyItem(this.shopId(), index)
+
+    // Spellbook unlocks the tab immediately and is not added to inventory
+    if (itemId === ItemID.spellbook) {
+      this.playerStore.unlockSpellbook()
+      return
+    }
+
     this.playerStore.updatePlayerInventory([{
       id: itemId,
       tier,
       type: ITEM_DATA[itemId].type as ItemType,
       amount: 1,
     }])
-    this.shopStore.buyItem(this.shopId(), index)
   }
 
   isNonRefreshableSoldOut(index: number): boolean {

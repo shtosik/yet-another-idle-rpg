@@ -1,6 +1,7 @@
 {
   "names": {
-    "laHarparShop": "Trader's Wares"
+    "laHarparShop": "Trader's Wares",
+    "mawoodMagicShop": "Elarion's Curiosities"
   },
   "ui": {
     "nextRefresh": "Next refresh in {{time}}",

@@ -109,4 +109,13 @@ export enum ItemID {
     shinyPetGiantEagle = 100,
     shinyPetCanopyBandit = 101,
     shinyPetHarpyMatriarch = 102,
+    // runes
+    fireRune = 103,
+    airRune = 104,
+    earthRune = 105,
+    waterRune = 106,
+    // magic shop
+    magicStaff = 107,
+    earthRuneRecipe = 108,
+    spellbook = 109,
 }

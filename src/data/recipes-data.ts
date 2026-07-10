@@ -7,6 +7,7 @@ export type CraftingRecipe = {
     itemsNeeded: RecipeCost[]
     createsAmount: number
     itemId: ItemID
+    requiresUnlock?: boolean
 }
 
 export type RecipeCost = {
@@ -55,6 +56,35 @@ const RECIPES_DATA: Partial<Record<RecipeID, CraftingRecipe>> = {
         itemId: ItemID.turtleShellHelmet,
         unlockRequirement: null,
         itemsNeeded: [{ id: ItemID.turtleShell, amount: 10 }],
+        createsAmount: 1,
+    },
+    [RecipeID.fireRune]: {
+        id: RecipeID.fireRune,
+        itemId: ItemID.fireRune,
+        unlockRequirement: null,
+        itemsNeeded: [{ id: ItemID.wolfFangs, amount: 5 }],
+        createsAmount: 1,
+    },
+    [RecipeID.airRune]: {
+        id: RecipeID.airRune,
+        itemId: ItemID.airRune,
+        unlockRequirement: null,
+        itemsNeeded: [{ id: ItemID.feather, amount: 5 }],
+        createsAmount: 1,
+    },
+    [RecipeID.earthRune]: {
+        id: RecipeID.earthRune,
+        itemId: ItemID.earthRune,
+        unlockRequirement: null,
+        itemsNeeded: [{ id: ItemID.stone, amount: 10 }],
+        createsAmount: 1,
+        requiresUnlock: true,
+    },
+    [RecipeID.waterRune]: {
+        id: RecipeID.waterRune,
+        itemId: ItemID.waterRune,
+        unlockRequirement: null,
+        itemsNeeded: [{ id: ItemID.slimeResidue, amount: 5 }],
         createsAmount: 1,
     },
 }

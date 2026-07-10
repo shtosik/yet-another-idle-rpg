@@ -16,6 +16,7 @@ import MAWOOD_SYLVIE from './dialogues/mawoodTown/mawoodSylvie'
 import MAWOOD_FINN from './dialogues/mawoodTown/mawoodFinn'
 import MAWOOD_BRENN from './dialogues/mawoodTown/mawoodBrenn'
 import MAWOOD_MILO from './dialogues/mawoodTown/mawoodMilo'
+import MAWOOD_ELARION from './dialogues/mawoodTown/mawoodElarion'
 
 export interface NPCProps {
   id: NpcID
@@ -82,6 +83,12 @@ const NPC_Data: Record<number, NPCProps> = {
     id: NpcID.mawoodMilo,
     url: './assets/img/avatars/mawood/mawoodMilo.png',
     dialogue: MAWOOD_MILO,
+    firstMeetNodeId: 1,
+  },
+  [NpcID.mawoodElarion]: {
+    id: NpcID.mawoodElarion,
+    url: './assets/img/avatars/mawood/mawoodElarion.png',
+    dialogue: MAWOOD_ELARION,
     firstMeetNodeId: 1,
   },
 }

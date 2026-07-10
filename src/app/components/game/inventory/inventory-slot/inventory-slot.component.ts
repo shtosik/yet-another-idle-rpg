@@ -38,6 +38,7 @@ export class InventoryItemComponent {
       || this.item.type === ItemType.food
       || this.item.type === ItemType.potion
       || this.item.type === ItemType.book
+      || this.item.type === ItemType.recipe
   }
 
   handleClick() {

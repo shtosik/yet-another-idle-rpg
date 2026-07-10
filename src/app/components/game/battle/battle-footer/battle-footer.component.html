@@ -11,15 +11,22 @@
     }
   </div>
   <div class="spell-bar">
-    @for (_ of slots; track $index) {
-      <app-slot>
-        @if (equippedSpells()[$index]) {
-          <app-spell-slot
-            [spellId]="equippedSpells()[$index].spellId"
-            [equippedSpell]="equippedSpells()[$index]"
-          />
+    @for (i of slotIndices; track i) {
+      @let spell = equippedSpells()[i];
+      <div
+        cdkDropList
+        [id]="'spell-slot-' + i"
+        [cdkDropListData]="i"
+        [cdkDropListConnectedTo]="connectedTo"
+        (cdkDropListDropped)="onSlotDrop($event)"
+        class="spell-bar__slot"
+      >
+        @if (spell) {
+          <div class="spell-bar__drag" cdkDrag [cdkDragData]="spell">
+            <app-spell-slot [spellId]="spell.spellId" [equippedSpell]="spell"/>
+          </div>
         }
-      </app-slot>
+      </div>
     }
   </div>
 

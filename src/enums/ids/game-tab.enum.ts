@@ -5,4 +5,5 @@ export enum GameTab {
     towns = 4,
     map = 5,
     bestiary = 6,
+    spellbook = 7,
 }

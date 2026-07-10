@@ -1,6 +1,6 @@
 <section class="crafting">
     <div class="crafting__recipes">
-        @for (recipe of recipesArray; track recipe.id) {
+        @for (recipe of recipesArray(); track recipe.id) {
             <app-slot>
                 <app-recipe-slot
                     [recipe]="recipe"

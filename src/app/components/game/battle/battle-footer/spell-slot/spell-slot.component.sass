@@ -26,6 +26,11 @@
     height: 100%
     width: 100%
 
+  &--disabled
+    filter: grayscale(1)
+    opacity: 0.45
+    cursor: not-allowed
+
   &__counter
     z-index: 5
     font-size: 1.2rem
@@ -55,6 +60,17 @@
 
     .buff
       color: map.get(palette.$spellTypePalette, buff)
+
+  &__rune-cost
+    display: flex
+    align-items: center
+    gap: 0.3rem
+    margin-top: 0.3rem
+
+  &__rune-icon
+    width: 16px
+    height: 16px
+    object-fit: contain
 
   &__desc
     margin-top: 0.5rem

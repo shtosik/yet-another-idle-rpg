@@ -48,6 +48,7 @@ export type PlayerStat =
     | 'damageVsBear'
     | 'damageVsUndead'
     | 'damageVsHarpy'
+    | 'magicDamageMultiplier'
 
 export const multiplierStats: PlayerStat[] = [
     'critMulti',
@@ -60,6 +61,7 @@ export const multiplierStats: PlayerStat[] = [
     'extraLightDamageMultiplier',
     'extraDarkDamageMultiplier',
     'extraPhysicalDamageMultiplier',
+    'magicDamageMultiplier',
 ]
 
 export const percentageState: PlayerStat[] = [

@@ -54,7 +54,9 @@ export class BattleManagerService {
 
     if (!enemy) return
 
-    let damage = magicDamage > 0 ? (magicDamage + stats.magicDamage) : stats.attackPower
+    let damage = magicDamage > 0
+      ? Math.ceil((magicDamage + stats.magicDamage) * stats.magicDamageMultiplier)
+      : stats.attackPower
 
     const isMagic = magicDamage > 0
     const shouldRollCrit = stats.critChance > 0 && (!isMagic || hasSpellCritUnlocked)
@@ -92,10 +94,28 @@ export class BattleManagerService {
     }
   }
 
+  canAffordSpell(spellId: SpellID): boolean {
+    const spellData = SPELLS_DATA[spellId]
+    return this.playerStore.stats().mana >= spellData.baseManaCost
+  }
+
   castSpell(spellId: SpellID) {
     const spellData = SPELLS_DATA[spellId]
     const stats = this.playerStore.stats()
     const cooldown = spellData.baseCooldown - stats.spellCooldownReduction
+
+    // for buff re-cast: don't charge costs, but keep existing cooldown behaviour
+    if (spellData.effect.type === SpellType.buff) {
+      const alreadyActive = this.battleStore.activeBuffs().some(b => b.spellId === spellId)
+      if (alreadyActive) {
+        this.battleStore.setSpellCooldown(spellId, cooldown)
+        return
+      }
+    }
+
+    if (!this.canAffordSpell(spellId)) return
+
+    this.playerStore.updatePlayerStats([{ stat: 'mana', amount: -spellData.baseManaCost }])
 
     this.battleStore.setSpellCooldown(spellId, cooldown)
 
@@ -107,8 +127,6 @@ export class BattleManagerService {
         this.doDamage(spellData.effect.baseDamage, false, spellData.effect.damageType)
         break
       case SpellType.buff: {
-        const alreadyActive = this.battleStore.activeBuffs().some(b => b.spellId === spellId)
-        if (alreadyActive) break
         const ticks = spellData.effect.duration + stats.increasedSpellDuration
         this.battleStore.addActiveBuff({ spellId, ticksRemaining: ticks })
         this.playerStore.updatePlayerStats([{ stat: spellData.effect.stat, amount: spellData.effect.amount }])
@@ -118,12 +136,12 @@ export class BattleManagerService {
   }
 
   equipSpell(spellId: SpellID) {
-    if (this.battleStore.equippedSpells().some(s => s.spellId === spellId)) return
+    if (this.battleStore.equippedSpells().some(s => s?.spellId === spellId)) return
     this.battleStore.addSpell({ spellId, cooldownRemaining: 0 })
   }
 
   unequipSpell(spellId: SpellID) {
-    const remaining = this.battleStore.equippedSpells().filter(s => s.spellId !== spellId)
+    const remaining = this.battleStore.equippedSpells().map(s => s?.spellId === spellId ? null : s)
     this.battleStore.setAllEquippedSpells(remaining)
   }
 

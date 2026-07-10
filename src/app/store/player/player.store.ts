@@ -2,7 +2,7 @@ import { patchState, signalStore, withComputed, withHooks, withMethods, withStat
 import { PlayerStat } from '../../../types/player/player-stat.type'
 import { calculateXp } from 'app/pipes/calculate-xp.pipe'
 import { initialEquipmentState, statsInitialState } from './player'
-import { EquipmentItem, InventoryItem } from 'interfaces/item.interface'
+import { EquipmentItem, InventoryItem, RecipeItem } from 'interfaces/item.interface'
 import { ItemID } from 'enums/ids/item-id.enum'
 import { ItemTier } from 'enums/items/item-tier.enum'
 import { EquipmentType } from 'interfaces/player/equipment.type'
@@ -55,6 +55,8 @@ interface PlayerState {
   craftingUnlocked: boolean;
   skillTreeUnlocked: boolean;
   mapUnlocked: boolean;
+  unlockedRecipes: RecipeID[];
+  spellbookUnlocked: boolean;
 }
 
 export const initialState: PlayerState = {
@@ -75,6 +77,8 @@ export const initialState: PlayerState = {
   craftingUnlocked: false,
   skillTreeUnlocked: false,
   mapUnlocked: false,
+  unlockedRecipes: [],
+  spellbookUnlocked: false,
 }
 
 const itemIndexFromInventory = (inventory: (InventoryItem | null)[], id: ItemID, tier: ItemTier): number =>
@@ -400,11 +404,37 @@ export const PlayerStore = signalStore(
 
     useItem(item: InventoryItem) {
       const itemData = ITEM_DATA[item.id]
+
+      if (itemData.type === ItemType.recipe) {
+        const recipeData = itemData as RecipeItem
+        if (store.unlockedRecipes().includes(recipeData.recipeId)) return
+        patchState(store, state => ({ unlockedRecipes: [...state.unlockedRecipes, recipeData.recipeId] }))
+        store.removeItemFromInventory(item.id, item.tier)
+        return
+      }
+
       if (itemData.type !== ItemType.rewardsStats) return
 
       const statsToUpdate = itemData.stats.map(s => ({ stat: s.id, amount: s.amount }))
       store.updatePlayerStats(statsToUpdate)
       store.removeItemFromInventory(item.id, item.tier)
+    },
+
+    regenMana(deltaMs: number) {
+      patchState(store, (state) => {
+        const s = state.stats
+        if (s.mana >= s.maxMana) {
+          return s.currentManaRegenTimer === 0 ? {} : { stats: { ...s, currentManaRegenTimer: 0 } }
+        }
+        let timer = s.currentManaRegenTimer + deltaMs
+        let mana = s.mana
+        while (timer >= s.manaRegenRate && mana < s.maxMana) {
+          timer -= s.manaRegenRate
+          mana++
+        }
+        if (mana >= s.maxMana) timer = 0
+        return { stats: { ...s, mana, currentManaRegenTimer: timer } }
+      })
     },
 
     craftItem(recipeId: RecipeID) {
@@ -480,6 +510,10 @@ export const PlayerStore = signalStore(
 
     unlockMap(): void {
       patchState(store, { mapUnlocked: true })
+    },
+
+    unlockSpellbook(): void {
+      patchState(store, { spellbookUnlocked: true })
     },
   })),
   withHooks((store) => ({

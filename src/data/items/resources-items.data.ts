@@ -2,6 +2,7 @@ import { ItemID } from '../../enums/ids/item-id.enum'
 import { Item } from '../../interfaces/item.interface'
 import { ItemTier } from '../../enums/items/item-tier.enum'
 import { ItemType } from '../../enums/items/item-type.enum'
+import { RecipeID } from '../../enums/ids/recipe-id.enum'
 
 export const ResourcesItemsData: Partial<Record<ItemID, Item>> = {
   [ItemID.slimeResidue]: {
@@ -165,4 +166,42 @@ export const ResourcesItemsData: Partial<Record<ItemID, Item>> = {
     value: 500,
     type: ItemType.resource,
   },
+  [ItemID.fireRune]: {
+    id: ItemID.fireRune,
+    tier: ItemTier.normal,
+    url: './assets/img/items/fireRune.png',
+    value: 5,
+    type: ItemType.resource,
+  },
+  [ItemID.airRune]: {
+    id: ItemID.airRune,
+    tier: ItemTier.normal,
+    url: './assets/img/items/airRune.png',
+    value: 5,
+    type: ItemType.resource,
+  },
+  [ItemID.earthRune]: {
+    id: ItemID.earthRune,
+    tier: ItemTier.normal,
+    url: './assets/img/items/earthRune.png',
+    value: 5,
+    type: ItemType.resource,
+  },
+  [ItemID.waterRune]: {
+    id: ItemID.waterRune,
+    tier: ItemTier.normal,
+    url: './assets/img/items/waterRune.png',
+    value: 5,
+    type: ItemType.resource,
+  },
+  [ItemID.earthRuneRecipe]: {
+    id: ItemID.earthRuneRecipe,
+    tier: ItemTier.uncommon,
+    url: './assets/img/items/earthRuneRecipe.png',
+    value: 100,
+    type: ItemType.recipe,
+    recipeId: RecipeID.earthRune,
+  },
 }
+
+export const RUNE_ITEM_IDS = [ItemID.fireRune, ItemID.airRune, ItemID.earthRune, ItemID.waterRune] as const

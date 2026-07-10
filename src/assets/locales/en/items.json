@@ -102,7 +102,14 @@
         "shinyPetHarpy": "Shiny Pet Harpy",
         "shinyPetGiantEagle": "Shiny Pet Giant Eagle",
         "shinyPetCanopyBandit": "Shiny Pet Canopy Bandit",
-        "shinyPetHarpyMatriarch": "Shiny Pet Harpy Matriarch"
+        "shinyPetHarpyMatriarch": "Shiny Pet Harpy Matriarch",
+        "fireRune": "Fire Rune",
+        "airRune": "Air Rune",
+        "earthRune": "Earth Rune",
+        "waterRune": "Water Rune",
+        "magicStaff": "Magic Staff",
+        "earthRuneRecipe": "Earth Rune Recipe",
+        "spellbook": "Spellbook"
     },
     "tiers": {
         "trash": "Trash",

@@ -17,6 +17,7 @@ export const statsInitialState: PlayerStatsType = {
     attackSpeed: 3,
     // magic
     magicDamage: 0,
+    magicDamageMultiplier: 1,
     mana: 5,
     maxMana: 5,
     currentManaRegenTimer: 0,

@@ -5,4 +5,8 @@ export enum RecipeID {
     turtleShellBoots = 4,
     turtleShellGloves = 5,
     turtleShellHelmet = 6,
+    fireRune = 7,
+    airRune = 8,
+    earthRune = 9,
+    waterRune = 10,
 }

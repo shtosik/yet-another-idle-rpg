@@ -18,7 +18,7 @@ export interface BattleState {
   currentZoneId: ZoneID;
   currentWave: number;
   autoWaveProgressionEnabled: boolean;
-  equippedSpells: EquippedSpell[];
+  equippedSpells: (EquippedSpell | null)[];
   activeBuffs: ActiveBuff[];
   attackInterval: number;
   isShinyEnemy: boolean;
@@ -31,7 +31,7 @@ export const initialState: BattleState = {
   currentZoneId: ZoneID.horseshoeBeach,
   currentWave: 1,
   autoWaveProgressionEnabled: false,
-  equippedSpells: [],
+  equippedSpells: [null, null, null, null, null],
   activeBuffs: [],
   attackInterval: 0,
   isShinyEnemy: false,
@@ -140,20 +140,25 @@ export const BattleStore = signalStore(
     },
 
     addSpell(spell: EquippedSpell): void {
-      patchState(store, (state) => ({
-        equippedSpells: [...state.equippedSpells, spell],
-      }))
+      patchState(store, (state) => {
+        const arr = [...state.equippedSpells]
+        while (arr.length < 5) arr.push(null)
+        const free = arr.findIndex(s => !s)
+        if (free === -1) return {}
+        arr[free] = spell
+        return { equippedSpells: arr }
+      })
     },
 
     setSpellCooldown(spellId: SpellID, cooldown: number): void {
       patchState(store, (state) => ({
         equippedSpells: state.equippedSpells.map(s =>
-          s.spellId === spellId ? { ...s, cooldownRemaining: cooldown } : s,
+          s && s.spellId === spellId ? { ...s, cooldownRemaining: cooldown } : s,
         ),
       }))
     },
 
-    setAllEquippedSpells(equippedSpells: EquippedSpell[]): void {
+    setAllEquippedSpells(equippedSpells: (EquippedSpell | null)[]): void {
       patchState(store, { equippedSpells })
     },
 
@@ -166,7 +171,7 @@ export const BattleStore = signalStore(
     tickCooldowns(): void {
       patchState(store, (state) => ({
         equippedSpells: state.equippedSpells.map(s =>
-          s.cooldownRemaining > 0 ? { ...s, cooldownRemaining: s.cooldownRemaining - 1 } : s,
+          s && s.cooldownRemaining > 0 ? { ...s, cooldownRemaining: s.cooldownRemaining - 1 } : s,
         ),
       }))
     },

@@ -62,7 +62,8 @@
     "skillTree": "Skill tree",
     "crafting": "Crafting",
     "towns": "Towns",
-    "bestiary": "Bestiary"
+    "bestiary": "Bestiary",
+    "spellbook": "Spellbook"
   },
   "starts": "Starts",
   "requires": "Requires",

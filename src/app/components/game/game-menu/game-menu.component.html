@@ -37,5 +37,12 @@
       (click)="changeTab.emit(GameTab.bestiary)"
     >{{ ('gameTabs.' + GameTab[GameTab.bestiary]) | i18next }}
     </li>
+    @if (playerStore.spellbookUnlocked()) {
+      <li
+        class="game-menu__tab"
+        (click)="changeTab.emit(GameTab.spellbook)"
+      >{{ ('gameTabs.' + GameTab[GameTab.spellbook]) | i18next }}
+      </li>
+    }
   </ul>
 </nav>

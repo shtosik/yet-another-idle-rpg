@@ -111,4 +111,27 @@ export const WeaponsItemsData: Partial<Record<ItemID, Item>> = {
       },
     ],
   },
+  [ItemID.magicStaff]: {
+    id: ItemID.magicStaff,
+    tier: ItemTier.uncommon,
+    url: './assets/img/items/magicStaff.png',
+    value: 800,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.weapon,
+    damageType: DamageElement.physical,
+    stats: [
+      {
+        id: 'attackPower',
+        amount: 2,
+      },
+      {
+        id: 'magicDamage',
+        amount: 5,
+      },
+      {
+        id: 'magicDamageMultiplier',
+        amount: 0.05,
+      },
+    ],
+  },
 }

@@ -54,8 +54,8 @@ export class PlayerManagerService {
     if (skillData.type === SkillPointType.spell) {
       this.playerStore.levelUpSpell(skillData.spellId)
 
-      const alreadyEquipped = currentEquippedSpells.some(s => s.spellId === skillData.spellId)
-      if (!alreadyEquipped && currentEquippedSpells.length < 5) {
+      const alreadyEquipped = currentEquippedSpells.some(s => s?.spellId === skillData.spellId)
+      if (!alreadyEquipped && currentEquippedSpells.filter(Boolean).length < 5) {
         this.battleManagerService.equipSpell(skillData.spellId)
       }
     }
