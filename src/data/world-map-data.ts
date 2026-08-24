@@ -76,41 +76,51 @@ const portStocksmarMarkers: WorldMapMarker[] = [
     position: { x: 670, y: 260 },
     minZoom: 2,
   },
-  // NOTE: the current map art ends at the mountains; the positions below are
-  // placeholders in the "beyond the pass" bottom-right region and should be
-  // nudged once the Elderwood is drawn into the world map. The Deepwood and
-  // Upper Canopy are intentionally omitted — like the Trader's Basement they
-  // are entered through Mawood's buildings, not the world map.
+  // Zones beyond the pass, positioned on the expanded (2794-wide) map art.
   {
     type: 'zone',
     zoneId: ZoneID.mountainPass,
     label: 'Mountain Pass',
-    position: { x: 1010, y: 470 },
+    position: { x: 1250, y: 550 },
     minZoom: 2,
   },
   {
     type: 'zone',
     zoneId: ZoneID.elderwoodWilds,
     label: 'Elderwood Wilds',
-    position: { x: 1190, y: 600 },
+    position: { x: 1765, y: 310 },
+    minZoom: 2,
+  },
+  {
+    type: 'zone',
+    zoneId: ZoneID.deepwood,
+    label: 'Deepwood',
+    position: { x: 2030, y: 125 },
+    minZoom: 2,
+  },
+  {
+    type: 'zone',
+    zoneId: ZoneID.upperCanopy,
+    label: 'Upper Canopy',
+    position: { x: 2500, y: 75 },
     minZoom: 2,
   },
   {
     type: 'town',
     townId: TownID.mawood,
     label: 'Mawood',
-    position: { x: 1310, y: 665 },
+    position: { x: 2305, y: 150 },
   },
 ]
 
 export const WORLD_MAP_DATA: WorldMap = {
   tilesPath: 'assets/maps/world/tiles',
   manifest: {
-    width: 1397,
+    width: 2794,
     height: 752,
     tileSize: 256,
     minZoom: 1,
-    maxZoom: 3,
+    maxZoom: 4,
   },
   defaultView: {
     center: { x: 698, y: 376 },

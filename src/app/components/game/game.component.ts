@@ -23,6 +23,7 @@ import { WorldMapComponent } from './world-map/world-map.component'
 import { BestiaryComponent } from './bestiary/bestiary.component'
 import { ShopStore } from '../../store/shop/shop.store'
 import { SpellbookComponent } from './spellbook/spellbook.component'
+import { ZoneID } from 'enums/ids/zone-id.enum'
 
 const imports = [
   PanelComponent,
@@ -88,5 +89,11 @@ export class GameComponent {
 
   giveStat(stat: PlayerStat) {
     this.playerStore.updatePlayerStats([{ stat, amount: 1000 }])
+  }
+
+  unlockAllZones() {
+    for (const id of Object.values(ZoneID)) {
+      if (typeof id === 'number') this.playerStore.unlockZone(id)
+    }
   }
 }

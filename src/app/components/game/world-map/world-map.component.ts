@@ -176,5 +176,14 @@ export class WorldMapComponent {
     for (const { marker, minZoom } of this.activeMarkers) {
       marker.setOpacity(zoom >= minZoom ? 1 : 0)
     }
+    this.updateMarkerScale(zoom)
+  }
+
+  // Grow markers as the player zooms in. divIcons are fixed screen-size by
+  // default; a CSS var on the container drives a scale transform in the sass.
+  private updateMarkerScale(zoom: number): void {
+    const { minZoom } = WORLD_MAP_DATA.manifest
+    const scale = 0.6 + (zoom - minZoom) * 0.25
+    this.map.getContainer().style.setProperty('--marker-scale', String(scale))
   }
 }
