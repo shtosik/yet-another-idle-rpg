@@ -143,6 +143,16 @@ export class DialogueManagerService {
         return c.wavesRequired.every(
           req => this.playerStore.getKillCountByZoneAndWave(req.zoneId, req.waveNumber) >= req.amount,
         )
+      case 'manyQuestCompleted':
+        return c.questsRequired.every(req =>
+          matchesQuestState(
+            this.questStore.questStepProgression(),
+            req.questId,
+            req.questState,
+            r => this.checkRequirement(r),
+            req.step,
+          ),
+        )
       case 'guild': {
         const task = this.playerStore.activeTask()
         switch (c.condition) {

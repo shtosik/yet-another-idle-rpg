@@ -13,6 +13,7 @@ export type DialogueCondition = { hidden?: boolean } & (
   | ItemCondition
   | ManyItemsCondition
   | ManyStatsCondition
+  | ManyQuestsCondition
   | WaveKillCountCondition
   | ManyWavesKillCountCondition
   | GuildCondition
@@ -23,6 +24,15 @@ interface QuestCondition {
   questId: QuestID
   questState: QuestState
   step?: number // only QuestState.active
+}
+
+interface ManyQuestsCondition {
+  type: 'manyQuestCompleted'
+  questsRequired: {
+    questId: QuestID
+    questState: QuestState
+    step?: number  // only QuestState.active
+  }[]
 }
 
 interface StatCondition {
