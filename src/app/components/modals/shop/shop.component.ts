@@ -6,7 +6,6 @@ import SHOPS_DATA from '../../../../data/shops-data'
 import ITEM_DATA from '../../../../data/items-data'
 import { ItemTier } from '../../../../enums/items/item-tier.enum'
 import { ItemID } from '../../../../enums/ids/item-id.enum'
-import { ItemType } from '../../../../enums/items/item-type.enum'
 import { TranslatePipe } from '../../../pipes/i18next.pipe'
 import { SlotComponent } from '../../shared/slot/slot.component'
 import { InventoryItemComponent } from '../../game/inventory/inventory-slot/inventory-slot.component'
@@ -90,12 +89,7 @@ export class ShopComponent implements OnInit {
       return
     }
 
-    this.playerStore.updatePlayerInventory([{
-      id: itemId,
-      tier,
-      type: ITEM_DATA[itemId].type as ItemType,
-      amount: 1,
-    }])
+    this.playerStore.addItems([{ id: itemId, tier, amount: 1 }])
   }
 
   isNonRefreshableSoldOut(index: number): boolean {

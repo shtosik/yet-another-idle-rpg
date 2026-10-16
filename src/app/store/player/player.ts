@@ -40,6 +40,8 @@ export const statsInitialState: PlayerStatsType = {
     currentShopRefreshCooldown: 0,
     // shiny
     shinyChance: 0,
+    // inventory
+    inventorySlots: 40,
     // damage vs enemy type (additive, fraction: 0.2 = +20% of total damage)
     damageVsCrab: 0,
     damageVsBird: 0,
