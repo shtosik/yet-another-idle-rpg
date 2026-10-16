@@ -117,7 +117,13 @@ export class DialogueComponent {
 
   isOptionDisabled(option: DialogueOption<any>): boolean {
     const result = this.dialogueService.getActiveResult(option)
-    if (!result || !result.requirementsNeeded) return false
+    if (!result) return false
+    if (this.isInventoryBlocked(option)) return true
+    if (!result.requirementsNeeded) return false
     return !result.requirementsNeeded.every(req => this.dialogueService.checkCondition(req))
+  }
+
+  isInventoryBlocked(option: DialogueOption<any>): boolean {
+    return !this.dialogueService.canApplyResult(this.dialogueService.getActiveResult(option))
   }
 }

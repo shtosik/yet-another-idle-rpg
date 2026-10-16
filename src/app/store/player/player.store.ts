@@ -28,7 +28,7 @@ import { DamageElement } from '../../../enums/damage-element.enum'
 import { withDevtools } from '@angular-architects/ngrx-toolkit'
 import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
 import { UNLOCK_RULES } from '../../../data/unlock-conditions'
-import { addItems, countItem, createInventory, hasItems, ItemStack, removeItems, resizeInventory } from './inventory'
+import { addItems, canFit, countItem, createInventory, hasItems, ItemStack, removeItems, resizeInventory } from './inventory'
 
 export type PlayerStatsType = Record<PlayerStat, number>;
 
@@ -202,6 +202,23 @@ export const PlayerStore = signalStore(
       patchState(store, (state) => ({ inventory: removeItems(state.inventory, items) }))
     },
 
+    /** Whether `adding` fits after `removing` is taken out first. */
+    canFitItems(adding: ItemStack[], removing: ItemStack[] = []): boolean {
+      return canFit(store.inventory(), store.stats.inventorySlots(), adding, removing)
+    },
+
+    /** Owns the ingredients and has room for the output. */
+    canCraft(recipeId: RecipeID): boolean {
+      const recipeData = RECIPES_DATA[recipeId]
+      return hasItems(store.inventory(), recipeData.itemsNeeded)
+        && canFit(
+          store.inventory(),
+          store.stats.inventorySlots(),
+          [{ id: recipeData.itemId, amount: recipeData.createsAmount }],
+          recipeData.itemsNeeded,
+        )
+    },
+
     updateUnlockedSkillPoints(id: SkillPointID, amount: number) {
       patchState(store, (state) => ({
         unlockedSkillPoints: {
@@ -326,6 +343,7 @@ export const PlayerStore = signalStore(
       const equippedItem = equipment[slot]
 
       if (!equippedItem) return
+      if (!store.canFitItems([{ id: equippedItem.id, tier: equippedItem.tier, amount: 1 }])) return
 
       const itemData = ITEM_DATA[equippedItem.id] as EquipmentItem
       const statsToUpdate: { stat: PlayerStat, amount: number }[] = []
@@ -380,7 +398,7 @@ export const PlayerStore = signalStore(
 
     craftItem(recipeId: RecipeID) {
       const recipeData = RECIPES_DATA[recipeId]
-      if (!hasItems(store.inventory(), recipeData.itemsNeeded)) return
+      if (!store.canCraft(recipeId)) return
 
       store.removeItems(recipeData.itemsNeeded)
       store.addItems([{ id: recipeData.itemId, amount: recipeData.createsAmount }])

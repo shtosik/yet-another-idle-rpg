@@ -36,16 +36,6 @@ export class CraftingComponent {
   }
 
   handleCraftItem(recipe: CraftingRecipe) {
-    let cantCraft = false
-
-    recipe.itemsNeeded.forEach((itemNeeded) => {
-      const owned = this.playerStore.itemCount(itemNeeded.id)
-
-      if (owned < itemNeeded.amount) cantCraft = true
-    })
-
-    if (cantCraft) return
-
     this.playerStore.craftItem(recipe.id)
   }
 

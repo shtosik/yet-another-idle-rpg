@@ -13,6 +13,7 @@ import QUEST_DATA, {
   QUEST_STEP_AFTER_FAILED,
   RequirementProps,
 } from '../../data/quests-data'
+import { ItemStack } from '../store/player/inventory'
 import { ExplorationGuildService } from './exploration-guild.service'
 import { TownsStore } from '../store/towns/towns.store'
 
@@ -51,6 +52,36 @@ export class DialogueManagerService {
     })
   }
 
+  /** False when the result's item or quest-completion rewards would not fit in the inventory. */
+  canApplyResult(result: DialogueResult<any> | undefined): boolean {
+    if (!result?.effects) return true
+
+    const adding: ItemStack[] = []
+    const removing: ItemStack[] = []
+
+    for (const effect of result.effects) {
+      if (effect.type === 'item') {
+        const stacks = effect.items.map(i => ({ id: i.itemId, amount: i.amount }))
+        if (effect.action === 'give') adding.push(...stacks)
+        else removing.push(...stacks)
+      } else if (effect.type === 'quest') {
+        adding.push(...this.questCompletionRewards(effect))
+      }
+    }
+
+    return adding.length === 0 || this.playerStore.canFitItems(adding, removing)
+  }
+
+  private questCompletionRewards(effect: QuestEffect): ItemStack[] {
+    const questData = QUEST_DATA[effect.questId]
+    const step = this.questStore.getQuestStep(effect.questId)
+    const completes = effect.action === 'end'
+      || (effect.action === 'advance' && step !== undefined && step + 1 > questData.steps.length)
+    if (!completes) return []
+
+    return questData.rewards.flatMap(r => r.type === 'item' ? [{ id: r.itemId, amount: r.amount }] : [])
+  }
+
   selectOption(option: DialogueOption<any>) {
     const validResult = option.results.find(res =>
       this.checkConditions(res.visibilityConditions),
@@ -61,7 +92,7 @@ export class DialogueManagerService {
       return
     }
 
-    if (!this.checkConditions(validResult.requirementsNeeded)) {
+    if (!this.checkConditions(validResult.requirementsNeeded) || !this.canApplyResult(validResult)) {
       return
     }
 
