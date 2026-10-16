@@ -181,6 +181,8 @@ export class SkillTreeComponent {
           .map(id => i18next.t(`skill-tree:skillPoints.${SkillPointID[id]}.name`))
           .join(', ')
         refundLine = `<div class="skill-tooltip__refund skill-tooltip__refund--blocked">Refund blocked by: ${blockerNames}</div>`
+      } else if ('reason' in check && check.reason === 'inventory-in-use') {
+        refundLine = `<div class="skill-tooltip__refund skill-tooltip__refund--blocked">${i18next.t('skill-tree:refundBlockedInventory')}</div>`
       }
     }
 

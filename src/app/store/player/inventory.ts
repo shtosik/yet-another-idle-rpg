@@ -84,3 +84,11 @@ export function canFit(inventory: Inventory, capacity: number, adding: ItemStack
 
   return newStacks.size <= freeSlots
 }
+
+/** True when no item sits at or beyond slot `capacity`. */
+export function fitsCapacity(inventory: Inventory, capacity: number): boolean {
+  for (let i = capacity; i < inventory.length; i++) {
+    if (inventory[i] !== null) return false
+  }
+  return true
+}

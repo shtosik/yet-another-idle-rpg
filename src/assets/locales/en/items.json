@@ -122,5 +122,6 @@
     },
     "clickToEquip": "Click to equip",
     "clickToUnequip": "Click to unequip",
+    "unequipBlockedInventory": "Cannot unequip: items occupy the slots this grants",
     "rightClickToUse": "Right-click to use"
 }

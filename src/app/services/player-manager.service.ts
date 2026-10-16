@@ -62,7 +62,18 @@ export class PlayerManagerService {
   }
 
   previewRefund(id: SkillPointID, levels: number | 'all'): CanRefundResult {
-    return canRefundSkillPoint(id, levels, this.playerStore.unlockedSkillPoints(), SKILL_TREE_GRAPH)
+    const check = canRefundSkillPoint(id, levels, this.playerStore.unlockedSkillPoints(), SKILL_TREE_GRAPH)
+    if (!check.ok) return check
+
+    const node = ALL_SKILLS[id]
+    const slotsLost = node.type === SkillPointType.stat && node.stat === 'inventorySlots'
+      ? node.statAmount * check.pointsReturned
+      : 0
+    if (!this.playerStore.canChangeInventorySlots(-slotsLost)) {
+      return { ok: false, reason: 'inventory-in-use', blockers: [] }
+    }
+
+    return check
   }
 
   refundGoldCost(pointsReturned: number): number {
@@ -110,6 +121,7 @@ export class PlayerManagerService {
     skillPointsToReturn: number
     goldCost: number
     canAfford: boolean
+    inventoryBlocked: boolean
   } {
     const unlocked = this.playerStore.unlockedSkillPoints()
     let allocatedLevels = 0
@@ -123,10 +135,24 @@ export class PlayerManagerService {
     }
     const goldCost = SKILL_TREE_DATA.respec.fullResetGoldCost({ allocatedPointCount: allocatedLevels })
     const canAfford = this.playerStore.stats().goldCoins >= goldCost
-    return { allocatedLevels, skillPointsToReturn, goldCost, canAfford }
+    const inventoryBlocked = !this.playerStore.canChangeInventorySlots(-this.inventorySlotsGranted())
+    return { allocatedLevels, skillPointsToReturn, goldCost, canAfford, inventoryBlocked }
+  }
+
+  private inventorySlotsGranted(): number {
+    let slots = 0
+    for (const [idStr, level] of Object.entries(this.playerStore.unlockedSkillPoints())) {
+      const node = ALL_SKILLS[Number(idStr) as SkillPointID]
+      if (level && node?.type === SkillPointType.stat && node.stat === 'inventorySlots') {
+        slots += node.statAmount * level
+      }
+    }
+    return slots
   }
 
   respecEntireTree(): boolean {
+    if (!this.playerStore.canChangeInventorySlots(-this.inventorySlotsGranted())) return false
+
     const unlocked = this.playerStore.unlockedSkillPoints()
     let allocatedLevels = 0
     let skillPointsToReturn = 0
