@@ -10,13 +10,12 @@ import { SpellType } from '../../enums/spell-type.enum'
 import { SpellSupportStatBuffEffectProps } from '../../interfaces/spell.interface'
 import { Enemy } from '../../interfaces/enemy.interface'
 import { ItemID } from '../../enums/ids/item-id.enum'
-import { QuestID } from '../../enums/ids/quest-id.enum'
 import { UNLOCK_RULES, ZONE_UNLOCK_NOTIFICATIONS } from '../../data/unlock-conditions'
 import { ModalService } from './modal.service'
 import { DamageElement } from '../../enums/damage-element.enum'
 import { PlayerStat } from '../../types/player/player-stat.type'
 import { EnemyType } from '../../enums/enemy-type.enum'
-import { QUEST_STEP_AFTER_COMPLETED, QUEST_STEP_AFTER_FAILED } from '../../data/quests-data'
+import { getActiveQuestIds } from './quest-status'
 
 @Injectable({ providedIn: 'root' })
 export class BattleManagerService {
@@ -154,24 +153,13 @@ export class BattleManagerService {
     }
   }
 
-  private activeQuestIds(): Set<QuestID> {
-    const progression = this.questsStore.questStepProgression()
-    const active = new Set<QuestID>()
-    for (const key in progression) {
-      const step = progression[key as unknown as QuestID]
-      if (step === undefined || step === QUEST_STEP_AFTER_COMPLETED || step === QUEST_STEP_AFTER_FAILED) continue
-      active.add(Number(key) as QuestID)
-    }
-    return active
-  }
-
   private handleEnemyDeath(enemy: Enemy) {
     const zoneId = this.battleStore.currentZoneId()
     const wave = this.battleStore.currentWave()
 
     const isShiny = this.battleStore.isShinyEnemy()
     this.battleStore.endBattle()
-    const activeQuestIds = this.activeQuestIds()
+    const activeQuestIds = getActiveQuestIds(this.questsStore.questStepProgression())
     this.playerStore.processBattleEnd(enemy.id, zoneId, wave, isShiny, activeQuestIds)
 
     this.checkUnlocks(wave)

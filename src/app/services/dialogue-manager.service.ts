@@ -7,12 +7,8 @@ import { DialogueOption, DialogueResult } from '../../interfaces/dialogues/dialo
 import { DialogueCondition } from '../../types/dialogues/dialogue-condition.type'
 import { NpcID } from '../../enums/map/npc-id.enum'
 import npcData, { NPCProps } from '../../data/npc-data'
-import { QuestState } from '../../enums/quest-state.enum'
-import QUEST_DATA, {
-  QUEST_STEP_AFTER_COMPLETED,
-  QUEST_STEP_AFTER_FAILED,
-  RequirementProps,
-} from '../../data/quests-data'
+import { RequirementProps } from '../../data/quests-data'
+import { matchesQuestState } from './quest-status'
 import ITEM_DATA from '../../data/items-data'
 import { InventoryItem } from '../../interfaces/item.interface'
 import { ExplorationGuildService } from './exploration-guild.service'
@@ -117,34 +113,14 @@ export class DialogueManagerService {
             ? (this.playerStore.stats()[req.stat] as number) >= req.amount
             : (this.playerStore.stats()[req.stat] as number) <= req.amount,
         )
-      case 'quest': {
-        const questData = QUEST_DATA[c.questId]
-        const currentProgress = this.questStore.getQuestStep(c.questId)
-
-        switch (c.questState) {
-          case QuestState.active:
-            if (!currentProgress || currentProgress === QUEST_STEP_AFTER_COMPLETED) return false
-
-            if (c.step !== undefined && currentProgress !== c.step) return false
-
-            const currentStep = this.questStore.getQuestStepData(c.questId, currentProgress)
-
-            if (!currentStep.requirements) return true
-
-            return currentStep.requirements.every(req => this.checkRequirement(req))
-          case QuestState.available:
-            if (currentProgress !== undefined) return false
-
-            return questData.startRequirements.every(req => this.checkRequirement(req))
-
-          case QuestState.completed:
-            return currentProgress === QUEST_STEP_AFTER_COMPLETED
-          case QuestState.failed:
-            return currentProgress === QUEST_STEP_AFTER_FAILED
-          default:
-            return false
-        }
-      }
+      case 'quest':
+        return matchesQuestState(
+          this.questStore.questStepProgression(),
+          c.questId,
+          c.questState,
+          req => this.checkRequirement(req),
+          c.step,
+        )
       case 'item': {
         const item = this.playerStore.inventory().find(i => i.id === c.itemId)
         return !!item && item.amount >= c.amount
@@ -167,24 +143,6 @@ export class DialogueManagerService {
         return c.wavesRequired.every(
           req => this.playerStore.getKillCountByZoneAndWave(req.zoneId, req.waveNumber) >= req.amount,
         )
-      case 'manyQuestCompleted':
-        return c.questsRequired.every(req => {
-          const progress = this.questStore.getQuestStep(req.questId)
-          switch (req.questState) {
-            case QuestState.active:
-              if (!progress || progress === QUEST_STEP_AFTER_COMPLETED) return false
-              return req.step === undefined || progress === req.step
-            case QuestState.available:
-              if (progress !== undefined) return false
-              return QUEST_DATA[req.questId].startRequirements.every(r => this.checkRequirement(r))
-            case QuestState.completed:
-              return progress === QUEST_STEP_AFTER_COMPLETED
-            case QuestState.failed:
-              return progress === QUEST_STEP_AFTER_FAILED
-            default:
-              return false
-          }
-        })
       case 'guild': {
         const task = this.playerStore.activeTask()
         switch (c.condition) {
