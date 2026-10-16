@@ -16,6 +16,8 @@ import { DamageElement } from '../../enums/damage-element.enum'
 import { PlayerStat } from '../../types/player/player-stat.type'
 import { EnemyType } from '../../enums/enemy-type.enum'
 import { getActiveQuestIds } from './quest-status'
+import { resolveHit } from './hit-resolution'
+import { QUEST_STEP_AFTER_COMPLETED, QUEST_STEP_AFTER_FAILED } from '../../data/quests-data'
 
 @Injectable({ providedIn: 'root' })
 export class BattleManagerService {
@@ -46,47 +48,25 @@ export class BattleManagerService {
   })
 
   doDamage(magicDamage = 0, isDoubleAttack = false, damageType?: DamageElement) {
-    const stats = this.playerStore.stats()
     const enemyHp = this.battleStore.currentEnemyHp()
     const enemy = this.battleStore.enemy()
-    const hasSpellCritUnlocked = this.playerStore.hasSkillUnlocked(SkillPointID.spellCrit) // Generic getter we made earlier
 
     if (!enemy) return
 
-    let damage = magicDamage > 0
-      ? Math.ceil((magicDamage + stats.magicDamage) * stats.magicDamageMultiplier)
-      : stats.attackPower
-
-    const isMagic = magicDamage > 0
-    const shouldRollCrit = stats.critChance > 0 && (!isMagic || hasSpellCritUnlocked)
-    let isCrit = false
-
-    if (shouldRollCrit && (Math.random() * 100 <= stats.critChance)) {
-      isCrit = true
-      damage = Math.ceil(damage * stats.critMulti)
-    }
-
-    if (isDoubleAttack) damage *= 2
-
-    const effectiveDamageType = damageType ?? this.playerStore.equippedWeaponDamageType()
-    const hasWeaknessSkill = this.playerStore.hasSkillUnlocked(SkillPointID.weaknesses)
-    const isStrong = hasWeaknessSkill && enemy.weakness === effectiveDamageType
-    if (isStrong) {
-      const elementName = DamageElement[effectiveDamageType]
-      const multiplierStat = `extra${elementName.charAt(0).toUpperCase() + elementName.slice(1)}DamageMultiplier` as PlayerStat
-      damage = Math.ceil(damage * (stats[multiplierStat] as number))
-    }
-
-    const typeBonus = enemy.enemyTypes.reduce((sum, type) => {
-      const typeName = EnemyType[type]
-      const statName = `damageVs${typeName.charAt(0).toUpperCase() + typeName.slice(1)}` as PlayerStat
-      return sum + (stats[statName] as number)
-    }, 0)
-    if (typeBonus > 0) damage = Math.floor(damage * (1 + typeBonus))
+    const { damage, isCrit, isWeaknessHit } = resolveHit({
+      stats: this.playerStore.stats(),
+      magicDamage,
+      isDoubleAttack,
+      damageType: damageType ?? this.playerStore.equippedWeaponDamageType(),
+      enemyWeakness: enemy.weakness,
+      enemyTypes: enemy.enemyTypes,
+      hasWeaknessSkill: this.playerStore.hasSkillUnlocked(SkillPointID.weaknesses),
+      hasSpellCritSkill: this.playerStore.hasSkillUnlocked(SkillPointID.spellCrit),
+    })
 
     const newHp = Math.max(0, enemyHp - damage)
     this.battleStore.updateEnemyHp(newHp)
-    this.animations.showDamage(damage, isCrit, isStrong)
+    this.animations.showDamage(damage, isCrit, isWeaknessHit)
 
     if (newHp === 0) {
       this.handleEnemyDeath(enemy)
