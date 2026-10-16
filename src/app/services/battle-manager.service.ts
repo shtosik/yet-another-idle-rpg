@@ -9,15 +9,11 @@ import SPELLS_DATA from '../../data/spells-data'
 import { SpellType } from '../../enums/spell-type.enum'
 import { SpellSupportStatBuffEffectProps } from '../../interfaces/spell.interface'
 import { Enemy } from '../../interfaces/enemy.interface'
-import { ItemID } from '../../enums/ids/item-id.enum'
 import { UNLOCK_RULES, ZONE_UNLOCK_NOTIFICATIONS } from '../../data/unlock-conditions'
 import { ModalService } from './modal.service'
 import { DamageElement } from '../../enums/damage-element.enum'
-import { PlayerStat } from '../../types/player/player-stat.type'
-import { EnemyType } from '../../enums/enemy-type.enum'
 import { getActiveQuestIds } from './quest-status'
 import { resolveHit } from './hit-resolution'
-import { QUEST_STEP_AFTER_COMPLETED, QUEST_STEP_AFTER_FAILED } from '../../data/quests-data'
 
 @Injectable({ providedIn: 'root' })
 export class BattleManagerService {
@@ -164,16 +160,6 @@ export class BattleManagerService {
       if (notification) this.modalService.openUnlockNotification(notification)
     }
 
-    if (!this.playerStore.craftingUnlocked() && this.playerStore.inventory().some(i => i?.id === ItemID.turtleShell)) {
-      this.playerStore.unlockCrafting()
-      this.modalService.openUnlockNotification({ titleKey: 'unlocks:crafting.title', bodyKey: 'unlocks:crafting.body' })
-    }
-
-    if (!this.playerStore.skillTreeUnlocked() && this.playerStore.stats().level >= 2) {
-      this.playerStore.unlockSkillTree()
-      this.modalService.openUnlockNotification({ titleKey: 'unlocks:skillTree.title', bodyKey: 'unlocks:skillTree.body' })
-    }
-
     this.checkProgressionUnlocks(wave)
   }
 
@@ -182,17 +168,15 @@ export class BattleManagerService {
 
     for (const rule of UNLOCK_RULES) {
       const { condition, target } = rule
+      if (this.playerStore.isUnlockTargetUnlocked(target)) continue
 
-      if (condition.type === 'waveReached') {
-        if (currentZoneId !== condition.zoneId) continue
-        if (wave < condition.wave) continue
+      const isMet = condition.type === 'waveReached'
+        ? currentZoneId === condition.zoneId && wave >= condition.wave
+        : this.playerStore.isPlayerStateConditionMet(condition)
+      if (!isMet) continue
 
-        if (target.type === 'town' && !this.playerStore.isTownUnlocked(target.townId)) {
-          this.playerStore.unlockTown(target.townId)
-          this.playerStore.unlockMap()
-          if (rule.notification) this.modalService.openUnlockNotification(rule.notification)
-        }
-      }
+      this.playerStore.applyUnlockTarget(target)
+      if (rule.notification) this.modalService.openUnlockNotification(rule.notification)
     }
   }
 }

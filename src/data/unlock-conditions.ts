@@ -1,3 +1,4 @@
+import { ItemID } from 'enums/ids/item-id.enum'
 import { ZoneID } from 'enums/ids/zone-id.enum'
 import { TownID } from 'enums/map/town-id.enum'
 
@@ -7,14 +8,31 @@ export interface WaveReachedCondition {
   wave: number
 }
 
-export type UnlockCondition = WaveReachedCondition
+export interface HasItemCondition {
+  type: 'hasItem'
+  itemId: ItemID
+}
+
+export interface LevelReachedCondition {
+  type: 'levelReached'
+  level: number
+}
+
+export type UnlockCondition = WaveReachedCondition | HasItemCondition | LevelReachedCondition
 
 export interface TownUnlockTarget {
   type: 'town'
   townId: TownID
 }
 
-export type UnlockTarget = TownUnlockTarget
+export type UnlockableFeature = 'crafting' | 'skillTree'
+
+export interface FeatureUnlockTarget {
+  type: 'feature'
+  feature: UnlockableFeature
+}
+
+export type UnlockTarget = TownUnlockTarget | FeatureUnlockTarget
 
 export interface UnlockNotification {
   titleKey: string
@@ -28,6 +46,22 @@ export interface UnlockRule {
 }
 
 export const UNLOCK_RULES: UnlockRule[] = [
+  {
+    condition: { type: 'hasItem', itemId: ItemID.turtleShell },
+    target:    { type: 'feature', feature: 'crafting' },
+    notification: {
+      titleKey: 'unlocks:crafting.title',
+      bodyKey:  'unlocks:crafting.body',
+    },
+  },
+  {
+    condition: { type: 'levelReached', level: 2 },
+    target:    { type: 'feature', feature: 'skillTree' },
+    notification: {
+      titleKey: 'unlocks:skillTree.title',
+      bodyKey:  'unlocks:skillTree.body',
+    },
+  },
   {
     condition: { type: 'waveReached', zoneId: ZoneID.horseshoeBeach, wave: 5 },
     target:    { type: 'town', townId: TownID.laHarpar },
