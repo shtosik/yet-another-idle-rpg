@@ -9,3 +9,26 @@
   flex-wrap: wrap
   justify-content: center
   height: fit-content
+
+.inventory-header
+  display: flex
+  justify-content: space-between
+  align-items: center
+  margin-bottom: 0.8rem
+
+.pager
+  display: flex
+  align-items: center
+  gap: 0.6rem
+
+  button
+    cursor: pointer
+
+    &:disabled
+      cursor: default
+      opacity: 0.4
+
+.locked
+  opacity: 0.35
+  background-image: repeating-linear-gradient(45deg, transparent 0 6px, rgba(0, 0, 0, 0.35) 6px 12px)
+  pointer-events: none
