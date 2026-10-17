@@ -40,8 +40,8 @@ test('transparent sprites are flattened onto the montage background', async () =
     const dir = mkdtempSync(join(tmpdir(), 'montage-'))
     const file = join(dir, 'ghost.png')
     writeFileSync(file, await sharp({ create: { width: 8, height: 8, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } }).png().toBuffer())
-    const { buffer } = await makeMontage([file], { cols: 1, cell: 16, bg: '#00aaff' })
+    const { buffer } = await makeMontage([file], { cols: 1, cell: 64, bg: '#00aaff' })
     const { data, info } = await sharp(buffer).raw().toBuffer({ resolveWithObject: true })
     const at = (x, y) => [...data.subarray((y * info.width + x) * info.channels, (y * info.width + x) * info.channels + 3)]
-    assert.deepEqual(at(6 + 12, 6 + 12), [0, 170, 255])
+    assert.deepEqual(at(6 + 50, 6 + 50), [0, 170, 255])
 })
