@@ -2,7 +2,7 @@
 // Asset generation CLI. Interface = family + target + subject, then pick.
 //
 //   node scripts/asset-gen/generate.mjs --family item-pixel --target src/assets/img/items/frostShard.png \
-//        --subject "a jagged pale-blue ice crystal shard" [--count 4] [--seed N] [--no-ref]
+//        --subject "a jagged pale-blue ice crystal shard" [--count 4] [--seed N] [--no-ref] [--tier tiny|small|medium|large]
 //   node scripts/asset-gen/generate.mjs --pick 3 --slug item-pixel-frostShard
 //   node scripts/asset-gen/generate.mjs --list-families | --stop
 //
@@ -18,7 +18,7 @@ import { runPipeline } from './lib/postprocess.mjs'
 import { loadRefs } from './lib/refs.mjs'
 import { makeSheet } from './lib/sheet.mjs'
 import { buildGraph } from './lib/workflow.mjs'
-import { assertRegistry, FAMILIES, getFamily, REPO_ROOT } from './styles.mjs'
+import { assertRegistry, DEFAULT_TIER, FAMILIES, getFamily, REPO_ROOT, resolvePost } from './styles.mjs'
 
 const TMP_DIR = join(REPO_ROOT, '.tmp-gen')
 const log = (...args) => console.error('[asset-gen]', ...args)
@@ -43,9 +43,12 @@ export function applyOverrides(family, { steps, cfg, ipWeight, sampler, grid, co
  * Generates `count` candidates for one job into `.tmp-gen/<slug>/` and writes candidate PNGs, sheet and meta.
  * @returns {Promise<object>} the JSON result printed on stdout
  */
-export async function generateJob({ comfy, familyId, target, subject, seed, count = 4, useRef = true, tag, keepRaw = false, overrides = {} }) {
+export async function generateJob({ comfy, familyId, target, subject, seed, count = 4, useRef = true, tag, tier, keepRaw = false, overrides = {} }) {
     const family = applyOverrides(getFamily(familyId), overrides)
     const slug = slugFor(familyId, target, tag)
+    const sizeGuessed = !!family.tiers && !tier
+    const usedTier = family.tiers ? (tier ?? DEFAULT_TIER) : null
+    const post = resolvePost(family, usedTier)
     const dir = join(TMP_DIR, slug)
     mkdirSync(dir, { recursive: true })
     const started = Date.now()
@@ -60,7 +63,7 @@ export async function generateJob({ comfy, familyId, target, subject, seed, coun
     const raws = await comfy.run(graph)
 
     if (keepRaw) raws.forEach((raw, i) => writeFileSync(join(dir, `raw-${i + 1}.png`), raw))
-    const candidates = await Promise.all(raws.map((raw) => runPipeline(raw, family.post)))
+    const candidates = await Promise.all(raws.map((raw) => runPipeline(raw, post)))
     const files = []
     for (const [i, buf] of candidates.entries()) {
         const file = join(dir, `candidate-${i + 1}.png`)
@@ -71,7 +74,7 @@ export async function generateJob({ comfy, familyId, target, subject, seed, coun
     writeFileSync(sheet, await makeSheet({ refs: useRef ? refs.map((r) => r.buffer) : [], candidates, target: family.target, pixel: !!family.pixel }))
 
     const seconds = Math.round((Date.now() - started) / 100) / 10
-    const meta = { slug, family: familyId, target, subject, seed, count: files.length, useRef, tag: tag ?? null, seconds }
+    const meta = { slug, family: familyId, target, subject, seed, count: files.length, useRef, tag: tag ?? null, tier: usedTier, sizeGuessed, seconds }
     writeFileSync(join(dir, 'meta.json'), JSON.stringify(meta, null, 2))
     return { ...meta, candidates: files, sheet, refs: useRef ? refs.map((r) => r.path) : [] }
 }
@@ -89,7 +92,7 @@ export function pickCandidate({ slug, n }) {
 
 const OPTIONS = {
     family: { type: 'string' }, target: { type: 'string' }, subject: { type: 'string' },
-    count: { type: 'string' }, seed: { type: 'string' }, 'no-ref': { type: 'boolean' }, tag: { type: 'string' },
+    count: { type: 'string' }, seed: { type: 'string' }, 'no-ref': { type: 'boolean' }, tag: { type: 'string' }, tier: { type: 'string' },
     pick: { type: 'string' }, slug: { type: 'string' },
     'list-families': { type: 'boolean' }, stop: { type: 'boolean' },
     steps: { type: 'string' }, cfg: { type: 'string' }, 'ip-weight': { type: 'string' }, sampler: { type: 'string' },
@@ -120,7 +123,7 @@ export async function main(argv = process.argv.slice(2)) {
     const seed = v.seed !== undefined ? Number(v.seed) : Math.floor(Math.random() * 2 ** 31)
     const result = await generateJob({
         comfy, familyId: v.family, target: v.target, subject: v.subject, seed,
-        count: v.count ? Number(v.count) : 4, useRef: !v['no-ref'], tag: v.tag, keepRaw: v['keep-raw'],
+        count: v.count ? Number(v.count) : 4, useRef: !v['no-ref'], tag: v.tag, tier: v.tier, keepRaw: v['keep-raw'],
         overrides: { steps: v.steps, cfg: v.cfg, ipWeight: v['ip-weight'], sampler: v.sampler, grid: v.grid, colors: v.colors },
     })
     return { ...result, serverStarted: started, bootSeconds }

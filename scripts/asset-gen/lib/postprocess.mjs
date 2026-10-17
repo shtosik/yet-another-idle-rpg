@@ -88,12 +88,13 @@ export async function trim(buf, { alphaMin = 8, pad = 0 } = {}) {
 /**
  * Area-averages the image down to an art-pixel grid, then scales back up with nearest-neighbour so every art pixel
  * is a crisp block. Two modes:
- *  - `grid`: the longer side becomes `grid` art pixels (aspect kept). With `width`/`height` the result is exactly
- *    that size (subject contained and centred on transparent), otherwise the cell grid itself is returned.
+ *  - `grid`: the longer side becomes `grid` art pixels (aspect kept), plus `pad` transparent cells on every side
+ *    (room for the outline). With `width`/`height` the result is exactly that size (subject contained and centred on
+ *    transparent); otherwise the cell grid itself is returned.
  *  - `block`: each `block`×`block` output square is one art pixel; dimensions are unchanged.
  * Colour is alpha-weighted so transparent pixels never bleed into the subject; alpha snaps to 0/255 at `alphaCut`.
  */
-export async function pixelate(buf, { grid, block, width, height, alphaCut = 128 }) {
+export async function pixelate(buf, { grid, block, width, height, pad = 0, alphaCut = 128 }) {
     const src = await raw(buf)
     let cw, ch
     if (block) {
@@ -132,12 +133,19 @@ export async function pixelate(buf, { grid, block, width, height, alphaCut = 128
             cells[o + 3] = a / n >= alphaCut ? 255 : 0
         }
     }
-    const small = await png(cells, cw, ch)
+    let small = await png(cells, cw, ch)
+    if (pad) small = await sharp(small).extend({ top: pad, bottom: pad, left: pad, right: pad, background: { r: 0, g: 0, b: 0, alpha: 0 } }).png().toBuffer()
     if (block) {
         return sharp(small).resize(src.width, src.height, { kernel: 'nearest', fit: 'fill' }).png().toBuffer()
     }
     if (!width || !height) return small
     return fit(small, { width, height })
+}
+
+/** Nearest-neighbour integer up-scale: every art pixel becomes a `factor`×`factor` block. */
+export async function upscale(buf, { factor }) {
+    const meta = await sharp(buf).metadata()
+    return sharp(buf).resize(meta.width * factor, meta.height * factor, { kernel: 'nearest' }).png().toBuffer()
 }
 
 /** Reduces to at most `colors` palette entries (no dithering, so pixel art stays flat). */
@@ -185,7 +193,7 @@ export async function fit(buf, { width, height, position = 'centre' }) {
         .toBuffer()
 }
 
-export const STEPS = { keyout, trim, pixelate, quantize, outline, cover, fit }
+export const STEPS = { keyout, trim, pixelate, upscale, quantize, outline, cover, fit }
 
 /** Runs a family `post` list: `[['keyout', {…}], ['trim'], …]`. */
 export async function runPipeline(buf, steps) {

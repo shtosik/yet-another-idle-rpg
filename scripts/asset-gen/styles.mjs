@@ -10,6 +10,8 @@
 //   target      [w, h] final asset size (must match FAMILY_TARGETS)
 //   pixel       true => pixel-art family: nearest-neighbour refs/sheet scaling
 //   refBackground [r, g, b] refs are flattened onto; match the prompted keyout background so style transfer keeps it flat
+//   tiers       size-tier table (enemy-pixel): `target` is then the 256 cap and post params may use the tokens
+//               $tier (longer side px), $factor (px per art pixel), $grid (art pixels on the longer side), $inner (grid minus outline)
 //   alpha       true => transparent asset, false => fully opaque
 //   post        ordered [step, params] list, see lib/postprocess.mjs
 //   ipWeight    IP-Adapter strength; sampler overrides steps/cfg/sampler_name/scheduler
@@ -23,7 +25,14 @@ export const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..
 /** The agreed final size per family. Registry validation fails if an entry drifts from this table. */
 export const FAMILY_TARGETS = {
     'item-pixel': [48, 48],
+    'enemy-pixel': [256, 256], // hard cap on the longer side; the real size comes from the Size tier
 }
+
+/** Size tier -> longer side in px (CONTEXT.md: Size tier). 256 is the hard cap. */
+export const SIZE_TIERS = { tiny: 96, small: 144, medium: 192, large: 256 }
+export const DEFAULT_TIER = 'medium'
+
+const ENEMY_REFS = ['bandit', 'troll', 'crab', 'goat', 'goblinScavenger', 'deer'].map((n) => `src/assets/img/enemies/${n}.png`)
 
 const NEGATIVE_BASE = 'text, watermark, signature, frame, border, ui, blurry, photo, realistic, 3d render'
 
@@ -55,6 +64,47 @@ export const FAMILIES = {
         ipWeight: 0.5,
         sampler: { steps: 8, cfg: 5.5, sampler_name: 'euler', scheduler: 'sgm_uniform' },
     },
+}
+
+export const ENEMY_ART_PIXEL = 2
+
+FAMILIES['enemy-pixel'] = {
+    description: 'transparent pixel-art enemy sprite, ≤256 on the longer side by Size tier, natural aspect',
+    checkpoint: 'zavychromaxl_v80.safetensors',
+    stylePrompt:
+        'pixel art game enemy sprite, full body, single character, dark outline, limited colour palette, crisp hard pixels, ' +
+        'plain flat solid light grey background',
+    negative: `${NEGATIVE_BASE}, multiple characters, ground shadow, gradient background, anti-aliased, smooth shading, cropped`,
+    references: ENEMY_REFS,
+    gen: [1024, 1024],
+    target: [256, 256],
+    tiers: SIZE_TIERS,
+    artPixel: ENEMY_ART_PIXEL,
+    pixel: true,
+    alpha: true,
+    refBackground: [200, 200, 200],
+    // Art-pixel size is fixed (2 output px, matching the legacy ~69×113 sprites shown at half size), so a smaller
+    // tier simply has fewer art pixels. Outline and palette are applied on the cell grid, then blocks are scaled up.
+    post: [
+        ['keyout', { threshold: 60, feather: 0 }],
+        ['trim'],
+        ['pixelate', { grid: '$inner', pad: 1 }],
+        ['outline', { px: 1 }],
+        ['quantize', { colors: 32 }],
+        ['upscale', { factor: '$factor' }],
+    ],
+    ipWeight: 0.5,
+    sampler: { steps: 8, cfg: 5.5, sampler_name: 'euler', scheduler: 'sgm_uniform' },
+}
+
+/** Substitutes the tier tokens in a family's post list. Families without `tiers` pass through unchanged. */
+export function resolvePost(family, tier) {
+    if (!family.tiers) return family.post
+    const px = family.tiers[tier]
+    if (!px) throw new Error(`Unknown Size tier "${tier}". Known: ${Object.keys(family.tiers).join(', ')}`)
+    const grid = px / family.artPixel
+    const tokens = { $tier: px, $factor: family.artPixel, $grid: grid, $inner: grid - 2 }
+    return family.post.map(([name, params]) => [name, Object.fromEntries(Object.entries(params ?? {}).map(([k, v]) => [k, tokens[v] ?? v]))])
 }
 
 /** Returns the registry problems (empty when valid): missing refs, target drift, malformed post steps. */
