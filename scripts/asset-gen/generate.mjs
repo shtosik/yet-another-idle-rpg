@@ -2,7 +2,7 @@
 // Asset generation CLI. Interface = family + target + subject, then pick.
 //
 //   node scripts/asset-gen/generate.mjs --family item-pixel --target src/assets/img/items/frostShard.png \
-//        --subject "a jagged pale-blue ice crystal shard" [--count 4] [--seed N] [--no-ref] [--tier tiny|small|medium|large] [--control spider|crab|quadruped]
+//        --subject "a jagged pale-blue ice crystal shard" [--count 4] [--seed N] [--no-ref] [--tier tiny|small|medium|large] [--control spider|crab|crabFront|quadruped]
 //   node scripts/asset-gen/generate.mjs --pick 3 --slug item-pixel-frostShard
 //   node scripts/asset-gen/generate.mjs --reprocess --slug <slug>   # re-run post-process on the saved raw generations, no GPU
 //   node scripts/asset-gen/generate.mjs --batch jobs.json       # [{family,target,subject,count?,seed?,tier?,tag?}], one boot
@@ -11,6 +11,8 @@
 //   node scripts/asset-gen/generate.mjs --list-families | --stop
 //
 // Tuning overrides (A/B runs): --steps --cfg --ip-weight --sampler --grid --colors --tag <suffix for the slug>
+// --style "<prompt>" replaces the family's style prompt for this job
+// --ref <repo path> (repeatable) replaces the family's reference images for this job, e.g. a species-specific set
 // Progress goes to stderr; the result is a single JSON document on stdout.
 
 import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
@@ -34,12 +36,14 @@ const log = (...args) => console.error('[asset-gen]', ...args)
 export const slugFor = (familyId, target, tag) => `${familyId}-${basename(target, extname(target))}${tag ? `-${tag}` : ''}`
 
 /** Returns a family copy with CLI tuning overrides applied (never mutates the registry). */
-export function applyOverrides(family, { steps, cfg, ipWeight, sampler, grid, colors }) {
+export function applyOverrides(family, { steps, cfg, ipWeight, sampler, grid, colors, refs, stylePrompt }) {
     const next = { ...family, sampler: { ...family.sampler }, post: family.post.map(([name, params]) => [name, { ...params }]) }
     if (steps !== undefined) next.sampler.steps = Number(steps)
     if (cfg !== undefined) next.sampler.cfg = Number(cfg)
     if (sampler !== undefined) next.sampler.sampler_name = sampler
     if (ipWeight !== undefined) next.ipWeight = Number(ipWeight)
+    if (refs?.length) next.references = refs
+    if (stylePrompt) next.stylePrompt = stylePrompt
     for (const [name, params] of next.post) {
         if (grid !== undefined && name === 'pixelate') params.grid = Number(grid)
         if (colors !== undefined && name === 'quantize') params.colors = Number(colors)
@@ -53,6 +57,9 @@ export function applyOverrides(family, { steps, cfg, ipWeight, sampler, grid, co
  */
 export async function generateJob({ comfy, familyId, target, subject, seed, count = 4, useRef = true, tag, tier, control, keepRaw = true, overrides = {}, tmpDir = TMP_DIR }) {
     const family = applyOverrides(getFamily(familyId), overrides)
+    for (const ref of family.references) {
+        if (!existsSync(resolve(REPO_ROOT, ref))) throw new Error(`Reference not found: ${ref}`)
+    }
     const slug = slugFor(familyId, target, tag)
     const sizeGuessed = !!family.tiers && !tier
     const usedTier = family.tiers ? (tier ?? DEFAULT_TIER) : null
@@ -65,7 +72,7 @@ export async function generateJob({ comfy, familyId, target, subject, seed, coun
     const graph = buildGraph({
         family, subject, seed, count, useRef,
         refsBase64: refs.map((r) => r.base64),
-        control: control ? { base64: (await controlImage(control)).toString('base64') } : undefined,
+        control: control ? { base64: (await controlImage(control)).toString('base64'), strength: overrides.controlStrength, end: overrides.controlEnd } : undefined,
         prefix: `asset-gen/${slug}`,
     })
     log(`${slug}: generating ${count} × ${family.gen.join('×')} (${useRef ? `${refs.length} refs` : 'no refs'}, ${family.sampler.steps} steps)`)
@@ -161,7 +168,7 @@ const OPTIONS = {
     pick: { type: 'string' }, slug: { type: 'string' }, batch: { type: 'string' },
     'list-families': { type: 'boolean' }, stop: { type: 'boolean' }, reprocess: { type: 'boolean' }, control: { type: 'string' },
     steps: { type: 'string' }, cfg: { type: 'string' }, 'ip-weight': { type: 'string' }, sampler: { type: 'string' },
-    grid: { type: 'string' }, colors: { type: 'string' }, 
+    grid: { type: 'string' }, colors: { type: 'string' }, ref: { type: 'string', multiple: true }, 'control-strength': { type: 'string' }, 'control-end': { type: 'string' }, style: { type: 'string' }, 
 }
 
 export async function main(argv = process.argv.slice(2)) {
@@ -203,7 +210,7 @@ export async function main(argv = process.argv.slice(2)) {
     const result = await generateJob({
         comfy, familyId: v.family, target: v.target, subject: v.subject, seed,
         count: v.count ? Number(v.count) : 4, useRef: !v['no-ref'], tag: v.tag, tier: v.tier, control: v.control,
-        overrides: { steps: v.steps, cfg: v.cfg, ipWeight: v['ip-weight'], sampler: v.sampler, grid: v.grid, colors: v.colors },
+        overrides: { steps: v.steps, cfg: v.cfg, ipWeight: v['ip-weight'], sampler: v.sampler, grid: v.grid, colors: v.colors, refs: v.ref, stylePrompt: v.style, controlStrength: v['control-strength'] === undefined ? undefined : Number(v['control-strength']), controlEnd: v['control-end'] === undefined ? undefined : Number(v['control-end']) },
     })
     return { ...result, serverStarted: started, bootSeconds }
 }
