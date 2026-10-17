@@ -58,7 +58,7 @@ export const FAMILIES = {
         // Grid 46 inside a 48 canvas leaves the 1px outline room; outline runs before quantize so its colour
         // is part of the palette and the colour budget holds for the finished asset.
         post: [
-            ['keyout', { threshold: 60, feather: 0 }],
+            ['matte'],
             ['trim'],
             ['pixelate', { grid: 46, width: 48, height: 48 }],
             ['outline', { px: 1 }],
@@ -89,7 +89,7 @@ FAMILIES['enemy-pixel'] = {
     // Art-pixel size is fixed (2 output px, matching the legacy ~69×113 sprites shown at half size), so a smaller
     // tier simply has fewer art pixels. Outline and palette are applied on the cell grid, then blocks are scaled up.
     post: [
-        ['keyout', { threshold: 60, feather: 0 }],
+        ['matte'],
         ['trim'],
         ['pixelate', { grid: '$inner', pad: 1 }],
         ['outline', { px: 1 }],
@@ -156,7 +156,7 @@ FAMILIES['portrait-pixel'] = {
     refBackground: [200, 200, 200],
     // 128-cell square canvas (126 art pixels + 1-cell outline room each side), scaled 2× so pixels are chunky.
     post: [
-        ['keyout', { threshold: 60, feather: 0 }],
+        ['matte'],
         ['trim'],
         ['pixelate', { grid: 126, pad: 1, width: 128, height: 128 }],
         ['outline', { px: 1 }],

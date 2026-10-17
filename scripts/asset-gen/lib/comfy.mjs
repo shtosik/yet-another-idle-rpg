@@ -31,6 +31,7 @@ export function createComfy({
     readyTimeoutMs = 120_000,
     pollMs = 1000,
     runTimeoutMs = 600_000,
+    outputRetries = 20,
 } = {}) {
     const base = `http://${host}:${port}`
     const clientId = randomUUID()
@@ -142,8 +143,13 @@ export function createComfy({
             const { prompt_id: promptId } = await res.json()
             await Promise.race([socket?.wait(promptId) ?? new Promise(() => {}), waitViaHistory(promptId, abort.signal)])
             if (abort.signal.aborted) throw new Error('timed out waiting for ComfyUI')
-            const entry = (await getJson(`/history/${promptId}`))[promptId]
-            const images = Object.values(entry?.outputs ?? {}).flatMap((out) => out.images ?? [])
+            // The completion event can arrive a beat before /history carries the outputs, so retry briefly.
+            let images = []
+            for (let attempt = 0; attempt < outputRetries && !images.length; attempt++) {
+                if (attempt) await sleep(pollMs)
+                const entry = (await getJson(`/history/${promptId}`))[promptId]
+                images = Object.values(entry?.outputs ?? {}).flatMap((out) => out.images ?? [])
+            }
             if (!images.length) throw new Error('ComfyUI finished but produced no images')
             return await Promise.all(
                 images.map(async ({ filename, subfolder, type }) => {

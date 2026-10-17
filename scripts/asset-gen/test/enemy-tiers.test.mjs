@@ -16,7 +16,9 @@ const rawGeneration = () =>
         .png().toBuffer()
 
 const render = async (tier) => {
-    const out = await runPipeline(await rawGeneration(), resolvePost(family, tier))
+    // the matting model needs a real subject; the synthetic flat figure is keyed by colour instead (tiering is what is under test)
+    const post = resolvePost(family, tier).map((step) => (step[0] === 'matte' ? ['keyout', { feather: 0 }] : step))
+    const out = await runPipeline(await rawGeneration(), post)
     const { data, info } = await sharp(out).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
     return { out, data, width: info.width, height: info.height }
 }

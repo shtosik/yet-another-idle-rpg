@@ -17,7 +17,7 @@ const wsFrame = (text) => Buffer.concat([Buffer.from([0x81, Buffer.byteLength(te
  * `mode`: 'socket' announces completion over ws, 'history' never does (forces the poll fallback), 'error' fails the run.
  */
 function startFake({ mode = 'socket', checkpoints = ['good.safetensors'] } = {}) {
-    const state = { submitted: [], sockets: [] }
+    const state = { submitted: [], sockets: [], historyHits: 0 }
     const server = http.createServer(async (req, res) => {
         const url = new URL(req.url, 'http://x')
         const json = (body, status = 200) => {
@@ -34,14 +34,15 @@ function startFake({ mode = 'socket', checkpoints = ['good.safetensors'] } = {})
             state.submitted.push(JSON.parse(body))
             setTimeout(() => {
                 for (const socket of state.sockets) {
-                    if (mode === 'socket') socket.write(wsFrame(JSON.stringify({ type: 'executing', data: { node: null, prompt_id: 'p1' } })))
+                    if (mode === 'socket' || mode === 'late') socket.write(wsFrame(JSON.stringify({ type: 'executing', data: { node: null, prompt_id: 'p1' } })))
                     if (mode === 'error') socket.write(wsFrame(JSON.stringify({ type: 'execution_error', data: { prompt_id: 'p1', exception_message: 'boom' } })))
                 }
             }, 20)
             return json({ prompt_id: 'p1' })
         }
         if (url.pathname === '/history/p1') {
-            const done = mode === 'history' || mode === 'socket'
+            // 'late': the completion event is out, but /history only carries outputs from its 3rd read on
+            const done = mode === 'history' || mode === 'socket' || (mode === 'late' && ++state.historyHits >= 3)
             return json(done ? { p1: { outputs: { save: { images: [{ filename: 'a.png', subfolder: '', type: 'output' }, { filename: 'b.png', subfolder: '', type: 'output' }] } } } } : {})
         }
         if (url.pathname === '/view') {
@@ -159,4 +160,15 @@ test('stop kills only the pid it wrote, then forgets it', () => {
     assert.equal(existsSync(pidFile), false)
     assert.deepEqual(comfy.stop(), { stopped: false })
     assert.deepEqual(killed, [777])
+})
+
+test('retries /history when the completion event arrives before the outputs are written', async () => {
+    const fake = await startFake({ mode: 'late' })
+    try {
+        const images = await comfyFor(fake).run({})
+        assert.equal(images.length, 2)
+        assert.ok(fake.state.historyHits >= 3)
+    } finally {
+        fake.close()
+    }
 })

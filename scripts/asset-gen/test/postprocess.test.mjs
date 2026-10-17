@@ -1,7 +1,8 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import sharp from 'sharp'
-import { cover, fit, keyout, outline, pixelate, quantize, runPipeline, trim } from '../lib/postprocess.mjs'
+import { existsSync } from 'node:fs'
+import { MATTE_MODEL, cleanMask, cover, fit, keyout, matte, outline, pixelate, quantize, runPipeline, trim } from '../lib/postprocess.mjs'
 
 const rawOf = async (buf) => {
     const { data, info } = await sharp(buf).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
@@ -96,4 +97,33 @@ test('runPipeline composes steps and rejects unknown ones', async () => {
     ])
     assert.equal((await sharp(out).metadata()).width, 12)
     await assert.rejects(runPipeline(out, [['nope']]), /Unknown post-process step/)
+})
+
+const maskFrom = (rows) => Uint8Array.from(rows.join('').split('').map((c) => (c === '#' ? 1 : 0)))
+const show = (mask, width) => Array.from({ length: mask.length / width }, (_, y) => Array.from(mask.slice(y * width, (y + 1) * width), (v) => (v ? '#' : '.')).join(''))
+
+test('cleanMask drops subject specks and fills small enclosed holes, but keeps open gaps and the border-connected background', () => {
+    const rows = [
+        '.........#',
+        '.#####....',
+        '.#.###....',
+        '.#####..#.',
+        '.#.......#',
+        '.#########',
+    ]
+    const out = show(cleanMask(maskFrom(rows), 10, 6, { minArea: 3, holeArea: 3 }), 10)
+    assert.equal(out[0][9], '.', 'single-pixel speck removed')
+    assert.equal(out[2][2], '#', 'one-pixel hole inside the subject filled')
+    assert.equal(out[4][2], '.', 'gap open to the border stays background')
+    assert.equal(out[1][1], '#')
+})
+
+test('cleanMask erosion strips one pixel off the silhouette', () => {
+    const out = show(cleanMask(maskFrom(['.......', '.#####.', '.#####.', '.#####.', '.......']), 7, 5, { minArea: 0, holeArea: 0, erode: 1 }), 7)
+    assert.deepEqual(out, ['.......', '.......', '..###..', '.......', '.......'])
+})
+
+test('matte step returns the same size with an alpha mask (needs the matting model; skipped when absent)', { skip: !existsSync(MATTE_MODEL) }, async () => {
+    const meta = await sharp(await matte(await squareOnBg(128, 64, [200, 200, 200], [180, 40, 40]))).metadata()
+    assert.deepEqual([meta.width, meta.height, meta.channels], [128, 128, 4])
 })
