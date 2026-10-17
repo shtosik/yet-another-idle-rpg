@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { TranslatePipe } from '../../../pipes/i18next.pipe'
+import { HalfSizeSpriteDirective } from '../../shared/half-size-sprite/half-size-sprite.directive'
 import { PlayerStore } from '../../../store/player/player.store'
 import { EnemyID } from 'enums/ids/enemy-id.enum'
 import { ItemID } from 'enums/ids/item-id.enum'
@@ -16,7 +17,7 @@ const LOCKED_SPRITE = './assets/img/enemies/unknown.png'
     selector: 'app-bestiary',
     templateUrl: './bestiary.component.html',
     styleUrls: ['./bestiary.component.sass'],
-    imports: [CommonModule, TranslatePipe],
+    imports: [CommonModule, TranslatePipe, HalfSizeSpriteDirective],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BestiaryComponent {

@@ -35,12 +35,15 @@
         {{ ('enemies:names.' + EnemyID[m.id]) | i18next }}
         <span class="bestiary__title-kills">x{{ m.killCount }}</span>
       </h2>
-      <img
-        class="bestiary__detail-sprite"
-        [class.bestiary__detail-sprite--shiny]="showShiny()"
-        [src]="displayUrl()"
-        alt=""
-      />
+      <div class="bestiary__detail-sprite-box">
+        <img
+          appHalfSizeSprite
+          class="bestiary__detail-sprite"
+          [class.bestiary__detail-sprite--shiny]="showShiny()"
+          [src]="displayUrl()"
+          alt=""
+        />
+      </div>
 
       @if (shinyUnlocked() && m.shinyDrops.length) {
         <button

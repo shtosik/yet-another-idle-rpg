@@ -24,9 +24,17 @@
     span
       position: relative
 
+  &__sprite-box
+    display: flex
+    align-items: flex-end
+    justify-content: center
+    height: 8rem
+
   img
     object-fit: contain
 
   &__sprite
+    image-rendering: pixelated
+
     &--shiny
       filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.85))

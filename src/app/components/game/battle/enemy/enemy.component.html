@@ -14,13 +14,13 @@
     <span>{{ currentEnemyHp() }} / {{ currentEnemy().maxHp }}</span>
   </div>
   <app-monster-debuff-bar />
-  <img
-    [ngSrc]="currentEnemy().url"
-    [class.enemy__sprite--shiny]="battleStore.isShinyEnemy()"
-    class="enemy__sprite"
-    alt=""
-    disableOptimizedSrcset
-    height="128"
-    width="128"
-  >
+  <div class="enemy__sprite-box">
+    <img
+      appHalfSizeSprite
+      [src]="currentEnemy().url"
+      [class.enemy__sprite--shiny]="battleStore.isShinyEnemy()"
+      class="enemy__sprite"
+      alt=""
+    >
+  </div>
 </div>
