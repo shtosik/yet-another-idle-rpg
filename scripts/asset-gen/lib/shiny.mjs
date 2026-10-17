@@ -7,9 +7,12 @@ import sharp from 'sharp'
 /** `<dir>/<name>.png` -> `<dir>/<name>-shiny.png` (same rule as src/utils/shiny-url.ts). */
 export const shinyPathFor = (target) => target.replace(/\.png$/i, '-shiny.png')
 
-/** Rotates hue by `degrees` via sharp `modulate`; alpha is preserved. */
-export function hueShift(buf, degrees) {
-    return sharp(buf).ensureAlpha().modulate({ hue: ((degrees % 360) + 360) % 360 }).png().toBuffer()
+/**
+ * Rotates hue by `degrees` via sharp `modulate`; alpha is preserved. `saturation` / `brightness` (multipliers, default 1)
+ * are for creatures with little colour (grey rat, white gull) where a hue rotation alone changes nothing visible.
+ */
+export function hueShift(buf, degrees, { saturation = 1, brightness = 1 } = {}) {
+    return sharp(buf).ensureAlpha().modulate({ hue: ((degrees % 360) + 360) % 360, saturation, brightness }).png().toBuffer()
 }
 
 const SAMPLE = 48

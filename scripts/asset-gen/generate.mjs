@@ -2,22 +2,24 @@
 // Asset generation CLI. Interface = family + target + subject, then pick.
 //
 //   node scripts/asset-gen/generate.mjs --family item-pixel --target src/assets/img/items/frostShard.png \
-//        --subject "a jagged pale-blue ice crystal shard" [--count 4] [--seed N] [--no-ref] [--tier tiny|small|medium|large]
+//        --subject "a jagged pale-blue ice crystal shard" [--count 4] [--seed N] [--no-ref] [--tier tiny|small|medium|large] [--control spider|crab]
 //   node scripts/asset-gen/generate.mjs --pick 3 --slug item-pixel-frostShard
+//   node scripts/asset-gen/generate.mjs --reprocess --slug <slug>   # re-run post-process on the saved raw generations, no GPU
 //   node scripts/asset-gen/generate.mjs --batch jobs.json       # [{family,target,subject,count?,seed?,tier?,tag?}], one boot
 //   node scripts/asset-gen/generate.mjs --estimate-hue <base target>   # from the existing base + -shiny pair; stores shinyHue
-//   node scripts/asset-gen/generate.mjs --shiny-of <base target> [--hue N]   # writes <name>-shiny.png beside the base
+//   node scripts/asset-gen/generate.mjs --shiny-of <base target> [--hue N] [--saturation X] [--brightness X]   # writes <name>-shiny.png beside the base
 //   node scripts/asset-gen/generate.mjs --list-families | --stop
 //
-// Tuning overrides (A/B runs): --steps --cfg --ip-weight --sampler --grid --colors --tag <suffix for the slug> --keep-raw
+// Tuning overrides (A/B runs): --steps --cfg --ip-weight --sampler --grid --colors --tag <suffix for the slug>
 // Progress goes to stderr; the result is a single JSON document on stdout.
 
-import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { copyFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { basename, dirname, extname, isAbsolute, join, relative, resolve } from 'node:path'
 import { parseArgs } from 'node:util'
 import { pathToFileURL } from 'node:url'
 import { parseJobs, runBatch } from './lib/batch.mjs'
 import { createComfy } from './lib/comfy.mjs'
+import { controlImage } from './lib/controls.mjs'
 import { MANIFEST_PATH, readManifest, recordEntry, setField } from './lib/manifest.mjs'
 import { estimateHue, hueShift, shinyPathFor } from './lib/shiny.mjs'
 import { runPipeline } from './lib/postprocess.mjs'
@@ -49,7 +51,7 @@ export function applyOverrides(family, { steps, cfg, ipWeight, sampler, grid, co
  * Generates `count` candidates for one job into `.tmp-gen/<slug>/` and writes candidate PNGs, sheet and meta.
  * @returns {Promise<object>} the JSON result printed on stdout
  */
-export async function generateJob({ comfy, familyId, target, subject, seed, count = 4, useRef = true, tag, tier, keepRaw = false, overrides = {}, tmpDir = TMP_DIR }) {
+export async function generateJob({ comfy, familyId, target, subject, seed, count = 4, useRef = true, tag, tier, control, keepRaw = true, overrides = {}, tmpDir = TMP_DIR }) {
     const family = applyOverrides(getFamily(familyId), overrides)
     const slug = slugFor(familyId, target, tag)
     const sizeGuessed = !!family.tiers && !tier
@@ -63,6 +65,7 @@ export async function generateJob({ comfy, familyId, target, subject, seed, coun
     const graph = buildGraph({
         family, subject, seed, count, useRef,
         refsBase64: refs.map((r) => r.base64),
+        control: control ? { base64: (await controlImage(control)).toString('base64') } : undefined,
         prefix: `asset-gen/${slug}`,
     })
     log(`${slug}: generating ${count} × ${family.gen.join('×')} (${useRef ? `${refs.length} refs` : 'no refs'}, ${family.sampler.steps} steps)`)
@@ -80,9 +83,31 @@ export async function generateJob({ comfy, familyId, target, subject, seed, coun
     writeFileSync(sheet, await makeSheet({ refs: useRef ? refs.map((r) => r.buffer) : [], candidates, target: family.target, pixel: !!family.pixel }))
 
     const seconds = Math.round((Date.now() - started) / 100) / 10
-    const meta = { slug, family: familyId, target, subject, seed, count: files.length, useRef, tag: tag ?? null, tier: usedTier, sizeGuessed, seconds }
+    const meta = { slug, family: familyId, target, subject, seed, count: files.length, useRef, tag: tag ?? null, tier: usedTier, control: control ?? null, sizeGuessed, seconds }
     writeFileSync(join(dir, 'meta.json'), JSON.stringify(meta, null, 2))
     return { ...meta, candidates: files, sheet, refs: useRef ? refs.map((r) => r.path) : [] }
+}
+
+/**
+ * Re-runs the post-process chain and contact sheet over the raw generations saved in `.tmp-gen/<slug>/`, so a
+ * post-process change can be judged (and an old batch repaired) without regenerating. Needs `raw-N.png` files.
+ */
+export async function reprocessJob({ slug, tmpDir = TMP_DIR }) {
+    const dir = join(tmpDir, slug)
+    const meta = JSON.parse(readFileSync(join(dir, 'meta.json'), 'utf8'))
+    const family = getFamily(meta.family)
+    const post = resolvePost(family, meta.tier)
+    const refs = meta.useRef ? await loadRefs(family) : []
+    const candidates = []
+    for (let i = 1; i <= meta.count; i++) {
+        const rawFile = join(dir, `raw-${i}.png`)
+        if (!existsSync(rawFile)) throw new Error(`${slug}: no raw-${i}.png (it was generated before raws were kept); regenerate instead`)
+        candidates.push(await runPipeline(readFileSync(rawFile), post))
+        writeFileSync(join(dir, `candidate-${i}.png`), candidates[i - 1])
+    }
+    const sheet = join(dir, 'sheet.png')
+    writeFileSync(sheet, await makeSheet({ refs: refs.map((r) => r.buffer), candidates, target: family.target, pixel: !!family.pixel }))
+    return { slug, reprocessed: candidates.length, sheet }
 }
 
 /**
@@ -114,24 +139,29 @@ export async function estimateShinyHue({ target, root = REPO_ROOT, manifestPath 
  * Writes `<name>-shiny.png` beside the accepted base: hue angle = `hue` flag, else the manifest's stored
  * `shinyHue`. A flag value is stored back so the next redo reuses it.
  */
-export async function makeShiny({ target, hue, root = REPO_ROOT, manifestPath = MANIFEST_PATH }) {
+export async function makeShiny({ target, hue, saturation, brightness, root = REPO_ROOT, manifestPath = MANIFEST_PATH }) {
     const base = resolve(root, target)
-    const angle = hue ?? readManifest(manifestPath)[target]?.shinyHue
+    const entry = readManifest(manifestPath)[target]
+    const angle = hue ?? entry?.shinyHue
+    const sat = saturation ?? entry?.shinySaturation
+    const bright = brightness ?? entry?.shinyBrightness
     if (angle === undefined) throw new Error(`No shinyHue for ${target}: pass --hue N, or run --estimate-hue before regenerating the base`)
     const out = shinyPathFor(base)
-    writeFileSync(out, await hueShift(readFileSync(base), angle))
+    writeFileSync(out, await hueShift(readFileSync(base), angle, { saturation: sat, brightness: bright }))
     setField(target, 'shinyHue', angle, manifestPath)
-    return { target, shiny: relative(root, out).replaceAll('\\', '/'), shinyHue: angle }
+    if (saturation !== undefined) setField(target, 'shinySaturation', saturation, manifestPath)
+    if (brightness !== undefined) setField(target, 'shinyBrightness', brightness, manifestPath)
+    return { target, shiny: relative(root, out).replaceAll('\\', '/'), shinyHue: angle, shinySaturation: sat ?? null, shinyBrightness: bright ?? null }
 }
 
 const OPTIONS = {
-    'estimate-hue': { type: 'string' }, 'shiny-of': { type: 'string' }, hue: { type: 'string' },
+    'estimate-hue': { type: 'string' }, 'shiny-of': { type: 'string' }, hue: { type: 'string' }, saturation: { type: 'string' }, brightness: { type: 'string' },
     family: { type: 'string' }, target: { type: 'string' }, subject: { type: 'string' },
     count: { type: 'string' }, seed: { type: 'string' }, 'no-ref': { type: 'boolean' }, tag: { type: 'string' }, tier: { type: 'string' },
     pick: { type: 'string' }, slug: { type: 'string' }, batch: { type: 'string' },
-    'list-families': { type: 'boolean' }, stop: { type: 'boolean' },
+    'list-families': { type: 'boolean' }, stop: { type: 'boolean' }, reprocess: { type: 'boolean' }, control: { type: 'string' },
     steps: { type: 'string' }, cfg: { type: 'string' }, 'ip-weight': { type: 'string' }, sampler: { type: 'string' },
-    grid: { type: 'string' }, colors: { type: 'string' }, 'keep-raw': { type: 'boolean' },
+    grid: { type: 'string' }, colors: { type: 'string' }, 
 }
 
 export async function main(argv = process.argv.slice(2)) {
@@ -144,7 +174,11 @@ export async function main(argv = process.argv.slice(2)) {
     const comfy = createComfy()
     if (v.stop) return comfy.stop()
     if (v['estimate-hue']) return estimateShinyHue({ target: v['estimate-hue'] })
-    if (v['shiny-of']) return makeShiny({ target: v['shiny-of'], hue: v.hue === undefined ? undefined : Number(v.hue) })
+    if (v['shiny-of']) return makeShiny({ target: v['shiny-of'], hue: v.hue === undefined ? undefined : Number(v.hue), saturation: v.saturation === undefined ? undefined : Number(v.saturation), brightness: v.brightness === undefined ? undefined : Number(v.brightness) })
+    if (v.reprocess) {
+        if (!v.slug) throw new Error('--reprocess needs --slug')
+        return reprocessJob({ slug: v.slug })
+    }
     if (v.pick !== undefined) {
         if (!v.slug) throw new Error('--pick needs --slug')
         return pickCandidate({ slug: v.slug, n: Number(v.pick) })
@@ -168,7 +202,7 @@ export async function main(argv = process.argv.slice(2)) {
     const seed = v.seed !== undefined ? Number(v.seed) : Math.floor(Math.random() * 2 ** 31)
     const result = await generateJob({
         comfy, familyId: v.family, target: v.target, subject: v.subject, seed,
-        count: v.count ? Number(v.count) : 4, useRef: !v['no-ref'], tag: v.tag, tier: v.tier, keepRaw: v['keep-raw'],
+        count: v.count ? Number(v.count) : 4, useRef: !v['no-ref'], tag: v.tag, tier: v.tier, control: v.control,
         overrides: { steps: v.steps, cfg: v.cfg, ipWeight: v['ip-weight'], sampler: v.sampler, grid: v.grid, colors: v.colors },
     })
     return { ...result, serverStarted: started, bootSeconds }

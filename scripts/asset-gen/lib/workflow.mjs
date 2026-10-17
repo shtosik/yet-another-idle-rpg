@@ -6,6 +6,8 @@
 export const LORA_NAME = 'Hyper-SDXL-8steps-CFG-lora.safetensors'
 export const IPADAPTER_NAME = 'ip-adapter_sdxl_vit-h.safetensors'
 export const CLIP_VISION_NAME = 'clip-vision_vit-h.safetensors'
+export const CONTROLNET_NAME = 'xinsir-controlnet-union-sdxl-1.0-promax.safetensors'
+const CONTROL_TYPE = 'hed/pidi/scribble/ted'
 
 const DEFAULT_SAMPLER = { steps: 8, cfg: 5.5, sampler_name: 'euler', scheduler: 'sgm_uniform' }
 
@@ -18,9 +20,11 @@ const DEFAULT_SAMPLER = { steps: 8, cfg: 5.5, sampler_name: 'euler', scheduler: 
  * @param {string[]} [p.refsBase64] reference images, base64 PNG, already prepared for CLIP vision
  * @param {number} [p.count]      batch size (candidates per run)
  * @param {boolean} [p.useRef]
+ * @param {{base64: string, strength?: number, end?: number}} [p.control] scribble control image (union ControlNet) that
+ *        fixes the layout, e.g. limb count; `end` is the fraction of sampling it applies to
  * @param {string} [p.prefix]     SaveImage filename prefix
  */
-export function buildGraph({ family, subject, seed, refsBase64 = [], count = 1, useRef = true, prefix = 'asset-gen' }) {
+export function buildGraph({ family, subject, seed, refsBase64 = [], count = 1, useRef = true, control, prefix = 'asset-gen' }) {
     const sampler = { ...DEFAULT_SAMPLER, ...family.sampler }
     const withRefs = useRef && refsBase64.length > 0
 
@@ -67,6 +71,29 @@ export function buildGraph({ family, subject, seed, refsBase64 = [], count = 1, 
         modelRef = ['ipadapter', 0]
     }
 
+    let positiveRef = ['positive', 0]
+    let negativeRef = ['negative', 0]
+    if (control) {
+        graph.controlImage = { class_type: 'ETN_LoadImageBase64', inputs: { image: control.base64 } }
+        graph.controlLoader = { class_type: 'ControlNetLoader', inputs: { control_net_name: CONTROLNET_NAME } }
+        graph.controlType = { class_type: 'SetUnionControlNetType', inputs: { control_net: ['controlLoader', 0], type: CONTROL_TYPE } }
+        graph.controlApply = {
+            class_type: 'ControlNetApplyAdvanced',
+            inputs: {
+                positive: positiveRef,
+                negative: negativeRef,
+                control_net: ['controlType', 0],
+                image: ['controlImage', 0],
+                vae: ['checkpoint', 2],
+                strength: control.strength ?? 0.5,
+                start_percent: 0,
+                end_percent: control.end ?? 0.5,
+            },
+        }
+        positiveRef = ['controlApply', 0]
+        negativeRef = ['controlApply', 1]
+    }
+
     graph.sampler = {
         class_type: 'KSampler',
         inputs: {
@@ -77,8 +104,8 @@ export function buildGraph({ family, subject, seed, refsBase64 = [], count = 1, 
             scheduler: sampler.scheduler,
             denoise: 1,
             model: modelRef,
-            positive: ['positive', 0],
-            negative: ['negative', 0],
+            positive: positiveRef,
+            negative: negativeRef,
             latent_image: ['latent', 0],
         },
     }

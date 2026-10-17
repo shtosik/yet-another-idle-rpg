@@ -38,6 +38,7 @@ export const DEFAULT_TIER = 'medium'
 const ENEMY_REFS = ['bandit', 'troll', 'crab', 'goat', 'goblinScavenger', 'deer'].map((n) => `src/assets/img/enemies/${n}.png`)
 
 const ANATOMY_NEGATIVE = 'extra limbs, extra legs, extra arms, missing limbs, bad anatomy, deformed, mutated, disfigured, duplicate, two heads, multiple heads, floating body parts, fused bodies, cropped, character sheet, turnaround, multiple views, collage, ground, floor, platform, pedestal'
+const GRITTY_NEGATIVE = 'cute, chibi, kawaii, plush toy, cartoon, mascot, big round eyes, childish, cheerful'
 const NEGATIVE_BASE = 'text, watermark, signature, frame, border, ui, blurry, photo, realistic, 3d render'
 
 const ITEM_REFS = ['cheese', 'machete', 'vialOfWater', 'stone', 'fish', 'wolfFangs'].map((n) => `src/assets/img/items/${n}.png`)
@@ -76,9 +77,9 @@ FAMILIES['enemy-pixel'] = {
     description: 'transparent pixel-art enemy sprite, ≤256 on the longer side by Size tier, natural aspect',
     checkpoint: 'zavychromaxl_v80.safetensors',
     stylePrompt:
-        'pixel art game enemy sprite, anatomically correct, full body, single character, dark outline, limited colour palette, crisp hard pixels, ' +
+        'dark fantasy pixel art game enemy sprite, anatomically correct, full body, single character, dark outline, limited colour palette, crisp hard pixels, ' +
         'plain flat solid light grey background',
-    negative: `${NEGATIVE_BASE}, multiple characters, ground shadow, gradient background, anti-aliased, smooth shading, ${ANATOMY_NEGATIVE}`,
+    negative: `${NEGATIVE_BASE}, multiple characters, ground shadow, gradient background, anti-aliased, smooth shading, ${GRITTY_NEGATIVE}, ${ANATOMY_NEGATIVE}`,
     references: ENEMY_REFS,
     gen: [1024, 1024],
     target: [256, 256],
@@ -145,9 +146,9 @@ FAMILIES['portrait-pixel'] = {
     description: '256×256 transparent pixel-art character bust (2× chunky pixels, not the Corwin ink style)',
     checkpoint: 'zavychromaxl_v80.safetensors',
     stylePrompt:
-        'pixel art character portrait, head and shoulders bust, facing the viewer, dark outline, limited colour palette, ' +
+        'dark fantasy pixel art character portrait, realistic proportions, medieval clothing, head and shoulders bust, facing the viewer, dark outline, limited colour palette, ' +
         'crisp hard pixels, plain flat solid light grey background',
-    negative: `${NEGATIVE_BASE}, full body, multiple characters, gradient background, anti-aliased, smooth shading, ink drawing, sketch, ${ANATOMY_NEGATIVE}`,
+    negative: `${NEGATIVE_BASE}, full body, multiple characters, gradient background, anti-aliased, smooth shading, ink drawing, sketch, ${GRITTY_NEGATIVE}, modern clothing, hoodie, zipper, t-shirt, sneakers, ${ANATOMY_NEGATIVE}`,
     // No pixel portraits exist yet: bootstrap from humanoid enemy-pixel refs; add the first accepted portraits here.
     references: ['bandit', 'troll', 'goblinScavenger'].map((n) => `src/assets/img/enemies/${n}.png`),
     gen: [1024, 1024],
@@ -157,7 +158,7 @@ FAMILIES['portrait-pixel'] = {
     refBackground: [200, 200, 200],
     // 128-cell square canvas (126 art pixels + 1-cell outline room each side), scaled 2× so pixels are chunky.
     post: [
-        ['matte'],
+        ['matte', { pad: 96 }],
         ['trim'],
         ['pixelate', { grid: 126, pad: 1, width: 128, height: 128 }],
         ['outline', { px: 1 }],

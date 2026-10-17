@@ -133,11 +133,54 @@ export function cleanMask(mask, width, height, { minArea, holeArea, erode = 0, k
 }
 
 /**
+ * Grows the background into the subject mask through pixels whose colour is within `distance` of the background
+ * colour (the median colour of everything already masked out). The matting model tends to keep the flat ground
+ * shadow / backdrop attached to a subject as part of it; this removes exactly the patches that are bounded by the
+ * real background and look like it, and leaves enclosed same-coloured parts (a grey loincloth) alone.
+ * `data` is RGBA; `mask` is edited in place.
+ */
+export function eatAttachedBackground(mask, data, width, height, distance) {
+    const channel = (c) => {
+        const samples = []
+        for (let p = 0; p < mask.length; p += 7) if (!mask[p]) samples.push(data[p * 4 + c])
+        samples.sort((x, y) => x - y)
+        return samples.length > mask.length / 70 ? samples[samples.length >> 1] : null
+    }
+    const bg = [channel(0), channel(1), channel(2)]
+    if (bg.includes(null)) return mask
+    const near = (p) => Math.hypot(data[p * 4] - bg[0], data[p * 4 + 1] - bg[1], data[p * 4 + 2] - bg[2]) < distance
+    const stack = []
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            const p = y * width + x
+            if (mask[p]) continue
+            if ((x > 0 && mask[p - 1]) || (x < width - 1 && mask[p + 1]) || (y > 0 && mask[p - width]) || (y < height - 1 && mask[p + width])) stack.push(p)
+        }
+    }
+    while (stack.length) {
+        const p = stack.pop()
+        const x = p % width, y = (p - x) / width
+        for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+            const nx = x + dx, ny = y + dy
+            if (nx < 0 || ny < 0 || nx >= width || ny >= height) continue
+            const np = ny * width + nx
+            if (mask[np] && near(np)) {
+                mask[np] = 0
+                stack.push(np)
+            }
+        }
+    }
+    return mask
+}
+
+/**
  * Removes the background with a matting model (ISNet via onnxruntime in the ComfyUI venv), which handles pockets
  * between limbs, light subjects on a light background, and ground shadows that colour keying cannot. The mask is
- * thresholded and cleaned (see cleanMask); thresholds are fractions of the image area.
+ * thresholded, attached backdrop is eaten (`bgDistance`, 0 = off) and the result cleaned (see cleanMask);
+ * area thresholds are fractions of the image area. `pad` replicates the image edge by that many px before matting
+ * so a bust cropped by the frame is not mistaken for background along the cut.
  */
-export async function matte(buf, { threshold = 128, minArea = 0.001, holeArea = 0.03, keepRatio = 0.2, erode = 1 } = {}) {
+export async function matte(buf, { threshold = 128, minArea = 0.001, holeArea = 0.03, keepRatio = 0.2, erode = 1, bgDistance = 34, pad = 0 } = {}) {
     if (!existsSync(MATTE_MODEL)) {
         throw new Error(`Matting model not found at ${MATTE_MODEL}. Download it once: curl -L -o "${MATTE_MODEL}" https://github.com/danielgatis/rembg/releases/download/v0.0.0/isnet-general-use.onnx`)
     }
@@ -145,10 +188,14 @@ export async function matte(buf, { threshold = 128, minArea = 0.001, holeArea = 
     const dir = mkdtempSync(join(tmpdir(), 'matte-'))
     try {
         const input = join(dir, 'in.png'), output = join(dir, 'mask.png')
-        writeFileSync(input, buf)
+        const padded = pad ? await sharp(buf).extend({ top: pad, bottom: pad, left: pad, right: pad, extendWith: 'copy' }).png().toBuffer() : buf
+        writeFileSync(input, padded)
         await run(MATTE_PYTHON, [MATTE_SCRIPT, MATTE_MODEL, input, output], { windowsHide: true, maxBuffer: 1 << 24 })
-        const soft = await sharp(readFileSync(output)).greyscale().raw().toBuffer()
+        let softImage = sharp(readFileSync(output)).greyscale()
+        if (pad) softImage = softImage.extract({ left: pad, top: pad, width, height })
+        const soft = await softImage.raw().toBuffer()
         const mask = Uint8Array.from(soft, (v) => (v >= threshold ? 1 : 0))
+        if (bgDistance) eatAttachedBackground(mask, data, width, height, bgDistance)
         const area = width * height
         cleanMask(mask, width, height, { minArea: Math.round(minArea * area), holeArea: Math.round(holeArea * area), keepRatio, erode })
         for (let p = 0; p < mask.length; p++) data[p * 4 + 3] = mask[p] ? 255 : 0

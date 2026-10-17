@@ -35,18 +35,24 @@ Override locations with `ASSET_GEN_PYTHON` / `ASSET_GEN_MATTE_MODEL`.
 ## CLI reference
 
 ```
-generate --family <id> --target <path> --subject "<text>" [--count 4] [--seed N] [--no-ref] [--tier tiny|small|medium|large]
+generate --family <id> --target <path> --subject "<text>" [--count 4] [--seed N] [--no-ref] [--tier tiny|small|medium|large] [--control spider|crab]
 generate --pick <n> --slug <slug>            copy candidate n to its target and record it in manifest.json
 generate --batch jobs.json                   [{family,target,subject,count?,seed?,tier?,tag?,noRef?}], one server boot
 generate --estimate-hue <base target>        estimate shinyHue from the existing base + -shiny pair (run BEFORE regenerating)
-generate --shiny-of <base target> [--hue N]  write <name>-shiny.png beside the base (hue-shifted)
+generate --shiny-of <base target> [--hue N] [--saturation X] [--brightness X]  write <name>-shiny.png beside the base (hue-shifted;
+                                             saturation/brightness for low-colour creatures, stored in the manifest)
+generate --reprocess --slug <slug>           re-run post-process + sheet over the saved raw-N.png (no GPU)
 generate --list-families | --stop
-tuning:  --steps --cfg --sampler --ip-weight --grid --colors --tag <suffix> --keep-raw
+tuning:  --steps --cfg --sampler --ip-weight --grid --colors --tag <suffix>
 ```
 
 Run as `node scripts/asset-gen/generate.mjs …`. Progress goes to stderr, a JSON result to stdout (`slug`, `seed`, `candidates`, `sheet`, `seconds`, `tier`, `sizeGuessed`). Candidates are written to `.tmp-gen/<slug>/` (gitignored); `--pick` writes the final file. Redo = same target with a new `--seed` or an edited subject; `--pick` overwrites the manifest entry.
 
 `scripts/asset-gen/manifest.json` (tracked) maps target → `{family, tier, subject, seed, date}` plus `shinyHue` for enemies. Targets under `.tmp-gen/` are never recorded.
+
+## Anatomy and controls
+
+SDXL cannot count limbs. For spiders (8 legs) and crabs (2 claws + 8 legs) pass `--control spider|crab`: `lib/controls.mjs` draws a scribble skeleton and the union ControlNet (strength 0.5, first half of sampling) fixes the layout while the family still sets the style. Add a new control by adding a drawing function to `CONTROLS`. For everything else, state the counts in the subject, use `--count 6`, and reject bad candidates when picking. `matte` also removes backdrop attached to the subject (`bgDistance`), detached fragments and enclosed holes; portraits are edge-padded (`pad: 96`) so a bust cropped by the frame is not masked out along the cut. Raw generations are saved (`raw-N.png`), so post-process changes can be applied with `--reprocess`.
 
 ## Writing a subject
 

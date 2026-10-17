@@ -38,7 +38,7 @@ result reports `sizeGuessed: true`).
 node scripts/asset-gen/generate.mjs --family <family> --target <path> --subject "<subject>" [--tier <tier>]
 ```
 
-Use `--count 6` for enemies and portraits (anatomy fails often), 4 otherwise. The JSON result lists `sheet` (references on top, numbered candidates below). `Read` the sheet and choose the candidate
+Use `--count 6` for enemies and portraits (anatomy fails often), 4 otherwise. **Spiders and crabs: always add `--control spider` / `--control crab`** (batch field `control`); it draws a skeleton that forces eight legs (and two claws for crabs), which prompts alone cannot. Raw generations are kept, so if only the cutout is wrong, `--reprocess --slug <slug>` re-runs post-processing without the GPU. The JSON result lists `sheet` (references on top, numbered candidates below). `Read` the sheet and choose the candidate
 that best matches the references and the subject: clean silhouette, readable at game size, no stray fragments or text. **Count limbs, heads and eyes against the creature** (a bear has four legs, a spider eight, a crab two claws and eight legs, a humanoid one head), and reject candidates with duplicated or floating parts, holes inside the body, a grey ground slab, cut-off edges, or several copies of the subject. Look at the candidate itself, not just the sheet thumbnail.
 If none is usable, do **one** re-roll (new `--seed`, or a clearer subject) and choose again. Then:
 
@@ -48,7 +48,7 @@ node scripts/asset-gen/generate.mjs --pick <n> --slug <slug>
 
 `--pick` writes the file to the target and records it in `scripts/asset-gen/manifest.json`. For an enemy that has a
 shiny, also run `--shiny-of <target>` (see the doc; the hue angle must come from `--estimate-hue` on the legacy pair or
-`--hue`). For several assets of one family use one `--batch jobs.json` run rather than one call per asset.
+`--hue`). Low-colour creatures (grey, white, brown) also need `--saturation 2` or more (and maybe `--brightness`) or the shiny looks identical: compare the two files. For several assets of one family use one `--batch jobs.json` run rather than one call per asset.
 
 If a step fails twice with the same error, stop and report the error; do not write your own image-processing code.
 

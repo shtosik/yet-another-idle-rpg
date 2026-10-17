@@ -1,11 +1,12 @@
 // --batch jobs.json: many {family, target, subject} jobs behind one server boot.
 
 import { slugFor } from '../generate.mjs'
+import { CONTROLS } from './controls.mjs'
 import { FAMILIES } from '../styles.mjs'
 
 /**
  * Validates a parsed jobs file and returns normalised jobs. Throws one error listing every problem.
- * Accepted job fields: family, target, subject (required); count, seed, tier, tag, noRef (optional).
+ * Accepted job fields: family, target, subject (required); count, seed, tier, tag, control, noRef (optional).
  */
 export function parseJobs(json) {
     if (!Array.isArray(json) || json.length === 0) throw new Error('Batch file must be a non-empty JSON array of jobs')
@@ -17,6 +18,7 @@ export function parseJobs(json) {
         }
         if (job?.family && !FAMILIES[job.family]) problems.push(`job ${i}: unknown family "${job.family}"`)
         if (job?.tier && FAMILIES[job.family] && !FAMILIES[job.family].tiers?.[job.tier]) problems.push(`job ${i}: invalid tier "${job.tier}"`)
+        if (job?.control && !CONTROLS[job.control]) problems.push(`job ${i}: unknown control "${job.control}"`)
         if (job?.family && job?.target) {
             const slug = slugFor(job.family, job.target, job.tag)
             if (slugs.has(slug)) problems.push(`job ${i}: slug "${slug}" collides with job ${slugs.get(slug)} (add a "tag")`)
@@ -43,7 +45,7 @@ export async function runBatch({ comfy, jobs, generate, nextSeed = () => Math.fl
                 await comfy.assertCheckpoint(checkpoint)
                 checked.add(checkpoint)
             }
-            results.push(await generate({ comfy, familyId: job.family, target: job.target, subject: job.subject, seed: job.seed ?? nextSeed(), count: job.count, useRef: !job.noRef, tag: job.tag, tier: job.tier }))
+            results.push(await generate({ comfy, familyId: job.family, target: job.target, subject: job.subject, seed: job.seed ?? nextSeed(), count: job.count, useRef: !job.noRef, tag: job.tag, tier: job.tier, control: job.control }))
         } catch (err) {
             failures.push({ index, target: job.target, error: err.message })
         }
