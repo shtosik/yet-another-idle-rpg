@@ -27,6 +27,7 @@ export const FAMILY_TARGETS = {
     'item-pixel': [48, 48],
     'zone-pixel': [832, 1248],
     'town-painterly': [1376, 768],
+    'portrait-pixel': [256, 256],
     'enemy-pixel': [256, 256], // hard cap on the longer side; the real size comes from the Size tier
 }
 
@@ -136,6 +137,33 @@ FAMILIES['town-painterly'] = {
     // Generate at the nearest SDXL-native size and cover up to the exact asset size (a 32px crop-fill, no distortion).
     post: [['cover', { width: 1376, height: 768 }]],
     ipWeight: 0.7,
+    sampler: { steps: 8, cfg: 5.5, sampler_name: 'euler', scheduler: 'sgm_uniform' },
+}
+
+FAMILIES['portrait-pixel'] = {
+    description: '256×256 transparent pixel-art character bust (2× chunky pixels, not the Corwin ink style)',
+    checkpoint: 'zavychromaxl_v80.safetensors',
+    stylePrompt:
+        'pixel art character portrait, head and shoulders bust, facing the viewer, dark outline, limited colour palette, ' +
+        'crisp hard pixels, plain flat solid light grey background',
+    negative: `${NEGATIVE_BASE}, full body, multiple characters, gradient background, anti-aliased, smooth shading, ink drawing, sketch`,
+    // No pixel portraits exist yet: bootstrap from humanoid enemy-pixel refs; add the first accepted portraits here.
+    references: ['bandit', 'troll', 'goblinScavenger'].map((n) => `src/assets/img/enemies/${n}.png`),
+    gen: [1024, 1024],
+    target: [256, 256],
+    pixel: true,
+    alpha: true,
+    refBackground: [200, 200, 200],
+    // 128-cell square canvas (126 art pixels + 1-cell outline room each side), scaled 2× so pixels are chunky.
+    post: [
+        ['keyout', { threshold: 60, feather: 0 }],
+        ['trim'],
+        ['pixelate', { grid: 126, pad: 1, width: 128, height: 128 }],
+        ['outline', { px: 1 }],
+        ['quantize', { colors: 32 }],
+        ['upscale', { factor: 2 }],
+    ],
+    ipWeight: 0.5,
     sampler: { steps: 8, cfg: 5.5, sampler_name: 'euler', scheduler: 'sgm_uniform' },
 }
 
