@@ -37,7 +37,7 @@ export const DEFAULT_TIER = 'medium'
 
 const ENEMY_REFS = ['bandit', 'troll', 'crab', 'goat', 'goblinScavenger', 'deer'].map((n) => `src/assets/img/enemies/${n}.png`)
 
-const ANATOMY_NEGATIVE = 'extra limbs, extra legs, extra arms, missing limbs, bad anatomy, deformed, mutated, disfigured, duplicate, two heads, multiple heads, floating body parts, fused bodies, cropped'
+const ANATOMY_NEGATIVE = 'extra limbs, extra legs, extra arms, missing limbs, bad anatomy, deformed, mutated, disfigured, duplicate, two heads, multiple heads, floating body parts, fused bodies, cropped, character sheet, turnaround, multiple views, collage, ground, floor, platform, pedestal'
 const NEGATIVE_BASE = 'text, watermark, signature, frame, border, ui, blurry, photo, realistic, 3d render'
 
 const ITEM_REFS = ['cheese', 'machete', 'vialOfWater', 'stone', 'fish', 'wolfFangs'].map((n) => `src/assets/img/items/${n}.png`)

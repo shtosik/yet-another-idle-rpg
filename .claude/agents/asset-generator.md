@@ -26,7 +26,7 @@ fits (for example a skill icon or world-map tile), report that and skip; do not 
 
 ## 2. Write the subject only
 
-One or two sentences: the thing, its pose or scene, distinguishing features. Take it from `docs/character/**`,
+One or two sentences: the thing, its pose or scene, distinguishing features. For creatures state the anatomy counts the model gets wrong ("exactly four legs and one head", "exactly two claws and eight legs", "two arms, two legs") and describe ONE subject; words like "side view" or "turnaround" make it draw several copies. Take it from `docs/character/**`,
 `docs/design/**`, the enemy/item description or the task. **Never write style words** (pixel art, outline, palette,
 painterly, resolution, background colour); the family adds them. Name an enemy's tier from lore if known: `tiny` 96,
 `small` 144, `medium` 192, `large` 256 (longer side). No hint means omit `--tier` (it defaults to `medium` and the
@@ -38,8 +38,8 @@ result reports `sizeGuessed: true`).
 node scripts/asset-gen/generate.mjs --family <family> --target <path> --subject "<subject>" [--tier <tier>]
 ```
 
-The JSON result lists `sheet` (references on top, numbered candidates below). `Read` the sheet and choose the candidate
-that best matches the references and the subject: clean silhouette, readable at game size, no stray fragments or text.
+Use `--count 6` for enemies and portraits (anatomy fails often), 4 otherwise. The JSON result lists `sheet` (references on top, numbered candidates below). `Read` the sheet and choose the candidate
+that best matches the references and the subject: clean silhouette, readable at game size, no stray fragments or text. **Count limbs, heads and eyes against the creature** (a bear has four legs, a spider eight, a crab two claws and eight legs, a humanoid one head), and reject candidates with duplicated or floating parts, holes inside the body, a grey ground slab, cut-off edges, or several copies of the subject. Look at the candidate itself, not just the sheet thumbnail.
 If none is usable, do **one** re-roll (new `--seed`, or a clearer subject) and choose again. Then:
 
 ```
