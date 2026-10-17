@@ -27,7 +27,7 @@ import { TownID } from '../../../enums/map/town-id.enum'
 import { DamageElement } from '../../../enums/damage-element.enum'
 import { withDevtools } from '@angular-architects/ngrx-toolkit'
 import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
-import { UNLOCK_RULES } from '../../../data/unlock-conditions'
+import { UNLOCK_RULES, UnlockCondition, UnlockTarget } from '../../../data/unlock-conditions'
 import { addItems, canFit, countItem, createInventory, hasItems, ItemStack, removeItems, resizeInventory } from './inventory'
 
 export type PlayerStatsType = Record<PlayerStat, number>;
@@ -457,7 +457,43 @@ export const PlayerStore = signalStore(
       patchState(store, { spellbookUnlocked: true })
     },
   })),
+  withMethods((store) => ({
+    isUnlockTargetUnlocked(target: UnlockTarget): boolean {
+      switch (target.type) {
+        case 'town':
+          return store.isTownUnlocked(target.townId)
+        case 'feature':
+          return target.feature === 'crafting' ? store.craftingUnlocked() : store.skillTreeUnlocked()
+      }
+    },
+
+    applyUnlockTarget(target: UnlockTarget): void {
+      switch (target.type) {
+        case 'town':
+          store.unlockTown(target.townId)
+          store.unlockMap()
+          break
+        case 'feature':
+          if (target.feature === 'crafting') store.unlockCrafting()
+          else store.unlockSkillTree()
+          break
+      }
+    },
+
+    /** Conditions that depend only on saved player state. `waveReached` is judged by the caller. */
+    isPlayerStateConditionMet(condition: UnlockCondition): boolean {
+      switch (condition.type) {
+        case 'hasItem':
+          return store.inventory().some(i => i?.id === condition.itemId)
+        case 'levelReached':
+          return store.stats().level >= condition.level
+        case 'waveReached':
+          return false
+      }
+    },
+  })),
   withHooks((store) => ({
+    // Re-apply unlocks for existing saves silently (no notifications).
     onInit() {
       // Raising the inventorySlots stat grows the inventory; it never shrinks here.
       effect(() => {
@@ -466,13 +502,11 @@ export const PlayerStore = signalStore(
       })
 
       for (const rule of UNLOCK_RULES) {
-        if (rule.condition.type !== 'waveReached') continue
-        const killCount = store.getKillCountByZoneAndWave(rule.condition.zoneId, rule.condition.wave)
-        if (killCount <= 0) continue
-        if (rule.target.type === 'town') {
-          store.unlockTown(rule.target.townId)
-          store.unlockMap()
-        }
+        const { condition } = rule
+        const isMet = condition.type === 'waveReached'
+          ? store.getKillCountByZoneAndWave(condition.zoneId, condition.wave) > 0
+          : store.isPlayerStateConditionMet(condition)
+        if (isMet) store.applyUnlockTarget(rule.target)
       }
     },
   })),

@@ -84,3 +84,12 @@ export function canFit(inventory: Inventory, capacity: number, adding: ItemStack
 
   return newStacks.size <= freeSlots
 }
+
+/** A Page is a 40-slot view of the inventory. */
+export const INVENTORY_PAGE_SIZE = 40
+
+export const pageCount = (capacity: number): number => Math.max(1, Math.ceil(capacity / INVENTORY_PAGE_SIZE))
+
+/** Empty usable slots across all pages. */
+export const countFreeSlots = (inventory: Inventory, capacity: number): number =>
+  inventory.slice(0, capacity).filter(slot => slot === null).length
