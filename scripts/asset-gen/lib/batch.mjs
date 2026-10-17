@@ -6,7 +6,7 @@ import { FAMILIES } from '../styles.mjs'
 
 /**
  * Validates a parsed jobs file and returns normalised jobs. Throws one error listing every problem.
- * Accepted job fields: family, target, subject (required); count, seed, tier, tag, control, noRef (optional).
+ * Accepted job fields: family, target, subject (required); count, seed, tier, tag, control, noRef, refs (repo paths replacing the family references), ipWeight, style (replaces the family style prompt), controlStrength, controlEnd (optional).
  */
 export function parseJobs(json) {
     if (!Array.isArray(json) || json.length === 0) throw new Error('Batch file must be a non-empty JSON array of jobs')
@@ -45,7 +45,7 @@ export async function runBatch({ comfy, jobs, generate, nextSeed = () => Math.fl
                 await comfy.assertCheckpoint(checkpoint)
                 checked.add(checkpoint)
             }
-            results.push(await generate({ comfy, familyId: job.family, target: job.target, subject: job.subject, seed: job.seed ?? nextSeed(), count: job.count, useRef: !job.noRef, tag: job.tag, tier: job.tier, control: job.control }))
+            results.push(await generate({ comfy, familyId: job.family, target: job.target, subject: job.subject, seed: job.seed ?? nextSeed(), count: job.count, useRef: !job.noRef, tag: job.tag, tier: job.tier, control: job.control, overrides: { refs: job.refs, ipWeight: job.ipWeight, stylePrompt: job.style, controlStrength: job.controlStrength, controlEnd: job.controlEnd } }))
         } catch (err) {
             failures.push({ index, target: job.target, error: err.message })
         }

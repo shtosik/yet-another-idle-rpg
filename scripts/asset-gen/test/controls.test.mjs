@@ -10,7 +10,7 @@ import { eatAttachedBackground } from '../lib/postprocess.mjs'
 import { hueShift } from '../lib/shiny.mjs'
 import { buildGraph, CONTROLNET_NAME } from '../lib/workflow.mjs'
 import { FAMILIES } from '../styles.mjs'
-import { reprocessJob } from '../generate.mjs'
+import { applyOverrides, reprocessJob } from '../generate.mjs'
 
 const family = FAMILIES['enemy-pixel']
 
@@ -89,4 +89,24 @@ test('reprocessJob re-runs post-process over saved raws and explains when raws a
 
     writeFileSync(join(dir, 'meta.json'), JSON.stringify({ slug: 'zone-pixel-demo', family: 'zone-pixel', tier: null, count: 2, useRef: false }))
     await assert.rejects(reprocessJob({ slug: 'zone-pixel-demo', tmpDir }), /no raw-2\.png/)
+})
+
+test('every control name used in docs exists, including the front-view crab', () => {
+    for (const name of ['spider', 'crab', 'crabFront', 'quadruped']) assert.ok(CONTROLS[name], name)
+})
+
+test('applyOverrides can swap references and style prompt per job without touching the registry', () => {
+    const tuned = applyOverrides(family, { refs: ['scripts/asset-gen/refs/legacy-crab.png'], stylePrompt: 'clean bright pixel art', ipWeight: '0.9' })
+    assert.deepEqual(tuned.references, ['scripts/asset-gen/refs/legacy-crab.png'])
+    assert.equal(tuned.stylePrompt, 'clean bright pixel art')
+    assert.equal(tuned.ipWeight, 0.9)
+    assert.ok(family.references.length > 1)
+    assert.notEqual(family.stylePrompt, 'clean bright pixel art')
+    assert.deepEqual(applyOverrides(family, {}).references, family.references)
+})
+
+test('legacy crab references ship in the repo and batch jobs accept refs/style/control strength', () => {
+    for (const name of ['legacy-crab', 'legacy-gangsterCrab']) assert.ok(existsSync(`scripts/asset-gen/refs/${name}.png`), name)
+    const [job] = parseJobs([{ family: 'enemy-pixel', target: 'a.png', subject: 's', control: 'crabFront', refs: ['scripts/asset-gen/refs/legacy-crab.png'], style: 'x', controlStrength: 0.4 }])
+    assert.deepEqual(job.refs, ['scripts/asset-gen/refs/legacy-crab.png'])
 })
