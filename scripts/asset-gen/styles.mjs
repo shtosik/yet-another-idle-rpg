@@ -37,6 +37,7 @@ export const DEFAULT_TIER = 'medium'
 
 const ENEMY_REFS = ['bandit', 'troll', 'crab', 'goat', 'goblinScavenger', 'deer'].map((n) => `src/assets/img/enemies/${n}.png`)
 
+const ANATOMY_NEGATIVE = 'extra limbs, extra legs, extra arms, missing limbs, bad anatomy, deformed, mutated, disfigured, duplicate, two heads, multiple heads, floating body parts, fused bodies, cropped'
 const NEGATIVE_BASE = 'text, watermark, signature, frame, border, ui, blurry, photo, realistic, 3d render'
 
 const ITEM_REFS = ['cheese', 'machete', 'vialOfWater', 'stone', 'fish', 'wolfFangs'].map((n) => `src/assets/img/items/${n}.png`)
@@ -75,9 +76,9 @@ FAMILIES['enemy-pixel'] = {
     description: 'transparent pixel-art enemy sprite, ≤256 on the longer side by Size tier, natural aspect',
     checkpoint: 'zavychromaxl_v80.safetensors',
     stylePrompt:
-        'pixel art game enemy sprite, full body, single character, dark outline, limited colour palette, crisp hard pixels, ' +
+        'pixel art game enemy sprite, anatomically correct, full body, single character, dark outline, limited colour palette, crisp hard pixels, ' +
         'plain flat solid light grey background',
-    negative: `${NEGATIVE_BASE}, multiple characters, ground shadow, gradient background, anti-aliased, smooth shading, cropped`,
+    negative: `${NEGATIVE_BASE}, multiple characters, ground shadow, gradient background, anti-aliased, smooth shading, ${ANATOMY_NEGATIVE}`,
     references: ENEMY_REFS,
     gen: [1024, 1024],
     target: [256, 256],
@@ -146,7 +147,7 @@ FAMILIES['portrait-pixel'] = {
     stylePrompt:
         'pixel art character portrait, head and shoulders bust, facing the viewer, dark outline, limited colour palette, ' +
         'crisp hard pixels, plain flat solid light grey background',
-    negative: `${NEGATIVE_BASE}, full body, multiple characters, gradient background, anti-aliased, smooth shading, ink drawing, sketch`,
+    negative: `${NEGATIVE_BASE}, full body, multiple characters, gradient background, anti-aliased, smooth shading, ink drawing, sketch, ${ANATOMY_NEGATIVE}`,
     // No pixel portraits exist yet: bootstrap from humanoid enemy-pixel refs; add the first accepted portraits here.
     references: ['bandit', 'troll', 'goblinScavenger'].map((n) => `src/assets/img/enemies/${n}.png`),
     gen: [1024, 1024],

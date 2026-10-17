@@ -79,10 +79,11 @@ export async function keyout(buf, { threshold = 40, feather = 1 } = {}) {
 
 /**
  * Cleans a binary mask (1 = subject): drops subject specks smaller than `minArea` pixels and fills background
- * holes (not connected to the border) smaller than `holeArea` pixels, then erodes `erode` px so no background-coloured
+ * holes (not connected to the border) smaller than `holeArea` pixels, drops subject parts smaller than
+ * `keepRatio` × the largest part, then erodes `erode` px so no background-coloured
  * fringe survives. Pure function over a Uint8Array, 8-connected for subject, 4-connected for background.
  */
-export function cleanMask(mask, width, height, { minArea, holeArea, erode = 0 }) {
+export function cleanMask(mask, width, height, { minArea, holeArea, erode = 0, keepRatio = 0 }) {
     const label = (value, neighbours, keep) => {
         // returns components of `value` pixels as arrays of indices that satisfy keep(size, touchesBorder)
         const seen = new Uint8Array(width * height)
@@ -112,7 +113,10 @@ export function cleanMask(mask, width, height, { minArea, holeArea, erode = 0 })
     }
     const four = [[1, 0], [-1, 0], [0, 1], [0, -1]]
     const eight = [...four, [1, 1], [-1, -1], [1, -1], [-1, 1]]
-    label(1, eight, (size) => size < minArea)
+    let largest = 0
+    if (keepRatio) label(1, eight, (size) => ((largest = Math.max(largest, size)), false))
+    // detached fragments (a floating second head, stray cubs) smaller than keepRatio × the main body are dropped too
+    label(1, eight, (size) => size < Math.max(minArea, keepRatio * largest))
     label(0, four, (size, border) => !border && size < holeArea)
     for (let pass = 0; pass < erode; pass++) {
         const next = Uint8Array.from(mask)
@@ -133,7 +137,7 @@ export function cleanMask(mask, width, height, { minArea, holeArea, erode = 0 })
  * between limbs, light subjects on a light background, and ground shadows that colour keying cannot. The mask is
  * thresholded and cleaned (see cleanMask); thresholds are fractions of the image area.
  */
-export async function matte(buf, { threshold = 128, minArea = 0.001, holeArea = 0.003, erode = 1 } = {}) {
+export async function matte(buf, { threshold = 128, minArea = 0.001, holeArea = 0.03, keepRatio = 0.2, erode = 1 } = {}) {
     if (!existsSync(MATTE_MODEL)) {
         throw new Error(`Matting model not found at ${MATTE_MODEL}. Download it once: curl -L -o "${MATTE_MODEL}" https://github.com/danielgatis/rembg/releases/download/v0.0.0/isnet-general-use.onnx`)
     }
@@ -146,7 +150,7 @@ export async function matte(buf, { threshold = 128, minArea = 0.001, holeArea = 
         const soft = await sharp(readFileSync(output)).greyscale().raw().toBuffer()
         const mask = Uint8Array.from(soft, (v) => (v >= threshold ? 1 : 0))
         const area = width * height
-        cleanMask(mask, width, height, { minArea: Math.round(minArea * area), holeArea: Math.round(holeArea * area), erode })
+        cleanMask(mask, width, height, { minArea: Math.round(minArea * area), holeArea: Math.round(holeArea * area), keepRatio, erode })
         for (let p = 0; p < mask.length; p++) data[p * 4 + 3] = mask[p] ? 255 : 0
         return png(data, width, height)
     } finally {

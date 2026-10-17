@@ -118,6 +118,20 @@ test('cleanMask drops subject specks and fills small enclosed holes, but keeps o
     assert.equal(out[1][1], '#')
 })
 
+test('cleanMask keepRatio drops detached parts much smaller than the main body but keeps comparable ones', () => {
+    const rows = [
+        '######..#.',
+        '######..#.',
+        '######....',
+        '######.##.',
+        '......###.',
+    ]
+    const out = show(cleanMask(maskFrom(rows), 10, 5, { minArea: 0, holeArea: 0, keepRatio: 0.2 }), 10)
+    assert.equal(out[0][8], '.', '2-pixel fragment (floating head) dropped')
+    assert.equal(out[3][7], '#', '5-pixel part is above 20% of the 24-pixel body and is kept')
+    assert.equal(out[0][0], '#', 'main body kept')
+})
+
 test('cleanMask erosion strips one pixel off the silhouette', () => {
     const out = show(cleanMask(maskFrom(['.......', '.#####.', '.#####.', '.#####.', '.......']), 7, 5, { minArea: 0, holeArea: 0, erode: 1 }), 7)
     assert.deepEqual(out, ['.......', '.......', '..###..', '.......', '.......'])
