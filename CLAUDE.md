@@ -33,14 +33,19 @@ Change detection is `OnPush` throughout; inject services via `inject()`, not con
 ```
 src/
 ├── app/
-│   ├── components/game/    # Feature tabs: battle, inventory, equipment, skill-tree, map, …
+│   ├── components/game/    # Feature tabs: battle, inventory, equipment, skill-tree, world-map,
+│   │                       #   bestiary, crafting, town, spellbook, quests, player-stats, dialogue, game-menu
 │   ├── components/modals/  # Shop, quest-completed, respec-confirm
 │   ├── components/shared/  # Reusable UI (panel, slot, spinner, close-button)
 │   ├── services/           # Business logic (battle-manager, dialogue-manager, modal, …)
-│   └── store/              # NgRx signal stores (player, battle, quests, shops, towns)
+│   └── store/              # NgRx signal stores (player, battle, quests, shop, towns, helpers)
 ├── data/                   # All static game content as typed TS objects
 │   └── dialogues/          # Per-NPC dialogue trees
-├── enums/ids/              # Numeric enums for every entity type (EnemyID, ItemID, …)
+├── enums/                  # Numeric enums for every entity type, split by domain:
+│   ├── ids/                #   EnemyID, ItemID, QuestID, ZoneID, SkillTreeNodeID, SpellID, …
+│   ├── items/              #   ItemType, ItemTier
+│   ├── map/                #   NpcID, TownID, RegionID, TownObject, TownTabID
+│   └── *.enum.ts           #   loose top-level enums (DamageElement, EquipmentSlot, …)
 ├── interfaces/             # TypeScript interfaces
 ├── types/                  # Discriminated unions (DialogueEffect, DialogueCondition, …)
 └── assets/
@@ -48,6 +53,8 @@ src/
     ├── maps/               # Leaflet tile data
     └── img/                # Enemy sprites, NPC avatars, backgrounds
 ```
+
+`NpcID` lives in `enums/map/npc-id.enum.ts`, not `enums/ids/` — check the subfolder before importing an enum.
 
 ### State management
 
@@ -72,7 +79,7 @@ signalStore(
 
 ### Data conventions
 
-- All entities are identified by numeric enums in `src/enums/ids/` (`EnemyID`, `ItemID`, `QuestID`, `ZoneID`, `NpcID`, `SkillPointID`, `SpellID`, …).
+- All entities are identified by numeric enums, mostly in `src/enums/ids/` (`EnemyID`, `ItemID`, `QuestID`, `ZoneID`, `SkillTreeNodeID`, `SpellID`, …) — `NpcID` and other map-related enums live in `src/enums/map/` instead.
 - Data keyed by enum: `ENEMIES_DATA[enemyId]`, `ITEM_DATA[itemId]`, etc.
 - Discriminated unions (`DialogueEffect`, `DialogueCondition`) drive dialogue logic — add new variants by extending the union **and** the switch in `DialogueManagerService`.
 
@@ -99,10 +106,26 @@ The typical pattern for adding a new game entity:
 3. Add i18n keys to the appropriate JSON file under `src/assets/locales/en/`.
 4. Wire any store/service references.
 
-Skills (slash commands) are available for common additions: `/add-npc-dialogue`, `/add-shop`, `/add-town-building`, `/add-dialogue-effect`.
+Skills (slash commands, in `.claude/skills/`) are available for common additions: `/add-npc-dialogue`, `/add-shop`, `/add-town-building`, `/add-dialogue-effect`, `/add-equipment-item`, `/add-monster-weakness`, `/add-shiny-variant`, `/generate-2d-asset`, `/angular-developer`. A few maintenance skills (`audit-dialogue`, `fix-dialogue-bugs`, `fix-leaflet-tile-gaps`, `update-shiny-enemy-visuals`) exist but are toggled off in `.claude/settings.local.json` — re-enable there before invoking.
 
 Art generation (item icons, enemy sprites, portraits, zone and town backgrounds) runs through the `asset-generator` agent (`.claude/agents/asset-generator.md`), which drives `scripts/asset-gen/generate.mjs` and its Style Families. Prefer `/generate-2d-asset` to brief it. See `docs/analysis/asset-pipeline.md`.
+
+Narrative/world-building (character personalities, dialogue scripts, zone lore, town/building
+descriptions) is the `lore-writer` agent (`.claude/agents/lore-writer.md`) — docs-only, writes
+under `docs/character/` and `docs/design/`, never touches `src/` or assigns real IDs. Run it
+before `/add-npc-dialogue` or `/add-town-building` to get the source material those skills wire
+into code.
 
 ### Analysis docs
 
 `docs/analysis/` contains detailed write-ups for major systems (dialogue, skill-tree, map, shop, shiny enemies, bestiary). Read the relevant doc before making changes to those systems.
+
+## Agent skills
+
+### Issue tracker
+
+GitHub Issues (`viionc/yet-another-idle-rpg`, via `gh`). See `docs/agents/issue-tracker.md`.
+
+### Domain docs
+
+Single-context: `CONTEXT.md` + `docs/adr/` at repo root. See `docs/agents/domain.md`.
