@@ -8,7 +8,10 @@ import { randomUUID } from 'node:crypto'
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
-const defaultServerDir = () => join(process.env.APPDATA ?? '', 'krita', 'ai_diffusion', 'server')
+const defaultServerDir = () => {
+    if (!process.env.APPDATA) throw new Error('APPDATA is not set; pass serverDir to createComfy')
+    return join(process.env.APPDATA, 'krita', 'ai_diffusion', 'server')
+}
 
 function defaultKill(pid) {
     if (process.platform === 'win32') {
@@ -23,7 +26,7 @@ export function createComfy({
     host = '127.0.0.1',
     port = 8188,
     pidFile = join('.tmp-gen', 'comfy.pid'),
-    serverDir = defaultServerDir(),
+    serverDir,
     fetchFn = fetch,
     WebSocketImpl = globalThis.WebSocket,
     spawnFn = nodeSpawn,
@@ -53,9 +56,10 @@ export function createComfy({
     /** Probes the server; if down, spawns it detached, records its pid and polls until ready. */
     async function ensureServer() {
         if (await isUp()) return { started: false }
-        const python = join(serverDir, 'venv', 'Scripts', 'python.exe')
+        const dir = serverDir ?? defaultServerDir()
+        const python = join(dir, 'venv', 'Scripts', 'python.exe')
         const child = spawnFn(python, ['main.py', '--port', String(port)], {
-            cwd: join(serverDir, 'ComfyUI'),
+            cwd: join(dir, 'ComfyUI'),
             detached: true,
             stdio: 'ignore',
             windowsHide: true,
@@ -68,6 +72,7 @@ export function createComfy({
             if (await isUp()) return { started: true }
             await sleep(pollMs)
         }
+        stop() // don't leave a half-booted server we started running
         throw new Error(`ComfyUI did not become ready within ${readyTimeoutMs / 1000}s (pid ${child.pid})`)
     }
 
@@ -82,7 +87,7 @@ export function createComfy({
 
     /**
      * Opens the progress socket before the prompt is queued, so a fast prompt cannot finish unobserved.
-     * `wait(id)` resolves on completion and rejects (fatal) on execution_error; if the socket is unavailable it
+     * `wait(id)` resolves on completion and rejects on execution_error; if the socket is unavailable it
      * simply never settles and the history poll in `run` wins the race.
      */
     function openSocket() {
@@ -96,13 +101,18 @@ export function createComfy({
         let ws
         try {
             ws = new WebSocketImpl(`ws://${host}:${port}/ws?clientId=${clientId}`)
-            ws.onerror = () => {}
+            ws.onerror = () => {} // socket is only an accelerator; run() falls back to polling /history
             ws.onmessage = (event) => {
                 if (typeof event.data !== 'string') return
-                const msg = JSON.parse(event.data)
+                let msg
+                try {
+                    msg = JSON.parse(event.data)
+                } catch {
+                    return // ignore malformed frames; the history poll still observes completion
+                }
                 const id = msg.data?.prompt_id
                 if (!id) return
-                if (msg.type === 'execution_error') settle(id, Object.assign(new Error(`ComfyUI execution error: ${msg.data.exception_message}`), { fatal: true }))
+                if (msg.type === 'execution_error') settle(id, new Error(`ComfyUI execution error: ${msg.data.exception_message}`))
                 if ((msg.type === 'executing' && msg.data.node === null) || msg.type === 'execution_success') settle(id, null)
             }
         } catch {
@@ -120,8 +130,14 @@ export function createComfy({
 
     async function waitViaHistory(promptId, signal) {
         while (!signal.aborted) {
-            const entry = (await getJson(`/history/${promptId}`))[promptId]
-            if (entry?.status?.status_str === 'error') throw Object.assign(new Error('ComfyUI execution error (see server log)'), { fatal: true })
+            let entry
+            try {
+                entry = (await getJson(`/history/${promptId}`))[promptId]
+            } catch {
+                await sleep(pollMs) // transient fetch error: keep polling until done or runTimeoutMs aborts
+                continue
+            }
+            if (entry?.status?.status_str === 'error') throw new Error('ComfyUI execution error (see server log)')
             if (entry?.outputs && Object.keys(entry.outputs).length) return
             await sleep(pollMs)
         }
@@ -129,6 +145,8 @@ export function createComfy({
 
     /** Submits `graph` and returns every SaveImage output as a PNG buffer. */
     async function run(graph) {
+        const checkpoint = Object.values(graph).find((node) => node.class_type === 'CheckpointLoaderSimple')?.inputs?.ckpt_name
+        if (checkpoint) await assertCheckpoint(checkpoint)
         const socket = WebSocketImpl ? openSocket() : undefined
         const abort = new AbortController()
         const timer = setTimeout(() => abort.abort(), runTimeoutMs)

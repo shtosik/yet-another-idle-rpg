@@ -160,3 +160,40 @@ test('stop kills only the pid it wrote, then forgets it', () => {
     assert.deepEqual(comfy.stop(), { stopped: false })
     assert.deepEqual(killed, [777])
 })
+
+test('run rejects a graph whose checkpoint is not installed, before queueing it', async () => {
+    const fake = await startFake({ checkpoints: ['good.safetensors'] })
+    try {
+        const graph = { checkpoint: { class_type: 'CheckpointLoaderSimple', inputs: { ckpt_name: 'missing.safetensors' } } }
+        await assert.rejects(comfyFor(fake).run(graph), /"missing\.safetensors" is not installed/)
+        assert.equal(fake.state.submitted.length, 0)
+    } finally {
+        fake.close()
+    }
+})
+
+test('a transient /history failure does not fail the run', async () => {
+    const fake = await startFake({ mode: 'history' })
+    let failures = 1
+    const flakyFetch = (url, init) => (String(url).includes('/history/') && failures-- > 0 ? Promise.reject(new Error('blip')) : fetch(url, init))
+    try {
+        const images = await comfyFor(fake, { WebSocketImpl: undefined, fetchFn: flakyFetch }).run({})
+        assert.equal(images.length, 2)
+    } finally {
+        fake.close()
+    }
+})
+
+test('ensureServer that never becomes ready stops the process it spawned', async () => {
+    const pidFile = join(mkdtempSync(join(tmpdir(), 'comfy-')), 'comfy.pid')
+    const killed = []
+    const comfy = createComfy({
+        port: 1, pollMs: 5, readyTimeoutMs: 30, pidFile, serverDir: 'x',
+        fetchFn: () => Promise.reject(new Error('down')),
+        spawnFn: () => ({ pid: 99, unref() {} }),
+        killFn: (pid) => killed.push(pid),
+    })
+    await assert.rejects(comfy.ensureServer(), /did not become ready/)
+    assert.deepEqual(killed, [99])
+    assert.equal(existsSync(pidFile), false)
+})
