@@ -13,3 +13,9 @@ Live A/B on `woodenBow`, `fireRune` and `turtleShellHelmet` (4 candidates each, 
 - **Grid / palette**: grid 46 inside a 48 canvas (room for the 1px outline), outline before quantize, 24 colours.
 
 Known weakness: thin, elongated subjects (bows) come out inconsistently; the agent's one re-roll covers it. No pixel-art LoRA needed yet.
+
+## Status and scope
+
+Accepted for all five families. The live checks for `enemy-pixel`, `portrait-pixel` (pixel via IP-Adapter + downscale + outline + palette) and `zone-pixel` (block pixelate) confirmed the approach; `town-painterly` needs no pixel step and only uses the references for style. The item style gate (#34) is the one review that was blocking; revisit a pixel LoRA only if a later review rejects results across several families.
+
+Consequences: art-pixel size is a code constant per family (items 1 px at 48², enemies and portraits 2 px, zones 4 px), so assets generated at different times stay on one grid; references must be real, distinct art (placeholder duplicates are excluded); the pipeline is tested without a GPU (`npm run test:assets`).
