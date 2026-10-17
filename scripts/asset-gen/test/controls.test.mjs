@@ -9,7 +9,7 @@ import { CONTROLS, controlImage } from '../lib/controls.mjs'
 import { eatAttachedBackground } from '../lib/postprocess.mjs'
 import { hueShift } from '../lib/shiny.mjs'
 import { buildGraph, CONTROLNET_NAME } from '../lib/workflow.mjs'
-import { FAMILIES } from '../styles.mjs'
+import { applyRecipe, FAMILIES, RECIPES } from '../styles.mjs'
 import { applyOverrides, reprocessJob } from '../generate.mjs'
 
 const family = FAMILIES['enemy-pixel']
@@ -109,4 +109,30 @@ test('legacy crab references ship in the repo and batch jobs accept refs/style/c
     for (const name of ['legacy-crab', 'legacy-gangsterCrab']) assert.ok(existsSync(`scripts/asset-gen/refs/${name}.png`), name)
     const [job] = parseJobs([{ family: 'enemy-pixel', target: 'a.png', subject: 's', control: 'crabFront', refs: ['scripts/asset-gen/refs/legacy-crab.png'], style: 'x', controlStrength: 0.4 }])
     assert.deepEqual(job.refs, ['scripts/asset-gen/refs/legacy-crab.png'])
+})
+
+test('every recipe points at a real control and real reference files', () => {
+    for (const [name, recipe] of Object.entries(RECIPES)) {
+        assert.ok(FAMILIES[recipe.family], `${name}: family`)
+        assert.ok(CONTROLS[recipe.control], `${name}: control ${recipe.control}`)
+        for (const ref of recipe.refs ?? []) assert.ok(existsSync(ref), `${name}: ref ${ref}`)
+    }
+})
+
+test('applyRecipe fills unset fields, lets explicit fields win, and rejects bad recipes', () => {
+    const job = applyRecipe({ recipe: 'crab', target: 'a.png', subject: 's', ipWeight: 0.6 })
+    assert.equal(job.family, 'enemy-pixel')
+    assert.equal(job.control, 'crabFront')
+    assert.equal(job.controlStrength, 0.4)
+    assert.equal(job.ipWeight, 0.6, 'explicit field overrides the recipe')
+    assert.equal(job.refs.length, 2)
+    assert.deepEqual(applyRecipe({ target: 'a.png' }), { target: 'a.png' }, 'no recipe: unchanged')
+    assert.throws(() => applyRecipe({ recipe: 'dragon' }), /Unknown recipe "dragon"/)
+    assert.throws(() => applyRecipe({ recipe: 'crab', family: 'item-pixel' }), /is for family enemy-pixel/)
+})
+
+test('batch jobs expand recipes, including the family, and report a bad recipe', () => {
+    const [job] = parseJobs([{ recipe: 'spider', target: 'a.png', subject: 's' }])
+    assert.deepEqual([job.family, job.control, job.controlEnd], ['enemy-pixel', 'spider', 0.5])
+    assert.throws(() => parseJobs([{ recipe: 'dragon', target: 'a.png', subject: 's', family: 'enemy-pixel' }]), /job 0: Unknown recipe "dragon"/)
 })

@@ -2,17 +2,23 @@
 
 import { slugFor } from '../generate.mjs'
 import { CONTROLS } from './controls.mjs'
-import { FAMILIES } from '../styles.mjs'
+import { applyRecipe, FAMILIES } from '../styles.mjs'
 
 /**
  * Validates a parsed jobs file and returns normalised jobs. Throws one error listing every problem.
- * Accepted job fields: family, target, subject (required); count, seed, tier, tag, control, noRef, refs (repo paths replacing the family references), ipWeight, style (replaces the family style prompt), controlStrength, controlEnd (optional).
+ * Accepted job fields: family, target, subject (required); recipe (named species settings, see RECIPES in styles.mjs), count, seed, tier, tag, control, noRef, refs (repo paths replacing the family references), ipWeight, style (replaces the family style prompt), controlStrength, controlEnd (optional).
  */
 export function parseJobs(json) {
     if (!Array.isArray(json) || json.length === 0) throw new Error('Batch file must be a non-empty JSON array of jobs')
     const problems = []
     const slugs = new Map()
-    const jobs = json.map((job, i) => {
+    const jobs = json.map((raw, i) => {
+        let job = raw
+        try {
+            job = applyRecipe(raw ?? {})
+        } catch (err) {
+            problems.push(`job ${i}: ${err.message}`)
+        }
         for (const key of ['family', 'target', 'subject']) {
             if (typeof job?.[key] !== 'string' || !job[key]) problems.push(`job ${i}: missing "${key}"`)
         }

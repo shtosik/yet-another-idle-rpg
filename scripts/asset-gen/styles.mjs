@@ -179,6 +179,45 @@ export function resolvePost(family, tier) {
     return family.post.map(([name, params]) => [name, Object.fromEntries(Object.entries(params ?? {}).map(([k, v]) => [k, tokens[v] ?? v]))])
 }
 
+/**
+ * Species recipes: the per-job settings that make one kind of creature come out right (skeleton control, references,
+ * style, strengths), named so a job says `recipe: "crab"` instead of carrying seven fields. Explicit job fields
+ * override a recipe. Add a recipe here (and a skeleton in lib/controls.mjs) rather than describing settings in docs.
+ */
+const CLEAN_STYLE =
+    'clean bright pixel art game sprite, flat colours, bold dark outline, simple shading with highlights, limited colour palette, plain flat solid light grey background'
+const CRAB = {
+    family: 'enemy-pixel',
+    control: 'crabFront',
+    controlStrength: 0.4,
+    controlEnd: 0.45,
+    refs: ['scripts/asset-gen/refs/legacy-crab.png', 'scripts/asset-gen/refs/legacy-gangsterCrab.png'],
+    ipWeight: 0.85,
+    style: CLEAN_STYLE,
+}
+export const RECIPES = {
+    /** Front-view crab in the look of the original crab sprites (domed shell, eye stalks, pincers, 8 legs). */
+    crab: CRAB,
+    /** Same as crab; the subject adds the eyepatch and knife. */
+    gangsterCrab: CRAB,
+    /** Spider seen from above: 8 legs, two body segments, eye cluster and fangs. */
+    spider: { family: 'enemy-pixel', control: 'spider', controlStrength: 0.45, controlEnd: 0.5, style: CLEAN_STYLE },
+    /** Four-legged animal in side view facing left (bear, wolf, deer, goat). */
+    quadruped: { family: 'enemy-pixel', control: 'quadruped' },
+}
+
+/** Fills a job's unset fields from its recipe. Throws on an unknown recipe or one used with another family. */
+export function applyRecipe(job) {
+    if (!job.recipe) return job
+    const recipe = RECIPES[job.recipe]
+    if (!recipe) throw new Error(`Unknown recipe "${job.recipe}". Known: ${Object.keys(RECIPES).join(', ')}`)
+    const { family, ...settings } = recipe
+    if (job.family && job.family !== family) throw new Error(`Recipe "${job.recipe}" is for family ${family}, not ${job.family}`)
+    const merged = { ...job, family: job.family ?? family }
+    for (const [key, value] of Object.entries(settings)) if (merged[key] === undefined) merged[key] = value
+    return merged
+}
+
 /** Returns the registry problems (empty when valid): missing refs, target drift, malformed post steps. */
 export function validateRegistry(families = FAMILIES, root = REPO_ROOT) {
     const problems = []

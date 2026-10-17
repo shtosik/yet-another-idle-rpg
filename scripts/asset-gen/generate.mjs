@@ -2,7 +2,7 @@
 // Asset generation CLI. Interface = family + target + subject, then pick.
 //
 //   node scripts/asset-gen/generate.mjs --family item-pixel --target src/assets/img/items/frostShard.png \
-//        --subject "a jagged pale-blue ice crystal shard" [--count 4] [--seed N] [--no-ref] [--tier tiny|small|medium|large] [--control spider|crab|crabFront|quadruped]
+//        --subject "a jagged pale-blue ice crystal shard" [--count 4] [--seed N] [--no-ref] [--tier tiny|small|medium|large] [--recipe crab|gangsterCrab|spider|quadruped] [--control spider|crab|crabFront|quadruped]
 //   node scripts/asset-gen/generate.mjs --pick 3 --slug item-pixel-frostShard
 //   node scripts/asset-gen/generate.mjs --reprocess --slug <slug>   # re-run post-process on the saved raw generations, no GPU
 //   node scripts/asset-gen/generate.mjs --batch jobs.json       # [{family,target,subject,count?,seed?,tier?,tag?}], one boot
@@ -29,7 +29,7 @@ import { runPipeline } from './lib/postprocess.mjs'
 import { loadRefs } from './lib/refs.mjs'
 import { makeSheet } from './lib/sheet.mjs'
 import { buildGraph } from './lib/workflow.mjs'
-import { assertRegistry, DEFAULT_TIER, FAMILIES, getFamily, REPO_ROOT, resolvePost } from './styles.mjs'
+import { applyRecipe, assertRegistry, DEFAULT_TIER, FAMILIES, getFamily, REPO_ROOT, resolvePost } from './styles.mjs'
 
 const TMP_DIR = join(REPO_ROOT, '.tmp-gen')
 const log = (...args) => console.error('[asset-gen]', ...args)
@@ -182,7 +182,7 @@ const OPTIONS = {
     family: { type: 'string' }, target: { type: 'string' }, subject: { type: 'string' },
     count: { type: 'string' }, seed: { type: 'string' }, 'no-ref': { type: 'boolean' }, tag: { type: 'string' }, tier: { type: 'string' },
     pick: { type: 'string' }, slug: { type: 'string' }, batch: { type: 'string' },
-    'list-families': { type: 'boolean' }, stop: { type: 'boolean' }, reprocess: { type: 'boolean' }, control: { type: 'string' },
+    'list-families': { type: 'boolean' }, stop: { type: 'boolean' }, reprocess: { type: 'boolean' }, control: { type: 'string' }, recipe: { type: 'string' },
     steps: { type: 'string' }, cfg: { type: 'string' }, 'ip-weight': { type: 'string' }, sampler: { type: 'string' },
     grid: { type: 'string' }, colors: { type: 'string' }, ref: { type: 'string', multiple: true }, 'control-strength': { type: 'string' }, 'control-end': { type: 'string' }, style: { type: 'string' }, 
 }
@@ -223,10 +223,15 @@ export async function main(argv = process.argv.slice(2)) {
     const bootSeconds = Math.round((Date.now() - bootStart) / 100) / 10
     await comfy.assertCheckpoint(family.checkpoint)
     const seed = v.seed !== undefined ? Number(v.seed) : Math.floor(Math.random() * 2 ** 31)
+    const job = applyRecipe({
+        recipe: v.recipe, family: v.family, control: v.control, refs: v.ref, style: v.style,
+        ipWeight: v['ip-weight'], controlStrength: v['control-strength'] === undefined ? undefined : Number(v['control-strength']),
+        controlEnd: v['control-end'] === undefined ? undefined : Number(v['control-end']),
+    })
     const result = await generateJob({
         comfy, familyId: v.family, target: v.target, subject: v.subject, seed,
-        count: v.count ? Number(v.count) : 4, useRef: !v['no-ref'], tag: v.tag, tier: v.tier, control: v.control,
-        overrides: { steps: v.steps, cfg: v.cfg, ipWeight: v['ip-weight'], sampler: v.sampler, grid: v.grid, colors: v.colors, refs: v.ref, stylePrompt: v.style, controlStrength: v['control-strength'] === undefined ? undefined : Number(v['control-strength']), controlEnd: v['control-end'] === undefined ? undefined : Number(v['control-end']) },
+        count: v.count ? Number(v.count) : 4, useRef: !v['no-ref'], tag: v.tag, tier: v.tier, control: job.control,
+        overrides: { steps: v.steps, cfg: v.cfg, ipWeight: job.ipWeight, sampler: v.sampler, grid: v.grid, colors: v.colors, refs: job.refs, stylePrompt: job.style, controlStrength: job.controlStrength, controlEnd: job.controlEnd },
     })
     return { ...result, serverStarted: started, bootSeconds }
 }

@@ -35,7 +35,7 @@ Override locations with `ASSET_GEN_PYTHON` / `ASSET_GEN_MATTE_MODEL`.
 ## CLI reference
 
 ```
-generate --family <id> --target <path> --subject "<text>" [--count 4] [--seed N] [--no-ref] [--tier tiny|small|medium|large] [--control spider|crab|crabFront|quadruped] [--control-strength X] [--control-end X]
+generate --family <id> --target <path> --subject "<text>" [--count 4] [--seed N] [--no-ref] [--tier tiny|small|medium|large] [--recipe crab|gangsterCrab|spider|quadruped] [--control spider|crab|crabFront|quadruped] [--control-strength X] [--control-end X]
 generate --pick <n> --slug <slug>            copy candidate n to its target and record it in manifest.json
 generate --batch jobs.json                   [{family,target,subject,count?,seed?,tier?,tag?,noRef?}], one server boot
 generate --estimate-hue <base target>        estimate shinyHue from the existing base + -shiny pair (run BEFORE regenerating)
@@ -57,10 +57,11 @@ SDXL cannot count limbs. For spiders (8 legs), crabs (2 claws + 8 legs) and four
 
 ## Species recipes
 
-The family refs are detailed dark-fantasy sprites; some species look better against a different anchor. Per-job overrides (`refs`, `style`, `ipWeight`, `controlStrength`) keep that out of the registry.
+A recipe bundles the per-job settings that make one kind of creature come out right (skeleton control, references, style, strengths). Use `--recipe <name>` (batch field `recipe`); explicit fields still override it. The recipes live in `RECIPES` in `styles.mjs`, which is the one place to read or change them: `crab` and `gangsterCrab` (front-view crab in the look of the original crab sprites kept in `scripts/asset-gen/refs/`), `spider`, `quadruped`. Add a recipe there and a skeleton in `lib/controls.mjs`.
 
-- **Crab / gangsterCrab**: the original crab sprites are kept as references in `scripts/asset-gen/refs/` (`legacy-crab.png`, `legacy-gangsterCrab.png`: bright, flat, chunky, with the eyepatch-and-knife gangster crab). Job: `control: "crabFront"`, `controlStrength: 0.4`, `controlEnd: 0.45`, `refs` = both legacy files, `ipWeight: 0.85`, `style: "clean bright pixel art game sprite, flat colours, bold dark outline, simple shading with highlights, limited colour palette, plain flat solid light grey background"`. The skeleton is a front view (domed shell, eye stalks, two arms with a big hand and open pincer, four legs per side). `crab` is the top-view variant.
-- **Spiders**: `control: "spider"`, `controlStrength: 0.45`, `controlEnd: 0.5`, a cleaner style prompt as above; family refs are fine (no pixel spider reference exists). The skeleton has two body segments, eye cluster, fangs, palps and eight legs with a raised knee.
+## QC
+
+`generate` prints `qc` per candidate (empty flags = clean): holes inside the body, detached fragments or specks, a subject running off the generated frame, wrong size or colour budget; `--pick` repeats the flags of what you picked. `node scripts/asset-gen/qc.mjs` checks the committed art in `manifest.json` (plus whether each shiny differs from its base), and `npm run test:assets` fails on any defect beyond the baseline in `qc-known.json` (fix the asset, then `qc.mjs --update-known` to shrink it). QC cannot judge limb or head counts or species fidelity: that stays a visual review.
 
 ## Writing a subject
 
