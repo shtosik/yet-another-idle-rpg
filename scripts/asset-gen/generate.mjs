@@ -22,6 +22,7 @@ import { pathToFileURL } from 'node:url'
 import { parseJobs, runBatch } from './lib/batch.mjs'
 import { createComfy } from './lib/comfy.mjs'
 import { controlImage } from './lib/controls.mjs'
+import { qcOptionsFor, qcSprite, rawQc } from './lib/qc.mjs'
 import { MANIFEST_PATH, readManifest, recordEntry, setField } from './lib/manifest.mjs'
 import { estimateHue, hueShift, shinyPathFor } from './lib/shiny.mjs'
 import { runPipeline } from './lib/postprocess.mjs'
@@ -49,6 +50,14 @@ export function applyOverrides(family, { steps, cfg, ipWeight, sampler, grid, co
         if (colors !== undefined && name === 'quantize') params.colors = Number(colors)
     }
     return next
+}
+
+/** QC flags per candidate, 1-based: [{n, flags}] (empty flags = clean). See lib/qc.mjs. */
+async function qcAll(candidates, family, tier, raws) {
+    const opts = qcOptionsFor(family, family.tiers?.[tier])
+    return Promise.all(
+        candidates.map(async (buf, i) => ({ n: i + 1, flags: [...(await qcSprite(buf, opts)).flags, ...(family.alpha ? await rawQc(raws[i]) : [])] })),
+    )
 }
 
 /**
@@ -80,6 +89,7 @@ export async function generateJob({ comfy, familyId, target, subject, seed, coun
 
     if (keepRaw) raws.forEach((raw, i) => writeFileSync(join(dir, `raw-${i + 1}.png`), raw))
     const candidates = await Promise.all(raws.map((raw) => runPipeline(raw, post)))
+    const qc = await qcAll(candidates, family, usedTier, raws)
     const files = []
     for (const [i, buf] of candidates.entries()) {
         const file = join(dir, `candidate-${i + 1}.png`)
@@ -90,7 +100,7 @@ export async function generateJob({ comfy, familyId, target, subject, seed, coun
     writeFileSync(sheet, await makeSheet({ refs: useRef ? refs.map((r) => r.buffer) : [], candidates, target: family.target, pixel: !!family.pixel }))
 
     const seconds = Math.round((Date.now() - started) / 100) / 10
-    const meta = { slug, family: familyId, target, subject, seed, count: files.length, useRef, tag: tag ?? null, tier: usedTier, control: control ?? null, sizeGuessed, seconds }
+    const meta = { slug, family: familyId, target, subject, seed, count: files.length, useRef, tag: tag ?? null, tier: usedTier, control: control ?? null, sizeGuessed, seconds, qc }
     writeFileSync(join(dir, 'meta.json'), JSON.stringify(meta, null, 2))
     return { ...meta, candidates: files, sheet, refs: useRef ? refs.map((r) => r.path) : [] }
 }
@@ -106,15 +116,19 @@ export async function reprocessJob({ slug, tmpDir = TMP_DIR }) {
     const post = resolvePost(family, meta.tier)
     const refs = meta.useRef ? await loadRefs(family) : []
     const candidates = []
+    const raws = []
     for (let i = 1; i <= meta.count; i++) {
         const rawFile = join(dir, `raw-${i}.png`)
         if (!existsSync(rawFile)) throw new Error(`${slug}: no raw-${i}.png (it was generated before raws were kept); regenerate instead`)
-        candidates.push(await runPipeline(readFileSync(rawFile), post))
+        raws.push(readFileSync(rawFile))
+        candidates.push(await runPipeline(raws[i - 1], post))
         writeFileSync(join(dir, `candidate-${i}.png`), candidates[i - 1])
     }
     const sheet = join(dir, 'sheet.png')
     writeFileSync(sheet, await makeSheet({ refs: refs.map((r) => r.buffer), candidates, target: family.target, pixel: !!family.pixel }))
-    return { slug, reprocessed: candidates.length, sheet }
+    const qc = await qcAll(candidates, family, meta.tier, raws)
+    writeFileSync(join(dir, 'meta.json'), JSON.stringify({ ...meta, qc }, null, 2))
+    return { slug, reprocessed: candidates.length, sheet, qc }
 }
 
 /**
@@ -130,7 +144,9 @@ export function pickCandidate({ slug, n, tmpDir = TMP_DIR, root = REPO_ROOT, man
     copyFileSync(join(dir, `candidate-${n}.png`), dest)
     const target = relative(root, dest).replaceAll('\\', '/')
     const entry = target.startsWith('.tmp-gen/') ? null : recordEntry(target, { family: meta.family, tier: meta.tier, subject: meta.subject, seed: meta.seed, date }, manifestPath)
-    return { slug, picked: n, target, manifest: entry, meta }
+    const qc = meta.qc?.find((c) => c.n === n)?.flags ?? []
+    if (qc.length) log(`${slug}: candidate ${n} was picked with QC flags: ${qc.join('; ')}`)
+    return { slug, picked: n, target, manifest: entry, qc, meta }
 }
 
 /** Estimates the hue angle from the base + shiny pair currently on disk and stores it as `shinyHue`. Run before the base is regenerated. */
