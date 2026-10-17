@@ -2,8 +2,8 @@
   "src/assets/img/avatars/laHarpar/laHarparBartender.png": {
     "family": "portrait-pixel",
     "tier": null,
-    "subject": "a stocky irritated tavern owner, bust, sleeves rolled up past the elbows, stained apron, a white dish rag hanging over his left shoulder, scowl with one raised eyebrow, brown and faded blue-grey clothes",
-    "seed": 661779414,
+    "subject": "a realistic stocky irritated medieval tavern keeper, middle-aged man with scowl and one raised eyebrow, rough linen shirt with sleeves rolled past the elbows, stained leather apron, a white dish rag over his left shoulder, brown and faded blue-grey clothes, one consistent natural skin tone on face, neck and hands, fully opaque solid figure, bust with both shoulders fully in frame",
+    "seed": 604710212,
     "date": "2026-10-17"
   },
   "src/assets/img/avatars/laHarpar/laHarparElara.png": {
@@ -16,29 +16,29 @@
   "src/assets/img/avatars/laHarpar/laHarparJosh.png": {
     "family": "portrait-pixel",
     "tier": null,
-    "subject": "a stubbled tired fisherman, bust, plain dark knit cap with nothing attached, orange vest over a patched tunic, knowing half-lidded eyes",
-    "seed": 1879812367,
+    "subject": "a realistic stubbled tired medieval fisherman, knowing half-lidded eyes, plain dark wool cap, orange-dyed leather jerkin over a patched coarse linen tunic, rope-tied collar, one consistent natural skin tone on face, neck and hands, fully opaque solid figure, bust with both shoulders fully in frame",
+    "seed": 1296567103,
     "date": "2026-10-17"
   },
   "src/assets/img/avatars/laHarpar/laHarparMarvin.png": {
     "family": "portrait-pixel",
     "tier": null,
-    "subject": "a scarred veteran warrior guild master, bust, auburn hair and beard, a clearly visible long scar across his cheek and eyebrow, grey plate pauldrons, orange scarf, direct stern gaze",
-    "seed": 963697424,
+    "subject": "a realistic scarred veteran warrior guild master, auburn hair and beard, a clearly visible long scar across his cheek and eyebrow, grey steel plate pauldrons over a chainmail and wool tunic, orange wool scarf, direct stern gaze, one consistent natural skin tone on face, neck and hands, fully opaque solid figure, bust with both shoulders fully in frame",
+    "seed": 430251489,
     "date": "2026-10-17"
   },
   "src/assets/img/avatars/laHarpar/laHarparTrader.png": {
     "family": "portrait-pixel",
     "tier": null,
-    "subject": "an older warm shopkeeper man, bust, grey hair under a dark bandana, thick mustache, green tunic over white undershirt, loud friendly grin",
-    "seed": 217538187,
+    "subject": "a realistic older warm medieval shopkeeper man, grey hair under a dark cloth headwrap, thick mustache, green wool tunic over a plain linen undershirt, loud friendly grin, one consistent natural skin tone on face, neck and hands, fully opaque solid figure, bust with both shoulders fully in frame",
+    "seed": 507802261,
     "date": "2026-10-17"
   },
   "src/assets/img/avatars/mawood/mawoodBrenn.png": {
     "family": "portrait-pixel",
     "tier": null,
-    "subject": "a sturdy woman carver, bust, chestnut brown tousled hair tied back with wood shavings in it, sleeves rolled, leather work apron, small scars, confident half-smirk, a carving knife with a wooden handle tucked at her belt",
-    "seed": 2110280336,
+    "subject": "a realistic sturdy medieval woman carver, chestnut brown tousled hair tied back with wood shavings in it, rough linen shirt with sleeves rolled, leather work apron, small scars, confident half-smirk, a carving knife with wooden handle tucked at her belt, one consistent natural skin tone on face, neck and hands, fully opaque solid figure, bust with both shoulders fully in frame",
+    "seed": 685367700,
     "date": "2026-10-17"
   },
   "src/assets/img/avatars/mawood/mawoodCorwin.png": {
@@ -58,15 +58,15 @@
   "src/assets/img/avatars/mawood/mawoodFinn.png": {
     "family": "portrait-pixel",
     "tier": null,
-    "subject": "a weathered ranger trapper man, bust, short practical hair, fur-lined trapper vest, scar through eyebrow, bow slung on back, hard eyes, green-brown tones",
-    "seed": 1885413835,
+    "subject": "a realistic weathered ranger trapper man, short practical hair, scar through one eyebrow, fur-lined leather trapper vest over rough wool shirt, a bow slung over the shoulder, hard eyes, green-brown forest tones, one consistent natural skin tone on face, neck and hands, fully opaque solid figure, bust with both shoulders fully in frame",
+    "seed": 294464300,
     "date": "2026-10-17"
   },
   "src/assets/img/avatars/mawood/mawoodMilo.png": {
     "family": "portrait-pixel",
     "tier": null,
-    "subject": "a small freckled kid about nine years old, bust, wind-tousled hair, oversized hand-me-down jacket, rope climbing harness, feather tied on, wide eager grin",
-    "seed": 1730645017,
+    "subject": "a realistic young boy about nine years old with proportions of a real child, freckles, wind-tousled hair, oversized rough wool tunic and patched leather vest, a coarse rope climbing harness across the chest, a feather tied at the shoulder, wide eager grin, one consistent natural skin tone on face, neck and hands, fully opaque solid figure, bust with both shoulders fully in frame",
+    "seed": 1936352505,
     "date": "2026-10-17"
   },
   "src/assets/img/avatars/mawood/mawoodSylvie.png": {
@@ -355,132 +355,6 @@
     "date": "2026-10-17",
     "shinySaturation": 4,
     "shinyBrightness": 1.2
-  },
-  "src/assets/img/items/ancientWood.png": {
-    "family": "item-pixel",
-    "tier": null,
-    "subject": "a thick gnarled chunk of old pale wood log with deep bark ridges and rings, single object",
-    "seed": 535645451,
-    "date": "2026-10-17"
-  },
-  "src/assets/img/items/ashwoodBow.png": {
-    "family": "item-pixel",
-    "tier": null,
-    "subject": "a curved dark grey ashwood hunting bow with a taut string, single object",
-    "seed": 1100205231,
-    "date": "2026-10-17"
-  },
-  "src/assets/img/items/bearPelt.png": {
-    "family": "item-pixel",
-    "tier": null,
-    "subject": "a folded brown bear fur hide pelt, thick fur, single object, no animal",
-    "seed": 1606794755,
-    "date": "2026-10-17"
-  },
-  "src/assets/img/items/blightedFetish.png": {
-    "family": "item-pixel",
-    "tier": null,
-    "subject": "a small voodoo charm object: a bundle of twisted roots and a bone wrapped in cord with fur scraps, black tar dripping from it, single object, no creature, no face",
-    "seed": 1960297685,
-    "date": "2026-10-17"
-  },
-  "src/assets/img/items/blightedHeartwood.png": {
-    "family": "item-pixel",
-    "tier": null,
-    "subject": "a chunk of dark rotten heartwood timber with black tar veins and sickly green cracks, single object",
-    "seed": 1869639304,
-    "date": "2026-10-17"
-  },
-  "src/assets/img/items/boneFragment.png": {
-    "family": "item-pixel",
-    "tier": null,
-    "subject": "a broken off piece of yellowed bone with jagged edge, single object",
-    "seed": 1199052729,
-    "date": "2026-10-17"
-  },
-  "src/assets/img/items/corruptedResin.png": {
-    "family": "item-pixel",
-    "tier": null,
-    "subject": "a shiny lump of hardened amber crystal with dark purple-black veins, a single faceted gemstone-like nugget",
-    "seed": 31,
-    "date": "2026-10-17"
-  },
-  "src/assets/img/items/cursedSap.png": {
-    "family": "item-pixel",
-    "tier": null,
-    "subject": "a small glass vial of thick black sap with an eerie green glow, single object",
-    "seed": 1290736726,
-    "date": "2026-10-17"
-  },
-  "src/assets/img/items/eagleTalon.png": {
-    "family": "item-pixel",
-    "tier": null,
-    "subject": "a single curved sharp raptor claw, dark tan with pale tip, single object, no bird",
-    "seed": 480541409,
-    "date": "2026-10-17"
-  },
-  "src/assets/img/items/elderSilk.png": {
-    "family": "item-pixel",
-    "tier": null,
-    "subject": "a loose skein of fine glowing pale silver silk thread, single object",
-    "seed": 1451607053,
-    "date": "2026-10-17"
-  },
-  "src/assets/img/items/gnollTrophy.png": {
-    "family": "item-pixel",
-    "tier": null,
-    "subject": "a hunting trophy: a wooden plaque with a mounted bone-and-fang necklace and fur tuft, single object, no creature, no face",
-    "seed": 1610306603,
-    "date": "2026-10-17"
-  },
-  "src/assets/img/items/harpyCrown.png": {
-    "family": "item-pixel",
-    "tier": null,
-    "subject": "a small ornate crown made of interlocked bronze talons and teal feathers, single object",
-    "seed": 1920127222,
-    "date": "2026-10-17"
-  },
-  "src/assets/img/items/harpyFeather.png": {
-    "family": "item-pixel",
-    "tier": null,
-    "subject": "a single long feather, teal and brown with a pale quill, single object",
-    "seed": 1114497759,
-    "date": "2026-10-17"
-  },
-  "src/assets/img/items/heartwoodAmulet.png": {
-    "family": "item-pixel",
-    "tier": null,
-    "subject": "a round carved wooden amulet pendant of dark red heartwood on a cord, glowing green rune in the center, single object",
-    "seed": 202870648,
-    "date": "2026-10-17"
-  },
-  "src/assets/img/items/matriarchPlume.png": {
-    "family": "item-pixel",
-    "tier": null,
-    "subject": "a large flamboyant plume of golden and crimson feathers, single object",
-    "seed": 5818524,
-    "date": "2026-10-17"
-  },
-  "src/assets/img/items/silverwoodChestplate.png": {
-    "family": "item-pixel",
-    "tier": null,
-    "subject": "a chestplate armor made of pale silvery bark plates with leather straps, single object",
-    "seed": 1032867683,
-    "date": "2026-10-17"
-  },
-  "src/assets/img/items/spiderFang.png": {
-    "family": "item-pixel",
-    "tier": null,
-    "subject": "a single curved ivory fang, one object",
-    "seed": 152762729,
-    "date": "2026-10-17"
-  },
-  "src/assets/img/items/spiderSilk.png": {
-    "family": "item-pixel",
-    "tier": null,
-    "subject": "a small wound ball of white spider web silk thread, single object",
-    "seed": 1263046399,
-    "date": "2026-10-17"
   },
   "src/assets/img/items/ancientWood.png": {
     "family": "item-pixel",
