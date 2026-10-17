@@ -1,0 +1,485 @@
+{
+  "src/assets/img/avatars/laHarpar/laHarparBartender.png": {
+    "family": "portrait-pixel",
+    "tier": null,
+    "subject": "a realistic stocky irritated medieval tavern keeper, middle-aged man with scowl and one raised eyebrow, rough linen shirt with sleeves rolled past the elbows, stained leather apron, a white dish rag over his left shoulder, brown and faded blue-grey clothes, one consistent natural skin tone on face, neck and hands, fully opaque solid figure, bust with both shoulders fully in frame",
+    "seed": 604710212,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/avatars/laHarpar/laHarparElara.png": {
+    "family": "portrait-pixel",
+    "tier": null,
+    "subject": "a young red-haired half-elf woman, bust, pointed ears, green headband, freckles, bright pink off-shoulder top, earnest chip-on-shoulder expression",
+    "seed": 1093571196,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/avatars/laHarpar/laHarparJosh.png": {
+    "family": "portrait-pixel",
+    "tier": null,
+    "subject": "a realistic stubbled tired medieval fisherman, knowing half-lidded eyes, plain dark wool cap, orange-dyed leather jerkin over a patched coarse linen tunic, rope-tied collar, one consistent natural skin tone on face, neck and hands, fully opaque solid figure, bust with both shoulders fully in frame",
+    "seed": 1296567103,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/avatars/laHarpar/laHarparMarvin.png": {
+    "family": "portrait-pixel",
+    "tier": null,
+    "subject": "a realistic scarred veteran warrior guild master, auburn hair and beard, a clearly visible long scar across his cheek and eyebrow, grey steel plate pauldrons over a chainmail and wool tunic, orange wool scarf, direct stern gaze, one consistent natural skin tone on face, neck and hands, fully opaque solid figure, bust with both shoulders fully in frame",
+    "seed": 430251489,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/avatars/laHarpar/laHarparTrader.png": {
+    "family": "portrait-pixel",
+    "tier": null,
+    "subject": "a realistic older warm medieval shopkeeper man, grey hair under a dark cloth headwrap, thick mustache, green wool tunic over a plain linen undershirt, loud friendly grin, one consistent natural skin tone on face, neck and hands, fully opaque solid figure, bust with both shoulders fully in frame",
+    "seed": 507802261,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/avatars/mawood/mawoodBrenn.png": {
+    "family": "portrait-pixel",
+    "tier": null,
+    "subject": "a realistic sturdy medieval woman carver, chestnut brown tousled hair tied back with wood shavings in it, rough linen shirt with sleeves rolled, leather work apron, small scars, confident half-smirk, a carving knife with wooden handle tucked at her belt, one consistent natural skin tone on face, neck and hands, fully opaque solid figure, bust with both shoulders fully in frame",
+    "seed": 685367700,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/avatars/mawood/mawoodCorwin.png": {
+    "family": "portrait-pixel",
+    "tier": null,
+    "subject": "an old man elder with white hair, bust, deep-lined face, rough pale silver tree bark growing over the left side of his neck and jaw up to his hairline, his left eye clouded milky white, simple brown wrap robe, faint pale-green glow where bark meets skin",
+    "seed": 971210610,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/avatars/mawood/mawoodElarion.png": {
+    "family": "portrait-pixel",
+    "tier": null,
+    "subject": "a slim androgynous eccentric mage shopkeeper, bust, court robe worn under a shop apron, a round monocle with a thin gold rim in front of one eye, soot smudge on cheek, wild expressive eyebrows, mischievous grin",
+    "seed": 208119081,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/avatars/mawood/mawoodFinn.png": {
+    "family": "portrait-pixel",
+    "tier": null,
+    "subject": "a realistic weathered ranger trapper man, short practical hair, scar through one eyebrow, fur-lined leather trapper vest over rough wool shirt, a bow slung over the shoulder, hard eyes, green-brown forest tones, one consistent natural skin tone on face, neck and hands, fully opaque solid figure, bust with both shoulders fully in frame",
+    "seed": 294464300,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/avatars/mawood/mawoodMilo.png": {
+    "family": "portrait-pixel",
+    "tier": null,
+    "subject": "a realistic young boy about nine years old with proportions of a real child, freckles, wind-tousled hair, oversized rough wool tunic and patched leather vest, a coarse rope climbing harness across the chest, a feather tied at the shoulder, wide eager grin, one consistent natural skin tone on face, neck and hands, fully opaque solid figure, bust with both shoulders fully in frame",
+    "seed": 1936352505,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/avatars/mawood/mawoodSylvie.png": {
+    "family": "portrait-pixel",
+    "tier": null,
+    "subject": "a gentle freckled woman apothecary, bust, hair half-braided with dried herbs and flowers, apron with vial pouches, holding a small glass vial, warm rosy smile, green and lavender clothes",
+    "seed": 513426195,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/enemies/bandit.png": {
+    "shinyHue": 88,
+    "family": "enemy-pixel",
+    "tier": "medium",
+    "subject": "a human bandit with one head, two arms and two legs, wearing a red hood with a bandana over his face, holding a short dagger in one hand",
+    "seed": 1004223603,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/enemies/blueSlime.png": {
+    "shinyHue": 342,
+    "family": "enemy-pixel",
+    "tier": "small",
+    "subject": "a single blob, a blue slime with a glossy dome body and two simple eyes",
+    "seed": 421649261,
+    "date": "2026-10-17",
+    "shinySaturation": 2.2,
+    "shinyBrightness": 1.3
+  },
+  "src/assets/img/enemies/bogSkeleton.png": {
+    "shinyHue": 180,
+    "family": "enemy-pixel",
+    "tier": "medium",
+    "subject": "an ancient skeleton warrior with one skull, two arms and two legs, half covered in moss and tangled roots, holding a rusted sword",
+    "seed": 1569708908,
+    "date": "2026-10-17",
+    "shinySaturation": 2.5,
+    "shinyBrightness": 1.1
+  },
+  "src/assets/img/enemies/canopyBandit.png": {
+    "shinyHue": 90,
+    "family": "enemy-pixel",
+    "tier": "medium",
+    "subject": "a rugged outlaw with one head, two arms and two legs, in dark green clothes with a scarf over his face, holding a machete",
+    "seed": 1479903915,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/enemies/corruptedSapling.png": {
+    "shinyHue": 280,
+    "family": "enemy-pixel",
+    "tier": "small",
+    "subject": "one small young tree with a single thin trunk and bare twisted branches, the bark covered in glowing dark purple-black cracks and veins of blight, a few withered leaves",
+    "seed": 1324844182,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/enemies/crab.png": {
+    "shinyHue": 250,
+    "family": "enemy-pixel",
+    "tier": "small",
+    "subject": "a red crab facing the viewer, wide domed orange-red shell, eyes on two short stalks, two big claws raised with open pincers, eight legs",
+    "seed": 762066615,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/enemies/deer.png": {
+    "shinyHue": 212,
+    "family": "enemy-pixel",
+    "tier": "medium",
+    "subject": "a brown deer with antlers, one head, exactly four legs, standing",
+    "seed": 304546822,
+    "date": "2026-10-17",
+    "shinySaturation": 2.5,
+    "shinyBrightness": 1.1
+  },
+  "src/assets/img/enemies/elderSpider.png": {
+    "shinyHue": 300,
+    "family": "enemy-pixel",
+    "tier": "large",
+    "subject": "a huge ancient grey spider seen from above, round abdomen with a pale bone-white skull-shaped marking, small head with red eyes and large fangs, thick dark grey hairy legs with bent joints",
+    "seed": 1865909053,
+    "date": "2026-10-17",
+    "shinySaturation": 2.5,
+    "shinyBrightness": 1.1
+  },
+  "src/assets/img/enemies/forestBear.png": {
+    "shinyHue": 200,
+    "family": "enemy-pixel",
+    "tier": "large",
+    "subject": "a large brown grizzly bear walking on all four legs, exactly four legs, one head, thick brown fur",
+    "seed": 12,
+    "date": "2026-10-17",
+    "shinySaturation": 2.5,
+    "shinyBrightness": 1.1
+  },
+  "src/assets/img/enemies/forestSpider.png": {
+    "shinyHue": 330,
+    "family": "enemy-pixel",
+    "tier": "small",
+    "subject": "a forest spider seen from above, round pale-green abdomen with a darker pattern, small brown head with several eyes and two fangs, thick brown hairy legs with bent joints",
+    "seed": 1885925255,
+    "date": "2026-10-17",
+    "shinySaturation": 3,
+    "shinyBrightness": 1.25
+  },
+  "src/assets/img/enemies/gangsterCrab.png": {
+    "shinyHue": 254,
+    "family": "enemy-pixel",
+    "tier": "small",
+    "subject": "a red crab facing the viewer wearing a black eyepatch, one claw raised high holding a large kitchen knife, domed red shell, eyes on two short stalks, eight legs",
+    "seed": 1556945092,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/enemies/giantEagle.png": {
+    "shinyHue": 200,
+    "family": "enemy-pixel",
+    "tier": "large",
+    "subject": "a giant eagle with two wings spread wide and two legs, one head, hooked beak and sharp golden talons",
+    "seed": 66768990,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/enemies/giantRat.png": {
+    "shinyHue": 344,
+    "family": "enemy-pixel",
+    "tier": "small",
+    "subject": "a large grey rat in side view with one head, exactly four legs, one long thin pink tail and big yellow buck teeth",
+    "seed": 376893830,
+    "date": "2026-10-17",
+    "shinySaturation": 4,
+    "shinyBrightness": 1.2
+  },
+  "src/assets/img/enemies/gnarledTreant.png": {
+    "shinyHue": 180,
+    "family": "enemy-pixel",
+    "tier": "large",
+    "subject": "a massive gnarled ancient tree creature with one face in its bark, two root legs, two branch arms and glowing blight cracks",
+    "seed": 1522338292,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/enemies/gnollScout.png": {
+    "shinyHue": 120,
+    "family": "enemy-pixel",
+    "tier": "medium",
+    "subject": "a lean hyena-headed humanoid scout with one head, two arms and two legs, in simple leather clothes holding a single spear, no cloak",
+    "seed": 1183454334,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/enemies/gnollWarchief.png": {
+    "shinyHue": 160,
+    "family": "enemy-pixel",
+    "tier": "large",
+    "subject": "a massive hyena-headed gnoll warchief with one head, two arms and two legs, in crude spiked armour holding one large axe, roaring",
+    "seed": 1282136480,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/enemies/goat.png": {
+    "shinyHue": 344,
+    "family": "enemy-pixel",
+    "tier": "medium",
+    "subject": "a mountain goat with curved horns, one head, exactly four legs, standing",
+    "seed": 574794833,
+    "date": "2026-10-17",
+    "shinySaturation": 2.5,
+    "shinyBrightness": 1.1
+  },
+  "src/assets/img/enemies/goblinScavenger.png": {
+    "shinyHue": 288,
+    "family": "enemy-pixel",
+    "tier": "small",
+    "subject": "a small green goblin with one normally sized head, pointy ears, two arms and two legs, ragged patched clothes, a small sack over one shoulder and a rusty knife",
+    "seed": 35693272,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/enemies/goblinScout.png": {
+    "shinyHue": 266,
+    "family": "enemy-pixel",
+    "tier": "small",
+    "subject": "a small green goblin with one head, long pointed ears, two arms and two legs, in a leather cap holding a short bow, no cloak",
+    "seed": 657997838,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/enemies/greenSlime.png": {
+    "shinyHue": 26,
+    "family": "enemy-pixel",
+    "tier": "small",
+    "subject": "a single blob, a green slime with a glossy dome body and two simple eyes",
+    "seed": 797856277,
+    "date": "2026-10-17",
+    "shinySaturation": 2.2,
+    "shinyBrightness": 1.3
+  },
+  "src/assets/img/enemies/harpy.png": {
+    "shinyHue": 260,
+    "family": "enemy-pixel",
+    "tier": "medium",
+    "subject": "a harpy: the head, hair and torso of a human woman, but her arms are large brown feathered bird wings with no hands, and her legs are two scaly bird legs with yellow talons, a feathered tail, one head with no horns",
+    "seed": 151429908,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/enemies/harpyMatriarch.png": {
+    "shinyHue": 300,
+    "family": "enemy-pixel",
+    "tier": "large",
+    "subject": "an older larger harpy matriarch: the head, grey hair and torso of an aged human woman wearing a small crown, but her arms are huge grey and white feathered bird wings with no hands, and her legs are two scaly bird legs with large talons, one head with no horns",
+    "seed": 1134554239,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/enemies/kingSlime.png": {
+    "shinyHue": 262,
+    "family": "enemy-pixel",
+    "tier": "large",
+    "subject": "a single giant blob, a slime wearing a golden crown, with a smug face",
+    "seed": 1469883411,
+    "date": "2026-10-17",
+    "shinySaturation": 2.5,
+    "shinyBrightness": 1.1
+  },
+  "src/assets/img/enemies/mountainBat.png": {
+    "shinyHue": 96,
+    "family": "enemy-pixel",
+    "tier": "small",
+    "subject": "a menacing realistic mountain bat with leathery membrane wings and sharp fangs, not cute, one head, two wings, gritty",
+    "seed": 1886961095,
+    "date": "2026-10-17",
+    "shinySaturation": 2.5,
+    "shinyBrightness": 1.1
+  },
+  "src/assets/img/enemies/rat.png": {
+    "shinyHue": 168,
+    "family": "enemy-pixel",
+    "tier": "tiny",
+    "subject": "a tiny small brown rat with one head, four legs, a thin tail, compact body",
+    "seed": 797891088,
+    "date": "2026-10-17",
+    "shinySaturation": 2.5,
+    "shinyBrightness": 1.1
+  },
+  "src/assets/img/enemies/redSlime.png": {
+    "shinyHue": 18,
+    "family": "enemy-pixel",
+    "tier": "small",
+    "subject": "a single smooth glossy translucent red slime blob with a plain smooth surface, no spots or bumps, melting into a puddle at the base, two eyes",
+    "seed": 1966822229,
+    "date": "2026-10-17",
+    "shinySaturation": 2.2,
+    "shinyBrightness": 1.3
+  },
+  "src/assets/img/enemies/seagull.png": {
+    "shinyHue": 38,
+    "family": "enemy-pixel",
+    "tier": "tiny",
+    "subject": "a white seagull standing calmly with its grey wings folded against its body, two legs, one head and a yellow beak",
+    "seed": 413721988,
+    "date": "2026-10-17",
+    "shinySaturation": 2.5,
+    "shinyBrightness": 1.1
+  },
+  "src/assets/img/enemies/treantSprout.png": {
+    "shinyHue": 270,
+    "family": "enemy-pixel",
+    "tier": "medium",
+    "subject": "a small wise slightly sinister woodland tree sprite with bark skin, narrow amber eyes, a stubby trunk body, two root feet, two twig arms, one head, a few leaves",
+    "seed": 164823496,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/enemies/troll.png": {
+    "shinyHue": 90,
+    "family": "enemy-pixel",
+    "tier": "large",
+    "subject": "a huge green-skinned troll with a hunched back, one head, two thick arms and two legs, holding a single large wooden club in ONE hand only, the other arm hanging empty at its side",
+    "seed": 995717204,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/enemies/turtle.png": {
+    "shinyHue": 26,
+    "family": "enemy-pixel",
+    "tier": "small",
+    "subject": "a green turtle with one head, exactly four legs and a domed shell",
+    "seed": 4673125,
+    "date": "2026-10-17",
+    "shinySaturation": 2.5,
+    "shinyBrightness": 1.1
+  },
+  "src/assets/img/enemies/wolf.png": {
+    "shinyHue": 200,
+    "family": "enemy-pixel",
+    "tier": "medium",
+    "subject": "a grey wolf with one head, exactly four legs, snarling with bared fangs, standing",
+    "seed": 1395072976,
+    "date": "2026-10-17",
+    "shinySaturation": 4,
+    "shinyBrightness": 1.2
+  },
+  "src/assets/img/items/ancientWood.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a thick gnarled chunk of old pale wood log with deep bark ridges and rings, single object",
+    "seed": 535645451,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/items/ashwoodBow.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a curved dark grey ashwood hunting bow with a taut string, single object",
+    "seed": 1100205231,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/items/bearPelt.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a folded brown bear fur hide pelt, thick fur, single object, no animal",
+    "seed": 1606794755,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/items/blightedFetish.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a small voodoo charm object: a bundle of twisted roots and a bone wrapped in cord with fur scraps, black tar dripping from it, single object, no creature, no face",
+    "seed": 1960297685,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/items/blightedHeartwood.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a chunk of dark rotten heartwood timber with black tar veins and sickly green cracks, single object",
+    "seed": 1869639304,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/items/boneFragment.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a broken off piece of yellowed bone with jagged edge, single object",
+    "seed": 1199052729,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/items/corruptedResin.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a shiny lump of hardened amber crystal with dark purple-black veins, a single faceted gemstone-like nugget",
+    "seed": 31,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/items/cursedSap.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a small glass vial of thick black sap with an eerie green glow, single object",
+    "seed": 1290736726,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/items/eagleTalon.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single curved sharp raptor claw, dark tan with pale tip, single object, no bird",
+    "seed": 480541409,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/items/elderSilk.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a loose skein of fine glowing pale silver silk thread, single object",
+    "seed": 1451607053,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/items/gnollTrophy.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a hunting trophy: a wooden plaque with a mounted bone-and-fang necklace and fur tuft, single object, no creature, no face",
+    "seed": 1610306603,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/items/harpyCrown.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a small ornate crown made of interlocked bronze talons and teal feathers, single object",
+    "seed": 1920127222,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/items/harpyFeather.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single long feather, teal and brown with a pale quill, single object",
+    "seed": 1114497759,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/items/heartwoodAmulet.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a round carved wooden amulet pendant of dark red heartwood on a cord, glowing green rune in the center, single object",
+    "seed": 202870648,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/items/matriarchPlume.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a large flamboyant plume of golden and crimson feathers, single object",
+    "seed": 5818524,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/items/silverwoodChestplate.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a chestplate armor made of pale silvery bark plates with leather straps, single object",
+    "seed": 1032867683,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/items/spiderFang.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single curved ivory fang, one object",
+    "seed": 152762729,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/items/spiderSilk.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a small wound ball of white spider web silk thread, single object",
+    "seed": 1263046399,
+    "date": "2026-10-17"
+  }
+}
