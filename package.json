@@ -7,7 +7,8 @@
         "build": "ng build",
         "watch": "ng build --watch --configuration development",
         "test": "ng test",
-        "tile": "node scripts/tile-map.mjs"
+        "tile": "node scripts/tile-map.mjs",
+        "test:assets": "node --test \"scripts/asset-gen/test/*.test.mjs\""
     },
     "prettier": {
         "overrides": [
