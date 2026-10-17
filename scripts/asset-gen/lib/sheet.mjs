@@ -14,7 +14,7 @@ const DIGITS = {
 }
 
 /** RGBA badge with `n` drawn in 3×5 digits at `scale`, white on dark. */
-function badge(n, scale) {
+export function badge(n, scale) {
     const digits = String(n).split('')
     const w = (digits.length * 4 + 1) * scale
     const h = 7 * scale

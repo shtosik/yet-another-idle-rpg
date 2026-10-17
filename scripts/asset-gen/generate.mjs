@@ -8,6 +8,8 @@
 //   node scripts/asset-gen/generate.mjs --batch jobs.json       # [{family,target,subject,count?,seed?,tier?,tag?}], one boot
 //   node scripts/asset-gen/generate.mjs --estimate-hue <base target>   # from the existing base + -shiny pair; stores shinyHue
 //   node scripts/asset-gen/generate.mjs --shiny-of <base target> [--hue N] [--saturation X] [--brightness X]   # writes <name>-shiny.png beside the base
+//   node scripts/asset-gen/generate.mjs --montage <png|dir>... [--pairs] [--bg #00aaff] [--cols 6] [--cell 300] [--out file]
+//        # flatten sprites on a contrasting colour, numbered, to review a whole set at once
 //   node scripts/asset-gen/generate.mjs --list-families | --stop
 //
 // Tuning overrides (A/B runs): --steps --cfg --ip-weight --sampler --grid --colors --tag <suffix for the slug>
@@ -21,6 +23,7 @@ import { parseArgs } from 'node:util'
 import { pathToFileURL } from 'node:url'
 import { parseJobs, runBatch } from './lib/batch.mjs'
 import { createComfy } from './lib/comfy.mjs'
+import { collectImages, makeMontage } from './lib/montage.mjs'
 import { controlImage } from './lib/controls.mjs'
 import { qcOptionsFor, qcSprite, rawQc } from './lib/qc.mjs'
 import { MANIFEST_PATH, readManifest, recordEntry, setField } from './lib/manifest.mjs'
@@ -182,7 +185,7 @@ const OPTIONS = {
     family: { type: 'string' }, target: { type: 'string' }, subject: { type: 'string' },
     count: { type: 'string' }, seed: { type: 'string' }, 'no-ref': { type: 'boolean' }, tag: { type: 'string' }, tier: { type: 'string' },
     pick: { type: 'string' }, slug: { type: 'string' }, batch: { type: 'string' },
-    'list-families': { type: 'boolean' }, stop: { type: 'boolean' }, reprocess: { type: 'boolean' }, control: { type: 'string' }, recipe: { type: 'string' },
+    'list-families': { type: 'boolean' }, stop: { type: 'boolean' }, reprocess: { type: 'boolean' }, montage: { type: 'string', multiple: true }, pairs: { type: 'boolean' }, bg: { type: 'string' }, cols: { type: 'string' }, cell: { type: 'string' }, out: { type: 'string' }, control: { type: 'string' }, recipe: { type: 'string' },
     steps: { type: 'string' }, cfg: { type: 'string' }, 'ip-weight': { type: 'string' }, sampler: { type: 'string' },
     grid: { type: 'string' }, colors: { type: 'string' }, ref: { type: 'string', multiple: true }, 'control-strength': { type: 'string' }, 'control-end': { type: 'string' }, style: { type: 'string' }, 
 }
@@ -193,6 +196,14 @@ export async function main(argv = process.argv.slice(2)) {
 
     if (v['list-families']) {
         return Object.entries(FAMILIES).map(([id, f]) => ({ id, description: f.description, target: f.target, gen: f.gen, alpha: f.alpha, refs: f.references.length }))
+    }
+    if (v.montage) {
+        const files = collectImages(v.montage, { pairs: v.pairs })
+        const { buffer, items } = await makeMontage(files, { bg: v.bg, cols: v.cols ? Number(v.cols) : undefined, cell: v.cell ? Number(v.cell) : undefined })
+        const out = resolve(REPO_ROOT, v.out ?? join('.tmp-gen', 'montage.png'))
+        mkdirSync(dirname(out), { recursive: true })
+        writeFileSync(out, buffer)
+        return { montage: out, count: items.length, items }
     }
     const comfy = createComfy()
     if (v.stop) return comfy.stop()
