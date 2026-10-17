@@ -4,6 +4,7 @@
 //   node scripts/asset-gen/generate.mjs --family item-pixel --target src/assets/img/items/frostShard.png \
 //        --subject "a jagged pale-blue ice crystal shard" [--count 4] [--seed N] [--no-ref] [--tier tiny|small|medium|large]
 //   node scripts/asset-gen/generate.mjs --pick 3 --slug item-pixel-frostShard
+//   node scripts/asset-gen/generate.mjs --batch jobs.json       # [{family,target,subject,count?,seed?,tier?,tag?}], one boot
 //   node scripts/asset-gen/generate.mjs --list-families | --stop
 //
 // Tuning overrides (A/B runs): --steps --cfg --ip-weight --sampler --grid --colors --tag <suffix for the slug> --keep-raw
@@ -13,7 +14,9 @@ import { copyFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { basename, dirname, extname, isAbsolute, join, relative, resolve } from 'node:path'
 import { parseArgs } from 'node:util'
 import { pathToFileURL } from 'node:url'
+import { parseJobs, runBatch } from './lib/batch.mjs'
 import { createComfy } from './lib/comfy.mjs'
+import { MANIFEST_PATH, recordEntry } from './lib/manifest.mjs'
 import { runPipeline } from './lib/postprocess.mjs'
 import { loadRefs } from './lib/refs.mjs'
 import { makeSheet } from './lib/sheet.mjs'
@@ -43,13 +46,13 @@ export function applyOverrides(family, { steps, cfg, ipWeight, sampler, grid, co
  * Generates `count` candidates for one job into `.tmp-gen/<slug>/` and writes candidate PNGs, sheet and meta.
  * @returns {Promise<object>} the JSON result printed on stdout
  */
-export async function generateJob({ comfy, familyId, target, subject, seed, count = 4, useRef = true, tag, tier, keepRaw = false, overrides = {} }) {
+export async function generateJob({ comfy, familyId, target, subject, seed, count = 4, useRef = true, tag, tier, keepRaw = false, overrides = {}, tmpDir = TMP_DIR }) {
     const family = applyOverrides(getFamily(familyId), overrides)
     const slug = slugFor(familyId, target, tag)
     const sizeGuessed = !!family.tiers && !tier
     const usedTier = family.tiers ? (tier ?? DEFAULT_TIER) : null
     const post = resolvePost(family, usedTier)
-    const dir = join(TMP_DIR, slug)
+    const dir = join(tmpDir, slug)
     mkdirSync(dir, { recursive: true })
     const started = Date.now()
 
@@ -79,21 +82,26 @@ export async function generateJob({ comfy, familyId, target, subject, seed, coun
     return { ...meta, candidates: files, sheet, refs: useRef ? refs.map((r) => r.path) : [] }
 }
 
-/** Copies candidate `n` of `slug` to the job's target path. */
-export function pickCandidate({ slug, n }) {
-    const dir = join(TMP_DIR, slug)
+/**
+ * Copies candidate `n` of `slug` to the job's target path and records it in the manifest (scratch targets under
+ * `.tmp-gen/` are not recorded).
+ */
+export function pickCandidate({ slug, n, tmpDir = TMP_DIR, root = REPO_ROOT, manifestPath = MANIFEST_PATH, date }) {
+    const dir = join(tmpDir, slug)
     const meta = JSON.parse(readFileSync(join(dir, 'meta.json'), 'utf8'))
     if (!Number.isInteger(n) || n < 1 || n > meta.count) throw new Error(`--pick must be 1..${meta.count} for ${slug}`)
-    const dest = isAbsolute(meta.target) ? meta.target : resolve(REPO_ROOT, meta.target)
+    const dest = isAbsolute(meta.target) ? meta.target : resolve(root, meta.target)
     mkdirSync(dirname(dest), { recursive: true })
     copyFileSync(join(dir, `candidate-${n}.png`), dest)
-    return { slug, picked: n, target: relative(REPO_ROOT, dest).replaceAll('\\', '/'), meta }
+    const target = relative(root, dest).replaceAll('\\', '/')
+    const entry = target.startsWith('.tmp-gen/') ? null : recordEntry(target, { family: meta.family, tier: meta.tier, subject: meta.subject, seed: meta.seed, date }, manifestPath)
+    return { slug, picked: n, target, manifest: entry, meta }
 }
 
 const OPTIONS = {
     family: { type: 'string' }, target: { type: 'string' }, subject: { type: 'string' },
     count: { type: 'string' }, seed: { type: 'string' }, 'no-ref': { type: 'boolean' }, tag: { type: 'string' }, tier: { type: 'string' },
-    pick: { type: 'string' }, slug: { type: 'string' },
+    pick: { type: 'string' }, slug: { type: 'string' }, batch: { type: 'string' },
     'list-families': { type: 'boolean' }, stop: { type: 'boolean' },
     steps: { type: 'string' }, cfg: { type: 'string' }, 'ip-weight': { type: 'string' }, sampler: { type: 'string' },
     grid: { type: 'string' }, colors: { type: 'string' }, 'keep-raw': { type: 'boolean' },
@@ -111,6 +119,14 @@ export async function main(argv = process.argv.slice(2)) {
     if (v.pick !== undefined) {
         if (!v.slug) throw new Error('--pick needs --slug')
         return pickCandidate({ slug: v.slug, n: Number(v.pick) })
+    }
+    if (v.batch) {
+        const jobs = parseJobs(JSON.parse(readFileSync(v.batch, 'utf8')))
+        const bootStart = Date.now()
+        const { started } = await comfy.ensureServer()
+        const bootSeconds = Math.round((Date.now() - bootStart) / 100) / 10
+        const { results, failures } = await runBatch({ comfy, jobs, generate: generateJob })
+        return { jobs: jobs.length, serverStarted: started, bootSeconds, results, failures }
     }
     for (const required of ['family', 'target', 'subject']) {
         if (!v[required]) throw new Error(`Missing --${required}`)
