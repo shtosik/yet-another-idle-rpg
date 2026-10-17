@@ -26,6 +26,7 @@ export const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..
 export const FAMILY_TARGETS = {
     'item-pixel': [48, 48],
     'zone-pixel': [832, 1248],
+    'town-painterly': [1376, 768],
     'enemy-pixel': [256, 256], // hard cap on the longer side; the real size comes from the Size tier
 }
 
@@ -116,6 +117,24 @@ FAMILIES['zone-pixel'] = {
         ['pixelate', { block: 4 }],
         ['quantize', { colors: 48 }],
     ],
+    ipWeight: 0.7,
+    sampler: { steps: 8, cfg: 5.5, sampler_name: 'euler', scheduler: 'sgm_uniform' },
+}
+
+FAMILIES['town-painterly'] = {
+    description: '1376×768 opaque painterly matte (town / building background)',
+    checkpoint: 'zavychromaxl_v80.safetensors',
+    stylePrompt:
+        'painterly fantasy matte painting, town scene, rich brushwork, warm atmospheric lighting, ' +
+        'no characters, no text, wide cinematic composition',
+    negative: `${NEGATIVE_BASE}, characters, people, pixel art, low detail, ui`,
+    references: ['mawood', 'mawoodApothecary', 'laHarparTavern'].map((n) => `src/assets/img/backgrounds/${n}.png`),
+    gen: [1344, 768],
+    target: [1376, 768],
+    pixel: false,
+    alpha: false,
+    // Generate at the nearest SDXL-native size and cover up to the exact asset size (a 32px crop-fill, no distortion).
+    post: [['cover', { width: 1376, height: 768 }]],
     ipWeight: 0.7,
     sampler: { steps: 8, cfg: 5.5, sampler_name: 'euler', scheduler: 'sgm_uniform' },
 }
