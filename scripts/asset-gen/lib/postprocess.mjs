@@ -9,6 +9,12 @@ const raw = async (buf) => {
 }
 const png = (data, width, height) => sharp(data, { raw: { width, height, channels: 4 } }).png().toBuffer()
 
+const TRANSPARENT = { r: 0, g: 0, b: 0, alpha: 0 }
+
+/** In-bounds 4-neighbourhood of (x, y) as `[nx, ny]` pairs. */
+const neighbours4 = (x, y, width, height) =>
+    [[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]].filter(([nx, ny]) => nx >= 0 && ny >= 0 && nx < width && ny < height)
+
 /**
  * Corner-seeded BFS flood-fill background remover. Only pixels contiguously connected to a corner by colour
  * similarity become transparent, so a subject colour close to the background is safe unless it touches the frame.
@@ -18,8 +24,9 @@ const png = (data, width, height) => sharp(data, { raw: { width, height, channel
 export async function keyout(buf, { threshold = 40, feather = 1 } = {}) {
     const { data, width, height } = await raw(buf)
     const idx = (x, y) => (y * width + x) * 4
-    const refIdx = idx(0, 0)
-    const dist = (i) => Math.hypot(data[i] - data[refIdx], data[i + 1] - data[refIdx + 1], data[i + 2] - data[refIdx + 2])
+    const cornerIdx = idx(0, 0)
+    const colourDistance = (i) =>
+        Math.hypot(data[i] - data[cornerIdx], data[i + 1] - data[cornerIdx + 1], data[i + 2] - data[cornerIdx + 2])
 
     const isBg = new Uint8Array(width * height)
     const visited = new Uint8Array(width * height)
@@ -31,12 +38,12 @@ export async function keyout(buf, { threshold = 40, feather = 1 } = {}) {
         }
     }
     for (let qi = 0; qi < queue.length;) {
-        const x = queue[qi++], y = queue[qi++]
+        const x = queue[qi++]
+        const y = queue[qi++]
         isBg[y * width + x] = 1
-        for (const [nx, ny] of [[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]]) {
-            if (nx < 0 || ny < 0 || nx >= width || ny >= height) continue
+        for (const [nx, ny] of neighbours4(x, y, width, height)) {
             const np = ny * width + nx
-            if (visited[np] || dist(idx(nx, ny)) >= threshold) continue
+            if (visited[np] || colourDistance(idx(nx, ny)) >= threshold) continue
             visited[np] = 1
             queue.push(nx, ny)
         }
@@ -47,7 +54,8 @@ export async function keyout(buf, { threshold = 40, feather = 1 } = {}) {
         const next = new Uint8Array(alpha)
         for (let y = 0; y < height; y++) {
             for (let x = 0; x < width; x++) {
-                let sum = 0, count = 0
+                let sum = 0
+                let count = 0
                 for (let dy = -1; dy <= 1; dy++) {
                     for (let dx = -1; dx <= 1; dx++) {
                         const nx = x + dx, ny = y + dy
@@ -81,7 +89,7 @@ export async function trim(buf, { alphaMin = 8, pad = 0 } = {}) {
     if (maxX < 0) return buf
     const cropped = await sharp(buf).extract({ left: minX, top: minY, width: maxX - minX + 1, height: maxY - minY + 1 }).png().toBuffer()
     return pad
-        ? sharp(cropped).extend({ top: pad, bottom: pad, left: pad, right: pad, background: { r: 0, g: 0, b: 0, alpha: 0 } }).png().toBuffer()
+        ? sharp(cropped).extend({ top: pad, bottom: pad, left: pad, right: pad, background: TRANSPARENT }).png().toBuffer()
         : cropped
 }
 
@@ -95,44 +103,48 @@ export async function trim(buf, { alphaMin = 8, pad = 0 } = {}) {
  */
 export async function pixelate(buf, { grid, block, width, height, alphaCut = 128 }) {
     const src = await raw(buf)
-    let cw, ch
+    let cellsWide, cellsHigh
     if (block) {
-        cw = Math.ceil(src.width / block)
-        ch = Math.ceil(src.height / block)
+        cellsWide = Math.ceil(src.width / block)
+        cellsHigh = Math.ceil(src.height / block)
     } else {
         const scale = grid / Math.max(src.width, src.height)
-        cw = Math.max(1, Math.round(src.width * scale))
-        ch = Math.max(1, Math.round(src.height * scale))
+        cellsWide = Math.max(1, Math.round(src.width * scale))
+        cellsHigh = Math.max(1, Math.round(src.height * scale))
     }
-    const cells = Buffer.alloc(cw * ch * 4)
-    for (let cy = 0; cy < ch; cy++) {
-        const y0 = Math.floor((cy * src.height) / ch)
-        const y1 = Math.max(y0 + 1, Math.floor(((cy + 1) * src.height) / ch))
-        for (let cx = 0; cx < cw; cx++) {
-            const x0 = Math.floor((cx * src.width) / cw)
-            const x1 = Math.max(x0 + 1, Math.floor(((cx + 1) * src.width) / cw))
-            let r = 0, g = 0, b = 0, a = 0, n = 0
-            for (let y = y0; y < y1; y++) {
-                for (let x = x0; x < x1; x++) {
+    const cells = Buffer.alloc(cellsWide * cellsHigh * 4)
+    for (let cy = 0; cy < cellsHigh; cy++) {
+        const top = Math.floor((cy * src.height) / cellsHigh)
+        const bottom = Math.max(top + 1, Math.floor(((cy + 1) * src.height) / cellsHigh))
+        for (let cx = 0; cx < cellsWide; cx++) {
+            const left = Math.floor((cx * src.width) / cellsWide)
+            const right = Math.max(left + 1, Math.floor(((cx + 1) * src.width) / cellsWide))
+            let redSum = 0
+            let greenSum = 0
+            let blueSum = 0
+            let alphaSum = 0
+            let pixelCount = 0
+            for (let y = top; y < bottom; y++) {
+                for (let x = left; x < right; x++) {
                     const i = (y * src.width + x) * 4
-                    const w = src.data[i + 3]
-                    r += src.data[i] * w
-                    g += src.data[i + 1] * w
-                    b += src.data[i + 2] * w
-                    a += w
-                    n++
+                    const weight = src.data[i + 3]
+                    redSum += src.data[i] * weight
+                    greenSum += src.data[i + 1] * weight
+                    blueSum += src.data[i + 2] * weight
+                    alphaSum += weight
+                    pixelCount++
                 }
             }
-            const o = (cy * cw + cx) * 4
-            if (a > 0) {
-                cells[o] = Math.round(r / a)
-                cells[o + 1] = Math.round(g / a)
-                cells[o + 2] = Math.round(b / a)
+            const o = (cy * cellsWide + cx) * 4
+            if (alphaSum > 0) {
+                cells[o] = Math.round(redSum / alphaSum)
+                cells[o + 1] = Math.round(greenSum / alphaSum)
+                cells[o + 2] = Math.round(blueSum / alphaSum)
             }
-            cells[o + 3] = a / n >= alphaCut ? 255 : 0
+            cells[o + 3] = alphaSum / pixelCount >= alphaCut ? 255 : 0
         }
     }
-    const small = await png(cells, cw, ch)
+    const small = await png(cells, cellsWide, cellsHigh)
     if (block) {
         return sharp(small).resize(src.width, src.height, { kernel: 'nearest', fit: 'fill' }).png().toBuffer()
     }
@@ -146,26 +158,25 @@ export function quantize(buf, { colors = 16 } = {}) {
 }
 
 /**
- * Paints a `color` border on transparent pixels that touch an opaque pixel (4-neighbourhood), `px` times.
+ * Paints a `color` border on transparent pixels that touch an opaque pixel (4-neighbourhood), `thickness` times.
  * Opaque pixels are never modified, so the silhouette stays intact.
  */
-export async function outline(buf, { px = 1, color = [24, 16, 32] } = {}) {
+export async function outline(buf, { thickness = 1, color = [24, 16, 32] } = {}) {
     const { data, width, height } = await raw(buf)
-    for (let pass = 0; pass < px; pass++) {
+    const [red, green, blue] = color
+    for (let pass = 0; pass < thickness; pass++) {
         const edge = []
         for (let y = 0; y < height; y++) {
             for (let x = 0; x < width; x++) {
                 if (data[(y * width + x) * 4 + 3] !== 0) continue
-                const touches = [[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]].some(
-                    ([nx, ny]) => nx >= 0 && ny >= 0 && nx < width && ny < height && data[(ny * width + nx) * 4 + 3] > 0,
-                )
-                if (touches) edge.push((y * width + x) * 4)
+                const touchesSubject = neighbours4(x, y, width, height).some(([nx, ny]) => data[(ny * width + nx) * 4 + 3] > 0)
+                if (touchesSubject) edge.push((y * width + x) * 4)
             }
         }
         for (const i of edge) {
-            data[i] = color[0]
-            data[i + 1] = color[1]
-            data[i + 2] = color[2]
+            data[i] = red
+            data[i + 1] = green
+            data[i + 2] = blue
             data[i + 3] = 255
         }
     }
@@ -178,9 +189,9 @@ export function cover(buf, { width, height }) {
 }
 
 /** Scales to fit inside `width`×`height` (nearest, to keep pixel art crisp) and pads with transparency. */
-export async function fit(buf, { width, height, position = 'centre' }) {
+export function fit(buf, { width, height }) {
     return sharp(buf)
-        .resize(width, height, { fit: 'contain', kernel: 'nearest', position, background: { r: 0, g: 0, b: 0, alpha: 0 } })
+        .resize(width, height, { fit: 'contain', kernel: 'nearest', background: TRANSPARENT })
         .png()
         .toBuffer()
 }
