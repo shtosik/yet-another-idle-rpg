@@ -481,5 +481,131 @@
     "subject": "a small wound ball of white spider web silk thread, single object",
     "seed": 1263046399,
     "date": "2026-10-17"
+  },
+  "src/assets/img/items/ancientWood.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a thick gnarled chunk of old pale wood log with deep bark ridges and rings, single object",
+    "seed": 535645451,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/items/ashwoodBow.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a curved dark grey ashwood hunting bow with a taut string, single object",
+    "seed": 1100205231,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/items/bearPelt.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a folded brown bear fur hide pelt, thick fur, single object, no animal",
+    "seed": 1606794755,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/items/blightedFetish.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a small voodoo charm object: a bundle of twisted roots and a bone wrapped in cord with fur scraps, black tar dripping from it, single object, no creature, no face",
+    "seed": 1960297685,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/items/blightedHeartwood.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a chunk of dark rotten heartwood timber with black tar veins and sickly green cracks, single object",
+    "seed": 1869639304,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/items/boneFragment.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a broken off piece of yellowed bone with jagged edge, single object",
+    "seed": 1199052729,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/items/corruptedResin.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a shiny lump of hardened amber crystal with dark purple-black veins, a single faceted gemstone-like nugget",
+    "seed": 31,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/items/cursedSap.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a small glass vial of thick black sap with an eerie green glow, single object",
+    "seed": 1290736726,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/items/eagleTalon.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single curved sharp raptor claw, dark tan with pale tip, single object, no bird",
+    "seed": 480541409,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/items/elderSilk.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a loose skein of fine glowing pale silver silk thread, single object",
+    "seed": 1451607053,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/items/gnollTrophy.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a hunting trophy: a wooden plaque with a mounted bone-and-fang necklace and fur tuft, single object, no creature, no face",
+    "seed": 1610306603,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/items/harpyCrown.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a small ornate crown made of interlocked bronze talons and teal feathers, single object",
+    "seed": 1920127222,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/items/harpyFeather.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single long feather, teal and brown with a pale quill, single object",
+    "seed": 1114497759,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/items/heartwoodAmulet.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a round carved wooden amulet pendant of dark red heartwood on a cord, glowing green rune in the center, single object",
+    "seed": 202870648,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/items/matriarchPlume.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a large flamboyant plume of golden and crimson feathers, single object",
+    "seed": 5818524,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/items/silverwoodChestplate.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a chestplate armor made of pale silvery bark plates with leather straps, single object",
+    "seed": 1032867683,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/items/spiderFang.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single curved ivory fang, one object",
+    "seed": 152762729,
+    "date": "2026-10-17"
+  },
+  "src/assets/img/items/spiderSilk.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a small wound ball of white spider web silk thread, single object",
+    "seed": 1263046399,
+    "date": "2026-10-17"
   }
 }
