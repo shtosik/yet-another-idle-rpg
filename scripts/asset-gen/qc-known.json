@@ -1,0 +1,33 @@
+{
+  "src/assets/img/enemies/corruptedSapling.png": [
+    "holes"
+  ],
+  "src/assets/img/enemies/crab.png": [
+    "holes"
+  ],
+  "src/assets/img/enemies/elderSpider.png": [
+    "shiny"
+  ],
+  "src/assets/img/enemies/giantEagle.png": [
+    "holes"
+  ],
+  "src/assets/img/enemies/gnollScout.png": [
+    "holes"
+  ],
+  "src/assets/img/enemies/goblinScout.png": [
+    "holes"
+  ],
+  "src/assets/img/enemies/harpyMatriarch.png": [
+    "fragments",
+    "shiny"
+  ],
+  "src/assets/img/enemies/redSlime.png": [
+    "holes"
+  ],
+  "src/assets/img/enemies/treantSprout.png": [
+    "shiny"
+  ],
+  "src/assets/img/items/gnollTrophy.png": [
+    "holes"
+  ]
+}
