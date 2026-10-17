@@ -25,3 +25,11 @@ export function recordEntry(target, { family, tier = null, subject, seed, date =
     writeManifest(manifest, path)
     return manifest[target]
 }
+
+/** Sets one field on `target`'s entry, creating a partial entry if none exists yet (a later `--pick` fills the rest). */
+export function setField(target, field, value, path = MANIFEST_PATH) {
+    const manifest = readManifest(path)
+    manifest[target] = { ...manifest[target], [field]: value }
+    writeManifest(manifest, path)
+    return manifest[target]
+}

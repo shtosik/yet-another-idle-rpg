@@ -5,6 +5,8 @@
 //        --subject "a jagged pale-blue ice crystal shard" [--count 4] [--seed N] [--no-ref] [--tier tiny|small|medium|large]
 //   node scripts/asset-gen/generate.mjs --pick 3 --slug item-pixel-frostShard
 //   node scripts/asset-gen/generate.mjs --batch jobs.json       # [{family,target,subject,count?,seed?,tier?,tag?}], one boot
+//   node scripts/asset-gen/generate.mjs --estimate-hue <base target>   # from the existing base + -shiny pair; stores shinyHue
+//   node scripts/asset-gen/generate.mjs --shiny-of <base target> [--hue N]   # writes <name>-shiny.png beside the base
 //   node scripts/asset-gen/generate.mjs --list-families | --stop
 //
 // Tuning overrides (A/B runs): --steps --cfg --ip-weight --sampler --grid --colors --tag <suffix for the slug> --keep-raw
@@ -16,7 +18,8 @@ import { parseArgs } from 'node:util'
 import { pathToFileURL } from 'node:url'
 import { parseJobs, runBatch } from './lib/batch.mjs'
 import { createComfy } from './lib/comfy.mjs'
-import { MANIFEST_PATH, recordEntry } from './lib/manifest.mjs'
+import { MANIFEST_PATH, readManifest, recordEntry, setField } from './lib/manifest.mjs'
+import { estimateHue, hueShift, shinyPathFor } from './lib/shiny.mjs'
 import { runPipeline } from './lib/postprocess.mjs'
 import { loadRefs } from './lib/refs.mjs'
 import { makeSheet } from './lib/sheet.mjs'
@@ -98,7 +101,31 @@ export function pickCandidate({ slug, n, tmpDir = TMP_DIR, root = REPO_ROOT, man
     return { slug, picked: n, target, manifest: entry, meta }
 }
 
+/** Estimates the hue angle from the base + shiny pair currently on disk and stores it as `shinyHue`. Run before the base is regenerated. */
+export async function estimateShinyHue({ target, root = REPO_ROOT, manifestPath = MANIFEST_PATH }) {
+    const base = resolve(root, target)
+    const shiny = shinyPathFor(base)
+    const angle = await estimateHue(readFileSync(base), readFileSync(shiny))
+    setField(target, 'shinyHue', angle, manifestPath)
+    return { target, shinyHue: angle }
+}
+
+/**
+ * Writes `<name>-shiny.png` beside the accepted base: hue angle = `hue` flag, else the manifest's stored
+ * `shinyHue`. A flag value is stored back so the next redo reuses it.
+ */
+export async function makeShiny({ target, hue, root = REPO_ROOT, manifestPath = MANIFEST_PATH }) {
+    const base = resolve(root, target)
+    const angle = hue ?? readManifest(manifestPath)[target]?.shinyHue
+    if (angle === undefined) throw new Error(`No shinyHue for ${target}: pass --hue N, or run --estimate-hue before regenerating the base`)
+    const out = shinyPathFor(base)
+    writeFileSync(out, await hueShift(readFileSync(base), angle))
+    setField(target, 'shinyHue', angle, manifestPath)
+    return { target, shiny: relative(root, out).replaceAll('\\', '/'), shinyHue: angle }
+}
+
 const OPTIONS = {
+    'estimate-hue': { type: 'string' }, 'shiny-of': { type: 'string' }, hue: { type: 'string' },
     family: { type: 'string' }, target: { type: 'string' }, subject: { type: 'string' },
     count: { type: 'string' }, seed: { type: 'string' }, 'no-ref': { type: 'boolean' }, tag: { type: 'string' }, tier: { type: 'string' },
     pick: { type: 'string' }, slug: { type: 'string' }, batch: { type: 'string' },
@@ -116,6 +143,8 @@ export async function main(argv = process.argv.slice(2)) {
     }
     const comfy = createComfy()
     if (v.stop) return comfy.stop()
+    if (v['estimate-hue']) return estimateShinyHue({ target: v['estimate-hue'] })
+    if (v['shiny-of']) return makeShiny({ target: v['shiny-of'], hue: v.hue === undefined ? undefined : Number(v.hue) })
     if (v.pick !== undefined) {
         if (!v.slug) throw new Error('--pick needs --slug')
         return pickCandidate({ slug: v.slug, n: Number(v.pick) })
