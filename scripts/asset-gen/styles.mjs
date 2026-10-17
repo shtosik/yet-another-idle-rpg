@@ -35,14 +35,14 @@ export const FAMILIES = {
         checkpoint: 'zavychromaxl_v80.safetensors',
         stylePrompt:
             'pixel art game item icon, single object centred, dark outline, limited colour palette, crisp hard pixels, ' +
-            'solid flat bright green background',
+            'plain flat solid light grey background',
         negative: `${NEGATIVE_BASE}, multiple objects, ground shadow, gradient background, anti-aliased, smooth shading`,
         references: ITEM_REFS,
         gen: [1024, 1024],
         target: [48, 48],
         pixel: true,
         alpha: true,
-        refBackground: [0, 200, 0],
+        refBackground: [200, 200, 200],
         // Grid 46 inside a 48 canvas leaves the 1px outline room; outline runs before quantize so its colour
         // is part of the palette and the colour budget holds for the finished asset.
         post: [
@@ -52,7 +52,7 @@ export const FAMILIES = {
             ['outline', { px: 1 }],
             ['quantize', { colors: 24 }],
         ],
-        ipWeight: 0.8,
+        ipWeight: 0.5,
         sampler: { steps: 8, cfg: 5.5, sampler_name: 'euler', scheduler: 'sgm_uniform' },
     },
 }
