@@ -49,6 +49,10 @@
                 }
               }
 
+              @if (isInventoryBlocked(option)) {
+                <span class="meta-tag requirement">[{{ 'app:inventory.full' | i18next }}]</span>
+              }
+
               @if (result?.effects) {
                 @for (eff of result.effects; track $index) {
                   @let label = getEffectLabel(eff);

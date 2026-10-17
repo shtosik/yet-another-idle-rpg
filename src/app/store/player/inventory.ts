@@ -71,6 +71,20 @@ export function removeItems(inventory: Inventory, items: ItemStack[]): Inventory
   return result
 }
 
+/** True when `adding` fits in `capacity` slots once `removing` has been taken out first. */
+export function canFit(inventory: Inventory, capacity: number, adding: ItemStack[], removing: ItemStack[] = []): boolean {
+  const after = removeItems(inventory, removing).slice(0, capacity)
+  const freeSlots = after.filter(slot => slot === null).length + Math.max(0, capacity - after.length)
+
+  const newStacks = new Set<string>()
+  for (const { id, tier } of adding) {
+    const itemTier = tier ?? ITEM_DATA[id].tier
+    if (findStackIndex(after, id, itemTier) === -1) newStacks.add(`${id}:${itemTier}`)
+  }
+
+  return newStacks.size <= freeSlots
+}
+
 /** A Page is a 40-slot view of the inventory. */
 export const INVENTORY_PAGE_SIZE = 40
 
