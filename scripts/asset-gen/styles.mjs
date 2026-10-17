@@ -25,6 +25,7 @@ export const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..
 /** The agreed final size per family. Registry validation fails if an entry drifts from this table. */
 export const FAMILY_TARGETS = {
     'item-pixel': [48, 48],
+    'zone-pixel': [832, 1248],
     'enemy-pixel': [256, 256], // hard cap on the longer side; the real size comes from the Size tier
 }
 
@@ -94,6 +95,28 @@ FAMILIES['enemy-pixel'] = {
         ['upscale', { factor: '$factor' }],
     ],
     ipWeight: 0.5,
+    sampler: { steps: 8, cfg: 5.5, sampler_name: 'euler', scheduler: 'sgm_uniform' },
+}
+
+FAMILIES['zone-pixel'] = {
+    description: '832×1248 opaque pixel-art zone landscape (vertical battle background)',
+    checkpoint: 'zavychromaxl_v80.safetensors',
+    stylePrompt:
+        'pixel art game background, side-view landscape scene, no characters, no text, detailed environment, ' +
+        'limited colour palette, crisp hard pixels, atmospheric depth',
+    negative: `${NEGATIVE_BASE}, characters, people, creatures, ui, anti-aliased, smooth gradient, photograph`,
+    references: ['plains-vertical', 'horseshoeBeach-vertical', 'the-long-path-vertical'].map((n) => `src/assets/img/backgrounds/${n}.png`),
+    gen: [832, 1216],
+    target: [832, 1248],
+    pixel: true,
+    alpha: false,
+    // Generate at the nearest SDXL-native size, cover up to the exact asset size, then 4×4 blocks = one art pixel.
+    post: [
+        ['cover', { width: 832, height: 1248 }],
+        ['pixelate', { block: 4 }],
+        ['quantize', { colors: 48 }],
+    ],
+    ipWeight: 0.7,
     sampler: { steps: 8, cfg: 5.5, sampler_name: 'euler', scheduler: 'sgm_uniform' },
 }
 
