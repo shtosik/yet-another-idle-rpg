@@ -22,19 +22,27 @@ import { assertRegistry, FAMILIES, getFamily, REPO_ROOT } from './styles.mjs'
 
 const TMP_DIR = join(REPO_ROOT, '.tmp-gen')
 const log = (...args) => console.error('[asset-gen]', ...args)
+const elapsedSeconds = (since) => Math.round((Date.now() - since) / 100) / 10
+
+/** Parses a numeric CLI value, failing with the flag name instead of letting NaN leak into the graph. */
+function num(flag, value) {
+    const n = Number(value)
+    if (value === '' || !Number.isFinite(n)) throw new Error(`--${flag} must be a number, got "${value}"`)
+    return n
+}
 
 export const slugFor = (familyId, target, tag) => `${familyId}-${basename(target, extname(target))}${tag ? `-${tag}` : ''}`
 
 /** Returns a family copy with CLI tuning overrides applied (never mutates the registry). */
 export function applyOverrides(family, { steps, cfg, ipWeight, sampler, grid, colors }) {
     const next = { ...family, sampler: { ...family.sampler }, post: family.post.map(([name, params]) => [name, { ...params }]) }
-    if (steps !== undefined) next.sampler.steps = Number(steps)
-    if (cfg !== undefined) next.sampler.cfg = Number(cfg)
+    if (steps !== undefined) next.sampler.steps = num('steps', steps)
+    if (cfg !== undefined) next.sampler.cfg = num('cfg', cfg)
     if (sampler !== undefined) next.sampler.sampler_name = sampler
-    if (ipWeight !== undefined) next.ipWeight = Number(ipWeight)
+    if (ipWeight !== undefined) next.ipWeight = num('ip-weight', ipWeight)
     for (const [name, params] of next.post) {
-        if (grid !== undefined && name === 'pixelate') params.grid = Number(grid)
-        if (colors !== undefined && name === 'quantize') params.colors = Number(colors)
+        if (grid !== undefined && name === 'pixelate') params.grid = num('grid', grid)
+        if (colors !== undefined && name === 'quantize') params.colors = num('colors', colors)
     }
     return next
 }
@@ -70,14 +78,14 @@ export async function generateJob({ comfy, familyId, target, subject, seed, coun
     const sheet = join(dir, 'sheet.png')
     writeFileSync(sheet, await makeSheet({ refs: useRef ? refs.map((r) => r.buffer) : [], candidates, target: family.target, pixel: !!family.pixel }))
 
-    const seconds = Math.round((Date.now() - started) / 100) / 10
-    const meta = { slug, family: familyId, target, subject, seed, count: files.length, useRef, tag: tag ?? null, seconds }
+    const meta = { slug, family: familyId, target, subject, seed, count: files.length, useRef, tag: tag ?? null, seconds: elapsedSeconds(started) }
     writeFileSync(join(dir, 'meta.json'), JSON.stringify(meta, null, 2))
     return { ...meta, candidates: files, sheet, refs: useRef ? refs.map((r) => r.path) : [] }
 }
 
 /** Copies candidate `n` of `slug` to the job's target path. */
 export function pickCandidate({ slug, n }) {
+    if (!/^[w.-]+$/.test(slug) || /^.+$/.test(slug)) throw new Error(`Invalid --slug "${slug}"`)
     const dir = join(TMP_DIR, slug)
     const meta = JSON.parse(readFileSync(join(dir, 'meta.json'), 'utf8'))
     if (!Number.isInteger(n) || n < 1 || n > meta.count) throw new Error(`--pick must be 1..${meta.count} for ${slug}`)
@@ -107,20 +115,22 @@ export async function main(argv = process.argv.slice(2)) {
     if (v.stop) return comfy.stop()
     if (v.pick !== undefined) {
         if (!v.slug) throw new Error('--pick needs --slug')
-        return pickCandidate({ slug: v.slug, n: Number(v.pick) })
+        return pickCandidate({ slug: v.slug, n: num('pick', v.pick) })
     }
     for (const required of ['family', 'target', 'subject']) {
         if (!v[required]) throw new Error(`Missing --${required}`)
     }
     const family = getFamily(v.family)
+    const seed = v.seed !== undefined ? num('seed', v.seed) : Math.floor(Math.random() * 2 ** 31)
+    const count = v.count !== undefined ? num('count', v.count) : 4
+    if (!Number.isInteger(count) || count < 1) throw new Error(`--count must be a positive integer, got "${v.count}"`)
     const bootStart = Date.now()
     const { started } = await comfy.ensureServer()
-    const bootSeconds = Math.round((Date.now() - bootStart) / 100) / 10
+    const bootSeconds = elapsedSeconds(bootStart)
     await comfy.assertCheckpoint(family.checkpoint)
-    const seed = v.seed !== undefined ? Number(v.seed) : Math.floor(Math.random() * 2 ** 31)
     const result = await generateJob({
         comfy, familyId: v.family, target: v.target, subject: v.subject, seed,
-        count: v.count ? Number(v.count) : 4, useRef: !v['no-ref'], tag: v.tag, keepRaw: v['keep-raw'],
+        count, useRef: !v['no-ref'], tag: v.tag, keepRaw: v['keep-raw'],
         overrides: { steps: v.steps, cfg: v.cfg, ipWeight: v['ip-weight'], sampler: v.sampler, grid: v.grid, colors: v.colors },
     })
     return { ...result, serverStarted: started, bootSeconds }

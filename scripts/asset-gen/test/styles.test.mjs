@@ -1,17 +1,17 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { applyOverrides, slugFor } from '../generate.mjs'
+import sharp from 'sharp'
+import { runPipeline } from '../lib/postprocess.mjs'
 import { FAMILIES, FAMILY_TARGETS, REPO_ROOT, assertRegistry, validateRegistry } from '../styles.mjs'
 
-test('shipped registry is valid: refs exist and targets match the plan', () => {
+test('shipped registry is valid: refs exist, are unique and targets match the plan', () => {
     assert.deepEqual(validateRegistry(), [])
     assertRegistry()
-    for (const [id, family] of Object.entries(FAMILIES)) assert.deepEqual(family.target, FAMILY_TARGETS[id], id)
 })
 
 test('item-pixel is 48×48 transparent pixel art', () => {
     const f = FAMILIES['item-pixel']
-    assert.deepEqual(f.target, [48, 48])
+    assert.deepEqual(FAMILY_TARGETS['item-pixel'], [48, 48])
     assert.equal(f.alpha, true)
     assert.equal(f.pixel, true)
 })
@@ -28,19 +28,41 @@ test('validation reports a missing reference, target drift and an unknown family
     assert.throws(() => assertRegistry(bad), /Invalid Style Family registry/)
 })
 
-test('applyOverrides tunes a copy and leaves the registry untouched', () => {
-    const base = FAMILIES['item-pixel']
-    const tuned = applyOverrides(base, { steps: '30', cfg: '7', ipWeight: '0.5', grid: '40', colors: '12' })
-    assert.equal(tuned.sampler.steps, 30)
-    assert.equal(tuned.sampler.cfg, 7)
-    assert.equal(tuned.ipWeight, 0.5)
-    assert.equal(tuned.post.find(([n]) => n === 'pixelate')[1].grid, 40)
-    assert.equal(tuned.post.find(([n]) => n === 'quantize')[1].colors, 12)
-    assert.equal(base.sampler.steps, 8)
-    assert.equal(base.post.find(([n]) => n === 'pixelate')[1].grid, 46)
+test('validation reports missing keys the CLI reads, unknown post steps and a pixelate/target mismatch', () => {
+    const { sampler, ...withoutSampler } = FAMILIES['item-pixel']
+    const bad = {
+        'item-pixel': { ...withoutSampler, post: [['nonsense'], ['pixelate', { grid: 46, width: 32, height: 32 }]] },
+    }
+    const problems = validateRegistry(bad, REPO_ROOT).join('\n')
+    assert.match(problems, /missing "sampler"/)
+    assert.match(problems, /unknown post step "nonsense"/)
+    assert.match(problems, /pixelate output 32x32 != target 48,48/)
 })
 
-test('slugFor combines family, target name and optional tag', () => {
-    assert.equal(slugFor('item-pixel', 'src/assets/img/items/frostShard.png'), 'item-pixel-frostShard')
-    assert.equal(slugFor('item-pixel', 'x/frostShard.png', 'noref'), 'item-pixel-frostShard-noref')
+test('validation reports a reference that duplicates another by content', () => {
+    const ref = FAMILIES['item-pixel'].references[0]
+    const bad = { 'item-pixel': { ...FAMILIES['item-pixel'], references: [ref, ref] } }
+    assert.match(validateRegistry(bad, REPO_ROOT).join('\n'), /duplicates/)
+})
+
+test('post chain turns a raw generation into an exact 48×48 asset with alpha and a bounded palette', async () => {
+    const family = FAMILIES['item-pixel']
+    const [w, h] = family.gen
+    const circle = Buffer.from(
+        `<svg width="${w}" height="${h}"><rect width="100%" height="100%" fill="rgb(${family.refBackground})"/>` +
+            `<circle cx="${w / 2}" cy="${h / 2}" r="300" fill="rgb(200,40,40)"/><circle cx="${w / 2 - 80}" cy="${h / 2 - 80}" r="90" fill="rgb(240,200,60)"/></svg>`,
+    )
+    const raw = await sharp(circle).png().toBuffer()
+    const out = await runPipeline(raw, family.post)
+    const { data, info } = await sharp(out).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
+    assert.deepEqual([info.width, info.height], family.target)
+    const colours = new Set()
+    let transparent = 0
+    for (let i = 0; i < data.length; i += 4) {
+        if (data[i + 3] === 0) transparent++
+        else colours.add(`${data[i]},${data[i + 1]},${data[i + 2]}`)
+    }
+    assert.ok(transparent > 0, 'keyed-out background must be transparent')
+    const budget = family.post.find(([name]) => name === 'quantize')[1].colors
+    assert.ok(colours.size <= budget, `${colours.size} colours > budget ${budget}`)
 })

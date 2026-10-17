@@ -3,6 +3,7 @@
 // raw generation into game-ready art. Agents only ever supply the subject (content); everything here is style.
 //
 // Per family:
+//   description one-line summary shown by --list-families
 //   checkpoint  installed SDXL checkpoint
 //   stylePrompt appended to the subject; negative is the negative prompt
 //   references  repo paths conditioning the IP-Adapter (style transfer)
@@ -14,9 +15,11 @@
 //   post        ordered [step, params] list, see lib/postprocess.mjs
 //   ipWeight    IP-Adapter strength; sampler overrides steps/cfg/sampler_name/scheduler
 
-import { existsSync } from 'node:fs'
+import { createHash } from 'node:crypto'
+import { existsSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { STEPS } from './lib/postprocess.mjs'
 
 export const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..')
 
@@ -57,21 +60,39 @@ export const FAMILIES = {
     },
 }
 
-/** Returns the registry problems (empty when valid): missing refs, target drift, malformed post steps. */
+const REQUIRED_KEYS = ['description', 'checkpoint', 'stylePrompt', 'negative', 'references', 'gen', 'target', 'pixel', 'alpha', 'refBackground', 'post', 'ipWeight', 'sampler']
+
+/** Returns the registry problems (empty when valid): missing keys/refs, duplicate refs, target drift, bad post steps. */
 export function validateRegistry(families = FAMILIES, root = REPO_ROOT) {
     const problems = []
     for (const [id, f] of Object.entries(families)) {
         const expected = FAMILY_TARGETS[id]
         if (!expected) problems.push(`${id}: not in FAMILY_TARGETS`)
         else if (f.target[0] !== expected[0] || f.target[1] !== expected[1]) problems.push(`${id}: target ${f.target} != planned ${expected}`)
-        for (const key of ['checkpoint', 'stylePrompt', 'negative', 'gen', 'target', 'post', 'references']) {
+        for (const key of REQUIRED_KEYS) {
             if (f[key] === undefined) problems.push(`${id}: missing "${key}"`)
         }
+        const seen = new Map() // content hash -> first ref path; identical files are placeholder duplicates
         for (const ref of f.references ?? []) {
-            if (!existsSync(join(root, ref))) problems.push(`${id}: reference not found: ${ref}`)
+            const path = join(root, ref)
+            if (!existsSync(path)) {
+                problems.push(`${id}: reference not found: ${ref}`)
+                continue
+            }
+            const hash = createHash('sha1').update(readFileSync(path)).digest('hex')
+            if (seen.has(hash)) problems.push(`${id}: reference ${ref} duplicates ${seen.get(hash)}`)
+            else seen.set(hash, ref)
         }
         for (const step of f.post ?? []) {
-            if (!Array.isArray(step) || typeof step[0] !== 'string') problems.push(`${id}: malformed post step ${JSON.stringify(step)}`)
+            if (!Array.isArray(step) || typeof step[0] !== 'string') {
+                problems.push(`${id}: malformed post step ${JSON.stringify(step)}`)
+                continue
+            }
+            const [name, params = {}] = step
+            if (!(name in STEPS)) problems.push(`${id}: unknown post step "${name}"`)
+            if (name === 'pixelate' && f.target && (params.width !== f.target[0] || params.height !== f.target[1])) {
+                problems.push(`${id}: pixelate output ${params.width}x${params.height} != target ${f.target}`)
+            }
         }
     }
     return problems
