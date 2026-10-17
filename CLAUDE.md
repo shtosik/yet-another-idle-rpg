@@ -9,6 +9,7 @@ npm start          # dev server (ng serve)
 npm run build      # production build
 npm test           # karma/jasmine tests (ng test)
 npm run tile       # regenerate world map tiles (node scripts/tile-map.mjs)
+npm run test:assets # asset-gen pipeline tests (node:test, no GPU needed)
 ```
 
 ## Role
@@ -99,6 +100,8 @@ The typical pattern for adding a new game entity:
 4. Wire any store/service references.
 
 Skills (slash commands) are available for common additions: `/add-npc-dialogue`, `/add-shop`, `/add-town-building`, `/add-dialogue-effect`.
+
+Art generation (item icons, enemy sprites, portraits, zone and town backgrounds) runs through the `asset-generator` agent (`.claude/agents/asset-generator.md`), which drives `scripts/asset-gen/generate.mjs` and its Style Families. Prefer `/generate-2d-asset` to brief it. See `docs/analysis/asset-pipeline.md`.
 
 ### Analysis docs
 
