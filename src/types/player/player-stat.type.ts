@@ -49,6 +49,7 @@ export type PlayerStat =
     | 'damageVsUndead'
     | 'damageVsHarpy'
     | 'magicDamageMultiplier'
+    | 'inventorySlots'
 
 export const multiplierStats: PlayerStat[] = [
     'critMulti',

@@ -39,9 +39,9 @@ export class CraftingComponent {
     let cantCraft = false
 
     recipe.itemsNeeded.forEach((itemNeeded) => {
-      const ownedResource = this.playerInventory().find(item => item.id === itemNeeded.id)
+      const owned = this.playerStore.itemCount(itemNeeded.id)
 
-      if (!ownedResource || ownedResource.amount < itemNeeded.amount) cantCraft = true
+      if (owned < itemNeeded.amount) cantCraft = true
     })
 
     if (cantCraft) return

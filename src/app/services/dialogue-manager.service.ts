@@ -9,8 +9,6 @@ import { NpcID } from '../../enums/map/npc-id.enum'
 import npcData, { NPCProps } from '../../data/npc-data'
 import { RequirementProps } from '../../data/quests-data'
 import { matchesQuestState } from './quest-status'
-import ITEM_DATA from '../../data/items-data'
-import { InventoryItem } from '../../interfaces/item.interface'
 import { ExplorationGuildService } from './exploration-guild.service'
 import { TownsStore } from '../store/towns/towns.store'
 
@@ -121,16 +119,10 @@ export class DialogueManagerService {
           req => this.checkRequirement(req),
           c.step,
         )
-      case 'item': {
-        const item = this.playerStore.inventory().find(i => i.id === c.itemId)
-        return !!item && item.amount >= c.amount
-      }
+      case 'item':
+        return this.playerStore.itemCount(c.itemId) >= c.amount
       case 'manyItems':
-        return c.itemIds.every(itemId => {
-          const required = c.amounts[itemId] ?? 1
-          const item = this.playerStore.inventory().find(i => i.id === itemId)
-          return !!item && item.amount >= required
-        })
+        return c.itemIds.every(itemId => this.playerStore.itemCount(itemId) >= (c.amounts[itemId] ?? 1))
       case 'killCount':
         return (this.playerStore.enemyKillCounts()[c.enemyId] ?? 0) >= c.amount
       case 'manyKillCount':
@@ -173,9 +165,7 @@ export class DialogueManagerService {
 
         return (stats[req.key] as number) >= req.amount
       case 'item':
-        const item = this.playerStore.inventory().find(i => i.id === req.itemId)
-
-        return item && item.amount >= req.amount
+        return this.playerStore.itemCount(req.itemId) >= req.amount
       case 'enemy':
         return this.playerStore.enemyKillCounts()[req.enemyId] >= req.amount
       case 'quest':
@@ -225,13 +215,9 @@ export class DialogueManagerService {
           break
         case 'item':
           if (effect.action === 'take') {
-            this.playerStore.removeItemsFromInventory(effect.items.map(i => ({ id: i.itemId, amount: i.amount })))
+            this.playerStore.removeItems(effect.items.map(i => ({ id: i.itemId, amount: i.amount })))
           } else if (effect.action === 'give') {
-            const itemsToUpdate: InventoryItem[] = effect.items.map(i => {
-              const itemData = ITEM_DATA[i.itemId]
-              return { id: i.itemId, amount: i.amount, type: itemData.type, tier: itemData.tier }
-            })
-            this.playerStore.updatePlayerInventory(itemsToUpdate)
+            this.playerStore.addItems(effect.items.map(i => ({ id: i.itemId, amount: i.amount })))
           }
           break
         case 'guild':

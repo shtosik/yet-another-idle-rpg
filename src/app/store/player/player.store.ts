@@ -1,10 +1,10 @@
+import { effect } from '@angular/core'
 import { patchState, signalStore, withComputed, withHooks, withMethods, withState } from '@ngrx/signals'
 import { PlayerStat } from '../../../types/player/player-stat.type'
 import { calculateXp } from 'app/pipes/calculate-xp.pipe'
 import { initialEquipmentState, statsInitialState } from './player'
 import { EquipmentItem, InventoryItem, RecipeItem } from 'interfaces/item.interface'
 import { ItemID } from 'enums/ids/item-id.enum'
-import { ItemTier } from 'enums/items/item-tier.enum'
 import { EquipmentType } from 'interfaces/player/equipment.type'
 import { ZonesProgression } from '../../../types/player/zones-progression.type'
 import { UnlockedContent } from '../../../types/player/unlocked-content.type'
@@ -27,6 +27,7 @@ import { TownID } from '../../../enums/map/town-id.enum'
 import { DamageElement } from '../../../enums/damage-element.enum'
 import { withDevtools } from '@angular-architects/ngrx-toolkit'
 import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
+import { addItems, countItem, createInventory, hasItems, ItemStack, removeItems, resizeInventory } from './inventory'
 import { UNLOCK_RULES, UnlockCondition, UnlockTarget } from '../../../data/unlock-conditions'
 
 export type PlayerStatsType = Record<PlayerStat, number>;
@@ -62,7 +63,7 @@ interface PlayerState {
 export const initialState: PlayerState = {
   stats: statsInitialState,
   zonesProgression: {},
-  inventory: new Array(40).fill(null),
+  inventory: createInventory(),
   equipment: initialEquipmentState,
   unlockedSkillPoints: {},
   unlockedSpells: {},
@@ -80,9 +81,6 @@ export const initialState: PlayerState = {
   unlockedRecipes: [],
   spellbookUnlocked: false,
 }
-
-const itemIndexFromInventory = (inventory: (InventoryItem | null)[], id: ItemID, tier: ItemTier): number =>
-  inventory.findIndex(item => item?.id === id && item?.tier === tier)
 
 const handleExperience = (stats: PlayerStatsType) => {
   const xpForNextLevel = calculateXp(stats.level + 1)
@@ -194,61 +192,14 @@ export const PlayerStore = signalStore(
       }))
     },
 
-    updatePlayerInventory(items: InventoryItem[]) {
-      patchState(store, (state) => {
-        const inventory = [...state.inventory]
-
-        items.forEach((item) => {
-          const itemIndex = itemIndexFromInventory(inventory, item.id, item.tier)
-          const emptySlotIndex = inventory.findIndex(i => i === null)
-
-          if (itemIndex === -1 && emptySlotIndex !== -1) {
-            inventory[emptySlotIndex] = item
-          } else if (itemIndex !== -1) {
-            const existing = inventory[itemIndex]!
-            inventory[itemIndex] = { ...item, amount: existing.amount + item.amount }
-          }
-        })
-
-        return { inventory }
-      })
+    addItems(items: ItemStack[]) {
+      patchState(store, (state) => ({
+        inventory: addItems(state.inventory, state.stats.inventorySlots, items),
+      }))
     },
 
-    removeItemsFromInventory(items: { id: ItemID; amount: number }[]) {
-      patchState(store, (state) => {
-        const inventory = [...state.inventory]
-
-        for (const { id, amount } of items) {
-          const itemIndex = inventory.findIndex(i => i?.id === id)
-          if (itemIndex === -1) continue
-
-          const existing = inventory[itemIndex]!
-          if (existing.amount <= amount) {
-            inventory[itemIndex] = null
-          } else {
-            inventory[itemIndex] = { ...existing, amount: existing.amount - amount }
-          }
-        }
-
-        return { inventory }
-      })
-    },
-
-    removeItemFromInventory(id: ItemID, tier: ItemTier) {
-      patchState(store, (state) => {
-        const itemIndex = itemIndexFromInventory(state.inventory, id, tier)
-        if (itemIndex === -1) return {}
-
-        const newInventory = [...state.inventory]
-        const item = newInventory[itemIndex]!
-
-        if (item.amount <= 1) {
-          newInventory[itemIndex] = null
-        } else {
-          newInventory[itemIndex] = { ...item, amount: item.amount - 1 }
-        }
-        return { inventory: newInventory }
-      })
+    removeItems(items: ItemStack[]) {
+      patchState(store, (state) => ({ inventory: removeItems(state.inventory, items) }))
     },
 
     updateUnlockedSkillPoints(id: SkillPointID, amount: number) {
@@ -339,7 +290,7 @@ export const PlayerStore = signalStore(
       store.updateEnemyKillCount(enemyId)
       store.updateTaskProgress(enemyId)
 
-      if (itemsToUpdate.length) store.updatePlayerInventory(itemsToUpdate)
+      if (itemsToUpdate.length) store.addItems(itemsToUpdate)
     },
 
     equipItem(item: InventoryItem) {
@@ -352,22 +303,18 @@ export const PlayerStore = signalStore(
       const slotKey = EquipmentSlot[itemData.slot] as EquipmentSlotKey
       const currentlyEquipped = equipment[slotKey]
 
+      // Remove first so the swapped-out item always has a free slot to return to.
+      store.removeItems([{ id: item.id, tier: item.tier, amount: 1 }])
+
       if (currentlyEquipped) {
         (ITEM_DATA[currentlyEquipped.id] as EquipmentItem).stats?.forEach(s =>
           statsToUpdate.push({ stat: s.id, amount: -s.amount }),
         )
 
-        store.updatePlayerInventory([
-          {
-            ...currentlyEquipped,
-            amount: 1,
-            type: ITEM_DATA[currentlyEquipped.id].type,
-          },
-        ])
+        store.addItems([{ id: currentlyEquipped.id, tier: currentlyEquipped.tier, amount: 1 }])
       }
 
       store.updatePlayerStats(statsToUpdate)
-      store.removeItemFromInventory(item.id, item.tier)
 
       patchState(store, (state) => ({
         equipment: { ...state.equipment, [slotKey]: { id: item.id, tier: item.tier } },
@@ -387,13 +334,7 @@ export const PlayerStore = signalStore(
         statsToUpdate.push({ stat: s.id, amount: -1 * s.amount })
       })
 
-      store.updatePlayerInventory([
-        {
-          ...equippedItem,
-          amount: 1,
-          type: itemData.type,
-        } as InventoryItem,
-      ])
+      store.addItems([{ id: equippedItem.id, tier: equippedItem.tier, amount: 1 }])
 
       patchState(store, (state) => ({
         equipment: { ...state.equipment, [slot]: null },
@@ -409,7 +350,7 @@ export const PlayerStore = signalStore(
         const recipeData = itemData as RecipeItem
         if (store.unlockedRecipes().includes(recipeData.recipeId)) return
         patchState(store, state => ({ unlockedRecipes: [...state.unlockedRecipes, recipeData.recipeId] }))
-        store.removeItemFromInventory(item.id, item.tier)
+        store.removeItems([{ id: item.id, tier: item.tier, amount: 1 }])
         return
       }
 
@@ -417,7 +358,7 @@ export const PlayerStore = signalStore(
 
       const statsToUpdate = itemData.stats.map(s => ({ stat: s.id, amount: s.amount }))
       store.updatePlayerStats(statsToUpdate)
-      store.removeItemFromInventory(item.id, item.tier)
+      store.removeItems([{ id: item.id, tier: item.tier, amount: 1 }])
     },
 
     regenMana(deltaMs: number) {
@@ -439,32 +380,14 @@ export const PlayerStore = signalStore(
 
     craftItem(recipeId: RecipeID) {
       const recipeData = RECIPES_DATA[recipeId]
-      const playerResources = store.inventory()
-      const itemsToUpdate: InventoryItem[] = []
+      if (!hasItems(store.inventory(), recipeData.itemsNeeded)) return
 
-      const canCraft = recipeData.itemsNeeded.every(req => {
-        const owned = playerResources.find(i => i.id === req.id)
-        return owned && owned.amount >= req.amount
-      })
+      store.removeItems(recipeData.itemsNeeded)
+      store.addItems([{ id: recipeData.itemId, amount: recipeData.createsAmount }])
+    },
 
-      if (!canCraft) return
-
-      recipeData.itemsNeeded.forEach(req => {
-        const itemData = ITEM_DATA[req.id]
-
-        itemsToUpdate.push({ id: req.id, amount: -req.amount, type: itemData.type, tier: itemData.tier })
-      })
-
-      const itemData = ITEM_DATA[recipeData.itemId]
-
-      itemsToUpdate.push({
-        id: itemData.id,
-        type: itemData.type,
-        amount: recipeData.createsAmount,
-        tier: itemData.tier,
-      })
-
-      store.updatePlayerInventory(itemsToUpdate)
+    itemCount(id: ItemID): number {
+      return countItem(store.inventory(), id)
     },
   })),
   withMethods((store) => ({
@@ -554,6 +477,12 @@ export const PlayerStore = signalStore(
   withHooks((store) => ({
     // Re-apply unlocks for existing saves silently (no notifications).
     onInit() {
+      // Raising the inventorySlots stat grows the inventory; it never shrinks here.
+      effect(() => {
+        const capacity = store.stats.inventorySlots()
+        patchState(store, (state) => ({ inventory: resizeInventory(state.inventory, capacity) }))
+      })
+
       for (const rule of UNLOCK_RULES) {
         const { condition } = rule
         const isMet = condition.type === 'waveReached'

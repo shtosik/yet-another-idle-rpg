@@ -7,8 +7,7 @@ import QUEST_DATA, { QUEST_STEP_AFTER_COMPLETED, QUEST_STEP_AFTER_FAILED, QuestP
 import { inject } from '@angular/core'
 import { ModalService } from '../../services/modal.service'
 import { PlayerStore } from '../player/player.store'
-import { InventoryItem } from '../../../interfaces/item.interface'
-import ITEM_DATA from '../../../data/items-data'
+import { ItemStack } from '../player/inventory'
 
 export interface QuestState {
   questStepProgression: QuestProgression
@@ -36,7 +35,7 @@ export const QuestsStore = signalStore(
   ) => ({
     handleQuestCompleted(data: QuestProps) {
       const statsToUpdate = []
-      const itemsToUpdate: InventoryItem[] = []
+      const itemsToUpdate: ItemStack[] = []
 
       data.rewards.forEach((reward) => {
         switch (reward.type) {
@@ -44,8 +43,8 @@ export const QuestsStore = signalStore(
             statsToUpdate.push({ stat: reward.key, amount: reward.amount })
             break
           case 'item':
-            const itemData = ITEM_DATA[reward.itemId]
-            itemsToUpdate.push({ id: reward.itemId, amount: reward.amount, tier: itemData.tier, type: itemData.type })
+
+            itemsToUpdate.push({ id: reward.itemId, amount: reward.amount })
             break
         }
       })
@@ -56,7 +55,7 @@ export const QuestsStore = signalStore(
 
       modalService.openQuestCompleted(data)
       playerStore.updatePlayerStats(statsToUpdate)
-      playerStore.updatePlayerInventory(itemsToUpdate)
+      playerStore.addItems(itemsToUpdate)
     },
   })),
   withMethods((store) => ({
