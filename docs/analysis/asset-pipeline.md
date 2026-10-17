@@ -35,7 +35,7 @@ Override locations with `ASSET_GEN_PYTHON` / `ASSET_GEN_MATTE_MODEL`.
 ## CLI reference
 
 ```
-generate --family <id> --target <path> --subject "<text>" [--count 4] [--seed N] [--no-ref] [--tier tiny|small|medium|large] [--control spider|crab]
+generate --family <id> --target <path> --subject "<text>" [--count 4] [--seed N] [--no-ref] [--tier tiny|small|medium|large] [--control spider|crab|quadruped]
 generate --pick <n> --slug <slug>            copy candidate n to its target and record it in manifest.json
 generate --batch jobs.json                   [{family,target,subject,count?,seed?,tier?,tag?,noRef?}], one server boot
 generate --estimate-hue <base target>        estimate shinyHue from the existing base + -shiny pair (run BEFORE regenerating)
@@ -52,7 +52,7 @@ Run as `node scripts/asset-gen/generate.mjs …`. Progress goes to stderr, a JSO
 
 ## Anatomy and controls
 
-SDXL cannot count limbs. For spiders (8 legs) and crabs (2 claws + 8 legs) pass `--control spider|crab`: `lib/controls.mjs` draws a scribble skeleton and the union ControlNet (strength 0.5, first half of sampling) fixes the layout while the family still sets the style. Add a new control by adding a drawing function to `CONTROLS`. For everything else, state the counts in the subject, use `--count 6`, and reject bad candidates when picking. `matte` also removes backdrop attached to the subject (`bgDistance`), detached fragments and enclosed holes; portraits are edge-padded (`pad: 96`) so a bust cropped by the frame is not masked out along the cut. Raw generations are saved (`raw-N.png`), so post-process changes can be applied with `--reprocess`.
+SDXL cannot count limbs. For spiders (8 legs), crabs (2 claws + 8 legs) and four-legged animals in side view (4 legs, facing left) pass `--control spider|crab|quadruped`: `lib/controls.mjs` draws a scribble skeleton and the union ControlNet (strength 0.5, first half of sampling) fixes the layout while the family still sets the style. Add a new control by adding a drawing function to `CONTROLS`. For everything else, state the counts in the subject, use `--count 6`, and reject bad candidates when picking. `matte` also removes backdrop attached to the subject (`bgDistance`), detached fragments and enclosed holes; portraits are edge-padded (`pad: 96`) so a bust cropped by the frame is not masked out along the cut. Raw generations are saved (`raw-N.png`), so post-process changes can be applied with `--reprocess`.
 
 ## Writing a subject
 

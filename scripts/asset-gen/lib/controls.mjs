@@ -1,5 +1,5 @@
 // Procedural scribble control images (white lines on black, 1024²) for the union ControlNet. SDXL cannot count
-// limbs, so for creatures where the count defines the species (spider: 8 legs, crab: 2 claws + 8 legs) a skeleton
+// limbs, so for creatures where the count defines the species (spider: 8 legs, crab: 2 claws + 8 legs, quadruped: 4 legs) a skeleton
 // is drawn here and the generation is conditioned on it. Only the layout is constrained; style still comes from the
 // family and its references.
 
@@ -27,6 +27,13 @@ export const CONTROLS = {
                 leg([75, 390], [310, 310], [470, 440]) +
                 leg([75, 420], [310, 470], [450, 630]) +
                 leg([65, 450], [260, 620], [350, 840]),
+        ),
+    /** Side view facing left: body, head on a neck, exactly four legs (two front, two hind). */
+    quadruped: () =>
+        svg(
+            '<ellipse cx="560" cy="470" rx="270" ry="160"/><circle cx="250" cy="380" r="95"/><polyline points="330,420 400,420"/>' +
+                '<polyline points="380,580 360,700 340,830"/><polyline points="470,590 480,710 490,830"/>' +
+                '<polyline points="670,590 700,710 690,830"/><polyline points="760,570 790,700 800,830"/>',
         ),
     /** Top view: oval shell, two arm + pincer claws, exactly eight walking legs (four per side). */
     crab: () => {

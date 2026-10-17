@@ -2,7 +2,7 @@
 // Asset generation CLI. Interface = family + target + subject, then pick.
 //
 //   node scripts/asset-gen/generate.mjs --family item-pixel --target src/assets/img/items/frostShard.png \
-//        --subject "a jagged pale-blue ice crystal shard" [--count 4] [--seed N] [--no-ref] [--tier tiny|small|medium|large] [--control spider|crab]
+//        --subject "a jagged pale-blue ice crystal shard" [--count 4] [--seed N] [--no-ref] [--tier tiny|small|medium|large] [--control spider|crab|quadruped]
 //   node scripts/asset-gen/generate.mjs --pick 3 --slug item-pixel-frostShard
 //   node scripts/asset-gen/generate.mjs --reprocess --slug <slug>   # re-run post-process on the saved raw generations, no GPU
 //   node scripts/asset-gen/generate.mjs --batch jobs.json       # [{family,target,subject,count?,seed?,tier?,tag?}], one boot
