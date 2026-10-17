@@ -124,8 +124,8 @@
     "shinyHue": 250,
     "family": "enemy-pixel",
     "tier": "small",
-    "subject": "a single red crab seen from above with exactly two claws and eight walking legs, symmetrical",
-    "seed": 1605547410,
+    "subject": "a red crab facing the viewer, wide domed orange-red shell, eyes on two short stalks, two big claws raised with open pincers, eight legs",
+    "seed": 762066615,
     "date": "2026-10-17"
   },
   "src/assets/img/enemies/deer.png": {
@@ -142,8 +142,8 @@
     "shinyHue": 300,
     "family": "enemy-pixel",
     "tier": "large",
-    "subject": "a huge old spider with exactly eight legs, four legs on each side, one round dark hairy body, fangs, pale elder markings",
-    "seed": 1363671100,
+    "subject": "a huge ancient grey spider seen from above, round abdomen with a pale bone-white skull-shaped marking, small head with red eyes and large fangs, thick dark grey hairy legs with bent joints",
+    "seed": 1865909053,
     "date": "2026-10-17",
     "shinySaturation": 2.5,
     "shinyBrightness": 1.1
@@ -162,8 +162,8 @@
     "shinyHue": 330,
     "family": "enemy-pixel",
     "tier": "small",
-    "subject": "a green-brown forest spider with exactly eight legs, one round body, one head, many small eyes",
-    "seed": 1947505459,
+    "subject": "a forest spider seen from above, round pale-green abdomen with a darker pattern, small brown head with several eyes and two fangs, thick brown hairy legs with bent joints",
+    "seed": 1885925255,
     "date": "2026-10-17",
     "shinySaturation": 3,
     "shinyBrightness": 1.25
@@ -172,8 +172,8 @@
     "shinyHue": 254,
     "family": "enemy-pixel",
     "tier": "small",
-    "subject": "a plain red crab with exactly two big red claws and eight walking legs, the right claw holding up a kitchen knife with a wooden handle and a steel blade",
-    "seed": 1964786999,
+    "subject": "a red crab facing the viewer wearing a black eyepatch, one claw raised high holding a large kitchen knife, domed red shell, eyes on two short stalks, eight legs",
+    "seed": 1556945092,
     "date": "2026-10-17"
   },
   "src/assets/img/enemies/giantEagle.png": {
