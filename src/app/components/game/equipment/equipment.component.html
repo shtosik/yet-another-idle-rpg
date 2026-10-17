@@ -6,6 +6,7 @@
                 [item]="Items[slot.item?.id]"
                 [slotName]="slot.name"
                 [tier]="slot.item?.tier"
+                [unequipBlocked]="!!slot.item && !playerStore.canUnequip(slot.name)"
             />
         </app-slot>
     }

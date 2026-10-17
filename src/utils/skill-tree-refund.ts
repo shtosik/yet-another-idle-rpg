@@ -4,7 +4,7 @@ import { isRequirementMet } from 'utils/skill-tree-requirements'
 
 export type CanRefundResult =
     | { ok: true; pointsReturned: number }
-    | { ok: false; reason: 'not-allocated' | 'blocked-by'; blockers: SkillPointID[] }
+    | { ok: false; reason: 'not-allocated' | 'blocked-by' | 'inventory-in-use'; blockers: SkillPointID[] }
 
 export function canRefundSkillPoint(
     targetId: SkillPointID,

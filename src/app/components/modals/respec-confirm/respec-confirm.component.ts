@@ -19,7 +19,7 @@ export class RespecConfirmComponent {
 
     canExecute = computed(() => {
         const p = this.preview()
-        return p.allocatedLevels > 0 && p.canAfford
+        return p.allocatedLevels > 0 && p.canAfford && !p.inventoryBlocked
     })
 
     confirm(): void {
