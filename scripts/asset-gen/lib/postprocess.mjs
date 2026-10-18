@@ -351,6 +351,16 @@ export function cover(buf, { width, height }) {
     return sharp(buf).resize(width, height, { fit: 'cover', kernel: 'lanczos3' }).png().toBuffer()
 }
 
+/** Drops a `px` border on every side and scales back to the original size: the generator leaves a bright edge row at the top (and a faint one at the bottom) of full-frame images. */
+export async function shave(buf, { px = 4 }) {
+    const { width, height } = await sharp(buf).metadata()
+    return sharp(buf)
+        .extract({ left: px, top: px, width: width - 2 * px, height: height - 2 * px })
+        .resize(width, height, { kernel: 'lanczos3' })
+        .png()
+        .toBuffer()
+}
+
 /** Scales to fit inside `width`×`height` (nearest, to keep pixel art crisp) and pads with transparency. */
 export function fit(buf, { width, height }) {
     return sharp(buf)
@@ -359,7 +369,7 @@ export function fit(buf, { width, height }) {
         .toBuffer()
 }
 
-export const STEPS = { matte, alpha, keyout, trim, pixelate, upscale, quantize, outline, cover, fit }
+export const STEPS = { matte, alpha, keyout, trim, pixelate, upscale, quantize, outline, cover, shave, fit }
 
 /** Runs a family `post` list: `[['keyout', {…}], ['trim'], …]`. */
 export async function runPipeline(buf, steps) {

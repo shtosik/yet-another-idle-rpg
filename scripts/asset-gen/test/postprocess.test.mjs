@@ -2,7 +2,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import sharp from 'sharp'
 import { existsSync } from 'node:fs'
-import { MATTE_MODEL, alpha, cleanMask, cover, fit, keyout, matte, outline, pixelate, quantize, runPipeline, trim } from '../lib/postprocess.mjs'
+import { MATTE_MODEL, alpha, cleanMask, cover, fit, shave, keyout, matte, outline, pixelate, quantize, runPipeline, trim } from '../lib/postprocess.mjs'
 
 const rawOf = async (buf) => {
     const { data, info } = await sharp(buf).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
@@ -154,4 +154,15 @@ test('alpha step snaps a soft generated alpha to 0/255 and drops specks', async 
     assert.equal(alphaAt(out, 10, 10), 0)
     assert.equal(alphaAt(out, 2, 2), 0)
     assert.equal(alphaAt(out, 32, 32), 255)
+})
+
+test('shave removes a bright edge row and keeps the size', async () => {
+    const edge = await sharp({ create: { width: 40, height: 20, channels: 3, background: '#202020' } })
+        .composite([{ input: await sharp({ create: { width: 40, height: 1, channels: 3, background: '#ffffff' } }).png().toBuffer(), left: 0, top: 0 }])
+        .png()
+        .toBuffer()
+    const out = await sharp(await shave(edge, { px: 2 })).raw().toBuffer({ resolveWithObject: true })
+    assert.equal(out.info.width, 40)
+    assert.equal(out.info.height, 20)
+    assert.ok(out.data[1] < 64, 'top row is no longer white')
 })

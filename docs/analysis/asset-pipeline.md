@@ -18,9 +18,13 @@ A family (an entry in `styles.mjs`) is a named art recipe: checkpoint, style pro
 | `enemy-pixel` | longer side by Size tier, natural aspect | pixel-art sprite, LayerDiffuse transparency | transparent |
 | `portrait-pixel` | 256×256 | pixel-art bust, 2× chunky pixels | transparent |
 | `zone-pixel` | 832×1248 | pixel-art landscape | opaque |
-| `town-painterly` | 1376×768 | painterly matte | opaque |
+| `town-painterly` | 1376×768 | inked cartoon illustration (laHarpar look) | opaque |
 
 **Size tier** (enemies): `tiny` 96, `small` 144, `medium` 192, `large` 256 px on the longer side. Pixel density is constant (2 output px per art pixel), so a smaller tier has fewer art pixels. Omitting `--tier` means `medium`, reported as `sizeGuessed: true`.
+
+**Town and building backgrounds** (`town-painterly`): references are frozen copies in `scripts/asset-gen/refs/background/` (`laHarpar`, `mawood`), and a `shave` post step drops the 4 px border because the generator leaves a bright top row. Lessons from the Mawood set: the references pull every result bright, so a dark scene needs the prompt, the negatives and, for a dark exterior, a darkened source repaint (`--source`, denoise about 0.55-0.7, ipWeight 0.4); denoise below about 0.5 keeps the source's values and colours, so recolouring needs more. Prompt wording alone does not remove a lake, sky or pale trunks. No people in backgrounds. Procedural edits (recolouring trunks, darkening haze, clone-patching figures) were done with throwaway sharp scripts after generation.
+
+**Lattice items** (a spider web): the `item-pixel` `matte` step fills enclosed holes, so a web comes out as a slab. SDXL also does not draw one. The web icon was drawn in code (spokes and sagging rings at 48 px, dark outline) and is recorded in the manifest as `procedural`.
 
 ## One-time setup
 

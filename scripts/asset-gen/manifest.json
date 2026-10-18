@@ -76,6 +76,48 @@
     "seed": 513426195,
     "date": "2026-10-17"
   },
+  "src/assets/img/backgrounds/mawood.png": {
+    "family": "town-painterly",
+    "tier": null,
+    "subject": "a vertical treetop town in dim forest twilight, built around several giant tall tree trunks with pale silver-grey bark (Silverwood Spire) lit by glowing blue-green moss, a dense leaf canopy covering the whole top of the image, plain wooden gabled houses with dark wooden shingle roofs on round wooden platforms, a diagonal rope bridge, ladders and stairs between levels, small hanging wooden cage lanterns holding glowing blue-green fungus, a few small townsfolk, deep shadows, very dark forest floor far below",
+    "seed": 497080745,
+    "date": "2026-10-18"
+  },
+  "src/assets/img/backgrounds/mawoodApothecary.png": {
+    "family": "town-painterly",
+    "tier": null,
+    "subject": "inside a hollowed tree trunk with curved pale silver-grey bark walls, shelves grown into the wood grain, bundles of dried herbs and flowers hanging from the ceiling, glass vials catching blue-green moss light, a mortar and pestle on a root-shelf counter, skeins of spider silk, small hanging wooden cage lanterns with glowing fungus, cluttered cosy workspace, soft green and lavender tones, dim twilight, empty room",
+    "seed": 697443909,
+    "date": "2026-10-18"
+  },
+  "src/assets/img/backgrounds/mawoodElderTree.png": {
+    "family": "town-painterly",
+    "tier": null,
+    "subject": "inside a huge hollowed tree trunk with pale silver-grey bark walls, wide gnarled roots forming carved columns and a curved bench, small hanging wooden cage lanterns holding glowing blue-green fungus, soft blue-green moss glow, faint carved rune scars in the bark, a ceremonial round chamber, dim twilight, deep shadows, empty room",
+    "seed": 651404133,
+    "date": "2026-10-18"
+  },
+  "src/assets/img/backgrounds/mawoodHighPlatform.png": {
+    "family": "town-painterly",
+    "tier": null,
+    "subject": "a rickety lookout platform tied with ropes to a huge pale silver-grey trunk, seen from above, an endless sea of dark leafy treetop foliage far below to the horizon and more pale trunks standing up out of the foliage, rope pulleys and rigging, an unfinished kite frame with feathers, a brass spyglass on a wooden post, found driftwood boards, small hanging wooden cage lanterns with glowing teal fungus, thin rope bridges running out of frame, nobody here",
+    "seed": 6262,
+    "date": "2026-10-18"
+  },
+  "src/assets/img/backgrounds/mawoodHunterLodge.png": {
+    "family": "town-painterly",
+    "tier": null,
+    "subject": "inside a plain built wooden lodge with one open window showing dark forest twilight, left half: animal pelts, snares, arrows and a drying rack on the wall beside a stone fireplace; right half: a carpentry bench with wood shavings, stacked pale grey bark planks, half-carved armor pieces and carving tools, warm small wooden cage lanterns, empty room",
+    "seed": 1784154570,
+    "date": "2026-10-18"
+  },
+  "src/assets/img/backgrounds/mawoodMagicShop.png": {
+    "family": "town-painterly",
+    "tier": null,
+    "subject": "inside a wooden sorcerer's study built in a giant tree, wood walls crossed by glowing purple and cyan veins of energy, an open glowing spellbook on a tall lectern, floating crystals and carved rune stones, an arcane summoning circle on the floor, floating candle flames, scorch marks on the planks, chaotic heaps of scrolls, a glass crystal ball on a stand, a brass orrery, a glowing magically warded door, empty room",
+    "seed": 4444,
+    "date": "2026-10-18"
+  },
   "src/assets/img/enemies/bandit.png": {
     "shinyHue": 88,
     "family": "enemy-pixel",
@@ -480,10 +522,9 @@
     "date": "2026-10-17"
   },
   "src/assets/img/items/spiderSilk.png": {
-    "family": "item-pixel",
+    "family": "procedural",
     "tier": null,
-    "subject": "a small wound ball of white spider web silk thread, single object",
-    "seed": 1263046399,
-    "date": "2026-10-17"
+    "subject": "spider web drawn in code (spokes and sagging rings, 48px, hard pixels); SDXL could not draw a web with transparent gaps",
+    "date": "2026-10-18"
   }
 }

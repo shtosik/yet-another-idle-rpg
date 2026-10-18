@@ -140,19 +140,20 @@ FAMILIES['zone-pixel'] = {
 }
 
 FAMILIES['town-painterly'] = {
-    description: '1376×768 opaque painterly matte (town / building background)',
+    description: '1376×768 opaque inked cartoon illustration (town / building background, laHarpar look)',
     checkpoint: 'zavychromaxl_v80.safetensors',
     stylePrompt:
-        'painterly fantasy matte painting, town scene, rich brushwork, warm atmospheric lighting, ' +
-        'no characters, no text, wide cinematic composition',
-    negative: `${NEGATIVE_BASE}, characters, people, pixel art, low detail, ui`,
-    references: ['mawood', 'mawoodApothecary', 'laHarparTavern'].map((n) => `src/assets/img/backgrounds/${n}.png`),
+        'hand-drawn fantasy town illustration, bold dark ink outlines, flat cel colouring with soft shading, muted earthy palette, ' +
+        'elevated three-quarter view looking down on the scene, weathered wooden buildings, small background figures, no text, wide composition',
+    negative: `${NEGATIVE_BASE}, pixel art, low detail, ui, painterly, photorealistic, dramatic god rays, volumetric light, neon, oversaturated`,
+    // frozen copies of the approved backgrounds (laHarpar's inked look, Mawood's dark twilight); never live src/assets files
+    references: ['laHarpar', 'mawood'].map((n) => `scripts/asset-gen/refs/background/${n}.png`),
     gen: [1344, 768],
     target: [1376, 768],
     pixel: false,
     alpha: false,
     // Generate at the nearest SDXL-native size and cover up to the exact asset size (a 32px crop-fill, no distortion).
-    post: [['cover', { width: 1376, height: 768 }]],
+    post: [['cover', { width: 1376, height: 768 }], ['shave', { px: 4 }]],
     ipWeight: 0.7,
     sampler: { steps: 8, cfg: 5.5, sampler_name: 'euler', scheduler: 'sgm_uniform' },
 }
