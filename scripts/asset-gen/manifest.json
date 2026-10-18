@@ -2,9 +2,9 @@
   "src/assets/img/avatars/laHarpar/laHarparBartender.png": {
     "family": "portrait-pixel",
     "tier": null,
-    "subject": "a realistic stocky irritated medieval tavern keeper, middle-aged man with scowl and one raised eyebrow, rough linen shirt with sleeves rolled past the elbows, stained leather apron, a white dish rag over his left shoulder, brown and faded blue-grey clothes, one consistent natural skin tone on face, neck and hands, fully opaque solid figure, bust with both shoulders fully in frame",
-    "seed": 604710212,
-    "date": "2026-10-17"
+    "subject": "a realistic irritated medieval barmaid in her thirties, long loose wavy black hair, round tanned face, scowl and one raised eyebrow, bright yellow linen blouse with sleeves rolled past the elbows, a white dish rag over her left shoulder, one consistent natural skin tone on face, neck and hands, fully opaque solid figure, bust with both shoulders fully in frame",
+    "seed": 9932,
+    "date": "2026-10-18"
   },
   "src/assets/img/avatars/laHarpar/laHarparElara.png": {
     "family": "portrait-pixel",
@@ -85,22 +85,22 @@
     "date": "2026-10-17"
   },
   "src/assets/img/enemies/blueSlime.png": {
-    "shinyHue": 342,
+    "shinyHue": 120,
     "family": "enemy-pixel",
     "tier": "small",
-    "subject": "a single blob, a blue slime with a glossy dome body and two simple eyes",
-    "seed": 421649261,
-    "date": "2026-10-17",
-    "shinySaturation": 2.2,
+    "subject": "a single blue slime blob with a glossy dome body and two simple eyes",
+    "seed": 9014,
+    "date": "2026-10-18",
+    "shinySaturation": 1.6,
     "shinyBrightness": 1.3
   },
   "src/assets/img/enemies/bogSkeleton.png": {
     "shinyHue": 180,
     "family": "enemy-pixel",
     "tier": "medium",
-    "subject": "an ancient skeleton warrior with one skull, two arms and two legs, half covered in moss and tangled roots, holding a rusted sword",
-    "seed": 1569708908,
-    "date": "2026-10-17",
+    "subject": "a single skeleton with one skull, two arms and two legs, a few small patches of green moss and thin roots wrapped around its ribs and arms, one straight rusted sword with a long blade, a short hilt and a small crossguard held in its right hand, nothing in the left hand, alone",
+    "seed": 9304,
+    "date": "2026-10-18",
     "shinySaturation": 2.5,
     "shinyBrightness": 1.1
   },
@@ -116,17 +116,18 @@
     "shinyHue": 280,
     "family": "enemy-pixel",
     "tier": "small",
-    "subject": "one small young tree with a single thin trunk and bare twisted branches, the bark covered in glowing dark purple-black cracks and veins of blight, a few withered leaves",
-    "seed": 1324844182,
-    "date": "2026-10-17"
+    "subject": "one small young tree with a single thin trunk and bare twisted branches, the bark covered in glowing dark purple-black cracks, a few withered leaves",
+    "seed": 9017,
+    "date": "2026-10-18"
   },
   "src/assets/img/enemies/crab.png": {
     "shinyHue": 250,
     "family": "enemy-pixel",
     "tier": "small",
-    "subject": "a red crab facing the viewer, wide domed orange-red shell, eyes on two short stalks, two big claws raised with open pincers, eight legs",
-    "seed": 762066615,
-    "date": "2026-10-17"
+    "subject": "a red crab facing the viewer, two big raised claws with open pincers, domed red shell with a plain smooth front, two eyes on short stalks on top, walking legs on each side",
+    "seed": 303,
+    "date": "2026-10-17",
+    "source": "scripts/asset-gen/refs/control/crab-source.png (Z-Image, seed 101) + SDXL img2img denoise 0.45"
   },
   "src/assets/img/enemies/deer.png": {
     "shinyHue": 212,
@@ -142,28 +143,28 @@
     "shinyHue": 300,
     "family": "enemy-pixel",
     "tier": "large",
-    "subject": "a huge ancient grey spider seen from above, round abdomen with a pale bone-white skull-shaped marking, small head with red eyes and large fangs, thick dark grey hairy legs with bent joints",
-    "seed": 1865909053,
+    "subject": "a huge ancient spider seen from the front and slightly above, cluster of glowing red eyes and two large fangs on its head, a big round ash-grey abdomen with a pale bone-white skull-like pattern behind the head, eight thick dark grey hairy legs, four on each side",
+    "seed": 4242,
     "date": "2026-10-17",
-    "shinySaturation": 2.5,
-    "shinyBrightness": 1.1
+    "shinySaturation": 14,
+    "shinyBrightness": 1.15
   },
   "src/assets/img/enemies/forestBear.png": {
     "shinyHue": 200,
     "family": "enemy-pixel",
     "tier": "large",
     "subject": "a large brown grizzly bear walking on all four legs, exactly four legs, one head, thick brown fur",
-    "seed": 12,
-    "date": "2026-10-17",
+    "seed": 9006,
+    "date": "2026-10-18",
     "shinySaturation": 2.5,
     "shinyBrightness": 1.1
   },
   "src/assets/img/enemies/forestSpider.png": {
     "shinyHue": 330,
     "family": "enemy-pixel",
-    "tier": "small",
-    "subject": "a forest spider seen from above, round pale-green abdomen with a darker pattern, small brown head with several eyes and two fangs, thick brown hairy legs with bent joints",
-    "seed": 1885925255,
+    "tier": "medium",
+    "subject": "a forest spider seen from the front and slightly above, brown head with small fangs, a big round abdomen striped moss green and brown behind the head, eight brown hairy legs with green bands, four on each side",
+    "seed": 4242,
     "date": "2026-10-17",
     "shinySaturation": 3,
     "shinyBrightness": 1.25
@@ -172,9 +173,10 @@
     "shinyHue": 254,
     "family": "enemy-pixel",
     "tier": "small",
-    "subject": "a red crab facing the viewer wearing a black eyepatch, one claw raised high holding a large kitchen knife, domed red shell, eyes on two short stalks, eight legs",
-    "seed": 1556945092,
-    "date": "2026-10-17"
+    "subject": "a red crab facing the viewer, one arm ends in a large kitchen knife blade instead of a claw, the other arm has a big open claw, domed red shell, two eyes on short stalks on top, walking legs on each side",
+    "seed": 302,
+    "date": "2026-10-17",
+    "source": "scripts/asset-gen/refs/control/gangsterCrab-source.png (Z-Image, seed 55) + SDXL img2img denoise 0.45"
   },
   "src/assets/img/enemies/giantEagle.png": {
     "shinyHue": 200,
@@ -189,8 +191,8 @@
     "family": "enemy-pixel",
     "tier": "small",
     "subject": "a large grey rat in side view with one head, exactly four legs, one long thin pink tail and big yellow buck teeth",
-    "seed": 376893830,
-    "date": "2026-10-17",
+    "seed": 9010,
+    "date": "2026-10-18",
     "shinySaturation": 4,
     "shinyBrightness": 1.2
   },
@@ -198,9 +200,9 @@
     "shinyHue": 180,
     "family": "enemy-pixel",
     "tier": "large",
-    "subject": "a massive gnarled ancient tree creature with one face in its bark, two root legs, two branch arms and glowing blight cracks",
-    "seed": 1522338292,
-    "date": "2026-10-17"
+    "subject": "a single massive walking tree creature standing upright like a giant humanoid: its whole body is rough dark bark and wood grain, one head shaped like a gnarled knot of wood with a stern bark face, broad shoulders of thick bark, two thick branch arms hanging at its sides ending in twisted root fingers, two thick root legs, twigs and green moss growing from its head and shoulders, glowing cracks in the bark, alone",
+    "seed": 9703,
+    "date": "2026-10-18"
   },
   "src/assets/img/enemies/gnollScout.png": {
     "shinyHue": 120,
@@ -214,9 +216,9 @@
     "shinyHue": 160,
     "family": "enemy-pixel",
     "tier": "large",
-    "subject": "a massive hyena-headed gnoll warchief with one head, two arms and two legs, in crude spiked armour holding one large axe, roaring",
-    "seed": 1282136480,
-    "date": "2026-10-17"
+    "subject": "a massive hyena-headed gnoll with one head, two arms and two legs, crude spiked shoulder armour, one single-bladed axe on a long straight wooden handle held in its right hand, nothing in the left hand, mouth open roaring",
+    "seed": 9303,
+    "date": "2026-10-18"
   },
   "src/assets/img/enemies/goat.png": {
     "shinyHue": 344,
@@ -232,25 +234,25 @@
     "shinyHue": 288,
     "family": "enemy-pixel",
     "tier": "small",
-    "subject": "a small green goblin with one normally sized head, pointy ears, two arms and two legs, ragged patched clothes, a small sack over one shoulder and a rusty knife",
-    "seed": 35693272,
-    "date": "2026-10-17"
+    "subject": "a small green goblin with one normally sized head, pointy ears, two arms and two legs, ragged patched clothes, holding one short straight rusty knife in its right hand, nothing in the left hand",
+    "seed": 9302,
+    "date": "2026-10-18"
   },
   "src/assets/img/enemies/goblinScout.png": {
     "shinyHue": 266,
     "family": "enemy-pixel",
     "tier": "small",
-    "subject": "a small green goblin with one head, long pointed ears, two arms and two legs, in a leather cap holding a short bow, no cloak",
-    "seed": 657997838,
-    "date": "2026-10-17"
+    "subject": "a small green goblin with one head, long pointed ears, two arms and two legs, a leather cap, holding one short plain wooden bow in its left hand with one taut straight bowstring from tip to tip, nothing in the right hand",
+    "seed": 9602,
+    "date": "2026-10-18"
   },
   "src/assets/img/enemies/greenSlime.png": {
     "shinyHue": 26,
     "family": "enemy-pixel",
     "tier": "small",
-    "subject": "a single blob, a green slime with a glossy dome body and two simple eyes",
-    "seed": 797856277,
-    "date": "2026-10-17",
+    "subject": "a single bright vivid saturated green slime: one solid opaque jelly blob in a smooth dome shape with a flat base resting on the ground, two simple round eyes, alone",
+    "seed": 9701,
+    "date": "2026-10-18",
     "shinySaturation": 2.2,
     "shinyBrightness": 1.3
   },
@@ -259,24 +261,26 @@
     "family": "enemy-pixel",
     "tier": "medium",
     "subject": "a harpy: the head, hair and torso of a human woman, but her arms are large brown feathered bird wings with no hands, and her legs are two scaly bird legs with yellow talons, a feathered tail, one head with no horns",
-    "seed": 151429908,
-    "date": "2026-10-17"
+    "seed": 9004,
+    "date": "2026-10-18"
   },
   "src/assets/img/enemies/harpyMatriarch.png": {
-    "shinyHue": 300,
+    "shinyHue": 345,
     "family": "enemy-pixel",
     "tier": "large",
-    "subject": "an older larger harpy matriarch: the head, grey hair and torso of an aged human woman wearing a small crown, but her arms are huge grey and white feathered bird wings with no hands, and her legs are two scaly bird legs with large talons, one head with no horns",
-    "seed": 1134554239,
-    "date": "2026-10-17"
+    "subject": "an older larger harpy: the head, grey hair and torso of an aged human woman wearing a small crown, but her arms are huge grey and white feathered bird wings with no hands, and her legs are two scaly bird legs with large talons, one head with no horns",
+    "seed": 9005,
+    "date": "2026-10-18",
+    "shinySaturation": 5,
+    "shinyBrightness": 1
   },
   "src/assets/img/enemies/kingSlime.png": {
     "shinyHue": 262,
     "family": "enemy-pixel",
     "tier": "large",
-    "subject": "a single giant blob, a slime wearing a golden crown, with a smug face",
-    "seed": 1469883411,
-    "date": "2026-10-17",
+    "subject": "a single giant slime blob wearing a golden crown, with a smug face",
+    "seed": 9015,
+    "date": "2026-10-18",
     "shinySaturation": 2.5,
     "shinyBrightness": 1.1
   },
@@ -284,9 +288,9 @@
     "shinyHue": 96,
     "family": "enemy-pixel",
     "tier": "small",
-    "subject": "a menacing realistic mountain bat with leathery membrane wings and sharp fangs, not cute, one head, two wings, gritty",
-    "seed": 1886961095,
-    "date": "2026-10-17",
+    "subject": "a bat with spread leathery membrane wings, sharp fangs, pointed ears, one head, two wings",
+    "seed": 9007,
+    "date": "2026-10-18",
     "shinySaturation": 2.5,
     "shinyBrightness": 1.1
   },
@@ -294,55 +298,55 @@
     "shinyHue": 168,
     "family": "enemy-pixel",
     "tier": "tiny",
-    "subject": "a tiny small brown rat with one head, four legs, a thin tail, compact body",
-    "seed": 797891088,
-    "date": "2026-10-17",
+    "subject": "a small brown rat with one head, four legs, a thin tail, compact body",
+    "seed": 9009,
+    "date": "2026-10-18",
     "shinySaturation": 2.5,
     "shinyBrightness": 1.1
   },
   "src/assets/img/enemies/redSlime.png": {
-    "shinyHue": 18,
+    "shinyHue": 190,
     "family": "enemy-pixel",
     "tier": "small",
-    "subject": "a single smooth glossy translucent red slime blob with a plain smooth surface, no spots or bumps, melting into a puddle at the base, two eyes",
-    "seed": 1966822229,
-    "date": "2026-10-17",
-    "shinySaturation": 2.2,
-    "shinyBrightness": 1.3
+    "subject": "a single bright red lava slime: one solid opaque glossy blob shaped like a rounded droplet with a pointed top, orange glowing cracks across its body, two glowing yellow eyes, alone",
+    "seed": 9915,
+    "date": "2026-10-18",
+    "shinySaturation": 1.2,
+    "shinyBrightness": 1.1
   },
   "src/assets/img/enemies/seagull.png": {
     "shinyHue": 38,
     "family": "enemy-pixel",
     "tier": "tiny",
     "subject": "a white seagull standing calmly with its grey wings folded against its body, two legs, one head and a yellow beak",
-    "seed": 413721988,
-    "date": "2026-10-17",
-    "shinySaturation": 2.5,
-    "shinyBrightness": 1.1
+    "seed": 9011,
+    "date": "2026-10-18",
+    "shinySaturation": 9,
+    "shinyBrightness": 1.05
   },
   "src/assets/img/enemies/treantSprout.png": {
     "shinyHue": 270,
     "family": "enemy-pixel",
     "tier": "medium",
-    "subject": "a small wise slightly sinister woodland tree sprite with bark skin, narrow amber eyes, a stubby trunk body, two root feet, two twig arms, one head, a few leaves",
-    "seed": 164823496,
-    "date": "2026-10-17"
+    "subject": "a small tree creature with bark skin, narrow amber eyes, a stubby trunk body, two root feet, two twig arms, one head, a few leaves",
+    "seed": 9018,
+    "date": "2026-10-18"
   },
   "src/assets/img/enemies/troll.png": {
     "shinyHue": 90,
     "family": "enemy-pixel",
     "tier": "large",
-    "subject": "a huge green-skinned troll with a hunched back, one head, two thick arms and two legs, holding a single large wooden club in ONE hand only, the other arm hanging empty at its side",
-    "seed": 995717204,
-    "date": "2026-10-17"
+    "subject": "a single hulking green-skinned troll standing upright, hunched back, one head, two thick arms and two legs, all of its skin the same green from head to bare feet including the arms and legs, a brown loincloth, both hands empty and open, alone",
+    "seed": 9801,
+    "date": "2026-10-18"
   },
   "src/assets/img/enemies/turtle.png": {
     "shinyHue": 26,
     "family": "enemy-pixel",
     "tier": "small",
     "subject": "a green turtle with one head, exactly four legs and a domed shell",
-    "seed": 4673125,
-    "date": "2026-10-17",
+    "seed": 9008,
+    "date": "2026-10-18",
     "shinySaturation": 2.5,
     "shinyBrightness": 1.1
   },
