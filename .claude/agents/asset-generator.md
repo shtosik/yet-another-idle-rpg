@@ -26,21 +26,25 @@ fits (for example a skill icon or world-map tile), report that and skip; do not 
 
 ## 2. Write the subject only
 
-One or two sentences: the thing, its pose or scene, distinguishing features. For creatures state the anatomy counts the model gets wrong ("exactly four legs and one head", "exactly two claws and eight legs", "two arms, two legs") and describe ONE subject; words like "side view" or "turnaround" make it draw several copies. Take it from `docs/character/**`,
+One or two sentences: the thing, its pose or scene, distinguishing features. Take it from `docs/character/**`,
 `docs/design/**`, the enemy/item description or the task. **Never write style words** (pixel art, outline, palette,
-painterly, resolution, background colour); the family adds them. Describe the **body plan and visible features**, not the
-setting or a role: no setting words ("mossy", "ancient forest", "dark") and no role labels ("gangster", "bandit") that
-make the model draw that setting or role; say what is physically there ("an eyepatch", "a knife blade in place of one
-claw"). Markings: "skull-like pattern" makes it draw real skulls (a second skull as the head), "face" or "eyes" makes it
-paint a face on a shell. Write those words only when you want them. **No environment:** never describe anything on the floor (moss, roots, grass, puddles, mounds, a base) as part of the creature; put it on the body or leave it out, and reject a candidate that stands on a mound, patch or shadow (doc § No environment). **One creature per image:** start the subject with "a single …" or "one …", name the species once, say "alone" for
-animals that come in groups, and use **no view words** ("side view", "front view") unless a control fixes the pose: they
-make SDXL draw several copies (doc § One creature per image). **Weapons** (full rules and evidence in the doc
-§ Weapons): one weapon per creature, named once with its hand and "nothing in the other hand"; a plain straight shape
-material and proportions ("short straight rusty knife", "long blade with a short hilt and a small crossguard", otherwise the hilt comes out as long as the blade); nothing attached (no quiver, arrows, sheath) and at
-most one other carried item; prefer rigid straight weapons, and treat a bow, sling, whip or flail as error-prone (generate
-8 candidates and check each one, or suggest a different weapon). Name an enemy's tier from lore if known: `tiny` 96,
-`small` 144, `medium` 192, `large` 256 (longer side). No hint means omit `--tier` (it defaults to `medium` and the
-result reports `sizeGuessed: true`).
+painterly, resolution, background colour); the family adds them. Describe what is physically there, not the setting or a
+role: no "mossy" or "gangster", say "an eyepatch" or "a knife blade in place of one claw". The rules below come from
+real failures; the evidence is in `docs/analysis/asset-pipeline.md` (§ Writing a subject, No environment, One creature
+per image, Weapons):
+
+- **Anatomy:** state the counts the model gets wrong ("exactly four legs and one head", "two claws and eight legs").
+- **One creature:** start with "a single …" or "one …", name the species once, say "alone" for animals that come in groups, use no view words ("side view", "turnaround") unless a control fixes the pose.
+- **No environment:** nothing on the floor (moss, roots, puddles, a mound) as part of the creature; reject a candidate that stands on one.
+- **Markings:** "skull-like" and "face"/"eyes" make it draw real skulls and painted faces; write them only when wanted.
+- **Weapons:** one weapon, named once with its hand and "nothing in the other hand"; a plain straight shape with proportions ("long blade with a short hilt and a small crossguard"); nothing attached (no quiver, sheath). A bow, sling, whip or flail is error-prone: generate 8 candidates or suggest another weapon.
+- **Tier:** from lore if known: `tiny` 96, `small` 144, `medium` 192, `large` 256 (longer side). No hint: omit `--tier` (the result reports `sizeGuessed: true`).
+
+**Backgrounds** (`town-painterly`, no people or text): the family refs pull results bright and prompt words alone do
+not remove a lake, sky or pale trunks, so a dark scene is made by repainting a darkened source (`edit.mjs darken`, then
+`--source` at denoise 0.55-0.7, ipWeight 0.4); see the doc § Town and building backgrounds. After generating run
+`node scripts/asset-gen/generate.mjs --qc <candidate>` (luminance, `edge` strips) and make a review grid with
+`node scripts/asset-gen/edit.mjs montage`. A lattice (a web) cannot be generated: report it, the main thread draws it.
 
 ## 3. Generate, look, pick (at most 2 rounds per asset)
 
@@ -82,7 +86,7 @@ node scripts/asset-gen/generate.mjs --pick <n> --slug <slug>
 shiny, also run `--shiny-of <target>` (see the doc; the hue angle must come from `--estimate-hue` on the legacy pair or
 `--hue`). Low-colour creatures (grey, white, brown) also need `--saturation 2` or more (and maybe `--brightness`) or the shiny looks identical: compare the two files. For several assets of one family use one `--batch jobs.json` run rather than one call per asset.
 
-If a step fails twice with the same error, stop and report the error; do not write your own image-processing code.
+If a step fails twice with the same error, stop and report the error. Repairs after generation (darken, recolour, patch, trim an edge) go through `scripts/asset-gen/edit.mjs`; do not write your own image-processing code.
 
 ## 4. Finish
 

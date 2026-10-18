@@ -34,7 +34,7 @@ import { CONTROL_TYPES, controlImage } from './lib/controls.mjs'
 import { MANIFEST_PATH, readManifest, recordEntry, setField } from './lib/manifest.mjs'
 import { estimateHue, hueShift, shinyPathFor } from './lib/shiny.mjs'
 import { runPipeline } from './lib/postprocess.mjs'
-import { qcCandidate } from './lib/qc.mjs'
+import { imageStats, qcBackground, qcCandidate } from './lib/qc.mjs'
 import { loadRefs } from './lib/refs.mjs'
 import { makeSheet } from './lib/sheet.mjs'
 import { makeControl } from './lib/silhouette.mjs'
@@ -79,7 +79,8 @@ export function applyOverrides(family, { steps, cfg, ipWeight, sampler, grid, co
 }
 
 /**
- * QC every candidate of a job (transparent families only). Flags never block a pick: they say where to look.
+ * QC every candidate of a job: cutout checks for transparent families, edge and tone checks for opaque ones.
+ * Flags never block a pick: they say where to look.
  * @returns {Promise<{n: number, flags: {code: string, detail: string}[], metrics: object}[]>}
  */
 async function runQc({ family, raws, candidates, control }) {
@@ -211,7 +212,7 @@ export async function makeShiny({ target, hue, saturation, brightness, root = RE
 }
 
 const OPTIONS = {
-    'estimate-hue': { type: 'string' }, 'shiny-of': { type: 'string' }, hue: { type: 'string' }, saturation: { type: 'string' }, brightness: { type: 'string' },
+    qc: { type: 'string' }, 'estimate-hue': { type: 'string' }, 'shiny-of': { type: 'string' }, hue: { type: 'string' }, saturation: { type: 'string' }, brightness: { type: 'string' },
     family: { type: 'string' }, target: { type: 'string' }, subject: { type: 'string' },
     count: { type: 'string' }, seed: { type: 'string' }, 'no-ref': { type: 'boolean' }, tag: { type: 'string' }, tier: { type: 'string' },
     pick: { type: 'string' }, slug: { type: 'string' }, batch: { type: 'string' },
@@ -231,6 +232,12 @@ export async function main(argv = process.argv.slice(2)) {
     }
     const comfy = createComfy()
     if (v.stop) return comfy.stop()
+    if (v.qc) {
+        // opaque image check for a finished background: luminance, edge strips and the flags a generation would get
+        const file = resolve(REPO_ROOT, v.qc)
+        const candidate = readFileSync(file)
+        return { file: relative(REPO_ROOT, file).replaceAll('\\', '/'), ...(await imageStats(candidate)), flags: (await qcBackground({ candidate })).flags }
+    }
     if (v['estimate-hue']) return estimateShinyHue({ target: v['estimate-hue'] })
     if (v['shiny-of']) return makeShiny({ target: v['shiny-of'], hue: v.hue === undefined ? undefined : Number(v.hue), saturation: v.saturation === undefined ? undefined : Number(v.saturation), brightness: v.brightness === undefined ? undefined : Number(v.brightness) })
     if (v.reprocess) {

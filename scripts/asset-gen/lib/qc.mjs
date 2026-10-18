@@ -10,6 +10,8 @@
 //   skeleton  the generated shape strays from its control image: too little of the skeleton is covered (a missing limb),
 //             too much of the shape lies outside it, and, for a silhouette control, an empty patch in the body area or
 //             more limbs than the control on the rings around the body. Needs raw alpha and a control.
+// Opaque families (backgrounds) get `qcBackground`: `edge` (the outer rows or columns are far brighter or darker than the
+// image just inside them: the generator leaves a bright top row) and `tone` (nearly black or nearly white overall).
 // Not checked, so still a manual look: faces painted on shells, metallic or plated surfaces, wrong limb counts without
 // a control, grey halo residue.
 
@@ -37,6 +39,12 @@ export const QC = {
     ringRadii: [0.38, 0.47, 0.55, 0.64, 0.72, 0.8], // ring radii as a fraction of the control's reach from its centre
     ringExcess: 4, // limb crossings over the control's count that make a ring "too busy"
     ringBusy: 2, // rings that must be too busy to flag extra limbs (good spiders 0-1, extra-legged ones 3-5)
+    // Backgrounds (opaque): the edge ring (3 px) against the band just inside it (8-16 px in), and the mean tone.
+    edgeBand: 3,
+    edgeInner: [8, 16],
+    edgeStep: 45, // difference in mean luminance (0-255) that makes an edge ring a strip; clean generations differ by under 15
+    toneDark: 12, // mean luminance under this is a black image
+    toneBright: 215, // mean luminance over this is a washed-out image
 }
 
 const N4 = [[1, 0], [-1, 0], [0, 1], [0, -1]]
@@ -252,4 +260,51 @@ export async function qcCandidate({ raw, candidate, control }) {
         if (fit.busyRings >= QC.ringBusy) flags.push({ code: 'skeleton', detail: `more limbs than the control on ${fit.busyRings} of ${QC.ringRadii.length} rings around the body (extra or doubled legs)` })
     }
     return { flags, metrics }
+}
+
+/**
+ * Luminance facts of an opaque image: the mean (0-255) and, per side, how far the outer `edgeBand` px differ from the
+ * band just inside (`edgeInner`). Both `qcBackground` and the `--qc` / `edit.mjs stats` commands use this, so every
+ * reviewer measures tone and edge strips the same way.
+ * @returns {Promise<{width: number, height: number, mean: number, edges: {top: number, bottom: number, left: number, right: number}}>}
+ */
+export async function imageStats(buf) {
+    const { data, info } = await sharp(buf).flatten({ background: '#000000' }).greyscale().raw().toBuffer({ resolveWithObject: true })
+    if (info.channels !== 1) throw new Error(`expected 1 channel after greyscale, got ${info.channels}`)
+    const { width: w, height: h } = info
+    let total = 0
+    for (const v of data) total += v
+    const meanOf = (x0, y0, x1, y1) => {
+        let sum = 0, n = 0
+        for (let y = y0; y < y1; y++) for (let x = x0; x < x1; x++) { sum += data[y * w + x]; n++ }
+        return n ? sum / n : 0
+    }
+    const b = QC.edgeBand, [i0, i1] = QC.edgeInner
+    const step = (outer, inner) => Math.round((outer - inner) * 10) / 10
+    return {
+        width: w,
+        height: h,
+        mean: Math.round((total / data.length) * 10) / 10,
+        edges: {
+            top: step(meanOf(0, 0, w, b), meanOf(0, i0, w, i1)),
+            bottom: step(meanOf(0, h - b, w, h), meanOf(0, h - i1, w, h - i0)),
+            left: step(meanOf(0, 0, b, h), meanOf(i0, 0, i1, h)),
+            right: step(meanOf(w - b, 0, w, h), meanOf(w - i1, 0, w - i0, h)),
+        },
+    }
+}
+
+/**
+ * QC for an opaque candidate (a background or zone image). Flags only, like `qcCandidate`.
+ * @returns {Promise<{flags: {code: string, detail: string}[], metrics: object}>}
+ */
+export async function qcBackground({ candidate }) {
+    const { mean, edges } = await imageStats(candidate)
+    const flags = []
+    for (const [side, d] of Object.entries(edges)) {
+        if (Math.abs(d) >= QC.edgeStep) flags.push({ code: 'edge', detail: `the ${side} edge is ${d > 0 ? 'brighter' : 'darker'} than the image inside it by ${Math.abs(d)} (a strip; inner band is clean at under 15)` })
+    }
+    if (mean < QC.toneDark) flags.push({ code: 'tone', detail: `mean luminance ${mean}: the image is almost black` })
+    if (mean > QC.toneBright) flags.push({ code: 'tone', detail: `mean luminance ${mean}: the image is washed out` })
+    return { flags, metrics: { luminance: mean, edges } }
 }

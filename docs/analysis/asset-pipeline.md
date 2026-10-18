@@ -147,6 +147,10 @@ Shiny sprites are separate hue-shifted files at `<name>-shiny.png` (the runtime 
 
 `npm run test:assets` (node:test, no GPU needed): post-process steps (including `alpha`), graph builder (LayerDiffuse, no-LoRA, control and source graphs), Z-Image graph and structure job, QC checks (synthetic shapes), ComfyUI adapter against a fake http/ws server, registry validation, tiers, batch and manifest, controls, shiny.
 
+## Editing a finished image (`edit.mjs`)
+
+For repairs after generation, use `node scripts/asset-gen/edit.mjs <command>` (`lib/edit.mjs`, tested) instead of writing a script: `stats` (luminance, edge strips, flags), `darken` (a darker, teal-tinted source with a dark top gradient, for a repaint), `haze` (darkens pale haze behind a foreground), `trunks` (brown trunks toward pale silver-grey), `trim` (drops an edge strip), `patch --box x0,y0,x1,y1,dx,dy` (clones pixels from an offset over a box, e.g. to remove a small figure) and `montage` (numbered grid with each image's luminance, for the user to review). The sheet's reference row shows what the model sees: a centre square crop (`cover`) of each reference at 512 px, so a wide background reference is cropped; check that crop matches the style you want before a batch.
+
 ## Reviewing candidates
 
 ### Automatic QC (`lib/qc.mjs`)
@@ -161,6 +165,10 @@ Every job for a transparent family gets a `qc` list in its JSON result and `meta
 | `hollow` | a see-through shell instead of a solid body | enclosed empty space ≥ 30% of the filled silhouette (translucent slimes drew as empty arches at 38-50%; skeletons reach 24%, everything else stays under 18%; thick-walled arches at about 22% are missed) |
 | `skeleton` | the shape strays from its control | needs a `control` and a LayerDiffuse raw: under 60% of the skeleton covered, over 30% of the shape outside it, and for a silhouette control more than 5% of its body core empty, or more limbs than the control on at least 2 of 6 rings around the body |
 | `empty` | nothing left after cutout | |
+| `edge` | opaque images only: a bright or black strip on one side | the outer 3 px differ from the band 8-16 px inside by ≥ 45 (clean generations by under 15). The generator leaves a bright top row; the family's `shave` step removes it |
+| `tone` | opaque images only: nearly black or washed out | mean luminance under 12 or over 215 |
+
+Opaque families (backgrounds) get `edge` and `tone` instead of the cutout checks, and `metrics.luminance` holds the mean (0-255; the dark Mawood forest is about 40-65 by the greyscale mean, the interiors 70-100). Check a finished file with `node scripts/asset-gen/generate.mjs --qc <image>`.
 
 Calibration: the 31 shipped enemy sprites give no flags. On 12 real spider generations (a fixed seed, silhouette control) it flagged 4: the two with extra or doubled legs, one with a notch cut into the abdomen, and one with its head and abdomen stacked in the wrong place, and it passed the 3 candidates the user had accepted. It missed one candidate with a single doubled leg. The `hole` rule was first tuned on spiders and then flagged 12 of 24 troll, goblin and gnoll candidates for the gap between an arm and the torso; it was retightened on those (now only a troll with several torso patches is flagged). `fragment` and `slab` were only checked on synthetic images and the shipped sprites. Treat a pass as "nothing obvious", not as approval. The `skeleton` body and limb checks only run with a silhouette control (spider).
 
