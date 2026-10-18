@@ -15,6 +15,8 @@
 //   alpha       true => transparent asset, false => fully opaque
 //   post        ordered [step, params] list, see lib/postprocess.mjs
 //   ipWeight    IP-Adapter strength; sampler overrides steps/cfg/sampler_name/scheduler
+//   layer       true => LayerDiffuse generates real alpha (needs `lora: false`, a plain style prompt, and an `alpha` post step in place of `matte`)
+//   lora        false => no Hyper-SDXL 8-step LoRA (full-step sampling)
 
 import { existsSync } from 'node:fs'
 import { dirname, join } from 'node:path'
@@ -35,9 +37,17 @@ export const FAMILY_TARGETS = {
 export const SIZE_TIERS = { tiny: 96, small: 144, medium: 192, large: 256 }
 export const DEFAULT_TIER = 'medium'
 
-const ENEMY_REFS = ['bandit', 'troll', 'crab', 'goat', 'goblinScavenger', 'deer'].map((n) => `src/assets/img/enemies/${n}.png`)
+// The user-approved sprites, frozen as copies: a reference must never point at a live src/assets file, because
+// regenerating overwrites it and one bad sprite (the troll's grey slab) would then leak into every later generation.
+const ENEMY_REFS = ['goat', 'gnollScout', 'giantEagle', 'deer', 'canopyBandit', 'bandit', 'wolf'].map((n) => `scripts/asset-gen/refs/enemy/${n}.png`)
 
 const ANATOMY_NEGATIVE = 'extra limbs, extra legs, extra arms, missing limbs, bad anatomy, deformed, mutated, disfigured, duplicate, two heads, multiple heads, floating body parts, fused bodies, cropped, character sheet, turnaround, multiple views, collage, ground, floor, platform, pedestal'
+// A weapon should be one rigid object in one hand: SDXL otherwise doubles it or merges two (a blade that turns into a bow)
+const WEAPON_NEGATIVE = 'two weapons, double weapon, merged weapons, bent blade, broken weapon'
+// SDXL tends to draw the subject twice (a second rat under the first) unless it is told it is alone
+const SINGLE_NEGATIVE = 'two animals, pair of animals, group of creatures, several creatures, second creature, duplicate creature, two of the same creature'
+// The sprite stands alone: no mound, grass, soil or puddle under it (moss and roots in a prompt became a dirt mound)
+const ENVIRONMENT_NEGATIVE = 'grass, dirt mound, soil, rocks at the feet, puddle, ground patch, base under the feet, scenery'
 const GRITTY_NEGATIVE = 'cute, chibi, kawaii, plush toy, cartoon, mascot, big round eyes, childish, cheerful'
 const NEGATIVE_BASE = 'text, watermark, signature, frame, border, ui, blurry, photo, realistic, 3d render'
 
@@ -76,10 +86,10 @@ export const ENEMY_ART_PIXEL = 2
 FAMILIES['enemy-pixel'] = {
     description: 'transparent pixel-art enemy sprite, ≤256 on the longer side by Size tier, natural aspect',
     checkpoint: 'zavychromaxl_v80.safetensors',
-    stylePrompt:
-        'dark fantasy pixel art game enemy sprite, anatomically correct, full body, single character, dark outline, limited colour palette, crisp hard pixels, ' +
-        'plain flat solid light grey background',
-    negative: `${NEGATIVE_BASE}, multiple characters, ground shadow, gradient background, anti-aliased, smooth shading, ${GRITTY_NEGATIVE}, ${ANATOMY_NEGATIVE}`,
+    // LayerDiffuse was trained against the plain SDXL model: with the Hyper LoRA, or with setting words such as "dark
+    // fantasy" or a prompted background, its alpha comes out as garbage. Keep this prompt plain.
+    stylePrompt: 'clean bright pixel art game sprite, flat colours, bold dark outline, simple shading with highlights, limited colour palette, isolated, no background',
+    negative: `${NEGATIVE_BASE}, multiple characters, ground shadow, gradient background, anti-aliased, smooth shading, ${GRITTY_NEGATIVE}, ${ANATOMY_NEGATIVE}, ${WEAPON_NEGATIVE}, ${SINGLE_NEGATIVE}, ${ENVIRONMENT_NEGATIVE}`,
     references: ENEMY_REFS,
     gen: [1024, 1024],
     target: [256, 256],
@@ -87,19 +97,24 @@ FAMILIES['enemy-pixel'] = {
     artPixel: ENEMY_ART_PIXEL,
     pixel: true,
     alpha: true,
+    layer: true,
+    lora: false,
     refBackground: [200, 200, 200],
     // Art-pixel size is fixed (2 output px, matching the legacy ~69×113 sprites shown at half size), so a smaller
     // tier simply has fewer art pixels. Outline and palette are applied on the cell grid, then blocks are scaled up.
+    // `alpha` cleans the LayerDiffuse alpha; a job without `layer` (a `source` repaint) swaps it back to `matte`.
     post: [
-        ['matte'],
+        ['alpha'],
         ['trim'],
         ['pixelate', { grid: '$inner', pad: 1 }],
         ['outline', { px: 1 }],
         ['quantize', { colors: 32 }],
         ['upscale', { factor: '$factor' }],
     ],
-    ipWeight: 0.5,
-    sampler: { steps: 8, cfg: 5.5, sampler_name: 'euler', scheduler: 'sgm_uniform' },
+    // 0.5 left about half of the troll candidates with an opaque backdrop slab (LayerDiffuse alpha fails when the
+    // references pull too little); 0.8 and 1.0 gave none in 16. 0.8 keeps more of the subject's own colour.
+    ipWeight: 0.8,
+    sampler: { steps: 25, cfg: 6, sampler_name: 'dpmpp_2m', scheduler: 'sgm_uniform' },
 }
 
 FAMILIES['zone-pixel'] = {

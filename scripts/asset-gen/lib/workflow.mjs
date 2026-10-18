@@ -7,7 +7,11 @@ export const LORA_NAME = 'Hyper-SDXL-8steps-CFG-lora.safetensors'
 export const IPADAPTER_NAME = 'ip-adapter_sdxl_vit-h.safetensors'
 export const CLIP_VISION_NAME = 'clip-vision_vit-h.safetensors'
 export const CONTROLNET_NAME = 'xinsir-controlnet-union-sdxl-1.0-promax.safetensors'
-const CONTROL_TYPE = 'hed/pidi/scribble/ted'
+export const SCRIBBLE_TYPE = 'hed/pidi/scribble/ted'
+export const LINEART_TYPE = 'canny/lineart/anime_lineart/mlsd'
+export const LAYER_CONFIG = 'SDXL, Attention Injection'
+/** How far img2img repaints a frozen source: lower keeps its shapes, above ~0.6 the model starts redrawing anatomy. */
+export const SOURCE_DENOISE = 0.45
 
 const DEFAULT_SAMPLER = { steps: 8, cfg: 5.5, sampler_name: 'euler', scheduler: 'sgm_uniform' }
 
@@ -20,11 +24,13 @@ const DEFAULT_SAMPLER = { steps: 8, cfg: 5.5, sampler_name: 'euler', scheduler: 
  * @param {string[]} [p.refsBase64] reference images, base64 PNG, already prepared for CLIP vision
  * @param {number} [p.count]      batch size (candidates per run)
  * @param {boolean} [p.useRef]
- * @param {{base64: string, strength?: number, end?: number}} [p.control] scribble control image (union ControlNet) that
- *        fixes the layout, e.g. limb count; `end` is the fraction of sampling it applies to
+ * @param {{base64: string, strength?: number, end?: number, type?: string}} [p.control] union ControlNet image that
+ *        fixes the layout, e.g. limb count (scribble by default, `type` picks another mode); `end` is the fraction of sampling it applies to
+ * @param {{base64: string, denoise?: number}} [p.source] frozen image repainted in the family's style (img2img) instead
+ *        of sampling from noise; the image must already be the family's gen size
  * @param {string} [p.prefix]     SaveImage filename prefix
  */
-export function buildGraph({ family, subject, seed, refsBase64 = [], count = 1, useRef = true, control, prefix = 'asset-gen' }) {
+export function buildGraph({ family, subject, seed, refsBase64 = [], count = 1, useRef = true, control, source, prefix = 'asset-gen' }) {
     const sampler = { ...DEFAULT_SAMPLER, ...family.sampler }
     const withRefs = useRef && refsBase64.length > 0
 
@@ -43,6 +49,21 @@ export function buildGraph({ family, subject, seed, refsBase64 = [], count = 1, 
     }
 
     let modelRef = ['lora', 0]
+    if (family.lora === false) {
+        // full-step sampling without the Hyper-SDXL LoRA (LayerDiffuse was trained against the base model)
+        delete graph.lora
+        modelRef = ['checkpoint', 0]
+        graph.positive.inputs.clip = ['checkpoint', 1]
+        graph.negative.inputs.clip = ['checkpoint', 1]
+    }
+    if (family.layer) {
+        // LayerDiffuse: the model generates the subject on a transparent background, so no matting is needed
+        graph.layer = {
+            class_type: 'LayeredDiffusionApply',
+            inputs: { model: modelRef, config: LAYER_CONFIG, weight: family.layerWeight ?? 1 },
+        }
+        modelRef = ['layer', 0]
+    }
     if (withRefs) {
         let batchRef = ['ref0', 0]
         refsBase64.forEach((image, i) => {
@@ -76,7 +97,7 @@ export function buildGraph({ family, subject, seed, refsBase64 = [], count = 1, 
     if (control) {
         graph.controlImage = { class_type: 'ETN_LoadImageBase64', inputs: { image: control.base64 } }
         graph.controlLoader = { class_type: 'ControlNetLoader', inputs: { control_net_name: CONTROLNET_NAME } }
-        graph.controlType = { class_type: 'SetUnionControlNetType', inputs: { control_net: ['controlLoader', 0], type: CONTROL_TYPE } }
+        graph.controlType = { class_type: 'SetUnionControlNetType', inputs: { control_net: ['controlLoader', 0], type: control.type ?? SCRIBBLE_TYPE } }
         graph.controlApply = {
             class_type: 'ControlNetApplyAdvanced',
             inputs: {
@@ -109,7 +130,32 @@ export function buildGraph({ family, subject, seed, refsBase64 = [], count = 1, 
             latent_image: ['latent', 0],
         },
     }
+    if (source) {
+        graph.sourceImage = { class_type: 'ETN_LoadImageBase64', inputs: { image: source.base64 } }
+        graph.sourceLatent = { class_type: 'VAEEncode', inputs: { pixels: ['sourceImage', 0], vae: ['checkpoint', 2] } }
+        let latentRef = ['sourceLatent', 0]
+        if (count > 1) {
+            // each candidate repaints the same source with its own noise
+            graph.sourceBatch = { class_type: 'RepeatLatentBatch', inputs: { samples: latentRef, amount: count } }
+            latentRef = ['sourceBatch', 0]
+        }
+        graph.sampler.inputs.latent_image = latentRef
+        graph.sampler.inputs.denoise = source.denoise ?? SOURCE_DENOISE
+        delete graph.latent
+    }
     graph.decode = { class_type: 'VAEDecode', inputs: { samples: ['sampler', 0], vae: ['checkpoint', 2] } }
-    graph.save = { class_type: 'SaveImage', inputs: { filename_prefix: prefix, images: ['decode', 0] } }
+    let imageRef = ['decode', 0]
+    if (family.layer) {
+        // LayeredDiffusionDecodeRGBA calls a JoinImageWithAlpha method current ComfyUI no longer has, so join here.
+        // Core JoinImageWithAlpha inverts its mask input, hence the InvertMask in front of it.
+        graph.decodeAlpha = {
+            class_type: 'LayeredDiffusionDecode',
+            inputs: { samples: ['sampler', 0], images: imageRef, sd_version: 'SDXL', sub_batch_size: 16 },
+        }
+        graph.invertAlpha = { class_type: 'InvertMask', inputs: { mask: ['decodeAlpha', 1] } }
+        graph.joinAlpha = { class_type: 'JoinImageWithAlpha', inputs: { image: ['decodeAlpha', 0], alpha: ['invertAlpha', 0] } }
+        imageRef = ['joinAlpha', 0]
+    }
+    graph.save = { class_type: 'SaveImage', inputs: { filename_prefix: prefix, images: imageRef } }
     return graph
 }

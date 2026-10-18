@@ -5,10 +5,10 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import sharp from 'sharp'
 import { parseJobs } from '../lib/batch.mjs'
-import { CONTROLS, controlImage } from '../lib/controls.mjs'
+import { CONTROL_TYPES, CONTROLS, controlImage } from '../lib/controls.mjs'
 import { eatAttachedBackground } from '../lib/postprocess.mjs'
 import { hueShift } from '../lib/shiny.mjs'
-import { buildGraph, CONTROLNET_NAME } from '../lib/workflow.mjs'
+import { buildGraph, CONTROLNET_NAME, LINEART_TYPE } from '../lib/workflow.mjs'
 import { FAMILIES } from '../styles.mjs'
 import { applyOverrides, reprocessJob } from '../generate.mjs'
 
@@ -20,8 +20,10 @@ test('control images are 1024² white-on-black scribbles, and differ per creatur
         const buf = await controlImage(name)
         const { data, info } = await sharp(buf).greyscale().raw().toBuffer({ resolveWithObject: true })
         assert.deepEqual([info.width, info.height], [1024, 1024])
-        const lit = data.filter((v) => v > 200).length
-        assert.ok(lit > 10_000 && lit < 400_000, `${name}: ${lit} lit pixels`)
+        // line art is soft grey, scribbles and silhouettes are near-white
+        const lit = data.filter((v) => v > (CONTROL_TYPES[name] ? 40 : 200)).length
+        // a filled silhouette of a chunky creature covers up to ~40% of the frame; strokes far less
+        assert.ok(lit > 10_000 && lit < 600_000, `${name}: ${lit} lit pixels`)
         assert.equal(data[0], 0, 'corner is black')
         images[name] = buf.toString('base64')
     }
@@ -92,7 +94,18 @@ test('reprocessJob re-runs post-process over saved raws and explains when raws a
 })
 
 test('every control name used in docs exists, including the front-view crab', () => {
-    for (const name of ['spider', 'crab', 'crabFront', 'quadruped']) assert.ok(CONTROLS[name], name)
+    for (const name of ['spider', 'spiderSketch', 'crab', 'crabFront', 'crabFrontSketch', 'quadruped']) assert.ok(CONTROLS[name], name)
+})
+
+test('frozen controls load from refs/control, sit next to their checked source, and name a known ControlNet mode', async () => {
+    for (const name of ['spider', 'crabFront']) {
+        const frozen = await sharp(`scripts/asset-gen/refs/control/${name}.png`).png().toBuffer()
+        assert.ok((await controlImage(name)).equals(frozen), name)
+        assert.ok(existsSync(`scripts/asset-gen/refs/control/${name}-source.png`), name)
+    }
+    for (const name of Object.keys(CONTROL_TYPES)) assert.ok(CONTROLS[name], name)
+    assert.equal(CONTROL_TYPES.crabFront, LINEART_TYPE)
+    assert.equal(CONTROL_TYPES.spider, undefined)
 })
 
 test('applyOverrides can swap references and style prompt per job without touching the registry', () => {

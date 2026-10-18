@@ -28,7 +28,17 @@ fits (for example a skill icon or world-map tile), report that and skip; do not 
 
 One or two sentences: the thing, its pose or scene, distinguishing features. For creatures state the anatomy counts the model gets wrong ("exactly four legs and one head", "exactly two claws and eight legs", "two arms, two legs") and describe ONE subject; words like "side view" or "turnaround" make it draw several copies. Take it from `docs/character/**`,
 `docs/design/**`, the enemy/item description or the task. **Never write style words** (pixel art, outline, palette,
-painterly, resolution, background colour); the family adds them. Name an enemy's tier from lore if known: `tiny` 96,
+painterly, resolution, background colour); the family adds them. Describe the **body plan and visible features**, not the
+setting or a role: no setting words ("mossy", "ancient forest", "dark") and no role labels ("gangster", "bandit") that
+make the model draw that setting or role; say what is physically there ("an eyepatch", "a knife blade in place of one
+claw"). Markings: "skull-like pattern" makes it draw real skulls (a second skull as the head), "face" or "eyes" makes it
+paint a face on a shell. Write those words only when you want them. **No environment:** never describe anything on the floor (moss, roots, grass, puddles, mounds, a base) as part of the creature; put it on the body or leave it out, and reject a candidate that stands on a mound, patch or shadow (doc § No environment). **One creature per image:** start the subject with "a single …" or "one …", name the species once, say "alone" for
+animals that come in groups, and use **no view words** ("side view", "front view") unless a control fixes the pose: they
+make SDXL draw several copies (doc § One creature per image). **Weapons** (full rules and evidence in the doc
+§ Weapons): one weapon per creature, named once with its hand and "nothing in the other hand"; a plain straight shape
+material and proportions ("short straight rusty knife", "long blade with a short hilt and a small crossguard", otherwise the hilt comes out as long as the blade); nothing attached (no quiver, arrows, sheath) and at
+most one other carried item; prefer rigid straight weapons, and treat a bow, sling, whip or flail as error-prone (generate
+8 candidates and check each one, or suggest a different weapon). Name an enemy's tier from lore if known: `tiny` 96,
 `small` 144, `medium` 192, `large` 256 (longer side). No hint means omit `--tier` (it defaults to `medium` and the
 result reports `sizeGuessed: true`).
 
@@ -38,8 +48,30 @@ result reports `sizeGuessed: true`).
 node scripts/asset-gen/generate.mjs --family <family> --target <path> --subject "<subject>" [--tier <tier>]
 ```
 
-Use `--count 6` for enemies and portraits (anatomy fails often), 4 otherwise. **Spiders, crabs and four-legged animals: always add `--control spider` / `crabFront` (or `crab`) / `quadruped`** (crabs and spiders also have a recipe with reference and style overrides in `docs/analysis/asset-pipeline.md` § Species recipes: follow it) (batch field `control`); it draws a skeleton that forces eight legs (two claws for crabs, four legs for bears, wolves, deer, goats), which prompts alone cannot. Raw generations are kept, so if only the cutout is wrong, `--reprocess --slug <slug>` re-runs post-processing without the GPU. The JSON result lists `sheet` (references on top, numbered candidates below). `Read` the sheet and choose the candidate
-that best matches the references and the subject: clean silhouette, readable at game size, no stray fragments or text. **Count limbs, heads and eyes against the creature** (a bear has four legs, a spider eight, a crab two claws and eight legs, a humanoid one head), and reject candidates with duplicated or floating parts, holes inside the body, a grey ground slab, cut-off edges, or several copies of the subject. Look at the candidate itself, not just the sheet thumbnail.
+Use `--count 6` for enemies and portraits (anatomy fails often), 4 otherwise. SDXL cannot count limbs, so creatures
+whose count defines the species need a fixed structure. The `enemy-pixel` family already carries the **enemy recipe**
+(LayerDiffuse transparency, no Hyper LoRA, golden references); the species recipes in
+`docs/analysis/asset-pipeline.md` § Species recipes add to it. Follow them:
+- **Spiders:** `--control spider --control-strength 0.75 --control-end 0.8 --ip-weight 0.5`, a frozen silhouette of a
+  checked spider (batch field `control`). Only the outline is fixed, so colour and markings come from the subject; the
+  weaker `--ip-weight` keeps the subject's colours (the family default 0.8 washes them out).
+- **Crabs and other creatures Z-Image draws correctly** (claws, stalks, body plan): draw the structure first,
+  `--zimage "<prompt>" --name <creature>`, `Read` its `sheet.png`, count the parts, then freeze the best one with
+  `--pick <n> --slug zimage-<creature>`, and repaint it with `--source scripts/asset-gen/refs/control/<creature>-source.png --no-layer --ip-weight 0.5` (batch: `layer: false`; a repaint is matted, and the run is rejected without that).
+  Choose a source with no face or marks on the shell, since the repaint keeps them. State in your report which source you froze.
+- **Four-legged animals:** `--control quadruped` (hand-drawn side-view skeleton; not yet tried with Z-Image).
+
+Z-Image cannot count many identical thin limbs (spider legs): do not use it as a spider structure source without
+counting every leg on the candidate.
+
+**QC flags.** The JSON result has `qc`: per candidate `flags` (`slab`, `fragment`, `hole`, `hollow`, `skeleton`, `empty`, each with
+a `detail`) and a red number badge on the sheet. Look at flagged candidates first and at the flagged spot, and prefer an
+unflagged one. A flag never blocks a pick and a pass is not approval: QC cannot see faces on shells, metallic surfaces,
+grey halos or wrong limb counts without a control, so you still count and look at every candidate yourself. If you pick
+a flagged candidate (all of them were flagged), say so and why in the report; `--pick` echoes its `qcFlags`.
+
+Raw generations are kept, so if only the cutout is wrong, `--reprocess --slug <slug>` re-runs post-processing without the GPU. The JSON result lists `sheet` (references on top, numbered candidates below). `Read` the sheet and choose the candidate
+that best matches the references and the subject: clean silhouette, readable at game size, no stray fragments or text. **Count limbs, heads and eyes against the creature** (a bear has four legs, a spider eight, a crab two claws and eight legs, a humanoid one head), and reject candidates with duplicated or floating parts, holes or empty patches inside the body, a pale or grey backdrop slab (LayerDiffuse sometimes fails to cut the background out: the sprite sits on a flat rectangle or a lilac haze), cut-off edges, a **metallic or plated look on a creature that should be organic**, a face painted on a shell, a weapon that changes shape along its length (a blade that turns into a bow), is doubled, floats away from the hand or passes through the body, or several copies of the subject. Look at the candidate itself, not just the sheet thumbnail (and judge transparency on a magenta backdrop, which shows residue that a grey sheet hides).
 If none is usable, do **one** re-roll (new `--seed`, or a clearer subject) and choose again. Then:
 
 ```
@@ -55,6 +87,15 @@ If a step fails twice with the same error, stop and report the error; do not wri
 ## 4. Finish
 
 Run `node scripts/asset-gen/generate.mjs --stop` at the end of the task (frees VRAM). Do not `git add` or commit.
+Run **one batch at a time**: every process shares the single ComfyUI queue, and a job that waits behind another batch
+for more than 10 minutes fails with "timed out waiting for ComfyUI" (two concurrent batches did exactly that). Split
+a big redo into batches and start the next when the previous has finished.
+ComfyUI is started with `--reserve-vram 2`, so the desktop stays usable, but a batch still uses the whole GPU while it
+runs. Each Z-Image candidate takes about 9 s and each SDXL repaint or LayerDiffuse candidate 10-20 s.
+
+Setup the pipeline relies on, outside git (see the doc): the ISNet matting model, the LayerDiffuse custom node in the
+Krita-managed ComfyUI (a Krita AI Diffusion update can remove it: if `LayeredDiffusionApply` is missing, reinstall it
+before anything else), and the Z-Image files. If one is missing, report it instead of falling back to another recipe.
 
 Final report: the path written per asset, the sheet path, any `sizeGuessed` tiers, assets skipped and why, and any
 result that is **excellent enough to become a family reference** (listed only; the user approves adding references

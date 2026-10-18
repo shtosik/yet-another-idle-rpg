@@ -2,7 +2,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import sharp from 'sharp'
 import { existsSync } from 'node:fs'
-import { MATTE_MODEL, cleanMask, cover, fit, keyout, matte, outline, pixelate, quantize, runPipeline, trim } from '../lib/postprocess.mjs'
+import { MATTE_MODEL, alpha, cleanMask, cover, fit, keyout, matte, outline, pixelate, quantize, runPipeline, trim } from '../lib/postprocess.mjs'
 
 const rawOf = async (buf) => {
     const { data, info } = await sharp(buf).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
@@ -140,4 +140,18 @@ test('cleanMask erosion strips one pixel off the silhouette', () => {
 test('matte step returns the same size with an alpha mask (needs the matting model; skipped when absent)', { skip: !existsSync(MATTE_MODEL) }, async () => {
     const meta = await sharp(await matte(await squareOnBg(128, 64, [200, 200, 200], [180, 40, 40]))).metadata()
     assert.deepEqual([meta.width, meta.height, meta.channels], [128, 128, 4])
+})
+
+test('alpha step snaps a soft generated alpha to 0/255 and drops specks', async () => {
+    // soft background (alpha 80) with an opaque square and a 1px opaque speck in the corner
+    const soft = await sharp({ create: { width: 64, height: 64, channels: 4, background: { r: 90, g: 90, b: 90, alpha: 80 / 255 } } })
+        .composite([
+            { input: { create: { width: 24, height: 24, channels: 4, background: { r: 200, g: 30, b: 30, alpha: 1 } } }, left: 20, top: 20 },
+            { input: { create: { width: 1, height: 1, channels: 4, background: { r: 200, g: 30, b: 30, alpha: 1 } } }, left: 2, top: 2 },
+        ])
+        .png().toBuffer()
+    const out = await rawOf(await alpha(soft))
+    assert.equal(alphaAt(out, 10, 10), 0)
+    assert.equal(alphaAt(out, 2, 2), 0)
+    assert.equal(alphaAt(out, 32, 32), 255)
 })

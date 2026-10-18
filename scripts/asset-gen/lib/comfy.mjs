@@ -2,7 +2,7 @@
 // All I/O seams (fetch, WebSocket, spawn, kill) are injectable so the adapter is testable against a fake server.
 
 import { spawn as nodeSpawn } from 'node:child_process'
-import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { closeSync, mkdirSync, openSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { randomUUID } from 'node:crypto'
 
@@ -13,7 +13,7 @@ const defaultServerDir = () => join(process.env.APPDATA ?? '', 'krita', 'ai_diff
 function defaultKill(pid) {
     if (process.platform === 'win32') {
         // The venv python launcher can leave a child behind; /T takes the whole tree owned by that pid.
-        nodeSpawn('taskkill', ['/pid', String(pid), '/T', '/F'], { stdio: 'ignore' })
+        nodeSpawn('taskkill', ['/pid', String(pid), '/T', '/F'], { stdio: 'ignore', windowsHide: true })
     } else {
         process.kill(pid)
     }
@@ -32,6 +32,8 @@ export function createComfy({
     pollMs = 1000,
     runTimeoutMs = 600_000,
     outputRetries = 20,
+    // VRAM (GB) ComfyUI leaves free for the desktop and other apps; models that do not fit offload to RAM
+    reserveVramGb = 2,
 } = {}) {
     const base = `http://${host}:${port}`
     const clientId = randomUUID()
@@ -54,15 +56,21 @@ export function createComfy({
     /** Probes the server; if down, spawns it detached, records its pid and polls until ready. */
     async function ensureServer() {
         if (await isUp()) return { started: false }
-        const python = join(serverDir, 'venv', 'Scripts', 'python.exe')
-        const child = spawnFn(python, ['main.py', '--port', String(port)], {
+        // pythonw has no console, so a detached boot opens no empty cmd window (windowsHide alone does not stop the
+        // venv launcher's child from getting one). ComfyUI wraps sys.stdout, so it needs real handles: log to a file.
+        const python = join(serverDir, 'venv', 'Scripts', process.platform === 'win32' ? 'pythonw.exe' : 'python')
+        mkdirSync(dirname(pidFile), { recursive: true })
+        const log = openSync(join(dirname(pidFile), 'comfy.log'), 'w')
+        const args = ['main.py', '--port', String(port)]
+        if (reserveVramGb > 0) args.push('--reserve-vram', String(reserveVramGb))
+        const child = spawnFn(python, args, {
             cwd: join(serverDir, 'ComfyUI'),
             detached: true,
-            stdio: 'ignore',
+            stdio: ['ignore', log, log],
             windowsHide: true,
         })
+        closeSync(log)
         child.unref?.()
-        mkdirSync(dirname(pidFile), { recursive: true })
         writeFileSync(pidFile, String(child.pid))
         const deadline = Date.now() + readyTimeoutMs
         while (Date.now() < deadline) {

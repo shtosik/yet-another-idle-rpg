@@ -1,10 +1,16 @@
-// Procedural scribble control images (white lines on black, 1024²) for the union ControlNet. SDXL cannot count
+// Scribble control images (white lines or silhouettes on black, 1024²) for the union ControlNet, drawn here as SVG
+// or frozen from a checked source image in refs/control. SDXL cannot count
 // limbs, so for creatures where the count defines the species (spider: 8 legs, crab: 2 claws + 8 legs, quadruped: 4 legs) a skeleton
 // is drawn here and the generation is conditioned on it. Only the layout is constrained; style still comes from the
 // family and its references.
 
+import { existsSync, readdirSync, readFileSync } from 'node:fs'
+import { dirname, join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import sharp from 'sharp'
+import { LINEART_TYPE } from './workflow.mjs'
 
+const CONTROL_DIR = join(dirname(fileURLToPath(import.meta.url)), '..', 'refs', 'control')
 const SIZE = 1024
 const STROKE = 28
 
@@ -25,15 +31,44 @@ const joints = (...points) =>
 /** Mirrored shape: `make(s)` returns SVG for the right (s = 1) and left (s = -1) side. */
 const mirrored = (make) => [-1, 1].map(make).join('')
 
+/** Frozen control image from refs/control (white on black, 1024²). */
+const fromFile = (name) => () => readFileSync(join(CONTROL_DIR, `${name}.png`))
+
+/** Union ControlNet mode per control; anything not listed is a scribble (SVG skeletons, filled silhouettes). */
+export const CONTROL_TYPES = { crabFront: LINEART_TYPE }
+
 export const CONTROLS = {
+    /**
+     * Spider in 3/4 front view: filled silhouette of a hand-checked Z-Image spider (refs/control/spider-source.png,
+     * exactly four legs per side plus palps). Only the outline is fixed, so colour, markings and texture follow the
+     * subject prompt. To add a pose: generate a source, check the leg count, save its alpha silhouette next to it.
+     */
+    spider: fromFile('spider'),
+    /**
+     * Hand-drawn spider in 3/4 front view (facing the viewer, camera slightly above, like the other enemy sprites): the head in
+     * front with two fangs and palps, the larger abdomen rising behind it, and exactly eight legs (four per side)
+     * that arch up to a knee and come down, front pair reaching toward the camera, back pair out to the sides.
+     * Body segments are filled (an outlined segment reads as another pair of legs); a black rim keeps head and abdomen apart.
+     */
+    spiderSketch: () =>
+        svg(
+            '<ellipse cx="512" cy="390" rx="170" ry="140" fill="white"/>' +
+                '<ellipse cx="512" cy="580" rx="115" ry="88" fill="white" stroke="black" stroke-width="22"/>' +
+                '<polyline points="490,665 482,725"/><polyline points="534,665 542,725"/>' +
+                mirrored((s) => `<polyline points="${512 + s * 60},650 ${512 + s * 85},700"/>`) +
+                joints([95, 610], [250, 570], [290, 935]) +
+                joints([110, 580], [330, 460], [425, 865]) +
+                joints([112, 550], [375, 385], [485, 725]) +
+                joints([100, 520], [335, 295], [480, 560]),
+        ),
     /**
      * Spider seen from above: small cephalothorax with eye cluster, chelicerae and palps, a large separate abdomen,
      * and exactly eight legs (four per side) that rise to a high knee and come back down, like a real spider's.
      */
-    spider: () =>
+    spiderTop: () =>
         svg(
-            '<ellipse cx="512" cy="410" rx="100" ry="88"/><ellipse cx="512" cy="660" rx="145" ry="195"/>' +
-                '<circle cx="480" cy="360" r="14"/><circle cx="544" cy="360" r="14"/><circle cx="500" cy="388" r="10"/><circle cx="524" cy="388" r="10"/>' +
+            // both body segments are filled: an outlined abdomen reads as one more pair of curved legs
+            '<ellipse cx="512" cy="410" rx="100" ry="88" fill="white"/><ellipse cx="512" cy="660" rx="145" ry="195" fill="white"/>' +
                 '<polyline points="486,490 478,550"/><polyline points="538,490 546,550"/>' +
                 // each leg: body joint, high knee, foot; the four per side fan from forward-reaching to backward-reaching
                 joints([70, 375], [250, 215], [400, 300]) +
@@ -49,12 +84,19 @@ export const CONTROLS = {
                 '<polyline points="670,590 700,710 690,830"/><polyline points="760,570 790,700 800,830"/>',
         ),
     /**
-     * Crab seen from the front (like the original crab sprite): wide domed shell with eye stalks, two arms ending in a
+     * Crab seen from the front: line art of a hand-checked Z-Image crab (refs/control/crabFront-source.png) with
+     * two raised open pincers, eye stalks on top and legs out to the sides; the face marks on its shell were cleared
+     * from the line art. Line art, not a silhouette: the source legs touch and only their outlines keep them apart.
+     */
+    crabFront: fromFile('crabFront'),
+    /**
+     * Hand-drawn crab seen from the front (like the original crab sprite): wide domed shell with eye stalks, two arms ending in a
      * big hand whose two fingers form an open pincer, and exactly eight legs (four per side) angled down and out.
      */
-    crabFront: () =>
+    crabFrontSketch: () =>
         svg(
-            '<path d="M 280,560 C 270,400 390,340 512,340 C 634,340 754,400 744,560 C 735,650 640,690 512,690 C 384,690 289,650 280,560 Z"/>' +
+            // filled shell: an empty outline invites the model to paint a face on it
+            '<path fill="white" d="M 280,560 C 270,400 390,340 512,340 C 634,340 754,400 744,560 C 735,650 640,690 512,690 C 384,690 289,650 280,560 Z"/>' +
                 '<polyline points="470,350 462,290"/><circle cx="462" cy="275" r="22"/><polyline points="554,350 562,290"/><circle cx="562" cy="275" r="22"/>' +
                 mirrored(
                     (s) =>
@@ -90,9 +132,24 @@ export const CONTROLS = {
         ),
 }
 
+/**
+ * Registers every frozen pair in `dir` (`<name>.png` with its `<name>-source.png`) that is not defined above, so a
+ * control made with `--make-control` works as `--control <name>` without touching this file. Silhouette scribble mode.
+ */
+export function registerFrozenControls(dir = CONTROL_DIR, controls = CONTROLS) {
+    const names = existsSync(dir) ? readdirSync(dir) : []
+    for (const file of names) {
+        const name = file.endsWith('-source.png') ? undefined : file.match(/^([A-Za-z][A-Za-z0-9]*)\.png$/)?.[1]
+        if (name && names.includes(`${name}-source.png`) && !controls[name]) controls[name] = () => readFileSync(join(dir, file))
+    }
+    return controls
+}
+registerFrozenControls()
+
 /** @returns {Promise<Buffer>} PNG of the named control image */
 export async function controlImage(name) {
     const make = CONTROLS[name]
     if (!make) throw new Error(`Unknown control "${name}". Known: ${Object.keys(CONTROLS).join(', ')}`)
-    return sharp(Buffer.from(make())).png().toBuffer()
+    const source = make()
+    return sharp(Buffer.isBuffer(source) ? source : Buffer.from(source)).png().toBuffer()
 }

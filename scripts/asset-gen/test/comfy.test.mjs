@@ -4,7 +4,7 @@ import http from 'node:http'
 import { createHash } from 'node:crypto'
 import { existsSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
-import { join } from 'node:path'
+import { dirname, join } from 'node:path'
 import { createComfy } from '../lib/comfy.mjs'
 
 const PNG = Buffer.from('89504e470d0a1a0a', 'hex')
@@ -144,7 +144,9 @@ test('ensureServer spawns detached, records the pid and polls until ready', asyn
         assert.deepEqual(await comfy.ensureServer(), { started: true })
         assert.equal(readFileSync(pidFile, 'utf8'), '4242')
         assert.equal(spawned[0].opts.detached, true)
-        assert.deepEqual(spawned[0].args, ['main.py', '--port', String(fake.port)])
+        assert.deepEqual(spawned[0].args, ['main.py', '--port', String(fake.port), '--reserve-vram', '2'])
+        if (process.platform === 'win32') assert.match(spawned[0].cmd, /pythonw\.exe$/)
+        assert.ok(existsSync(join(dirname(pidFile), 'comfy.log')))
     } finally {
         fake.close()
     }

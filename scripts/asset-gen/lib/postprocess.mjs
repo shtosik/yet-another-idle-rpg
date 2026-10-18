@@ -213,6 +213,21 @@ export async function matte(buf, { threshold = 128, minArea = 0.001, holeArea = 
     }
 }
 
+/**
+ * Cleans an alpha channel the generator already produced (LayerDiffuse): thresholds it to 0/255 and runs cleanMask.
+ * The replacement for `matte` on transparent generations; no hole fill by default, since a real gap between limbs
+ * is transparent in the generation and must stay so.
+ */
+export async function alpha(buf, { threshold = 128, minArea = 0.001, holeArea = 0, keepRatio = 0.2, erode = 0 } = {}) {
+    const { data, width, height } = await raw(buf)
+    const mask = new Uint8Array(width * height)
+    for (let p = 0; p < mask.length; p++) mask[p] = data[p * 4 + 3] >= threshold ? 1 : 0
+    const area = width * height
+    cleanMask(mask, width, height, { minArea: Math.round(minArea * area), holeArea: Math.round(holeArea * area), keepRatio, erode })
+    for (let p = 0; p < mask.length; p++) data[p * 4 + 3] = mask[p] ? 255 : 0
+    return png(data, width, height)
+}
+
 /** Crops to the bounding box of pixels with alpha above `alphaMin`, plus `pad` transparent pixels. */
 export async function trim(buf, { alphaMin = 8, pad = 0 } = {}) {
     const { data, width, height } = await raw(buf)
@@ -344,7 +359,7 @@ export function fit(buf, { width, height }) {
         .toBuffer()
 }
 
-export const STEPS = { matte, keyout, trim, pixelate, upscale, quantize, outline, cover, fit }
+export const STEPS = { matte, alpha, keyout, trim, pixelate, upscale, quantize, outline, cover, fit }
 
 /** Runs a family `post` list: `[['keyout', {…}], ['trim'], …]`. */
 export async function runPipeline(buf, steps) {

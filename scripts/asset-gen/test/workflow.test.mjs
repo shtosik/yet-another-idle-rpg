@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { buildGraph, CLIP_VISION_NAME, IPADAPTER_NAME, LORA_NAME } from '../lib/workflow.mjs'
+import { buildGraph, CLIP_VISION_NAME, IPADAPTER_NAME, LORA_NAME, SOURCE_DENOISE } from '../lib/workflow.mjs'
 
 const family = (overrides = {}) => ({
     checkpoint: 'zavychromaxl_v80.safetensors',
@@ -72,6 +72,47 @@ test('family inputs drive size, prompt and sampler overrides', () => {
 
 test('every node link points at an existing node', () => {
     const g = buildGraph({ family: family(), subject: 's', seed: 1, refsBase64: ['A', 'B'], count: 2 })
+    for (const [id, node] of Object.entries(g)) {
+        for (const value of Object.values(node.inputs)) {
+            if (Array.isArray(value)) assert.ok(g[value[0]], `${id} links to missing ${value[0]}`)
+        }
+    }
+})
+
+test('layer graph: LayerDiffuse patches the model before IP-Adapter and decodes alpha before save', () => {
+    const g = buildGraph({ family: family({ layer: true }), subject: 'a troll', seed: 1, refsBase64: ['AAA'] })
+    assert.equal(g.layer.class_type, 'LayeredDiffusionApply')
+    assert.deepEqual(g.layer.inputs.model, ['lora', 0])
+    assert.deepEqual(g.ipadapter.inputs.model, ['layer', 0])
+    assert.deepEqual(g.decodeAlpha.inputs.samples, ['sampler', 0])
+    assert.deepEqual(g.joinAlpha.inputs.alpha, ['invertAlpha', 0])
+    assert.deepEqual(g.save.inputs.images, ['joinAlpha', 0])
+})
+
+test('lora: false drops the Hyper-SDXL LoRA and wires model and clip straight from the checkpoint', () => {
+    const g = buildGraph({ family: family({ lora: false }), subject: 'a troll', seed: 1, useRef: false })
+    assert.equal(g.lora, undefined)
+    assert.deepEqual(g.sampler.inputs.model, ['checkpoint', 0])
+    assert.deepEqual(g.positive.inputs.clip, ['checkpoint', 1])
+    assert.ok(!classes(g).includes('LayeredDiffusionApply'))
+})
+
+test('source graph: the frozen image is VAE-encoded as the start latent at the chosen denoise, no empty latent', () => {
+    const g = buildGraph({ family: family(), subject: 'a crab', seed: 1, source: { base64: 'SRC', denoise: 0.4 } })
+    assert.equal(g.sourceImage.inputs.image, 'SRC')
+    assert.deepEqual(g.sourceLatent.inputs, { pixels: ['sourceImage', 0], vae: ['checkpoint', 2] })
+    assert.deepEqual(g.sampler.inputs.latent_image, ['sourceLatent', 0])
+    assert.equal(g.sampler.inputs.denoise, 0.4)
+    assert.equal(g.latent, undefined)
+    assert.ok(!classes(g).includes('RepeatLatentBatch'))
+    assert.equal(buildGraph({ family: family(), subject: 's', seed: 1, source: { base64: 'SRC' } }).sampler.inputs.denoise, SOURCE_DENOISE)
+    assert.equal(buildGraph({ family: family(), subject: 's', seed: 1 }).sampler.inputs.denoise, 1)
+})
+
+test('source graph repeats the encoded latent once per candidate and keeps every link valid', () => {
+    const g = buildGraph({ family: family(), subject: 's', seed: 1, count: 6, refsBase64: ['A'], source: { base64: 'SRC' } })
+    assert.deepEqual(g.sourceBatch.inputs, { samples: ['sourceLatent', 0], amount: 6 })
+    assert.deepEqual(g.sampler.inputs.latent_image, ['sourceBatch', 0])
     for (const [id, node] of Object.entries(g)) {
         for (const value of Object.values(node.inputs)) {
             if (Array.isArray(value)) assert.ok(g[value[0]], `${id} links to missing ${value[0]}`)

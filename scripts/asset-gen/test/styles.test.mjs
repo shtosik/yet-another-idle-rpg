@@ -16,6 +16,43 @@ test('item-pixel is 48×48 transparent pixel art', () => {
     assert.equal(f.pixel, true)
 })
 
+test('enemy-pixel defaults to the validated LayerDiffuse recipe with frozen golden references', () => {
+    const f = FAMILIES['enemy-pixel']
+    assert.equal(f.layer, true)
+    assert.equal(f.lora, false)
+    assert.equal(f.ipWeight, 0.8, 'weaker references let LayerDiffuse leave an opaque backdrop slab')
+    assert.match(f.negative, /double weapon, merged weapons/)
+    assert.match(f.negative, /second creature, duplicate creature/)
+    assert.match(f.negative, /dirt mound, soil/)
+    assert.deepEqual(f.sampler, { steps: 25, cfg: 6, sampler_name: 'dpmpp_2m', scheduler: 'sgm_uniform' })
+    assert.equal(f.post[0][0], 'alpha', 'generated alpha is cleaned, not matted')
+    assert.doesNotMatch(f.stylePrompt, /dark fantasy|background colour|grey background/i)
+    assert.deepEqual(f.references.map((r) => r.split('/').pop()), ['goat.png', 'gnollScout.png', 'giantEagle.png', 'deer.png', 'canopyBandit.png', 'bandit.png', 'wolf.png'])
+    for (const ref of f.references) assert.match(ref, /^scripts\/asset-gen\/refs\/enemy\//, 'references are frozen copies, never live src/assets files')
+})
+
+test('applyOverrides layer: false turns an alpha family back into a matted one, and layer: true the reverse', () => {
+    const enemy = FAMILIES['enemy-pixel']
+    const matted = applyOverrides(enemy, { layer: false })
+    assert.equal(matted.layer, false)
+    assert.equal(matted.post[0][0], 'matte')
+    assert.equal(enemy.post[0][0], 'alpha', 'registry untouched')
+    const item = applyOverrides(FAMILIES['item-pixel'], { layer: true, lora: false })
+    assert.equal(item.post[0][0], 'alpha')
+    assert.equal(item.lora, false)
+    assert.equal(applyOverrides(enemy, {}).layer, true)
+    assert.equal(applyOverrides(enemy, { lora: true }).lora, true)
+})
+
+test('applyOverrides erode and fillHoles tune the cutout step of the copy only', () => {
+    const enemy = FAMILIES['enemy-pixel']
+    const tuned = applyOverrides(enemy, { erode: '14', fillHoles: '0.03' })
+    assert.deepEqual(tuned.post.find(([n]) => n === 'alpha')[1], { erode: 14, holeArea: 0.03 })
+    assert.deepEqual(enemy.post.find(([n]) => n === 'alpha')[1] ?? {}, {}, 'registry untouched')
+    const matted = applyOverrides(enemy, { layer: false, erode: '2' })
+    assert.deepEqual(matted.post.find(([n]) => n === 'matte')[1], { erode: 2 })
+})
+
 test('validation reports a missing reference, target drift and an unknown family', () => {
     const bad = {
         'item-pixel': { ...FAMILIES['item-pixel'], target: [64, 64], references: ['src/assets/img/items/doesNotExist.png'] },

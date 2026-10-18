@@ -13,14 +13,14 @@ const DIGITS = {
     5: '111100111001111', 6: '111100111101111', 7: '111001001001001', 8: '111101111101111', 9: '111101111001111',
 }
 
-/** RGBA badge with `n` drawn in 3×5 digits at `scale`, white on dark. */
-function badge(n, scale) {
+/** RGBA badge with `n` drawn in 3×5 digits at `scale`, white on dark (red when the candidate is QC-flagged). */
+function badge(n, scale, flagged = false) {
     const digits = String(n).split('')
     const w = (digits.length * 4 + 1) * scale
     const h = 7 * scale
     const data = Buffer.alloc(w * h * 4)
     const set = (x, y, rgba) => rgba.forEach((v, k) => (data[(y * w + x) * 4 + k] = v))
-    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) set(x, y, [20, 20, 28, 230])
+    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) set(x, y, flagged ? [190, 30, 30, 240] : [20, 20, 28, 230])
     digits.forEach((d, di) => {
         for (let gy = 0; gy < 5; gy++) {
             for (let gx = 0; gx < 3; gx++) {
@@ -41,10 +41,11 @@ export function tileSize([w, h]) {
 }
 
 /**
- * @param {{refs: Buffer[], candidates: Buffer[], target: [number, number], pixel: boolean}} p
+ * @param {{refs: Buffer[], candidates: Buffer[], target: [number, number], pixel: boolean, flagged?: number[]}} p
+ *        `flagged` = 1-based candidate numbers that QC flagged; their badge is red
  * @returns {Promise<Buffer>} PNG sheet
  */
-export async function makeSheet({ refs, candidates, target, pixel }) {
+export async function makeSheet({ refs, candidates, target, pixel, flagged = [] }) {
     const [tw, th] = tileSize(target)
     const kernel = pixel ? 'nearest' : 'lanczos3'
     const tile = (buf, fitMode) =>
@@ -60,7 +61,7 @@ export async function makeSheet({ refs, candidates, target, pixel }) {
             const left = GAP + i * (tw + GAP)
             const top = GAP + row * (th + GAP)
             layers.push({ input: await tile(buf, fitMode), left, top })
-            if (numbered) layers.push({ input: await badge(i + 1, 3), left, top })
+            if (numbered) layers.push({ input: await badge(i + 1, 3, flagged.includes(i + 1)), left, top })
         }
     }
     let row = 0
