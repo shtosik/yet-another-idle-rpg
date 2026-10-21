@@ -57,7 +57,11 @@ export function matchesQuestState(
   atStep?: QuestStep,
 ): boolean {
   switch (state) {
-    case QuestState.active:
+    case QuestState.active: {
+      const status = getQuestStatus(progression, questId)
+      return status.state === QuestState.active && (atStep === undefined || status.step === atStep)
+    }
+    case QuestState.readyToAdvance:
       return canAdvanceQuest(progression, questId, isRequirementMet, atStep)
     case QuestState.available:
       return isQuestAvailable(progression, questId, isRequirementMet)

@@ -70,7 +70,7 @@ const LA_HARPAR_JOSH: LaHarparJoshDialogueType = {
               {
                 type: 'quest',
                 questId: QuestID.clearingOutTheBeach,
-                questState: QuestState.active,
+                questState: QuestState.readyToAdvance,
                 step: 1,
               },
             ],

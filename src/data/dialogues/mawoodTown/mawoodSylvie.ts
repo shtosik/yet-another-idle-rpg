@@ -87,13 +87,13 @@ const MAWOOD_SYLVIE: MawoodSylvieDialogueType = {
         results: [
           // Quest 9 — The Infestation: turn-in
           {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.theInfestation, questState: QuestState.active, step: 1 }],
+            visibilityConditions: [{ type: 'quest', questId: QuestID.theInfestation, questState: QuestState.readyToAdvance, step: 1 }],
             next: SylvieDialogue.questInfestationComplete,
             requirementsNeeded: [{ type: 'waveKillCount', zoneId: ZoneID.elderwoodWilds, waveNumber: 10, amount: 60 }],
           },
           // Quest 9 — in progress
           {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.theInfestation, questState: QuestState.active }],
+            visibilityConditions: [{ type: 'quest', questId: QuestID.theInfestation, questState: QuestState.readyToAdvance }],
             next: SylvieDialogue.questInfestationProgress,
           },
           // Quest 9 — offer (after silk quest done)
@@ -103,13 +103,13 @@ const MAWOOD_SYLVIE: MawoodSylvieDialogueType = {
           },
           // Quest 8 — Silk and Water: turn-in
           {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.silkAndWater, questState: QuestState.active, step: 1 }],
+            visibilityConditions: [{ type: 'quest', questId: QuestID.silkAndWater, questState: QuestState.readyToAdvance, step: 1 }],
             next: SylvieDialogue.questSilkWaterComplete,
             requirementsNeeded: [{ type: 'manyItems', itemIds: [ItemID.spiderSilk, ItemID.vialOfWater], amounts: { [ItemID.spiderSilk]: 15, [ItemID.vialOfWater]: 10 } }],
           },
           // Quest 8 — in progress
           {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.silkAndWater, questState: QuestState.active }],
+            visibilityConditions: [{ type: 'quest', questId: QuestID.silkAndWater, questState: QuestState.readyToAdvance }],
             next: SylvieDialogue.questSilkWaterProgress,
           },
           // Silk and Water: offer (only once available — after The Sap That Burns)

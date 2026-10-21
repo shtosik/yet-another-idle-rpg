@@ -23,7 +23,7 @@ interface QuestCondition {
   type: 'quest'
   questId: QuestID
   questState: QuestState
-  step?: number // only QuestState.active
+  step?: number // only QuestState.active and QuestState.readyToAdvance
 }
 
 interface ManyQuestsCondition {
@@ -31,7 +31,7 @@ interface ManyQuestsCondition {
   questsRequired: {
     questId: QuestID
     questState: QuestState
-    step?: number  // only QuestState.active
+    step?: number  // only QuestState.active and QuestState.readyToAdvance
   }[]
 }
 

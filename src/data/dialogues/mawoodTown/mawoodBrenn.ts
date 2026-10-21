@@ -67,13 +67,13 @@ const MAWOOD_BRENN: MawoodBrennDialogueType = {
         results: [
           // War Trophies: turn-in
           {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.warTrophies, questState: QuestState.active, step: 1 }],
+            visibilityConditions: [{ type: 'quest', questId: QuestID.warTrophies, questState: QuestState.readyToAdvance, step: 1 }],
             next: BrennDialogue.questWarTrophiesComplete,
             requirementsNeeded: [{ type: 'killCount', enemyId: EnemyID.gnollWarchief, amount: 3 }],
           },
           // War Trophies: in progress
           {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.warTrophies, questState: QuestState.active }],
+            visibilityConditions: [{ type: 'quest', questId: QuestID.warTrophies, questState: QuestState.readyToAdvance }],
             next: BrennDialogue.questWarTrophiesProgress,
           },
           // War Trophies: offer (after Raw Materials done)
@@ -83,13 +83,13 @@ const MAWOOD_BRENN: MawoodBrennDialogueType = {
           },
           // Raw Materials: turn-in
           {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.rawMaterials, questState: QuestState.active, step: 1 }],
+            visibilityConditions: [{ type: 'quest', questId: QuestID.rawMaterials, questState: QuestState.readyToAdvance, step: 1 }],
             next: BrennDialogue.questRawMaterialsComplete,
             requirementsNeeded: [{ type: 'manyItems', itemIds: [ItemID.ancientWood, ItemID.bearPelt], amounts: { [ItemID.ancientWood]: 20, [ItemID.bearPelt]: 5 } }],
           },
           // Raw Materials: in progress
           {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.rawMaterials, questState: QuestState.active }],
+            visibilityConditions: [{ type: 'quest', questId: QuestID.rawMaterials, questState: QuestState.readyToAdvance }],
             next: BrennDialogue.questRawMaterialsProgress,
           },
           // Raw Materials: offer (only once available — after The Sap That Burns)

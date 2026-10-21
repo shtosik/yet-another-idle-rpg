@@ -81,24 +81,24 @@ const MAWOOD_CORWIN: MawoodCorwinDialogueType = {
         results: [
           // Quest 7 — The Blighted Heart: turn-in
           {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.theBlightedHeart, questState: QuestState.active, step: 1 }],
+            visibilityConditions: [{ type: 'quest', questId: QuestID.theBlightedHeart, questState: QuestState.readyToAdvance, step: 1 }],
             next: CorwinDialogue.questBlightedHeartComplete,
             requirementsNeeded: [{ type: 'item', itemId: ItemID.blightedHeartwood, amount: 1 }],
           },
           // Quest 7 — in progress
           {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.theBlightedHeart, questState: QuestState.active }],
+            visibilityConditions: [{ type: 'quest', questId: QuestID.theBlightedHeart, questState: QuestState.readyToAdvance }],
             next: CorwinDialogue.questBlightedHeart,
           },
           // Quest 6 — The Sap That Burns: turn-in
           {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.theSapThatBurns, questState: QuestState.active, step: 1 }],
+            visibilityConditions: [{ type: 'quest', questId: QuestID.theSapThatBurns, questState: QuestState.readyToAdvance, step: 1 }],
             next: CorwinDialogue.questTheSapComplete,
             requirementsNeeded: [{ type: 'item', itemId: ItemID.cursedSap, amount: 5 }],
           },
           // Quest 6 — in progress
           {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.theSapThatBurns, questState: QuestState.active }],
+            visibilityConditions: [{ type: 'quest', questId: QuestID.theSapThatBurns, questState: QuestState.readyToAdvance }],
             next: CorwinDialogue.questTheSapProgress,
           },
           // Quest 6 — offer (unlocked after Finn's fetishes quest completes)
@@ -108,13 +108,13 @@ const MAWOOD_CORWIN: MawoodCorwinDialogueType = {
           },
           // Quest 4 — Signs of Rot: turn-in
           {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.signsOfRot, questState: QuestState.active, step: 1 }],
+            visibilityConditions: [{ type: 'quest', questId: QuestID.signsOfRot, questState: QuestState.readyToAdvance, step: 1 }],
             next: CorwinDialogue.questSignsOfRotComplete,
             requirementsNeeded: [{ type: 'item', itemId: ItemID.corruptedResin, amount: 3 }],
           },
           // Quest 4 — in progress
           {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.signsOfRot, questState: QuestState.active }],
+            visibilityConditions: [{ type: 'quest', questId: QuestID.signsOfRot, questState: QuestState.readyToAdvance }],
             next: CorwinDialogue.questSignsOfRotProgress,
           },
           // Default — offer Signs of Rot

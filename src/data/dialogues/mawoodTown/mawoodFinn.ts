@@ -77,13 +77,13 @@ const MAWOOD_FINN: MawoodFinnDialogueType = {
         results: [
           // Big Game: turn-in
           {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.bigGame, questState: QuestState.active, step: 1 }],
+            visibilityConditions: [{ type: 'quest', questId: QuestID.bigGame, questState: QuestState.readyToAdvance, step: 1 }],
             next: FinnDialogue.questBigGameComplete,
             requirementsNeeded: [{ type: 'item', itemId: ItemID.bearPelt, amount: 3 }],
           },
           // Big Game: in progress
           {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.bigGame, questState: QuestState.active }],
+            visibilityConditions: [{ type: 'quest', questId: QuestID.bigGame, questState: QuestState.readyToAdvance }],
             next: FinnDialogue.questBigGameProgress,
           },
           // Big Game: offer (after Prove Your Aim done)
@@ -93,24 +93,24 @@ const MAWOOD_FINN: MawoodFinnDialogueType = {
           },
           // Fetches and Fangs (corruption quest): turn-in
           {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.fetchesAndFangs, questState: QuestState.active, step: 1 }],
+            visibilityConditions: [{ type: 'quest', questId: QuestID.fetchesAndFangs, questState: QuestState.readyToAdvance, step: 1 }],
             next: FinnDialogue.questFetchesComplete,
             requirementsNeeded: [{ type: 'item', itemId: ItemID.blightedFetish, amount: 1 }],
           },
           // Fetches and Fangs: in progress
           {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.fetchesAndFangs, questState: QuestState.active }],
+            visibilityConditions: [{ type: 'quest', questId: QuestID.fetchesAndFangs, questState: QuestState.readyToAdvance }],
             next: FinnDialogue.questFetchesProgress,
           },
           // Prove Your Aim: turn-in
           {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.proveYourAim, questState: QuestState.active, step: 1 }],
+            visibilityConditions: [{ type: 'quest', questId: QuestID.proveYourAim, questState: QuestState.readyToAdvance, step: 1 }],
             next: FinnDialogue.questProveYourAimComplete,
             requirementsNeeded: [{ type: 'killCount', enemyId: EnemyID.gnollScout, amount: 10 }],
           },
           // Prove Your Aim: in progress
           {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.proveYourAim, questState: QuestState.active }],
+            visibilityConditions: [{ type: 'quest', questId: QuestID.proveYourAim, questState: QuestState.readyToAdvance }],
             next: FinnDialogue.questProveYourAimProgress,
           },
           // Default — offer Prove Your Aim first

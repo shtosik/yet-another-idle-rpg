@@ -4,7 +4,7 @@ import { NpcID } from '../../../enums/map/npc-id.enum'
 import { EnemyID } from '../../../enums/ids/enemy-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
 
-export enum TraderConversationId {
+export enum TraderDialogue {
   default = 0,
   intro1,
   intro2,
@@ -21,48 +21,48 @@ export enum TraderConversationId {
   questCompleted,
 }
 
-export type LaHarparTraderDialogueType = Record<TraderConversationId, DialogueNode<TraderConversationId>>
+export type LaHarparTraderDialogueType = Record<TraderDialogue, DialogueNode<TraderDialogue>>
 
 const NS = 'dialogues/laHarparTrader'
 
 const LA_HARPAR_TRADER: LaHarparTraderDialogueType = {
-  [TraderConversationId.intro1]: {
-    id: TraderConversationId.intro1,
+  [TraderDialogue.intro1]: {
+    id: TraderDialogue.intro1,
     messageKey: `${NS}:intro1.message`,
     options: [
       {
         responseKey: `${NS}:intro1.opt1`,
-        results: [{ next: TraderConversationId.intro2 }],
+        results: [{ next: TraderDialogue.intro2 }],
       },
     ],
   },
-  [TraderConversationId.intro2]: {
-    id: TraderConversationId.intro2,
+  [TraderDialogue.intro2]: {
+    id: TraderDialogue.intro2,
     messageKey: `${NS}:intro2.message`,
     options: [
       {
         responseKey: `${NS}:intro2.opt1`,
-        results: [{ next: TraderConversationId.intro3 }],
+        results: [{ next: TraderDialogue.intro3 }],
       },
     ],
   },
-  [TraderConversationId.intro3]: {
-    id: TraderConversationId.intro3,
+  [TraderDialogue.intro3]: {
+    id: TraderDialogue.intro3,
     messageKey: `${NS}:intro3.message`,
     options: [
       {
         responseKey: `${NS}:intro3.opt1`,
         results: [
           {
-            next: TraderConversationId.default,
+            next: TraderDialogue.default,
             effects: [{ type: 'flag', name: `met_${NpcID.laHarparTrader}` }],
           },
         ],
       },
     ],
   },
-  [TraderConversationId.default]: {
-    id: TraderConversationId.default,
+  [TraderDialogue.default]: {
+    id: TraderDialogue.default,
     messageKey: `${NS}:default.message`,
     options: [
       {
@@ -73,11 +73,11 @@ const LA_HARPAR_TRADER: LaHarparTraderDialogueType = {
               {
                 type: 'quest',
                 questId: QuestID.ratsWereRats,
-                questState: QuestState.active,
+                questState: QuestState.readyToAdvance,
                 step: 1,
               },
             ],
-            next: TraderConversationId.default,
+            next: TraderDialogue.default,
             effects: [{ type: 'quest', action: 'end', questId: QuestID.ratsWereRats }],
           },
         ],
@@ -86,94 +86,94 @@ const LA_HARPAR_TRADER: LaHarparTraderDialogueType = {
         responseKey: `${NS}:default.opt2`,
         results: [
           {
-            next: TraderConversationId.default,
+            next: TraderDialogue.default,
             effects: [{ type: 'shop', shopId: 0 }],
             closeDialogue: true,
           },
         ],
       },
-      { responseKey: `${NS}:default.opt3`, results: [{ next: TraderConversationId.aboutMe }] },
-      { responseKey: `${NS}:default.opt4`, results: [{ next: TraderConversationId.aboutVillage }] },
-      { responseKey: `${NS}:default.opt5`, results: [{ next: TraderConversationId.aboutPeople }] },
-      { responseKey: `${NS}:default.opt6`, results: [{ next: TraderConversationId.questOffer }] },
+      { responseKey: `${NS}:default.opt3`, results: [{ next: TraderDialogue.aboutMe }] },
+      { responseKey: `${NS}:default.opt4`, results: [{ next: TraderDialogue.aboutVillage }] },
+      { responseKey: `${NS}:default.opt5`, results: [{ next: TraderDialogue.aboutPeople }] },
+      { responseKey: `${NS}:default.opt6`, results: [{ next: TraderDialogue.questOffer }] },
     ],
   },
-  [TraderConversationId.aboutMe]: {
-    id: TraderConversationId.aboutMe,
+  [TraderDialogue.aboutMe]: {
+    id: TraderDialogue.aboutMe,
     messageKey: `${NS}:aboutMe.message`,
     options: [
-      { responseKey: `${NS}:aboutMe.opt1`, results: [{ next: TraderConversationId.aboutLiving }] },
-      { responseKey: `${NS}:aboutMe.opt2`, results: [{ next: TraderConversationId.aboutPeople }] },
+      { responseKey: `${NS}:aboutMe.opt1`, results: [{ next: TraderDialogue.aboutLiving }] },
+      { responseKey: `${NS}:aboutMe.opt2`, results: [{ next: TraderDialogue.aboutPeople }] },
     ],
   },
-  [TraderConversationId.aboutLiving]: {
-    id: TraderConversationId.aboutLiving,
+  [TraderDialogue.aboutLiving]: {
+    id: TraderDialogue.aboutLiving,
     messageKey: `${NS}:aboutLiving.message`,
     options: [
       {
         responseKey: `${NS}:aboutLiving.opt1`,
-        results: [{ next: TraderConversationId.default }],
+        results: [{ next: TraderDialogue.default }],
       },
     ],
   },
-  [TraderConversationId.aboutVillage]: {
-    id: TraderConversationId.aboutVillage,
+  [TraderDialogue.aboutVillage]: {
+    id: TraderDialogue.aboutVillage,
     messageKey: `${NS}:aboutVillage.message`,
     options: [
-      { responseKey: `${NS}:aboutVillage.opt1`, results: [{ next: TraderConversationId.aboutFishermen }] },
-      { responseKey: `${NS}:aboutVillage.opt2`, results: [{ next: TraderConversationId.default }] },
+      { responseKey: `${NS}:aboutVillage.opt1`, results: [{ next: TraderDialogue.aboutFishermen }] },
+      { responseKey: `${NS}:aboutVillage.opt2`, results: [{ next: TraderDialogue.default }] },
     ],
   },
-  [TraderConversationId.aboutFishermen]: {
-    id: TraderConversationId.aboutFishermen,
+  [TraderDialogue.aboutFishermen]: {
+    id: TraderDialogue.aboutFishermen,
     messageKey: `${NS}:aboutFishermen.message`,
     options: [
       {
         responseKey: `${NS}:aboutFishermen.opt1`,
-        results: [{ next: TraderConversationId.aboutFishQuality }],
+        results: [{ next: TraderDialogue.aboutFishQuality }],
       },
     ],
   },
-  [TraderConversationId.aboutFishQuality]: {
-    id: TraderConversationId.aboutFishQuality,
+  [TraderDialogue.aboutFishQuality]: {
+    id: TraderDialogue.aboutFishQuality,
     messageKey: `${NS}:aboutFishQuality.message`,
     options: [
       {
         responseKey: `${NS}:aboutFishQuality.opt1`,
-        results: [{ next: TraderConversationId.default }],
+        results: [{ next: TraderDialogue.default }],
       },
     ],
   },
-  [TraderConversationId.aboutPeople]: {
-    id: TraderConversationId.aboutPeople,
+  [TraderDialogue.aboutPeople]: {
+    id: TraderDialogue.aboutPeople,
     messageKey: `${NS}:aboutPeople.message`,
     options: [
       {
         responseKey: `${NS}:aboutPeople.opt1`,
-        results: [{ next: TraderConversationId.aboutGuild }],
+        results: [{ next: TraderDialogue.aboutGuild }],
       },
     ],
   },
-  [TraderConversationId.aboutGuild]: {
-    id: TraderConversationId.aboutGuild,
+  [TraderDialogue.aboutGuild]: {
+    id: TraderDialogue.aboutGuild,
     messageKey: `${NS}:aboutGuild.message`,
     options: [
-      { responseKey: `${NS}:aboutGuild.opt1`, results: [{ next: TraderConversationId.default }] },
-      { responseKey: `${NS}:aboutGuild.opt2`, results: [{ next: TraderConversationId.aboutDanger }] },
+      { responseKey: `${NS}:aboutGuild.opt1`, results: [{ next: TraderDialogue.default }] },
+      { responseKey: `${NS}:aboutGuild.opt2`, results: [{ next: TraderDialogue.aboutDanger }] },
     ],
   },
-  [TraderConversationId.aboutDanger]: {
-    id: TraderConversationId.aboutDanger,
+  [TraderDialogue.aboutDanger]: {
+    id: TraderDialogue.aboutDanger,
     messageKey: `${NS}:aboutDanger.message`,
     options: [
       {
         responseKey: `${NS}:aboutDanger.opt1`,
-        results: [{ next: TraderConversationId.default }],
+        results: [{ next: TraderDialogue.default }],
       },
     ],
   },
-  [TraderConversationId.questOffer]: {
-    id: TraderConversationId.questOffer,
+  [TraderDialogue.questOffer]: {
+    id: TraderDialogue.questOffer,
     messageKey: `${NS}:questOffer.message`,
     options: [
       {
@@ -184,32 +184,32 @@ const LA_HARPAR_TRADER: LaHarparTraderDialogueType = {
               {
                 type: 'quest',
                 questId: QuestID.ratsWereRats,
-                questState: QuestState.active,
+                questState: QuestState.readyToAdvance,
                 step: 1,
                 hidden: true,
               },
             ],
-            next: TraderConversationId.questCompleted,
+            next: TraderDialogue.questCompleted,
             requirementsNeeded: [{ type: 'killCount', enemyId: EnemyID.rat, amount: 50 }],
             effects: [{ type: 'quest', action: 'end', questId: QuestID.ratsWereRats }],
           },
           {
-            next: TraderConversationId.default,
+            next: TraderDialogue.default,
             closeDialogue: true,
             effects: [{ type: 'quest', action: 'start', questId: QuestID.ratsWereRats }],
           },
         ],
       },
-      { responseKey: `${NS}:questOffer.opt2`, results: [{ next: TraderConversationId.default }] },
+      { responseKey: `${NS}:questOffer.opt2`, results: [{ next: TraderDialogue.default }] },
     ],
   },
-  [TraderConversationId.questCompleted]: {
-    id: TraderConversationId.questCompleted,
+  [TraderDialogue.questCompleted]: {
+    id: TraderDialogue.questCompleted,
     messageKey: `${NS}:questCompleted.message`,
     options: [
       {
         responseKey: `${NS}:questCompleted.opt1`,
-        results: [{ next: TraderConversationId.default }],
+        results: [{ next: TraderDialogue.default }],
       },
     ],
   },

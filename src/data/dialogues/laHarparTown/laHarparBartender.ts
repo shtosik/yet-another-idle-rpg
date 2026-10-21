@@ -4,7 +4,7 @@ import { NpcID } from '../../../enums/map/npc-id.enum'
 import { ItemID } from '../../../enums/ids/item-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
 
-export enum laHarparBartenderConversationID {
+export enum BartenderDialogue {
   default = 0, // Explicitly set to 0 for returning players
   introduction1,
   introduction2,
@@ -15,24 +15,24 @@ export enum laHarparBartenderConversationID {
   anyWorkForMe2,
 }
 
-export type LaHarparBartenderDialogueType = Record<laHarparBartenderConversationID, DialogueNode<laHarparBartenderConversationID>>
+export type LaHarparBartenderDialogueType = Record<BartenderDialogue, DialogueNode<BartenderDialogue>>
 
 const NS = 'dialogues/laHarparBartender'
 
 const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
-  [laHarparBartenderConversationID.introduction1]: {
-    id: laHarparBartenderConversationID.introduction1,
+  [BartenderDialogue.introduction1]: {
+    id: BartenderDialogue.introduction1,
     messageKey: `${NS}:introduction1.message`,
     options: [
       {
         responseKey: `${NS}:introduction1.opt1`,
-        results: [{ next: laHarparBartenderConversationID.introduction2 }],
+        results: [{ next: BartenderDialogue.introduction2 }],
       },
       {
         responseKey: `${NS}:introduction1.opt2`,
         results: [
           {
-            next: laHarparBartenderConversationID.default,
+            next: BartenderDialogue.default,
             effects: [{ type: 'flag', name: `met_${NpcID.laHarparBartender}` }],
           },
         ],
@@ -40,8 +40,8 @@ const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
     ],
   },
 
-  [laHarparBartenderConversationID.default]: {
-    id: laHarparBartenderConversationID.default,
+  [BartenderDialogue.default]: {
+    id: BartenderDialogue.default,
     messageKey: `${NS}:default.message`,
     options: [
       {
@@ -53,10 +53,10 @@ const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
                 type: 'quest',
                 questId: QuestID.meatShortage,
                 step: 1,
-                questState: QuestState.active,
+                questState: QuestState.readyToAdvance,
               },
             ],
-            next: laHarparBartenderConversationID.default,
+            next: BartenderDialogue.default,
             requirementsNeeded: [{ type: 'item', itemId: ItemID.crabMeat, amount: 50 }],
             effects: [
               { type: 'quest', action: 'advance', questId: QuestID.meatShortage },
@@ -69,7 +69,7 @@ const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
         responseKey: `${NS}:default.whatIsThisPlace`,
         results: [
           {
-            next: laHarparBartenderConversationID.whatIsThisPlace1,
+            next: BartenderDialogue.whatIsThisPlace1,
             effects: [{ type: 'stat', action: 'deduct', stats: [{ stat: 'goldCoins', amount: 20 }] }],
           },
         ],
@@ -82,14 +82,14 @@ const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
               {
                 type: 'quest',
                 questId: QuestID.meatShortage,
-                questState: QuestState.active,
+                questState: QuestState.readyToAdvance,
                 step: 1,
               },
             ],
-            next: laHarparBartenderConversationID.anyWorkForMe2,
+            next: BartenderDialogue.anyWorkForMe2,
           },
           {
-            next: laHarparBartenderConversationID.anyWorkForMe1,
+            next: BartenderDialogue.anyWorkForMe1,
             effects: [{ type: 'stat', action: 'deduct', stats: [{ stat: 'goldCoins', amount: 40 }] }],
           },
         ],
@@ -98,7 +98,7 @@ const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
         responseKey: `${NS}:default.anyTrainer`,
         results: [
           {
-            next: laHarparBartenderConversationID.anyoneWhoCanTrainMe1,
+            next: BartenderDialogue.anyoneWhoCanTrainMe1,
             effects: [{ type: 'stat', action: 'deduct', stats: [{ stat: 'goldCoins', amount: 60 }] }],
           },
         ],
@@ -107,89 +107,89 @@ const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
         responseKey: `${NS}:default.goodbye`,
         results: [
           {
-            next: laHarparBartenderConversationID.default,
+            next: BartenderDialogue.default,
             closeDialogue: true,
           },
         ],
       },
     ],
   },
-  [laHarparBartenderConversationID.anyWorkForMe1]: {
-    id: laHarparBartenderConversationID.anyWorkForMe1,
+  [BartenderDialogue.anyWorkForMe1]: {
+    id: BartenderDialogue.anyWorkForMe1,
     messageKey: `${NS}:anyWorkForMe1.message`,
     options: [
       {
         responseKey: `${NS}:anyWorkForMe1.accept`,
         results: [
           {
-            next: laHarparBartenderConversationID.default,
+            next: BartenderDialogue.default,
             effects: [{ type: 'quest', action: 'start', questId: QuestID.meatShortage }],
           },
         ],
       },
       {
         responseKey: `${NS}:anyWorkForMe1.decline`,
-        results: [{ next: laHarparBartenderConversationID.default }],
+        results: [{ next: BartenderDialogue.default }],
       },
     ],
   },
 
-  [laHarparBartenderConversationID.introduction2]: {
-    id: laHarparBartenderConversationID.introduction2,
+  [BartenderDialogue.introduction2]: {
+    id: BartenderDialogue.introduction2,
     messageKey: `${NS}:introduction2.message`,
     options: [
       {
         responseKey: `${NS}:introduction2.opt1`,
         results: [
           {
-            next: laHarparBartenderConversationID.default,
+            next: BartenderDialogue.default,
             effects: [{ type: 'flag', name: `met_${NpcID.laHarparBartender}` }],
           },
         ],
       },
     ],
   },
-  [laHarparBartenderConversationID.whatIsThisPlace1]: {
-    id: laHarparBartenderConversationID.whatIsThisPlace1,
+  [BartenderDialogue.whatIsThisPlace1]: {
+    id: BartenderDialogue.whatIsThisPlace1,
     messageKey: `${NS}:whatIsThisPlace1.message`,
     options: [
       {
         responseKey: `${NS}:whatIsThisPlace1.opt1`,
-        results: [{ next: laHarparBartenderConversationID.default }],
+        results: [{ next: BartenderDialogue.default }],
       },
     ],
   },
-  [laHarparBartenderConversationID.anyoneWhoCanTrainMe1]: {
-    id: laHarparBartenderConversationID.anyoneWhoCanTrainMe1,
+  [BartenderDialogue.anyoneWhoCanTrainMe1]: {
+    id: BartenderDialogue.anyoneWhoCanTrainMe1,
     messageKey: `${NS}:anyoneWhoCanTrainMe1.message`,
     options: [
       {
         responseKey: `${NS}:anyoneWhoCanTrainMe1.opt1`,
-        results: [{ next: laHarparBartenderConversationID.default }],
+        results: [{ next: BartenderDialogue.default }],
       },
       {
         responseKey: `${NS}:anyoneWhoCanTrainMe1.opt2`,
-        results: [{ next: laHarparBartenderConversationID.anyoneWhoCanTrainMe2 }],
+        results: [{ next: BartenderDialogue.anyoneWhoCanTrainMe2 }],
       },
     ],
   },
-  [laHarparBartenderConversationID.anyoneWhoCanTrainMe2]: {
-    id: laHarparBartenderConversationID.anyoneWhoCanTrainMe2,
+  [BartenderDialogue.anyoneWhoCanTrainMe2]: {
+    id: BartenderDialogue.anyoneWhoCanTrainMe2,
     messageKey: `${NS}:anyoneWhoCanTrainMe2.message`,
     options: [
       {
         responseKey: `${NS}:anyoneWhoCanTrainMe2.opt1`,
-        results: [{ next: laHarparBartenderConversationID.default, closeDialogue: true }],
+        results: [{ next: BartenderDialogue.default, closeDialogue: true }],
       },
     ],
   },
-  [laHarparBartenderConversationID.anyWorkForMe2]: {
-    id: laHarparBartenderConversationID.anyWorkForMe2,
+  [BartenderDialogue.anyWorkForMe2]: {
+    id: BartenderDialogue.anyWorkForMe2,
     messageKey: `${NS}:anyWorkForMe2.message`,
     options: [
       {
         responseKey: `${NS}:anyWorkForMe2.opt1`,
-        results: [{ next: laHarparBartenderConversationID.default, closeDialogue: true }],
+        results: [{ next: BartenderDialogue.default, closeDialogue: true }],
       },
     ],
   },

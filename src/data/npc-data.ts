@@ -1,9 +1,3 @@
-// import LA_HARPAR_BARTENDER from "./dialogues/laHarparTown/laHarparBartender";
-// import LA_HARPAR_ELARA from "./dialogues/laHarparTown/laHarparElara";
-// import LA_HARPAR_JOSH from "./dialogues/laHarparTown/laHarparJosh";
-// import LA_HARPAR_TRADER from "./dialogues/laHarparTown/laHarparTrader";
-// import {DialogueProps} from "./dialogues/types";
-
 import { NpcID } from '../enums/map/npc-id.enum'
 import LA_HARPAR_BARTENDER from './dialogues/laHarparTown/laHarparBartender'
 import { DialogueType } from './dialogues/types'
