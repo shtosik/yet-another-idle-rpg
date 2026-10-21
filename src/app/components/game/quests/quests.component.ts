@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, Signal, signal } 
 import { QuestsStore } from '../../../store/quests/quests.store'
 import QUEST_DATA, { QUEST_STEP_AFTER_COMPLETED } from '../../../../data/quests-data'
 import { QuestID } from '../../../../enums/ids/quest-id.enum'
-import { TranslatePipe } from '../../../pipes/i18next.pipe'
+import { I18nextPipe } from '../../../pipes/i18next.pipe'
 
 type QuestFilters = 'all' | 'completed' | 'started'
 
@@ -12,7 +12,7 @@ type QuestFilters = 'all' | 'completed' | 'started'
   styleUrls: ['./quests.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    TranslatePipe,
+    I18nextPipe,
 
   ],
 })

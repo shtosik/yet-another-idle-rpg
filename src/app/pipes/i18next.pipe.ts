@@ -5,7 +5,7 @@ import i18next from 'i18next';
     name: 'i18next',
     pure: false,
 })
-export class TranslatePipe implements PipeTransform {
+export class I18nextPipe implements PipeTransform {
     transform(key: string, options?: any) {
         return i18next.t(key, options);
     }

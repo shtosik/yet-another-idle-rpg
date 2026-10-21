@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common'
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core'
-import { TranslatePipe } from 'app/pipes/i18next.pipe'
+import { I18nextPipe } from 'app/pipes/i18next.pipe'
 import { EnemyID } from 'enums/ids/enemy-id.enum'
 import { ZoneID } from 'enums/ids/zone-id.enum'
 import { BattleStore } from '../../../../store/battle/battle.store'
@@ -14,7 +14,7 @@ import { NgOptimizedImage } from '@angular/common'
   templateUrl: 'battle-nav-bar.component.html',
   styleUrls: ['./battle-nav-bar.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, TranslatePipe, NgOptimizedImage],
+  imports: [CommonModule, I18nextPipe, NgOptimizedImage],
 })
 export class BattleNavBarComponent {
   private battleStore = inject(BattleStore)

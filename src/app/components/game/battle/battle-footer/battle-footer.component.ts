@@ -8,7 +8,7 @@ import { EquippedSpell } from '../../../../../interfaces/spells/equipped-spell.i
 import { SpellID } from '../../../../../enums/ids/spell-id.enum'
 import ITEM_DATA from '../../../../../data/items-data'
 import { DurationPipe } from '../../../../pipes/duration.pipe'
-import { TranslatePipe } from '../../../../pipes/i18next.pipe'
+import { I18nextPipe } from '../../../../pipes/i18next.pipe'
 import { ItemID } from '../../../../../enums/ids/item-id.enum'
 import { CONSUMABLE_SLOTS } from '../../../../../interfaces/consumable.interface'
 
@@ -23,7 +23,7 @@ const PALETTE_DROP_ID = 'spellbook-palette'
     CdkDropList,
     CdkDrag,
     DurationPipe,
-    TranslatePipe,
+    I18nextPipe,
   ],
   templateUrl: './battle-footer.component.html',
   styleUrl: './battle-footer.component.sass',

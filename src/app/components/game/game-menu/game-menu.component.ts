@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common'
 import { ChangeDetectionStrategy, Component, EventEmitter, inject, Output } from '@angular/core'
 import { GameTab } from 'enums/ids/game-tab.enum'
-import { TranslatePipe } from '../../../pipes/i18next.pipe'
+import { I18nextPipe } from '../../../pipes/i18next.pipe'
 import { PlayerStore } from '../../../store/player/player.store'
 
 @Component({
@@ -9,7 +9,7 @@ import { PlayerStore } from '../../../store/player/player.store'
     templateUrl: 'game-menu.component.html',
     styleUrls: ['./game-menu.component.sass'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [CommonModule, TranslatePipe],
+    imports: [CommonModule, I18nextPipe],
 })
 
 export class GameMenuComponent {

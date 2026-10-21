@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, EventEmitter, inject, Output } from '@angular/core'
 import { TownID } from '../../../../enums/map/town-id.enum'
-import { TranslatePipe } from '../../../pipes/i18next.pipe'
+import { I18nextPipe } from '../../../pipes/i18next.pipe'
 import TOWNS_DATA from '../../../../data/towns-data'
 import { TownBuilding } from '../../../../interfaces/town.interface'
 import { TownBuildingID } from '../../../../enums/map/town-building-id.enum'
@@ -18,7 +18,7 @@ import { ShopComponent } from '../../modals/shop/shop.component'
   styleUrls: ['./towns.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    TranslatePipe,
+    I18nextPipe,
     CloseButtonComponent,
     TownBuildingComponent,
     ShopComponent,

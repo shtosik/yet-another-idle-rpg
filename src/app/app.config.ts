@@ -12,7 +12,7 @@ import { provideStoreDevtools } from '@ngrx/store-devtools'
 import { provideHttpClient } from '@angular/common/http'
 import i18next from 'i18next'
 import HttpBackend from 'i18next-http-backend'
-import { TranslatePipe } from './pipes/i18next.pipe'
+import { I18nextPipe } from './pipes/i18next.pipe'
 import { AsyncPipe } from '@angular/common'
 import { UrlPipe } from './pipes/url.pipe'
 import { CalculateXpPipe } from './pipes/calculate-xp.pipe'
@@ -70,7 +70,7 @@ export const appConfig: ApplicationConfig = {
             useFactory: i18nextInitializer,
             multi: true,
         },
-        importProvidersFrom([TranslatePipe, AsyncPipe, UrlPipe, CalculateXpPipe]),
+        importProvidersFrom([I18nextPipe, AsyncPipe, UrlPipe, CalculateXpPipe]),
 
     ],
 }

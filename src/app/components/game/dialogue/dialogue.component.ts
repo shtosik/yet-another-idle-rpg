@@ -3,7 +3,7 @@ import { DialogueManagerService } from '../../../services/dialogue-manager.servi
 import { DialogueOption } from '../../../../interfaces/dialogues/dialogue-option.type'
 import i18next from 'i18next'
 import { NgOptimizedImage } from '@angular/common'
-import { TranslatePipe } from '../../../pipes/i18next.pipe'
+import { I18nextPipe } from '../../../pipes/i18next.pipe'
 import { QuestID } from '../../../../enums/ids/quest-id.enum'
 import { NpcID } from '../../../../enums/map/npc-id.enum'
 import { ItemID } from '../../../../enums/ids/item-id.enum'
@@ -17,7 +17,7 @@ import { CloseButtonComponent } from '../../shared/close-button/close-button.com
   selector: 'app-dialogue',
   imports: [
     NgOptimizedImage,
-    TranslatePipe,
+    I18nextPipe,
     CloseButtonComponent,
   ],
   templateUrl: './dialogue.component.html',

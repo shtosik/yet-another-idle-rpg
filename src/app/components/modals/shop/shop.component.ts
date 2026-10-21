@@ -6,7 +6,7 @@ import SHOPS_DATA from '../../../../data/shops-data'
 import ITEM_DATA from '../../../../data/items-data'
 import { ItemTier } from '../../../../enums/items/item-tier.enum'
 import { ItemID } from '../../../../enums/ids/item-id.enum'
-import { TranslatePipe } from '../../../pipes/i18next.pipe'
+import { I18nextPipe } from '../../../pipes/i18next.pipe'
 import { SlotComponent } from '../../shared/slot/slot.component'
 import { InventoryItemComponent } from '../../game/inventory/inventory-slot/inventory-slot.component'
 import { CloseButtonComponent } from '../../shared/close-button/close-button.component'
@@ -20,7 +20,7 @@ type BuyBlockReason = 'stock' | 'gold' | 'inventory' | 'station' | null
   templateUrl: './shop.component.html',
   styleUrl: './shop.component.sass',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe, SlotComponent, InventoryItemComponent, CloseButtonComponent],
+  imports: [I18nextPipe, SlotComponent, InventoryItemComponent, CloseButtonComponent],
 })
 export class ShopComponent implements OnInit {
   private shopStore = inject(ShopStore)

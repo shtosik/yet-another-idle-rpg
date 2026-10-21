@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, effect, inject, Input, signal } from '@angular/core'
 import { AnimationsService } from '../../../services/animations.service'
-import { TranslatePipe } from '../../../pipes/i18next.pipe'
+import { I18nextPipe } from '../../../pipes/i18next.pipe'
 
 interface FloatingDamage {
   id: number // for tracking in template loop
@@ -13,7 +13,7 @@ interface FloatingDamage {
   selector: 'app-damage-popup',
   templateUrl: './damage-popup.component.html',
   styleUrls: ['./damage-popup.component.sass'],
-  imports: [TranslatePipe],
+  imports: [I18nextPipe],
   changeDetection: ChangeDetectionStrategy.Default,
 })
 export class DamagePopupComponent {

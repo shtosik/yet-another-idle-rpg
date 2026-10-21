@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core'
 import { MatDialogRef } from '@angular/material/dialog'
-import { TranslatePipe } from '../../../pipes/i18next.pipe'
+import { I18nextPipe } from '../../../pipes/i18next.pipe'
 import { CloseButtonComponent } from '../../shared/close-button/close-button.component'
 import { PlayerManagerService } from '../../../services/player-manager.service'
 
@@ -9,7 +9,7 @@ import { PlayerManagerService } from '../../../services/player-manager.service'
     templateUrl: './respec-confirm.component.html',
     styleUrl: './respec-confirm.component.sass',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [TranslatePipe, CloseButtonComponent],
+    imports: [I18nextPipe, CloseButtonComponent],
 })
 export class RespecConfirmComponent {
     private readonly modalRef = inject(MatDialogRef)

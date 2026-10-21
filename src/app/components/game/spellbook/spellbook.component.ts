@@ -6,14 +6,14 @@ import { SpellID } from '../../../../enums/ids/spell-id.enum'
 import { EquippedSpell } from '../../../../interfaces/spells/equipped-spell.interface'
 import SPELLS_DATA from '../../../../data/spells-data'
 import { UrlPipe } from '../../../pipes/url.pipe'
-import { TranslatePipe } from '../../../pipes/i18next.pipe'
+import { I18nextPipe } from '../../../pipes/i18next.pipe'
 
 @Component({
   selector: 'app-spellbook',
   templateUrl: './spellbook.component.html',
   styleUrls: ['./spellbook.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CdkDropList, CdkDrag, UrlPipe, TranslatePipe],
+  imports: [CdkDropList, CdkDrag, UrlPipe, I18nextPipe],
 })
 export class SpellbookComponent {
   private playerStore = inject(PlayerStore)

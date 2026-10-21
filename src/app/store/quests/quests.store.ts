@@ -9,13 +9,13 @@ import { ModalService } from '../../services/modal.service'
 import { PlayerStore } from '../player/player.store'
 import { ItemStack } from '../player/inventory'
 
-export interface QuestState {
+export interface QuestsState {
   questStepProgression: QuestProgression
   completedQuests: Partial<Record<QuestID, boolean>>
   dialogueFlags: Record<string, boolean>
 }
 
-export const initialState: QuestState = {
+export const initialState: QuestsState = {
   questStepProgression: {},
   completedQuests: {},
   dialogueFlags: {},

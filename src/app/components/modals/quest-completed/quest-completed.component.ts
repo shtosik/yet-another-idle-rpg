@@ -2,7 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core'
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
 import { QuestProps } from '../../../../data/quests-data'
 import { QuestID } from '../../../../enums/ids/quest-id.enum'
-import { TranslatePipe } from '../../../pipes/i18next.pipe'
+import { I18nextPipe } from '../../../pipes/i18next.pipe'
 import { InventoryItemComponent } from '../../game/inventory/inventory-slot/inventory-slot.component'
 import ITEM_DATA from '../../../../data/items-data'
 import { SlotComponent } from '../../shared/slot/slot.component'
@@ -11,7 +11,7 @@ import { CloseButtonComponent } from '../../shared/close-button/close-button.com
 @Component({
   selector: 'app-quest-complete-component',
   imports: [
-    TranslatePipe,
+    I18nextPipe,
     InventoryItemComponent,
     SlotComponent,
     CloseButtonComponent,

@@ -9,7 +9,7 @@ import { SkillNode } from 'interfaces/skill-tree/skill-node.interface'
 import { PlayerManagerService } from 'app/services/player-manager.service'
 import { ModalService } from 'app/services/modal.service'
 import { isRequirementMet } from 'utils/skill-tree-requirements'
-import { TranslatePipe } from 'app/pipes/i18next.pipe'
+import { I18nextPipe } from 'app/pipes/i18next.pipe'
 
 type NodeState = 'allocated' | 'available' | 'locked' | 'maxed'
 
@@ -23,7 +23,7 @@ const EDGE_STYLE: Record<'locked' | 'available' | 'allocated', { color: string; 
   selector: 'app-skill-tree',
   templateUrl: 'skill-tree.component.html',
   styleUrl: './skill-tree.component.sass',
-  imports: [LeafletModule, TranslatePipe],
+  imports: [LeafletModule, I18nextPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SkillTreeComponent {

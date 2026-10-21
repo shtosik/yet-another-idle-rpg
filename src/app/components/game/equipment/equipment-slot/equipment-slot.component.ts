@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { EquipmentSlotKey } from 'enums/equipment-slot.enum'
 import { ItemTier } from 'enums/items/item-tier.enum'
 import { Item } from 'interfaces/item.interface'
-import { TranslatePipe } from '../../../../pipes/i18next.pipe'
+import { I18nextPipe } from '../../../../pipes/i18next.pipe'
 import { ItemID } from '../../../../../enums/ids/item-id.enum'
 import { TooltipTemplateDirective } from 'ngx-tooltip-directives'
 import { ItemType } from '../../../../../enums/items/item-type.enum'
@@ -14,7 +14,7 @@ import { StatToPercentagePipe } from '../../../../pipes/stat-to-percentage.pipe'
     templateUrl: 'equipment-slot.component.html',
     styleUrls: ['./equipment-slot.component.sass'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [NgOptimizedImage, CommonModule, TranslatePipe, TooltipTemplateDirective, StatToPercentagePipe],
+    imports: [NgOptimizedImage, CommonModule, I18nextPipe, TooltipTemplateDirective, StatToPercentagePipe],
 })
 
 export class EquipmentItemComponent {

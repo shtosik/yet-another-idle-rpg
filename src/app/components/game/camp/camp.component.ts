@@ -4,7 +4,7 @@ import i18next from 'i18next'
 import { PlayerStore } from '../../../store/player/player.store'
 import { CampStore } from '../../../store/camp/camp.store'
 import { ModalService } from '../../../services/modal.service'
-import { TranslatePipe } from '../../../pipes/i18next.pipe'
+import { I18nextPipe } from '../../../pipes/i18next.pipe'
 import STATIONS_DATA from '../../../../data/stations-data'
 import RECIPES_DATA from '../../../../data/recipes-data'
 import ITEM_DATA from '../../../../data/items-data'
@@ -26,7 +26,7 @@ const TOAST_MS = 1800
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     NgOptimizedImage,
-    TranslatePipe,
+    I18nextPipe,
     StationIconComponent,
     RecipeDetailComponent,
   ],

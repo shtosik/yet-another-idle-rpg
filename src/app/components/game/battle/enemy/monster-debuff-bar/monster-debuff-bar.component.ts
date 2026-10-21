@@ -4,7 +4,7 @@ import { BattleStore } from '../../../../../store/battle/battle.store'
 import { PlayerStore } from '../../../../../store/player/player.store'
 import { SkillNodeID } from '../../../../../../enums/ids/skill-node-id.enum'
 import { DamageElement } from '../../../../../../enums/damage-element.enum'
-import { TranslatePipe } from '../../../../../pipes/i18next.pipe'
+import { I18nextPipe } from '../../../../../pipes/i18next.pipe'
 
 const WEAKNESS_ICONS: Record<DamageElement, string> = {
   [DamageElement.fire]: './assets/img/icons/fireWeakness.png',
@@ -20,7 +20,7 @@ const WEAKNESS_ICONS: Record<DamageElement, string> = {
   selector: 'app-monster-debuff-bar',
   templateUrl: './monster-debuff-bar.component.html',
   styleUrls: ['./monster-debuff-bar.component.sass'],
-  imports: [NgOptimizedImage, TranslatePipe],
+  imports: [NgOptimizedImage, I18nextPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MonsterDebuffBarComponent {

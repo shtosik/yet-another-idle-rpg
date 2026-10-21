@@ -2,7 +2,7 @@ import { NgOptimizedImage } from '@angular/common'
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core'
 import { ItemTier } from 'enums/items/item-tier.enum'
 import { Item } from 'interfaces/item.interface'
-import { TranslatePipe } from '../../../../pipes/i18next.pipe'
+import { I18nextPipe } from '../../../../pipes/i18next.pipe'
 import { EnemyID } from '../../../../../enums/ids/enemy-id.enum'
 import { SkillNodeID } from '../../../../../enums/ids/skill-node-id.enum'
 import { ItemID } from '../../../../../enums/ids/item-id.enum'
@@ -17,7 +17,7 @@ import { ConsumableEffectComponent } from '../../../shared/consumable-effect/con
   templateUrl: 'inventory-slot.component.html',
   styleUrls: ['./inventory-slot.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgOptimizedImage, TranslatePipe, TooltipTemplateDirective, StatToPercentagePipe, ConsumableEffectComponent],
+  imports: [NgOptimizedImage, I18nextPipe, TooltipTemplateDirective, StatToPercentagePipe, ConsumableEffectComponent],
 })
 
 export class InventoryItemComponent {

@@ -3,7 +3,7 @@ import { NgOptimizedImage } from '@angular/common'
 import i18next from 'i18next'
 import { PlayerStore } from '../../../../store/player/player.store'
 import { CampStore } from '../../../../store/camp/camp.store'
-import { TranslatePipe } from '../../../../pipes/i18next.pipe'
+import { I18nextPipe } from '../../../../pipes/i18next.pipe'
 import { StatToPercentagePipe } from '../../../../pipes/stat-to-percentage.pipe'
 import { DurationPipe } from '../../../../pipes/duration.pipe'
 import { ConsumableEffectComponent } from '../../../shared/consumable-effect/consumable-effect.component'
@@ -31,7 +31,7 @@ const itemName = (id: ItemID) => i18next.t(`items:names.${ItemID[id]}`)
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     NgOptimizedImage,
-    TranslatePipe,
+    I18nextPipe,
     StatToPercentagePipe,
     DurationPipe,
     ConsumableEffectComponent,

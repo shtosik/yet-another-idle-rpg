@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core'
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
-import { TranslatePipe } from '../../../pipes/i18next.pipe'
+import { I18nextPipe } from '../../../pipes/i18next.pipe'
 import { CloseButtonComponent } from '../../shared/close-button/close-button.component'
 import { UnlockNotification } from '../../../../data/unlock-conditions'
 
@@ -9,7 +9,7 @@ import { UnlockNotification } from '../../../../data/unlock-conditions'
   templateUrl: './unlock-notification.component.html',
   styleUrl: './unlock-notification.component.sass',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [TranslatePipe, CloseButtonComponent],
+  imports: [I18nextPipe, CloseButtonComponent],
 })
 export class UnlockNotificationComponent {
   modalRef = inject(MatDialogRef)

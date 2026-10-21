@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, Input } from '@angular/core'
 import { TooltipTemplateDirective } from 'ngx-tooltip-directives'
-import { TranslatePipe } from '../../../../../pipes/i18next.pipe'
+import { I18nextPipe } from '../../../../../pipes/i18next.pipe'
 import { UrlPipe } from '../../../../../pipes/url.pipe'
 import { EquippedSpell } from '../../../../../../interfaces/spells/equipped-spell.interface'
 import { PlayerStore } from '../../../../../store/player/player.store'
@@ -16,7 +16,7 @@ import { BattleManagerService } from '../../../../../services/battle-manager.ser
   styleUrls: ['spell-slot.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    TranslatePipe,
+    I18nextPipe,
     UrlPipe,
     TooltipTemplateDirective,
   ],
