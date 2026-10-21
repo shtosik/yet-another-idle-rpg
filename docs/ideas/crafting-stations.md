@@ -102,7 +102,7 @@ interface StationUpgradeItem extends ItemData {
 
 ## UI (48×20rem panel, full redesign)
 
-**Approved reference mockup (owner, 2026-10-20):** interactive canvas at https://claude.ai/artifact/TAZ3xoPeH4x6eV1U8664Xv (private, owner only). Its source is in [mockups/camp-panel.dc.html](mockups/camp-panel.dc.html). It only renders in the artifact, since icons are uploaded blobs and it needs the canvas runtime, but colours, sizes, states and copy can be read straight from it.
+**Approved reference mockup (owner, 2026-10-20):** interactive canvas at https://claude.ai/artifact/TAZ3xoPeH4x6eV1U8664Xv (private, owner only). Colours, sizes, states and copy can be read straight from it.
 
 Settled in the mockup:
 - **Accent is game yellow** `#eab308` (`palette.$yellow`): selected tab, selected row outline, station header, selected quantity, quick-craft button, Craft button, toast, focus ring.
