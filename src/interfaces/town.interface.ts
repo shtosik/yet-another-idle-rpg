@@ -13,7 +13,7 @@ export interface Town {
     buildings: TownBuilding[]
 }
 
-export interface TownBuildingNpcProps {
+export interface TownBuildingNpc {
     id: NpcID
     position: {
         x: number
@@ -23,7 +23,7 @@ export interface TownBuildingNpcProps {
 
 export interface TownBuilding {
     buildingId: TownBuildingID
-    npcIds: TownBuildingNpcProps[]
+    npcs: TownBuildingNpc[]
     /** Absent for zone entrances, which travel to `zoneId` instead of opening a view. */
     url?: string
     position?: {

@@ -30,7 +30,7 @@ For **expanding** an existing NPC, do only steps 2 (new nodes and options), 5 (k
 
 6. **Register the namespace** — add `'dialogues/<npcKey>'` to `translations` in `src/app/app.config.ts`.
 
-7. **Place and draw** — add `{ id: NpcID.<npcKey>, position: { x, y } }` (percent of the building view) to a building's `npcIds` in `src/data/towns-data.ts`. Clicking the NPC frame starts the dialogue. Generate the avatar with `/generate-2d-asset` (portrait briefs live in `docs/character/<town>/`).
+7. **Place and draw** — add `{ id: NpcID.<npcKey>, position: { x, y } }` (percent of the building view) to a building's `npcs` in `src/data/towns-data.ts`. Clicking the NPC frame starts the dialogue. Generate the avatar with `/generate-2d-asset` (portrait briefs live in `docs/character/<town>/`).
 
 8. **Check** — run the `audit-dialogue` skill on the file.
 

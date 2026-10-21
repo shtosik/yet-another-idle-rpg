@@ -18,7 +18,7 @@ export const TOWNS_DATA: Record<TownID, Town> = {
           x: 20,
           y: 80,
         },
-        npcIds: [
+        npcs: [
           {
             id: NpcID.laHarparBartender,
             position: {
@@ -42,7 +42,7 @@ export const TOWNS_DATA: Record<TownID, Town> = {
           x: 50,
           y: 70,
         },
-        npcIds: [
+        npcs: [
           {
             id: NpcID.laHarparTrader,
             position: {
@@ -68,7 +68,7 @@ export const TOWNS_DATA: Record<TownID, Town> = {
         },
         zoneId: ZoneID.tradersBasement,
         questRequirement: QuestID.ratsWereRats,
-        npcIds: [],
+        npcs: [],
       },
       {
         buildingId: TownBuildingID.shop,
@@ -76,7 +76,7 @@ export const TOWNS_DATA: Record<TownID, Town> = {
           x: 70,
           y: 35,
         },
-        npcIds: [
+        npcs: [
           {
             id: NpcID.laHarparTrader,
             position: {
@@ -93,7 +93,7 @@ export const TOWNS_DATA: Record<TownID, Town> = {
           x: 85,
           y: 80,
         },
-        npcIds: [
+        npcs: [
           {
             id: NpcID.laHarparMarvin,
             position: {
@@ -118,7 +118,7 @@ export const TOWNS_DATA: Record<TownID, Town> = {
       {
         buildingId: TownBuildingID.main,
         position: { x: 50, y: 55 },
-        npcIds: [
+        npcs: [
           { id: NpcID.mawoodCorwin, position: { x: 50, y: 50 } },
         ],
         url: './assets/img/backgrounds/mawoodElderTree.png',
@@ -126,7 +126,7 @@ export const TOWNS_DATA: Record<TownID, Town> = {
       {
         buildingId: TownBuildingID.mawoodApothecary,
         position: { x: 20, y: 70 },
-        npcIds: [
+        npcs: [
           { id: NpcID.mawoodSylvie, position: { x: 50, y: 50 } },
         ],
         url: './assets/img/backgrounds/mawoodApothecary.png',
@@ -134,7 +134,7 @@ export const TOWNS_DATA: Record<TownID, Town> = {
       {
         buildingId: TownBuildingID.mawoodHunterLodge,
         position: { x: 80, y: 70 },
-        npcIds: [
+        npcs: [
           { id: NpcID.mawoodFinn, position: { x: 35, y: 50 } },
           { id: NpcID.mawoodBrenn, position: { x: 65, y: 50 } },
         ],
@@ -143,7 +143,7 @@ export const TOWNS_DATA: Record<TownID, Town> = {
       {
         buildingId: TownBuildingID.mawoodMagicShop,
         position: { x: 30, y: 40 },
-        npcIds: [
+        npcs: [
           { id: NpcID.mawoodElarion, position: { x: 50, y: 50 } },
         ],
         url: './assets/img/backgrounds/mawoodMagicShop.png',
@@ -151,7 +151,7 @@ export const TOWNS_DATA: Record<TownID, Town> = {
       {
         buildingId: TownBuildingID.mawoodHighPlatform,
         position: { x: 70, y: 20 },
-        npcIds: [
+        npcs: [
           { id: NpcID.mawoodMilo, position: { x: 50, y: 50 } },
         ],
         url: './assets/img/backgrounds/mawoodHighPlatform.png',
@@ -164,7 +164,7 @@ export const TOWNS_DATA: Record<TownID, Town> = {
         // Corwin only offers theSapThatBurns after fetchesAndFangs is completed,
         // so this entrance can never appear before the player has earned it.
         questRequirement: QuestID.theSapThatBurns,
-        npcIds: [],
+        npcs: [],
       },
       {
         buildingId: TownBuildingID.upperCanopyEntrance,
@@ -174,7 +174,7 @@ export const TOWNS_DATA: Record<TownID, Town> = {
         // gated on theBlightedHeart being completed (the Gnarled Treant must be dead),
         // so the rope-lift only appears after the corruption questline is finished.
         questRequirement: QuestID.feathersForAKite,
-        npcIds: [],
+        npcs: [],
       },
     ],
   },

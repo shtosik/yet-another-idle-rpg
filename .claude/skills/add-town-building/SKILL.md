@@ -16,7 +16,7 @@ Background: `docs/systems/towns-shops-guild.md`. Building-specific gameplay goes
    {
      buildingId: TownBuildingID.mawoodBlacksmith,
      position: { x: 40, y: 60 },          // button position on the town view, % of width/height
-     npcIds: [{ id: NpcID.mawoodSmith, position: { x: 50, y: 55 } }],   // % on the building view
+     npcs: [{ id: NpcID.mawoodSmith, position: { x: 50, y: 55 } }],   // % on the building view
      url: './assets/img/backgrounds/mawoodBlacksmith.png',
      questRequirement: QuestID.someQuest, // optional: hidden until this quest has started
    },
@@ -27,7 +27,7 @@ Background: `docs/systems/towns-shops-guild.md`. Building-specific gameplay goes
 
 4. **Background** — `/generate-2d-asset` for `src/assets/img/backgrounds/<buildingKey>.png` (town backgrounds use the `town-painterly` family).
 
-5. **NPCs** — for each new NPC, run `add-npc-dialogue` (step 7 there places them using the `npcIds` entry above).
+5. **NPCs** — for each new NPC, run `add-npc-dialogue` (step 7 there places them using the `npcs` entry above).
 
 6. **New mechanic** (optional) — new dialogue effects or conditions via `add-dialogue-effect`.
 

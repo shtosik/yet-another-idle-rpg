@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core'
-import { TownBuildingNpcProps } from '../../../../../interfaces/town.interface'
+import { TownBuildingNpc } from '../../../../../interfaces/town.interface'
 import NPC_Data from '../../../../../data/npc-data'
 import { NgOptimizedImage } from '@angular/common'
 import { NpcID } from '../../../../../enums/map/npc-id.enum'
@@ -14,7 +14,7 @@ import { NpcID } from '../../../../../enums/map/npc-id.enum'
     ],
 })
 export class NpcFrameComponent {
-    @Input() npc: TownBuildingNpcProps
+    @Input() npc: TownBuildingNpc
 
     @Output() openDialogue = new EventEmitter<NpcID>()
 

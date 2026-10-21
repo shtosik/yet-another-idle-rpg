@@ -179,7 +179,7 @@ for (const recipe of Object.values(D.RECIPES_DATA)) {
 for (const town of Object.values(D.TOWNS_DATA)) {
   for (const b of town.buildings) {
     if (!enumValues(D.TownBuildingID).includes(b.buildingId)) error('src/data/towns-data.ts', `${idName(D.TownID, town.id)} has unknown TownBuildingID ${b.buildingId}`)
-    for (const npc of b.npcIds) {
+    for (const npc of b.npcs) {
       if (!has(D.NPC_DATA, npc.id)) error('src/data/towns-data.ts', `${idName(D.TownID, town.id)}.${idName(D.TownBuildingID, b.buildingId)} has unknown NpcID ${npc.id}`)
     }
   }
@@ -209,6 +209,7 @@ for (const npc of Object.values(D.NPC_DATA)) {
   for (const [key, node] of Object.entries(nodes)) {
     if (node.id !== Number(key)) error(file, `node key ${key} has id ${node.id}`)
     const targets = []
+    if (!Array.isArray(node.options)) { error(file, `node ${key} has no options array`); continue }
     node.options.forEach((opt, i) => {
       if (!opt.results?.length) error(file, `node ${key} option ${i} has no results`)
       for (const r of opt.results ?? []) {

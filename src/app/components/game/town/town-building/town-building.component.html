@@ -5,7 +5,7 @@
   [style.background-image]="buildingData.url | url"
 >
   <h2 class="building__title">{{ 'map:buildings.' + TownBuildingID[buildingData.buildingId] | i18next }}</h2>
-  @for (npc of buildingData.npcIds; track npc.id) {
+  @for (npc of buildingData.npcs; track npc.id) {
     <app-npc-frame
       [npc]="npc"
       (openDialogue)="openDialogue($event)"
