@@ -8,7 +8,7 @@ Enemy definitions and their loot. A **shiny** is a rare recolored spawn with muc
 - `src/interfaces/enemy.interface.ts:Enemy`, `enemy-drop.interface.ts:EnemyDrop` (`chance` = 1 in N per roll; optional `requiredActiveQuestId`).
 - `src/enums/ids/enemy-id.enum.ts:EnemyID`, `src/enums/enemy-type.enum.ts:EnemyType` (used by `damageVs<Type>` stats).
 - `src/data/items/pet-items.data.ts` — `PETS` table (enemy → pet item, shiny pet item, sprite stem, stats); builds `PetItemsData`, `petDrop(enemyId)`, `shinyPetDrops(enemyId)`; `PET_DROP_CHANCE` = 2000.
-- `src/utils/shiny-url.ts:toShinyUrl` — `name.png` → `name-shiny.png`.
+- `src/utils/shiny-url.ts:toShinyUrl` — `<name>.png` → `<name>-shiny.png`.
 - `src/app/store/battle/battle.store.ts:startBattle` — shiny roll; `src/app/store/player/player.store.ts:processBattleEnd` — shiny rewards and drop rolls.
 - `src/app/components/game/bestiary/bestiary.component.ts` — bestiary tab; `src/data/helpers/enemy-zones.ts:ZONES_BY_ENEMY`.
 

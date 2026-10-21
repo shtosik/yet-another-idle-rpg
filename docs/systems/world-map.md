@@ -1,0 +1,31 @@
+# World map
+
+## Purpose
+A pannable, zoomable painted map (Leaflet) with markers for unlocked towns and zones. Clicking a marker travels there. The map tab appears once the first town unlocks.
+
+## Key files
+- `src/app/components/game/world-map/world-map.component.ts:WorldMapComponent` — Leaflet map with a custom `PIXEL_CRS`, tile layer, marker sync.
+- `src/data/world-map-data.ts:WORLD_MAP_DATA` — tile path, image `manifest` (size, tile size, zoom range), default view, `markers` (`town` / `zone` / `poi`, position in source-image pixels, `label`, optional `minZoom`).
+- `scripts/tile-map.mjs` (`npm run tile`) — slices `src/assets/img/world/source.png` into `src/assets/maps/world/tiles/{z}/{x}/{y}.webp`.
+- `src/styles.sass` — global Leaflet positioning override (see gotchas).
+
+## Data flow
+1. `PIXEL_CRS` makes 1 CRS unit = 1 source pixel at `maxZoom`, so marker positions are authored as raw image pixels (`x` right, `y` down → `latLng(-y, x)`).
+2. `onMapReady` waits a tick, calls `invalidateSize`, then adds the tile layer bounded to the image.
+3. Effects on `PlayerStore.unlockedContent().zones` / `.towns` add markers for unlocked entries only. `minZoom` hides a marker when zoomed out.
+4. Town marker click: `TownsStore.selectTown` + switch to the towns tab. Zone marker click: `BattleStore.setZone` + switch to battle.
+
+## Invariants & gotchas
+- **Tile gaps**: Leaflet's bundled `position: absolute` rules don't apply in this build, so `src/styles.sass` forces them on `.leaflet-pane`, `.leaflet-tile`, `.leaflet-tile-container` and related elements, plus fixed 256 px tile size. Remove it and every tile renders a tile apart and containers jump during zoom. Component-level `::ng-deep` doesn't reach these elements reliably.
+- Changing `source.png` means re-running `npm run tile` and updating `manifest` width/height (and marker positions if the art moved).
+- Marker HTML uses the CSS classes `map-marker map-marker--<type>`.
+- The skill tree uses the same Leaflet approach with plain `CRS.Simple` (see `skill-tree.md`).
+
+## Known issues
+- Marker labels are hard-coded English (`label`) instead of `zones:names` / `map:towns` keys; points of interest open a popup showing the raw `i18nKey`.
+- `setTimeout` in `onMapReady` is never cleared on destroy.
+- Map source art (`source.png` 4 MB, `source.png.kra` 10 MB) ships in the build because all of `src/assets` is copied.
+- Zones entered from town buildings never get markers (see `zones-waves-unlocks.md`).
+
+## How to extend
+New marker: add an entry to `WORLD_MAP_DATA.markers` with the source-image pixel position. A new zone marker only shows once the zone is in `unlockedContent.zones`.
