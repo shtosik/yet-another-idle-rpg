@@ -8,6 +8,7 @@ import { SkillPointID } from '../../../../../enums/ids/skill-tree-node-id.enum'
 import { ItemID } from '../../../../../enums/ids/item-id.enum'
 import { TooltipTemplateDirective } from 'ngx-tooltip-directives'
 import { StatToPercentagePipe } from '../../../../pipes/stat-to-percentage.pipe'
+import { StationID } from '../../../../../enums/ids/station-id.enum'
 import { ItemType } from '../../../../../enums/items/item-type.enum'
 import { ConsumableEffectComponent } from '../../../shared/consumable-effect/consumable-effect.component'
 
@@ -33,6 +34,7 @@ export class InventoryItemComponent {
   protected readonly SkillPointID = SkillPointID
   protected readonly ItemID = ItemID
   protected readonly ItemType = ItemType
+  protected readonly StationID = StationID
 
   get isUsable(): boolean {
     return this.item.type === ItemType.rewardsStats
@@ -40,6 +42,7 @@ export class InventoryItemComponent {
       || this.item.type === ItemType.potion
       || this.item.type === ItemType.book
       || this.item.type === ItemType.recipe
+      || this.item.type === ItemType.stationUpgrade
   }
 
   handleClick() {

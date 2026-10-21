@@ -10,8 +10,10 @@ import { TranslatePipe } from '../../../pipes/i18next.pipe'
 import { SlotComponent } from '../../shared/slot/slot.component'
 import { InventoryItemComponent } from '../../game/inventory/inventory-slot/inventory-slot.component'
 import { CloseButtonComponent } from '../../shared/close-button/close-button.component'
+import { ModalService } from '../../../services/modal.service'
+import { canInstall, isInstalled, stationUpgradeOf } from '../../../store/player/camp'
 
-type BuyBlockReason = 'stock' | 'gold' | 'inventory' | null
+type BuyBlockReason = 'stock' | 'gold' | 'inventory' | 'station' | null
 
 @Component({
   selector: 'app-shop',
@@ -23,6 +25,7 @@ type BuyBlockReason = 'stock' | 'gold' | 'inventory' | null
 export class ShopComponent implements OnInit {
   private shopStore = inject(ShopStore)
   private playerStore = inject(PlayerStore)
+  private modalService = inject(ModalService)
 
   shopId = input.required<ShopID>()
   closed = output<void>()
@@ -60,6 +63,10 @@ export class ShopComponent implements OnInit {
 
     if (this.playerStore.stats().goldCoins < entry.staticItem.price) return 'gold'
 
+    // Station gear installs on purchase and never takes a slot, but must follow the previous level.
+    const upgrade = stationUpgradeOf(entry.staticItem.itemId)
+    if (upgrade) return canInstall(this.playerStore.stations(), upgrade) ? null : 'station'
+
     const inventory = this.playerStore.inventory()
     const hasStack = inventory.some(
       slot => slot?.id === entry.staticItem.itemId && slot?.tier === entry.staticItem.tier,
@@ -89,7 +96,20 @@ export class ShopComponent implements OnInit {
       return
     }
 
-    this.playerStore.addItems([{ id: itemId, tier, amount: 1 }])
+    const installed = this.playerStore.addItems([{ id: itemId, tier, amount: 1 }])
+    installed.forEach(id => this.modalService.openStationInstalled(id))
+  }
+
+  /** Station gear the player already owns is hidden from shops. */
+  isInstalledStation(index: number): boolean {
+    const entry = this.items()[index]
+    const upgrade = entry && stationUpgradeOf(entry.staticItem.itemId)
+    return !!upgrade && isInstalled(this.playerStore.stations(), upgrade)
+  }
+
+  /** Level the station must be at before this gear can be bought. */
+  requiredStationLevel(index: number): number {
+    return (stationUpgradeOf(this.items()[index].staticItem.itemId)?.level ?? 1) - 1
   }
 
   isNonRefreshableSoldOut(index: number): boolean {

@@ -27,7 +27,9 @@ import { TownID } from '../../../enums/map/town-id.enum'
 import { DamageElement } from '../../../enums/damage-element.enum'
 import { withDevtools } from '@angular-architects/ngrx-toolkit'
 import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
-import { addItems, canFit, countItem, createInventory, ItemStack, maxAffordable, removeItems, resizeInventory } from './inventory'
+import { addItems, countItem, createInventory, ItemStack, removeItems, resizeInventory } from './inventory'
+import { canInstall, evaluateRecipe, installStations, Stations } from './camp'
+import { StationID } from '../../../enums/ids/station-id.enum'
 import { UNLOCK_RULES, UnlockCondition, UnlockTarget } from '../../../data/unlock-conditions'
 
 export type PlayerStatsType = Record<PlayerStat, number>;
@@ -53,7 +55,8 @@ interface PlayerState {
   totalTasksCompleted: number;
   explorerTokens: number;
   unlockedContent: UnlockedContent;
-  craftingUnlocked: boolean;
+  campUnlocked: boolean;
+  stations: Stations;
   skillTreeUnlocked: boolean;
   mapUnlocked: boolean;
   unlockedRecipes: RecipeID[];
@@ -75,7 +78,8 @@ export const initialState: PlayerState = {
     zones: [ZoneID.horseshoeBeach],
     towns: [],
   },
-  craftingUnlocked: false,
+  campUnlocked: false,
+  stations: {},
   skillTreeUnlocked: false,
   mapUnlocked: false,
   unlockedRecipes: [],
@@ -192,10 +196,14 @@ export const PlayerStore = signalStore(
       }))
     },
 
-    addItems(items: ItemStack[]) {
+    /** Station upgrades install instead of entering the inventory. Returns the ones installed. */
+    addItems(items: ItemStack[]): ItemID[] {
+      const { stations, rest, installed } = installStations(store.stations(), items)
       patchState(store, (state) => ({
-        inventory: addItems(state.inventory, state.stats.inventorySlots, items),
+        stations,
+        inventory: addItems(state.inventory, state.stats.inventorySlots, rest),
       }))
+      return installed
     },
 
     removeItems(items: ItemStack[]) {
@@ -343,6 +351,16 @@ export const PlayerStore = signalStore(
       store.updatePlayerStats(statsToUpdate)
     },
 
+    /** Installs station gear that was kept because it arrived out of order. Returns whether it installed. */
+    installStationItem(item: InventoryItem): boolean {
+      const itemData = ITEM_DATA[item.id]
+      if (itemData.type !== ItemType.stationUpgrade || !canInstall(store.stations(), itemData)) return false
+
+      store.removeItems([{ id: item.id, tier: item.tier, amount: 1 }])
+      store.addItems([{ id: item.id, amount: 1 }])
+      return true
+    },
+
     useItem(item: InventoryItem) {
       const itemData = ITEM_DATA[item.id]
 
@@ -378,22 +396,19 @@ export const PlayerStore = signalStore(
       })
     },
 
-    /** Crafts up to `times`, limited by ingredients. Blocked when the result has no inventory space. Returns how many were crafted. */
-    craftItem(recipeId: RecipeID, times = 1): number {
+    /**
+     * Crafts up to `times`, limited by ingredients. Blocked by station level and missing inventory space.
+     * Returns how many were crafted and which station upgrades got installed.
+     */
+    craftItem(recipeId: RecipeID, times = 1): { crafted: number, installed: ItemID[] } {
       const recipeData = RECIPES_DATA[recipeId]
-      const count = Math.min(times, maxAffordable(store.inventory(), recipeData.itemsNeeded))
-      if (count < 1) return 0
+      const { maxCraftable, blockReason } = evaluateRecipe(recipeData, store.inventory(), store.stations(), store.unlockedRecipes())
+      const count = Math.min(times, maxCraftable)
+      if (blockReason || count < 1) return { crafted: 0, installed: [] }
 
-      const ingredients = recipeData.itemsNeeded.map(({ id, amount }) => ({ id, amount: amount * count }))
-      const afterPayment = removeItems(store.inventory(), ingredients)
-      if (!canFit(afterPayment, recipeData.itemId)) return 0
-
-      patchState(store, (state) => ({
-        inventory: addItems(afterPayment, state.stats.inventorySlots, [
-          { id: recipeData.itemId, amount: recipeData.createsAmount * count },
-        ]),
-      }))
-      return count
+      store.removeItems(recipeData.itemsNeeded.map(({ id, amount }) => ({ id, amount: amount * count })))
+      const installed = store.addItems([{ id: recipeData.itemId, amount: recipeData.createsAmount * count }])
+      return { crafted: count, installed }
     },
 
     itemCount(id: ItemID): number {
@@ -433,8 +448,12 @@ export const PlayerStore = signalStore(
       return (store.unlockedContent().towns ?? []).includes(id)
     },
 
-    unlockCrafting(): void {
-      patchState(store, { craftingUnlocked: true })
+    /** Camp starts with the Workbench. */
+    unlockCamp(): void {
+      patchState(store, (state) => ({
+        campUnlocked: true,
+        stations: { [StationID.workbench]: 1, ...state.stations },
+      }))
     },
 
     unlockSkillTree(): void {
@@ -455,7 +474,7 @@ export const PlayerStore = signalStore(
         case 'town':
           return store.isTownUnlocked(target.townId)
         case 'feature':
-          return target.feature === 'crafting' ? store.craftingUnlocked() : store.skillTreeUnlocked()
+          return target.feature === 'camp' ? store.campUnlocked() : store.skillTreeUnlocked()
       }
     },
 
@@ -466,7 +485,7 @@ export const PlayerStore = signalStore(
           store.unlockMap()
           break
         case 'feature':
-          if (target.feature === 'crafting') store.unlockCrafting()
+          if (target.feature === 'camp') store.unlockCamp()
           else store.unlockSkillTree()
           break
       }

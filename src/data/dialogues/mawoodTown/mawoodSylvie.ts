@@ -4,6 +4,7 @@ import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
 import { ItemID } from '../../../enums/ids/item-id.enum'
 import { ZoneID } from '../../../enums/ids/zone-id.enum'
+import { ShopID } from '../../../enums/ids/shop-id.enum'
 
 export enum SylvieDialogue {
   default = 0,
@@ -119,6 +120,17 @@ const MAWOOD_SYLVIE: MawoodSylvieDialogueType = {
           // Nothing for the player yet — keep the conversation on the default node
           {
             next: SylvieDialogue.default,
+          },
+        ],
+      },
+      {
+        responseKey: `${NS}:default.browseWares`,
+        results: [
+          {
+            // She only trusts her tools to someone who has helped her once.
+            visibilityConditions: [{ type: 'quest', questId: QuestID.silkAndWater, questState: QuestState.completed }],
+            next: SylvieDialogue.default,
+            effects: [{ type: 'shop', shopId: ShopID.mawoodApothecary }],
           },
         ],
       },

@@ -7,6 +7,7 @@ import { UsableItemType } from 'enums/usable-item-type.enum'
 import { PlayerStat } from 'types/player/player-stat.type'
 import { RecipeID } from 'enums/ids/recipe-id.enum'
 import { ConsumableEffect } from './consumable.interface'
+import { StationID } from 'enums/ids/station-id.enum'
 
 export interface ItemData {
     id: ItemID
@@ -69,7 +70,17 @@ export interface RecipeItem extends ItemData {
     recipeId: RecipeID
 }
 
-export type Item = EquipmentItem | ResourceItem | RewardsStatsItem | QuestItem | FoodItem | BookItem | PotionItem | RecipeItem
+/** Camp gear. Installs on acquire instead of entering the inventory; needs the station at `level - 1`. */
+export interface StationUpgradeItem extends ItemData {
+    type: ItemType.stationUpgrade
+    stationId: StationID
+    level: number
+}
+
+export const isStationUpgradeItem = (item: Item): item is StationUpgradeItem =>
+    item.type === ItemType.stationUpgrade
+
+export type Item = EquipmentItem | ResourceItem | RewardsStatsItem | QuestItem | FoodItem | BookItem | PotionItem | RecipeItem | StationUpgradeItem
 
 export type UseItemProps = UseItemStatProps
 

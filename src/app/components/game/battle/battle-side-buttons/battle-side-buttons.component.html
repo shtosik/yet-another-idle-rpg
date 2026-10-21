@@ -56,4 +56,16 @@
         loading="lazy"
       ></button>
   }
+
+  <!-- Dev builds only: skips the grind for a first weapon while testing. -->
+  @if (isDevMode) {
+    <button class="auto-button cheat-button" title="Cheat: give Machete" (click)="giveCheatGear()">
+      <img
+        [ngSrc]="'./assets/img/items/machete.png'"
+        width="26"
+        height="26"
+        alt="Cheat: give Machete"
+        loading="lazy"
+      ></button>
+  }
 </aside>

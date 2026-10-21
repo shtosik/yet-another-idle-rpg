@@ -23,16 +23,21 @@ export const ShopStore = signalStore(
   withGameStateSync(STORE_KEY, initialState),
   withDevtools(STORE_KEY),
   withMethods((store, playerStore = inject(PlayerStore)) => ({
+    /** Creates runtime state on first visit, and re-aligns it when the static item list changed. */
     ensureShop(shopId: ShopID): void {
-      if (store.shops()[shopId]) return
-
+      const existing = store.shops()[shopId]
       const staticShop = SHOPS_DATA[shopId]
-      const cooldownRemainingMs = playerStore.stats().shopRefreshCooldown
+      const inSync = existing?.items.length === staticShop.items.length
+        && existing.items.every((item, i) => item.itemId === staticShop.items[i].itemId)
+      if (inSync) return
 
+      const cooldownRemainingMs = existing?.cooldownRemainingMs ?? playerStore.stats().shopRefreshCooldown
+
+      // Saved stock is matched by item id so sold-out uniques stay sold out.
       const items: ShopRuntimeItem[] = staticShop.items.map(item => ({
         itemId: item.itemId,
         tier: item.tier,
-        currentStock: item.maxStock,
+        currentStock: existing?.items.find(saved => saved.itemId === item.itemId)?.currentStock ?? item.maxStock,
       }))
 
       patchState(store, (state) => ({

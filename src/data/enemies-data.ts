@@ -94,7 +94,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     drops: [
       generateItem(ItemID.feather, 1, 2, 2),
       generateItem(ItemID.stick, 1, 1, 4),
-      generateItem(ItemID.machete, 1, 1, 1),
+      generateItem(ItemID.stone, 1, 1, 4),
       generateItem(ItemID.airRune, 1, 1, 5),
       petDrop(EnemyID.seagull),
     ],

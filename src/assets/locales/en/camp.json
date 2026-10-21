@@ -1,0 +1,49 @@
+{
+    "stations": {
+        "workbench": {
+            "name": "Workbench",
+            "levels": { "1": "Workbench", "2": "Carpenter's Tools", "3": "Carver's Bench" }
+        },
+        "cooking": {
+            "name": "Cooking",
+            "levels": { "1": "Fire Pit", "2": "Cooking Pot", "3": "Smoking Rack" }
+        },
+        "alchemy": {
+            "name": "Alchemy",
+            "levels": { "1": "Mortar & Pestle", "2": "Alembic" }
+        },
+        "runeAltar": {
+            "name": "Rune Altar",
+            "levels": { "1": "Rune Altar" }
+        }
+    },
+    "itemTypes": {
+        "resource": "Material",
+        "equipment": "Equipment",
+        "food": "Food",
+        "potion": "Potion",
+        "stationUpgrade": "Camp gear"
+    },
+    "level": "Lv {{level}}",
+    "levelProgress": "Lv {{level}} / {{max}}",
+    "owned": "Owned {{count}}",
+    "equipped": "Equipped: {{item}}",
+    "equippedNone": "Equipped: none",
+    "craft": "Craft",
+    "craftTimes": "Craft ×{{count}}",
+    "amount": "×{{count}}",
+    "max": "Max {{count}}",
+    "build": "Build {{item}}",
+    "locked": "Locked",
+    "quickCraft": "Craft one {{item}}",
+    "quickBuild": "Build {{item}}",
+    "crafted": "+{{count}} {{item}}",
+    "appliesOnCraft": "Takes effect on craft · takes no inventory slot",
+    "reasons": {
+        "stationLevel": "Requires {{station}} Lv {{level}} ({{gear}})",
+        "stationOrder": "Needs {{station}} Lv {{level}} first",
+        "missingItems": "Missing {{items}}",
+        "inventoryFull": "Inventory full · free a slot first",
+        "onlyPossible": "Only {{count}} possible"
+    }
+}

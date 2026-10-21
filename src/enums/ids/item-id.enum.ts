@@ -131,4 +131,9 @@ export enum ItemID {
     cheesePlatterRecipe = 118,
     fishApplePieRecipe = 119,
     huntersFeastRecipe = 120,
+    // camp station upgrades
+    firePit = 121,
+    cookingPot = 122,
+    mortarAndPestle = 123,
+    runeAltar = 124,
 }

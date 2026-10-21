@@ -44,7 +44,14 @@
     @if (item.type === ItemType.food || item.type === ItemType.potion) {
       <app-consumable-effect [effect]="item.effect"/>
     }
-    @if (item.type === ItemType.food || item.type === ItemType.potion || item.type === ItemType.book) {
+    @if (item.type === ItemType.stationUpgrade) {
+      @let station = ('camp:stations.' + StationID[item.stationId] + '.name') | i18next;
+      <span class="stat">{{ (item.level === 1 ? 'items:station.unlocks' : 'items:station.upgrades') | i18next:{ station, level: item.level } }}</span>
+      @if (item.level > 1) {
+        <span class="stat">{{ 'items:station.needsPrevious' | i18next:{ station, level: item.level - 1 } }}</span>
+      }
+    }
+    @if (item.type === ItemType.food || item.type === ItemType.potion || item.type === ItemType.book || item.type === ItemType.stationUpgrade) {
       <span class="click">{{ 'items:rightClickToUse' | i18next }}</span>
     }
   </div>

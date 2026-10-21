@@ -25,7 +25,7 @@ export interface TownUnlockTarget {
   townId: TownID
 }
 
-export type UnlockableFeature = 'crafting' | 'skillTree'
+export type UnlockableFeature = 'camp' | 'skillTree'
 
 export interface FeatureUnlockTarget {
   type: 'feature'
@@ -48,10 +48,10 @@ export interface UnlockRule {
 export const UNLOCK_RULES: UnlockRule[] = [
   {
     condition: { type: 'hasItem', itemId: ItemID.turtleShell },
-    target:    { type: 'feature', feature: 'crafting' },
+    target:    { type: 'feature', feature: 'camp' },
     notification: {
-      titleKey: 'unlocks:crafting.title',
-      bodyKey:  'unlocks:crafting.body',
+      titleKey: 'unlocks:camp.title',
+      bodyKey:  'unlocks:camp.body',
     },
   },
   {

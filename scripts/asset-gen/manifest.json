@@ -458,6 +458,13 @@
     "seed": 988075298,
     "date": "2026-10-21"
   },
+  "src/assets/img/items/cookingPot.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "one old dark cast iron cooking pot with a round bulging belly, three short stubby feet, a thin wire bail handle arched over the open top, rust spots on the dark iron, no lid",
+    "seed": 88320907,
+    "date": "2026-10-21"
+  },
   "src/assets/img/items/cookingRecipe.png": {
     "family": "item-pixel",
     "tier": null,
@@ -499,6 +506,13 @@
     "subject": "a loose skein of fine glowing pale silver silk thread, single object",
     "seed": 1451607053,
     "date": "2026-10-17"
+  },
+  "src/assets/img/items/firePit.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a small campfire: a closed ring of grey stones with a few crossed burning sticks in the middle and orange flames rising from them",
+    "seed": 72154605,
+    "date": "2026-10-21"
   },
   "src/assets/img/items/fishApplePie.png": {
     "family": "item-pixel",
@@ -561,6 +575,20 @@
     "tier": null,
     "subject": "one small potion bottle with a squat rounded glass body and a short neck with a cork stopper, the glass completely full of bright glowing royal blue liquid with a few tiny white sparkles, plain glass with no label and no symbol",
     "seed": 777,
+    "date": "2026-10-21"
+  },
+  "src/assets/img/items/mortarAndPestle.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "one grey stone mortar bowl with a single stone pestle resting inside it, leaning against the rim",
+    "seed": 1581558275,
+    "date": "2026-10-21"
+  },
+  "src/assets/img/items/runeAltar.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a small stepped stone altar with two square tiers, a glowing blue crystal standing on its flat top, small angular blue runes carved into the stone tiers",
+    "seed": 1702929459,
     "date": "2026-10-21"
   },
   "src/assets/img/items/silverwoodChestplate.png": {

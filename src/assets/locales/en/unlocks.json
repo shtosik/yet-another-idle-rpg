@@ -22,12 +22,30 @@
       "body": "Past the Mountain Pass the trees close in and the sky disappears. Forest spiders, gnoll war-bands and blighted saplings prowl the outer rim. Push deeper — the town of Mawood lies just ahead."
     }
   },
-  "crafting": {
-    "title": "Crafting Unlocked!",
-    "body": "You've found a turtle shell — sturdy enough to forge into real gear. The Crafting tab is now available. Combine the materials you've gathered to craft powerful equipment."
+  "camp": {
+    "title": "Camp Set Up!",
+    "body": "That turtle shell is too good to leave on the sand. You pitch a small camp and knock together a Workbench. The Camp tab is now available — craft gear there, and gather stones and sticks to build a Fire Pit for cooking."
   },
   "skillTree": {
     "title": "Level Up! Skill Tree Unlocked",
     "body": "You've grown stronger. The Skill Tree tab is now available — spend your skill points to unlock passive bonuses and sharpen your fighting style."
+  },
+  "stations": {
+    "firePit": {
+      "title": "Fire Pit Built!",
+      "body": "A ring of stones and a crackle of dry sticks — your camp finally has a fire. A Cooking tab has appeared in Camp. Grill what the sea gives you; a full belly hits harder."
+    },
+    "cookingPot": {
+      "title": "Cooking Upgraded!",
+      "body": "The trader’s old iron pot hangs over your Fire Pit now. Stews and pies are within reach — Cooking is now Lv 2."
+    },
+    "mortarAndPestle": {
+      "title": "Alchemy Unlocked!",
+      "body": "Sylvie’s spare Mortar & Pestle travels with you now. An Alchemy tab has appeared in Camp — grind herbs and water into potions."
+    },
+    "runeAltar": {
+      "title": "Rune Altar Raised!",
+      "body": "Elarion’s portable altar hums faintly when you set it down. A Rune Altar tab has appeared in Camp — bind raw materials into runes."
+    }
   }
 }

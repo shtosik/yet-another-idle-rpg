@@ -120,7 +120,11 @@
         "crabStewRecipe": "Crab Stew Recipe",
         "cheesePlatterRecipe": "Cheese Platter Recipe",
         "fishApplePieRecipe": "Fish & Apple Pie Recipe",
-        "huntersFeastRecipe": "Hunter's Feast Recipe"
+        "huntersFeastRecipe": "Hunter's Feast Recipe",
+        "firePit": "Fire Pit",
+        "cookingPot": "Cooking Pot",
+        "mortarAndPestle": "Mortar & Pestle",
+        "runeAltar": "Rune Altar"
     },
     "tiers": {
         "trash": "Trash",
@@ -137,10 +141,16 @@
     "consumable": {
         "restoresMana": "Restores {{amount}} mana",
         "duration": "Lasts {{time}}",
+        "cooldown": "Cooldown {{time}}",
         "readyIn": "Ready in {{time}}",
         "nextIn": {
             "food": "next food in {{time}}",
             "potion": "next potion in {{time}}"
         }
+    },
+    "station": {
+        "unlocks": "Unlocks {{station}}",
+        "upgrades": "Upgrades {{station}} to Lv {{level}}",
+        "needsPrevious": "Needs {{station}} Lv {{level}} first"
     }
 }

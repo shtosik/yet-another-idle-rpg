@@ -24,12 +24,12 @@
         }
       </li>
     }
-    @if (playerStore.craftingUnlocked()) {
+    @if (playerStore.campUnlocked()) {
       <li
         class="game-menu__tab"
-        (click)="changeTab.emit(GameTab.crafting)"
+        (click)="changeTab.emit(GameTab.camp)"
       >
-        {{ ('gameTabs.' + GameTab[GameTab.crafting]) | i18next }}
+        {{ ('gameTabs.' + GameTab[GameTab.camp]) | i18next }}
       </li>
     }
     <li

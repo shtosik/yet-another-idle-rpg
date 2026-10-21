@@ -7,6 +7,7 @@ import { ShopID } from '../../enums/ids/shop-id.enum'
 import { RespecConfirmComponent } from '../components/modals/respec-confirm/respec-confirm.component'
 import { UnlockNotificationComponent } from '../components/modals/unlock-notification/unlock-notification.component'
 import { UnlockNotification } from '../../data/unlock-conditions'
+import { ItemID } from '../../enums/ids/item-id.enum'
 
 @Injectable({ providedIn: 'root' })
 export class ModalService {
@@ -58,6 +59,11 @@ export class ModalService {
       disableClose: false,
       data: notification,
     })
+  }
+
+  openStationInstalled(itemId: ItemID) {
+    const key = `unlocks:stations.${ItemID[itemId]}`
+    return this.openUnlockNotification({ titleKey: `${key}.title`, bodyKey: `${key}.body` })
   }
 
   openRespecConfirm() {

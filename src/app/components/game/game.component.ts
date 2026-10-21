@@ -7,7 +7,7 @@ import { PlayerStat } from '../../../types/player/player-stat.type'
 import { TownsComponent } from './town/towns.component'
 import { InventoryWindow } from './inventory/inventory.component'
 import { EquipmentComponent } from './equipment/equipment.component'
-import { CraftingComponent } from './crafting/crafting.component'
+import { CampComponent } from './camp/camp.component'
 import { PlayerStore } from '../../store/player/player.store'
 import { PlayerStatsComponent } from './player-stats/player-stats.component'
 import { GameMenuComponent } from './game-menu/game-menu.component'
@@ -22,6 +22,7 @@ import { QuestsComponent } from './quests/quests.component'
 import { WorldMapComponent } from './world-map/world-map.component'
 import { BestiaryComponent } from './bestiary/bestiary.component'
 import { ShopStore } from '../../store/shop/shop.store'
+import { CampStore } from '../../store/camp/camp.store'
 import { SpellbookComponent } from './spellbook/spellbook.component'
 import { ZoneID } from 'enums/ids/zone-id.enum'
 
@@ -32,7 +33,6 @@ const imports = [
   TownsComponent,
   InventoryWindow,
   EquipmentComponent,
-  CraftingComponent,
   PlayerStatsComponent,
   GameMenuComponent,
   BattleComponent,
@@ -50,6 +50,7 @@ const imports = [
     WorldMapComponent,
     BestiaryComponent,
     SpellbookComponent,
+    CampComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -60,6 +61,7 @@ export class GameComponent {
   questsStore = inject(QuestsStore)
   townsStore = inject(TownsStore)
   shopStore = inject(ShopStore)
+  campStore = inject(CampStore)
   dialogueManagerService = inject(DialogueManagerService)
   gameTab = new BehaviorSubject<GameTab>(GameTab.main)
 
@@ -73,6 +75,7 @@ export class GameComponent {
     this.questsStore.resetState()
     this.townsStore.resetState()
     this.shopStore.resetState()
+    this.campStore.resetState()
   }
 
   resetQuests() {

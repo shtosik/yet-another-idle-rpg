@@ -14,6 +14,7 @@ import { BootsItemsData } from './items/boots-items.data'
 import { ResourcesItemsData } from './items/resources-items.data'
 import { RewardsItemsData } from './items/rewards-items.data'
 import { ConsumablesItemsData } from './items/consumables-items.data'
+import { StationItemsData } from './items/station-items.data'
 
 
 const ITEM_DATA: Partial<Record<ItemID, Item>> = {
@@ -31,6 +32,7 @@ const ITEM_DATA: Partial<Record<ItemID, Item>> = {
   ...PetItemsData,
   ...RewardsItemsData,
   ...ConsumablesItemsData,
+  ...StationItemsData,
 }
 
 export default ITEM_DATA

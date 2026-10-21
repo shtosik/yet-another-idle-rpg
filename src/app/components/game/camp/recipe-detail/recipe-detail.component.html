@@ -1,0 +1,97 @@
+@let v = view();
+@let item = v.item;
+@let name = ('items:names.' + ItemID[v.recipe.itemId]) | i18next;
+@let upgrade = stationUpgrade();
+
+<header class="detail__header">
+  <span class="detail__icon" [attr.data-tier]="ItemTier[item.tier]">
+    <img alt="" disableOptimizedSrcset height="34" width="34" [ngSrc]="item.url">
+  </span>
+  <div class="detail__title">
+    <h3 class="detail__name" [attr.data-tier]="ItemTier[item.tier]">{{ name }}</h3>
+    <span class="detail__type">
+      {{ ('camp:itemTypes.' + ItemType[item.type]) | i18next }} · {{ ('items:tiers.' + ItemTier[item.tier]) | i18next }}
+      @if (!upgrade) {
+        · {{ 'camp:owned' | i18next:{ count: ownedCount() } }}
+      }
+    </span>
+  </div>
+</header>
+
+<div class="detail__effects">
+  @if (equipment(); as equipment) {
+    @for (stat of equipment.stats; track stat.id) {
+      <span class="detail__effect">+{{ stat.id | statToPercentage:stat.amount }} {{ ('app:playerStats.' + stat.id) | i18next }}</span>
+    }
+    <span class="detail__sub">
+      @if (equippedName(); as equipped) {
+        {{ 'camp:equipped' | i18next:{ item: equipped } }}
+      } @else {
+        {{ 'camp:equippedNone' | i18next }}
+      }
+    </span>
+  }
+  @if (consumable(); as consumable) {
+    <app-consumable-effect class="detail__consumable" [effect]="consumable.effect"/>
+    <span class="detail__sub">{{ 'items:consumable.cooldown' | i18next:{ time: (consumable.effect.cooldown | duration) } }}</span>
+  }
+  @if (upgrade) {
+    <span class="detail__effect">{{ (upgrade.level === 1 ? 'items:station.unlocks' : 'items:station.upgrades') | i18next:{ station: stationName(upgrade.stationId), level: upgrade.level } }}</span>
+  }
+</div>
+
+<ul class="detail__ingredients">
+  @for (ingredient of ingredients(); track ingredient.id) {
+    <li class="detail__ingredient">
+      <img alt="" disableOptimizedSrcset height="18" width="18" [ngSrc]="ingredient.url">
+      <span class="detail__ingredient-name">{{ ('items:names.' + ItemID[ingredient.id]) | i18next }}</span>
+      <span class="detail__count" [class.detail__count--short]="!ingredient.enough">{{ ingredient.owned }} / {{ ingredient.needed }}</span>
+    </li>
+  }
+</ul>
+
+<div class="detail__actions">
+  <div class="detail__amounts" role="group" [attr.aria-label]="'camp:craft' | i18next">
+    @for (size of batchSizes(); track size) {
+      <button
+        class="detail__amount"
+        type="button"
+        [attr.aria-pressed]="size === batchSize()"
+        [class.detail__amount--active]="size === batchSize()"
+        (click)="selectBatchSize(size)"
+      >
+        @if (size === 'max') {
+          {{ 'camp:max' | i18next:{ count: v.evaluation.maxCraftable } }}
+        } @else {
+          {{ 'camp:amount' | i18next:{ count: size } }}
+        }
+      </button>
+    }
+  </div>
+
+  <button
+    class="detail__craft"
+    type="button"
+    [disabled]="craftCount() < 1"
+    (click)="craft.emit(craftCount())"
+  >
+    @if (craftCount() > 0) {
+      @if (upgrade) {
+        {{ 'camp:build' | i18next:{ item: name } }}
+      } @else {
+        {{ 'camp:craftTimes' | i18next:{ count: craftCount() } }}
+      }
+    } @else if (v.evaluation.blockReason === 'stationLevel') {
+      {{ 'camp:locked' | i18next }}
+    } @else {
+      {{ 'camp:craft' | i18next }}
+    }
+  </button>
+
+  <span
+    class="detail__reason"
+    role="status"
+    [class.detail__reason--blocked]="reason()?.blocked"
+    [class.detail__reason--locked]="v.evaluation.blockReason === 'stationLevel'"
+  >{{ reason()?.text }}</span>
+</div>

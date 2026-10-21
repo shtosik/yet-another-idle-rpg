@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Camp panel</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&amp;family=Silkscreen&amp;display=swap">
+<style>
+body{margin:0;background:#171717}
+a{color:#eab308}a:hover{color:#fde047}
+button{font:inherit;color:inherit;cursor:pointer}
+button:disabled{cursor:default}
+button:focus-visible{outline:2px solid #eab308;outline-offset:-2px}
+</style>
+</helmet>
+<div style="width: 768px; height: 320px; box-sizing: border-box; position: relative; display: flex; flex-direction: column; background: #262626; border: 1px solid #3a3630; border-radius: 6px; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); font-family: Roboto, sans-serif; font-size: 13px; color: #dddada; overflow: hidden">
+
+  <nav aria-label="Camp stations" style="display: flex; gap: 2px; padding: 4px 6px 0; background: #1f1f1f; border-bottom: 1px solid #3a3630; height: 36px; box-sizing: border-box">
+    <sc-for list="{{ tabs }}" as="tab" hint-placeholder-count="3">
+      <button type="button" onClick="{{ tab.pick }}" aria-pressed="{{ tab.selected }}" style="{{ tab.style }}">
+        <sc-if value="{{ tab.hammer }}" hint-placeholder-val="{{ true }}">
+          <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 10 4.5 19.5a2.1 2.1 0 0 1-3-3L11 7"></path><path d="m10 6 4-4 8 8-4 4z"></path></svg>
+        </sc-if>
+        <sc-if value="{{ tab.flame }}" hint-placeholder-val="{{ false }}">
+          <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c1 3 5 6 5 11a5 5 0 0 1-10 0c0-2.5 1.5-4 2.5-5 0 2 1 3.5 2.5 3.5 0-3.5-1-6 0-9.5z"></path></svg>
+        </sc-if>
+        <sc-if value="{{ tab.flask }}" hint-placeholder-val="{{ false }}">
+          <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6"></path><path d="M10 2v7L4.5 19a2 2 0 0 0 1.8 3h11.4a2 2 0 0 0 1.8-3L14 9V2"></path><path d="M7 15h10"></path></svg>
+        </sc-if>
+        <sc-if value="{{ tab.rune }}" hint-placeholder-val="{{ false }}">
+          <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 20 12 12 22 4 12z"></path><path d="M12 7v10"></path><path d="m9 10 3 3 3-3"></path></svg>
+        </sc-if>
+        <span style="font-family: Silkscreen, sans-serif; font-size: 12px">{{ tab.name }}</span>
+        <span style="font-size: 11px; padding: 1px 5px; border-radius: 3px; background: #333; color: #dddada">{{ tab.lvl }}</span>
+      </button>
+    </sc-for>
+  </nav>
+
+  <div style="display: flex; gap: 8px; padding: 8px; flex: 1 1 auto; min-height: 0">
+
+    <section aria-label="Recipes" style="width: 440px; flex: none; display: flex; flex-direction: column; gap: 6px; min-height: 0">
+      <div style="display: flex; justify-content: space-between; align-items: baseline; padding: 0 2px">
+        <span style="font-family: Silkscreen, sans-serif; font-size: 12px; color: #eab308">{{ header }}</span>
+        <span style="font-size: 11px; color: #a3a3a3">{{ headerLevel }}</span>
+      </div>
+      <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 3px; overflow-y: auto; flex: 1 1 auto; min-height: 0">
+        <sc-for list="{{ rows }}" as="row" hint-placeholder-count="5">
+          <li style="{{ row.style }}">
+            <button type="button" onClick="{{ row.pick }}" aria-pressed="{{ row.selected }}" style="flex: 1 1 auto; display: flex; align-items: center; gap: 8px; height: 38px; padding: 0 6px; background: none; border: 0; text-align: left; min-width: 0">
+              <span style="{{ row.iconBox }}">
+                <sc-if value="{{ row.hasImg }}" hint-placeholder-val="{{ true }}">
+                  <img src="{{ row.img }}" alt="" width="26" height="26" style="{{ row.imgStyle }}">
+                </sc-if>
+                <sc-if value="{{ row.noImg }}" hint-placeholder-val="{{ false }}">
+                  <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c1 3 5 6 5 11a5 5 0 0 1-10 0c0-2.5 1.5-4 2.5-5 0 2 1 3.5 2.5 3.5 0-3.5-1-6 0-9.5z"></path><path d="M4 22h16"></path></svg>
+                </sc-if>
+              </span>
+              <span style="{{ row.nameStyle }}">{{ row.name }}</span>
+              <span style="display: flex; gap: 6px; flex: none">
+                <sc-for list="{{ row.ings }}" as="ing" hint-placeholder-count="2">
+                  <span style="display: flex; align-items: center; gap: 1px; font-size: 11px; color: #a3a3a3">
+                    <img src="{{ ing.img }}" alt="" width="16" height="16" style="image-rendering: pixelated">{{ ing.amt }}
+                  </span>
+                </sc-for>
+              </span>
+              <span style="{{ row.badgeStyle }}">
+                <sc-if value="{{ row.locked }}" hint-placeholder-val="{{ false }}">
+                  <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="10" rx="2"></rect><path d="M8 11V8a4 4 0 0 1 8 0v3"></path></svg>
+                </sc-if>
+                {{ row.badge }}
+              </span>
+            </button>
+            <button type="button" onClick="{{ row.quick }}" disabled="{{ row.quickDisabled }}" aria-label="{{ row.quickLabel }}" title="{{ row.quickLabel }}" style="{{ row.quickStyle }}">
+              <sc-if value="{{ row.hammer }}" hint-placeholder-val="{{ false }}">
+                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 10 4.5 19.5a2.1 2.1 0 0 1-3-3L11 7"></path><path d="m10 6 4-4 8 8-4 4z"></path></svg>
+              </sc-if>
+              <sc-if value="{{ row.flame }}" hint-placeholder-val="{{ true }}">
+                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c1 3 5 6 5 11a5 5 0 0 1-10 0c0-2.5 1.5-4 2.5-5 0 2 1 3.5 2.5 3.5 0-3.5-1-6 0-9.5z"></path></svg>
+              </sc-if>
+              <sc-if value="{{ row.flask }}" hint-placeholder-val="{{ false }}">
+                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2h6"></path><path d="M10 2v7L4.5 19a2 2 0 0 0 1.8 3h11.4a2 2 0 0 0 1.8-3L14 9V2"></path><path d="M7 15h10"></path></svg>
+              </sc-if>
+              <sc-if value="{{ row.rune }}" hint-placeholder-val="{{ false }}">
+                <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 20 12 12 22 4 12z"></path><path d="M12 7v10"></path><path d="m9 10 3 3 3-3"></path></svg>
+              </sc-if>
+            </button>
+          </li>
+        </sc-for>
+      </ul>
+    </section>
+
+    <section aria-label="Recipe details" style="flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 6px; padding: 8px 10px; background: #1f1f1f; border: 1px solid #3a3630; border-radius: 6px">
+      <div style="display: flex; gap: 10px; align-items: center">
+        <span style="{{ d.iconBox }}">
+          <sc-if value="{{ d.hasImg }}" hint-placeholder-val="{{ true }}">
+            <img src="{{ d.img }}" alt="" width="34" height="34" style="image-rendering: pixelated">
+          </sc-if>
+          <sc-if value="{{ d.noImg }}" hint-placeholder-val="{{ false }}">
+            <svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2c1 3 5 6 5 11a5 5 0 0 1-10 0c0-2.5 1.5-4 2.5-5 0 2 1 3.5 2.5 3.5 0-3.5-1-6 0-9.5z"></path><path d="M4 22h16"></path></svg>
+          </sc-if>
+        </span>
+        <div style="display: flex; flex-direction: column; gap: 2px; min-width: 0">
+          <h3 style="{{ d.nameStyle }}">{{ d.name }}</h3>
+          <span style="font-size: 11px; color: #a3a3a3">{{ d.typeLine }}</span>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 1px">
+        <sc-for list="{{ d.effects }}" as="fx" hint-placeholder-count="1">
+          <span style="color: #4ade80">{{ fx }}</span>
+        </sc-for>
+        <span style="font-size: 11px; color: #a3a3a3">{{ d.subLine }}</span>
+      </div>
+
+      <ul style="list-style: none; margin: 0; padding: 6px 0 0; border-top: 1px solid #3a3630; display: flex; flex-direction: column; gap: 3px">
+        <sc-for list="{{ d.ings }}" as="ing" hint-placeholder-count="2">
+          <li style="display: flex; align-items: center; gap: 6px">
+            <img src="{{ ing.img }}" alt="" width="18" height="18" style="image-rendering: pixelated">
+            <span style="flex: 1 1 auto">{{ ing.name }}</span>
+            <span style="{{ ing.countStyle }}">{{ ing.count }}</span>
+          </li>
+        </sc-for>
+      </ul>
+
+      <div style="margin-top: auto; display: flex; flex-direction: column; gap: 5px">
+        <div role="group" aria-label="Amount" style="display: flex; gap: 3px">
+          <sc-for list="{{ d.pills }}" as="pill" hint-placeholder-count="4">
+            <button type="button" onClick="{{ pill.pick }}" aria-pressed="{{ pill.selected }}" disabled="{{ pill.disabled }}" style="{{ pill.style }}">{{ pill.label }}</button>
+          </sc-for>
+        </div>
+        <button type="button" onClick="{{ d.craft }}" disabled="{{ d.cantCraft }}" style="{{ d.craftStyle }}">{{ d.craftLabel }}</button>
+        <span role="status" style="{{ d.reasonStyle }}">{{ d.reason }}</span>
+      </div>
+    </section>
+  </div>
+
+  <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+    <div role="status" style="position: absolute; top: 44px; left: 50%; transform: translateX(-50%); padding: 6px 14px; background: #0a0a0a; border: 1px solid #eab308; border-radius: 4px; font-family: Silkscreen, sans-serif; font-size: 12px; color: #fde047; box-shadow: 0 4px 12px rgba(0,0,0,0.6)">{{ toast }}</div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"scenario":{"editor":"enum","options":["Mid game","Fresh camp"],"default":"Mid game"},"inventoryFull":{"editor":"boolean","default":false},"$preview":{"width":768,"height":320}}'>
+const IMG = {
+  fishMeat: '/_blob/57ac360fb8485a717856da6625dac900',
+  apple: '/_blob/5ebbea987364f20d3f5e9ee1400ed968',
+  crabMeat: '/_blob/b0120caefeabab938dbe7444501545e9',
+  cheese: '/_blob/abdbad03fcf272983363880a9fd55a45',
+  vialOfWater: '/_blob/ef3ae9048ab5b4217e70766f8ce825da',
+  stone: '/_blob/b77dfff9d4dfa38c363da394fd5deaab',
+  stick: '/_blob/abaa8bd59e1e88f24beab7a6a57caa8c',
+  feather: '/_blob/ffa6d230d00119db04c60b3e185327a0',
+  turtleShell: '/_blob/fbb212c53608d2a0ae4e16d84aa735c4',
+  turtleShellChest: '/_blob/a32e2ee253d3b56058015a7e00a8621c',
+  turtleShellBoots: '/_blob/a00c1cdb968ad41f85f69d33943e9669',
+  fireRune: '/_blob/126b4cf4e13c251811df06669a092e77',
+  airRune: '/_blob/ccba290deafc9c6b63ce78724853bc3a',
+  waterRune: '/_blob/89ff5bbbcda84eb812424e581f92326b',
+  slimeResidue: '/_blob/1f431600e6eeef86a5de4ee81b013d23',
+  wolfFangs: '/_blob/07abebabfe753fc2ab1b4c5e6a2a7c74',
+};
+
+const TIER = { normal: '#e5e5e5', uncommon: 'rgb(60, 179, 113)', rare: 'rgb(64, 150, 255)' };
+
+const FOOD = 'Lasts 10m · Cooldown 15m';
+const ITEMS = {
+  fishMeat: { name: 'Fish Meat', img: IMG.fishMeat },
+  apple: { name: 'Apple', img: IMG.apple },
+  crabMeat: { name: 'Crab Meat', img: IMG.crabMeat },
+  cheese: { name: 'Cheese', img: IMG.cheese },
+  vialOfWater: { name: 'Vial of Water', img: IMG.vialOfWater },
+  stone: { name: 'Stone', img: IMG.stone },
+  stick: { name: 'Stick', img: IMG.stick },
+  feather: { name: 'Feather', img: IMG.feather },
+  turtleShell: { name: 'Turtle Shell', img: IMG.turtleShell },
+  slimeResidue: { name: 'Slime Residue', img: IMG.slimeResidue },
+  wolfFangs: { name: 'Wolf Fangs', img: IMG.wolfFangs },
+
+  firePit: { name: 'Fire Pit', tier: 'normal', img: null, type: 'Station', effects: ['Installs Cooking Lv 1'], sub: 'Takes no inventory slot' },
+  turtleShellChest: { name: 'Turtle Shell Chest', tier: 'uncommon', img: IMG.turtleShellChest, type: 'Equipment · Chest', effects: ['+1 Attack Power'], sub: 'Equipped: none' },
+  turtleShellBoots: { name: 'Turtle Shell Boots', tier: 'uncommon', img: IMG.turtleShellBoots, type: 'Equipment · Boots', effects: ['+1 Attack Power'], sub: 'Equipped: none' },
+  grilledFish: { name: 'Grilled Fish', tier: 'normal', img: IMG.fishMeat, type: 'Food', effects: ['+2 Attack Power'], sub: FOOD },
+  bakedApple: { name: 'Baked Apple', tier: 'normal', img: IMG.apple, type: 'Food', effects: ['+10% Experience'], sub: FOOD },
+  cheesePlatter: { name: 'Cheese Platter', tier: 'normal', img: IMG.cheese, type: 'Food', effects: ['+3% Crit Chance'], sub: FOOD },
+  crabStew: { name: 'Crab Stew', tier: 'normal', img: IMG.crabMeat, type: 'Food', effects: ['+10% Gold'], sub: FOOD },
+  fishApplePie: { name: 'Fish & Apple Pie', tier: 'uncommon', img: IMG.apple, type: 'Food', effects: ['+0.1 Attack Speed'], sub: FOOD },
+  huntersFeast: { name: "Hunter's Feast", tier: 'uncommon', img: IMG.crabMeat, type: 'Food', effects: ['+4 Attack Power', '+10% Experience'], sub: 'Lasts 15m · Cooldown 20m' },
+  minorManaPotion: { name: 'Minor Mana Potion', tier: 'normal', img: IMG.vialOfWater, type: 'Potion', effects: ['+30 Mana'], sub: 'Instant · Cooldown 2m' },
+  fireRune: { name: 'Fire Rune', tier: 'normal', img: IMG.fireRune, type: 'Rune', effects: [], sub: 'Spell reagent' },
+  airRune: { name: 'Air Rune', tier: 'normal', img: IMG.airRune, type: 'Rune', effects: [], sub: 'Spell reagent' },
+  waterRune: { name: 'Water Rune', tier: 'normal', img: IMG.waterRune, type: 'Rune', effects: [], sub: 'Spell reagent' },
+};
+
+const STATIONS = [
+  { id: 'workbench', name: 'Workbench', icon: 'hammer', gear: ['Workbench', "Carpenter's Tools", "Carver's Bench"] },
+  { id: 'cooking', name: 'Cooking', icon: 'flame', gear: ['Fire Pit', 'Cooking Pot', 'Smoking Rack'] },
+  { id: 'alchemy', name: 'Alchemy', icon: 'flask', gear: ['Mortar & Pestle', 'Alembic'] },
+  { id: 'runeAltar', name: 'Rune Altar', icon: 'rune', gear: ['Rune Altar'] },
+];
+
+const RECIPES = [
+  { id: 'firePit', rid: 18, station: 'workbench', level: 1, out: 'firePit', amt: 1, ing: [['stone', 10], ['stick', 10]], installs: { station: 'cooking', level: 1 } },
+  { id: 'turtleShellChest', rid: 2, station: 'workbench', level: 1, out: 'turtleShellChest', amt: 1, ing: [['turtleShell', 25]] },
+  { id: 'turtleShellBoots', rid: 4, station: 'workbench', level: 1, out: 'turtleShellBoots', amt: 1, ing: [['turtleShell', 10]] },
+  { id: 'grilledFish', rid: 11, station: 'cooking', level: 1, out: 'grilledFish', amt: 1, ing: [['fishMeat', 2]] },
+  { id: 'bakedApple', rid: 12, station: 'cooking', level: 1, out: 'bakedApple', amt: 1, ing: [['apple', 2], ['cheese', 1]] },
+  { id: 'cheesePlatter', rid: 14, station: 'cooking', level: 1, out: 'cheesePlatter', amt: 1, ing: [['cheese', 3], ['apple', 1]] },
+  { id: 'crabStew', rid: 13, station: 'cooking', level: 2, out: 'crabStew', amt: 1, ing: [['crabMeat', 3], ['vialOfWater', 1]] },
+  { id: 'fishApplePie', rid: 15, station: 'cooking', level: 2, out: 'fishApplePie', amt: 1, ing: [['fishMeat', 2], ['apple', 2], ['cheese', 1]] },
+  { id: 'huntersFeast', rid: 16, station: 'cooking', level: 3, out: 'huntersFeast', amt: 1, ing: [['crabMeat', 3], ['fishMeat', 3], ['cheese', 2]] },
+  { id: 'minorManaPotion', rid: 17, station: 'alchemy', level: 1, out: 'minorManaPotion', amt: 1, ing: [['vialOfWater', 1], ['apple', 1]] },
+  { id: 'fireRune', rid: 7, station: 'runeAltar', level: 1, out: 'fireRune', amt: 1, ing: [['wolfFangs', 5]] },
+  { id: 'airRune', rid: 8, station: 'runeAltar', level: 1, out: 'airRune', amt: 1, ing: [['feather', 5]] },
+  { id: 'waterRune', rid: 10, station: 'runeAltar', level: 1, out: 'waterRune', amt: 1, ing: [['slimeResidue', 5]] },
+];
+
+function initial(scenario) {
+  if (scenario === 'Fresh camp') {
+    return {
+      tab: 'workbench', qty: 1, selected: {}, toast: null,
+      stations: { workbench: 1 },
+      inv: { stone: 14, stick: 12, turtleShell: 6, fishMeat: 7, apple: 3, cheese: 1 },
+    };
+  }
+  return {
+    tab: 'cooking', qty: 1, selected: {}, toast: null,
+    stations: { workbench: 1, cooking: 2, alchemy: 1, runeAltar: 1 },
+    inv: {
+      fishMeat: 24, apple: 7, cheese: 3, crabMeat: 2, vialOfWater: 4, stone: 18, stick: 12,
+      turtleShell: 14, feather: 9, wolfFangs: 3, slimeResidue: 11,
+      grilledFish: 4, bakedApple: 1, fireRune: 6, airRune: 2,
+    },
+  };
+}
+
+const TAB_ON = 'display: flex; align-items: center; gap: 6px; padding: 0 12px; height: 32px; border: 0; border-radius: 4px 4px 0 0; background: #262626; color: #eab308; box-shadow: inset 0 2px 0 #eab308';
+const TAB_OFF = 'display: flex; align-items: center; gap: 6px; padding: 0 12px; height: 32px; border: 0; border-radius: 4px 4px 0 0; background: transparent; color: #dddada';
+const PILL = 'flex: 1 1 0; height: 26px; border-radius: 3px; font-size: 12px; ';
+
+class Component extends DCLogic {
+  data() {
+    const scenario = this.props.scenario ?? 'Mid game';
+    return (this.state && this.state[scenario]) || initial(scenario);
+  }
+
+  patch(p) {
+    const scenario = this.props.scenario ?? 'Mid game';
+    this.setState({ [scenario]: { ...this.data(), ...p } });
+  }
+
+  view(r, s, full) {
+    const lvl = s.stations[r.station] || 0;
+    const locked = r.level > lvl;
+    let max = Math.min(...r.ing.map(([id, a]) => Math.floor((s.inv[id] || 0) / a)));
+    if (r.installs) max = Math.min(max, 1);
+    const noRoom = full && !r.installs;
+    const canCraft = !locked && max >= 1 && !noRoom;
+    const rank = locked ? 2 : max >= 1 ? 0 : 1;
+    return { r, item: ITEMS[r.out], locked, max, noRoom, canCraft, rank };
+  }
+
+  craft(r, n) {
+    const s = this.data();
+    if (n < 1) return;
+    const inv = { ...s.inv };
+    r.ing.forEach(([id, a]) => { inv[id] = (inv[id] || 0) - a * n; });
+    let stations = s.stations;
+    let toast;
+    if (r.installs) {
+      stations = { ...stations, [r.installs.station]: r.installs.level };
+      const st = STATIONS.find(x => x.id === r.installs.station);
+      toast = ITEMS[r.out].name + ' built · ' + st.name + ' unlocked';
+    } else {
+      inv[r.out] = (inv[r.out] || 0) + r.amt * n;
+      toast = '+' + r.amt * n + ' ' + ITEMS[r.out].name;
+    }
+    this.patch({ inv, stations, toast });
+    clearTimeout(this._t);
+    this._t = setTimeout(() => this.patch({ toast: null }), 1800);
+  }
+
+  componentWillUnmount() { clearTimeout(this._t); }
+
+  renderVals() {
+    const s = this.data();
+    const full = this.props.inventoryFull ?? false;
+
+    const owned = STATIONS.filter(st => (s.stations[st.id] || 0) > 0);
+    const tabId = owned.some(o => o.id === s.tab) ? s.tab : owned[0].id;
+    const station = STATIONS.find(st => st.id === tabId);
+    const lvl = s.stations[tabId];
+
+    const tabs = owned.map(st => ({
+      name: st.name,
+      lvl: 'Lv ' + s.stations[st.id],
+      selected: st.id === tabId,
+      style: st.id === tabId ? TAB_ON : TAB_OFF,
+      pick: () => this.patch({ tab: st.id }),
+      hammer: st.icon === 'hammer', flame: st.icon === 'flame', flask: st.icon === 'flask', rune: st.icon === 'rune',
+    }));
+
+    const views = RECIPES
+      .filter(r => r.station === tabId)
+      .filter(r => !(r.installs && (s.stations[r.installs.station] || 0) >= r.installs.level))
+      .map(r => this.view(r, s, full))
+      .sort((a, b) => a.r.rid - b.r.rid);
+
+    const selId = views.some(v => v.r.id === s.selected[tabId]) ? s.selected[tabId] : views[0].r.id;
+    const sel = views.find(v => v.r.id === selId);
+
+    const rows = views.map(v => {
+      const isSel = v.r.id === selId;
+      const muted = v.locked || v.max < 1;
+      return {
+        name: v.item.name,
+        selected: isSel,
+        img: v.item.img,
+        hasImg: !!v.item.img,
+        noImg: !v.item.img,
+        imgStyle: 'image-rendering: pixelated; opacity: ' + (v.locked ? 0.45 : 1),
+        iconBox: 'width: 30px; height: 30px; flex: none; display: flex; align-items: center; justify-content: center; border-radius: 4px; background: #1a1a1a; border: 1px solid ' + TIER[v.item.tier],
+        nameStyle: 'flex: 1 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: ' + (muted ? '#a3a3a3' : '#f5f5f5'),
+        ings: v.r.ing.map(([id, a]) => ({ img: ITEMS[id].img, amt: '×' + a })),
+        locked: v.locked,
+        badge: v.locked ? String(v.r.level) : '×' + Math.max(v.max, 0),
+        badgeStyle: 'flex: none; width: 40px; display: flex; align-items: center; justify-content: flex-end; gap: 3px; font-size: 12px; font-weight: 500; color: ' +
+          (v.locked ? '#fb923c' : v.max >= 1 ? '#4ade80' : '#a3a3a3'),
+        style: 'display: flex; align-items: center; border-radius: 4px; background: ' + (isSel ? '#1a1a1a' : '#2c2c2c') +
+          '; box-shadow: ' + (isSel ? 'inset 0 0 0 1px #eab308' : 'none'),
+        pick: () => this.patch({ selected: { ...s.selected, [tabId]: v.r.id } }),
+        quick: () => this.craft(v.r, 1),
+        quickDisabled: !v.canCraft,
+        quickLabel: (v.r.installs ? 'Build ' : 'Craft one ') + v.item.name,
+        hammer: station.icon === 'hammer', flame: station.icon === 'flame', flask: station.icon === 'flask', rune: station.icon === 'rune',
+        quickStyle: 'flex: none; width: 32px; height: 32px; margin-right: 3px; border: 0; border-radius: 3px; display: flex; align-items: center; justify-content: center; background: ' +
+          (v.canCraft ? '#422006' : 'transparent') + '; color: ' + (v.canCraft ? '#fde047' : '#555'),
+      };
+    });
+
+    const qty = s.qty;
+    const n = !sel.canCraft ? 0 : qty === 'max' ? sel.max : Math.min(qty, sel.max);
+    const per = Math.max(n, 1);
+    const pillDefs = sel.r.installs ? [1] : [1, 5, 10, 'max'];
+    const pills = pillDefs.map(q => {
+      const on = q === qty || (sel.r.installs && q === 1);
+      return {
+        label: q === 'max' ? 'Max ' + Math.max(sel.max, 0) : '×' + q,
+        selected: on,
+        disabled: false,
+        pick: () => this.patch({ qty: q }),
+        style: PILL + (on ? 'border: 1px solid #eab308; background: #422006; color: #fef9c3' : 'border: 1px solid #3a3630; background: #2c2c2c; color: #dddada'),
+      };
+    });
+
+    let reason = '';
+    let reasonColor = '#a3a3a3';
+    if (sel.locked) {
+      reason = 'Requires ' + station.name + ' Lv ' + sel.r.level + ' (' + station.gear[sel.r.level - 1] + ')';
+      reasonColor = '#fb923c';
+    } else if (sel.max < 1) {
+      const missing = sel.r.ing.filter(([id, a]) => (s.inv[id] || 0) < a).map(([id, a]) => (a - (s.inv[id] || 0)) + ' ' + ITEMS[id].name);
+      reason = 'Missing ' + missing.join(', ');
+      reasonColor = '#f87171';
+    } else if (sel.noRoom) {
+      reason = 'Inventory full · free a slot first';
+      reasonColor = '#f87171';
+    } else if (qty !== 'max' && qty > sel.max) {
+      reason = 'Only ' + sel.max + ' possible';
+    } else if (sel.r.installs) {
+      reason = 'Installs on craft';
+    }
+
+    const item = sel.item;
+    const ownedOut = s.inv[sel.r.out] || 0;
+    const d = {
+      name: item.name,
+      nameStyle: 'margin: 0; font-family: Silkscreen, sans-serif; font-size: 14px; font-weight: 400; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: ' + TIER[item.tier],
+      typeLine: item.type + ' · ' + item.tier + (sel.r.installs ? '' : ' · Owned ' + ownedOut),
+      img: item.img, hasImg: !!item.img, noImg: !item.img,
+      iconBox: 'width: 42px; height: 42px; flex: none; display: flex; align-items: center; justify-content: center; border-radius: 4px; background: #141414; border: 1px solid ' + TIER[item.tier],
+      effects: item.effects,
+      subLine: item.sub,
+      ings: sel.r.ing.map(([id, a]) => {
+        const have = s.inv[id] || 0;
+        const need = a * per;
+        return {
+          img: ITEMS[id].img, name: ITEMS[id].name,
+          count: have + ' / ' + need,
+          countStyle: 'font-variant-numeric: tabular-nums; font-weight: 500; color: ' + (have >= need ? '#4ade80' : '#f87171'),
+        };
+      }),
+      pills,
+      cantCraft: !sel.canCraft,
+      craft: () => this.craft(sel.r, n),
+      craftLabel: sel.canCraft ? (sel.r.installs ? 'Build ' + item.name : 'Craft ×' + n) : sel.locked ? 'Locked' : 'Craft',
+      craftStyle: 'height: 32px; border: 0; border-radius: 4px; font-family: Silkscreen, sans-serif; font-size: 13px; ' +
+        (sel.canCraft ? 'background: #eab308; color: #0a0a0a' : 'background: #333; color: #a3a3a3'),
+      reason,
+      reasonStyle: 'min-height: 15px; font-size: 11px; color: ' + reasonColor,
+    };
+
+    const nextGear = station.gear[lvl];
+    return {
+      tabs, rows, d,
+      header: station.gear[lvl - 1] === station.name ? station.name : station.name + ' · ' + station.gear[lvl - 1],
+      headerLevel: 'Lv ' + lvl + ' / ' + station.gear.length + (nextGear ? ' · next: ' + nextGear : ''),
+      hasToast: !!s.toast,
+      toast: s.toast || '',
+    };
+  }
+}
+</script>
+</body>
+</html>

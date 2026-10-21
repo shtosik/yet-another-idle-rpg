@@ -1,0 +1,105 @@
+<section class="camp">
+  <nav class="camp__tabs" [attr.aria-label]="'gameTabs.camp' | i18next">
+    @for (entry of stations(); track entry.station.id) {
+      @let stationKey = StationID[entry.station.id];
+      <button
+        class="camp__tab"
+        type="button"
+        [attr.aria-pressed]="entry.station.id === activeStation()?.station?.id"
+        [class.camp__tab--active]="entry.station.id === activeStation()?.station?.id"
+        (click)="selectStation(entry.station.id)"
+      >
+        <app-station-icon [stationId]="entry.station.id"/>
+        <span>{{ ('camp:stations.' + stationKey + '.name') | i18next }}</span>
+        <span class="camp__tab-level">{{ 'camp:level' | i18next:{ level: entry.level } }}</span>
+      </button>
+    }
+  </nav>
+
+  @if (activeStation(); as active) {
+    @let stationKey = StationID[active.station.id];
+    @let stationName = ('camp:stations.' + stationKey + '.name') | i18next;
+    @let gear = ('camp:stations.' + stationKey + '.levels.' + active.level) | i18next;
+
+    <div class="camp__body">
+      <section class="camp__recipes">
+        <header class="camp__recipes-header">
+          <span class="camp__station-name">{{ gear === stationName ? stationName : stationName + ' · ' + gear }}</span>
+          <span class="camp__station-level">{{ 'camp:levelProgress' | i18next:{ level: active.level, max: active.station.maxLevel } }}</span>
+        </header>
+
+        <ul class="camp__list">
+          @for (view of recipes(); track view.recipe.id) {
+            @let itemName = ('items:names.' + ItemID[view.recipe.itemId]) | i18next;
+            @let locked = view.evaluation.blockReason === 'stationLevel';
+            @let canCraft = view.evaluation.maxCraftable > 0;
+            @let isStation = view.item.type === ItemType.stationUpgrade;
+
+            <li
+              class="row"
+              [class.row--selected]="view.recipe.id === selectedRecipe()?.recipe?.id"
+            >
+              <button
+                class="row__select"
+                type="button"
+                [attr.aria-pressed]="view.recipe.id === selectedRecipe()?.recipe?.id"
+                (click)="selectRecipe(view)"
+              >
+                <span class="row__icon" [attr.data-tier]="ItemTier[view.item.tier]" [class.row__icon--locked]="locked">
+                  <img alt="" disableOptimizedSrcset height="26" width="26" [ngSrc]="view.item.url">
+                </span>
+                <span class="row__name" [class.row__name--muted]="!canCraft">{{ itemName }}</span>
+                <span class="row__ingredients">
+                  @for (ingredient of view.recipe.itemsNeeded; track ingredient.id) {
+                    <span class="row__ingredient">
+                      <img alt="" disableOptimizedSrcset height="16" width="16" [ngSrc]="ITEM_DATA[ingredient.id]!.url">
+                      ×{{ ingredient.amount }}
+                    </span>
+                  }
+                </span>
+                <span
+                  class="row__badge"
+                  [class.row__badge--locked]="locked"
+                  [class.row__badge--ready]="canCraft"
+                >
+                  @if (locked) {
+                    <svg aria-hidden="true" fill="none" height="12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="12">
+                      <rect height="10" rx="2" width="14" x="5" y="11"/>
+                      <path d="M8 11V8a4 4 0 0 1 8 0v3"/>
+                    </svg>
+                    {{ view.recipe.stationLevel }}
+                  } @else {
+                    ×{{ view.evaluation.maxCraftable }}
+                  }
+                </span>
+              </button>
+              <button
+                class="row__quick"
+                type="button"
+                [attr.aria-label]="(isStation ? 'camp:quickBuild' : 'camp:quickCraft') | i18next:{ item: itemName }"
+                [disabled]="!canCraft"
+                [title]="(isStation ? 'camp:quickBuild' : 'camp:quickCraft') | i18next:{ item: itemName }"
+                (click)="craft(view, 1)"
+              >
+                <app-station-icon [stationId]="active.station.id"/>
+              </button>
+            </li>
+          }
+        </ul>
+      </section>
+
+      @if (selectedRecipe(); as view) {
+        <app-recipe-detail
+          class="camp__detail"
+          [stationLevel]="active.level"
+          [view]="view"
+          (craft)="craft(view, $event)"
+        />
+      }
+    </div>
+  }
+
+  @if (toast(); as message) {
+    <div class="camp__toast" role="status">{{ message }}</div>
+  }
+</section>

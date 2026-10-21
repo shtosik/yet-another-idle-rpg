@@ -1,7 +1,8 @@
 {
   "names": {
     "laHarparShop": "Trader's Wares",
-    "mawoodMagicShop": "Elarion's Curiosities"
+    "mawoodMagicShop": "Elarion's Curiosities",
+    "mawoodApothecary": "Sylvie’s Apothecary"
   },
   "ui": {
     "nextRefresh": "Next refresh in {{time}}",
@@ -11,6 +12,7 @@
     "notEnoughGold": "Need {{amount}}g",
     "price": "{{amount}}g",
     "stock": "{{current}} / {{max}}",
-    "buy": "Buy"
+    "buy": "Buy",
+    "needsStation": "Needs Lv {{level}}"
   }
 }
