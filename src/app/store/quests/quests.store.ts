@@ -11,13 +11,11 @@ import { ItemStack } from '../player/inventory'
 
 export interface QuestsState {
   questStepProgression: QuestProgression
-  completedQuests: Partial<Record<QuestID, boolean>>
   dialogueFlags: Record<string, boolean>
 }
 
 export const initialState: QuestsState = {
   questStepProgression: {},
-  completedQuests: {},
   dialogueFlags: {},
 }
 
@@ -49,10 +47,6 @@ export const QuestsStore = signalStore(
         }
       })
 
-      patchState(store, (state) => ({
-        completedQuests: { ...state.completedQuests, [data.questId]: true },
-      }))
-
       modalService.openQuestCompleted(data)
       playerStore.updatePlayerStats(statsToUpdate)
       playerStore.addItems(itemsToUpdate)
@@ -71,10 +65,6 @@ export const QuestsStore = signalStore(
 
       getQuestStep(questId: QuestID) {
         return store.questStepProgression()[questId]
-      },
-
-      getQuestStepData(questId: QuestID, step: number) {
-        return QUEST_DATA[questId].steps[step - 1] // -1 because its 0-indexed, but saved steps start from 1
       },
 
       setDialogueFlag(flag: string) {
@@ -114,16 +104,6 @@ export const QuestsStore = signalStore(
 
       hasQuestStarted(questId: QuestID) {
         return !!store.questStepProgression()[questId]
-      },
-
-      checkStep(questId: QuestID, step?: number) {
-        const isQuestActive = store.questStepProgression()[questId]
-
-        if (step) {
-          return isQuestActive && isQuestActive === step
-        }
-
-        return !!isQuestActive
       },
     }),
   ),
