@@ -1,3 +1,5 @@
+> **Archived 2026-10-21: superseded by [docs/systems/world-map.md](../systems/world-map.md).** Historical plan or analysis, not current behavior.
+
 # Map system — analysis
 
 ## Goal

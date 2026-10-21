@@ -1,3 +1,5 @@
+> **Archived 2026-10-21: superseded by [docs/systems/spells-and-buffs.md](../systems/spells-and-buffs.md).** Historical plan or analysis, not current behavior.
+
 # Magic Shop + Spellbook — Implementation Plan
 
 ## Context

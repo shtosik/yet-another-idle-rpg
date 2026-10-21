@@ -1,3 +1,5 @@
+> **Archived 2026-10-21: superseded by [docs/systems/zones-waves-unlocks.md](../systems/zones-waves-unlocks.md).** Historical plan or analysis, not current behavior.
+
 # Plan: Zone Unlock System via Boss-Kill Progression
 
 ## Context

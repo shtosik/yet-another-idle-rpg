@@ -1,3 +1,5 @@
+> **Archived 2026-10-21: superseded by [docs/systems/spells-and-buffs.md](../systems/spells-and-buffs.md).** Historical plan or analysis, not current behavior.
+
 # Buff Spell System — Analysis
 
 ## How it currently works

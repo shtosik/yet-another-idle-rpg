@@ -1,3 +1,5 @@
+> **Archived 2026-10-21: superseded by [docs/systems/enemies-shiny-pets-bestiary.md](../systems/enemies-shiny-pets-bestiary.md).** Historical plan or analysis, not current behavior.
+
 # Shiny Monster Mechanic — Implementation Plan
 
 > **Pitch:** Once unlocked via a new exploration skill, every enemy spawn has a small

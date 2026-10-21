@@ -1,3 +1,5 @@
+> **Archived 2026-10-21: abandoned.** Runes are not a spell cost; see [docs/ideas/README.md](../ideas/README.md) for current rune ideas. Historical plan, not current behavior.
+
 # Runes System — Implementation Plan
 
 ## Goal

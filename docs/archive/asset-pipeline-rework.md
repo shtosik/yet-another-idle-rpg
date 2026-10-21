@@ -1,3 +1,5 @@
+> **Archived 2026-10-21: superseded by [docs/systems/asset-pipeline.md](../systems/asset-pipeline.md).** Historical plan or analysis, not current behavior.
+
 # Asset pipeline rework: `generate` module + Style Family registry
 
 ## Context

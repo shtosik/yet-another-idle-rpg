@@ -1,3 +1,5 @@
+> **Archived 2026-10-21: superseded by [docs/systems/towns-shops-guild.md](../systems/towns-shops-guild.md).** Historical plan or analysis, not current behavior.
+
 # Shop Feature — Implementation Plan
 
 > **Trigger:** Trader's `default.opt2` dialogue option ("Show me your wares") already fires

@@ -1,3 +1,5 @@
+> **Archived 2026-10-21: superseded by [docs/systems/skill-tree.md](../systems/skill-tree.md).** Historical plan or analysis, not current behavior.
+
 # Skill tree system — analysis
 
 ## Goal

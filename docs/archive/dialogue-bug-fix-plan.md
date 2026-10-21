@@ -1,3 +1,5 @@
+> **Archived 2026-10-21: superseded by [docs/systems/dialogue.md](../systems/dialogue.md).** Historical plan or analysis, not current behavior.
+
 # Dialogue System — Bug-Fix Plan
 
 > **Source:** `docs/analysis/dialogue-system-analysis.md` §5 and §6.
