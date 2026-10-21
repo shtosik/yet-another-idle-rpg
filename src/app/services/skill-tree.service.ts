@@ -12,7 +12,7 @@ import { PlayerStat } from '../../types/player/player-stat.type'
 import { SpellID } from '../../enums/ids/spell-id.enum'
 
 @Injectable({ providedIn: 'root' })
-export class PlayerManagerService {
+export class SkillTreeService {
   private battleStore = inject(BattleStore)
   private playerStore = inject(PlayerStore)
 
@@ -65,8 +65,8 @@ export class PlayerManagerService {
     return canRefundNode(id, levels, this.playerStore.unlockedNodes(), SKILL_TREE_GRAPH)
   }
 
-  refundGoldCost(pointsReturned: number): number {
-    return pointsReturned * SKILL_TREE_DATA.respec.perPointGoldCost
+  refundGoldCost(levelsRefunded: number): number {
+    return levelsRefunded * SKILL_TREE_DATA.respec.goldCostPerLevel
   }
 
   refundNode(id: SkillNodeID, levels: number | 'all'): boolean {
@@ -76,11 +76,11 @@ export class PlayerManagerService {
     const check = this.previewRefund(id, levels)
     if (!check.ok) return false
 
-    const goldCost = this.refundGoldCost(check.pointsReturned)
+    const goldCost = this.refundGoldCost(check.levelsRefunded)
     const stats = this.playerStore.stats()
     if (stats.goldCoins < goldCost) return false
 
-    const refundedLevels = check.pointsReturned
+    const refundedLevels = check.levelsRefunded
     const currentLevel = this.playerStore.unlockedNodes()[id] || 0
     const newLevel = currentLevel - refundedLevels
 
@@ -121,7 +121,7 @@ export class PlayerManagerService {
       allocatedLevels += level
       skillPointsToReturn += level * node.skillPointCost
     }
-    const goldCost = SKILL_TREE_DATA.respec.fullResetGoldCost({ allocatedPointCount: allocatedLevels })
+    const goldCost = SKILL_TREE_DATA.respec.fullResetGoldCost({ allocatedLevels: allocatedLevels })
     const canAfford = this.playerStore.stats().goldCoins >= goldCost
     return { allocatedLevels, skillPointsToReturn, goldCost, canAfford }
   }
@@ -149,7 +149,7 @@ export class PlayerManagerService {
 
     if (allocatedLevels === 0) return false
 
-    const goldCost = SKILL_TREE_DATA.respec.fullResetGoldCost({ allocatedPointCount: allocatedLevels })
+    const goldCost = SKILL_TREE_DATA.respec.fullResetGoldCost({ allocatedLevels: allocatedLevels })
     if (this.playerStore.stats().goldCoins < goldCost) return false
 
     this.playerStore.updatePlayerStats([

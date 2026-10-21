@@ -6,7 +6,7 @@ import { SKILL_TREE_GRAPH } from 'data/skill-tree-graph'
 import { SkillNodeID } from 'enums/ids/skill-node-id.enum'
 import { SkillBranch } from 'enums/ids/skill-branch.enum'
 import { SkillNode } from 'interfaces/skill-tree/skill-node.interface'
-import { PlayerManagerService } from 'app/services/player-manager.service'
+import { SkillTreeService } from 'app/services/skill-tree.service'
 import { ModalService } from 'app/services/modal.service'
 import { isRequirementMet } from 'utils/skill-tree-requirements'
 import { I18nextPipe } from 'app/pipes/i18next.pipe'
@@ -27,9 +27,9 @@ const EDGE_STYLE: Record<'locked' | 'available' | 'allocated', { color: string; 
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SkillTreeComponent {
-  private readonly playerManagerService = inject(PlayerManagerService)
+  private readonly skillTreeService = inject(SkillTreeService)
   private readonly modalService = inject(ModalService)
-  private readonly unlockedNodes = this.playerManagerService.unlockedNodes
+  private readonly unlockedNodes = this.skillTreeService.unlockedNodes
 
   private map!: L.Map
   private readonly markersById = new Map<SkillNodeID, L.Marker>()
@@ -73,12 +73,12 @@ export class SkillTreeComponent {
       })
       marker.on('click', (ev) => {
         const orig = ev.originalEvent as MouseEvent
-        this.playerManagerService.buyNode(node.id, orig.ctrlKey)
+        this.skillTreeService.buyNode(node.id, orig.ctrlKey)
       })
       marker.on('contextmenu', (ev) => {
         const orig = ev.originalEvent as MouseEvent
         orig.preventDefault()
-        this.playerManagerService.refundNode(node.id, orig.ctrlKey ? 'all' : 1)
+        this.skillTreeService.refundNode(node.id, orig.ctrlKey ? 'all' : 1)
       })
       marker.bindTooltip(this.buildTooltip(node, 0, 'locked'), {
         direction: 'right',
@@ -120,7 +120,7 @@ export class SkillTreeComponent {
       let state: NodeState
       if (level >= node.maxLevel) state = 'maxed'
       else if (level > 0) state = 'allocated'
-      else if (isRequirementMet(node.unlockRequirements, unlocked))
+      else if (isRequirementMet(node.requires, unlocked))
         state = 'available'
       else state = 'locked'
       stateById.set(node.id, state)
@@ -173,9 +173,9 @@ export class SkillTreeComponent {
 
     let refundLine = ''
     if (level > 0) {
-      const check = this.playerManagerService.previewRefund(node.id, 1)
+      const check = this.skillTreeService.previewRefund(node.id, 1)
       if (check.ok) {
-        const goldCost = this.playerManagerService.refundGoldCost(check.pointsReturned)
+        const goldCost = this.skillTreeService.refundGoldCost(check.levelsRefunded)
         refundLine = `<div class="skill-tooltip__refund">Right-click: refund 1 (${goldCost} gold)</div>`
       } else if ('reason' in check && check.reason === 'blocked-by') {
         const blockerNames = check.blockers

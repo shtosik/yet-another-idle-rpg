@@ -3,7 +3,7 @@ import { SkillTreeGraph } from 'data/skill-tree-graph'
 import { isRequirementMet } from 'utils/skill-tree-requirements'
 
 export type CanRefundResult =
-    | { ok: true; pointsReturned: number }
+    | { ok: true; levelsRefunded: number }
     | { ok: false; reason: 'not-allocated' | 'blocked-by'; blockers: SkillNodeID[] }
 
 export function canRefundNode(
@@ -28,9 +28,9 @@ export function canRefundNode(
         if ((unlocked[dependentId] ?? 0) === 0) continue
         const dep = graph.nodes.get(dependentId)
         if (!dep) continue
-        if (!isRequirementMet(dep.unlockRequirements, next)) blockers.push(dependentId)
+        if (!isRequirementMet(dep.requires, next)) blockers.push(dependentId)
     }
 
     if (blockers.length > 0) return { ok: false, reason: 'blocked-by', blockers }
-    return { ok: true, pointsReturned: dropAmount }
+    return { ok: true, levelsRefunded: dropAmount }
 }

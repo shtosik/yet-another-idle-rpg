@@ -187,7 +187,7 @@ for (const town of Object.values(D.TOWNS_DATA)) {
 for (const skill of Object.values(D.ALL_SKILLS)) {
   const reqs = []
   const collect = r => { if (!r) return; if (r.kind === 'node') reqs.push(r.id); else r.of.forEach(collect) }
-  collect(skill.unlockRequirements)
+  collect(skill.requires)
   for (const id of reqs) {
     if (!has(D.ALL_SKILLS, id)) error('src/data/skill-tree-data.ts', `${idName(D.SkillNodeID, skill.id)} requires unknown node ${id}`)
   }

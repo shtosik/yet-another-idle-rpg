@@ -1,7 +1,7 @@
-import { SkillNode, UnlockRequirement } from 'interfaces/skill-tree/skill-node.interface'
+import { SkillNode, NodeRequirement } from 'interfaces/skill-tree/skill-node.interface'
 
 export function isRequirementMet(
-    req: UnlockRequirement | null,
+    req: NodeRequirement | null,
     unlocked: Readonly<Record<number, number>>,
 ): boolean {
     if (req === null) return true
@@ -24,7 +24,7 @@ export function canBuyNode(
     const currentLevel = unlocked[node.id] ?? 0
     if (currentLevel >= node.maxLevel) return { ok: false, reason: 'maxed' }
     if (unspentSkillPoints < node.skillPointCost) return { ok: false, reason: 'cost' }
-    if (currentLevel === 0 && !isRequirementMet(node.unlockRequirements, unlocked)) {
+    if (currentLevel === 0 && !isRequirementMet(node.requires, unlocked)) {
         return { ok: false, reason: 'locked' }
     }
     return { ok: true }

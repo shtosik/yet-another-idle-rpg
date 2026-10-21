@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { MatDialogRef } from '@angular/material/dialog'
 import { I18nextPipe } from '../../../pipes/i18next.pipe'
 import { CloseButtonComponent } from '../../shared/close-button/close-button.component'
-import { PlayerManagerService } from '../../../services/player-manager.service'
+import { SkillTreeService } from '../../../services/skill-tree.service'
 
 @Component({
     selector: 'app-respec-confirm',
@@ -13,9 +13,9 @@ import { PlayerManagerService } from '../../../services/player-manager.service'
 })
 export class RespecConfirmComponent {
     private readonly modalRef = inject(MatDialogRef)
-    private readonly playerManagerService = inject(PlayerManagerService)
+    private readonly skillTreeService = inject(SkillTreeService)
 
-    preview = computed(() => this.playerManagerService.respecPreview())
+    preview = computed(() => this.skillTreeService.respecPreview())
 
     canExecute = computed(() => {
         const p = this.preview()
@@ -24,7 +24,7 @@ export class RespecConfirmComponent {
 
     confirm(): void {
         if (!this.canExecute()) return
-        this.playerManagerService.respecEntireTree()
+        this.skillTreeService.respecEntireTree()
         this.modalRef.close()
     }
 

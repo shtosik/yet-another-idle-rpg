@@ -1,7 +1,7 @@
 import { ALL_SKILLS } from 'data/skill-tree-data'
 import { SkillNodeID } from 'enums/ids/skill-node-id.enum'
 import { SkillBranch } from 'enums/ids/skill-branch.enum'
-import { SkillNode, SkillNodePosition, UnlockRequirement } from 'interfaces/skill-tree/skill-node.interface'
+import { SkillNode, SkillNodePosition, NodeRequirement } from 'interfaces/skill-tree/skill-node.interface'
 
 export interface SkillTreeGraph {
     nodes: ReadonlyMap<SkillNodeID, SkillNode>
@@ -20,7 +20,7 @@ const BRANCH_LAUNCH: Record<SkillBranch, number> = {
     [SkillBranch.magic]: 30,
 }
 
-function collectNodeRefs(req: UnlockRequirement | null, out: Set<SkillNodeID>): void {
+function collectNodeRefs(req: NodeRequirement | null, out: Set<SkillNodeID>): void {
     if (req === null) return
     switch (req.kind) {
         case 'node':
@@ -139,7 +139,7 @@ function buildGraph(): SkillTreeGraph {
 
     for (const [id, node] of nodes) {
         const prereqs = new Set<SkillNodeID>()
-        collectNodeRefs(node.unlockRequirements, prereqs)
+        collectNodeRefs(node.requires, prereqs)
         outgoingPrereqs.set(id, prereqs)
         for (const prereqId of prereqs) {
             let dependents = forwardEdges.get(prereqId)

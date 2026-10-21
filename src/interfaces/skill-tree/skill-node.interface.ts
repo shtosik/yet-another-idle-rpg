@@ -9,10 +9,10 @@ export interface SkillNodePosition {
     y: number
 }
 
-export type UnlockRequirement =
+export type NodeRequirement =
     | { kind: 'node'; id: SkillNodeID; minLevel: number }
-    | { kind: 'all'; of: UnlockRequirement[] }
-    | { kind: 'any'; of: UnlockRequirement[] }
+    | { kind: 'all'; of: NodeRequirement[] }
+    | { kind: 'any'; of: NodeRequirement[] }
 
 export interface SkillNode {
     id: SkillNodeID
@@ -26,7 +26,7 @@ export interface SkillNode {
     turn?: number
     skillPointCost: number
     maxLevel: number
-    unlockRequirements: UnlockRequirement | null
+    requires: NodeRequirement | null
     url: string
     type: SkillNodeType
     stat?: PlayerStat
