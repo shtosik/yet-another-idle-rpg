@@ -203,7 +203,7 @@ export const BattleStore = signalStore(
       }))
     },
 
-    /** Advances buffs and slot locks by one second. Returns the stats of buffs that just expired. */
+    /** Advances consumable effects and slot locks by one second. Returns the stats of effects that just expired. */
     tickConsumables(): ConsumableStat[] {
       const expired: ConsumableStat[] = []
       const slots = { ...store.consumableSlots() }
@@ -211,17 +211,17 @@ export const BattleStore = signalStore(
 
       for (const slot of CONSUMABLE_SLOTS) {
         const active = slots[slot]
-        if (!active || (active.buffRemaining === 0 && active.lockRemaining === 0)) continue
+        if (!active || (active.effectRemaining === 0 && active.lockRemaining === 0)) continue
 
-        const buffRemaining = Math.max(0, active.buffRemaining - 1)
-        const isBuffExpiring = active.buffRemaining > 0 && buffRemaining === 0
-        if (isBuffExpiring) expired.push(...active.stats)
+        const effectRemaining = Math.max(0, active.effectRemaining - 1)
+        const isEffectExpiring = active.effectRemaining > 0 && effectRemaining === 0
+        if (isEffectExpiring) expired.push(...active.stats)
 
         slots[slot] = {
           ...active,
-          buffRemaining,
+          effectRemaining,
           lockRemaining: Math.max(0, active.lockRemaining - 1),
-          stats: isBuffExpiring ? [] : active.stats,
+          stats: isEffectExpiring ? [] : active.stats,
         }
         changed = true
       }

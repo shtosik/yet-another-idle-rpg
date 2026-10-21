@@ -138,7 +138,7 @@ export class BattleManagerService {
     this.autoEat()
   }
 
-  /** Food and potions share one lock per slot, so swapping items can't stack buffs. */
+  /** Food and potions share one lock per slot, so swapping items can't stack effects. */
   useConsumable(itemId: ItemID): void {
     const itemData = ITEM_DATA[itemId]
     if (!itemData || !isConsumableItem(itemData)) return
@@ -153,15 +153,15 @@ export class BattleManagerService {
     // Don't waste a pure mana potion at full mana.
     if (manaRestore > 0 && !stats.length && manaGained <= 0) return
 
-    // The buff can never outlast the slot lock.
-    const buffRemaining = Math.min(duration, cooldown)
-    const appliedStats = buffRemaining > 0 ? stats : []
+    // The effect can never outlast the slot lock.
+    const effectRemaining = Math.min(duration, cooldown)
+    const appliedStats = effectRemaining > 0 ? stats : []
 
     this.playerStore.updatePlayerStats([
       ...appliedStats,
       ...(manaGained > 0 ? [{ stat: 'mana' as const, amount: manaGained }] : []),
     ])
-    this.battleStore.setConsumable(slot, { itemId, buffRemaining, lockRemaining: cooldown, stats: appliedStats })
+    this.battleStore.setConsumable(slot, { itemId, effectRemaining, lockRemaining: cooldown, stats: appliedStats })
     this.playerStore.removeItems([{ id: itemId, amount: 1 }])
   }
 

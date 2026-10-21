@@ -6,7 +6,6 @@ import { RecipeID } from '../../enums/ids/recipe-id.enum'
 
 const MINUTE = 60
 
-// Icons are placeholders until the asset pipeline generates real art.
 export const ConsumablesItemsData: Partial<Record<ItemID, Item>> = {
   [ItemID.grilledFish]: {
     id: ItemID.grilledFish,

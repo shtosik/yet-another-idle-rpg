@@ -10,7 +10,7 @@
       </div>
     }
     @for (consumable of activeConsumables(); track consumable.slot) {
-      @let isBuffActive = consumable.buffRemaining > 0;
+      @let isEffectActive = consumable.effectRemaining > 0;
       @let readyIn = consumable.lockRemaining | duration;
       <div
         class="consumable"
@@ -18,11 +18,11 @@
       >
         <div
           class="buff"
-          [class.buff--expired]="!isBuffActive"
+          [class.buff--expired]="!isEffectActive"
           [style]="{ 'background-image': ITEM_DATA[consumable.itemId]!.url | url }"
         >
-          @if (isBuffActive) {
-            {{ consumable.buffRemaining | duration }}
+          @if (isEffectActive) {
+            {{ consumable.effectRemaining | duration }}
           }
         </div>
         <span class="consumable__ready-in">{{ 'items:consumable.readyIn' | i18next:{ time: readyIn } }}</span>

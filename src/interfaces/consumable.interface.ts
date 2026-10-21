@@ -10,7 +10,7 @@ export interface ConsumableStat {
     amount: number
 }
 
-/** Durations are in seconds. Using the item locks its slot for `cooldown`; the buff can never outlast the lock. */
+/** Durations are in seconds. Using the item locks its slot for `cooldown`; the effect can never outlast the lock. */
 export interface ConsumableEffect {
     slot: ConsumableSlot
     cooldown: number
@@ -21,7 +21,7 @@ export interface ConsumableEffect {
 
 export interface ActiveConsumable {
     itemId: ItemID
-    buffRemaining: number
+    effectRemaining: number
     lockRemaining: number
     // Snapshot of what was applied, reverted exactly on expiry.
     stats: ConsumableStat[]

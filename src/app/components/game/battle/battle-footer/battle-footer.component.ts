@@ -35,7 +35,7 @@ export class BattleFooterComponent {
   equippedSpells = this.battleStore.equippedSpells
   activeSpells = this.battleStore.activeBuffs
 
-  // A slot stays visible while its buff runs and, dimmed, while it is still locked.
+  // A slot stays visible while its effect runs and, dimmed, while it is still locked.
   activeConsumables = computed(() => {
     const slots = this.battleStore.consumableSlots()
     return CONSUMABLE_SLOTS.flatMap(slot => {
