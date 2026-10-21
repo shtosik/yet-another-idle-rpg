@@ -23,7 +23,7 @@ For **an enemy in an existing zone**, do steps 1–4 and add it to that zone's `
 
 6. **How it unlocks** — pick one:
    - **Chain**: set `nextZoneId` on the previous zone and `previousZoneId` on the new one; killing the previous boss unlocks it. Add `ZONE_UNLOCK_NOTIFICATIONS[zone]` in `src/data/unlock-conditions.ts` with `unlocks:zones.<zoneKey>.title`/`.body` keys.
-   - **Town entrance**: add a building with `zoneId` (and usually `questRequirement`) via `add-town-building`.
+   - **Town entrance**: add a building with `zoneId` and `questRequirement` via `add-town-building`; starting that quest unlocks the zone.
 
 7. **Map marker** (chain zones) — add a `zone` marker to `src/data/world-map-data.ts:WORLD_MAP_DATA` at the source-image pixel position (see `docs/systems/world-map.md`).
 

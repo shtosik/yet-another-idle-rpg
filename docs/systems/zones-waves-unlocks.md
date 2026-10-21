@@ -17,7 +17,7 @@ Zones are the combat areas; each has waves of regular enemies ending in a boss. 
 
 **Zone unlocks**, two paths:
 1. **Chain**: killing the boss of a zone adds its `nextZoneId` to `unlockedContent.zones` and shows `ZONE_UNLOCK_NOTIFICATIONS[next]`. Chain: Horseshoe Beach → Plains → The Long Path → Mountain Pass → Elderwood Wilds.
-2. **Town entrance**: a town building with `zoneId` and `questRequirement` sends the player straight into that zone (`setZone`). Starting the quest adds the zone to `unlockedContent.zones` (`QuestsStore.startQuest` via `src/data/helpers/entrance-zones.ts:ENTRANCE_ZONES_BY_QUEST`; re-applied on load). Traders' Basement (La Harpar, Rats Were Rats), Deepwood (Mawood, The Sap That Burns), Upper Canopy (Mawood, Feathers for a Kite).
+2. **Town entrance**: a town building with `zoneId` and `questRequirement` sends the player straight into that zone (`setZone`). Starting the quest adds the zone to `unlockedContent.zones` (`QuestsStore.startQuest` via `src/data/helpers/entrance-zones.ts:ENTRANCE_ZONES_BY_QUEST`; re-applied on load). Traders' Basement (La Harpar, Rats Were Rats), Deepwood (Mawood, The Sap That Burns), Upper Canopy (Mawood, Feathers for a Kite). Deepwood and Upper Canopy also get world map markers once unlocked; Traders' Basement has none on purpose (it's a basement under the La Harpar market, reached only through the town). `npm run validate` errors on an entrance building without `questRequirement`.
 
 **Town and feature unlocks** (`UNLOCK_RULES`), checked after every kill:
 - `hasItem` Turtle Shell → Camp; `levelReached` 2 → skill tree;

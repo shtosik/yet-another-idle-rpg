@@ -52,8 +52,13 @@ export const QuestsStore = signalStore(
       playerStore.updatePlayerStats(statsToUpdate)
       playerStore.addItems(itemsToUpdate)
     },
+
+    /** Zones entered from a town building open when that building's quest starts. */
+    unlockEntranceZones(questId: QuestID) {
+      ENTRANCE_ZONES_BY_QUEST[questId]?.forEach(zoneId => playerStore.unlockZone(zoneId))
+    },
   })),
-  withMethods((store, playerStore = inject(PlayerStore)) => ({
+  withMethods((store) => ({
       resetState(): void {
         patchState(store, initialState)
       },
@@ -62,7 +67,7 @@ export const QuestsStore = signalStore(
         patchState(store, (state) => ({
           questStepProgression: { ...state.questStepProgression, [questId]: 1 },
         }))
-        ENTRANCE_ZONES_BY_QUEST[questId]?.forEach(zoneId => playerStore.unlockZone(zoneId))
+        store.unlockEntranceZones(questId)
       },
 
       getQuestStep(questId: QuestID) {
@@ -103,11 +108,11 @@ export const QuestsStore = signalStore(
       },
     }),
   ),
-  withHooks((store, playerStore = inject(PlayerStore)) => ({
+  withHooks((store) => ({
     // Re-applies entrance zone unlocks on load, like UNLOCK_RULES in PlayerStore.
     onInit() {
       for (const key of Object.keys(store.questStepProgression())) {
-        ENTRANCE_ZONES_BY_QUEST[Number(key) as QuestID]?.forEach(zoneId => playerStore.unlockZone(zoneId))
+        store.unlockEntranceZones(Number(key) as QuestID)
       }
     },
   })),

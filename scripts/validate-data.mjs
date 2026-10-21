@@ -179,6 +179,10 @@ for (const recipe of Object.values(D.RECIPES_DATA)) {
 for (const town of Object.values(D.TOWNS_DATA)) {
   for (const b of town.buildings) {
     if (!enumValues(D.TownBuildingID).includes(b.buildingId)) error('src/data/towns-data.ts', `${idName(D.TownID, town.id)} has unknown TownBuildingID ${b.buildingId}`)
+    // Entrance zones unlock when the building's quest starts (ENTRANCE_ZONES_BY_QUEST).
+    if (b.zoneId !== undefined && b.questRequirement === undefined) {
+      error('src/data/towns-data.ts', `${idName(D.TownID, town.id)}.${idName(D.TownBuildingID, b.buildingId)} is a zone entrance without questRequirement, so its zone never unlocks`)
+    }
     for (const npc of b.npcs) {
       if (!has(D.NPC_DATA, npc.id)) error('src/data/towns-data.ts', `${idName(D.TownID, town.id)}.${idName(D.TownBuildingID, b.buildingId)} has unknown NpcID ${npc.id}`)
     }
