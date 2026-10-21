@@ -29,6 +29,7 @@ const translations = [
     'dialogues/mawoodFinn',
     'dialogues/mawoodBrenn',
     'dialogues/mawoodMilo',
+    'dialogues/mawoodElarion',
 ]
 
 export function i18nextInitializer() {

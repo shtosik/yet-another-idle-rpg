@@ -69,7 +69,6 @@ export const TOWNS_DATA: Record<TownID, Town> = {
         zoneId: ZoneID.tradersBasement,
         questRequirement: QuestID.ratsWereRats,
         npcIds: [],
-        url: '',
       },
       {
         tabId: TownBuildingID.shop,
@@ -109,7 +108,6 @@ export const TOWNS_DATA: Record<TownID, Town> = {
   [TownID.northLirold]: {
     id: TownID.northLirold,
     regionId: RegionID.portStocksmar,
-    url: '',
     buildings: [],
   },
   [TownID.mawood]: {
@@ -167,7 +165,6 @@ export const TOWNS_DATA: Record<TownID, Town> = {
         // so this entrance can never appear before the player has earned it.
         questRequirement: QuestID.theSapThatBurns,
         npcIds: [],
-        url: '',
       },
       {
         tabId: TownBuildingID.upperCanopyEntrance,
@@ -178,7 +175,6 @@ export const TOWNS_DATA: Record<TownID, Town> = {
         // so the rope-lift only appears after the corruption questline is finished.
         questRequirement: QuestID.feathersForAKite,
         npcIds: [],
-        url: '',
       },
     ],
   },

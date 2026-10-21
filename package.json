@@ -8,7 +8,8 @@
         "watch": "ng build --watch --configuration development",
         "test": "ng test",
         "tile": "node scripts/tile-map.mjs",
-        "test:assets": "node --test \"scripts/asset-gen/test/*.test.mjs\""
+        "test:assets": "node --test \"scripts/asset-gen/test/*.test.mjs\"",
+        "validate": "node scripts/validate-data.mjs"
     },
     "prettier": {
         "overrides": [
@@ -53,6 +54,7 @@
         "@types/jasmine": "~5.1.0",
         "@types/leaflet": "^1.9.21",
         "@types/lodash-es": "^4.17.12",
+        "esbuild": "0.25.9",
         "jasmine-core": "~5.8.0",
         "karma": "~6.4.0",
         "karma-chrome-launcher": "~3.2.0",

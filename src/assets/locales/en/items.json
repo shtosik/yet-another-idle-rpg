@@ -132,8 +132,7 @@
         "uncommon": "Uncommon",
         "rare": "Rare",
         "epic": "Epic",
-        "legendary": "Legendary",
-        "quest": "Quest"
+        "legendary": "Legendary"
     },
     "clickToEquip": "Click to equip",
     "clickToUnequip": "Click to unequip",

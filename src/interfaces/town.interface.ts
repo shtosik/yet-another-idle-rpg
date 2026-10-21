@@ -8,7 +8,8 @@ import { QuestID } from 'enums/ids/quest-id.enum'
 export interface Town {
     id: TownID
     regionId: RegionID
-    url: string
+    /** Absent for towns that are still placeholders. */
+    url?: string
     buildings: TownBuilding[]
 }
 
@@ -23,7 +24,8 @@ export interface TownBuildingNpcProps {
 export interface TownBuilding {
     tabId: TownBuildingID
     npcIds: TownBuildingNpcProps[]
-    url: string
+    /** Absent for zone entrances, which travel to `zoneId` instead of opening a view. */
+    url?: string
     position?: {
         x: number
         y: number
