@@ -11,61 +11,17 @@ export type { TaskLength }
 export class ExplorationGuildService {
   private playerStore = inject(PlayerStore)
 
-  /** Zone Unlock Formula: UnlockedZoneCount = Math.floor(totalTasksCompleted / 5) + 1 */
-  unlockedZoneCount = computed(() => {
-    return Math.floor(this.playerStore.totalTasksCompleted() / 5) + 1
-  })
+  /** Task targets come from the regular enemies of every zone the player has unlocked (bosses are not in `enemies`). */
+  private taskTargets = computed(() =>
+    this.playerStore.unlockedContent().zones.flatMap(zoneId =>
+      ZONES_DATA[zoneId].enemies.map(monsterId => ({ monsterId, zoneId })),
+    ),
+  )
 
-  /** Returns the list of zone IDs that are currently unlocked based on task completions */
-  unlockedZoneIds = computed(() => {
-    const count = this.unlockedZoneCount()
-    // ZoneID enum values: horseshoeBeach=1, tradersBasement=2, plains=3, theLongPath=4
-    const allZoneIds: ZoneID[] = [
-      ZoneID.horseshoeBeach,
-      ZoneID.tradersBasement,
-      ZoneID.plains,
-      ZoneID.theLongPath,
-    ]
-    return allZoneIds.slice(0, count)
-  })
-
-  /** Returns all eligible (non-boss) enemy IDs from unlocked zones */
-  eligibleMonsterIds = computed(() => {
-    const zones = this.unlockedZoneIds()
-    const monsterIds: EnemyID[] = []
-
-    zones.forEach(zoneId => {
-      const zoneData = ZONES_DATA[zoneId]
-      if (zoneData) {
-        zoneData.enemies.forEach(enemyId => {
-          // Only include regular enemies, not bosses
-          if (!monsterIds.includes(enemyId)) {
-            monsterIds.push(enemyId)
-          }
-        })
-      }
-    })
-
-    return monsterIds
-  })
-
-  /** Rolls a random monster from the eligible pool */
+  /** Rolls a random monster from the task target pool */
   private rollMonsterId(): { monsterId: EnemyID; zoneId: ZoneID } {
-    const eligible = this.eligibleMonsterIds()
-    const randomIndex = Math.floor(Math.random() * eligible.length)
-    const monsterId = eligible[randomIndex]
-
-    // Find which zone this monster belongs to
-    const zones = this.unlockedZoneIds()
-    let zoneId = zones[0]
-    for (const zId of zones) {
-      if (ZONES_DATA[zId].enemies.includes(monsterId)) {
-        zoneId = zId
-        break
-      }
-    }
-
-    return { monsterId, zoneId }
+    const targets = this.taskTargets()
+    return targets[Math.floor(Math.random() * targets.length)]
   }
 
   /** Generates a random target count based on task length */
