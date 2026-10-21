@@ -16,8 +16,6 @@ Background: `docs/systems/dialogue.md` (engine rules, `QuestState` meanings, kno
 3. **Walk every option of every node** and apply each check below. Note `file:line` for each finding.
 4. **Report** under three headings, in order: `## Blockers` (player gets stuck, loses progress or resources), `## Wrong branch shown` (ordering or condition bugs), `## Style`. One line per finding, with `file:line` and the fix. If nothing is found, say so in one line.
 
-Done when every node's options have been checked against every rule below.
-
 ## Checks
 
 **Quest hubs** — for each option with several results, results are tried top to bottom and the first visible one wins:
@@ -37,3 +35,5 @@ Done when every node's options have been checked against every rule below.
 
 **Labels**
 - Requirements using `many*` conditions render without a label (`getConditionLabel` lacks them); flag them so the author knows.
+
+Done when every node's options have been checked against every rule above, and `npm run validate` and `npx ng build` pass.

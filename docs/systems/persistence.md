@@ -11,7 +11,7 @@ Saves game state to `localStorage` on every change and restores it on load. Ther
 |---|---|---|
 | `playerStore` | `src/app/store/player/player.store.ts:PlayerStore` | stats, inventory, equipment, unlocked nodes, stations, recipes, tasks, unlocked content |
 | `battleStore` | `src/app/store/battle/battle.store.ts:BattleStore` | current zone/wave/enemy, spells, buffs, consumable slots |
-| `questsStore` | `src/app/store/quests/quests.store.ts:QuestsStore` | quest step progression, completed quests, dialogue flags |
+| `questsStore` | `src/app/store/quests/quests.store.ts:QuestsStore` | quest step progression (completion is step 9999), dialogue flags |
 | `townsStore` | `src/app/store/towns/towns.store.ts:TownsStore` | selected town/building, open shop |
 | `shopStore` | `src/app/store/shop/shop.store.ts:ShopStore` | stock and refresh timers |
 | `campStore` | `src/app/store/camp/camp.store.ts:CampStore` | Camp tab UI selection |

@@ -21,3 +21,5 @@ Do not generate inline: it needs a local GPU service and visual review of candid
 
 - Files are written but **not committed**: surface the paths, the sheet paths, any `sizeGuessed` tiers and the reference candidates it listed, then let the user review.
 - Wiring a *new* entity (ID, data entry, i18n) is a separate step; use the relevant `/add-*` skill.
+
+Done when the agent has written every requested file, you have reported the paths for review, and `npm run validate` and `npx ng build` pass (validate confirms every asset path referenced by data exists).
