@@ -88,8 +88,12 @@ One stage of a quest that must be completed before the next one opens.
 _Avoid_: Stage, objective
 
 **Exploration Guild**:
-The town building that hands out tasks for guild tokens.
+The town building that hands out tasks for explorer tokens.
 _Avoid_: Guild (alone), adventurers' guild
+
+**Explorer token**:
+The currency earned by completing tasks.
+_Avoid_: Guild token, exploration token
 
 **Task**:
 A repeatable Exploration Guild contract to kill a set number of one monster, separate from quests.
