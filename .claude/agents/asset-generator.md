@@ -20,7 +20,7 @@ if unsure.
 | NPC portrait | `portrait-pixel` | `src/assets/img/avatars/<town>/<town><Name>.png` |
 | zone background | `zone-pixel` | `src/assets/img/backgrounds/<zone>-vertical.png` |
 | town / building background | `town-painterly` | `towns-data.ts` `url:` path |
-| skill-tree icon | `skill-icon` | `src/assets/img/skills/<SkillPointID name>.png` |
+| skill-tree icon | `skill-icon` | `src/assets/img/skills/<SkillNodeID name>.png` |
 
 Confirm the filename by grepping the enum (`ItemID`, `EnemyID`, `NpcID`) or the data file; never invent one. If no family
 fits (for example a world-map tile), report that and skip; do not improvise.

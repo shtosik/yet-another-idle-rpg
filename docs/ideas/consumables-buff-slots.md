@@ -49,7 +49,7 @@ Craftable food, potions and elixirs that apply timed stat buffs through **buff s
 ### Other
 - **No offline ticking.** Buff timers and slot locks only advance while the game runs (nothing progresses offline today). Revisit with [offline progress](offline-progress.md).
 - **No "Well Fed" combo bonus.**
-- Inventory full: crafting must be blocked when there's no space for the result (repo-audit owner decision) — applies here.
+- Inventory full: crafting must be blocked when there's no space for the result (owner decision, see `docs/systems/player-stats-inventory-equipment.md`) — applies here.
 - Skill-tree respec refunding auto-eat: disable cleanly, keep the selected item.
 
 ## First version scope

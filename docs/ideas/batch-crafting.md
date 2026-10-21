@@ -7,7 +7,7 @@
 Craft ×1 / ×5 / ×10 / max in one action. Consumables are crafted repeatedly, so one-at-a-time crafting gets tedious.
 
 ## Sketch
-- `craftItem(recipeId, times)` — clamp `times` to what ingredients allow and to free inventory space (crafting must be blocked when the result doesn't fit — repo-audit owner decision).
+- `craftItem(recipeId, times)` — clamp `times` to what ingredients allow and to free inventory space (crafting must be blocked when the result doesn't fit — owner decision, see `docs/systems/player-stats-inventory-equipment.md`).
 - Crafting UI: quantity buttons + "max craftable" computed from inventory.
 - Hook point for a future "chance to save ingredients" stat.
 
