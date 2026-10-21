@@ -4,7 +4,7 @@ import { UrlPipe } from '../../../../pipes/url.pipe'
 import { NpmFrameComponent } from '../npc-frame/npc-frame.component'
 import { CommonModule } from '@angular/common'
 import { TranslatePipe } from '../../../../pipes/i18next.pipe'
-import { TownBuildingID } from '../../../../../enums/map/town-tab-id.enum'
+import { TownBuildingID } from '../../../../../enums/map/town-building-id.enum'
 import { NpcID } from '../../../../../enums/map/npc-id.enum'
 import { DialogueManagerService } from '../../../../services/dialogue-manager.service'
 

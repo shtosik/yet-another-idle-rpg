@@ -3,7 +3,7 @@ import { BattleStore } from '../store/battle/battle.store'
 import { PlayerStore } from '../store/player/player.store'
 import { QuestsStore } from '../store/quests/quests.store'
 import { AnimationsService } from './animations.service'
-import { SkillPointID } from '../../enums/ids/skill-tree-node-id.enum'
+import { SkillNodeID } from '../../enums/ids/skill-node-id.enum'
 import { SpellID } from '../../enums/ids/spell-id.enum'
 import SPELLS_DATA from '../../data/spells-data'
 import { SpellType } from '../../enums/spell-type.enum'
@@ -59,8 +59,8 @@ export class BattleManagerService {
       damageType: damageType ?? this.playerStore.equippedWeaponDamageType(),
       enemyWeakness: enemy.weakness,
       enemyTypes: enemy.enemyTypes,
-      hasWeaknessSkill: this.playerStore.hasSkillUnlocked(SkillPointID.weaknesses),
-      hasSpellCritSkill: this.playerStore.hasSkillUnlocked(SkillPointID.spellCrit),
+      hasWeaknessSkill: this.playerStore.hasSkillUnlocked(SkillNodeID.weaknesses),
+      hasSpellCritSkill: this.playerStore.hasSkillUnlocked(SkillNodeID.spellCrit),
     })
 
     const newHp = Math.max(0, enemyHp - damage)
@@ -166,7 +166,7 @@ export class BattleManagerService {
   }
 
   private autoEat(): void {
-    if (!this.battleStore.autoEatEnabled() || !this.playerStore.hasSkillUnlocked(SkillPointID.autoEat)) return
+    if (!this.battleStore.autoEatEnabled() || !this.playerStore.hasSkillUnlocked(SkillNodeID.autoEat)) return
 
     // Re-eats whatever was last used in the food slot.
     const food = this.battleStore.consumableSlots().food

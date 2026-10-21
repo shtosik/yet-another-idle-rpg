@@ -1,13 +1,13 @@
-import { SkillPointID } from 'enums/ids/skill-tree-node-id.enum'
+import { SkillNodeID } from 'enums/ids/skill-node-id.enum'
 import { SkillTreeGraph } from 'data/skill-tree-graph'
 import { isRequirementMet } from 'utils/skill-tree-requirements'
 
 export type CanRefundResult =
     | { ok: true; pointsReturned: number }
-    | { ok: false; reason: 'not-allocated' | 'blocked-by'; blockers: SkillPointID[] }
+    | { ok: false; reason: 'not-allocated' | 'blocked-by'; blockers: SkillNodeID[] }
 
-export function canRefundSkillPoint(
-    targetId: SkillPointID,
+export function canRefundNode(
+    targetId: SkillNodeID,
     levels: number | 'all',
     unlocked: Readonly<Record<number, number>>,
     graph: SkillTreeGraph,
@@ -23,7 +23,7 @@ export function canRefundSkillPoint(
 
     // Only direct dependents need checking — transitive cases will be caught
     // when the player works top-down through the chain.
-    const blockers: SkillPointID[] = []
+    const blockers: SkillNodeID[] = []
     for (const dependentId of graph.forwardEdges.get(targetId) ?? []) {
         if ((unlocked[dependentId] ?? 0) === 0) continue
         const dep = graph.nodes.get(dependentId)

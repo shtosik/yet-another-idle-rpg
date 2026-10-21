@@ -2,7 +2,7 @@ import { Component, computed, inject } from '@angular/core'
 import { BattleStore } from '../../../../store/battle/battle.store'
 import { BattleManagerService } from '../../../../services/battle-manager.service'
 import { NgOptimizedImage } from '@angular/common'
-import { SkillPointID } from '../../../../../enums/ids/skill-tree-node-id.enum'
+import { SkillNodeID } from '../../../../../enums/ids/skill-node-id.enum'
 import { PlayerStore } from '../../../../store/player/player.store'
 
 @Component({
@@ -23,12 +23,12 @@ export class BattleSideButtonsComponent {
 
   hasAutoWaveProgressionEnabled = this.battleStore.autoWaveProgressionEnabled
   hasAutoWaveProgressionUnlocked = computed(() =>
-    this.playerStore.hasSkillUnlocked(SkillPointID.autoWaveProgression),
+    this.playerStore.hasSkillUnlocked(SkillNodeID.autoWaveProgression),
   )
 
   hasAutoEatEnabled = this.battleStore.autoEatEnabled
   hasAutoEatUnlocked = computed(() =>
-    this.playerStore.hasSkillUnlocked(SkillPointID.autoEat),
+    this.playerStore.hasSkillUnlocked(SkillNodeID.autoEat),
   )
 
   onNextWave() {

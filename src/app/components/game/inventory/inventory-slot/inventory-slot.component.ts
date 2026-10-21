@@ -4,7 +4,7 @@ import { ItemTier } from 'enums/items/item-tier.enum'
 import { Item } from 'interfaces/item.interface'
 import { TranslatePipe } from '../../../../pipes/i18next.pipe'
 import { EnemyID } from '../../../../../enums/ids/enemy-id.enum'
-import { SkillPointID } from '../../../../../enums/ids/skill-tree-node-id.enum'
+import { SkillNodeID } from '../../../../../enums/ids/skill-node-id.enum'
 import { ItemID } from '../../../../../enums/ids/item-id.enum'
 import { TooltipTemplateDirective } from 'ngx-tooltip-directives'
 import { StatToPercentagePipe } from '../../../../pipes/stat-to-percentage.pipe'
@@ -31,7 +31,7 @@ export class InventoryItemComponent {
 
   readonly ItemTier = ItemTier
   protected readonly EnemyID = EnemyID
-  protected readonly SkillPointID = SkillPointID
+  protected readonly SkillNodeID = SkillNodeID
   protected readonly ItemID = ItemID
   protected readonly ItemType = ItemType
   protected readonly StationID = StationID

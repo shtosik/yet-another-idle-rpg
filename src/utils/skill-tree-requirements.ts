@@ -1,4 +1,4 @@
-import { SkillPoint, UnlockRequirement } from 'interfaces/skill-tree/skill-point.interface'
+import { SkillNode, UnlockRequirement } from 'interfaces/skill-tree/skill-node.interface'
 
 export function isRequirementMet(
     req: UnlockRequirement | null,
@@ -16,8 +16,8 @@ export type CanBuyResult =
     | { ok: true }
     | { ok: false; reason: 'maxed' | 'cost' | 'locked' }
 
-export function canBuySkillPoint(
-    node: SkillPoint,
+export function canBuyNode(
+    node: SkillNode,
     unlocked: Readonly<Record<number, number>>,
     unspentSkillPoints: number,
 ): CanBuyResult {

@@ -1,4 +1,4 @@
-import { SkillPointID } from 'enums/ids/skill-tree-node-id.enum'
+import { SkillNodeID } from 'enums/ids/skill-node-id.enum'
 
 export interface RespecConfig {
     perPointGoldCost: number
@@ -6,7 +6,7 @@ export interface RespecConfig {
 }
 
 export interface SkillTree {
-    rootNodeId: SkillPointID
-    nodes: ReadonlyArray<SkillPointID>
+    rootNodeId: SkillNodeID
+    nodes: ReadonlyArray<SkillNodeID>
     respec: RespecConfig
 }

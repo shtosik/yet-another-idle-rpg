@@ -31,10 +31,11 @@ export { RecipeID } from 'enums/ids/recipe-id.enum'
 export { ShopID } from 'enums/ids/shop-id.enum'
 export { SpellID } from 'enums/ids/spell-id.enum'
 export { StationID } from 'enums/ids/station-id.enum'
-export { SkillPointID } from 'enums/ids/skill-tree-node-id.enum'
+export { SkillNodeID } from 'enums/ids/skill-node-id.enum'
+export { SkillBranch } from 'enums/ids/skill-branch.enum'
 export { NpcID } from 'enums/map/npc-id.enum'
 export { TownID } from 'enums/map/town-id.enum'
-export { TownBuildingID } from 'enums/map/town-tab-id.enum'
+export { TownBuildingID } from 'enums/map/town-building-id.enum'
 export { DamageElement } from 'enums/damage-element.enum'
 export { ItemTier } from 'enums/items/item-tier.enum'
 export { default as ITEM_DATA } from 'data/items-data'
@@ -82,7 +83,7 @@ const COVERAGE = [
   ['ShopID', D.ShopID, D.SHOPS_DATA, 'src/data/shops-data.ts', 'id'],
   ['SpellID', D.SpellID, D.SPELLS_DATA, 'src/data/spells-data.ts', 'id'],
   ['StationID', D.StationID, D.STATIONS_DATA, 'src/data/stations-data.ts', 'id'],
-  ['SkillPointID', D.SkillPointID, D.ALL_SKILLS, 'src/data/skill-tree-data.ts', 'id'],
+  ['SkillNodeID', D.SkillNodeID, D.ALL_SKILLS, 'src/data/skill-tree-data.ts', 'id'],
   ['NpcID', D.NpcID, D.NPC_DATA, 'src/data/npc-data.ts', 'id'],
   ['TownID', D.TownID, D.TOWNS_DATA, 'src/data/towns-data.ts', 'id'],
 ]
@@ -188,7 +189,7 @@ for (const skill of Object.values(D.ALL_SKILLS)) {
   const collect = r => { if (!r) return; if (r.kind === 'node') reqs.push(r.id); else r.of.forEach(collect) }
   collect(skill.unlockRequirements)
   for (const id of reqs) {
-    if (!has(D.ALL_SKILLS, id)) error('src/data/skill-tree-data.ts', `${idName(D.SkillPointID, skill.id)} requires unknown node ${id}`)
+    if (!has(D.ALL_SKILLS, id)) error('src/data/skill-tree-data.ts', `${idName(D.SkillNodeID, skill.id)} requires unknown node ${id}`)
   }
 }
 
@@ -291,7 +292,8 @@ const ENTITY_KEYS = [
   [D.QuestID, k => [`quests:names.${k}`], 'src/assets/locales/en/quests.json'],
   [D.NpcID, k => [`npc:names.${k}`], 'src/assets/locales/en/npc.json'],
   [D.SpellID, k => [`spells:names.${k}.name`, `spells:names.${k}.desc`], 'src/assets/locales/en/spells.json'],
-  [D.SkillPointID, k => [`skill-tree:skillPoints.${k}.name`, `skill-tree:skillPoints.${k}.desc`], 'src/assets/locales/en/skill-tree.json'],
+  [D.SkillBranch, k => [`skill-tree:branches.${k}`], 'src/assets/locales/en/skill-tree.json'],
+  [D.SkillNodeID, k => [`skill-tree:nodes.${k}.name`, `skill-tree:nodes.${k}.desc`], 'src/assets/locales/en/skill-tree.json'],
   [D.TownID, k => [`map:towns.${k}`], 'src/assets/locales/en/map.json'],
   [D.TownBuildingID, k => [`map:townTabs.${k}`], 'src/assets/locales/en/map.json'],
   [D.DamageElement, k => [`app:elements.${k}`], 'src/assets/locales/en/app.json'],

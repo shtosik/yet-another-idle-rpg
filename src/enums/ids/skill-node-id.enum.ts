@@ -1,4 +1,4 @@
-export enum SkillPointID {
+export enum SkillNodeID {
     // Hub
     origin = 1000,
 

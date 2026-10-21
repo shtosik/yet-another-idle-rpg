@@ -8,7 +8,7 @@ import { ItemID } from 'enums/ids/item-id.enum'
 import { EquipmentType } from 'interfaces/player/equipment.type'
 import { ZonesProgression } from '../../../types/player/zones-progression.type'
 import { UnlockedContent } from '../../../types/player/unlocked-content.type'
-import { UnlockedSkillPoints } from '../../../types/player/unlocked-skill-points.type'
+import { UnlockedNodes } from '../../../types/player/unlocked-nodes.type'
 import { UnlockedSpellsType } from '../../../types/player/unlocked-spells.type'
 import { Enemy } from '../../../interfaces/enemy.interface'
 import { EnemyDrop } from '../../../interfaces/enemy-drop.interface'
@@ -20,7 +20,7 @@ import RECIPES_DATA from '../../../data/recipes-data'
 import { RecipeID } from '../../../enums/ids/recipe-id.enum'
 import { EnemyID } from '../../../enums/ids/enemy-id.enum'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
-import { SkillPointID } from '../../../enums/ids/skill-tree-node-id.enum'
+import { SkillNodeID } from '../../../enums/ids/skill-node-id.enum'
 import { SpellID } from '../../../enums/ids/spell-id.enum'
 import { ZoneID } from '../../../enums/ids/zone-id.enum'
 import { TownID } from '../../../enums/map/town-id.enum'
@@ -49,7 +49,7 @@ interface PlayerState {
   enemyKillCounts: Partial<Record<EnemyID, number>>
   inventory: (InventoryItem | null)[];
   equipment: EquipmentType;
-  unlockedSkillPoints: UnlockedSkillPoints;
+  unlockedNodes: UnlockedNodes;
   unlockedSpells: UnlockedSpellsType;
   activeTasks: Task[];
   totalTasksCompleted: number;
@@ -68,7 +68,7 @@ export const initialState: PlayerState = {
   zonesProgression: {},
   inventory: createInventory(),
   equipment: initialEquipmentState,
-  unlockedSkillPoints: {},
+  unlockedNodes: {},
   unlockedSpells: {},
   enemyKillCounts: {},
   activeTasks: [],
@@ -210,17 +210,17 @@ export const PlayerStore = signalStore(
       patchState(store, (state) => ({ inventory: removeItems(state.inventory, items) }))
     },
 
-    updateUnlockedSkillPoints(id: SkillPointID, amount: number) {
+    updateUnlockedNodes(id: SkillNodeID, amount: number) {
       patchState(store, (state) => ({
-        unlockedSkillPoints: {
-          ...state.unlockedSkillPoints,
-          [id]: (state.unlockedSkillPoints[id] || 0) + amount,
+        unlockedNodes: {
+          ...state.unlockedNodes,
+          [id]: (state.unlockedNodes[id] || 0) + amount,
         },
       }))
     },
 
-    resetUnlockedSkillPoints() {
-      patchState(store, { unlockedSkillPoints: {} })
+    resetUnlockedNodes() {
+      patchState(store, { unlockedNodes: {} })
     },
 
     levelUpSpell(id: SpellID) {
@@ -416,8 +416,8 @@ export const PlayerStore = signalStore(
     },
   })),
   withMethods((store) => ({
-    hasSkillUnlocked(skillId: SkillPointID): boolean {
-      return !!store.unlockedSkillPoints()[skillId]
+    hasSkillUnlocked(skillId: SkillNodeID): boolean {
+      return !!store.unlockedNodes()[skillId]
     },
 
     getKillCountByZoneAndWave(zoneId: ZoneID, wave: number) {

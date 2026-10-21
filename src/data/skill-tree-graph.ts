@@ -1,26 +1,26 @@
 import { ALL_SKILLS } from 'data/skill-tree-data'
-import { SkillPointID } from 'enums/ids/skill-tree-node-id.enum'
-import { SkillRegion } from 'enums/ids/skill-region.enum'
-import { SkillPoint, SkillPointPosition, UnlockRequirement } from 'interfaces/skill-tree/skill-point.interface'
+import { SkillNodeID } from 'enums/ids/skill-node-id.enum'
+import { SkillBranch } from 'enums/ids/skill-branch.enum'
+import { SkillNode, SkillNodePosition, UnlockRequirement } from 'interfaces/skill-tree/skill-node.interface'
 
 export interface SkillTreeGraph {
-    nodes: ReadonlyMap<SkillPointID, SkillPoint>
-    forwardEdges: ReadonlyMap<SkillPointID, ReadonlySet<SkillPointID>>
-    outgoingPrereqs: ReadonlyMap<SkillPointID, ReadonlySet<SkillPointID>>
-    positions: ReadonlyMap<SkillPointID, SkillPointPosition>
+    nodes: ReadonlyMap<SkillNodeID, SkillNode>
+    forwardEdges: ReadonlyMap<SkillNodeID, ReadonlySet<SkillNodeID>>
+    outgoingPrereqs: ReadonlyMap<SkillNodeID, ReadonlySet<SkillNodeID>>
+    positions: ReadonlyMap<SkillNodeID, SkillNodePosition>
 }
 
 const STEP_DISTANCE = 120
 
-// Launch angle in degrees per region. Screen y increases downward, so
+// Launch angle in degrees per branch. Screen y increases downward, so
 // -90 points up. Symmetric 120° spread around origin.
-const REGION_LAUNCH: Record<SkillRegion, number> = {
-    [SkillRegion.damage]: -90,
-    [SkillRegion.exploration]: 150,
-    [SkillRegion.magic]: 30,
+const BRANCH_LAUNCH: Record<SkillBranch, number> = {
+    [SkillBranch.damage]: -90,
+    [SkillBranch.exploration]: 150,
+    [SkillBranch.magic]: 30,
 }
 
-function collectNodeRefs(req: UnlockRequirement | null, out: Set<SkillPointID>): void {
+function collectNodeRefs(req: UnlockRequirement | null, out: Set<SkillNodeID>): void {
     if (req === null) return
     switch (req.kind) {
         case 'node':
@@ -34,13 +34,13 @@ function collectNodeRefs(req: UnlockRequirement | null, out: Set<SkillPointID>):
 }
 
 function topoSort(
-    nodes: Map<SkillPointID, SkillPoint>,
-    outgoingPrereqs: Map<SkillPointID, Set<SkillPointID>>,
-): SkillPointID[] {
-    const visited = new Set<SkillPointID>()
-    const result: SkillPointID[] = []
+    nodes: Map<SkillNodeID, SkillNode>,
+    outgoingPrereqs: Map<SkillNodeID, Set<SkillNodeID>>,
+): SkillNodeID[] {
+    const visited = new Set<SkillNodeID>()
+    const result: SkillNodeID[] = []
 
-    function visit(id: SkillPointID): void {
+    function visit(id: SkillNodeID): void {
         if (visited.has(id)) return
         visited.add(id)
         for (const prereqId of outgoingPrereqs.get(id) ?? []) {
@@ -54,16 +54,16 @@ function topoSort(
 }
 
 interface ResolvedNode {
-    position: SkillPointPosition
+    position: SkillNodePosition
     chainDirection: number | null
 }
 
 function resolvePositions(
-    nodes: Map<SkillPointID, SkillPoint>,
-    outgoingPrereqs: Map<SkillPointID, Set<SkillPointID>>,
-): Map<SkillPointID, SkillPointPosition> {
+    nodes: Map<SkillNodeID, SkillNode>,
+    outgoingPrereqs: Map<SkillNodeID, Set<SkillNodeID>>,
+): Map<SkillNodeID, SkillNodePosition> {
     const order = topoSort(nodes, outgoingPrereqs)
-    const resolved = new Map<SkillPointID, ResolvedNode>()
+    const resolved = new Map<SkillNodeID, ResolvedNode>()
 
     for (const id of order) {
         const node = nodes.get(id)
@@ -75,7 +75,7 @@ function resolvePositions(
             continue
         }
 
-        const prereqIds = outgoingPrereqs.get(id) ?? new Set<SkillPointID>()
+        const prereqIds = outgoingPrereqs.get(id) ?? new Set<SkillNodeID>()
 
         // 2. Multi-prereq: auto-midpoint of all prereqs' resolved positions.
         if (prereqIds.size > 1) {
@@ -90,7 +90,7 @@ function resolvePositions(
                 count++
             }
             if (count === 0) {
-                throw new Error(`SkillPoint ${SkillPointID[id]} has multiple prereqs but none resolved.`)
+                throw new Error(`SkillNode ${SkillNodeID[id]} has multiple prereqs but none resolved.`)
             }
             resolved.set(id, {
                 position: { x: sumX / count, y: sumY / count },
@@ -101,12 +101,12 @@ function resolvePositions(
 
         // 3. Single prereq: chain inheritance.
         if (prereqIds.size === 1) {
-            const parentId = prereqIds.values().next().value as SkillPointID
+            const parentId = prereqIds.values().next().value as SkillNodeID
             const parent = resolved.get(parentId)
             if (!parent) {
-                throw new Error(`SkillPoint ${SkillPointID[id]} prereq ${SkillPointID[parentId]} not resolved.`)
+                throw new Error(`SkillNode ${SkillNodeID[id]} prereq ${SkillNodeID[parentId]} not resolved.`)
             }
-            const baseDirection = parent.chainDirection ?? REGION_LAUNCH[node.region]
+            const baseDirection = parent.chainDirection ?? BRANCH_LAUNCH[node.branch]
             const direction = baseDirection + (node.turn ?? 0)
             const rad = (direction * Math.PI) / 180
             const position = {
@@ -118,33 +118,33 @@ function resolvePositions(
         }
 
         throw new Error(
-            `SkillPoint ${SkillPointID[id]} has neither a position nor prerequisites; cannot resolve layout.`,
+            `SkillNode ${SkillNodeID[id]} has neither a position nor prerequisites; cannot resolve layout.`,
         )
     }
 
-    const positions = new Map<SkillPointID, SkillPointPosition>()
+    const positions = new Map<SkillNodeID, SkillNodePosition>()
     for (const [id, r] of resolved) positions.set(id, r.position)
     return positions
 }
 
 function buildGraph(): SkillTreeGraph {
-    const nodes = new Map<SkillPointID, SkillPoint>()
-    const forwardEdges = new Map<SkillPointID, Set<SkillPointID>>()
-    const outgoingPrereqs = new Map<SkillPointID, Set<SkillPointID>>()
+    const nodes = new Map<SkillNodeID, SkillNode>()
+    const forwardEdges = new Map<SkillNodeID, Set<SkillNodeID>>()
+    const outgoingPrereqs = new Map<SkillNodeID, Set<SkillNodeID>>()
 
     for (const [idStr, node] of Object.entries(ALL_SKILLS)) {
         if (!node) continue
-        nodes.set(Number(idStr) as SkillPointID, node)
+        nodes.set(Number(idStr) as SkillNodeID, node)
     }
 
     for (const [id, node] of nodes) {
-        const prereqs = new Set<SkillPointID>()
+        const prereqs = new Set<SkillNodeID>()
         collectNodeRefs(node.unlockRequirements, prereqs)
         outgoingPrereqs.set(id, prereqs)
         for (const prereqId of prereqs) {
             let dependents = forwardEdges.get(prereqId)
             if (!dependents) {
-                dependents = new Set<SkillPointID>()
+                dependents = new Set<SkillNodeID>()
                 forwardEdges.set(prereqId, dependents)
             }
             dependents.add(id)

@@ -3,9 +3,9 @@ import { LeafletModule } from '@bluehalo/ngx-leaflet'
 import * as L from 'leaflet'
 import i18next from 'i18next'
 import { SKILL_TREE_GRAPH } from 'data/skill-tree-graph'
-import { SkillPointID } from 'enums/ids/skill-tree-node-id.enum'
-import { SkillRegion } from 'enums/ids/skill-region.enum'
-import { SkillPoint } from 'interfaces/skill-tree/skill-point.interface'
+import { SkillNodeID } from 'enums/ids/skill-node-id.enum'
+import { SkillBranch } from 'enums/ids/skill-branch.enum'
+import { SkillNode } from 'interfaces/skill-tree/skill-node.interface'
 import { PlayerManagerService } from 'app/services/player-manager.service'
 import { ModalService } from 'app/services/modal.service'
 import { isRequirementMet } from 'utils/skill-tree-requirements'
@@ -29,11 +29,11 @@ const EDGE_STYLE: Record<'locked' | 'available' | 'allocated', { color: string; 
 export class SkillTreeComponent {
   private readonly playerManagerService = inject(PlayerManagerService)
   private readonly modalService = inject(ModalService)
-  private readonly unlockedSkillPoints = this.playerManagerService.unlockedSkillPoints
+  private readonly unlockedNodes = this.playerManagerService.unlockedNodes
 
   private map!: L.Map
-  private readonly markersById = new Map<SkillPointID, L.Marker>()
-  private readonly edges: Array<{ to: SkillPointID; polyline: L.Polyline }> = []
+  private readonly markersById = new Map<SkillNodeID, L.Marker>()
+  private readonly edges: Array<{ to: SkillNodeID; polyline: L.Polyline }> = []
 
   readonly mapOptions: L.MapOptions = {
     crs: L.CRS.Simple,
@@ -49,7 +49,7 @@ export class SkillTreeComponent {
 
   constructor() {
     effect(() => {
-      const unlocked = this.unlockedSkillPoints()
+      const unlocked = this.unlockedNodes()
       if (!this.map) return
       this.refresh(unlocked)
     })
@@ -61,7 +61,7 @@ export class SkillTreeComponent {
       map.invalidateSize()
       this.placeMarkers()
       this.placeEdges()
-      this.refresh(this.unlockedSkillPoints())
+      this.refresh(this.unlockedNodes())
     })
   }
 
@@ -73,12 +73,12 @@ export class SkillTreeComponent {
       })
       marker.on('click', (ev) => {
         const orig = ev.originalEvent as MouseEvent
-        this.playerManagerService.buySkillPoint(node.id, orig.ctrlKey)
+        this.playerManagerService.buyNode(node.id, orig.ctrlKey)
       })
       marker.on('contextmenu', (ev) => {
         const orig = ev.originalEvent as MouseEvent
         orig.preventDefault()
-        this.playerManagerService.refundSkillPoint(node.id, orig.ctrlKey ? 'all' : 1)
+        this.playerManagerService.refundNode(node.id, orig.ctrlKey ? 'all' : 1)
       })
       marker.bindTooltip(this.buildTooltip(node, 0, 'locked'), {
         direction: 'right',
@@ -114,7 +114,7 @@ export class SkillTreeComponent {
   }
 
   private refresh(unlocked: Readonly<Record<number, number>>): void {
-    const stateById = new Map<SkillPointID, NodeState>()
+    const stateById = new Map<SkillNodeID, NodeState>()
     for (const node of SKILL_TREE_GRAPH.nodes.values()) {
       const level = unlocked[node.id] ?? 0
       let state: NodeState
@@ -142,12 +142,12 @@ export class SkillTreeComponent {
     }
   }
 
-  private buildIcon(node: SkillPoint, level: number, state: NodeState): L.DivIcon {
-    const region = SkillRegion[node.region]
+  private buildIcon(node: SkillNode, level: number, state: NodeState): L.DivIcon {
+    const branch = SkillBranch[node.branch]
     const special = node.special ? ' skill-node--special' : ''
     return L.divIcon({
       html: `
-                <div class="skill-node skill-node--${state} skill-node--${region}${special}"
+                <div class="skill-node skill-node--${state} skill-node--${branch}${special}"
                      style="background-image: url('${node.url}')">
                     <div class="skill-node__info">
                         <span>${level} / ${node.maxLevel}</span>
@@ -161,10 +161,10 @@ export class SkillTreeComponent {
     })
   }
 
-  private buildTooltip(node: SkillPoint, level: number, state: NodeState): string {
-    const idName = SkillPointID[node.id]
-    const name = i18next.t(`skill-tree:skillPoints.${idName}.name`)
-    const desc = i18next.t(`skill-tree:skillPoints.${idName}.desc`)
+  private buildTooltip(node: SkillNode, level: number, state: NodeState): string {
+    const idName = SkillNodeID[node.id]
+    const name = i18next.t(`skill-tree:nodes.${idName}.name`)
+    const desc = i18next.t(`skill-tree:nodes.${idName}.desc`)
     const cost = i18next.t('skill-tree:cost', { amount: node.skillPointCost })
     const hint = i18next.t('skill-tree:add')
     const lockBadge = state === 'locked'
@@ -179,7 +179,7 @@ export class SkillTreeComponent {
         refundLine = `<div class="skill-tooltip__refund">Right-click: refund 1 (${goldCost} gold)</div>`
       } else if ('reason' in check && check.reason === 'blocked-by') {
         const blockerNames = check.blockers
-          .map(id => i18next.t(`skill-tree:skillPoints.${SkillPointID[id]}.name`))
+          .map(id => i18next.t(`skill-tree:nodes.${SkillNodeID[id]}.name`))
           .join(', ')
         refundLine = `<div class="skill-tooltip__refund skill-tooltip__refund--blocked">Refund blocked by: ${blockerNames}</div>`
       }

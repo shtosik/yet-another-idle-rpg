@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/c
 import { NgOptimizedImage } from '@angular/common'
 import { BattleStore } from '../../../../../store/battle/battle.store'
 import { PlayerStore } from '../../../../../store/player/player.store'
-import { SkillPointID } from '../../../../../../enums/ids/skill-tree-node-id.enum'
+import { SkillNodeID } from '../../../../../../enums/ids/skill-node-id.enum'
 import { DamageElement } from '../../../../../../enums/damage-element.enum'
 import { TranslatePipe } from '../../../../../pipes/i18next.pipe'
 
@@ -30,7 +30,7 @@ export class MonsterDebuffBarComponent {
   weakness = computed(() => {
     const enemy = this.battleStore.enemy()
     if (!enemy || enemy.weakness === undefined) return null
-    if (!this.playerStore.hasSkillUnlocked(SkillPointID.weaknesses)) return null
+    if (!this.playerStore.hasSkillUnlocked(SkillNodeID.weaknesses)) return null
     return {
       element: enemy.weakness,
       icon: WEAKNESS_ICONS[enemy.weakness],

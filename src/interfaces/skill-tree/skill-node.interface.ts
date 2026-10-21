@@ -1,34 +1,34 @@
-import { SkillPointID } from 'enums/ids/skill-tree-node-id.enum'
-import { SkillRegion } from 'enums/ids/skill-region.enum'
+import { SkillNodeID } from 'enums/ids/skill-node-id.enum'
+import { SkillBranch } from 'enums/ids/skill-branch.enum'
 import { SpellID } from 'enums/ids/spell-id.enum'
-import { SkillPointType } from 'enums/skill-point-type.enum'
+import { SkillNodeType } from 'enums/skill-node-type.enum'
 import { PlayerStat } from 'types/player/player-stat.type'
 
-export interface SkillPointPosition {
+export interface SkillNodePosition {
     x: number
     y: number
 }
 
 export type UnlockRequirement =
-    | { kind: 'node'; id: SkillPointID; minLevel: number }
+    | { kind: 'node'; id: SkillNodeID; minLevel: number }
     | { kind: 'all'; of: UnlockRequirement[] }
     | { kind: 'any'; of: UnlockRequirement[] }
 
-export interface SkillPoint {
-    id: SkillPointID
-    region: SkillRegion
+export interface SkillNode {
+    id: SkillNodeID
+    branch: SkillBranch
     // Layout strategy (resolved at module load by skill-tree-graph):
     //   - explicit `position` wins (origin, or unconnected special nodes)
     //   - else if single node prereq: chain-inherit direction from prereq + (turn ?? 0), step by STEP_DISTANCE
     //   - else if multiple prereqs: auto-midpoint of all prereqs' positions
     //   - else: authoring error
-    position?: SkillPointPosition
+    position?: SkillNodePosition
     turn?: number
     skillPointCost: number
     maxLevel: number
     unlockRequirements: UnlockRequirement | null
     url: string
-    type: SkillPointType
+    type: SkillNodeType
     stat?: PlayerStat
     statAmount?: number
     special?: boolean

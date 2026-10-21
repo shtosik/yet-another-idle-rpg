@@ -1,10 +1,10 @@
 {
-    "skillTreesNames": {
+    "branches": {
         "damage": "Damage",
         "exploration": "Exploration",
         "magic": "Magic"
     },
-    "skillPoints": {
+    "nodes": {
         "origin": {
             "name": "Genesis",
             "desc": "The starting point of your skill tree."
