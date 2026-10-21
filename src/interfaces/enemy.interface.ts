@@ -11,6 +11,5 @@ export interface Enemy {
   drops: EnemyDrop[]
   shinyDrops?: EnemyDrop[]
   url: string
-  isBossEnemy?: boolean
   enemyTypes: EnemyType[]
 }

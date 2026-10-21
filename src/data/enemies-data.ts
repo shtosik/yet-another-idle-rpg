@@ -69,7 +69,6 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     ],
     shinyDrops: shinyPetDrops(EnemyID.kingSlime),
     url: './assets/img/enemies/kingSlime.png',
-    isBossEnemy: true,
     enemyTypes: [EnemyType.slime],
   },
   [EnemyID.crab]: {
@@ -129,7 +128,6 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     ],
     shinyDrops: shinyPetDrops(EnemyID.gangsterCrab),
     url: './assets/img/enemies/gangsterCrab.png',
-    isBossEnemy: true,
     enemyTypes: [EnemyType.crustacean, EnemyType.crab],
   },
   [EnemyID.rat]: {
@@ -160,7 +158,6 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     ],
     shinyDrops: shinyPetDrops(EnemyID.giantRat),
     url: './assets/img/enemies/giantRat.png',
-    isBossEnemy: true,
     enemyTypes: [EnemyType.rodent, EnemyType.rat],
   },
   [EnemyID.wolf]: {
@@ -255,7 +252,6 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     drops: [petDrop(EnemyID.troll)],
     shinyDrops: shinyPetDrops(EnemyID.troll),
     url: './assets/img/enemies/troll.png',
-    isBossEnemy: true,
     enemyTypes: [EnemyType.troll, EnemyType.humanoid],
   },
   // ── Elderwood Wilds (Zone 6) ──────────────────────────────────────────────
@@ -317,7 +313,6 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     ],
     shinyDrops: shinyPetDrops(EnemyID.gnollWarchief),
     url: './assets/img/enemies/gnollWarchief.png',
-    isBossEnemy: true,
     enemyTypes: [EnemyType.gnoll, EnemyType.humanoid],
   },
   // ── The Deepwood (Zone 7) ─────────────────────────────────────────────────
@@ -392,7 +387,6 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     ],
     shinyDrops: shinyPetDrops(EnemyID.gnarledTreant),
     url: './assets/img/enemies/gnarledTreant.png',
-    isBossEnemy: true,
     enemyTypes: [EnemyType.plant, EnemyType.treant],
   },
   // ── The Upper Canopy (Zone 8) ─────────────────────────────────────────────
@@ -452,7 +446,6 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     ],
     shinyDrops: shinyPetDrops(EnemyID.harpyMatriarch),
     url: './assets/img/enemies/harpyMatriarch.png',
-    isBossEnemy: true,
     enemyTypes: [EnemyType.harpy, EnemyType.bird],
   },
 }

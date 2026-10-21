@@ -163,8 +163,8 @@ for (const zone of Object.values(D.ZONES_DATA)) {
   for (const id of zone.enemies) {
     if (!has(D.ENEMIES_DATA, id)) error('src/data/zones-data.ts', `${idName(D.ZoneID, zone.id)} has unknown EnemyID ${id}`)
   }
-  if (!D.ENEMIES_DATA[zone.bossEnemyId]?.isBossEnemy) {
-    warn('src/data/zones-data.ts', `${idName(D.ZoneID, zone.id)} boss ${idName(D.EnemyID, zone.bossEnemyId)} is not flagged isBossEnemy`)
+  if (zone.enemies.includes(zone.bossEnemyId)) {
+    warn('src/data/zones-data.ts', `${idName(D.ZoneID, zone.id)} lists its boss ${idName(D.EnemyID, zone.bossEnemyId)} as a regular enemy`)
   }
 }
 for (const recipe of Object.values(D.RECIPES_DATA)) {

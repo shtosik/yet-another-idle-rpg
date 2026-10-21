@@ -6,7 +6,7 @@ import { BattleManagerService } from './battle-manager.service'
 import { ShopStore } from '../store/shop/shop.store'
 
 const TICK_DURATION_IN_MS = 100
-const TICK_DURATION_IN_SECONDS = 1000
+const MS_PER_SECOND = 1000
 
 @Injectable({ providedIn: 'root' })
 export class GameIntervalService {
@@ -16,7 +16,7 @@ export class GameIntervalService {
     shopStore = inject(ShopStore)
 
 
-    private timePerAttack = computed(() => this.playerStore.stats().attackSpeed * TICK_DURATION_IN_SECONDS)
+    private timePerAttack = computed(() => this.playerStore.stats().attackSpeed * MS_PER_SECOND)
 
     private tickCounter = 0
 
@@ -26,12 +26,12 @@ export class GameIntervalService {
 
     private tick() {
         const isInCombat = this.battleStore.isInCombat()
-        const currentAccumulator = this.battleStore.attackInterval()
+        const currentAccumulator = this.battleStore.attackTimer()
 
-        const newInterval = currentAccumulator + TICK_DURATION_IN_MS
+        const newTimer = currentAccumulator + TICK_DURATION_IN_MS
 
-        if (newInterval >= this.timePerAttack()) {
-            this.battleStore.updateAttackInterval(0)
+        if (newTimer >= this.timePerAttack()) {
+            this.battleStore.updateAttackTimer(0)
 
             if (!isInCombat) {
                 this.battleStore.startBattle()
@@ -39,16 +39,16 @@ export class GameIntervalService {
                 this.battleManagerService.doDamage()
             }
         } else {
-            this.battleStore.updateAttackInterval(newInterval)
+            this.battleStore.updateAttackTimer(newTimer)
         }
 
         this.playerStore.regenMana(TICK_DURATION_IN_MS)
 
         this.tickCounter += TICK_DURATION_IN_MS
-        if (this.tickCounter >= 1000) {
+        if (this.tickCounter >= MS_PER_SECOND) {
             this.tickCounter = 0
             this.battleManagerService.tickSpells()
-            this.shopStore.tickCooldowns(1000)
+            this.shopStore.tickCooldowns(MS_PER_SECOND)
         }
     }
 }

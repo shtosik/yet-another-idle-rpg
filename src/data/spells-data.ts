@@ -5,7 +5,7 @@ import { SpellProps } from '../interfaces/spell.interface'
 
 const SPELLS_DATA: Record<SpellID, SpellProps> = {
   [SpellID.fireStrike]: {
-    id: 0,
+    id: SpellID.fireStrike,
     baseManaCost: 2,
     baseCooldown: 60,
     url: './assets/img/skills/fireStrike.png',
@@ -16,7 +16,7 @@ const SPELLS_DATA: Record<SpellID, SpellProps> = {
     },
   },
   [SpellID.haste]: {
-    id: 1,
+    id: SpellID.haste,
     baseManaCost: 5,
     baseCooldown: 300,
     url: './assets/img/skills/haste.png',
@@ -28,7 +28,7 @@ const SPELLS_DATA: Record<SpellID, SpellProps> = {
     },
   },
   [SpellID.doubleAttack]: {
-    id: 2,
+    id: SpellID.doubleAttack,
     baseManaCost: 2,
     baseCooldown: 60,
     url: './assets/img/skills/doubleAttack.png',

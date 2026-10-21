@@ -21,7 +21,7 @@ export interface BattleState {
   autoWaveProgressionEnabled: boolean;
   equippedSpells: (EquippedSpell | null)[];
   activeBuffs: ActiveBuff[];
-  attackInterval: number;
+  attackTimer: number;
   isShinyEnemy: boolean;
   consumableSlots: Record<ConsumableSlot, ActiveConsumable | null>;
   autoEatEnabled: boolean;
@@ -36,7 +36,7 @@ export const initialState: BattleState = {
   autoWaveProgressionEnabled: false,
   equippedSpells: [null, null, null, null, null],
   activeBuffs: [],
-  attackInterval: 0,
+  attackTimer: 0,
   isShinyEnemy: false,
   consumableSlots: { food: null, potion: null },
   autoEatEnabled: false,
@@ -82,8 +82,8 @@ export const BattleStore = signalStore(
       })
     },
 
-    updateAttackInterval(attackInterval: number): void {
-      patchState(store, { attackInterval })
+    updateAttackTimer(attackTimer: number): void {
+      patchState(store, { attackTimer })
     },
 
     changeWave(next: boolean): void {
