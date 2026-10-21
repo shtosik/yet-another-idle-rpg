@@ -1,5 +1,5 @@
 import { QuestProgression } from '../../../types/quests/quest-progression.type'
-import { patchState, signalStore, withMethods, withState } from '@ngrx/signals'
+import { patchState, signalStore, withHooks, withMethods, withState } from '@ngrx/signals'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { withDevtools } from '@angular-architects/ngrx-toolkit'
 import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
@@ -8,6 +8,7 @@ import { inject } from '@angular/core'
 import { ModalService } from '../../services/modal.service'
 import { PlayerStore } from '../player/player.store'
 import { ItemStack } from '../player/inventory'
+import { ENTRANCE_ZONES_BY_QUEST } from '../../../data/helpers/entrance-zones'
 
 export interface QuestsState {
   questStepProgression: QuestProgression
@@ -52,7 +53,7 @@ export const QuestsStore = signalStore(
       playerStore.addItems(itemsToUpdate)
     },
   })),
-  withMethods((store) => ({
+  withMethods((store, playerStore = inject(PlayerStore)) => ({
       resetState(): void {
         patchState(store, initialState)
       },
@@ -61,6 +62,7 @@ export const QuestsStore = signalStore(
         patchState(store, (state) => ({
           questStepProgression: { ...state.questStepProgression, [questId]: 1 },
         }))
+        ENTRANCE_ZONES_BY_QUEST[questId]?.forEach(zoneId => playerStore.unlockZone(zoneId))
       },
 
       getQuestStep(questId: QuestID) {
@@ -107,4 +109,12 @@ export const QuestsStore = signalStore(
       },
     }),
   ),
+  withHooks((store, playerStore = inject(PlayerStore)) => ({
+    // Re-applies entrance zone unlocks on load, like UNLOCK_RULES in PlayerStore.
+    onInit() {
+      for (const key of Object.keys(store.questStepProgression())) {
+        ENTRANCE_ZONES_BY_QUEST[Number(key) as QuestID]?.forEach(zoneId => playerStore.unlockZone(zoneId))
+      }
+    },
+  })),
 )

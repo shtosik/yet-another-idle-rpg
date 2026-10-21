@@ -25,7 +25,6 @@ A pannable, zoomable painted map (Leaflet) with markers for unlocked towns and z
 - Marker labels are hard-coded English (`label`) instead of `zones:names` / `map:towns` keys; points of interest open a popup showing the raw `i18nKey`.
 - `setTimeout` in `onMapReady` is never cleared on destroy.
 - Map source art (`source.png` 4 MB, `source.png.kra` 10 MB) ships in the build because all of `src/assets` is copied.
-- Zones entered from town buildings never get markers (see `zones-waves-unlocks.md`).
 
 ## How to extend
 New marker: add an entry to `WORLD_MAP_DATA.markers` with the source-image pixel position. A new zone marker only shows once the zone is in `unlockedContent.zones`.

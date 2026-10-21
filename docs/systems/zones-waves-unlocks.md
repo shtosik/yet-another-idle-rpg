@@ -17,7 +17,7 @@ Zones are the combat areas; each has waves of regular enemies ending in a boss. 
 
 **Zone unlocks**, two paths:
 1. **Chain**: killing the boss of a zone adds its `nextZoneId` to `unlockedContent.zones` and shows `ZONE_UNLOCK_NOTIFICATIONS[next]`. Chain: Horseshoe Beach → Plains → The Long Path → Mountain Pass → Elderwood Wilds.
-2. **Town entrance**: a town building with `zoneId` (and usually `questRequirement`) sends the player straight into that zone (`setZone`). Traders' Basement (La Harpar, Rats Were Rats), Deepwood (Mawood, The Sap That Burns), Upper Canopy (Mawood, Feathers for a Kite).
+2. **Town entrance**: a town building with `zoneId` and `questRequirement` sends the player straight into that zone (`setZone`). Starting the quest adds the zone to `unlockedContent.zones` (`QuestsStore.startQuest` via `src/data/helpers/entrance-zones.ts:ENTRANCE_ZONES_BY_QUEST`; re-applied on load). Traders' Basement (La Harpar, Rats Were Rats), Deepwood (Mawood, The Sap That Burns), Upper Canopy (Mawood, Feathers for a Kite).
 
 **Town and feature unlocks** (`UNLOCK_RULES`), checked after every kill:
 - `hasItem` Turtle Shell → Camp; `levelReached` 2 → skill tree;
@@ -31,7 +31,6 @@ On load, `PlayerStore.onInit` re-applies every rule already met, silently, so ne
 - `waveReached` means "killed something on that wave", measured at kill time in the current zone.
 
 ## Known issues
-- Zones entered from town buildings are never added to `unlockedContent.zones`, so they're missing from the guild task pool and world map zone markers.
 - Unlock rules are only evaluated on kills; a level-up from a quest reward unlocks nothing until the next kill.
 - The two `waveReached` checks disagree: on load, kills on exactly that wave; at runtime, any wave `>=` it.
 - Waves inside a zone are identical (no per-wave scaling); the HP/XP curve across zones isn't monotonic.

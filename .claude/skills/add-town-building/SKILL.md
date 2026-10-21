@@ -14,16 +14,16 @@ Background: `docs/systems/towns-shops-guild.md`. Building-specific gameplay goes
 2. **Building entry** — append to the town's `buildings` in `src/data/towns-data.ts`:
    ```ts
    {
-     tabId: TownBuildingID.mawoodBlacksmith,
+     buildingId: TownBuildingID.mawoodBlacksmith,
      position: { x: 40, y: 60 },          // button position on the town view, % of width/height
      npcIds: [{ id: NpcID.mawoodSmith, position: { x: 50, y: 55 } }],   // % on the building view
      url: './assets/img/backgrounds/mawoodBlacksmith.png',
      questRequirement: QuestID.someQuest, // optional: hidden until this quest has started
    },
    ```
-   For a **zone entrance**, set `zoneId` and omit `url` and NPCs; clicking it travels to the zone. Mention to the user that entrance zones aren't recorded as unlocked (see `docs/systems/zones-waves-unlocks.md`).
+   For a **zone entrance**, set `zoneId` and omit `url` and NPCs; clicking it travels to the zone. Give it a `questRequirement`: starting that quest unlocks the zone (see `docs/systems/zones-waves-unlocks.md`).
 
-3. **Label** — `map:townTabs.<buildingKey>` in `src/assets/locales/en/map.json`.
+3. **Label** — `map:buildings.<buildingKey>` in `src/assets/locales/en/map.json`.
 
 4. **Background** — `/generate-2d-asset` for `src/assets/img/backgrounds/<buildingKey>.png` (town backgrounds use the `town-painterly` family).
 
