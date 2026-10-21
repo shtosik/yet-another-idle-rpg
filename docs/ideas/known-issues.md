@@ -13,7 +13,7 @@
 8. Several turn-ins run `end` before `take`, so freed slots don't count toward rewards.
 9. `getConditionLabel` has no labels for `many*` conditions (Sylvie's and Brenna's turn-ins).
 10. Dead ends: Josh `missionCheck` and Corwin `aboutMawood` unreachable; Josh `workInfo` and Milo `questWhatLurksAccept` show no options after their quest starts.
-11. Quests tab `started` filter equals `all`; a failed quest's description lookup throws.
+11. Quests tab `started` filter equals `all`.
 
 ## Owner decisions not enforced yet
 12. Gold can go negative via dialogue fees (Bartender, Josh); the Bartender fallback charges 40 gold on every click.

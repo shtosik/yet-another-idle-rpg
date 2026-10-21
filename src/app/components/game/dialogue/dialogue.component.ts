@@ -80,7 +80,6 @@ export class DialogueComponent {
           case 'start':   return `New Quest: ${questName}`
           case 'advance': return `Progress: ${questName}`
           case 'end':     return `Complete: ${questName}`
-          case 'fail':    return `Fail: ${questName}`
         }
       }
       case 'stat':

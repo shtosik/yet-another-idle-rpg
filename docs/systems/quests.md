@@ -6,7 +6,7 @@ Multi-step story objectives handed out by NPCs. Quests are started, advanced and
 ## Key files
 - `src/data/quests-data.ts:QUEST_DATA` — per quest: `startRequirements`, `steps[]` (each with `description` and `requirements`), `rewards`.
 - `src/enums/ids/quest-id.enum.ts:QuestID`.
-- `src/app/store/quests/quests.store.ts:QuestsStore` — `questStepProgression` (saved), `dialogueFlags`, `startQuest`/`advanceQuest`/`endQuest`/`failQuest`, `handleQuestCompleted` (rewards + modal).
+- `src/app/store/quests/quests.store.ts:QuestsStore` — `questStepProgression` (saved), `dialogueFlags`, `startQuest`/`advanceQuest`/`endQuest`, `handleQuestCompleted` (rewards + modal).
 - `src/app/services/quest-status.ts` — `getQuestStatus`, `canAdvanceQuest`, `isQuestAvailable`, `matchesQuestState`, `getActiveQuestIds`. Status is always derived from the saved step.
 - `src/app/components/game/quests/quests.component.ts` — quests tab.
 - `src/app/components/modals/quest-completed/` — reward modal.
@@ -16,10 +16,9 @@ Multi-step story objectives handed out by NPCs. Quests are started, advanced and
 2. **Progress**: requirements (`item`, `stat`, `enemy` kill count, `wave` kill count, `quest`) are only checked, never tracked per quest. Item requirements are not consumed automatically; take items with an `item` `take` effect.
 3. **Advance**: a turn-in result gated by `QuestState.readyToAdvance` (with `step`) applies `action: 'advance'`. Advancing past the last step completes the quest.
 4. **Complete**: step becomes `QUEST_STEP_AFTER_COMPLETED` (9999); `handleQuestCompleted` grants `rewards` (stats and items) and opens the modal. `action: 'end'` completes immediately from any step.
-5. **Fail**: `action: 'fail'` sets `QUEST_STEP_AFTER_FAILED` (8888).
-6. Enemy drops with `requiredActiveQuestId` only roll while that quest is active (`getActiveQuestIds`).
+5. Enemy drops with `requiredActiveQuestId` only roll while that quest is active (`getActiveQuestIds`).
 
-Saved step encoding: `undefined` = not started, `1..n` = on step n, `9999` = completed, `8888` = failed.
+Saved step encoding: `undefined` = not started, `1..n` = on step n, `9999` = completed.
 
 ## Intended behavior (owner decisions)
 - **A Tale of a Captain is unfinished on purpose.** `captainsLetter` has no source and `rewards` is empty; it will be finished later.
@@ -37,7 +36,7 @@ Saved step encoding: `undefined` = not started, `1..n` = on step n, `9999` = com
 - No state guards: `endQuest` on a completed quest grants rewards again; `advanceQuest` on an unstarted quest saves `NaN`.
 - `enemy` kill-count requirements read lifetime kill counters, so some quests are already complete when accepted.
 - Dialogue turn-ins restate requirements by hand and drift from `QUEST_DATA` (Meat Shortage: dialogue takes 50 crab meat, quest says 30).
-- The quests tab's `started` filter shows every quest, the same as `all`; a failed quest's description lookup throws.
+- The quests tab's `started` filter shows every quest, the same as `all`.
 
 ## How to extend
 New quest: the `add-quest` skill (data, i18n, NPC quest hub ordering, start gating).

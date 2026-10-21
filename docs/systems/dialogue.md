@@ -21,7 +21,7 @@ Data-driven NPC conversations. Each NPC has a graph of nodes; options branch on 
 
 ## Conditions (quest)
 `{ type: 'quest', questId, questState, step? }` uses `QuestState`:
-- `notStarted`, `completed`, `failed` — plain status.
+- `notStarted`, `completed` — plain status.
 - `available` — not started and `startRequirements` met.
 - `active` — started (optionally at `step`).
 - `readyToAdvance` — active (optionally at `step`) **and** the current step's requirements are met. Use this for turn-in branches.

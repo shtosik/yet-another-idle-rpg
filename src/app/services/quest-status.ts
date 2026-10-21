@@ -1,6 +1,5 @@
 import QUEST_DATA, {
   QUEST_STEP_AFTER_COMPLETED,
-  QUEST_STEP_AFTER_FAILED,
   RequirementProps,
 } from '../../data/quests-data'
 import { QuestID } from '../../enums/ids/quest-id.enum'
@@ -8,7 +7,7 @@ import { QuestState } from '../../enums/quest-state.enum'
 import { QuestProgression, QuestStep } from '../../types/quests/quest-progression.type'
 
 export type QuestStatus =
-  | { state: QuestState.notStarted | QuestState.completed | QuestState.failed }
+  | { state: QuestState.notStarted | QuestState.completed }
   | { state: QuestState.active, step: QuestStep }
 
 export type RequirementCheck = (requirement: RequirementProps) => boolean
@@ -19,7 +18,6 @@ export function getQuestStatus(progression: QuestProgression, questId: QuestID):
 
   if (!step) return { state: QuestState.notStarted }
   if (step === QUEST_STEP_AFTER_COMPLETED) return { state: QuestState.completed }
-  if (step === QUEST_STEP_AFTER_FAILED) return { state: QuestState.failed }
 
   return { state: QuestState.active, step }
 }
@@ -67,7 +65,6 @@ export function matchesQuestState(
       return isQuestAvailable(progression, questId, isRequirementMet)
     case QuestState.notStarted:
     case QuestState.completed:
-    case QuestState.failed:
       return getQuestStatus(progression, questId).state === state
     default:
       return false

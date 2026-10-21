@@ -15,7 +15,7 @@ export type DialogueEffect =
 export interface QuestEffect {
   type: 'quest'
   questId: QuestID
-  action: 'start' | 'advance' | 'end' | 'fail'
+  action: 'start' | 'advance' | 'end'
 }
 
 export interface StatEffect {

@@ -202,9 +202,6 @@ export class DialogueManagerService {
             case 'end':
               this.questStore.endQuest(effect.questId)
               break
-            case 'fail':
-              this.questStore.failQuest(effect.questId)
-              break
           }
           break
         case 'shop':
