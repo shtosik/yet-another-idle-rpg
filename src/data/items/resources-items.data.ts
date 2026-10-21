@@ -75,6 +75,13 @@ export const ResourcesItemsData: Partial<Record<ItemID, Item>> = {
     value: 1,
     type: ItemType.resource,
   },
+  [ItemID.venison]: {
+    id: ItemID.venison,
+    tier: ItemTier.normal,
+    url: './assets/img/items/venison.png',
+    value: 1,
+    type: ItemType.resource,
+  },
   [ItemID.wolfFangs]: {
     id: ItemID.wolfFangs,
     tier: ItemTier.normal,

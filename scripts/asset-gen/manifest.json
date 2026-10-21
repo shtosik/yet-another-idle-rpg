@@ -625,6 +625,20 @@
     "subject": "spider web drawn in code (spokes and sagging rings, 48px, hard pixels); SDXL could not draw a web with transparent gaps",
     "date": "2026-10-18"
   },
+  "src/assets/img/items/venison.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "one raw deer meat steak, a rounded bright red slab of meat with a thin white fat rim, lying flat, nothing else",
+    "seed": 777,
+    "date": "2026-10-21"
+  },
+  "src/assets/img/items/venisonRoast.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "one browned roast meat joint with a short white bone sticking out of one end, one red apple beside it, nothing underneath",
+    "seed": 1268499607,
+    "date": "2026-10-21"
+  },
   "src/assets/img/skills/autoEat.png": {
     "family": "skill-icon",
     "tier": null,

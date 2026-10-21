@@ -124,7 +124,10 @@
         "firePit": "Fire Pit",
         "cookingPot": "Cooking Pot",
         "mortarAndPestle": "Mortar & Pestle",
-        "runeAltar": "Rune Altar"
+        "runeAltar": "Rune Altar",
+        "venison": "Venison",
+        "venisonRoast": "Venison Roast",
+        "venisonRoastRecipe": "Venison Roast Recipe"
     },
     "tiers": {
         "trash": "Trash",

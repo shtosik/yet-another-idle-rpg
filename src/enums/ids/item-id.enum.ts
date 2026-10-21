@@ -136,4 +136,8 @@ export enum ItemID {
     cookingPot = 122,
     mortarAndPestle = 123,
     runeAltar = 124,
+    // venison roast
+    venison = 125,
+    venisonRoast = 126,
+    venisonRoastRecipe = 127,
 }

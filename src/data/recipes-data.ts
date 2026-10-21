@@ -176,6 +176,15 @@ const RECIPES_DATA: Partial<Record<RecipeID, CraftingRecipe>> = {
         createsAmount: 1,
         requiresUnlock: true,
     },
+    [RecipeID.venisonRoast]: {
+        id: RecipeID.venisonRoast,
+        itemId: ItemID.venisonRoast,
+        stationId: StationID.cooking,
+        stationLevel: 2,
+        itemsNeeded: [{ id: ItemID.venison, amount: 3 }, { id: ItemID.apple, amount: 1 }],
+        createsAmount: 1,
+        requiresUnlock: true,
+    },
 }
 
 export default RECIPES_DATA

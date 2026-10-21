@@ -88,6 +88,19 @@ export const ConsumablesItemsData: Partial<Record<ItemID, Item>> = {
       ],
     },
   },
+  [ItemID.venisonRoast]: {
+    id: ItemID.venisonRoast,
+    tier: ItemTier.uncommon,
+    url: './assets/img/items/venisonRoast.png',
+    value: 100,
+    type: ItemType.food,
+    effect: {
+      slot: 'food',
+      duration: 10 * MINUTE,
+      cooldown: 15 * MINUTE,
+      stats: [{ stat: 'critMulti', amount: 0.2 }],
+    },
+  },
   [ItemID.minorManaPotion]: {
     id: ItemID.minorManaPotion,
     tier: ItemTier.normal,
@@ -131,5 +144,13 @@ export const ConsumablesItemsData: Partial<Record<ItemID, Item>> = {
     value: 250,
     type: ItemType.recipe,
     recipeId: RecipeID.huntersFeast,
+  },
+  [ItemID.venisonRoastRecipe]: {
+    id: ItemID.venisonRoastRecipe,
+    tier: ItemTier.uncommon,
+    url: './assets/img/items/cookingRecipe.png',
+    value: 150,
+    type: ItemType.recipe,
+    recipeId: RecipeID.venisonRoast,
   },
 }
