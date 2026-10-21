@@ -76,6 +76,13 @@
     "seed": 513426195,
     "date": "2026-10-17"
   },
+  "src/assets/img/backgrounds/laHarparExplorationGuild.png": {
+    "family": "town-painterly",
+    "tier": null,
+    "subject": "interior of a wooden harbour guild hall: a large notice board covered with pinned paper contracts on the back wall, sea charts and maps on the walls, mounted monster trophies and a stuffed swordfish, a long wooden counter, a table with a spread map and a lantern, warm daylight from round windows, empty with no people",
+    "seed": 1334379591,
+    "date": "2026-10-21"
+  },
   "src/assets/img/backgrounds/mawood.png": {
     "family": "town-painterly",
     "tier": null,
@@ -392,6 +399,13 @@
     "shinySaturation": 2.5,
     "shinyBrightness": 1.1
   },
+  "src/assets/img/enemies/unknown.png": {
+    "family": "enemy-pixel",
+    "tier": "medium",
+    "subject": "a single large bold question mark symbol, solid dark grey-blue, thick rounded stroke with a round dot below it, alone, nothing else",
+    "seed": 534521499,
+    "date": "2026-10-21"
+  },
   "src/assets/img/enemies/wolf.png": {
     "shinyHue": 200,
     "family": "enemy-pixel",
@@ -616,6 +630,13 @@
     "tier": null,
     "subject": "One big roasted meat leg with glossy golden-brown crispy skin and a round white bone end sticking out at the top, a large bite taken out of the meat showing the paler inside",
     "seed": 2034600005,
+    "date": "2026-10-21"
+  },
+  "src/assets/img/skills/origin.png": {
+    "family": "skill-icon",
+    "tier": null,
+    "subject": "a bright cosmic starburst in deep space: a glowing white-gold star core with radiating light rays, surrounded by a swirling purple and blue nebula and tiny scattered stars, the origin of everything",
+    "seed": 1941022359,
     "date": "2026-10-21"
   }
 }
