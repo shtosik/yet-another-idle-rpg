@@ -3,52 +3,55 @@
 @let name = ('items:names.' + ItemID[v.recipe.itemId]) | i18next;
 @let upgrade = stationUpgrade();
 
-<header class="detail__header">
-  <span class="detail__icon" [attr.data-tier]="ItemTier[item.tier]">
-    <img alt="" disableOptimizedSrcset height="34" width="34" [ngSrc]="item.url">
-  </span>
-  <div class="detail__title">
-    <h3 class="detail__name" [attr.data-tier]="ItemTier[item.tier]">{{ name }}</h3>
-    <span class="detail__type">
-      {{ ('camp:itemTypes.' + ItemType[item.type]) | i18next }} · {{ ('items:tiers.' + ItemTier[item.tier]) | i18next }}
-      @if (!upgrade) {
-        · {{ 'camp:owned' | i18next:{ count: ownedCount() } }}
-      }
+<!-- Scrolls on its own so the craft controls stay in view. -->
+<div class="detail__info">
+  <header class="detail__header">
+    <span class="detail__icon" [attr.data-tier]="ItemTier[item.tier]">
+      <img alt="" disableOptimizedSrcset height="34" width="34" [ngSrc]="item.url">
     </span>
-  </div>
-</header>
+    <div class="detail__title">
+      <h3 class="detail__name" [attr.data-tier]="ItemTier[item.tier]">{{ name }}</h3>
+      <span class="detail__type">
+        {{ ('camp:itemTypes.' + ItemType[item.type]) | i18next }} · {{ ('items:tiers.' + ItemTier[item.tier]) | i18next }}
+        @if (!upgrade) {
+          · {{ 'camp:owned' | i18next:{ count: ownedCount() } }}
+        }
+      </span>
+    </div>
+  </header>
 
-<div class="detail__effects">
-  @if (equipment(); as equipment) {
-    @for (stat of equipment.stats; track stat.id) {
-      <span class="detail__effect">+{{ stat.id | statToPercentage:stat.amount }} {{ ('app:playerStats.' + stat.id) | i18next }}</span>
+  <div class="detail__effects">
+    @if (equipment(); as equipment) {
+      @for (stat of equipment.stats; track stat.id) {
+        <span class="detail__effect">+{{ stat.id | statToPercentage:stat.amount }} {{ ('app:playerStats.' + stat.id) | i18next }}</span>
+      }
+      <span class="detail__sub">
+        @if (equippedName(); as equipped) {
+          {{ 'camp:equipped' | i18next:{ item: equipped } }}
+        } @else {
+          {{ 'camp:equippedNone' | i18next }}
+        }
+      </span>
     }
-    <span class="detail__sub">
-      @if (equippedName(); as equipped) {
-        {{ 'camp:equipped' | i18next:{ item: equipped } }}
-      } @else {
-        {{ 'camp:equippedNone' | i18next }}
-      }
-    </span>
-  }
-  @if (consumable(); as consumable) {
-    <app-consumable-effect class="detail__consumable" [effect]="consumable.effect"/>
-    <span class="detail__sub">{{ 'items:consumable.cooldown' | i18next:{ time: (consumable.effect.cooldown | duration) } }}</span>
-  }
-  @if (upgrade) {
-    <span class="detail__effect">{{ (upgrade.level === 1 ? 'items:station.unlocks' : 'items:station.upgrades') | i18next:{ station: stationName(upgrade.stationId), level: upgrade.level } }}</span>
-  }
-</div>
+    @if (consumable(); as consumable) {
+      <app-consumable-effect class="detail__consumable" [effect]="consumable.effect"/>
+      <span class="detail__sub">{{ 'items:consumable.cooldown' | i18next:{ time: (consumable.effect.cooldown | duration) } }}</span>
+    }
+    @if (upgrade) {
+      <span class="detail__effect">{{ (upgrade.level === 1 ? 'items:station.unlocks' : 'items:station.upgrades') | i18next:{ station: stationName(upgrade.stationId), level: upgrade.level } }}</span>
+    }
+  </div>
 
-<ul class="detail__ingredients">
-  @for (ingredient of ingredients(); track ingredient.id) {
-    <li class="detail__ingredient">
-      <img alt="" disableOptimizedSrcset height="18" width="18" [ngSrc]="ingredient.url">
-      <span class="detail__ingredient-name">{{ ('items:names.' + ItemID[ingredient.id]) | i18next }}</span>
-      <span class="detail__count" [class.detail__count--short]="!ingredient.enough">{{ ingredient.owned }} / {{ ingredient.needed }}</span>
-    </li>
-  }
-</ul>
+  <ul class="detail__ingredients">
+    @for (ingredient of ingredients(); track ingredient.id) {
+      <li class="detail__ingredient">
+        <img alt="" disableOptimizedSrcset height="18" width="18" [ngSrc]="ingredient.url">
+        <span class="detail__ingredient-name">{{ ('items:names.' + ItemID[ingredient.id]) | i18next }}</span>
+        <span class="detail__count" [class.detail__count--short]="!ingredient.enough">{{ ingredient.owned }} / {{ ingredient.needed }}</span>
+      </li>
+    }
+  </ul>
+</div>
 
 <div class="detail__actions">
   <div class="detail__amounts" role="group" [attr.aria-label]="'camp:craft' | i18next">
