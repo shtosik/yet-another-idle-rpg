@@ -100,7 +100,7 @@ A repeatable Exploration Guild contract to kill a set number of one monster, sep
 _Avoid_: Quest, bounty, mission
 
 **Zone unlock**:
-A zone opens when the boss of the zone before it is defeated.
+A zone opens when the boss of the zone before it is defeated, or, for a zone entered from a town building, when that building's quest has started.
 _Avoid_: Using unlock rules for zones
 
 **Unlock rule**:
