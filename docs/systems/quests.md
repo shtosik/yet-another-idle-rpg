@@ -32,8 +32,12 @@ Saved step encoding: `undefined` = not started, `1..n` = on step n, `9999` = com
 - Quest step descriptions are plain English strings, not i18n keys (see `localization.md`).
 
 ## Known issues
-- Item rewards are added without a space check; overflow is discarded (violates the owner decision above).
-- The quests tab's `started` filter shows every quest, the same as `all`.
+- Item rewards are added without a space check; overflow is discarded (violates the owner decision above). Several turn-ins run `end` before `take`, so freed slots don't count.
+- `startQuest` ignores `startRequirements`: ungated lore links start Feathers for a Kite (Milo) and Fetches and Fangs (Finn) early.
+- No state guards: `endQuest` on a completed quest grants rewards again; `advanceQuest` on an unstarted quest saves `NaN`.
+- `enemy` kill-count requirements read lifetime kill counters, so some quests are already complete when accepted.
+- Dialogue turn-ins restate requirements by hand and drift from `QUEST_DATA` (Meat Shortage: dialogue takes 50 crab meat, quest says 30).
+- The quests tab's `started` filter shows every quest, the same as `all`; a failed quest's description lookup throws.
 
 ## How to extend
 New quest: the `add-quest` skill (data, i18n, NPC quest hub ordering, start gating).

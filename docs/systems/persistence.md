@@ -31,6 +31,8 @@ Saves game state to `localStorage` on every change and restores it on load. Ther
 
 ## Known issues
 - No save version or migration step. Corrupt values (`NaN`, `null`) are never repaired.
+- Saves are written on every state change with no throttling and no `try/catch` around `setItem` (quota errors would throw). Transient timers (attack timer, mana regen timer, cooldowns) live in persisted state, so writes happen up to 10 times a second.
+- `withDevtools` is active on every store in production builds.
 
 ## Pre-release TODO
 - Add a save version per store and a migration table before the first public release; drop junk keys during migration.

@@ -41,7 +41,13 @@ Damage (`resolveHit`), in order:
 
 ## Known issues
 - `goldCoinsMultiplier` is never applied: every kill gives a flat 1 gold (×10 shiny), even though items and food grant the stat.
-- Every tick writes to `BattleStore` (attack timer) and usually `PlayerStore` (mana regen timer), so both stores are serialized to `localStorage` 10 times a second.
+- Every tick writes to `BattleStore` (attack timer) and usually `PlayerStore` (mana regen timer), so both stores are serialized to `localStorage` 10 times a second, and every `stats()` reader re-runs at 10 Hz.
+- Respawn downtime: spawning waits a full attack interval, roughly halving kill rate; spells can't be cast meanwhile.
+- No offline progress and no wall-clock delta: the loop adds a fixed 100 ms per tick, so throttled or sleeping tabs make no progress.
+- Attack overshoot is dropped (timer resets to 0), so the real interval rounds up to the next 100 ms.
+- `Math.ceil` at each step inflates small hits (1 damage × 1.2 crit = 2).
+- `castSpell` has no guards of its own (cooldown, enemy alive); they live only in the UI.
+- No fail state: auto wave progression can stall forever on a boss the player can't kill.
 
 ## How to extend
 Elemental weaknesses and damage types: the `add-monster-weakness` skill. New enemies or zones: `add-enemy-and-zone`. New spells: `spells-and-buffs.md`.

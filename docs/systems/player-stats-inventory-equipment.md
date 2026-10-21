@@ -10,7 +10,7 @@
 - `src/types/player/player-stat.type.ts:PlayerStat` — the stat union, plus `multiplierStats`, `percentageStats`, `additivePercentStats` (display format, used by `stat-to-percentage.pipe.ts`).
 - `src/interfaces/item.interface.ts:Item` — item union by `ItemType`.
 - `src/enums/equipment-slot.enum.ts:EquipmentSlot` — 11 slots; `EquipmentSlotKey` is the string key used in `PlayerState.equipment`.
-- `src/app/services/player-manager.service.ts:PlayerManagerService` — skill node buy/refund/respec (see `skill-tree.md`).
+- `src/app/services/skill-tree.service.ts:SkillTreeService` — skill node buy/refund/respec (see `skill-tree.md`).
 
 ## Data flow
 - **Stats** are one flat `Record<PlayerStat, number>` in persisted state. Every source changes it with `updatePlayerStats([{ stat, amount }])`: gear on equip (`+`) and unequip (`−`), skill nodes, buffs (`+` on cast, `−` on expiry), consumables, reward items, quest rewards.
@@ -33,6 +33,7 @@
 - `addItems` silently discards what doesn't fit. Callers that must not lose items check `canFit` first.
 
 ## Known issues
+- Because stats are accumulated: rebalancing an item or a node's `statAmount` leaves the old delta on saves that had it applied; `statsInitialState` changes never reach existing saves; float drift builds up (`attackSpeed` 2.7000000000000006).
 - `unequipItem` does not check for space; unequipping with a full inventory destroys the item (violates the owner decision above).
 - `goldCoinsMultiplier` is granted by items but never applied to gold gains (see `game-loop-and-combat.md`).
 

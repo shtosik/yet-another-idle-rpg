@@ -35,6 +35,10 @@ Data-driven NPC conversations. Each NPC has a graph of nodes; options branch on 
 - Flags (`{ type: 'flag' }`) are write-only for data: no condition reads them. Only the engine reads `met_<npcId>`.
 
 ## Known issues
+- **In-progress branches are unreachable.** The trees were written with `active` meaning "in progress" while the engine treated it as "ready to advance". The rename to `readyToAdvance` kept that behavior, so results meant for "quest in progress" still use `readyToAdvance`. They need switching to `active`.
+- Finn's quest hub lists the Big Game offer before the Fetches and Fangs turn-in, so Fetches and Fangs can't be turned in (blocks the Mawood questline).
+- `getConditionLabel` has no labels for the `many*` conditions (Sylvie's and Brenna's turn-ins show unlabeled requirements).
+- Nodes with no visible options after a quest starts: Josh `workInfo`, Milo `questWhatLurksAccept`.
 - `selectOption` picks its result by visibility only. It does not skip already-started quest starts the way `getActiveResult` does, so the executed branch can differ from the shown one.
 - Gold fees in dialogue (`stat` `deduct` of `goldCoins`, Bartender and Josh) are not gated, so gold can go negative. Owner decision: block spending when the player can't afford it (`player-stats-inventory-equipment.md`).
 - `item` `give` effects (quest rewards in dialogue) don't check inventory space; overflow is discarded.
