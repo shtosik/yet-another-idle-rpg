@@ -7,5 +7,5 @@ export interface EquippedSpell {
 
 export interface ActiveBuff {
   spellId: SpellID
-  ticksRemaining: number
+  secondsRemaining: number
 }

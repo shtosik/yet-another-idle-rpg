@@ -6,7 +6,7 @@
         class="buff"
         [style]="{ 'background-image': spellData.url | url }"
       >
-        {{ spell.ticksRemaining }}
+        {{ spell.secondsRemaining }}
       </div>
     }
     @for (consumable of activeConsumables(); track consumable.slot) {

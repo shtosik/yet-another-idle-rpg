@@ -7,7 +7,7 @@ import { SkillNodeID } from '../../enums/ids/skill-node-id.enum'
 import { SpellID } from '../../enums/ids/spell-id.enum'
 import SPELLS_DATA from '../../data/spells-data'
 import { SpellType } from '../../enums/spell-type.enum'
-import { SpellSupportStatBuffEffectProps } from '../../interfaces/spell.interface'
+import { SpellBuffEffectProps } from '../../interfaces/spell.interface'
 import { Enemy } from '../../interfaces/enemy.interface'
 import { UNLOCK_RULES, ZONE_UNLOCK_NOTIFICATIONS } from '../../data/unlock-conditions'
 import { ModalService } from './modal.service'
@@ -105,8 +105,8 @@ export class BattleManagerService {
         this.doDamage(spellData.effect.baseDamage, false, spellData.effect.damageType)
         break
       case SpellType.buff: {
-        const ticks = spellData.effect.duration + stats.increasedSpellDuration
-        this.battleStore.addActiveBuff({ spellId, ticksRemaining: ticks })
+        const seconds = spellData.effect.duration + stats.increasedSpellDuration
+        this.battleStore.addActiveBuff({ spellId, secondsRemaining: seconds })
         this.playerStore.updatePlayerStats([{ stat: spellData.effect.stat, amount: spellData.effect.amount }])
         break
       }
@@ -127,7 +127,7 @@ export class BattleManagerService {
     this.battleStore.tickCooldowns()
     const expired = this.battleStore.tickBuffs()
     for (const spellId of expired) {
-      const effect = SPELLS_DATA[spellId].effect as SpellSupportStatBuffEffectProps
+      const effect = SPELLS_DATA[spellId].effect as SpellBuffEffectProps
       this.playerStore.updatePlayerStats([{ stat: effect.stat, amount: -effect.amount }])
     }
 

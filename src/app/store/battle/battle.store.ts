@@ -186,10 +186,10 @@ export const BattleStore = signalStore(
       const remaining: ActiveBuff[] = []
 
       for (const buff of store.activeBuffs()) {
-        if (buff.ticksRemaining <= 1) {
+        if (buff.secondsRemaining <= 1) {
           expired.push(buff.spellId)
         } else {
-          remaining.push({ ...buff, ticksRemaining: buff.ticksRemaining - 1 })
+          remaining.push({ ...buff, secondsRemaining: buff.secondsRemaining - 1 })
         }
       }
 
