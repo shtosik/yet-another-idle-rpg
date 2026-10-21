@@ -2,7 +2,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import sharp from 'sharp'
 import { existsSync } from 'node:fs'
-import { MATTE_MODEL, alpha, cleanMask, cover, fit, shave, keyout, matte, outline, pixelate, quantize, runPipeline, trim } from '../lib/postprocess.mjs'
+import { MATTE_MODEL, alpha, cleanMask, cover, fit, shave, keyout, matte, outline, pixelate, quantize, runPipeline, tile, trim } from '../lib/postprocess.mjs'
 
 const rawOf = async (buf) => {
     const { data, info } = await sharp(buf).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
@@ -165,4 +165,14 @@ test('shave removes a bright edge row and keeps the size', async () => {
     assert.equal(out.info.width, 40)
     assert.equal(out.info.height, 20)
     assert.ok(out.data[1] < 64, 'top row is no longer white')
+})
+
+test('tile rounds the corners transparent and darkens the rim', async () => {
+    const flat = await sharp({ create: { width: 64, height: 64, channels: 3, background: '#c8c8c8' } }).png().toBuffer()
+    const { data, info } = await sharp(await tile(flat, { radius: 10, rim: 4, shade: 0.5 })).raw().toBuffer({ resolveWithObject: true })
+    const at = (x, y) => Array.from(data.slice((y * info.width + x) * 4, (y * info.width + x) * 4 + 4))
+    assert.equal(at(0, 0)[3], 0, 'corner cut')
+    assert.equal(at(32, 0)[3], 255, 'straight edge kept')
+    assert.equal(at(32, 1)[0], 100, 'rim darkened')
+    assert.deepEqual(at(32, 32), [200, 200, 200, 255], 'centre untouched')
 })

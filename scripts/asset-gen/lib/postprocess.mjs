@@ -369,7 +369,30 @@ export function fit(buf, { width, height }) {
         .toBuffer()
 }
 
-export const STEPS = { matte, alpha, keyout, trim, pixelate, upscale, quantize, outline, cover, shave, fit }
+/**
+ * Cuts a full-frame image into the skill-tree tile: anti-aliased rounded corners of `radius` and a `rim` px band
+ * along the edge darkened by `shade`, matching the hand-made 256px skill icons (radius 20, ~8px dark rim).
+ */
+export async function tile(buf, { radius = 20, rim = 8, shade = 0.55 } = {}) {
+    const { data, width, height } = await raw(buf)
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            const i = (y * width + x) * 4
+            // distance inside the rounded rectangle's edge (negative outside)
+            const cx = Math.min(Math.max(x + 0.5, radius), width - radius)
+            const cy = Math.min(Math.max(y + 0.5, radius), height - radius)
+            const inCorner = (x + 0.5 < radius || x + 0.5 > width - radius) && (y + 0.5 < radius || y + 0.5 > height - radius)
+            const edge = inCorner
+                ? radius - Math.hypot(x + 0.5 - cx, y + 0.5 - cy)
+                : Math.min(x + 0.5, y + 0.5, width - x - 0.5, height - y - 0.5)
+            data[i + 3] = Math.round(data[i + 3] * Math.min(1, Math.max(0, edge + 0.5)))
+            if (edge < rim) for (let c = 0; c < 3; c++) data[i + c] = Math.round(data[i + c] * shade)
+        }
+    }
+    return png(data, width, height)
+}
+
+export const STEPS = { matte, alpha, keyout, trim, pixelate, upscale, quantize, outline, cover, shave, fit, tile }
 
 /** Runs a family `post` list: `[['keyout', {…}], ['trim'], …]`. */
 export async function runPipeline(buf, steps) {

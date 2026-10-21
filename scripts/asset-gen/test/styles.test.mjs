@@ -81,3 +81,11 @@ test('slugFor combines family, target name and optional tag', () => {
     assert.equal(slugFor('item-pixel', 'src/assets/img/items/frostShard.png'), 'item-pixel-frostShard')
     assert.equal(slugFor('item-pixel', 'x/frostShard.png', 'noref'), 'item-pixel-frostShard-noref')
 })
+
+test('skill-icon is a 256×256 inked tile cut by the tile step, with frozen references', () => {
+    const f = FAMILIES['skill-icon']
+    assert.deepEqual(f.target, [256, 256])
+    assert.equal(f.pixel, false)
+    assert.equal(f.post.at(-1)[0], 'tile')
+    for (const ref of f.references) assert.match(ref, /^scripts\/asset-gen\/refs\/skill\//)
+})

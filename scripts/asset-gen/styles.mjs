@@ -30,6 +30,7 @@ export const FAMILY_TARGETS = {
     'zone-pixel': [832, 1248],
     'town-painterly': [1376, 768],
     'portrait-pixel': [256, 256],
+    'skill-icon': [256, 256],
     'enemy-pixel': [256, 256], // hard cap on the longer side; the real size comes from the Size tier
 }
 
@@ -184,6 +185,27 @@ FAMILIES['portrait-pixel'] = {
     ipWeight: 0.5,
     sampler: { steps: 8, cfg: 5.5, sampler_name: 'euler', scheduler: 'sgm_uniform' },
 }
+
+FAMILIES['skill-icon'] = {
+    description: '256×256 inked cartoon skill-tree tile: full-frame scene, rounded corners, dark rim',
+    checkpoint: 'zavychromaxl_v80.safetensors',
+    stylePrompt:
+        'hand-drawn game skill icon, one bold subject filling the frame, close-up, thick dark ink outlines, flat cel colouring with scratchy hatching, ' +
+        'thin pale glow around the subject, textured single-colour painted background, no text',
+    negative: `${NEGATIVE_BASE}, pixel art, multiple subjects, busy scene, landscape, tiny subject, photorealistic, smooth gradient, vignette, dark border, ${ANATOMY_NEGATIVE}`,
+    // frozen copies of the hand-made 256px skill icons (the 512px ones are a different, painterly set); never live src/assets files
+    references: ['attackPower', 'attackSpeed', 'knowledge', 'critChance', 'weaknesses', 'autoWaveProgression', 'overkill'].map((n) => `scripts/asset-gen/refs/skill/${n}.png`),
+    gen: [1024, 1024],
+    target: [256, 256],
+    pixel: false,
+    // the corners are cut transparent by `tile`, but the frame is otherwise opaque: no cutout QC
+    alpha: false,
+    // The model paints its own dark vignette ~40-60px into the 1024 frame: shave it off, then add the refs' faint rim (outer 8px at ~0.7).
+    post: [['shave', { px: 48 }], ['cover', { width: 256, height: 256 }], ['tile', { radius: 20, rim: 8, shade: 0.7 }]],
+    ipWeight: 0.7,
+    sampler: { steps: 8, cfg: 5.5, sampler_name: 'euler', scheduler: 'sgm_uniform' },
+}
+
 
 /** Substitutes the tier tokens in a family's post list. Families without `tiers` pass through unchanged. */
 export function resolvePost(family, tier) {

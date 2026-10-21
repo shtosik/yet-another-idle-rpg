@@ -19,6 +19,7 @@ A family (an entry in `styles.mjs`) is a named art recipe: checkpoint, style pro
 | `portrait-pixel` | 256×256 | pixel-art bust, 2× chunky pixels | transparent |
 | `zone-pixel` | 832×1248 | pixel-art landscape | opaque |
 | `town-painterly` | 1376×768 | inked cartoon illustration (laHarpar look) | opaque |
+| `skill-icon` | 256×256 | inked cartoon tile like `skills/attackPower.png`, full-frame scene | opaque, rounded corners cut by `tile` |
 
 **Size tier** (enemies): `tiny` 96, `small` 144, `medium` 192, `large` 256 px on the longer side. Pixel density is constant (2 output px per art pixel), so a smaller tier has fewer art pixels. Omitting `--tier` means `medium`, reported as `sizeGuessed: true`.
 
