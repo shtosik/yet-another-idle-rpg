@@ -78,6 +78,7 @@ Art (icons, sprites, portraits, backgrounds): `/generate-2d-asset`, which briefs
 
 - `GLOSSARY.md` — domain language.
 - `docs/ideas/` — design backlog with status per idea.
+- `docs/ideas/known-issues.md` — open bugs and tech debt across systems.
 - `docs/adr/` — architecture decisions.
 - `docs/plans/` — forward plans.
 - `docs/design/`, `docs/character/` — lore and portrait briefs.

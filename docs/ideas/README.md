@@ -24,3 +24,4 @@ Owner decisions in force:
 | [Town building upgrades](town-building-upgrades.md) | M | Proposed |
 | [Bounty board](bounty-board.md) | S-M | Proposed |
 | [Buffs and consumable effects](buffs-and-consumable-effects.md) | S-M | Open question |
+| [Known issues](known-issues.md) | — | Open bug and tech-debt list |

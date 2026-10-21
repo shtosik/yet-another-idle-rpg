@@ -1,3 +1,5 @@
+> **Archived 2026-10-21: completed.** Result: `docs/systems/`, `GLOSSARY.md`, `CLAUDE.md`, `npm run validate`, rewritten skills. Open bugs moved to [docs/ideas/known-issues.md](../ideas/known-issues.md).
+
 # AI dev docs overhaul
 
 ## Context
