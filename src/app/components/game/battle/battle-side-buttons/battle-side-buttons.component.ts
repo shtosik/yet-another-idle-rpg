@@ -1,11 +1,9 @@
-import { Component, computed, inject, isDevMode } from '@angular/core'
+import { Component, computed, inject } from '@angular/core'
 import { BattleStore } from '../../../../store/battle/battle.store'
 import { BattleManagerService } from '../../../../services/battle-manager.service'
 import { NgOptimizedImage } from '@angular/common'
 import { SkillPointID } from '../../../../../enums/ids/skill-tree-node-id.enum'
 import { PlayerStore } from '../../../../store/player/player.store'
-import { ItemID } from '../../../../../enums/ids/item-id.enum'
-import { ItemTier } from '../../../../../enums/items/item-tier.enum'
 
 @Component({
   selector: 'app-battle-side-buttons',
@@ -47,11 +45,5 @@ export class BattleSideButtonsComponent {
 
   toggleAutoEat(enabled: boolean) {
     this.battleStore.toggleAutoEat(enabled)
-  }
-
-  protected readonly isDevMode = isDevMode()
-
-  giveCheatGear() {
-    this.playerStore.addItems([{ id: ItemID.machete, tier: ItemTier.uncommon, amount: 1 }])
   }
 }

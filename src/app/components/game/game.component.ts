@@ -25,6 +25,8 @@ import { ShopStore } from '../../store/shop/shop.store'
 import { CampStore } from '../../store/camp/camp.store'
 import { SpellbookComponent } from './spellbook/spellbook.component'
 import { ZoneID } from 'enums/ids/zone-id.enum'
+import { ItemID } from 'enums/ids/item-id.enum'
+import { ItemTier } from 'enums/items/item-tier.enum'
 
 const imports = [
   PanelComponent,
@@ -98,5 +100,9 @@ export class GameComponent {
     for (const id of Object.values(ZoneID)) {
       if (typeof id === 'number') this.playerStore.unlockZone(id)
     }
+  }
+
+  giveMachete() {
+    this.playerStore.addItems([{ id: ItemID.machete, tier: ItemTier.uncommon, amount: 1 }])
   }
 }
