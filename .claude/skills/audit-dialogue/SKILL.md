@@ -1,83 +1,39 @@
 ---
 name: audit-dialogue
-description: Use to audit an NPC dialogue data file for orphan nodes, unreachable branches, broken `next` targets, missing flag-setters, requirement gates that won't be enforced by the current engine, and convention violations (e.g. `default != 0`, `introduction1 != 1`). Triggers on phrases like "audit this dialogue", "check Elara's dialogue", "find dialogue bugs in X", "is this NPC wired correctly?".
+description: Use to audit an NPC dialogue tree for logic bugs the validator can't see — quest hub ordering, ungated quest starts, dead ends, unpaid gold fees, turn-ins that drift from quest data. Triggers on "audit this dialogue", "check Elara's dialogue", "is this NPC wired correctly?", "find dialogue bugs in X".
 ---
 
-# Audit a Dialogue File
+# Audit a dialogue tree
 
-Run this skill against a file in `src/data/dialogues/**` to surface authoring + engine issues
-before they reach a player. The checks below mirror the failure modes documented in
-`docs/analysis/dialogue-system-analysis.md`.
+Read-only audit of one NPC file in `src/data/dialogues/<town>/<npcKey>.ts`. Report findings; fix nothing unless the user asks.
 
-## When invoked
-Ask the user for the target file (e.g., `src/data/dialogues/laHarparTown/laHarparJosh.ts`).
-If they invoked you with a path, skip the question.
+Background: `docs/systems/dialogue.md` (engine rules, `QuestState` meanings, known issues) and `docs/systems/quests.md`.
 
-## Checks to run
+## Steps
 
-### Convention checks (cheap)
-1. **`default = 0`** — the engine uses node id 0 as the returning-player entry.
-2. **`introduction1 = 1`** — the engine uses node id 1 as the first-visit entry.
-3. **Every option has at least one `result`** — empty `results: []` causes silent failure.
-4. **No result has both `next` and `closeDialogue: true`** — `closeDialogue` wins, `next` is dead.
-5. **At least one `goodbye`-style option in every reachable node** — there is no close
-   button in the modal (`dialogue.component.html:5` is commented out).
+1. **Pick the target.** Use the path the user gave; otherwise ask which NPC.
+2. **Run `npm run validate`** and copy every line mentioning this NPC (broken `next`, missing start node, unreachable nodes, missing i18n keys). These are mechanical; don't re-derive them by hand.
+3. **Walk every option of every node** and apply each check below. Note `file:line` for each finding.
+4. **Report** under three headings, in order: `## Blockers` (player gets stuck, loses progress or resources), `## Wrong branch shown` (ordering or condition bugs), `## Style`. One line per finding, with `file:line` and the fix. If nothing is found, say so in one line.
 
-### Reachability checks (graph walk)
-Build a directed graph from `option.results[].next`. Then:
+Done when every node's options have been checked against every rule below.
 
-6. **Orphan nodes** — every declared node id (other than `default` and `introduction1`)
-   must be the target of some `next:` somewhere. Example known orphan: `taskClaimed` in
-   `laHarparMarvin.ts`.
-7. **Dangling `next` targets** — every `next:` value must exist as a node id in the enum.
-8. **Unreachable through visibility** — for results with `visibilityConditions`, sanity-check
-   that there is at least one option-result combination that reaches them. (A result whose
-   visibility can never be satisfied is dead.)
+## Checks
 
-### Flag checks
-9. **First-visit flag setter present** — at least one terminal path through `introduction1`
-   (transitively) must include `effects: [{ type: 'flag', name: 'met_${NpcID.<x>}' }]`.
-   If absent, the player is stuck in the intro forever.
-10. **Flag name matches NPC** — the flag name must use the same `NpcID` member as the file's NPC.
+**Quest hubs** — for each option with several results, results are tried top to bottom and the first visible one wins:
+- Order must be turn-in (`readyToAdvance`) → in progress (`active`) → offer (`available`) → fallback. A broader result above a narrower one shadows it.
+- A result meant for "quest in progress" must use `QuestState.active`; `readyToAdvance` only fires when the step's requirements are met.
+- Every quest-start effect sits behind an `available` condition, including starts reached through lore links.
+- A turn-in's `requirementsNeeded` and `item` `take` amounts match the step's `requirements` in `src/data/quests-data.ts:QUEST_DATA`.
+- `take` effects come before `advance`/`end` in the same result, so freed slots count toward rewards.
 
-### Engine-enforcement checks (this is where most surprises live)
-11. **`requirementsNeeded` with type `item`, `killCount`, `waveKillCount`, `many*` is NOT enforced today.**
-    Flag every such use as "advisory-only until engine fix lands." Reference: analysis §5.1.
-12. **`requirementsNeeded` does not block click today.** Any option with requirements
-    will fire its effects regardless. Reference: analysis §5.2.
-13. **`{ type: 'quest', action: 'end' }` is silently dropped today.** Flag any usage as a
-    no-op until the engine fix lands. Reference: analysis §5.3.
-14. **`{ type: 'shop' }` is a stub.** Flag as not-yet-implemented. Reference: analysis §6.4.
+**Paths**
+- The first-meet node (`firstMeetNodeId` in `src/data/npc-data.ts`) has every path set the `met_<NpcID>` flag.
+- Every node reachable after a quest starts still shows at least one option (a dead end otherwise).
+- Every hub node has a goodbye option (`closeDialogue: true`).
 
-### Data-level smells
-15. **`hidden: true` on visibility conditions** — fine to author, but note the UI currently
-    ignores `hidden` on `requirementsNeeded` (analysis §7.2). If the user authored a hidden
-    requirement, warn them it will still render.
-16. **Multiple `met_` flag setters across paths** — usually intentional (redundancy),
-    but report so author is aware.
-17. **`closeDialogue: true` on intro paths** — usually a mistake; the intro should funnel
-    to `default`, not close the modal.
+**Costs**
+- A `stat` `deduct` of `goldCoins` has a matching `requirementsNeeded` gold check, and a repeated fallback doesn't charge on every click.
 
-## Reporting format
-
-Group findings under three headings, in this order:
-
-```
-## Blockers
-- <thing that prevents the dialogue from working>
-
-## Engine-level caveats
-- <thing the author probably assumes works but doesn't, with a link to the analysis section>
-
-## Style / convention
-- <minor>
-```
-
-Quote the file:line for every finding. Don't dump full nodes; show the offending line plus
-one or two of context. Never report "all checks passed" — if everything passes, say so in
-one line.
-
-## Don't
-- Don't fix issues you find — surface them only. The `fix-dialogue-bugs` skill is for
-  engine-side fixes; data-side fixes should be confirmed with the user first.
-- Don't run `tsc` or the test suite unless the user asks — this is a fast, read-only audit.
+**Labels**
+- Requirements using `many*` conditions render without a label (`getConditionLabel` lacks them); flag them so the author knows.

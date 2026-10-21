@@ -1,139 +1,30 @@
 ---
 name: add-dialogue-effect
-description: Use when adding a new variant to the DialogueEffect or DialogueCondition discriminated unions (e.g. unlocking a zone, granting a recipe, checking a town reputation, reading a dialogue flag). Walks all five touch-points required so the new variant compiles, runs, and shows up in the dialogue UI. Triggers on phrases like "add a new dialogue effect", "support recipe rewards from dialogue", "add a flag condition", "extend dialogue conditions with X".
+description: Use when adding a new variant to the DialogueEffect or DialogueCondition unions (e.g. unlocking a zone, granting a recipe, reading a dialogue flag, checking reputation). Walks every touch-point so the variant compiles, runs and shows in the dialogue UI. Triggers on "add a new dialogue effect", "support recipe rewards from dialogue", "add a flag condition", "extend dialogue conditions with X".
 ---
 
-# Add a New Dialogue Effect or Condition
+# Add a dialogue effect or condition
 
-The `DialogueEffect` and `DialogueCondition` unions are touched in five places. Miss any
-one and the variant either fails to compile, falls through silently (see analysis §5.1),
-or works at runtime but never shows up in the UI.
+Engine overview: `docs/systems/dialogue.md`. Settle with the user first: effect or condition, the `type` string, the payload shape, and which store it reads or writes.
 
-Use this skill when adding **either** an effect (causes a state change on the player or
-quest) **or** a condition (gates visibility / requirement). The procedure is symmetric.
+Use the `action` discriminator for related behaviors (one `RecipeEffect` with `action: 'unlock' | 'forget'`), as `QuestEffect`, `ItemEffect` and `StatEffect` do.
 
-## When invoked
-Ask the user:
-1. Effect or condition?
-2. The `type` discriminator string (e.g., `'recipe'`, `'flag'`, `'reputation'`).
-3. The shape of its payload.
-4. Which store the runtime needs to read/write.
+## Effect
 
-## Effect — five touch-points
+1. **Type** — add the interface to `src/types/dialogues/dialogue-effect.type.ts` and append it to `DialogueEffect`.
+2. **Engine** — add a `case` to `applyEffects` in `src/app/services/dialogue-manager.service.ts`. Call a store method; add one to the store if missing (e.g. a recipe unlock goes through `PlayerStore`, which owns `unlockedRecipes`). Inject new dependencies with `inject()`.
+3. **Label** — extend `getEffectLabel` in `src/app/components/game/dialogue/dialogue.component.ts`, using an i18n key (entity names via their namespace, e.g. `items:names.<ItemID key>`, `camp:` for recipes and stations).
+4. **Style** (optional) — add a `[class.effect-<type>]` binding in `dialogue.component.html` next to `effect-quest`/`effect-stat`, and a color in `dialogue.component.sass`.
 
-### 1. Type
-`src/types/dialogues/dialogue-effect.type.ts`
-Add the new interface and append it to the `DialogueEffect` union.
+## Condition
 
-```ts
-export interface RecipeEffect {
-  type: 'recipe'
-  action: 'unlock' | 'forget'
-  recipeId: RecipeID
-}
+1. **Type** — add the interface to `src/types/dialogues/dialogue-condition.type.ts` and append it inside the `{ hidden?: boolean } & (…)` union.
+2. **Engine** — add a `case` to `checkCondition` in `dialogue-manager.service.ts`. The `default` returns `false`, so a missing case hides every result using the variant.
+3. **Label** — extend `getConditionLabel` in `dialogue.component.ts` if the condition can appear in `requirementsNeeded`. Routing-only conditions should be authored with `hidden: true`.
 
-export type DialogueEffect =
-  | QuestEffect | StatEffect | ItemEffect | ShopEffect | DialogueFlagEffect
-  | RecipeEffect    // ← new
-```
+## Finish
 
-### 2. Engine handler
-`src/app/services/dialogue-manager.service.ts` — extend `applyEffects` with the new case.
+- Add the new variant to the conditions or effects description in `docs/systems/dialogue.md`.
+- Use it in one real dialogue and walk that branch in the dev server.
 
-```ts
-case 'recipe':
-  if (effect.action === 'unlock') this.recipeStore.unlockRecipe(effect.recipeId)
-  else this.recipeStore.forgetRecipe(effect.recipeId)
-  break
-```
-
-Inject any new store at the top of the service (`private recipeStore = inject(RecipeStore)`).
-
-### 3. Store method
-If the target store doesn't already have a mutator, add one. Don't reach into the
-state shape from the dialogue service — go through a store method.
-
-### 4. UI label
-`src/app/components/game/dialogue/dialogue.component.ts` — extend `getEffectLabel`.
-
-```ts
-if (effect.type === 'recipe' && effect.action === 'unlock') {
-  const recipe = i18next.t(`recipes:names.${RecipeID[effect.recipeId]}`)
-  return `Recipe unlocked: ${recipe}`
-}
-```
-
-### 5. UI styling (optional)
-`src/app/components/game/dialogue/dialogue.component.html` — add a `[class.effect-recipe]`
-binding alongside `effect-quest`/`effect-stat`, and a colour in `dialogue.component.sass`.
-
-## Condition — five touch-points
-
-### 1. Type
-`src/types/dialogues/dialogue-condition.type.ts`
-Add the interface and append to the union. Reminder: the union is wrapped with
-`{ hidden?: boolean } & (...)` — your new variant inherits `hidden` for free.
-
-```ts
-interface FlagCondition {
-  type: 'flag'
-  name: string
-  negate?: boolean
-}
-
-export type DialogueCondition = { hidden?: boolean } & (
-  | QuestCondition | StatCondition | /* ... */
-  | FlagCondition   // ← new
-)
-```
-
-### 2. Engine handler
-`src/app/services/dialogue-manager.service.ts` — extend `checkCondition`.
-
-**CRITICAL:** after analysis-doc fix 1 ([`fix-dialogue-bugs` skill](../fix-dialogue-bugs/SKILL.md)),
-the `default` case returns `false`. Forgetting your new case **breaks all visibility**
-for that variant, not silently passes. Verify the default is `false` before you start;
-if it still returns `true`, your case might appear to work but every author after you
-will hit a foot-gun.
-
-```ts
-case 'flag': {
-  const has = !!this.questStore.dialogueFlags()[c.name]
-  return c.negate ? !has : has
-}
-```
-
-### 3. UI label
-`src/app/components/game/dialogue/dialogue.component.ts` — extend `getConditionLabel`.
-
-```ts
-if (condition.type === 'flag') {
-  return condition.negate ? `(not ${condition.name})` : `(${condition.name})`
-}
-```
-
-Most flag conditions probably want `hidden: true` (internal routing only). The UI
-should respect `hidden` — see [`audit-dialogue` skill](../audit-dialogue/SKILL.md) §15.
-
-### 4. (No store method usually needed for conditions — they're read-only.)
-
-### 5. Author-facing docs
-Add an example in `docs/analysis/dialogue-system-analysis.md` §4 (Effects table) or §5
-(condition handling list), and update `add-npc-dialogue` skill's "known condition types"
-note so future authors don't reach for an obsolete subset.
-
-## Verification
-
-1. `npx tsc --noEmit` — ensure exhaustive discriminated-union narrowing still compiles.
-2. Author one usage in a real NPC dialogue and walk through it in dev mode.
-3. Confirm the meta-tag shows up in the UI (effects) or that visibility/disabled state
-   responds correctly (conditions).
-
-## Don't
-- Don't add a variant whose data shape duplicates another's (e.g. a separate
-  `RecipeUnlockEffect` and `RecipeForgetEffect`). Use the `action` discriminator pattern
-  established by `QuestEffect`/`ItemEffect`/`StatEffect`.
-- Don't bypass the store — mutating signal state from inside the dialogue manager makes
-  state changes invisible to dev-tools and untestable.
-- Don't forget the i18n key for the UI label. Defaulting to `''` is a footgun — players
-  see a stray `[]` in the meta row.
+Done when `npm run validate` and `npx ng build` pass and the new branch behaves as intended in the dev server.
