@@ -6,7 +6,7 @@ Date: 2026-10-17. Scope: why our SDXL pipeline draws crabs wrong while Gemini ge
 
 - **E1, real-reference ControlNet: works for layout, but line art copies the source's interior edges.** Line art from a Gemini crab and from a Z-Image crab gave correct anatomy; the plate-like double edges made shells look metallic. A filled silhouette fixes only the outline and leaves colour and markings to the prompt.
 - **E2, Z-Image-Turbo as structure source (12.3 GB bf16 + 5.6 GB encoder + 0.34 GB VAE, about 9 s per image): crabs yes, spiders no.** Crabs came out with two claws, stalk eyes and legs on both sides on all 8 seeds; faint faces on the shell appeared on about 3 of 8 until a source without one was picked. All 16 spiders (3/4 front and top view, with "exactly eight legs") had the wrong leg count. The count claim in section 1 holds for distinct parts, not for many identical thin limbs.
-- **What shipped:** `--zimage` (structure candidates), `--source` (SDXL img2img repaint of a frozen source, denoise 0.45), and a frozen spider silhouette control. Crabs: Z-Image source plus repaint. Spiders: silhouette control of one hand-checked Z-Image spider. See `docs/analysis/asset-pipeline.md` § Anatomy and controls and § Species recipes.
+- **What shipped:** `--zimage` (structure candidates), `--source` (SDXL img2img repaint of a frozen source, denoise 0.45), and a frozen spider silhouette control. Crabs: Z-Image source plus repaint. Spiders: silhouette control of one hand-checked Z-Image spider. See `docs/systems/asset-pipeline.md` § Anatomy and controls and § Species recipes.
 - **Not run:** FLUX.2 klein (E4), the Gemini API (E3), Z-Image ControlNet. The Gemini image the user supplied was used only as a line-art source.
 
 ## TL;DR

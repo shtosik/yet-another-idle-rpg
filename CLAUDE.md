@@ -110,7 +110,7 @@ The typical pattern for adding a new game entity:
 
 Skills (slash commands) are available for common additions: `/add-npc-dialogue`, `/add-shop`, `/add-town-building`, `/add-dialogue-effect`.
 
-Art generation (item icons, enemy sprites, portraits, zone and town backgrounds) runs through the `asset-generator` agent (`.claude/agents/asset-generator.md`), which drives `scripts/asset-gen/generate.mjs` and its Style Families. Prefer `/generate-2d-asset` to brief it. See `docs/analysis/asset-pipeline.md`.
+Art generation (item icons, enemy sprites, portraits, zone and town backgrounds) runs through the `asset-generator` agent (`.claude/agents/asset-generator.md`), which drives `scripts/asset-gen/generate.mjs` and its Style Families. Prefer `/generate-2d-asset` to brief it. See `docs/systems/asset-pipeline.md`.
 
 ### Analysis docs
 

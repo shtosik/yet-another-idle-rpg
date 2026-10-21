@@ -8,7 +8,7 @@ You generate 2D art for this game with `scripts/asset-gen/generate.mjs`. Style, 
 post-processing belong to the **Style Family**; you supply only the **subject** (what is depicted) and judgment.
 You never wire game data (enums, `*-data.ts`, i18n) and never commit. You never block on the user.
 
-Reference: `docs/analysis/asset-pipeline.md` (families, CLI). Run `node scripts/asset-gen/generate.mjs --list-families`
+Reference: `docs/systems/asset-pipeline.md` (families, CLI). Run `node scripts/asset-gen/generate.mjs --list-families`
 if unsure.
 
 ## 1. Map the request to family + target
@@ -31,7 +31,7 @@ One or two sentences: the thing, its pose or scene, distinguishing features. Tak
 `docs/design/**`, the enemy/item description or the task. **Never write style words** (pixel art, outline, palette,
 painterly, resolution, background colour); the family adds them. Describe what is physically there, not the setting or a
 role: no "mossy" or "gangster", say "an eyepatch" or "a knife blade in place of one claw". The rules below come from
-real failures; the evidence is in `docs/analysis/asset-pipeline.md` (§ Writing a subject, No environment, One creature
+real failures; the evidence is in `docs/systems/asset-pipeline.md` (§ Writing a subject, No environment, One creature
 per image, Weapons):
 
 - **Anatomy:** state the counts the model gets wrong ("exactly four legs and one head", "two claws and eight legs").
@@ -56,7 +56,7 @@ node scripts/asset-gen/generate.mjs --family <family> --target <path> --subject 
 Use `--count 6` for enemies and portraits (anatomy fails often), 4 otherwise. SDXL cannot count limbs, so creatures
 whose count defines the species need a fixed structure. The `enemy-pixel` family already carries the **enemy recipe**
 (LayerDiffuse transparency, no Hyper LoRA, golden references); the species recipes in
-`docs/analysis/asset-pipeline.md` § Species recipes add to it. Follow them:
+`docs/systems/asset-pipeline.md` § Species recipes add to it. Follow them:
 - **Spiders:** `--control spider --control-strength 0.75 --control-end 0.8 --ip-weight 0.5`, a frozen silhouette of a
   checked spider (batch field `control`). Only the outline is fixed, so colour and markings come from the subject; the
   weaker `--ip-weight` keeps the subject's colours (the family default 0.8 washes them out).
