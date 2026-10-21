@@ -65,7 +65,7 @@ export const multiplierStats: PlayerStat[] = [
     'magicDamageMultiplier',
 ]
 
-export const percentageState: PlayerStat[] = [
+export const percentageStats: PlayerStat[] = [
     'critChance',
 ]
 
