@@ -16,6 +16,10 @@ _Avoid_: Area, location, map, stage
 The player's progress counter inside a zone; the zone's boss appears at the last wave.
 _Avoid_: Stage, level
 
+**Boss**:
+The single enemy fought on a zone's last wave.
+_Avoid_: Elite, champion
+
 **Town**:
 A non-combat hub made of buildings.
 _Avoid_: City, location
@@ -87,6 +91,10 @@ _Avoid_: Mission, task
 One stage of a quest that must be completed before the next one opens.
 _Avoid_: Stage, objective
 
+**Quest hub**:
+The part of an NPC's dialogue that offers, tracks and turns in that NPC's quests.
+_Avoid_: Quest menu
+
 **Exploration Guild**:
 The town building that hands out tasks for explorer tokens.
 _Avoid_: Guild (alone), adventurers' guild
@@ -115,8 +123,16 @@ _Avoid_: Crafting tab, base
 
 **Station**:
 A crafting place in the camp where recipes are made.
-_Avoid_: Workbench, crafting table
+_Avoid_: Crafting table, bench (Workbench is one station, not the general term)
+
+**Station gear**:
+An item that installs a station or raises its level instead of entering the inventory.
+_Avoid_: Station item, upgrade
 
 **Recipe**:
 A known formula turning ingredient items into a result item at a station.
 _Avoid_: Blueprint, formula
+
+**Recipe scroll**:
+An item that, when used, permanently unlocks a recipe.
+_Avoid_: Recipe item, blueprint
