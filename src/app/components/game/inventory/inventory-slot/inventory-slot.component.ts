@@ -9,13 +9,14 @@ import { ItemID } from '../../../../../enums/ids/item-id.enum'
 import { TooltipTemplateDirective } from 'ngx-tooltip-directives'
 import { StatToPercentagePipe } from '../../../../pipes/stat-to-percentage.pipe'
 import { ItemType } from '../../../../../enums/items/item-type.enum'
+import { ConsumableEffectComponent } from '../../../shared/consumable-effect/consumable-effect.component'
 
 @Component({
   selector: 'app-inventory-slot',
   templateUrl: 'inventory-slot.component.html',
   styleUrls: ['./inventory-slot.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgOptimizedImage, TranslatePipe, TooltipTemplateDirective, StatToPercentagePipe],
+  imports: [NgOptimizedImage, TranslatePipe, TooltipTemplateDirective, StatToPercentagePipe, ConsumableEffectComponent],
 })
 
 export class InventoryItemComponent {

@@ -1,5 +1,9 @@
 {
     "names": {},
     "selectRecipe": "Select a recipe",
-    "craft": "Craft"
+    "craft": "Craft",
+    "craftTimes": "Craft x{{count}}",
+    "craftMax": "Craft max",
+    "craftable": "You can craft {{count}}",
+    "inventoryFull": "No inventory space for the result"
 }

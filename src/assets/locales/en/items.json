@@ -109,7 +109,18 @@
         "waterRune": "Water Rune",
         "magicStaff": "Magic Staff",
         "earthRuneRecipe": "Earth Rune Recipe",
-        "spellbook": "Spellbook"
+        "spellbook": "Spellbook",
+        "grilledFish": "Grilled Fish",
+        "bakedApple": "Baked Apple",
+        "crabStew": "Crab Stew",
+        "cheesePlatter": "Cheese Platter",
+        "fishApplePie": "Fish & Apple Pie",
+        "huntersFeast": "Hunter's Feast",
+        "minorManaPotion": "Minor Mana Potion",
+        "crabStewRecipe": "Crab Stew Recipe",
+        "cheesePlatterRecipe": "Cheese Platter Recipe",
+        "fishApplePieRecipe": "Fish & Apple Pie Recipe",
+        "huntersFeastRecipe": "Hunter's Feast Recipe"
     },
     "tiers": {
         "trash": "Trash",
@@ -122,5 +133,14 @@
     },
     "clickToEquip": "Click to equip",
     "clickToUnequip": "Click to unequip",
-    "rightClickToUse": "Right-click to use"
+    "rightClickToUse": "Right-click to use",
+    "consumable": {
+        "restoresMana": "Restores {{amount}} mana",
+        "duration": "Lasts {{time}}",
+        "readyIn": "Ready in {{time}}",
+        "nextIn": {
+            "food": "next food in {{time}}",
+            "potion": "next potion in {{time}}"
+        }
+    }
 }

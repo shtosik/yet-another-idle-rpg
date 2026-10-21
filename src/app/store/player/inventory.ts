@@ -29,6 +29,14 @@ export const countItem = (inventory: Inventory, id: ItemID): number =>
 export const hasItems = (inventory: Inventory, items: ItemStack[]): boolean =>
   items.every(({ id, amount }) => countItem(inventory, id) >= amount)
 
+/** How many times `items` can be paid in full from the inventory. */
+export const maxAffordable = (inventory: Inventory, items: ItemStack[]): number =>
+  Math.min(...items.map(({ id, amount }) => Math.floor(countItem(inventory, id) / amount)))
+
+/** Whether `id` can be added without being discarded: it stacks onto an existing stack or takes a free slot. */
+export const canFit = (inventory: Inventory, id: ItemID, tier?: ItemTier): boolean =>
+  findStackIndex(inventory, id, tier ?? ITEM_DATA[id].tier) !== -1 || inventory.includes(null)
+
 /** Stacks per id + tier. Items that do not fit in `capacity` slots are discarded. */
 export function addItems(inventory: Inventory, capacity: number, items: ItemStack[]): Inventory {
   const result = resizeInventory([...inventory], capacity)

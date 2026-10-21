@@ -21,12 +21,12 @@ const SHOPS_DATA: Record<ShopID, Shop> = {
     items: [
       { itemId: ItemID.skillPointBook, tier: ItemTier.legendary, price: 5000, maxStock: 1,  refreshable: false },
       { itemId: ItemID.fishMeat,       tier: ItemTier.normal,    price: 10,   maxStock: 99, refreshable: true  },
-      { itemId: ItemID.apple,          tier: ItemTier.normal,    price: 25,   maxStock: 99, refreshable: true  },
-      { itemId: ItemID.woodenBow,      tier: ItemTier.uncommon,  price: 2500, maxStock: 1,  refreshable: true  },
+      { itemId: ItemID.apple,          tier: ItemTier.normal,    price: 25,   maxStock: 99, refreshable: true  },      { itemId: ItemID.woodenBow,      tier: ItemTier.uncommon,  price: 2500, maxStock: 1,  refreshable: true  },
       { itemId: ItemID.fireRune,       tier: ItemTier.normal,    price: 20,   maxStock: 99, refreshable: true  },
       { itemId: ItemID.airRune,        tier: ItemTier.normal,    price: 20,   maxStock: 99, refreshable: true  },
       { itemId: ItemID.earthRune,      tier: ItemTier.normal,    price: 20,   maxStock: 99, refreshable: true  },
       { itemId: ItemID.waterRune,      tier: ItemTier.normal,    price: 20,   maxStock: 99, refreshable: true  },
+      { itemId: ItemID.fishApplePieRecipe, tier: ItemTier.uncommon, price: 300, maxStock: 1, refreshable: false },
     ],
   },
 }

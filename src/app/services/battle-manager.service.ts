@@ -14,6 +14,9 @@ import { ModalService } from './modal.service'
 import { DamageElement } from '../../enums/damage-element.enum'
 import { getActiveQuestIds } from './quest-status'
 import { resolveHit } from './hit-resolution'
+import { ItemID } from '../../enums/ids/item-id.enum'
+import ITEM_DATA from '../../data/items-data'
+import { isConsumableItem } from '../../interfaces/item.interface'
 
 @Injectable({ providedIn: 'root' })
 export class BattleManagerService {
@@ -127,6 +130,49 @@ export class BattleManagerService {
       const effect = SPELLS_DATA[spellId].effect as SpellSupportStatBuffEffectProps
       this.playerStore.updatePlayerStats([{ stat: effect.stat, amount: -effect.amount }])
     }
+
+    const expiredConsumableStats = this.battleStore.tickConsumables()
+    if (expiredConsumableStats.length) {
+      this.playerStore.updatePlayerStats(expiredConsumableStats.map(({ stat, amount }) => ({ stat, amount: -amount })))
+    }
+    this.autoEat()
+  }
+
+  /** Food and potions share one lock per slot, so swapping items can't stack buffs. */
+  useConsumable(itemId: ItemID): void {
+    const itemData = ITEM_DATA[itemId]
+    if (!itemData || !isConsumableItem(itemData)) return
+
+    const { slot, cooldown, duration = 0, stats = [], manaRestore = 0 } = itemData.effect
+    const current = this.battleStore.consumableSlots()[slot]
+    if (current && current.lockRemaining > 0) return
+    if (this.playerStore.itemCount(itemId) < 1) return
+
+    const playerStats = this.playerStore.stats()
+    const manaGained = Math.min(manaRestore, playerStats.maxMana - playerStats.mana)
+    // Don't waste a pure mana potion at full mana.
+    if (manaRestore > 0 && !stats.length && manaGained <= 0) return
+
+    // The buff can never outlast the slot lock.
+    const buffRemaining = Math.min(duration, cooldown)
+    const appliedStats = buffRemaining > 0 ? stats : []
+
+    this.playerStore.updatePlayerStats([
+      ...appliedStats,
+      ...(manaGained > 0 ? [{ stat: 'mana' as const, amount: manaGained }] : []),
+    ])
+    this.battleStore.setConsumable(slot, { itemId, buffRemaining, lockRemaining: cooldown, stats: appliedStats })
+    this.playerStore.removeItems([{ id: itemId, amount: 1 }])
+  }
+
+  private autoEat(): void {
+    if (!this.battleStore.autoEatEnabled() || !this.playerStore.hasSkillUnlocked(SkillPointID.autoEat)) return
+
+    // Re-eats whatever was last used in the food slot.
+    const food = this.battleStore.consumableSlots().food
+    if (!food || food.lockRemaining > 0 || this.playerStore.itemCount(food.itemId) < 1) return
+
+    this.useConsumable(food.itemId)
   }
 
   private handleEnemyDeath(enemy: Enemy) {

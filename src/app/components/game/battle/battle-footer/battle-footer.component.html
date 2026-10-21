@@ -9,6 +9,25 @@
         {{ spell.ticksRemaining }}
       </div>
     }
+    @for (consumable of activeConsumables(); track consumable.slot) {
+      @let isBuffActive = consumable.buffRemaining > 0;
+      @let readyIn = consumable.lockRemaining | duration;
+      <div
+        class="consumable"
+        [title]="(('items:names.' + ItemID[consumable.itemId]) | i18next) + ' — ' + (('items:consumable.nextIn.' + consumable.slot) | i18next:{ time: readyIn })"
+      >
+        <div
+          class="buff"
+          [class.buff--expired]="!isBuffActive"
+          [style]="{ 'background-image': ITEM_DATA[consumable.itemId]!.url | url }"
+        >
+          @if (isBuffActive) {
+            {{ consumable.buffRemaining | duration }}
+          }
+        </div>
+        <span class="consumable__ready-in">{{ 'items:consumable.readyIn' | i18next:{ time: readyIn } }}</span>
+      </div>
+    }
   </div>
   <div class="spell-bar">
     @for (i of slotIndices; track i) {

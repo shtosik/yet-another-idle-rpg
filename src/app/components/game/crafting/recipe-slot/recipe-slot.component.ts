@@ -9,6 +9,7 @@ import { ItemType } from '../../../../../enums/items/item-type.enum'
 import { ItemID } from '../../../../../enums/ids/item-id.enum'
 import ITEM_DATA from '../../../../../data/items-data'
 import { RecipeID } from '../../../../../enums/ids/recipe-id.enum'
+import { ConsumableEffectComponent } from '../../../shared/consumable-effect/consumable-effect.component'
 
 @Component({
     selector: 'app-recipe-slot',
@@ -20,6 +21,7 @@ import { RecipeID } from '../../../../../enums/ids/recipe-id.enum'
         StatToPercentagePipe,
         TranslatePipe,
         TooltipTemplateDirective,
+        ConsumableEffectComponent,
     ],
 })
 export class RecipeSlot {

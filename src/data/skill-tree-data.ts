@@ -89,6 +89,15 @@ const EXPLORATION_SKILLS_DATA: Partial<Record<SkillPointID, SkillPoint>> = {
     stat: 'shinyChance',
     statAmount: 1,
   },
+  [SkillPointID.autoEat]: {
+    id: SkillPointID.autoEat,
+    region: SkillRegion.exploration,
+    skillPointCost: 2,
+    unlockRequirements: { kind: 'node', id: SkillPointID.knowledge, minLevel: 1 },
+    maxLevel: 1,
+    url: './assets/img/items/fishMeat.png',
+    type: SkillPointType.battle,
+  },
 }
 
 const DAMAGE_SKILLS_DATA: Partial<Record<SkillPointID, SkillPoint>> = {

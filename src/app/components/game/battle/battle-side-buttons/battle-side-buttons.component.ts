@@ -26,6 +26,11 @@ export class BattleSideButtonsComponent {
     this.playerStore.hasSkillUnlocked(SkillPointID.autoWaveProgression),
   )
 
+  hasAutoEatEnabled = this.battleStore.autoEatEnabled
+  hasAutoEatUnlocked = computed(() =>
+    this.playerStore.hasSkillUnlocked(SkillPointID.autoEat),
+  )
+
   onNextWave() {
     this.battleStore.changeWave(true)
   }
@@ -36,5 +41,9 @@ export class BattleSideButtonsComponent {
 
   enableAutoWaveProgressionAction(checked: boolean) {
     this.battleStore.toggleAutoWave(checked)
+  }
+
+  toggleAutoEat(enabled: boolean) {
+    this.battleStore.toggleAutoEat(enabled)
   }
 }

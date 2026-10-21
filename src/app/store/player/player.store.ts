@@ -27,7 +27,7 @@ import { TownID } from '../../../enums/map/town-id.enum'
 import { DamageElement } from '../../../enums/damage-element.enum'
 import { withDevtools } from '@angular-architects/ngrx-toolkit'
 import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
-import { addItems, countItem, createInventory, hasItems, ItemStack, removeItems, resizeInventory } from './inventory'
+import { addItems, canFit, countItem, createInventory, ItemStack, maxAffordable, removeItems, resizeInventory } from './inventory'
 import { UNLOCK_RULES, UnlockCondition, UnlockTarget } from '../../../data/unlock-conditions'
 
 export type PlayerStatsType = Record<PlayerStat, number>;
@@ -378,12 +378,22 @@ export const PlayerStore = signalStore(
       })
     },
 
-    craftItem(recipeId: RecipeID) {
+    /** Crafts up to `times`, limited by ingredients. Blocked when the result has no inventory space. Returns how many were crafted. */
+    craftItem(recipeId: RecipeID, times = 1): number {
       const recipeData = RECIPES_DATA[recipeId]
-      if (!hasItems(store.inventory(), recipeData.itemsNeeded)) return
+      const count = Math.min(times, maxAffordable(store.inventory(), recipeData.itemsNeeded))
+      if (count < 1) return 0
 
-      store.removeItems(recipeData.itemsNeeded)
-      store.addItems([{ id: recipeData.itemId, amount: recipeData.createsAmount }])
+      const ingredients = recipeData.itemsNeeded.map(({ id, amount }) => ({ id, amount: amount * count }))
+      const afterPayment = removeItems(store.inventory(), ingredients)
+      if (!canFit(afterPayment, recipeData.itemId)) return 0
+
+      patchState(store, (state) => ({
+        inventory: addItems(afterPayment, state.stats.inventorySlots, [
+          { id: recipeData.itemId, amount: recipeData.createsAmount * count },
+        ]),
+      }))
+      return count
     },
 
     itemCount(id: ItemID): number {

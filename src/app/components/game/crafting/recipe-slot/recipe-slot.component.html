@@ -28,5 +28,8 @@
                 <span class="stat">{{ stat.id | statToPercentage:stat.amount }} {{ ('app:playerStats.' + stat.id) | i18next }}</span>
             }
         }
+        @if (item.type === ItemType.food || item.type === ItemType.potion) {
+            <app-consumable-effect [effect]="item.effect"/>
+        }
     </div>
 </ng-template>

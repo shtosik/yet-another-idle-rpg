@@ -13,6 +13,7 @@ import { LegsItemsData } from './items/legs-items.data'
 import { BootsItemsData } from './items/boots-items.data'
 import { ResourcesItemsData } from './items/resources-items.data'
 import { RewardsItemsData } from './items/rewards-items.data'
+import { ConsumablesItemsData } from './items/consumables-items.data'
 
 
 const ITEM_DATA: Partial<Record<ItemID, Item>> = {
@@ -29,6 +30,7 @@ const ITEM_DATA: Partial<Record<ItemID, Item>> = {
   ...WeaponsItemsData,
   ...PetItemsData,
   ...RewardsItemsData,
+  ...ConsumablesItemsData,
 }
 
 export default ITEM_DATA

@@ -118,4 +118,17 @@ export enum ItemID {
     magicStaff = 107,
     earthRuneRecipe = 108,
     spellbook = 109,
+    // consumables
+    grilledFish = 110,
+    bakedApple = 111,
+    crabStew = 112,
+    cheesePlatter = 113,
+    fishApplePie = 114,
+    huntersFeast = 115,
+    minorManaPotion = 116,
+    // consumable recipe scrolls
+    crabStewRecipe = 117,
+    cheesePlatterRecipe = 118,
+    fishApplePieRecipe = 119,
+    huntersFeastRecipe = 120,
 }

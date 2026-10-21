@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core'
 import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop'
 import { BattleStore } from '../../../../store/battle/battle.store'
 import { UrlPipe } from '../../../../pipes/url.pipe'
@@ -6,6 +6,11 @@ import SPELLS_DATA from '../../../../../data/spells-data'
 import { SpellSlotComponent } from './spell-slot/spell-slot.component'
 import { EquippedSpell } from '../../../../../interfaces/spells/equipped-spell.interface'
 import { SpellID } from '../../../../../enums/ids/spell-id.enum'
+import ITEM_DATA from '../../../../../data/items-data'
+import { DurationPipe } from '../../../../pipes/duration.pipe'
+import { TranslatePipe } from '../../../../pipes/i18next.pipe'
+import { ItemID } from '../../../../../enums/ids/item-id.enum'
+import { CONSUMABLE_SLOTS } from '../../../../../interfaces/consumable.interface'
 
 const SPELL_SLOT_COUNT = 5
 const PALETTE_DROP_ID = 'spellbook-palette'
@@ -17,6 +22,8 @@ const PALETTE_DROP_ID = 'spellbook-palette'
     SpellSlotComponent,
     CdkDropList,
     CdkDrag,
+    DurationPipe,
+    TranslatePipe,
   ],
   templateUrl: './battle-footer.component.html',
   styleUrl: './battle-footer.component.sass',
@@ -28,12 +35,23 @@ export class BattleFooterComponent {
   equippedSpells = this.battleStore.equippedSpells
   activeSpells = this.battleStore.activeBuffs
 
+  // A slot stays visible while its buff runs and, dimmed, while it is still locked.
+  activeConsumables = computed(() => {
+    const slots = this.battleStore.consumableSlots()
+    return CONSUMABLE_SLOTS.flatMap(slot => {
+      const active = slots[slot]
+      return active && active.lockRemaining > 0 ? [{ slot, ...active }] : []
+    })
+  })
+
   // Each spellbar position is its own single-item drop list, so a dropped spell
   // lands in exactly the hovered slot instead of being inserted/sorted.
   slotIndices = Array.from({ length: SPELL_SLOT_COUNT }, (_, i) => i)
   connectedTo = [...this.slotIndices.map(i => `spell-slot-${i}`), PALETTE_DROP_ID]
 
   protected readonly SPELLS_DATA = SPELLS_DATA
+  protected readonly ITEM_DATA = ITEM_DATA
+  protected readonly ItemID = ItemID
 
   onSlotDrop(event: CdkDragDrop<number>) {
     if (event.previousContainer === event.container) return

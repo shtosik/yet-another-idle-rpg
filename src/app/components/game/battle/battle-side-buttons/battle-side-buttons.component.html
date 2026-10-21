@@ -40,4 +40,20 @@
         loading="lazy"
       ></button>
   }
+
+  @if (hasAutoEatUnlocked()) {
+    <button
+      class="auto-button"
+      [class.active]="hasAutoEatEnabled()"
+      [class.disabled]="!hasAutoEatEnabled()"
+      (click)="toggleAutoEat(!hasAutoEatEnabled())"
+    >
+      <img
+        [ngSrc]="'./assets/img/items/fishMeat.png'"
+        width="26"
+        height="26"
+        alt=""
+        loading="lazy"
+      ></button>
+  }
 </aside>

@@ -1,0 +1,11 @@
+@let e = effect();
+
+@for (stat of e.stats ?? []; track stat.stat) {
+    <span class="stat">+{{ stat.stat | statToPercentage:stat.amount }} {{ ('app:playerStats.' + stat.stat) | i18next }}</span>
+}
+@if (e.manaRestore) {
+    <span class="stat">{{ 'items:consumable.restoresMana' | i18next:{ amount: e.manaRestore } }}</span>
+}
+@if (e.duration) {
+    <span class="timing">{{ 'items:consumable.duration' | i18next:{ time: (e.duration | duration) } }}</span>
+}

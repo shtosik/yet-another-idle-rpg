@@ -10,6 +10,7 @@ import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
 import { PlayerStore } from '../player/player.store'
 import { inject } from '@angular/core'
 import { toShinyUrl } from 'utils/shiny-url'
+import { ActiveConsumable, CONSUMABLE_SLOTS, ConsumableSlot, ConsumableStat } from '../../../interfaces/consumable.interface'
 
 export interface BattleState {
   isInCombat: boolean;
@@ -22,6 +23,8 @@ export interface BattleState {
   activeBuffs: ActiveBuff[];
   attackInterval: number;
   isShinyEnemy: boolean;
+  consumableSlots: Record<ConsumableSlot, ActiveConsumable | null>;
+  autoEatEnabled: boolean;
 }
 
 export const initialState: BattleState = {
@@ -35,6 +38,8 @@ export const initialState: BattleState = {
   activeBuffs: [],
   attackInterval: 0,
   isShinyEnemy: false,
+  consumableSlots: { food: null, potion: null },
+  autoEatEnabled: false,
 }
 
 const STORE_KEY = 'battleStore'
@@ -190,6 +195,43 @@ export const BattleStore = signalStore(
 
       patchState(store, { activeBuffs: remaining })
       return expired
+    },
+
+    setConsumable(slot: ConsumableSlot, consumable: ActiveConsumable): void {
+      patchState(store, (state) => ({
+        consumableSlots: { ...state.consumableSlots, [slot]: consumable },
+      }))
+    },
+
+    /** Advances buffs and slot locks by one second. Returns the stats of buffs that just expired. */
+    tickConsumables(): ConsumableStat[] {
+      const expired: ConsumableStat[] = []
+      const slots = { ...store.consumableSlots() }
+      let changed = false
+
+      for (const slot of CONSUMABLE_SLOTS) {
+        const active = slots[slot]
+        if (!active || (active.buffRemaining === 0 && active.lockRemaining === 0)) continue
+
+        const buffRemaining = Math.max(0, active.buffRemaining - 1)
+        const isBuffExpiring = active.buffRemaining > 0 && buffRemaining === 0
+        if (isBuffExpiring) expired.push(...active.stats)
+
+        slots[slot] = {
+          ...active,
+          buffRemaining,
+          lockRemaining: Math.max(0, active.lockRemaining - 1),
+          stats: isBuffExpiring ? [] : active.stats,
+        }
+        changed = true
+      }
+
+      if (changed) patchState(store, { consumableSlots: slots })
+      return expired
+    },
+
+    toggleAutoEat(enabled: boolean): void {
+      patchState(store, { autoEatEnabled: enabled })
     },
 
     setZone(zoneId: ZoneID): void {

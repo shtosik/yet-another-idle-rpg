@@ -43,5 +43,22 @@
     text-shadow: vars.$textShadow
     font-size: 1rem
 
+    .missing
+      color: #ef4444
+
+  &__hint
+    text-shadow: vars.$textShadow
+    font-size: 0.85rem
+    margin-bottom: 0.5rem
+
+  &__buttons
+    display: grid
+    grid-template-columns: repeat(2, 1fr)
+    gap: 0.4rem
+
   &__craft-button
     @include mixins.button
+
+    &:disabled
+      opacity: 0.5
+      cursor: not-allowed

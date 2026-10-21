@@ -6,6 +6,7 @@ import { ItemType } from 'enums/items/item-type.enum'
 import { UsableItemType } from 'enums/usable-item-type.enum'
 import { PlayerStat } from 'types/player/player-stat.type'
 import { RecipeID } from 'enums/ids/recipe-id.enum'
+import { ConsumableEffect } from './consumable.interface'
 
 export interface ItemData {
     id: ItemID
@@ -46,6 +47,7 @@ export interface QuestItem extends ItemData {
 
 export interface FoodItem extends ItemData {
     type: ItemType.food
+    effect: ConsumableEffect
 }
 
 export interface BookItem extends ItemData {
@@ -54,7 +56,13 @@ export interface BookItem extends ItemData {
 
 export interface PotionItem extends ItemData {
     type: ItemType.potion
+    effect: ConsumableEffect
 }
+
+export type ConsumableItem = FoodItem | PotionItem
+
+export const isConsumableItem = (item: Item): item is ConsumableItem =>
+    item.type === ItemType.food || item.type === ItemType.potion
 
 export interface RecipeItem extends ItemData {
     type: ItemType.recipe

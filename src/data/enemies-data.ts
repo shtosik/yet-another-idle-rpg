@@ -124,6 +124,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     drops: [
       generateItem(ItemID.knife, 1, 1, 10),
       generateItem(ItemID.crabMeat, 1, 3, 1),
+      generateItem(ItemID.crabStewRecipe, 1, 1, 10),
       petDrop(EnemyID.gangsterCrab),
     ],
     shinyDrops: shinyPetDrops(EnemyID.gangsterCrab),
@@ -154,6 +155,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
       generateItem(ItemID.ratTail, 1, 1, 1),
       generateItem(ItemID.cheese, 1, 3, 2),
       generateItem(ItemID.ratCatcher, 1, 1, 40),
+      generateItem(ItemID.cheesePlatterRecipe, 1, 1, 10),
       petDrop(EnemyID.giantRat),
     ],
     shinyDrops: shinyPetDrops(EnemyID.giantRat),
@@ -197,6 +199,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
       generateItem(ItemID.trophyNecklace, 1, 1, 100),
       generateItem(ItemID.machete, 1, 1, 80),
       generateItem(ItemID.fireRune, 1, 1, 5),
+      generateItem(ItemID.huntersFeastRecipe, 1, 1, 15),
       petDrop(EnemyID.bandit),
     ],
     shinyDrops: shinyPetDrops(EnemyID.bandit),

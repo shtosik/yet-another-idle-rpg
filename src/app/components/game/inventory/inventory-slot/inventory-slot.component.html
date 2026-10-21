@@ -41,6 +41,9 @@
       }
       <span class="click">{{ 'items:rightClickToUse' | i18next }}</span>
     }
+    @if (item.type === ItemType.food || item.type === ItemType.potion) {
+      <app-consumable-effect [effect]="item.effect"/>
+    }
     @if (item.type === ItemType.food || item.type === ItemType.potion || item.type === ItemType.book) {
       <span class="click">{{ 'items:rightClickToUse' | i18next }}</span>
     }

@@ -87,6 +87,67 @@ const RECIPES_DATA: Partial<Record<RecipeID, CraftingRecipe>> = {
         itemsNeeded: [{ id: ItemID.slimeResidue, amount: 5 }],
         createsAmount: 1,
     },
+    [RecipeID.grilledFish]: {
+        id: RecipeID.grilledFish,
+        itemId: ItemID.grilledFish,
+        unlockRequirement: null,
+        itemsNeeded: [{ id: ItemID.fishMeat, amount: 2 }],
+        createsAmount: 1,
+    },
+    [RecipeID.bakedApple]: {
+        id: RecipeID.bakedApple,
+        itemId: ItemID.bakedApple,
+        unlockRequirement: null,
+        itemsNeeded: [{ id: ItemID.apple, amount: 2 }, { id: ItemID.cheese, amount: 1 }],
+        createsAmount: 1,
+    },
+    [RecipeID.minorManaPotion]: {
+        id: RecipeID.minorManaPotion,
+        itemId: ItemID.minorManaPotion,
+        unlockRequirement: null,
+        itemsNeeded: [{ id: ItemID.vialOfWater, amount: 1 }, { id: ItemID.apple, amount: 1 }],
+        createsAmount: 1,
+    },
+    [RecipeID.crabStew]: {
+        id: RecipeID.crabStew,
+        itemId: ItemID.crabStew,
+        unlockRequirement: null,
+        itemsNeeded: [{ id: ItemID.crabMeat, amount: 3 }, { id: ItemID.vialOfWater, amount: 1 }],
+        createsAmount: 1,
+        requiresUnlock: true,
+    },
+    [RecipeID.cheesePlatter]: {
+        id: RecipeID.cheesePlatter,
+        itemId: ItemID.cheesePlatter,
+        unlockRequirement: null,
+        itemsNeeded: [{ id: ItemID.cheese, amount: 3 }, { id: ItemID.apple, amount: 1 }],
+        createsAmount: 1,
+        requiresUnlock: true,
+    },
+    [RecipeID.fishApplePie]: {
+        id: RecipeID.fishApplePie,
+        itemId: ItemID.fishApplePie,
+        unlockRequirement: null,
+        itemsNeeded: [
+            { id: ItemID.fishMeat, amount: 2 },
+            { id: ItemID.apple, amount: 2 },
+            { id: ItemID.cheese, amount: 1 },
+        ],
+        createsAmount: 1,
+        requiresUnlock: true,
+    },
+    [RecipeID.huntersFeast]: {
+        id: RecipeID.huntersFeast,
+        itemId: ItemID.huntersFeast,
+        unlockRequirement: null,
+        itemsNeeded: [
+            { id: ItemID.crabMeat, amount: 3 },
+            { id: ItemID.fishMeat, amount: 3 },
+            { id: ItemID.cheese, amount: 2 },
+        ],
+        createsAmount: 1,
+        requiresUnlock: true,
+    },
 }
 
 export default RECIPES_DATA

@@ -9,4 +9,11 @@ export enum RecipeID {
     airRune = 8,
     earthRune = 9,
     waterRune = 10,
+    grilledFish = 11,
+    bakedApple = 12,
+    crabStew = 13,
+    cheesePlatter = 14,
+    fishApplePie = 15,
+    huntersFeast = 16,
+    minorManaPotion = 17,
 }
