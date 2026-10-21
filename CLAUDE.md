@@ -1,16 +1,18 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance for Claude Code in this repository: a browser idle RPG (auto-battle in zones, skill tree, gear, quests, towns, crafting).
 
 ## Commands
 
 ```bash
-npm start          # dev server (ng serve)
-npm run build      # production build
-npm test           # karma/jasmine tests (ng test)
-npm run tile       # regenerate world map tiles (node scripts/tile-map.mjs)
-npm run test:assets # asset-gen pipeline tests (node:test, no GPU needed)
+npm start            # dev server (ng serve)
+npm run build        # production build
+npm run validate     # data, i18n, asset and doc-reference checks (scripts/validate-data.mjs)
+npm run tile         # regenerate world map tiles (node scripts/tile-map.mjs)
+npm run test:assets  # asset-gen pipeline tests (node:test, no GPU needed)
 ```
+
+**Done** = `npm run validate` and `npx ng build` both pass.
 
 ## Role
 
@@ -31,87 +33,51 @@ Several Claude sessions often run in parallel on this repo, sharing the main che
 - Run `npm install` in the new worktree. **Do not** junction/symlink `node_modules` from the main checkout — removing the worktree has deleted the real `node_modules` before.
 - Only stage files you changed yourself; other sessions' uncommitted work may be in the tree.
 
-## Architecture
+## Stack
 
-**Stack:** Angular 20 standalone components, NgRx Signal Stores, Angular Material, SASS, i18next, Leaflet.
+Angular 20 standalone components, zoneless change detection, `OnPush` on every component (a few older ones still lack it), `inject()` for DI, signal `input()`/`output()` in new code (some older components still use decorators). State in NgRx Signal Stores (`src/app/store/`), persisted to `localStorage`. Angular Material dialogs, SASS, i18next, Leaflet. Static game content is typed TS data in `src/data/`, keyed by numeric enums in `src/enums/`.
 
-Change detection is `OnPush` throughout; inject services via `inject()`, not constructor DI.
+## Gotchas
 
-### Directory layout
+- **Pre-release: save compatibility is not required.** Rename and renumber freely; clear `localStorage` after a breaking state change.
+- **Stats are accumulated, not derived.** Every source does `+=` into persisted `stats`; equip/unequip, buff expiry and respec must apply the exact mirror `−=`.
+- **New i18n namespace → register it** in the `translations` list in `src/app/app.config.ts`. Template pipe is `| i18next`.
+- **Item data lives in `src/data/items/<category>-items.data.ts`**; `src/data/items-data.ts` only merges them.
+- **Quest conditions**: `QuestState.active` = started; `QuestState.readyToAdvance` = started and current step's requirements met (turn-ins).
+- **Owner decisions**: block gold spending the player can't afford; block unequip, craft and quest turn-in when the result has no inventory space (enemy drops lost on a full inventory is intended). Details in `docs/systems/player-stats-inventory-equipment.md`.
+- **Language**: use the terms in `GLOSSARY.md` in code, docs and commits.
+- **`docs/archive/` is history.** Current behavior is in `docs/systems/`.
+- **Change a system → update its `docs/systems/` doc in the same commit.**
 
-```
-src/
-├── app/
-│   ├── components/game/    # Feature tabs: battle, inventory, equipment, skill-tree, map, …
-│   ├── components/modals/  # Shop, quest-completed, respec-confirm
-│   ├── components/shared/  # Reusable UI (panel, slot, spinner, close-button)
-│   ├── services/           # Business logic (battle-manager, dialogue-manager, modal, …)
-│   └── store/              # NgRx signal stores (player, battle, quests, shops, towns)
-├── data/                   # All static game content as typed TS objects
-│   └── dialogues/          # Per-NPC dialogue trees
-├── enums/ids/              # Numeric enums for every entity type (EnemyID, ItemID, …)
-├── interfaces/             # TypeScript interfaces
-├── types/                  # Discriminated unions (DialogueEffect, DialogueCondition, …)
-└── assets/
-    ├── locales/en/         # i18next JSON translation files, one per namespace
-    ├── maps/               # Leaflet tile data
-    └── img/                # Enemy sprites, NPC avatars, backgrounds
-```
+## Systems — read before touching
 
-### State management
+| Touching | Read |
+|---|---|
+| tick, auto-attack, damage, enemy death | `docs/systems/game-loop-and-combat.md` |
+| saves, stores, `localStorage` | `docs/systems/persistence.md` |
+| stats, XP, inventory, equipment, drops | `docs/systems/player-stats-inventory-equipment.md` |
+| NPC dialogue, conditions, effects | `docs/systems/dialogue.md` |
+| quests | `docs/systems/quests.md` |
+| skill tree, respec | `docs/systems/skill-tree.md` |
+| spells, buffs, mana | `docs/systems/spells-and-buffs.md` |
+| Camp, stations, recipes, food, potions | `docs/systems/consumables-camp-crafting.md` |
+| zones, waves, town/feature unlocks | `docs/systems/zones-waves-unlocks.md` |
+| towns, buildings, shops, Exploration Guild | `docs/systems/towns-shops-guild.md` |
+| enemies, shinies, pets, bestiary | `docs/systems/enemies-shiny-pets-bestiary.md` |
+| world map, map tiles | `docs/systems/world-map.md` |
+| translations | `docs/systems/localization.md` |
+| generated art | `docs/systems/asset-pipeline.md` |
 
-Stores live in `src/app/store/` and follow this pattern:
+## Skills and agents
 
-```ts
-signalStore(
-  { providedIn: 'root' },
-  withState(initialState),
-  withGameStateSync(STORE_KEY, initialState),  // custom persistence hook
-  withDevtools(STORE_KEY),
-  withComputed(...),
-  withMethods(...)
-)
-```
+Adding content: `/add-enemy-and-zone`, `/add-quest`, `/add-recipe-or-consumable`, `/add-equipment-item`, `/add-shiny-variant`, `/add-monster-weakness`, `/add-npc-dialogue`, `/add-shop`, `/add-town-building`, `/add-dialogue-effect`. Checking a dialogue tree: `/audit-dialogue`.
 
-`PlayerStore` is the central store: player stats, inventory, equipment, unlocked skill nodes, quest state, explored zones. `BattleStore` owns current enemy/zone/wave/combat state and active spells.
+Art (icons, sprites, portraits, backgrounds): `/generate-2d-asset`, which briefs the `asset-generator` agent.
 
-### Game loop
+## Other docs
 
-`GameIntervalService.initGameLoop()` ticks every 100 ms. Each tick accumulates attack cooldown and fires auto-attacks; 1-second ticks handle shop refresh cooldowns. `BattleManagerService` owns damage calc, spell casting, crits, and enemy-death handling.
-
-### Data conventions
-
-- All entities are identified by numeric enums in `src/enums/ids/` (`EnemyID`, `ItemID`, `QuestID`, `ZoneID`, `NpcID`, `SkillPointID`, `SpellID`, …).
-- Data keyed by enum: `ENEMIES_DATA[enemyId]`, `ITEM_DATA[itemId]`, etc.
-- Discriminated unions (`DialogueEffect`, `DialogueCondition`) drive dialogue logic — add new variants by extending the union **and** the switch in `DialogueManagerService`.
-
-### Dialogue system
-
-Each NPC has its own dialogue file in `src/data/dialogues/` with a per-NPC enum for node IDs. Dialogue nodes hold `results[]`; the engine picks the first result whose `visibilityConditions` all pass. Effects are applied imperatively in `DialogueManagerService.applyEffects()`. Known engine quirks are documented in `docs/analysis/dialogue-system-analysis.md`.
-
-### Localization
-
-Translation keys follow a namespace-per-feature scheme. Templates use the `translate` pipe:
-
-```html
-{{ 'namespace:key' | translate }}
-```
-
-Namespaces: `app`, `enemies`, `items`, `skill-tree`, `quests`, `npc`, `dialogues/*`.
-
-### Adding new content
-
-The typical pattern for adding a new game entity:
-
-1. Add an ID to the relevant enum in `src/enums/ids/`.
-2. Add a data entry in `src/data/*-data.ts` typed against the existing interface.
-3. Add i18n keys to the appropriate JSON file under `src/assets/locales/en/`.
-4. Wire any store/service references.
-
-Skills (slash commands) are available for common additions: `/add-npc-dialogue`, `/add-shop`, `/add-town-building`, `/add-dialogue-effect`.
-
-Art generation (item icons, enemy sprites, portraits, zone and town backgrounds) runs through the `asset-generator` agent (`.claude/agents/asset-generator.md`), which drives `scripts/asset-gen/generate.mjs` and its Style Families. Prefer `/generate-2d-asset` to brief it. See `docs/systems/asset-pipeline.md`.
-
-### Analysis docs
-
-`docs/analysis/` contains detailed write-ups for major systems (dialogue, skill-tree, map, shop, shiny enemies, bestiary). Read the relevant doc before making changes to those systems.
+- `GLOSSARY.md` — domain language.
+- `docs/ideas/` — design backlog with status per idea.
+- `docs/adr/` — architecture decisions.
+- `docs/plans/` — forward plans.
+- `docs/design/`, `docs/character/` — lore and portrait briefs.
