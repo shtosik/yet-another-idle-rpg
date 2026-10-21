@@ -1,12 +1,12 @@
 <footer>
-  <div class="active-buffs">
-    @for (spell of activeSpells(); track spell.spellId) {
-      @let spellData = SPELLS_DATA[spell.spellId];
+  <div class="active-effects">
+    @for (buff of activeBuffs(); track buff.spellId) {
+      @let spellData = SPELLS_DATA[buff.spellId];
       <div
-        class="buff"
+        class="effect-icon"
         [style]="{ 'background-image': spellData.url | url }"
       >
-        {{ spell.secondsRemaining }}
+        {{ buff.secondsRemaining }}
       </div>
     }
     @for (consumable of activeConsumables(); track consumable.slot) {
@@ -17,8 +17,8 @@
         [title]="(('items:names.' + ItemID[consumable.itemId]) | i18next) + ' — ' + (('items:consumable.nextIn.' + consumable.slot) | i18next:{ time: readyIn })"
       >
         <div
-          class="buff"
-          [class.buff--expired]="!isEffectActive"
+          class="effect-icon"
+          [class.effect-icon--expired]="!isEffectActive"
           [style]="{ 'background-image': ITEM_DATA[consumable.itemId]!.url | url }"
         >
           @if (isEffectActive) {

@@ -178,9 +178,9 @@ for (const recipe of Object.values(D.RECIPES_DATA)) {
 }
 for (const town of Object.values(D.TOWNS_DATA)) {
   for (const b of town.buildings) {
-    if (!enumValues(D.TownBuildingID).includes(b.tabId)) error('src/data/towns-data.ts', `${idName(D.TownID, town.id)} has unknown TownBuildingID ${b.tabId}`)
+    if (!enumValues(D.TownBuildingID).includes(b.buildingId)) error('src/data/towns-data.ts', `${idName(D.TownID, town.id)} has unknown TownBuildingID ${b.buildingId}`)
     for (const npc of b.npcIds) {
-      if (!has(D.NPC_DATA, npc.id)) error('src/data/towns-data.ts', `${idName(D.TownID, town.id)}.${idName(D.TownBuildingID, b.tabId)} has unknown NpcID ${npc.id}`)
+      if (!has(D.NPC_DATA, npc.id)) error('src/data/towns-data.ts', `${idName(D.TownID, town.id)}.${idName(D.TownBuildingID, b.buildingId)} has unknown NpcID ${npc.id}`)
     }
   }
 }
@@ -272,7 +272,7 @@ function walkKeys(node, file) {
   if (typeof node === 'string') {
     const m = node.match(KEY_RE)
     if (m && namespaces.has(m[1])) requireKey(file, node)
-    else if (m && /^dialogues\//.test(m[1])) error(file, `i18n key '${node}' uses unknown namespace '${m[1]}'`)
+    else if (m && /^[a-z]/i.test(m[1])) error(file, `i18n key '${node}' uses unknown namespace '${m[1]}'`)
     return
   }
   if (Array.isArray(node)) { node.forEach(n => walkKeys(n, file)); return }
@@ -295,7 +295,7 @@ const ENTITY_KEYS = [
   [D.SkillBranch, k => [`skill-tree:branches.${k}`], 'src/assets/locales/en/skill-tree.json'],
   [D.SkillNodeID, k => [`skill-tree:nodes.${k}.name`, `skill-tree:nodes.${k}.desc`], 'src/assets/locales/en/skill-tree.json'],
   [D.TownID, k => [`map:towns.${k}`], 'src/assets/locales/en/map.json'],
-  [D.TownBuildingID, k => [`map:townTabs.${k}`], 'src/assets/locales/en/map.json'],
+  [D.TownBuildingID, k => [`map:buildings.${k}`], 'src/assets/locales/en/map.json'],
   [D.DamageElement, k => [`app:elements.${k}`], 'src/assets/locales/en/app.json'],
   [D.ItemTier, k => [`items:tiers.${k}`], 'src/assets/locales/en/items.json'],
 ]

@@ -22,7 +22,7 @@ export interface TownBuildingNpcProps {
 }
 
 export interface TownBuilding {
-    tabId: TownBuildingID
+    buildingId: TownBuildingID
     npcIds: TownBuildingNpcProps[]
     /** Absent for zone entrances, which travel to `zoneId` instead of opening a view. */
     url?: string

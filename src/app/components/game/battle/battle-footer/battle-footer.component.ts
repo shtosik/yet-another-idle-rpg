@@ -33,7 +33,7 @@ export class BattleFooterComponent {
   private battleStore = inject(BattleStore)
 
   equippedSpells = this.battleStore.equippedSpells
-  activeSpells = this.battleStore.activeBuffs
+  activeBuffs = this.battleStore.activeBuffs
 
   // A slot stays visible while its effect runs and, dimmed, while it is still locked.
   activeConsumables = computed(() => {

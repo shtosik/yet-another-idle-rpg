@@ -13,7 +13,7 @@ export const TOWNS_DATA: Record<TownID, Town> = {
     url: './assets/img/backgrounds/laHarpar.png',
     buildings: [
       {
-        tabId: TownBuildingID.tavern,
+        buildingId: TownBuildingID.tavern,
         position: {
           x: 20,
           y: 80,
@@ -37,7 +37,7 @@ export const TOWNS_DATA: Record<TownID, Town> = {
         url: './assets/img/backgrounds/laHarparTavern.png',
       },
       {
-        tabId: TownBuildingID.market,
+        buildingId: TownBuildingID.market,
         position: {
           x: 50,
           y: 70,
@@ -61,7 +61,7 @@ export const TOWNS_DATA: Record<TownID, Town> = {
         url: './assets/img/backgrounds/laHarparMarket.png',
       },
       {
-        tabId: TownBuildingID.tradersBasement,
+        buildingId: TownBuildingID.tradersBasement,
         position: {
           x: 52,
           y: 35,
@@ -71,7 +71,7 @@ export const TOWNS_DATA: Record<TownID, Town> = {
         npcIds: [],
       },
       {
-        tabId: TownBuildingID.shop,
+        buildingId: TownBuildingID.shop,
         position: {
           x: 70,
           y: 35,
@@ -88,7 +88,7 @@ export const TOWNS_DATA: Record<TownID, Town> = {
         url: './assets/img/backgrounds/laHarparShop.png',
       },
       {
-        tabId: TownBuildingID.explorationGuild,
+        buildingId: TownBuildingID.explorationGuild,
         position: {
           x: 85,
           y: 80,
@@ -116,7 +116,7 @@ export const TOWNS_DATA: Record<TownID, Town> = {
     url: './assets/img/backgrounds/mawood.png',
     buildings: [
       {
-        tabId: TownBuildingID.main,
+        buildingId: TownBuildingID.main,
         position: { x: 50, y: 55 },
         npcIds: [
           { id: NpcID.mawoodCorwin, position: { x: 50, y: 50 } },
@@ -124,7 +124,7 @@ export const TOWNS_DATA: Record<TownID, Town> = {
         url: './assets/img/backgrounds/mawoodElderTree.png',
       },
       {
-        tabId: TownBuildingID.mawoodApothecary,
+        buildingId: TownBuildingID.mawoodApothecary,
         position: { x: 20, y: 70 },
         npcIds: [
           { id: NpcID.mawoodSylvie, position: { x: 50, y: 50 } },
@@ -132,7 +132,7 @@ export const TOWNS_DATA: Record<TownID, Town> = {
         url: './assets/img/backgrounds/mawoodApothecary.png',
       },
       {
-        tabId: TownBuildingID.mawoodHunterLodge,
+        buildingId: TownBuildingID.mawoodHunterLodge,
         position: { x: 80, y: 70 },
         npcIds: [
           { id: NpcID.mawoodFinn, position: { x: 35, y: 50 } },
@@ -141,7 +141,7 @@ export const TOWNS_DATA: Record<TownID, Town> = {
         url: './assets/img/backgrounds/mawoodHunterLodge.png',
       },
       {
-        tabId: TownBuildingID.mawoodMagicShop,
+        buildingId: TownBuildingID.mawoodMagicShop,
         position: { x: 30, y: 40 },
         npcIds: [
           { id: NpcID.mawoodElarion, position: { x: 50, y: 50 } },
@@ -149,7 +149,7 @@ export const TOWNS_DATA: Record<TownID, Town> = {
         url: './assets/img/backgrounds/mawoodMagicShop.png',
       },
       {
-        tabId: TownBuildingID.mawoodHighPlatform,
+        buildingId: TownBuildingID.mawoodHighPlatform,
         position: { x: 70, y: 20 },
         npcIds: [
           { id: NpcID.mawoodMilo, position: { x: 50, y: 50 } },
@@ -157,7 +157,7 @@ export const TOWNS_DATA: Record<TownID, Town> = {
         url: './assets/img/backgrounds/mawoodHighPlatform.png',
       },
       {
-        tabId: TownBuildingID.deepwoodEntrance,
+        buildingId: TownBuildingID.deepwoodEntrance,
         position: { x: 15, y: 90 },
         zoneId: ZoneID.deepwood,
         // Opens once Corwin sends the player into the Deepwood (Q3).
@@ -167,7 +167,7 @@ export const TOWNS_DATA: Record<TownID, Town> = {
         npcIds: [],
       },
       {
-        tabId: TownBuildingID.upperCanopyEntrance,
+        buildingId: TownBuildingID.upperCanopyEntrance,
         position: { x: 85, y: 10 },
         zoneId: ZoneID.upperCanopy,
         // Opens once Milo sends the player up (Q10). His feathersForAKite offer is

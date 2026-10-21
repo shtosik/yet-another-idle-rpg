@@ -4,7 +4,7 @@
 Towns are non-combat hubs. Each town has **buildings**; a building holds NPCs (dialogue) or is a zone entrance. Shops and the Exploration Guild are reached through NPC dialogue.
 
 ## Key files
-- `src/data/towns-data.ts:TOWNS_DATA` — per town: `regionId`, background `url`, `buildings[]` (`tabId`, `position` of the button on the town view, `npcIds` with positions, `url` background, optional `zoneId` and `questRequirement`).
+- `src/data/towns-data.ts:TOWNS_DATA` — per town: `regionId`, background `url`, `buildings[]` (`buildingId`, `position` of the button on the town view, `npcIds` with positions, `url` background, optional `zoneId` and `questRequirement`).
 - `src/enums/map/town-id.enum.ts:TownID`, `town-building-id.enum.ts:TownBuildingID`, `npc-id.enum.ts:NpcID`, `region-id.enum.ts:RegionID`.
 - `src/interfaces/town.interface.ts:Town`, `TownBuilding`.
 - `src/app/store/towns/towns.store.ts:TownsStore` — `selectedTownId`, `selectedTownBuilding`, `activeShopId`.
@@ -24,7 +24,7 @@ Towns are non-combat hubs. Each town has **buildings**; a building holds NPCs (d
 - Gold spending is blocked when the player can't afford it (shops already check).
 
 ## Invariants & gotchas
-- `TownBuildingID` keys name the building's i18n label (`map:townTabs.<key>`) and its tab; a zone entrance has no `url`.
+- `TownBuildingID` keys name the building's i18n label (`map:buildings.<key>`) and its button; a zone entrance has no `url`.
 - Runtime shop items are aligned with `SHOPS_DATA[shop].items` by index after `ensureShop`; `buyItem` and refresh use the index.
 - `activeShopId` and the selected building are saved, so a shop can reopen after reload.
 

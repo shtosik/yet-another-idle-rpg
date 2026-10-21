@@ -11,7 +11,7 @@ Craftable food, potions and elixirs that apply timed stat buffs through **buff s
 ## Constraints from the codebase
 - The player has no HP and enemies don't attack — no healing food. Effects are stat buffs, mana restores, XP / gold / shiny boosters.
 - `ItemType.food` / `ItemType.potion` and `FoodItem` / `PotionItem` exist but nothing uses them; `PlayerStore.useItem` only handles recipe scrolls and `rewardsStats`.
-- Spell buffs (`ActiveBuff = { spellId, ticksRemaining }`) are keyed by SpellID and expire via `SPELLS_DATA` lookup — not directly reusable.
+- Spell buffs (`ActiveBuff = { spellId, secondsRemaining }`) are keyed by SpellID and expire via `SPELLS_DATA` lookup — not directly reusable.
 - Attack speed: positive amounts make you faster (`updatePlayerStats` subtracts). Same convention for consumables.
 
 ## Decisions (owner, 2026-10-20)
