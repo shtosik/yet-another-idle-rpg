@@ -2,8 +2,6 @@ import { inject, Injectable } from '@angular/core'
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog'
 import { QuestProps } from '../../data/quests-data'
 import { QuestCompletedComponent } from '../components/modals/quest-completed/quest-completed.component'
-import { ShopComponent } from '../components/modals/shop/shop.component'
-import { ShopID } from '../../enums/ids/shop-id.enum'
 import { RespecConfirmComponent } from '../components/modals/respec-confirm/respec-confirm.component'
 import { UnlockNotificationComponent } from '../components/modals/unlock-notification/unlock-notification.component'
 import { UnlockNotification } from '../../data/unlock-conditions'
@@ -12,28 +10,6 @@ import { ItemID } from '../../enums/ids/item-id.enum'
 @Injectable({ providedIn: 'root' })
 export class ModalService {
   private dialog = inject(MatDialog)
-
-  openDialogue() {
-    const config: MatDialogConfig = {
-      minWidth: '1200px',
-      position: { top: '250px' },
-      disableClose: false,
-    }
-
-    // return this.dialog.open(DialogueModalComponent, config)
-  }
-
-  openShop(shopId: ShopID) {
-    const config: MatDialogConfig = {
-      panelClass: 'modal',
-      minWidth: '520px',
-      position: { top: '150px' },
-      data: { shopId },
-      disableClose: false,
-    }
-
-    return this.dialog.open(ShopComponent, config)
-  }
 
   openQuestCompleted(data: QuestProps) {
     const config: MatDialogConfig = {

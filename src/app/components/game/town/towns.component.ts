@@ -10,7 +10,7 @@ import { TownBuildingComponent } from './town-building/town-building.component'
 import { BattleStore } from '../../../store/battle/battle.store'
 import { QuestsStore } from '../../../store/quests/quests.store'
 import { GameTab } from '../../../../enums/ids/game-tab.enum'
-import { ShopComponent } from '../../modals/shop/shop.component'
+import { ShopComponent } from './shop/shop.component'
 
 @Component({
   selector: 'app-towns',

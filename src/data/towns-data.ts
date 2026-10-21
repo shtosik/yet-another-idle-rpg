@@ -78,7 +78,7 @@ export const TOWNS_DATA: Record<TownID, Town> = {
         },
         npcIds: [
           {
-            id: 2,
+            id: NpcID.laHarparTrader,
             position: {
               x: 40,
               y: 40,

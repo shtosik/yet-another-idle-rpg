@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, input } from '@angular/core'
 import { TownBuilding } from '../../../../../interfaces/town.interface'
 import { UrlPipe } from '../../../../pipes/url.pipe'
-import { NpmFrameComponent } from '../npc-frame/npc-frame.component'
+import { NpcFrameComponent } from '../npc-frame/npc-frame.component'
 import { CommonModule } from '@angular/common'
 import { I18nextPipe } from '../../../../pipes/i18next.pipe'
 import { TownBuildingID } from '../../../../../enums/map/town-building-id.enum'
@@ -15,7 +15,7 @@ import { DialogueManagerService } from '../../../../services/dialogue-manager.se
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     UrlPipe,
-    NpmFrameComponent,
+    NpcFrameComponent,
     CommonModule,
     I18nextPipe,
   ],

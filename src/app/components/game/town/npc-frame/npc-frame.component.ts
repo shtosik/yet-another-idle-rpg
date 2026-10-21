@@ -13,7 +13,7 @@ import { NpcID } from '../../../../../enums/map/npc-id.enum'
         NgOptimizedImage,
     ],
 })
-export class NpmFrameComponent {
+export class NpcFrameComponent {
     @Input() npc: TownBuildingNpcProps
 
     @Output() openDialogue = new EventEmitter<NpcID>()
