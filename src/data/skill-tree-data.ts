@@ -95,7 +95,7 @@ const EXPLORATION_SKILLS_DATA: Partial<Record<SkillPointID, SkillPoint>> = {
     skillPointCost: 2,
     unlockRequirements: { kind: 'node', id: SkillPointID.knowledge, minLevel: 1 },
     maxLevel: 1,
-    url: './assets/img/items/fishMeat.png',
+    url: './assets/img/skills/autoEat.png',
     type: SkillPointType.battle,
   },
 }

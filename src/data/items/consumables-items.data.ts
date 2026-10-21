@@ -11,7 +11,7 @@ export const ConsumablesItemsData: Partial<Record<ItemID, Item>> = {
   [ItemID.grilledFish]: {
     id: ItemID.grilledFish,
     tier: ItemTier.normal,
-    url: './assets/img/items/fishMeat.png',
+    url: './assets/img/items/grilledFish.png',
     value: 25,
     type: ItemType.food,
     effect: {
@@ -24,7 +24,7 @@ export const ConsumablesItemsData: Partial<Record<ItemID, Item>> = {
   [ItemID.bakedApple]: {
     id: ItemID.bakedApple,
     tier: ItemTier.normal,
-    url: './assets/img/items/apple.png',
+    url: './assets/img/items/bakedApple.png',
     value: 60,
     type: ItemType.food,
     effect: {
@@ -37,7 +37,7 @@ export const ConsumablesItemsData: Partial<Record<ItemID, Item>> = {
   [ItemID.crabStew]: {
     id: ItemID.crabStew,
     tier: ItemTier.normal,
-    url: './assets/img/items/crabMeat.png',
+    url: './assets/img/items/crabStew.png',
     value: 30,
     type: ItemType.food,
     effect: {
@@ -50,7 +50,7 @@ export const ConsumablesItemsData: Partial<Record<ItemID, Item>> = {
   [ItemID.cheesePlatter]: {
     id: ItemID.cheesePlatter,
     tier: ItemTier.normal,
-    url: './assets/img/items/cheese.png',
+    url: './assets/img/items/cheesePlatter.png',
     value: 40,
     type: ItemType.food,
     effect: {
@@ -63,7 +63,7 @@ export const ConsumablesItemsData: Partial<Record<ItemID, Item>> = {
   [ItemID.fishApplePie]: {
     id: ItemID.fishApplePie,
     tier: ItemTier.uncommon,
-    url: './assets/img/items/apple.png',
+    url: './assets/img/items/fishApplePie.png',
     value: 90,
     type: ItemType.food,
     effect: {
@@ -76,7 +76,7 @@ export const ConsumablesItemsData: Partial<Record<ItemID, Item>> = {
   [ItemID.huntersFeast]: {
     id: ItemID.huntersFeast,
     tier: ItemTier.uncommon,
-    url: './assets/img/items/crabMeat.png',
+    url: './assets/img/items/huntersFeast.png',
     value: 120,
     type: ItemType.food,
     effect: {
@@ -92,7 +92,7 @@ export const ConsumablesItemsData: Partial<Record<ItemID, Item>> = {
   [ItemID.minorManaPotion]: {
     id: ItemID.minorManaPotion,
     tier: ItemTier.normal,
-    url: './assets/img/items/vialOfWater.png',
+    url: './assets/img/items/minorManaPotion.png',
     value: 30,
     type: ItemType.potion,
     effect: {
@@ -104,7 +104,7 @@ export const ConsumablesItemsData: Partial<Record<ItemID, Item>> = {
   [ItemID.crabStewRecipe]: {
     id: ItemID.crabStewRecipe,
     tier: ItemTier.uncommon,
-    url: './assets/img/items/earthRuneRecipe.png',
+    url: './assets/img/items/cookingRecipe.png',
     value: 100,
     type: ItemType.recipe,
     recipeId: RecipeID.crabStew,
@@ -112,7 +112,7 @@ export const ConsumablesItemsData: Partial<Record<ItemID, Item>> = {
   [ItemID.cheesePlatterRecipe]: {
     id: ItemID.cheesePlatterRecipe,
     tier: ItemTier.uncommon,
-    url: './assets/img/items/earthRuneRecipe.png',
+    url: './assets/img/items/cookingRecipe.png',
     value: 100,
     type: ItemType.recipe,
     recipeId: RecipeID.cheesePlatter,
@@ -120,7 +120,7 @@ export const ConsumablesItemsData: Partial<Record<ItemID, Item>> = {
   [ItemID.fishApplePieRecipe]: {
     id: ItemID.fishApplePieRecipe,
     tier: ItemTier.uncommon,
-    url: './assets/img/items/earthRuneRecipe.png',
+    url: './assets/img/items/cookingRecipe.png',
     value: 150,
     type: ItemType.recipe,
     recipeId: RecipeID.fishApplePie,
@@ -128,7 +128,7 @@ export const ConsumablesItemsData: Partial<Record<ItemID, Item>> = {
   [ItemID.huntersFeastRecipe]: {
     id: ItemID.huntersFeastRecipe,
     tier: ItemTier.rare,
-    url: './assets/img/items/earthRuneRecipe.png',
+    url: './assets/img/items/cookingRecipe.png',
     value: 250,
     type: ItemType.recipe,
     recipeId: RecipeID.huntersFeast,

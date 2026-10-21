@@ -22,6 +22,15 @@ You're Senior Game Programmer. Prioritize good game design, user experience and 
 - If a requirement is ambiguous or if you need more information to provide the best solution, **ask me a clarifying question** before proceeding.
 - Do not make assumptions about my project architecture if the answer isn't clear from the existing files.
 
+## Git workflow
+
+Several Claude sessions often run in parallel on this repo, sharing the main checkout.
+
+- **Never switch branches (`git checkout` / `git switch`) in the main checkout.** It moves every other session onto your branch and mixes uncommitted work.
+- For a new feature branch, create a worktree instead: `git worktree add ../yari-<name> -b feat/<name>` (or start the session with `claude --worktree <name>`), and work only inside it.
+- Run `npm install` in the new worktree. **Do not** junction/symlink `node_modules` from the main checkout — removing the worktree has deleted the real `node_modules` before.
+- Only stage files you changed yourself; other sessions' uncommitted work may be in the tree.
+
 ## Architecture
 
 **Stack:** Angular 20 standalone components, NgRx Signal Stores, Angular Material, SASS, i18next, Leaflet.

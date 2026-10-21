@@ -416,6 +416,13 @@
     "seed": 1100205231,
     "date": "2026-10-17"
   },
+  "src/assets/img/items/bakedApple.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "one whole baked apple with glossy deep crimson and caramel-brown roasted skin, shiny with sticky amber syrup dripping down its sides, a melted slice of yellow cheese draped over its top, short brown stem, no leaf, nothing else",
+    "seed": 4242,
+    "date": "2026-10-21"
+  },
   "src/assets/img/items/bearPelt.png": {
     "family": "item-pixel",
     "tier": null,
@@ -444,12 +451,33 @@
     "seed": 1199052729,
     "date": "2026-10-17"
   },
+  "src/assets/img/items/cheesePlatter.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a rectangular wooden serving board with three bright yellow cheese wedges with round holes and one red apple on it, nothing else",
+    "seed": 988075298,
+    "date": "2026-10-21"
+  },
+  "src/assets/img/items/cookingRecipe.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single tan parchment recipe scroll rolled up at the top and bottom, tied with thin red string, with a small dark brown ink sketch of a fish and a few short lines of writing on the paper",
+    "seed": 1236277154,
+    "date": "2026-10-21"
+  },
   "src/assets/img/items/corruptedResin.png": {
     "family": "item-pixel",
     "tier": null,
     "subject": "a shiny lump of hardened amber crystal with dark purple-black veins, a single faceted gemstone-like nugget",
     "seed": 31,
     "date": "2026-10-17"
+  },
+  "src/assets/img/items/crabStew.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "one round brown wooden bowl full of thick orange stew, one red pincer claw sticking up out of the stew at the left side, nothing else",
+    "seed": 6060,
+    "date": "2026-10-21"
   },
   "src/assets/img/items/cursedSap.png": {
     "family": "item-pixel",
@@ -472,12 +500,26 @@
     "seed": 1451607053,
     "date": "2026-10-17"
   },
+  "src/assets/img/items/fishApplePie.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "one round golden-brown baked pie with a crimped crust edge and a wedge cut out of the front, the filling inside shows apple slices with red and green skin and pale flesh, a small pale blue fish-shaped pastry decoration with a forked tail on the top crust, nothing beside the pie",
+    "seed": 4242,
+    "date": "2026-10-21"
+  },
   "src/assets/img/items/gnollTrophy.png": {
     "family": "item-pixel",
     "tier": null,
     "subject": "a hunting trophy: a wooden plaque with a mounted bone-and-fang necklace and fur tuft, single object, no creature, no face",
     "seed": 1610306603,
     "date": "2026-10-17"
+  },
+  "src/assets/img/items/grilledFish.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "one whole roasted fish pierced lengthwise by a plain wooden stick, deep amber-brown cooked skin with several thick black char stripes across its body, crispy blackened tail and fins, nothing else",
+    "seed": 7331,
+    "date": "2026-10-21"
   },
   "src/assets/img/items/harpyCrown.png": {
     "family": "item-pixel",
@@ -500,12 +542,26 @@
     "seed": 202870648,
     "date": "2026-10-17"
   },
+  "src/assets/img/items/huntersFeast.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "one round grey plate with a large roasted meat leg with a white bone end, a small grilled fish, one yellow cheese wedge and one small red cooked crab on it, nothing else",
+    "seed": 1674236555,
+    "date": "2026-10-21"
+  },
   "src/assets/img/items/matriarchPlume.png": {
     "family": "item-pixel",
     "tier": null,
     "subject": "a large flamboyant plume of golden and crimson feathers, single object",
     "seed": 5818524,
     "date": "2026-10-17"
+  },
+  "src/assets/img/items/minorManaPotion.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "one small potion bottle with a squat rounded glass body and a short neck with a cork stopper, the glass completely full of bright glowing royal blue liquid with a few tiny white sparkles, plain glass with no label and no symbol",
+    "seed": 777,
+    "date": "2026-10-21"
   },
   "src/assets/img/items/silverwoodChestplate.png": {
     "family": "item-pixel",
@@ -526,5 +582,12 @@
     "tier": null,
     "subject": "spider web drawn in code (spokes and sagging rings, 48px, hard pixels); SDXL could not draw a web with transparent gaps",
     "date": "2026-10-18"
+  },
+  "src/assets/img/skills/autoEat.png": {
+    "family": "skill-icon",
+    "tier": null,
+    "subject": "One big roasted meat leg with glossy golden-brown crispy skin and a round white bone end sticking out at the top, a large bite taken out of the meat showing the paler inside",
+    "seed": 2034600005,
+    "date": "2026-10-21"
   }
 }
