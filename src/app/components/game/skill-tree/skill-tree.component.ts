@@ -85,6 +85,7 @@ export class SkillTreeComponent {
         offset: L.point(45, 0),
         className: 'skill-tooltip',
         sticky: false,
+        opacity: 1,
       })
       marker.addTo(this.map)
       this.markersById.set(node.id, marker)
