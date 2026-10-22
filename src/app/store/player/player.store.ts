@@ -262,7 +262,7 @@ export const PlayerStore = signalStore(
 
     /** Slots still to free before `adding` fits, after `removing` is taken out first. */
     missingSlotsFor(adding: ItemStack[], removing: ItemStack[] = []): number {
-      return missingSlots(store.inventory(), store.stats.inventorySlots(), adding, removing)
+      return missingSlots(store.inventory(), store.stats().inventorySlots, adding, removing)
     },
 
     /**
