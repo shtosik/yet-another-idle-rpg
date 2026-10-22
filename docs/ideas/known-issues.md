@@ -16,7 +16,9 @@
 17. Unlock rules run only on kills; `waveReached` uses `==` on load and `>=` at runtime.
 18. `explorerTokens` and `totalTasksCompleted` are never spent or read; Marvin promises unlocks every 5 tasks.
 19. Balance: shop prices far above income; XP curve uses the cumulative formula as a per-level delta; waves within a zone identical; HP/XP not monotonic across zones; Haste and Fire Strike weak; 11 loot items have no use; Harpy Matriarch plume drops every kill.
-20. Mountain Pass enemies (mountain bat, goat, goblin scavenger) have no pets or shinies.
+20. Fixed 2026-10-22: Mountain Pass enemies have pets and shiny pets.
+
+Planned fixes for 15–19 (2026-10-22): `gold-drops-and-selling.md`, `explorer-token-shop.md`, `wave-variety.md`, `progression-pacing.md`.
 
 ## Combat and spells
 21. No offline progress: a sleeping device or a tab gap longer than 1 s per tick loses that time.
