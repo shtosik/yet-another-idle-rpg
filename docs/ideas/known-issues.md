@@ -1,22 +1,12 @@
 # Known issues
 
-**Status:** Open · collected 2026-10-21 during the AI docs overhaul (from code reading and the October repo audit). None are fixed yet. Per-system details also live in each doc's "Known issues" section under `docs/systems/`.
+**Status:** Open · collected 2026-10-21 during the AI docs overhaul (from code reading and the October repo audit). Per-system details also live in each doc's "Known issues" section under `docs/systems/`.
 
 ## Quests and dialogue
-1. **In-progress quest branches are unreachable.** NPC trees used `active` meaning "in progress" while the engine meant "ready to turn in"; the rename to `QuestState.readyToAdvance` kept that behavior. Switch in-progress results to `QuestState.active`.
-2. Finn's quest hub lists the Big Game offer before the Fetches and Fangs turn-in, so Fetches and Fangs can't be turned in (blocks the Mawood questline).
-3. `startQuest` ignores `startRequirements`: Milo starts Feathers for a Kite and Finn starts Fetches and Fangs too early.
-4. Quest store has no guards: `endQuest` on a completed quest grants rewards again; `advanceQuest` on an unstarted quest saves `NaN`.
-5. `enemy` kill-count requirements read lifetime counters, so some quests are complete on accept.
-6. Meat Shortage: dialogue takes 50 crab meat, quest data says 30. Turn-ins restate requirements by hand and drift.
-7. `selectOption` and `getActiveResult` resolve results differently; the executed branch can differ from the shown one.
-8. Several turn-ins run `end` before `take`, so freed slots don't count toward rewards.
-9. `getConditionLabel` has no labels for `many*` conditions (Sylvie's and Brenna's turn-ins).
-10. Dead ends: Josh `missionCheck` and Corwin `aboutMawood` unreachable; Josh `workInfo` and Milo `questWhatLurksAccept` show no options after their quest starts.
-11. Quests tab `started` filter equals `all`.
+1–11 fixed 2026-10-22 (`fix/quest-dialogue`): in-progress branches, hub order, start gating, store guards, step kill baselines, turn-ins consume `QUEST_DATA` step items, one result resolver, `many*` labels, dead ends, `started` filter.
 
 ## Owner decisions not enforced yet
-12. Gold can go negative via dialogue fees (Bartender, Josh); the Bartender fallback charges 40 gold on every click.
+12. Gold can go negative via dialogue fees (Bartender, Josh); the Bartender charges 40 gold each time the Meat Shortage offer is opened.
 13. Full inventory destroys items on unequip, quest item rewards, and dialogue `give` effects.
 14. Buying the Spellbook is blocked on a full inventory although it never enters the inventory.
 

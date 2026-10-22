@@ -7,6 +7,11 @@
   >{{ 'quests:filters.all' | i18next }}
   </button>
   <button
+    [class.active]="filters === 'started'"
+    (click)="changeFilter('started')"
+  >{{ 'quests:filters.started' | i18next }}
+  </button>
+  <button
     [class.active]="filters === 'completed'"
     (click)="changeFilter('completed')"
   >{{ 'quests:filters.completed' | i18next }}

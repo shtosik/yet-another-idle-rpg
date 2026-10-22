@@ -8,7 +8,10 @@ import { DialogueCondition } from '../../types/dialogues/dialogue-condition.type
 import { NpcID } from '../../enums/map/npc-id.enum'
 import npcData, { NPCProps } from '../../data/npc-data'
 import QUEST_DATA, { RequirementProps } from '../../data/quests-data'
-import { matchesQuestState } from './quest-status'
+import { getQuestStatus, getStepItems, matchesQuestState } from './quest-status'
+import { QuestID } from '../../enums/ids/quest-id.enum'
+import { QuestState } from '../../enums/quest-state.enum'
+import { QuestStep } from '../../types/quests/quest-progression.type'
 import { ItemStack } from '../store/player/inventory'
 import { ExplorationGuildService } from './exploration-guild.service'
 import { TownsStore } from '../store/towns/towns.store'
@@ -31,6 +34,7 @@ export class DialogueManagerService {
 
   activeNpc = signal<NPCProps | null>(null)
 
+  /** The shown and executed branch: the first result whose conditions pass, skipping quest starts that aren't available. */
   getActiveResult<T>(option: DialogueOption<T>): DialogueResult<T> | undefined {
     if (!option.results || option.results.length === 0) return undefined
 
@@ -38,19 +42,29 @@ export class DialogueManagerService {
       const questStart = result.effects?.find(
         (e): e is QuestEffect => e.type === 'quest' && e.action === 'start',
       )
-      if (questStart && this.questStore.getQuestStep(questStart.questId) !== undefined) {
-        return false
-      }
+      if (questStart && !this.isQuestAvailable(questStart.questId)) return false
 
-      if (!result.visibilityConditions || result.visibilityConditions.length === 0) return true
-
-      return result.visibilityConditions.every(condition => this.checkCondition(condition))
+      return this.checkConditions(result.visibilityConditions)
     })
+  }
+
+  private isQuestAvailable(questId: QuestID): boolean {
+    return matchesQuestState(
+      this.questStore.questStepProgression(),
+      questId,
+      QuestState.available,
+      req => this.checkRequirement(req, questId),
+    )
   }
 
   /** False when the result's item or quest-completion rewards would not fit in the inventory. */
   canApplyResult(result: DialogueResult<any> | undefined): boolean {
-    if (!result?.effects) return true
+    return this.missingSlots(result) === 0
+  }
+
+  /** Slots the player must free before the result's item or quest-completion rewards fit. */
+  missingSlots(result: DialogueResult<any> | undefined): number {
+    if (!result?.effects) return 0
 
     const adding: ItemStack[] = []
     const removing: ItemStack[] = []
@@ -60,28 +74,28 @@ export class DialogueManagerService {
         const stacks = effect.items.map(i => ({ id: i.itemId, amount: i.amount }))
         if (effect.action === 'give') adding.push(...stacks)
         else removing.push(...stacks)
-      } else if (effect.type === 'quest') {
-        adding.push(...this.questCompletionRewards(effect))
+      } else if (effect.type === 'quest' && effect.action !== 'start') {
+        const status = getQuestStatus(this.questStore.questStepProgression(), effect.questId)
+        if (status.state !== QuestState.active) continue
+
+        removing.push(...getStepItems(effect.questId, status.step))
+        adding.push(...this.questCompletionRewards(effect, status.step))
       }
     }
 
-    return adding.length === 0 || this.playerStore.canFitItems(adding, removing)
+    return adding.length === 0 ? 0 : this.playerStore.missingSlotsFor(adding, removing)
   }
 
-  private questCompletionRewards(effect: QuestEffect): ItemStack[] {
+  private questCompletionRewards(effect: QuestEffect, step: QuestStep): ItemStack[] {
     const questData = QUEST_DATA[effect.questId]
-    const step = this.questStore.getQuestStep(effect.questId)
-    const completes = effect.action === 'end'
-      || (effect.action === 'advance' && step !== undefined && step + 1 > questData.steps.length)
+    const completes = effect.action === 'end' || step >= questData.steps.length
     if (!completes) return []
 
     return questData.rewards.flatMap(r => r.type === 'item' ? [{ id: r.itemId, amount: r.amount }] : [])
   }
 
   selectOption(option: DialogueOption<any>) {
-    const validResult = option.results.find(res =>
-      this.checkConditions(res.visibilityConditions),
-    )
+    const validResult = this.getActiveResult(option)
 
     if (!validResult) {
       console.error('No valid branch found for option:', option.responseKey)
@@ -147,7 +161,7 @@ export class DialogueManagerService {
           this.questStore.questStepProgression(),
           c.questId,
           c.questState,
-          req => this.checkRequirement(req),
+          req => this.checkRequirement(req, c.questId),
           c.step,
         )
       case 'item':
@@ -172,7 +186,7 @@ export class DialogueManagerService {
             this.questStore.questStepProgression(),
             req.questId,
             req.questState,
-            r => this.checkRequirement(r),
+            r => this.checkRequirement(r, req.questId),
             req.step,
           ),
         )
@@ -189,7 +203,8 @@ export class DialogueManagerService {
     }
   }
 
-  private checkRequirement(req: RequirementProps): boolean {
+  /** Kill requirements of `questId` count kills since its current step started. */
+  private checkRequirement(req: RequirementProps, questId: QuestID): boolean {
     switch (req.type) {
       case 'stat':
         const stats = this.playerStore.stats()
@@ -198,7 +213,7 @@ export class DialogueManagerService {
       case 'item':
         return this.playerStore.itemCount(req.itemId) >= req.amount
       case 'enemy':
-        return this.playerStore.enemyKillCounts()[req.enemyId] >= req.amount
+        return this.questStore.questEnemyKills(questId, req.enemyId) >= req.amount
       case 'quest':
         const currentProgress = this.questStore.getQuestStep(req.questId)
 
@@ -206,7 +221,7 @@ export class DialogueManagerService {
 
         return req.step !== undefined ? currentProgress === req.step : true
       case 'wave':
-        return this.playerStore.getKillCountByZoneAndWave(req.zoneId, req.wave) >= req.amount
+        return this.questStore.questWaveKills(questId, req.zoneId, req.wave) >= req.amount
       default:
         return false
     }

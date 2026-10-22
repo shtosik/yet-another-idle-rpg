@@ -2,8 +2,6 @@ import { DialogueNode } from '../../../interfaces/dialogues/dialogue-node.interf
 import { NpcID } from '../../../enums/map/npc-id.enum'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
-import { ItemID } from '../../../enums/ids/item-id.enum'
-import { EnemyID } from '../../../enums/ids/enemy-id.enum'
 
 export enum FinnDialogue {
   default = 0,
@@ -75,47 +73,50 @@ const MAWOOD_FINN: MawoodFinnDialogueType = {
       {
         responseKey: `${NS}:default.work`,
         results: [
-          // Big Game: turn-in
-          {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.bigGame, questState: QuestState.readyToAdvance, step: 1 }],
-            next: FinnDialogue.questBigGameComplete,
-            requirementsNeeded: [{ type: 'item', itemId: ItemID.bearPelt, amount: 3 }],
-          },
-          // Big Game: in progress
-          {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.bigGame, questState: QuestState.readyToAdvance }],
-            next: FinnDialogue.questBigGameProgress,
-          },
-          // Big Game: offer (after Prove Your Aim done)
-          {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.proveYourAim, questState: QuestState.completed }],
-            next: FinnDialogue.questBigGame,
-          },
-          // Fetches and Fangs (corruption quest): turn-in
+          // Finn runs two lines at once (corruption: Fetches and Fangs; hunting: Prove Your Aim → Big Game),
+          // so every turn-in comes first, then every in-progress, then the offers.
+          // Turn-ins
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.fetchesAndFangs, questState: QuestState.readyToAdvance, step: 1 }],
             next: FinnDialogue.questFetchesComplete,
-            requirementsNeeded: [{ type: 'item', itemId: ItemID.blightedFetish, amount: 1 }],
           },
-          // Fetches and Fangs: in progress
           {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.fetchesAndFangs, questState: QuestState.readyToAdvance }],
-            next: FinnDialogue.questFetchesProgress,
+            visibilityConditions: [{ type: 'quest', questId: QuestID.bigGame, questState: QuestState.readyToAdvance, step: 1 }],
+            next: FinnDialogue.questBigGameComplete,
           },
-          // Prove Your Aim: turn-in
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.proveYourAim, questState: QuestState.readyToAdvance, step: 1 }],
             next: FinnDialogue.questProveYourAimComplete,
-            requirementsNeeded: [{ type: 'killCount', enemyId: EnemyID.gnollScout, amount: 10 }],
           },
-          // Prove Your Aim: in progress
+          // In progress
           {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.proveYourAim, questState: QuestState.readyToAdvance }],
+            visibilityConditions: [{ type: 'quest', questId: QuestID.fetchesAndFangs, questState: QuestState.active }],
+            next: FinnDialogue.questFetchesProgress,
+          },
+          {
+            visibilityConditions: [{ type: 'quest', questId: QuestID.bigGame, questState: QuestState.active }],
+            next: FinnDialogue.questBigGameProgress,
+          },
+          {
+            visibilityConditions: [{ type: 'quest', questId: QuestID.proveYourAim, questState: QuestState.active }],
             next: FinnDialogue.questProveYourAimProgress,
           },
-          // Default — offer Prove Your Aim first
+          // Offers (Fetches and Fangs after Signs of Rot, Big Game after Prove Your Aim)
           {
+            visibilityConditions: [{ type: 'quest', questId: QuestID.fetchesAndFangs, questState: QuestState.available }],
+            next: FinnDialogue.questFetishes,
+          },
+          {
+            visibilityConditions: [{ type: 'quest', questId: QuestID.bigGame, questState: QuestState.available }],
+            next: FinnDialogue.questBigGame,
+          },
+          {
+            visibilityConditions: [{ type: 'quest', questId: QuestID.proveYourAim, questState: QuestState.available }],
             next: FinnDialogue.questProveYourAim,
+          },
+          // Nothing for the player yet — keep the conversation on the default node
+          {
+            next: FinnDialogue.default,
           },
         ],
       },
@@ -210,11 +211,23 @@ const MAWOOD_FINN: MawoodFinnDialogueType = {
     options: [
       {
         responseKey: `${NS}:aboutCorruptionGnolls.opt1`,
-        results: [{ next: FinnDialogue.questProveYourAim }],
+        results: [
+          {
+            visibilityConditions: [{ type: 'quest', questId: QuestID.proveYourAim, questState: QuestState.available }],
+            next: FinnDialogue.questProveYourAim,
+          },
+          { next: FinnDialogue.default },
+        ],
       },
       {
         responseKey: `${NS}:aboutCorruptionGnolls.opt2`,
-        results: [{ next: FinnDialogue.questFetishes }],
+        results: [
+          {
+            visibilityConditions: [{ type: 'quest', questId: QuestID.fetchesAndFangs, questState: QuestState.available }],
+            next: FinnDialogue.questFetishes,
+          },
+          { next: FinnDialogue.default },
+        ],
       },
     ],
   },
@@ -262,7 +275,6 @@ const MAWOOD_FINN: MawoodFinnDialogueType = {
             next: FinnDialogue.default,
             effects: [
               { type: 'quest', action: 'end', questId: QuestID.fetchesAndFangs },
-              { type: 'item', action: 'take', items: [{ itemId: ItemID.blightedFetish, amount: 1 }] },
             ],
           },
         ],
@@ -363,7 +375,6 @@ const MAWOOD_FINN: MawoodFinnDialogueType = {
             next: FinnDialogue.default,
             effects: [
               { type: 'quest', action: 'end', questId: QuestID.bigGame },
-              { type: 'item', action: 'take', items: [{ itemId: ItemID.bearPelt, amount: 3 }] },
             ],
           },
         ],

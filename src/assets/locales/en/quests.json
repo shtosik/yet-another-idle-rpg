@@ -22,6 +22,7 @@
   },
   "filters": {
     "all": "All",
+    "started": "In progress",
     "completed": "Completed"
   }
 }

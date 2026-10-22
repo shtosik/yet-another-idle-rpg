@@ -2,8 +2,6 @@ import { DialogueNode } from '../../../interfaces/dialogues/dialogue-node.interf
 import { NpcID } from '../../../enums/map/npc-id.enum'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
-import { ItemID } from '../../../enums/ids/item-id.enum'
-import { EnemyID } from '../../../enums/ids/enemy-id.enum'
 
 export enum MiloDialogue {
   default = 0,
@@ -91,27 +89,25 @@ const MAWOOD_MILO: MawoodMiloDialogueType = {
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.whatLurksAtTheTop, questState: QuestState.readyToAdvance, step: 1 }],
             next: MiloDialogue.questWhatLurksComplete,
-            requirementsNeeded: [{ type: 'killCount', enemyId: EnemyID.harpyMatriarch, amount: 1 }],
           },
           // What Lurks: in progress
           {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.whatLurksAtTheTop, questState: QuestState.readyToAdvance }],
+            visibilityConditions: [{ type: 'quest', questId: QuestID.whatLurksAtTheTop, questState: QuestState.active }],
             next: MiloDialogue.questWhatLurksProgress,
           },
-          // Feathers: offer (after What Lurks unlocked from feathers)
+          // What Lurks: offer (after Feathers for a Kite)
           {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.feathersForAKite, questState: QuestState.completed }],
+            visibilityConditions: [{ type: 'quest', questId: QuestID.whatLurksAtTheTop, questState: QuestState.available }],
             next: MiloDialogue.questWhatLurks,
           },
           // Feathers: turn-in
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.feathersForAKite, questState: QuestState.readyToAdvance, step: 1 }],
             next: MiloDialogue.questFeathersComplete,
-            requirementsNeeded: [{ type: 'item', itemId: ItemID.harpyFeather, amount: 5 }],
           },
           // Feathers: in progress
           {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.feathersForAKite, questState: QuestState.readyToAdvance }],
+            visibilityConditions: [{ type: 'quest', questId: QuestID.feathersForAKite, questState: QuestState.active }],
             next: MiloDialogue.questFeathersProgress,
           },
           // Feathers: offer (only once available — after The Blighted Heart).
@@ -207,7 +203,13 @@ const MAWOOD_MILO: MawoodMiloDialogueType = {
     options: [
       {
         responseKey: `${NS}:aboutCanopyBig.opt1`,
-        results: [{ next: MiloDialogue.questFeathers }],
+        results: [
+          {
+            visibilityConditions: [{ type: 'quest', questId: QuestID.feathersForAKite, questState: QuestState.available }],
+            next: MiloDialogue.questFeathers,
+          },
+          { next: MiloDialogue.default },
+        ],
       },
     ],
   },
@@ -266,7 +268,6 @@ const MAWOOD_MILO: MawoodMiloDialogueType = {
             next: MiloDialogue.questWhatLurks,
             effects: [
               { type: 'quest', action: 'end', questId: QuestID.feathersForAKite },
-              { type: 'item', action: 'take', items: [{ itemId: ItemID.harpyFeather, amount: 5 }] },
             ],
           },
         ],

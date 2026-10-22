@@ -5,6 +5,7 @@ import QUEST_DATA, {
 import { QuestID } from '../../enums/ids/quest-id.enum'
 import { QuestState } from '../../enums/quest-state.enum'
 import { QuestProgression, QuestStep } from '../../types/quests/quest-progression.type'
+import { ItemStack } from '../store/player/inventory'
 
 export type QuestStatus =
   | { state: QuestState.notStarted | QuestState.completed }
@@ -69,6 +70,12 @@ export function matchesQuestState(
     default:
       return false
   }
+}
+
+/** Item requirements of a quest step (1-based); turn-ins consume these. */
+export function getStepItems(questId: QuestID, step: QuestStep): ItemStack[] {
+  return (QUEST_DATA[questId].steps[step - 1]?.requirements ?? [])
+    .flatMap(r => r.type === 'item' ? [{ id: r.itemId, amount: r.amount }] : [])
 }
 
 export function getActiveQuestIds(progression: QuestProgression): Set<QuestID> {

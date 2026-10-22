@@ -77,8 +77,8 @@ export function removeItems(inventory: Inventory, items: ItemStack[]): Inventory
   return result
 }
 
-/** True when `adding` fits in `capacity` slots once `removing` has been taken out first. */
-export function canFit(inventory: Inventory, capacity: number, adding: ItemStack[], removing: ItemStack[] = []): boolean {
+/** Slots still to free before `adding` fits in `capacity` slots, once `removing` has been taken out first. */
+export function missingSlots(inventory: Inventory, capacity: number, adding: ItemStack[], removing: ItemStack[] = []): number {
   const after = removeItems(inventory, removing).slice(0, capacity)
   const freeSlots = after.filter(slot => slot === null).length + Math.max(0, capacity - after.length)
 
@@ -88,8 +88,12 @@ export function canFit(inventory: Inventory, capacity: number, adding: ItemStack
     if (findStackIndex(after, id, itemTier) === -1) newStacks.add(`${id}:${itemTier}`)
   }
 
-  return newStacks.size <= freeSlots
+  return Math.max(0, newStacks.size - freeSlots)
 }
+
+/** True when `adding` fits in `capacity` slots once `removing` has been taken out first. */
+export const canFit = (inventory: Inventory, capacity: number, adding: ItemStack[], removing: ItemStack[] = []): boolean =>
+  missingSlots(inventory, capacity, adding, removing) === 0
 
 /** True when no item sits at or beyond slot `capacity`. */
 export function fitsCapacity(inventory: Inventory, capacity: number): boolean {

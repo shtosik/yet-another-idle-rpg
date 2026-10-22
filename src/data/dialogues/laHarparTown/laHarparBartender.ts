@@ -1,7 +1,6 @@
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { DialogueNode } from '../../../interfaces/dialogues/dialogue-node.interface'
 import { NpcID } from '../../../enums/map/npc-id.enum'
-import { ItemID } from '../../../enums/ids/item-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
 
 export enum BartenderDialogue {
@@ -57,10 +56,8 @@ const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
               },
             ],
             next: BartenderDialogue.default,
-            requirementsNeeded: [{ type: 'item', itemId: ItemID.crabMeat, amount: 50 }],
             effects: [
               { type: 'quest', action: 'advance', questId: QuestID.meatShortage },
-              { type: 'item', action: 'take', items: [{ itemId: ItemID.crabMeat, amount: 50 }] },
             ],
           },
         ],
@@ -78,19 +75,13 @@ const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
         responseKey: `${NS}:default.anyWork`,
         results: [
           {
-            visibilityConditions: [
-              {
-                type: 'quest',
-                questId: QuestID.meatShortage,
-                questState: QuestState.readyToAdvance,
-                step: 1,
-              },
-            ],
-            next: BartenderDialogue.anyWorkForMe2,
-          },
-          {
+            visibilityConditions: [{ type: 'quest', questId: QuestID.meatShortage, questState: QuestState.available }],
             next: BartenderDialogue.anyWorkForMe1,
             effects: [{ type: 'stat', action: 'deduct', stats: [{ stat: 'goldCoins', amount: 40 }] }],
+          },
+          // Started or completed: nothing new
+          {
+            next: BartenderDialogue.anyWorkForMe2,
           },
         ],
       },

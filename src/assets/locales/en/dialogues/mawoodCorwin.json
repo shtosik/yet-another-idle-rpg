@@ -71,5 +71,9 @@
   "postQuestLore": {
     "message": "Safer. The gnolls will scatter without the blight driving them. The Deepwood will recover over years, perhaps decades. The Spires will outlast all of us. Go rest, traveler. You've earned it. Or don't rest — that also seems to be your nature.",
     "opt1": "Thank you, Elder."
+  },
+  "waitingForFinn": {
+    "message": "The resin told me what it could. The gnolls are the next thread to pull, and Finn knows their camps better than anyone. Find him. I'll be here when you have answers.",
+    "opt1": "I'll find Finn."
   }
 }

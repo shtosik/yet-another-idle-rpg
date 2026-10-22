@@ -61,6 +61,26 @@ export class DialogueComponent {
           zone,
         })
       }
+      case 'manyStat':
+        return condition.statsRequired
+          .map(req => this.getConditionLabel({ type: 'stat', ...req }))
+          .join(', ')
+      case 'manyItems':
+        return condition.itemIds
+          .map(itemId => this.getConditionLabel({ type: 'item', itemId, amount: condition.amounts[itemId] ?? 1 }))
+          .join(', ')
+      case 'manyKillCount':
+        return condition.enemiesRequired
+          .map(req => this.getConditionLabel({ type: 'killCount', ...req }))
+          .join(', ')
+      case 'manyWaveKillCount':
+        return condition.wavesRequired
+          .map(req => this.getConditionLabel({ type: 'waveKillCount', ...req }))
+          .join(', ')
+      case 'manyQuestCompleted':
+        return condition.questsRequired
+          .map(req => this.getConditionLabel({ type: 'quest', ...req }))
+          .join(', ')
       case 'guild':
         switch (condition.condition) {
           case 'hasActiveTask': return 'Active task in progress'
@@ -108,10 +128,7 @@ export class DialogueComponent {
   }
 
   isOptionVisible(option: DialogueOption<any>): boolean {
-    const result = this.dialogueService.getActiveResult(option)
-    if (!result) return false
-    if (!result.visibilityConditions) return true
-    return result.visibilityConditions.every(cond => this.dialogueService.checkCondition(cond))
+    return this.dialogueService.getActiveResult(option) !== undefined
   }
 
   isOptionDisabled(option: DialogueOption<any>): boolean {
@@ -123,6 +140,10 @@ export class DialogueComponent {
   }
 
   isInventoryBlocked(option: DialogueOption<any>): boolean {
-    return !this.dialogueService.canApplyResult(this.dialogueService.getActiveResult(option))
+    return this.missingSlots(option) > 0
+  }
+
+  missingSlots(option: DialogueOption<any>): number {
+    return this.dialogueService.missingSlots(this.dialogueService.getActiveResult(option))
   }
 }

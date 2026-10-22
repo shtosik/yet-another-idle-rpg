@@ -1,7 +1,6 @@
 import { DialogueNode } from '../../../interfaces/dialogues/dialogue-node.interface'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
-import { ZoneID } from '../../../enums/ids/zone-id.enum'
 
 export enum JoshDialogue {
   default,
@@ -75,14 +74,22 @@ const LA_HARPAR_JOSH: LaHarparJoshDialogueType = {
               },
             ],
             next: JoshDialogue.talkReady,
-            requirementsNeeded: [{ type: 'waveKillCount', zoneId: ZoneID.horseshoeBeach, waveNumber: 7, amount: 50 }],
             effects: [{ type: 'quest', questId: QuestID.clearingOutTheBeach, action: 'advance' }],
           },
         ],
       },
       { responseKey: `${NS}:talkReady.opt2`, results: [{ next: JoshDialogue.intro }] },
       { responseKey: `${NS}:talkReady.opt3`, results: [{ next: JoshDialogue.placeInfo }] },
-      { responseKey: `${NS}:talkReady.opt4`, results: [{ next: JoshDialogue.workInfo }] },
+      {
+        responseKey: `${NS}:talkReady.opt4`,
+        results: [
+          {
+            visibilityConditions: [{ type: 'quest', questId: QuestID.clearingOutTheBeach, questState: QuestState.completed }],
+            next: JoshDialogue.missionCheck,
+          },
+          { next: JoshDialogue.workInfo },
+        ],
+      },
       { responseKey: `${NS}:talkReady.opt5`, results: [{ next: JoshDialogue.talkReady, closeDialogue: true }] },
     ],
   },
@@ -113,6 +120,8 @@ const LA_HARPAR_JOSH: LaHarparJoshDialogueType = {
             next: JoshDialogue.talkReady,
             effects: [{ type: 'quest', questId: QuestID.clearingOutTheBeach, action: 'start' }],
           },
+          // Already on it: workInfo doubles as the in-progress reminder
+          { next: JoshDialogue.talkReady },
         ],
       },
     ],

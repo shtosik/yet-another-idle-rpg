@@ -82,7 +82,8 @@
   "quest": "Quest",
   "completed": "completed!",
   "inventory": {
-    "full": "Inventory full",
+    "slotsNeeded_one": "{{count}} slot needed",
+    "slotsNeeded_other": "{{count}} slots needed",
     "freeSlots": "Free slots: {{free}} / {{total}}",
     "lockedSlot": "Locked slot",
     "page": "Page {{page}}",

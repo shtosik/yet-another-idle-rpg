@@ -2,8 +2,6 @@ import { DialogueNode } from '../../../interfaces/dialogues/dialogue-node.interf
 import { NpcID } from '../../../enums/map/npc-id.enum'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
-import { ItemID } from '../../../enums/ids/item-id.enum'
-import { EnemyID } from '../../../enums/ids/enemy-id.enum'
 
 export enum BrennDialogue {
   default = 0,
@@ -69,27 +67,25 @@ const MAWOOD_BRENN: MawoodBrennDialogueType = {
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.warTrophies, questState: QuestState.readyToAdvance, step: 1 }],
             next: BrennDialogue.questWarTrophiesComplete,
-            requirementsNeeded: [{ type: 'killCount', enemyId: EnemyID.gnollWarchief, amount: 3 }],
           },
           // War Trophies: in progress
           {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.warTrophies, questState: QuestState.readyToAdvance }],
+            visibilityConditions: [{ type: 'quest', questId: QuestID.warTrophies, questState: QuestState.active }],
             next: BrennDialogue.questWarTrophiesProgress,
           },
           // War Trophies: offer (after Raw Materials done)
           {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.rawMaterials, questState: QuestState.completed }],
+            visibilityConditions: [{ type: 'quest', questId: QuestID.warTrophies, questState: QuestState.available }],
             next: BrennDialogue.questWarTrophies,
           },
           // Raw Materials: turn-in
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.rawMaterials, questState: QuestState.readyToAdvance, step: 1 }],
             next: BrennDialogue.questRawMaterialsComplete,
-            requirementsNeeded: [{ type: 'manyItems', itemIds: [ItemID.ancientWood, ItemID.bearPelt], amounts: { [ItemID.ancientWood]: 20, [ItemID.bearPelt]: 5 } }],
           },
           // Raw Materials: in progress
           {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.rawMaterials, questState: QuestState.readyToAdvance }],
+            visibilityConditions: [{ type: 'quest', questId: QuestID.rawMaterials, questState: QuestState.active }],
             next: BrennDialogue.questRawMaterialsProgress,
           },
           // Raw Materials: offer (only once available — after The Sap That Burns)
@@ -205,7 +201,6 @@ const MAWOOD_BRENN: MawoodBrennDialogueType = {
             next: BrennDialogue.default,
             effects: [
               { type: 'quest', action: 'end', questId: QuestID.rawMaterials },
-              { type: 'item', action: 'take', items: [{ itemId: ItemID.ancientWood, amount: 20 }, { itemId: ItemID.bearPelt, amount: 5 }] },
             ],
           },
         ],
