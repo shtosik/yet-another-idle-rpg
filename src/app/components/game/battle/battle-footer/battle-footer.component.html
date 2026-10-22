@@ -6,7 +6,7 @@
         class="effect-icon"
         [style]="{ 'background-image': spellData.url | url }"
       >
-        {{ buff.secondsRemaining }}
+        {{ buff.secondsLeft }}
       </div>
     }
     @for (consumable of activeConsumables(); track consumable.slot) {
@@ -37,12 +37,13 @@
         [id]="'spell-slot-' + i"
         [cdkDropListData]="i"
         [cdkDropListConnectedTo]="connectedTo"
+        [cdkDropListEnterPredicate]="canEnterSlot"
         (cdkDropListDropped)="onSlotDrop($event)"
         class="spell-bar__slot"
       >
         @if (spell) {
-          <div class="spell-bar__drag" cdkDrag [cdkDragData]="spell">
-            <app-spell-slot [spellId]="spell.spellId" [equippedSpell]="spell"/>
+          <div class="spell-bar__drag" cdkDrag [cdkDragData]="spell" [cdkDragDisabled]="spell.cooldownRemainingMs > 0">
+            <app-spell-slot [equippedSpell]="spell"/>
           </div>
         }
       </div>

@@ -19,13 +19,11 @@
 20. Mountain Pass enemies (mountain bat, goat, goblin scavenger) have no pets or shinies.
 
 ## Combat and spells
-21. Respawn waits a full attack interval (roughly halves kill rate; spells blocked meanwhile). No offline progress or wall-clock delta. Attack overshoot dropped (timer resets to 0).
-22. `Math.ceil` at each damage step inflates small hits (1 × 1.2 crit = 2).
-23. Re-equipping a spell resets its cooldown; `castSpell` has no guards of its own; cooldown can go negative; buff/cooldown timing off by up to 1 s; mana can stay above `maxMana`.
-24. Stats are accumulated: rebalanced items/nodes leave old deltas on saves; `statsInitialState` changes never reach saves; float drift (`attackSpeed` 2.7000000000000006).
+21. No offline progress: a sleeping device or a tab gap longer than 1 s per tick loses that time.
+
+(22–25 fixed 2026-10-22: 2 s respawn delay with wall-clock ticks, single damage rounding, spell guards and slot cooldown lock, derived stats, throttled saves.)
 
 ## Persistence and performance
-25. `localStorage` written up to 10×/s (attack timer, mana regen, cooldowns in persisted state); `stats` replaced every tick so every reader re-runs at 10 Hz; no save throttling or `try/catch` on `setItem`.
 26. No save version or migrations; full enemy object persisted (stale after data edits); `activeShopId` persisted; `withDevtools` on in production.
 
 ## UI, build and platform

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, Input } from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core'
 import { TooltipTemplateDirective } from 'ngx-tooltip-directives'
 import { I18nextPipe } from '../../../../../pipes/i18next.pipe'
 import { UrlPipe } from '../../../../../pipes/url.pipe'
@@ -7,8 +7,9 @@ import { PlayerStore } from '../../../../../store/player/player.store'
 import { SpellID } from '../../../../../../enums/ids/spell-id.enum'
 import SPELLS_DATA from '../../../../../../data/spells-data'
 import { SpellType } from '../../../../../../enums/spell-type.enum'
-import { BattleStore } from '../../../../../store/battle/battle.store'
 import { BattleManagerService } from '../../../../../services/battle-manager.service'
+
+const MS_PER_SECOND = 1000
 
 @Component({
   selector: 'app-spell-slot',
@@ -23,29 +24,23 @@ import { BattleManagerService } from '../../../../../services/battle-manager.ser
 })
 export class SpellSlotComponent {
   playerStore = inject(PlayerStore)
-  battleStore = inject(BattleStore)
   battleManagerService = inject(BattleManagerService)
 
-  spellId = input<SpellID>(null)
+  equippedSpell = input.required<EquippedSpell>()
 
   playerStats = this.playerStore.stats
-  isInCombat = this.battleStore.isInCombat
 
-  canAfford = computed(() => {
-    const id = this.spellId()
-    if (id === null) return true
-    return this.battleManagerService.canAffordSpell(id)
-  })
-
-  @Input() equippedSpell: EquippedSpell
-  @Input() spellLevel: number
+  spellData = computed(() => SPELLS_DATA[this.equippedSpell().spellId])
+  canAfford = computed(() => this.battleManagerService.canAffordSpell(this.equippedSpell().spellId))
+  /** Seconds, after cooldown reduction. */
+  cooldown = computed(() => this.battleManagerService.spellCooldown(this.equippedSpell().spellId))
+  secondsUntilReady = computed(() => Math.ceil(this.equippedSpell().cooldownRemainingMs / MS_PER_SECOND))
+  cooldownSweepDeg = computed(() => this.equippedSpell().cooldownRemainingMs / (this.cooldown() * MS_PER_SECOND) * 360)
 
   protected readonly SpellID = SpellID
-  protected readonly SPELLS_DATA = SPELLS_DATA
   protected readonly SpellType = SpellType
 
-  handleCastSpell(spellId: SpellID, equippedSpell: EquippedSpell) {
-    if (equippedSpell.cooldownRemaining > 0 || !this.isInCombat() || !this.canAfford()) return
-    this.battleManagerService.castSpell(spellId)
+  handleCastSpell() {
+    this.battleManagerService.castSpell(this.equippedSpell().spellId)
   }
 }

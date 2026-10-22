@@ -11,7 +11,6 @@ export type PlayerStat =
     | 'unspentSkillPoints'
     | 'goldCoinsMultiplier'
     | 'manaRegenRate'
-    | 'currentManaRegenTimer'
     | 'magicDamage'
     | 'spellCooldownReduction'
     | 'xpMultiplier'

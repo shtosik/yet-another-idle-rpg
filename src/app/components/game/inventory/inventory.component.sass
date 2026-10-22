@@ -2,6 +2,8 @@
 
 :host
   @include mixins.panel
+  // Header above the grid, not beside it.
+  flex-direction: column
 
 .inventory
   display: flex
@@ -14,7 +16,9 @@
   display: flex
   justify-content: space-between
   align-items: center
+  gap: 0.8rem
   margin-bottom: 0.8rem
+  white-space: nowrap
 
 .pager
   display: flex

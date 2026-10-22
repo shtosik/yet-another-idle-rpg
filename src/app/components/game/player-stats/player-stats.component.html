@@ -21,7 +21,9 @@
   </li>
   <li>
     {{ 'playerStats.mana' | i18next }}: {{ playerStatsData.mana }}/{{ playerStatsData.maxMana }}
-    <span class="blue">{{ playerStatsData.currentManaRegenTimer }}</span>
+    @if (secondsToNextMana() !== null) {
+      <span class="blue">{{ secondsToNextMana() }}s</span>
+    }
   </li>
   <li>{{ 'playerStats.attackPower' | i18next }}: {{ playerStatsData.attackPower }}</li>
   <li>{{ 'playerStats.attackSpeed' | i18next }}: {{ playerStatsData.attackSpeed.toFixed(1) }}</li>

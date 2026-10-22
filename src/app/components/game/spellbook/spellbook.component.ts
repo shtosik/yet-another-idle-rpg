@@ -7,6 +7,7 @@ import { EquippedSpell } from '../../../../interfaces/spells/equipped-spell.inte
 import SPELLS_DATA from '../../../../data/spells-data'
 import { UrlPipe } from '../../../pipes/url.pipe'
 import { I18nextPipe } from '../../../pipes/i18next.pipe'
+import { BattleManagerService } from '../../../services/battle-manager.service'
 
 @Component({
   selector: 'app-spellbook',
@@ -18,6 +19,7 @@ import { I18nextPipe } from '../../../pipes/i18next.pipe'
 export class SpellbookComponent {
   private playerStore = inject(PlayerStore)
   private battleStore = inject(BattleStore)
+  private battleManagerService = inject(BattleManagerService)
 
   protected readonly SPELLS_DATA = SPELLS_DATA
   protected readonly SpellID = SpellID
@@ -39,7 +41,6 @@ export class SpellbookComponent {
     // Only handle drops coming from the spell-bar (unequip).
     if (event.previousContainer === event.container) return
     const spell = event.item.data as EquippedSpell
-    const arr = this.battleStore.equippedSpells().map(s => s?.spellId === spell.spellId ? null : s)
-    this.battleStore.setAllEquippedSpells(arr)
+    this.battleManagerService.unequipSpell(spell.spellId)
   }
 }
