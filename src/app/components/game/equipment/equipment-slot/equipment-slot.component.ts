@@ -21,6 +21,7 @@ export class EquipmentItemComponent {
     @Input() item: Item
     @Input() tier: ItemTier
     @Input() slotName: EquipmentSlotKey
+    @Input() unequipBlocked = false
 
     @Output() unequipItem = new EventEmitter<EquipmentSlotKey>()
 

@@ -67,12 +67,11 @@ export class ShopComponent implements OnInit {
     const upgrade = stationUpgradeOf(entry.staticItem.itemId)
     if (upgrade) return canInstall(this.playerStore.stations(), upgrade) ? null : 'station'
 
-    const inventory = this.playerStore.inventory()
-    const hasStack = inventory.some(
-      slot => slot?.id === entry.staticItem.itemId && slot?.tier === entry.staticItem.tier,
-    )
-    const hasEmpty = inventory.some(slot => slot === null)
-    if (!hasStack && !hasEmpty) return 'inventory'
+    // The spellbook unlocks a tab and never enters the inventory.
+    const { itemId, tier } = entry.staticItem
+    if (itemId !== ItemID.spellbook && !this.playerStore.canFitItems([{ id: itemId, tier, amount: 1 }])) {
+      return 'inventory'
+    }
 
     return null
   }

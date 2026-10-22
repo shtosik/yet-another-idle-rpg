@@ -27,7 +27,7 @@ import { TownID } from '../../../enums/map/town-id.enum'
 import { DamageElement } from '../../../enums/damage-element.enum'
 import { withDevtools } from '@angular-architects/ngrx-toolkit'
 import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
-import { addItems, countItem, createInventory, ItemStack, removeItems, resizeInventory } from './inventory'
+import { addItems, canFitStacks, countItem, createInventory, fitsCapacity, ItemStack, removeItems, resizeInventory } from './inventory'
 import { canInstall, evaluateRecipe, installStations, Stations } from './camp'
 import { StationID } from '../../../enums/ids/station-id.enum'
 import { UNLOCK_RULES, UnlockCondition, UnlockTarget } from '../../../data/unlock-conditions'
@@ -86,7 +86,12 @@ export const initialState: PlayerState = {
   spellbookUnlocked: false,
 }
 
-const handleExperience = (stats: PlayerStatsType) => {
+const equipmentInventorySlots = (itemId: ItemID): number =>
+  (ITEM_DATA[itemId] as EquipmentItem).stats
+    ?.filter(s => s.id === 'inventorySlots')
+    .reduce((sum, s) => sum + s.amount, 0) ?? 0
+
+const handleExperience =(stats: PlayerStatsType) => {
   const xpForNextLevel = calculateXp(stats.level + 1)
   if (stats.experience < xpForNextLevel) return
 
@@ -210,6 +215,21 @@ export const PlayerStore = signalStore(
       patchState(store, (state) => ({ inventory: removeItems(state.inventory, items) }))
     },
 
+    /** Whether `adding` fits after `removing` is taken out first. */
+    canFitItems(adding: ItemStack[], removing: ItemStack[] = []): boolean {
+      return canFitStacks(store.inventory(), store.stats.inventorySlots(), adding, removing)
+    },
+
+    /**
+     * Whether `inventorySlots` can change by `delta` (negative shrinks) without stranding items,
+     * with `adding` still fitting afterwards once `removing` is taken out.
+     */
+    canChangeInventorySlots(delta: number, adding: ItemStack[] = [], removing: ItemStack[] = []): boolean {
+      const capacity = store.stats.inventorySlots() + delta
+      return fitsCapacity(removeItems(store.inventory(), removing), capacity)
+        && canFitStacks(store.inventory(), capacity, adding, removing)
+    },
+
     updateUnlockedNodes(id: SkillNodeID, amount: number) {
       patchState(store, (state) => ({
         unlockedNodes: {
@@ -277,6 +297,24 @@ export const PlayerStore = signalStore(
     },
   })),
   withMethods((store) => ({
+    canUnequip(slot: EquipmentSlotKey): boolean {
+      const equipped = store.equipment()[slot]
+      if (!equipped) return false
+      return store.canChangeInventorySlots(
+        -equipmentInventorySlots(equipped.id),
+        [{ id: equipped.id, tier: equipped.tier, amount: 1 }],
+      )
+    },
+
+    canEquip(item: InventoryItem): boolean {
+      const slotKey = EquipmentSlot[(ITEM_DATA[item.id] as EquipmentItem).slot] as EquipmentSlotKey
+      const equipped = store.equipment()[slotKey]
+      const delta = equipmentInventorySlots(item.id) - (equipped ? equipmentInventorySlots(equipped.id) : 0)
+      const adding = equipped ? [{ id: equipped.id, tier: equipped.tier, amount: 1 }] : []
+      return store.canChangeInventorySlots(delta, adding, [{ id: item.id, tier: item.tier, amount: 1 }])
+    },
+  })),
+  withMethods((store) => ({
     processBattleEnd(enemyId: EnemyID, zoneId: ZoneID, currentWave: number, isShiny: boolean, activeQuestIds?: Set<QuestID>) {
       const enemy = ENEMIES_DATA[enemyId]
       const stats = store.stats()
@@ -302,6 +340,8 @@ export const PlayerStore = signalStore(
     },
 
     equipItem(item: InventoryItem) {
+      if (!store.canEquip(item)) return
+
       const itemData = ITEM_DATA[item.id] as EquipmentItem
       const equipment = store.equipment()
       const statsToUpdate: { stat: PlayerStat, amount: number }[] = []
@@ -333,7 +373,7 @@ export const PlayerStore = signalStore(
       const equipment = store.equipment()
       const equippedItem = equipment[slot]
 
-      if (!equippedItem) return
+      if (!equippedItem || !store.canUnequip(slot)) return
 
       const itemData = ITEM_DATA[equippedItem.id] as EquipmentItem
       const statsToUpdate: { stat: PlayerStat, amount: number }[] = []

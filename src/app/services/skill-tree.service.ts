@@ -62,7 +62,18 @@ export class SkillTreeService {
   }
 
   previewRefund(id: SkillNodeID, levels: number | 'all'): CanRefundResult {
-    return canRefundNode(id, levels, this.playerStore.unlockedNodes(), SKILL_TREE_GRAPH)
+    const check = canRefundNode(id, levels, this.playerStore.unlockedNodes(), SKILL_TREE_GRAPH)
+    if (!check.ok) return check
+
+    const node = ALL_SKILLS[id]
+    const slotsLost = node.type === SkillNodeType.stat && node.stat === 'inventorySlots'
+      ? node.statAmount * check.levelsRefunded
+      : 0
+    if (!this.playerStore.canChangeInventorySlots(-slotsLost)) {
+      return { ok: false, reason: 'inventory-in-use', blockers: [] }
+    }
+
+    return check
   }
 
   refundGoldCost(levelsRefunded: number): number {
@@ -110,6 +121,7 @@ export class SkillTreeService {
     skillPointsToReturn: number
     goldCost: number
     canAfford: boolean
+    inventoryBlocked: boolean
   } {
     const unlocked = this.playerStore.unlockedNodes()
     let allocatedLevels = 0
@@ -123,10 +135,24 @@ export class SkillTreeService {
     }
     const goldCost = SKILL_TREE_DATA.respec.fullResetGoldCost({ allocatedLevels: allocatedLevels })
     const canAfford = this.playerStore.stats().goldCoins >= goldCost
-    return { allocatedLevels, skillPointsToReturn, goldCost, canAfford }
+    const inventoryBlocked = !this.playerStore.canChangeInventorySlots(-this.inventorySlotsGranted())
+    return { allocatedLevels, skillPointsToReturn, goldCost, canAfford, inventoryBlocked }
+  }
+
+  private inventorySlotsGranted(): number {
+    let slots = 0
+    for (const [idStr, level] of Object.entries(this.playerStore.unlockedNodes())) {
+      const node = ALL_SKILLS[Number(idStr) as SkillNodeID]
+      if (level && node?.type === SkillNodeType.stat && node.stat === 'inventorySlots') {
+        slots += node.statAmount * level
+      }
+    }
+    return slots
   }
 
   respecEntireTree(): boolean {
+    if (!this.playerStore.canChangeInventorySlots(-this.inventorySlotsGranted())) return false
+
     const unlocked = this.playerStore.unlockedNodes()
     let allocatedLevels = 0
     let skillPointsToReturn = 0
