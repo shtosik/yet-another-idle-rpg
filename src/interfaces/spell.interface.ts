@@ -28,4 +28,6 @@ export type SpellBuffEffectProps = {
     duration: number;
     stat: PlayerStat;
     amount: number;
+    /** `amount` is a fraction of the stat (0.2 = 20% better) instead of a flat value. */
+    percent?: boolean;
 };

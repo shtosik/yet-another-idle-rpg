@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core'
 import { PanelComponent } from '../shared/panel/panel.component'
-import { BehaviorSubject } from 'rxjs'
+import { GameNavigationService } from '../../services/game-navigation.service'
 import { GameTab } from 'enums/ids/game-tab.enum'
 import { AsyncPipe, CommonModule } from '@angular/common'
 import { PlayerStat } from '../../../types/player/player-stat.type'
@@ -65,7 +65,8 @@ export class GameComponent {
   shopStore = inject(ShopStore)
   campStore = inject(CampStore)
   dialogueManagerService = inject(DialogueManagerService)
-  gameTab = new BehaviorSubject<GameTab>(GameTab.main)
+  private navigation = inject(GameNavigationService)
+  gameTab = this.navigation.tab
 
   hasDialogueActive = computed(() => this.dialogueManagerService.activeNpc())
 
@@ -89,7 +90,7 @@ export class GameComponent {
   }
 
   changeTab(tab: GameTab) {
-    this.gameTab.next(tab)
+    this.navigation.changeTab(tab)
   }
 
   giveStat(stat: PlayerStat) {

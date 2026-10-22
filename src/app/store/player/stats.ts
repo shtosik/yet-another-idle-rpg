@@ -24,6 +24,8 @@ export type Resources = Record<ResourceStat, number>
 export interface StatModifier {
   stat: PlayerStat
   amount: number
+  /** `amount` is a fraction of the stat after every flat modifier (0.2 = 20% better), not a flat value. */
+  percent?: boolean
 }
 
 /** Positive amounts lower these stats: lower is better (seconds per attack, ms per mana, ms per refresh). */
@@ -60,8 +62,8 @@ export const sameIds = <T>(a: T[], b: T[]): boolean => a.length === b.length && 
 
 export const buffModifiers = (spellIds: SpellID[]): StatModifier[] =>
   spellIds.map(spellId => {
-    const { stat, amount } = SPELLS_DATA[spellId].effect as SpellBuffEffectProps
-    return { stat, amount }
+    const { stat, amount, percent } = SPELLS_DATA[spellId].effect as SpellBuffEffectProps
+    return { stat, amount, percent }
   })
 
 export const consumableModifiers = (itemIds: ItemID[]): StatModifier[] =>
@@ -77,9 +79,14 @@ export const bonusModifiers = (bonuses: Partial<Record<PlayerStat, number>>): St
 export function deriveStats(resources: Resources, modifiers: StatModifier[]): PlayerStatsType {
   const stats: PlayerStatsType = { ...statsInitialState }
 
-  for (const { stat, amount } of modifiers) {
-    if (isResourceStat(stat)) continue
+  for (const { stat, amount, percent } of modifiers) {
+    if (isResourceStat(stat) || percent) continue
     stats[stat] += INVERTED_STATS.has(stat) ? -amount : amount
+  }
+  // Percentages apply after flat modifiers, so they keep the same strength as gear improves.
+  for (const { stat, amount, percent } of modifiers) {
+    if (isResourceStat(stat) || !percent) continue
+    stats[stat] *= INVERTED_STATS.has(stat) ? 1 - amount : 1 + amount
   }
   for (const stat of Object.keys(stats) as PlayerStat[]) {
     stats[stat] = Math.round(stats[stat] * STAT_PRECISION) / STAT_PRECISION

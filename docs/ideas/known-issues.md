@@ -11,14 +11,14 @@
 14. Buying the Spellbook is blocked on a full inventory although it never enters the inventory.
 
 ## Economy and progression
-15. `goldCoinsMultiplier` is never applied (flat 1 gold per kill); the `goldGain` node grants `goldCoins` instead of the multiplier.
+15. Fixed 2026-10-22 (`feat/gold-selling`): enemies drop their own `gold` with `goldCoinsMultiplier` applied; `goldGain` grants the multiplier; loot sells at shops.
 16. Skill tree: ctrl-click buying a cost-0 node with 0 points saves `NaN`; `manaRegen` node is negligible (−2 ms on 30 000 ms); auto wave progression survives refund/respec.
 17. Unlock rules run only on kills; `waveReached` uses `==` on load and `>=` at runtime.
-18. `explorerTokens` and `totalTasksCompleted` are never spent or read; Marvin promises unlocks every 5 tasks.
-19. Balance: shop prices far above income; XP curve uses the cumulative formula as a per-level delta; waves within a zone identical; HP/XP not monotonic across zones; Haste and Fire Strike weak; 11 loot items have no use; Harpy Matriarch plume drops every kill.
+18. Fixed 2026-10-22 (`feat/gold-selling`): Guild rank, rank-gated task pool, tier-scaled tokens and the Guild store.
+19. Balance: XP curve uses the cumulative formula as a per-level delta (kept on purpose for now); Fire Strike weak; Harpy Matriarch plume drops every kill; gold shop prices not re-tuned. Fixed 2026-10-22: wave scaling, zone chain rescale, Haste as a percentage.
 20. Fixed 2026-10-22: Mountain Pass enemies have pets and shiny pets.
 
-Planned fixes for 15–19 (2026-10-22): `gold-drops-and-selling.md`, `explorer-token-shop.md`, `wave-variety.md`, `progression-pacing.md`.
+Remaining plans: `progression-pacing.md` (tuning with `npm run sim`).
 
 ## Combat and spells
 21. No offline progress: a sleeping device or a tab gap longer than 1 s per tick loses that time.

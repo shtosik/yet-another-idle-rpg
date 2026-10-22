@@ -8,6 +8,7 @@ Guidance for Claude Code in this repository: a browser idle RPG (auto-battle in 
 npm start            # dev server (ng serve)
 npm run build        # production build
 npm run validate     # data, i18n, asset and doc-reference checks (scripts/validate-data.mjs)
+npm run sim          # economy simulation: zone times, first-hour ladder, reward flags (scripts/sim-economy.mjs)
 npm run tile         # regenerate world map tiles (node scripts/tile-map.mjs)
 npm run test:assets  # asset-gen pipeline tests (node:test, no GPU needed)
 ```

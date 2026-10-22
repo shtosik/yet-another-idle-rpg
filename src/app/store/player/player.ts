@@ -41,6 +41,9 @@ export const statsInitialState: PlayerStatsType = {
     shinyChance: 0,
     // inventory
     inventorySlots: 40,
+    // Exploration Guild
+    maxTaskSlots: 1,
+    taskDoubleKillChance: 0, // percent: chance a kill counts twice toward tasks
     // damage vs enemy type (additive, fraction: 0.2 = +20% of total damage)
     damageVsCrab: 0,
     damageVsBird: 0,

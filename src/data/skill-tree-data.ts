@@ -53,7 +53,7 @@ const EXPLORATION_SKILLS_DATA: Partial<Record<SkillNodeID, SkillNode>> = {
     maxLevel: 5,
     url: './assets/img/skills/goldGain.png',
     type: SkillNodeType.stat,
-    stat: 'goldCoins',
+    stat: 'goldCoinsMultiplier',
     statAmount: 0.1,
   },
   [SkillNodeID.knowledge]: {

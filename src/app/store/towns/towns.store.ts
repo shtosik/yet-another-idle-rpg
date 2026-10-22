@@ -28,11 +28,12 @@ export const TownsStore = signalStore(
         resetState(): void {
             patchState(store, initialState)
         },
+        // Moving to another town or building closes any open shop.
         selectTown(townId: TownID): void {
-            patchState(store, { selectedTownId: townId })
+            patchState(store, { selectedTownId: townId, activeShopId: null })
         },
         selectTownBuilding(townBuilding: TownBuilding): void {
-            patchState(store, { selectedTownBuilding: townBuilding })
+            patchState(store, { selectedTownBuilding: townBuilding, activeShopId: null })
         },
         resetSelection(): void {
             patchState(store, initialState)

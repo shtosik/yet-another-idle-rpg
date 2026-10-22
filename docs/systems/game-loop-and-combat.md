@@ -25,7 +25,7 @@ The attack, respawn and second timers are plain fields on `GameIntervalService`,
 Spawning (`startBattle(shinyChance)`): a random enemy from `zone.enemies`, or `zone.bossEnemyId` on the last wave. A shiny roll uses `stats.shinyChance` (percent).
 
 Enemy death (`handleEnemyDeath`):
-1. `endBattle`, then `processBattleEnd`: XP `experience × xpMultiplier` (×5 if shiny), 1 gold (×10 if shiny), drop rolls (10 if shiny), wave kill count, enemy kill count, task progress.
+1. `endBattle`, then `processBattleEnd`: XP `ceil(experience × xpMultiplier × waveReward)` and gold `ceil(gold × goldCoinsMultiplier × waveReward)` (a shiny uses ×5 XP / ×10 gold instead of `waveReward`, see `zones-waves-unlocks.md`), drop rolls (10 if shiny), wave kill count, enemy kill count, task progress.
 2. Killing the boss on the last wave unlocks `zone.nextZoneId` (+ notification from `ZONE_UNLOCK_NOTIFICATIONS`).
 3. `UNLOCK_RULES` are checked (towns and features, see `zones-waves-unlocks.md`).
 4. With auto wave progression on and the wave's kill count met, move to the next wave.
@@ -48,7 +48,6 @@ Damage (`resolveHit`), in order, kept fractional throughout:
 - Stats are derived from their sources (equipment, nodes, buffs, consumables), see `player-stats-inventory-equipment.md`.
 
 ## Known issues
-- `goldCoinsMultiplier` is never applied: every kill gives a flat 1 gold (×10 shiny), even though items and food grant the stat.
 - No offline progress: a sleeping device or a tab gap longer than 1 s per tick loses that time.
 - No fail state: auto wave progression can stall forever on a boss the player can't kill.
 

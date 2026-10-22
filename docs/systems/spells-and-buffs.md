@@ -18,7 +18,7 @@ Active abilities on a 5-slot spell bar under the battle view. Spells cost mana a
 3. **Cast** (`castSpell`), only when `canCast`: the spell is equipped, its slot is off cooldown, the player can pay the mana, and either an enemy is alive (melee, magic) or the buff isn't already active (buffs work between fights). Then: pay `baseManaCost`, set the slot's cooldown to `spellCooldown` = `max(1, baseCooldown − spellCooldownReduction)` seconds, and:
    - melee: `doDamage` with double attack;
    - magic: `doDamage` with `baseDamage` and the spell's element (see `game-loop-and-combat.md`);
-   - buff: add to `activeBuffs` for `duration + increasedSpellDuration` seconds. The stat is derived from `activeBuffs`, nothing is added to stats directly.
+   - buff: add to `activeBuffs` for `duration + increasedSpellDuration` seconds. The stat is derived from `activeBuffs`, nothing is added to stats directly. A buff with `percent: true` scales the stat after every flat modifier (Haste: attack interval −20%), so it keeps its strength as gear improves.
 4. **Tick** (every game tick, by the real time elapsed): slot cooldowns and buffs count down in ms; a buff is removed when it reaches 0 and its stat disappears with it.
 5. **Mana** regenerates 1 point per `manaRegenRate` ms up to `maxMana`.
 
@@ -29,7 +29,7 @@ Active abilities on a 5-slot spell bar under the battle view. Spells cost mana a
 
 ## Known issues
 - Buying a multi-level spell node levels the spell only once (latent: all spell nodes have `maxLevel` 1).
-- Haste is weak (≈2% DPS); Fire Strike barely beats auto-attacks; spell descriptions hard-code numbers from data.
+- Fire Strike barely beats auto-attacks (spell numbers wait for magic gear); spell descriptions hard-code numbers from data.
 
 ## How to extend
 New spell: append a `SpellID`, add a `SPELLS_DATA` entry, a `spell` skill node with `spellId`, icon under `assets/img/skills/`, and `spells:names` keys. A new effect shape needs a new `SpellEffectProps` variant and a `castSpell` case (and a `canCast` rule if it needs a target).

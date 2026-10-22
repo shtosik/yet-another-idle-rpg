@@ -44,4 +44,6 @@ export interface GuildEffect {
   type: 'guild'
   action: 'acceptTask' | 'abandonTask' | 'claimTask'
   taskLength?: TaskLength
+  /** `abandonTask`: index into `activeTasks` of the task to cancel. */
+  taskIndex?: number
 }

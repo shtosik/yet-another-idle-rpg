@@ -143,4 +143,8 @@ export enum ItemID {
     shinyPetMountainBat = 128,
     shinyPetGoat = 129,
     shinyPetGoblinScavenger = 130,
+    // Explorer Token shop
+    guildSatchel = 131,
+    secondContract = 132,
+    bountyMark = 133,
 }

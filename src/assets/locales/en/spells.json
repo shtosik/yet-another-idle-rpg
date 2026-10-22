@@ -6,7 +6,7 @@
         },
         "haste": {
             "name": "Haste",
-            "desc": "Increases attack speed by 0.3 for 1 minute."
+            "desc": "Attacks 20% faster for 1 minute."
         },
         "fireStrike": {
             "name": "Fire Strike",

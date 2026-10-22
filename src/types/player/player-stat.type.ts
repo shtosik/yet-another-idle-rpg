@@ -49,6 +49,8 @@ export type PlayerStat =
     | 'damageVsHarpy'
     | 'magicDamageMultiplier'
     | 'inventorySlots'
+    | 'maxTaskSlots'
+    | 'taskDoubleKillChance'
 
 export const multiplierStats: PlayerStat[] = [
     'critMulti',

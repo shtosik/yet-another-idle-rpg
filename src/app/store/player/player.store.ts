@@ -1,7 +1,7 @@
 import { computed, effect, inject } from '@angular/core'
 import { patchState, signalStore, withComputed, withHooks, withMethods, withState } from '@ngrx/signals'
 import { PlayerStat } from '../../../types/player/player-stat.type'
-import { calculateXp } from 'app/pipes/calculate-xp.pipe'
+import { calculateXp } from './experience'
 import { initialEquipmentState, statsInitialState } from './player'
 import { EquipmentItem, InventoryItem, RecipeItem } from 'interfaces/item.interface'
 import { ItemID } from 'enums/ids/item-id.enum'
@@ -13,6 +13,10 @@ import { UnlockedSpellsType } from '../../../types/player/unlocked-spells.type'
 import { Enemy } from '../../../interfaces/enemy.interface'
 import { EnemyDrop } from '../../../interfaces/enemy-drop.interface'
 import ITEM_DATA from '../../../data/items-data'
+import ZONES_DATA from '../../../data/zones-data'
+import { waveMultipliers } from '../battle/wave-scaling'
+import { sellPrice } from '../shop/shop-prices'
+import { ShopID } from '../../../enums/ids/shop-id.enum'
 import ENEMIES_DATA from '../../../data/enemies-data'
 import { EquipmentSlot, EquipmentSlotKey } from '../../../enums/equipment-slot.enum'
 import { ItemType } from '../../../enums/items/item-type.enum'
@@ -57,6 +61,10 @@ export interface Task {
   rewardTokens: number
   zoneId: ZoneID
 }
+
+export const TASKS_PER_GUILD_RANK = 5
+
+export const isTaskDone = (task: Task): boolean => task.currentCount >= task.targetCount
 
 interface PlayerState {
   resources: Resources;
@@ -177,13 +185,11 @@ export const PlayerStore = signalStore(
     }
   }),
   withComputed((store) => ({
-    maxTaskSlots: () => 1,
-    hasAvailableTaskSlot: () => store.activeTasks().length < 1,
-    activeTask: () => store.activeTasks()[0] ?? null,
-    isTaskComplete: () => {
-      const task = store.activeTasks()[0]
-      return task ? task.currentCount >= task.targetCount : false
-    },
+    /** One rank per `TASKS_PER_GUILD_RANK` completed tasks, no cap. Each rank adds a zone tier to the task pool. */
+    guildRank: () => Math.floor(store.totalTasksCompleted() / TASKS_PER_GUILD_RANK),
+    hasAvailableTaskSlot: () => store.activeTasks().length < store.stats().maxTaskSlots,
+    hasCompletedTask: () => store.activeTasks().some(isTaskDone),
+    hasTaskInProgress: () => store.activeTasks().some(task => !isTaskDone(task)),
     equippedWeaponDamageType: () => {
       const weapon = store.equipment().weapon
       if (!weapon) return DamageElement.physical
@@ -312,33 +318,47 @@ export const PlayerStore = signalStore(
       }))
     },
 
+    /** Bounty Mark (`taskDoubleKillChance`, percent) can make one kill count twice. */
     updateTaskProgress(monsterId: EnemyID) {
-      patchState(store, (state) => {
-        const updatedTasks = state.activeTasks.map(task => {
-          if (task.monsterId === monsterId && task.currentCount < task.targetCount) {
-            return { ...task, currentCount: task.currentCount + 1 }
-          }
-          return task
-        })
-        return { activeTasks: updatedTasks }
-      })
-    },
+      if (!store.activeTasks().some(task => task.monsterId === monsterId && !isTaskDone(task))) return
 
-    claimTaskReward(taskId: string) {
-      const task = store.activeTasks().find(t => t.id === taskId)
-      if (!task || task.currentCount < task.targetCount) return
-
+      const counts = Math.random() * 100 < store.stats().taskDoubleKillChance ? 2 : 1
       patchState(store, (state) => ({
-        activeTasks: state.activeTasks.filter(t => t.id !== taskId),
-        totalTasksCompleted: state.totalTasksCompleted + 1,
-        explorerTokens: state.explorerTokens + task.rewardTokens,
+        activeTasks: state.activeTasks.map(task =>
+          task.monsterId === monsterId && !isTaskDone(task)
+            ? { ...task, currentCount: Math.min(task.targetCount, task.currentCount + counts) }
+            : task,
+        ),
       }))
     },
 
-    abandonTask(taskId: string) {
+    /** Claims every finished task at once. */
+    claimCompletedTasks() {
+      const done = store.activeTasks().filter(isTaskDone)
+      if (!done.length) return
+
       patchState(store, (state) => ({
-        activeTasks: state.activeTasks.filter(t => t.id !== taskId),
+        activeTasks: state.activeTasks.filter(task => !isTaskDone(task)),
+        totalTasksCompleted: state.totalTasksCompleted + done.length,
+        explorerTokens: state.explorerTokens + done.reduce((sum, task) => sum + task.rewardTokens, 0),
       }))
+    },
+
+    /** Cancels the task at `index` in `activeTasks`. Finished tasks can only be claimed. */
+    abandonTask(index: number) {
+      const task = store.activeTasks()[index]
+      if (!task || isTaskDone(task)) return
+
+      patchState(store, (state) => ({
+        activeTasks: state.activeTasks.filter(t => t.id !== task.id),
+      }))
+    },
+
+    /** Returns whether the tokens were spent; never goes below 0. */
+    spendTokens(amount: number): boolean {
+      if (amount < 0 || store.explorerTokens() < amount) return false
+      patchState(store, (state) => ({ explorerTokens: state.explorerTokens - amount }))
+      return true
     },
   })),
   withMethods((store) => ({
@@ -364,12 +384,14 @@ export const PlayerStore = signalStore(
       const enemy = ENEMIES_DATA[enemyId]
       const stats = store.stats()
 
-      const xpMultiplier = isShiny ? 5 : 1
-      const goldMultiplier = isShiny ? 10 : 1
+      // A shiny pays from the unscaled base, so low waves stay the place to hunt shinies.
+      const { reward: waveReward } = waveMultipliers(ZONES_DATA[zoneId], currentWave)
+      const xpMultiplier = isShiny ? 5 : waveReward
+      const goldMultiplier = isShiny ? 10 : waveReward
       const dropRolls = isShiny ? 10 : 1
 
       const xpGained = Math.ceil(enemy.experience * stats.xpMultiplier * xpMultiplier)
-      const goldGained = 1 * goldMultiplier
+      const goldGained = Math.ceil(enemy.gold * stats.goldCoinsMultiplier * goldMultiplier)
       const itemsToUpdate = calculateEnemyDrops(enemy, dropRolls, isShiny, activeQuestIds)
 
       store.updatePlayerStats([
@@ -382,6 +404,17 @@ export const PlayerStore = signalStore(
       store.updateTaskProgress(enemyId)
 
       if (itemsToUpdate.length) store.addItems(itemsToUpdate)
+    },
+
+    /** Sells up to `amount` from one stack at `shopId`'s price (`sellPrice`). No-op when that shop won't buy it. */
+    sellItem(item: InventoryItem, shopId: ShopID, amount = 1) {
+      const price = sellPrice(shopId, item.id)
+      const owned = store.inventory().find(slot => slot?.id === item.id && slot.tier === item.tier)?.amount ?? 0
+      const sold = Math.min(amount, owned)
+      if (price <= 0 || sold <= 0) return
+
+      store.removeItems([{ id: item.id, tier: item.tier, amount: sold }])
+      store.updatePlayerStats([{ stat: 'goldCoins', amount: price * sold }])
     },
 
     equipItem(item: InventoryItem) {

@@ -1,6 +1,6 @@
 # Shop preferences
 
-**Scope:** S · **Status:** Proposed
+**Scope:** S · **Status:** Done 2026-10-22 (`feat/gold-selling`); per-shop values in `docs/systems/towns-shops-guild.md`
 
 Shops pay differently for different item kinds: the Mawood apothecary pays more for herbs and vials, the La Harpar trader for fish and shells, a smith for ores and hides. Some shops may buy only their kind.
 

@@ -1,6 +1,6 @@
 <app-game-menu (changeTab)="changeTab($event)"/>
 <div class="game">
-  @let tab = gameTab | async;
+  @let tab = gameTab();
   <app-battle class="battle"/>
 
   @if (tab === GameTab.main) {

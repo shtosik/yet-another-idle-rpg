@@ -26,14 +26,14 @@
     </div>
 
     <ul class="dialogue-modal__options">
-      @for (option of currentNode.options; track option.responseKey) {
+      @for (option of currentNode.options; track $index) {
         @if (isOptionVisible(option)) {
           <li
             class="dialogue-modal__option-btn"
             [class.disabled]="isOptionDisabled(option)"
             (click)="!isOptionDisabled(option) && handleOptionClicked(option)"
           >
-            <span class="option-text">{{ option.responseKey | i18next }}</span>
+            <span class="option-text">{{ option.responseKey | i18next: getResponseParams(option) }}</span>
 
             <div class="option-meta">
               @let result = dialogueService.getActiveResult(option);

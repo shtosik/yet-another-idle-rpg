@@ -1,6 +1,6 @@
 # Explorer Token shop & guild ranks
 
-**Scope:** S-M · **Status:** Accepted (2026-10-22)
+**Scope:** S-M · **Status:** Done 2026-10-22 (`feat/gold-selling`) except Ambush and the extra consumable slot
 
 Spend `explorerTokens` at the Exploration Guild. Completing tasks raises a Guild rank that widens the task pool and opens shop tiers.
 
@@ -14,7 +14,7 @@ Spend `explorerTokens` at the Exploration Guild. Completing tasks raises a Guild
 
 **Task targets** stay a uniform random pick across the pool. Old zones staying in the pool is intended: they keep being useful, and their tasks finish faster. (Weighting toward the newest zone was considered and dropped for now.)
 
-**Token reward** = length reward (short 1, medium 2, long 3) × the zone tier of the task's target zone — the zone the player fights in to finish the task, not how many zones are unlocked. Zone tier follows progression order (Horseshoe Beach 1 … Upper Canopy highest; side zones share their town's tier). Shop prices scale with tier so new upgrades stay something to work towards.
+**Token reward** = length reward (short 1, medium 2, long 3) × the zone tier of the task's target zone — the zone the player fights in to finish the task, not how many zones are unlocked. Zone tier (`Zone.tier`) follows progression order: Horseshoe Beach and the Traders' Basement 1, Plains 2, The Long Path 3, Mountain Pass 4, Elderwood Wilds 5, Deepwood 6, Upper Canopy 7. A side zone takes the tier of where it sits in the quest line, not its town's: Deepwood and Upper Canopy come after Elderwood Wilds. Shop prices scale with tier so new upgrades stay something to work towards.
 
 **Shop tiers**
 - Rank 0 — basics: consumables, skill point books, recipe scrolls.
@@ -28,7 +28,8 @@ Spend `explorerTokens` at the Exploration Guild. Completing tasks raises a Guild
 **Dropped:** Quick Recovery (shorter respawn) — duplicates the Overkill node (`overkill-spell-mastery.md`). Revisit only as a cooldown spell.
 
 ## Open
-- Exact tier contents and prices — tune with the economy simulation (`progression-pacing.md`).
+- Exact tier contents and prices — tune with the economy simulation (`progression-pacing.md`). Shipped contents: `docs/systems/towns-shops-guild.md`.
+- **Ambush** needs a spell-unlock-by-item path and a "next hit crits" buff; **extra consumable slot** needs a third consumable slot in the battle UI. Both not built yet.
 
 ## Touch-points
 `player.store.ts` (`spendTokens`, `maxTaskSlots` stat), `shops-data.ts` (token currency), `exploration-guild.service.ts` (rank-gated pool, tier multiplier), Marvin's dialogue, `spells-data.ts` (Ambush).

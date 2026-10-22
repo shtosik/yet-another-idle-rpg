@@ -8,6 +8,7 @@ import { SpellID } from '../../../enums/ids/spell-id.enum'
 import { withDevtools } from '@angular-architects/ngrx-toolkit'
 import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
 import { toShinyUrl } from 'utils/shiny-url'
+import { waveMultipliers } from './wave-scaling'
 import { ActiveConsumable, CONSUMABLE_SLOTS, ConsumableSlot } from '../../../interfaces/consumable.interface'
 
 export interface BattleState {
@@ -68,11 +69,13 @@ export const BattleStore = signalStore(
         }
 
         const isShiny = shinyChance > 0 && Math.random() * 100 < shinyChance
+        // The scaled max HP is saved with the enemy, so the HP bar and a reload agree.
+        const maxHp = Math.round(enemy.maxHp * waveMultipliers(zoneData, state.currentWave).hp)
 
         return {
           isInCombat: true,
-          enemy: isShiny ? { ...enemy, url: toShinyUrl(enemy.url) } : enemy,
-          currentEnemyHp: enemy.maxHp,
+          enemy: { ...enemy, maxHp, url: isShiny ? toShinyUrl(enemy.url) : enemy.url },
+          currentEnemyHp: maxHp,
           isShinyEnemy: isShiny,
         }
       })

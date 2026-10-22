@@ -5,7 +5,8 @@ import { EnemyID } from 'enums/ids/enemy-id.enum'
 import { ZoneID } from 'enums/ids/zone-id.enum'
 import { BattleStore } from '../../../../store/battle/battle.store'
 import { BattleManagerService } from '../../../../services/battle-manager.service'
-import { PlayerStore } from '../../../../store/player/player.store'
+import { GameNavigationService } from '../../../../services/game-navigation.service'
+import { isTaskDone, PlayerStore } from '../../../../store/player/player.store'
 import ENEMIES_DATA from '../../../../../data/enemies-data'
 import { NgOptimizedImage } from '@angular/common'
 
@@ -37,26 +38,22 @@ export class BattleNavBarComponent {
     return `${current}`
   })
 
-  activeTask = this.playerStore.activeTask
-  isTaskComplete = this.playerStore.isTaskComplete
+  private navigation = inject(GameNavigationService)
 
-  taskIndicator = computed(() => {
-    const task = this.activeTask()
-    if (!task) return null
+  /** A finished task's indicator jumps straight to Marvin's dialogue. */
+  claimAtMarvin(): void {
+    this.navigation.talkToMarvin()
+  }
 
-    const enemy = ENEMIES_DATA[task.monsterId]
-    const remaining = task.targetCount - task.currentCount
-    const complete = task.currentCount >= task.targetCount
-
-    return {
-      enemyUrl: enemy.url,
+  taskIndicators = computed(() =>
+    this.playerStore.activeTasks().map(task => ({
+      id: task.id,
+      enemyUrl: ENEMIES_DATA[task.monsterId].url,
       enemyName: EnemyID[task.monsterId],
-      remaining,
-      complete,
-      current: task.currentCount,
-      target: task.targetCount,
-    }
-  })
+      remaining: task.targetCount - task.currentCount,
+      complete: isTaskDone(task),
+    })),
+  )
 
   readonly ZoneID = ZoneID
   readonly EnemyID = EnemyID
