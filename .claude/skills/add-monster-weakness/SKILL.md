@@ -17,7 +17,7 @@ The hit's element: auto-attacks and the melee spell use the weapon's `damageType
 
 **Spell element** — `damageType` is required on magic spells in `src/data/spells-data.ts`; melee and buff spells have none.
 
-**Tune the multiplier** — base values are in `statsInitialState` (`src/app/store/player/player.ts`); items and skill nodes add to them (`0.2` = +20 points on the 1.2 base). Existing saves keep the old base (stats are accumulated); clear `localStorage` to test.
+**Tune the multiplier** — base values are in `statsInitialState` (`src/app/store/player/player.ts`); items and skill nodes add to them (`0.2` = +20 points on the 1.2 base). Stats are derived, so existing saves pick up a new base immediately.
 
 **New element** (e.g. poison):
 1. Append it to `src/enums/damage-element.enum.ts:DamageElement`.

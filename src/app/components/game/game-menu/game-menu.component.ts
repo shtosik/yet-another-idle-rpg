@@ -14,8 +14,8 @@ import { PlayerStore } from '../../../store/player/player.store'
 
 export class GameMenuComponent {
     playerStore = inject(PlayerStore)
-    skillPoints = this.playerStore.stats.unspentSkillPoints
-    level = this.playerStore.stats.level
+    skillPoints = this.playerStore.resources.unspentSkillPoints
+    level = this.playerStore.resources.level
 
     @Output() changeTab = new EventEmitter<GameTab>()
 

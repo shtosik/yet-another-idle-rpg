@@ -41,7 +41,7 @@ Angular 20 standalone components, zoneless change detection, `OnPush` on every c
 ## Gotchas
 
 - **Pre-release: save compatibility is not required.** Rename and renumber freely; clear `localStorage` after a breaking state change.
-- **Stats are accumulated, not derived.** Every source does `+=` into persisted `stats`; equip/unequip, buff expiry and respec must apply the exact mirror `−=`.
+- **Stats are derived, not stored.** `PlayerStore.stats()` is computed from base + equipment + skill nodes + buffs + consumables + permanent bonuses. `updatePlayerStats` only earns/spends resources or adds a permanent bonus; a new stat source goes into the `stats` computed (ADR 0002).
 - **New i18n namespace → register it** in the `translations` list in `src/app/app.config.ts`. Template pipe is `| i18next`.
 - **Item data lives in `src/data/items/<category>-items.data.ts`**; `src/data/items-data.ts` only merges them.
 - **Quest conditions**: `QuestState.active` = started; `QuestState.readyToAdvance` = started and current step's requirements met (turn-ins).

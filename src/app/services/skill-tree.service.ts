@@ -8,7 +8,6 @@ import { BattleManagerService } from './battle-manager.service'
 import { canBuyNode } from '../../utils/skill-tree-requirements'
 import { canRefundNode, CanRefundResult } from '../../utils/skill-tree-refund'
 import { SKILL_TREE_GRAPH } from '../../data/skill-tree-graph'
-import { PlayerStat } from '../../types/player/player-stat.type'
 import { SpellID } from '../../enums/ids/spell-id.enum'
 
 @Injectable({ providedIn: 'root' })
@@ -42,12 +41,6 @@ export class SkillTreeService {
     this.playerStore.updatePlayerStats([
       { stat: 'unspentSkillPoints', amount: -(pointsToBuy * skillData.skillPointCost) },
     ])
-
-    if (skillData.type === SkillNodeType.stat) {
-      this.playerStore.updatePlayerStats([
-        { stat: skillData.stat, amount: skillData.statAmount * pointsToBuy },
-      ])
-    }
 
     this.playerStore.updateUnlockedNodes(id, pointsToBuy)
 
@@ -100,17 +93,11 @@ export class SkillTreeService {
       { stat: 'goldCoins', amount: -goldCost },
     ])
 
-    if (skillData.type === SkillNodeType.stat) {
-      this.playerStore.updatePlayerStats([
-        { stat: skillData.stat, amount: -(skillData.statAmount * refundedLevels) },
-      ])
-    }
-
     this.playerStore.updateUnlockedNodes(id, -refundedLevels)
 
     if (skillData.type === SkillNodeType.spell && newLevel === 0) {
       this.playerStore.levelDownSpell(skillData.spellId, refundedLevels)
-      this.battleManagerService.unequipSpell(skillData.spellId)
+      this.battleManagerService.unequipSpell(skillData.spellId, true)
     }
 
     return true
@@ -156,7 +143,6 @@ export class SkillTreeService {
     const unlocked = this.playerStore.unlockedNodes()
     let allocatedLevels = 0
     let skillPointsToReturn = 0
-    const statRollbacks: Array<{ stat: PlayerStat; amount: number }> = []
     const spellRollbacks: Array<{ spellId: SpellID; levels: number }> = []
 
     for (const [idStr, level] of Object.entries(unlocked)) {
@@ -165,9 +151,6 @@ export class SkillTreeService {
       if (!node) continue
       allocatedLevels += level
       skillPointsToReturn += level * node.skillPointCost
-      if (node.type === SkillNodeType.stat && node.stat) {
-        statRollbacks.push({ stat: node.stat, amount: -(node.statAmount * level) })
-      }
       if (node.type === SkillNodeType.spell && node.spellId !== undefined) {
         spellRollbacks.push({ spellId: node.spellId, levels: level })
       }
@@ -179,14 +162,13 @@ export class SkillTreeService {
     if (this.playerStore.stats().goldCoins < goldCost) return false
 
     this.playerStore.updatePlayerStats([
-      ...statRollbacks,
       { stat: 'unspentSkillPoints', amount: skillPointsToReturn },
       { stat: 'goldCoins', amount: -goldCost },
     ])
 
     for (const { spellId, levels } of spellRollbacks) {
       this.playerStore.levelDownSpell(spellId, levels)
-      this.battleManagerService.unequipSpell(spellId)
+      this.battleManagerService.unequipSpell(spellId, true)
     }
 
     this.playerStore.resetUnlockedNodes()

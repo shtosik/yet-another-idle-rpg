@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { AbbreviatePipe } from 'app/pipes/abbreviate.pipe'
 import { CalculateXpPipe } from 'app/pipes/calculate-xp.pipe'
@@ -17,4 +17,11 @@ import { StatToPercentagePipe } from '../../../pipes/stat-to-percentage.pipe'
 export class PlayerStatsComponent {
     playerStore = inject(PlayerStore)
     playerStats = this.playerStore.stats
+
+    /** Whole seconds until the next mana point; null at full mana. */
+    secondsToNextMana = computed(() => {
+        const { mana, maxMana, manaRegenRate } = this.playerStats()
+        if (mana >= maxMana) return null
+        return Math.ceil((manaRegenRate - this.playerStore.manaRegenTimer()) / 1000)
+    })
 }
