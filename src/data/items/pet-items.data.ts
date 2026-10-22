@@ -138,6 +138,30 @@ const PETS: PetEntry[] = [
     stats: [{ id: 'damageVsTroll', amount: 0.2 }],
     shinyStats: [{ id: 'damageVsTroll', amount: 0.4 }],
   },
+  {
+    enemyId: EnemyID.mountainBat,
+    petId: ItemID.petMountainBat,
+    shinyId: ItemID.shinyPetMountainBat,
+    asset: 'mountainBat',
+    stats: [{ id: 'damageVsMammal', amount: 0.2 }],
+    shinyStats: [{ id: 'damageVsMammal', amount: 0.4 }],
+  },
+  {
+    enemyId: EnemyID.goat,
+    petId: ItemID.petGoat,
+    shinyId: ItemID.shinyPetGoat,
+    asset: 'goat',
+    stats: [{ id: 'damageVsMammal', amount: 0.2 }],
+    shinyStats: [{ id: 'damageVsMammal', amount: 0.4 }],
+  },
+  {
+    enemyId: EnemyID.goblinScavenger,
+    petId: ItemID.petGoblinScavenger,
+    shinyId: ItemID.shinyPetGoblinScavenger,
+    asset: 'goblinScavenger',
+    stats: [{ id: 'damageVsGoblin', amount: 0.2 }],
+    shinyStats: [{ id: 'damageVsGoblin', amount: 0.4 }],
+  },
   // Mawood — Elderwood Wilds
   {
     enemyId: EnemyID.forestSpider,

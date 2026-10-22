@@ -136,4 +136,11 @@ export enum ItemID {
     cookingPot = 122,
     mortarAndPestle = 123,
     runeAltar = 124,
+    // Mountain Pass pets
+    petMountainBat = 125,
+    petGoat = 126,
+    petGoblinScavenger = 127,
+    shinyPetMountainBat = 128,
+    shinyPetGoat = 129,
+    shinyPetGoblinScavenger = 130,
 }

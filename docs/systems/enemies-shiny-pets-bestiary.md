@@ -27,7 +27,6 @@ Enemy definitions and their loot. A **shiny** is a rare recolored spawn with muc
 
 ## Known issues
 - No gold field on enemies: every kill gives 1 gold regardless of enemy.
-- Mountain Pass enemies (mountain bat, goat, goblin scavenger) have no pet or shiny drops.
 - The harpy matriarch's plume drops on every kill and has no use.
 - 11 loot items have no use (no recipe, quest, or sell action).
 
