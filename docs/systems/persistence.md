@@ -1,7 +1,7 @@
 # Persistence
 
 ## Purpose
-Saves game state to `localStorage` on every change and restores it on load. There is no backend and no save file.
+Saves game state to `localStorage` (at most once a second per store) and restores it on load. There is no backend and no save file.
 
 ## Key files
 - `src/app/store/helpers/with-game-state-sync.hook.ts:withGameStateSync` — the whole mechanism.
@@ -9,7 +9,7 @@ Saves game state to `localStorage` on every change and restores it on load. Ther
 
 | Key | Store | Holds |
 |---|---|---|
-| `playerStore` | `src/app/store/player/player.store.ts:PlayerStore` | stats, inventory, equipment, unlocked nodes, stations, recipes, tasks, unlocked content |
+| `playerStore` | `src/app/store/player/player.store.ts:PlayerStore` | resources, permanent bonuses, inventory, equipment, unlocked nodes, stations, recipes, tasks, unlocked content |
 | `battleStore` | `src/app/store/battle/battle.store.ts:BattleStore` | current zone/wave/enemy, spells, buffs, consumable slots |
 | `questsStore` | `src/app/store/quests/quests.store.ts:QuestsStore` | quest step progression (completion is step 9999), dialogue flags |
 | `townsStore` | `src/app/store/towns/towns.store.ts:TownsStore` | selected town/building, open shop |
@@ -17,21 +17,21 @@ Saves game state to `localStorage` on every change and restores it on load. Ther
 | `campStore` | `src/app/store/camp/camp.store.ts:CampStore` | Camp tab UI selection |
 
 ## Data flow
-1. Store `onInit`: read `localStorage[key]`, `JSON.parse`, then `merge({}, initialState, parsed)` (lodash deep merge) and `patchState`.
-2. An `effect` writes `JSON.stringify(getState(store))` back on every state change.
+1. Store `onInit`: read `localStorage[key]`, `JSON.parse`, keep only top-level keys that exist in `initialState`, drop `transientKeys`, then `merge({}, initialState, parsed)` (lodash deep merge) and `patchState`.
+2. An `effect` marks the store dirty on every state change; a 1 s interval writes `JSON.stringify` of the state without `transientKeys`, inside `try/catch`. Up to 1 s of progress is lost on close.
 3. `GameComponent.resetState` calls `resetState()` on every store, which patches `initialState` back in.
 
 ## Invariants & gotchas
 - **Pre-release: save compatibility is not required.** Renames and renumbers are allowed. After a breaking state change, clear `localStorage` (DevTools → Application → Local Storage).
-- **Renamed or removed keys linger.** The merge keeps every key in the saved JSON, so an old key stays in state (and gets saved again) forever. `resetState()` does not remove them either, because `patchState` only overwrites keys.
+- **Removed top-level keys are dropped on load.** Renamed or removed keys nested deeper (inside an object in state) still linger, because the merge keeps them.
 - **New keys pick up defaults.** A key added to `initialState` appears in old saves with its initial value, because of the merge.
 - **Arrays merge by index**, not replace. If `initialState` has a non-empty array and the save has a shorter one, the tail of the initial array survives. Keep initial arrays empty (or accept the effect).
 - **Enum values are what get saved**, never enum names. Renumbering an enum quietly points saved data at different entities.
-- Every state change triggers a full `JSON.stringify` of that store. Avoid high-frequency state updates for anything big (for example, don't put per-tick counters in `PlayerStore` if they can live in a non-persisted signal).
+- **Transient state**: pass per-tick timers as `transientKeys` (`withGameStateSync(KEY, initialState, ['manaRegenTimer'])`) or keep them outside stores (the attack and respawn timers live on `GameIntervalService`).
+- Clearing `localStorage` by hand: reload within a second, or the next save writes the old state back.
 
 ## Known issues
 - No save version or migration step. Corrupt values (`NaN`, `null`) are never repaired.
-- Saves are written on every state change with no throttling and no `try/catch` around `setItem` (quota errors would throw). Transient timers (attack timer, mana regen timer, cooldowns) live in persisted state, so writes happen up to 10 times a second.
 - `withDevtools` is active on every store in production builds.
 
 ## Pre-release TODO

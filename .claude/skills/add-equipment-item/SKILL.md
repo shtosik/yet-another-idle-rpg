@@ -5,7 +5,7 @@ description: Use when adding or rebalancing equipment — weapon, armor, ring, a
 
 # Add an equipment item
 
-Background: `docs/systems/player-stats-inventory-equipment.md` (stat units, accumulated stats). Pets: use `add-shiny-variant`. Weapon elements: `add-monster-weakness`.
+Background: `docs/systems/player-stats-inventory-equipment.md` (stat units, derived stats). Pets: use `add-shiny-variant`. Weapon elements: `add-monster-weakness`.
 
 ## Steps
 
@@ -44,6 +44,6 @@ Background: `docs/systems/player-stats-inventory-equipment.md` (stat units, accu
    - **Quest reward**: `{ type: 'item', itemId: ItemID.flameSword, amount: 1 }` in the quest's `rewards` in `src/data/quests-data.ts`.
    - **Recipe**: see `add-recipe-or-consumable`.
 
-7. **Rebalancing an existing item**: change `stats` in place. Saves that already have it equipped keep the old delta until it's unequipped and re-equipped (stats are accumulated); clear `localStorage` when testing.
+7. **Rebalancing an existing item**: change `stats` in place. Stats are derived, so saves pick up the new values immediately.
 
 Done when `npm run validate` and `npx ng build` pass, and in the dev server equipping then unequipping the item returns every stat to its previous value.

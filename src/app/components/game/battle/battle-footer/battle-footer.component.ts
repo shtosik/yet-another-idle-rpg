@@ -13,6 +13,7 @@ import { ItemID } from '../../../../../enums/ids/item-id.enum'
 import { CONSUMABLE_SLOTS } from '../../../../../interfaces/consumable.interface'
 
 const SPELL_SLOT_COUNT = 5
+const MS_PER_SECOND = 1000
 const PALETTE_DROP_ID = 'spellbook-palette'
 
 @Component({
@@ -33,7 +34,9 @@ export class BattleFooterComponent {
   private battleStore = inject(BattleStore)
 
   equippedSpells = this.battleStore.equippedSpells
-  activeBuffs = this.battleStore.activeBuffs
+  activeBuffs = computed(() =>
+    this.battleStore.activeBuffs().map(buff => ({ ...buff, secondsLeft: Math.ceil(buff.msRemaining / MS_PER_SECOND) })),
+  )
 
   // A slot stays visible while its effect runs and, dimmed, while it is still locked.
   activeConsumables = computed(() => {
@@ -53,6 +56,10 @@ export class BattleFooterComponent {
   protected readonly ITEM_DATA = ITEM_DATA
   protected readonly ItemID = ItemID
 
+  /** A cooling slot rejects drags outright, so CDK never moves its spell aside to preview a drop. */
+  canEnterSlot = (_drag: CdkDrag, drop: CdkDropList<number>): boolean =>
+    (this.battleStore.equippedSpells()[drop.data]?.cooldownRemainingMs ?? 0) <= 0
+
   onSlotDrop(event: CdkDragDrop<number>) {
     if (event.previousContainer === event.container) return
 
@@ -60,11 +67,14 @@ export class BattleFooterComponent {
     const arr: (EquippedSpell | null)[] = [...this.battleStore.equippedSpells()]
     while (arr.length < SPELL_SLOT_COUNT) arr.push(null)
 
+    // A slot on cooldown keeps its spell (cooling spells can't be dragged out either, see cdkDragDisabled).
+    if ((arr[targetIndex]?.cooldownRemainingMs ?? 0) > 0) return
+
     if (event.previousContainer.id === PALETTE_DROP_ID) {
       // Equip from the spellbook palette into the hovered slot.
       const spellId = event.item.data as SpellID
       const displaced = arr[targetIndex]
-      arr[targetIndex] = { spellId, cooldownRemaining: 0 }
+      arr[targetIndex] = { spellId, cooldownRemainingMs: 0 }
       if (displaced) {
         // Bump the previous occupant to a free slot; if none, it returns to the palette.
         const free = arr.findIndex(s => !s)

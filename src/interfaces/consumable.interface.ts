@@ -19,10 +19,9 @@ export interface ConsumableEffect {
     manaRestore?: number
 }
 
+/** While `effectRemaining` > 0 the item's `effect.stats` count towards the player's stats. */
 export interface ActiveConsumable {
     itemId: ItemID
     effectRemaining: number
     lockRemaining: number
-    // Snapshot of what was applied, reverted exactly on expiry.
-    stats: ConsumableStat[]
 }

@@ -1,4 +1,4 @@
-import { effect } from '@angular/core'
+import { computed, effect, inject } from '@angular/core'
 import { patchState, signalStore, withComputed, withHooks, withMethods, withState } from '@ngrx/signals'
 import { PlayerStat } from '../../../types/player/player-stat.type'
 import { calculateXp } from 'app/pipes/calculate-xp.pipe'
@@ -31,8 +31,23 @@ import { addItems, canFit, countItem, createInventory, fitsCapacity, ItemStack, 
 import { canInstall, evaluateRecipe, installStations, Stations } from './camp'
 import { StationID } from '../../../enums/ids/station-id.enum'
 import { UNLOCK_RULES, UnlockCondition, UnlockTarget } from '../../../data/unlock-conditions'
+import { BattleStore } from '../battle/battle.store'
+import {
+  activeBuffSpellIds,
+  activeConsumableItemIds,
+  bonusModifiers,
+  buffModifiers,
+  consumableModifiers,
+  deriveStats,
+  equipmentModifiers,
+  initialResources,
+  isResourceStat,
+  Resources,
+  sameIds,
+  skillNodeModifiers,
+} from './stats'
 
-export type PlayerStatsType = Record<PlayerStat, number>;
+export type { PlayerStatsType } from './stats'
 
 export interface Task {
   id: string
@@ -44,7 +59,11 @@ export interface Task {
 }
 
 interface PlayerState {
-  stats: PlayerStatsType;
+  resources: Resources;
+  /** Permanent stat gains from used items, quest rewards and dialogue. Raw amounts, before inversion. */
+  permanentBonuses: Partial<Record<PlayerStat, number>>;
+  /** Not saved: progress towards the next mana point. */
+  manaRegenTimer: number;
   zonesProgression: ZonesProgression;
   enemyKillCounts: Partial<Record<EnemyID, number>>
   inventory: (InventoryItem | null)[];
@@ -64,7 +83,9 @@ interface PlayerState {
 }
 
 export const initialState: PlayerState = {
-  stats: statsInitialState,
+  resources: initialResources(),
+  permanentBonuses: {},
+  manaRegenTimer: 0,
   zonesProgression: {},
   inventory: createInventory(),
   equipment: initialEquipmentState,
@@ -91,15 +112,15 @@ const equipmentInventorySlots = (itemId: ItemID): number =>
     ?.filter(s => s.id === 'inventorySlots')
     .reduce((sum, s) => sum + s.amount, 0) ?? 0
 
-const handleExperience =(stats: PlayerStatsType) => {
-  const xpForNextLevel = calculateXp(stats.level + 1)
-  if (stats.experience < xpForNextLevel) return
+const handleExperience = (resources: Resources) => {
+  const xpForNextLevel = calculateXp(resources.level + 1)
+  if (resources.experience < xpForNextLevel) return
 
-  stats.level++
-  stats.unspentSkillPoints++
-  const leftoverXp = stats.experience - xpForNextLevel
-  stats.experience = leftoverXp > 0 ? leftoverXp : 0
-  handleExperience(stats)
+  resources.level++
+  resources.unspentSkillPoints++
+  const leftoverXp = resources.experience - xpForNextLevel
+  resources.experience = leftoverXp > 0 ? leftoverXp : 0
+  handleExperience(resources)
 }
 
 const rollDropList = (
@@ -137,8 +158,24 @@ const STORE_KEY = 'playerStore'
 export const PlayerStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
-  withGameStateSync(STORE_KEY, initialState),
+  withGameStateSync(STORE_KEY, initialState, ['manaRegenTimer']),
   withDevtools(STORE_KEY),
+  withComputed((store, battleStore = inject(BattleStore)) => {
+    // Buff and consumable timers tick constantly; only a change in what's active should recompute stats.
+    const activeBuffs = computed(() => activeBuffSpellIds(battleStore.activeBuffs()), { equal: sameIds })
+    const activeConsumables = computed(() => activeConsumableItemIds(battleStore.consumableSlots()), { equal: sameIds })
+
+    return {
+      /** Base stats plus every source; never stored (docs/adr/0002-player-stats-derived-from-sources.md). */
+      stats: computed(() => deriveStats(store.resources(), [
+        ...bonusModifiers(store.permanentBonuses()),
+        ...equipmentModifiers(store.equipment()),
+        ...skillNodeModifiers(store.unlockedNodes()),
+        ...buffModifiers(activeBuffs()),
+        ...consumableModifiers(activeConsumables()),
+      ])),
+    }
+  }),
   withComputed((store) => ({
     maxTaskSlots: () => 1,
     hasAvailableTaskSlot: () => store.activeTasks().length < 1,
@@ -158,25 +195,28 @@ export const PlayerStore = signalStore(
       patchState(store, initialState)
     },
 
+    /**
+     * Earns or spends resources (gold, XP, mana, skill points), or grants a permanent stat bonus.
+     * Equipment, skill nodes, buffs and consumables are not applied here: `stats` derives them from their source.
+     */
     updatePlayerStats(statsUpdates: { stat: PlayerStat; amount: number }[]) {
+      const maxMana = store.stats().maxMana
       patchState(store, (state) => {
-        const tempStats = { ...state.stats }
+        const resources = { ...state.resources }
+        const permanentBonuses = { ...state.permanentBonuses }
         statsUpdates.forEach(({ stat, amount }) => {
-          switch (stat) {
-            case 'attackSpeed':
-            case 'manaRegenRate':
-            case 'shopRefreshCooldown':
-              tempStats[stat] -= amount
-              break
-            case 'experience':
-              tempStats[stat] += amount
-              handleExperience(tempStats)
-              break
-            default:
-              tempStats[stat] += amount
+          if (!isResourceStat(stat)) {
+            permanentBonuses[stat] = (permanentBonuses[stat] ?? 0) + amount
+            return
           }
+          if (stat === 'mana') {
+            resources.mana = Math.max(0, Math.min(maxMana, Math.min(resources.mana, maxMana) + amount))
+            return
+          }
+          resources[stat] += amount
+          if (stat === 'experience') handleExperience(resources)
         })
-        return { stats: tempStats }
+        return { resources, permanentBonuses }
       })
     },
 
@@ -206,7 +246,7 @@ export const PlayerStore = signalStore(
       const { stations, rest, installed } = installStations(store.stations(), items)
       patchState(store, (state) => ({
         stations,
-        inventory: addItems(state.inventory, state.stats.inventorySlots, rest),
+        inventory: addItems(state.inventory, store.stats().inventorySlots, rest),
       }))
       return installed
     },
@@ -217,7 +257,7 @@ export const PlayerStore = signalStore(
 
     /** Whether `adding` fits after `removing` is taken out first. */
     canFitItems(adding: ItemStack[], removing: ItemStack[] = []): boolean {
-      return canFit(store.inventory(), store.stats.inventorySlots(), adding, removing)
+      return canFit(store.inventory(), store.stats().inventorySlots, adding, removing)
     },
 
     /**
@@ -225,7 +265,7 @@ export const PlayerStore = signalStore(
      * with `adding` still fitting afterwards once `removing` is taken out.
      */
     canChangeInventorySlots(delta: number, adding: ItemStack[] = [], removing: ItemStack[] = []): boolean {
-      const capacity = store.stats.inventorySlots() + delta
+      const capacity = store.stats().inventorySlots + delta
       return fitsCapacity(removeItems(store.inventory(), removing), capacity)
         && canFit(store.inventory(), capacity, adding, removing)
     },
@@ -343,26 +383,15 @@ export const PlayerStore = signalStore(
       if (!store.canEquip(item)) return
 
       const itemData = ITEM_DATA[item.id] as EquipmentItem
-      const equipment = store.equipment()
-      const statsToUpdate: { stat: PlayerStat, amount: number }[] = []
-
-      itemData.stats?.forEach(s => statsToUpdate.push({ stat: s.id, amount: s.amount }))
-
       const slotKey = EquipmentSlot[itemData.slot] as EquipmentSlotKey
-      const currentlyEquipped = equipment[slotKey]
+      const currentlyEquipped = store.equipment()[slotKey]
 
       // Remove first so the swapped-out item always has a free slot to return to.
       store.removeItems([{ id: item.id, tier: item.tier, amount: 1 }])
 
       if (currentlyEquipped) {
-        (ITEM_DATA[currentlyEquipped.id] as EquipmentItem).stats?.forEach(s =>
-          statsToUpdate.push({ stat: s.id, amount: -s.amount }),
-        )
-
         store.addItems([{ id: currentlyEquipped.id, tier: currentlyEquipped.tier, amount: 1 }])
       }
-
-      store.updatePlayerStats(statsToUpdate)
 
       patchState(store, (state) => ({
         equipment: { ...state.equipment, [slotKey]: { id: item.id, tier: item.tier } },
@@ -370,25 +399,15 @@ export const PlayerStore = signalStore(
     },
 
     unequipItem(slot: EquipmentSlotKey) {
-      const equipment = store.equipment()
-      const equippedItem = equipment[slot]
+      const equippedItem = store.equipment()[slot]
 
       if (!equippedItem || !store.canUnequip(slot)) return
-
-      const itemData = ITEM_DATA[equippedItem.id] as EquipmentItem
-      const statsToUpdate: { stat: PlayerStat, amount: number }[] = []
-
-      itemData.stats?.forEach(s => {
-        statsToUpdate.push({ stat: s.id, amount: -1 * s.amount })
-      })
 
       store.addItems([{ id: equippedItem.id, tier: equippedItem.tier, amount: 1 }])
 
       patchState(store, (state) => ({
         equipment: { ...state.equipment, [slot]: null },
       }))
-
-      store.updatePlayerStats(statsToUpdate)
     },
 
     /** Installs station gear that was kept because it arrived out of order. Returns whether it installed. */
@@ -420,20 +439,24 @@ export const PlayerStore = signalStore(
     },
 
     regenMana(deltaMs: number) {
-      patchState(store, (state) => {
-        const s = state.stats
-        if (s.mana >= s.maxMana) {
-          return s.currentManaRegenTimer === 0 ? {} : { stats: { ...s, currentManaRegenTimer: 0 } }
-        }
-        let timer = s.currentManaRegenTimer + deltaMs
-        let mana = s.mana
-        while (timer >= s.manaRegenRate && mana < s.maxMana) {
-          timer -= s.manaRegenRate
-          mana++
-        }
-        if (mana >= s.maxMana) timer = 0
-        return { stats: { ...s, mana, currentManaRegenTimer: timer } }
-      })
+      const { mana: currentMana, maxMana, manaRegenRate } = store.stats()
+      if (currentMana >= maxMana) {
+        if (store.manaRegenTimer() !== 0) patchState(store, { manaRegenTimer: 0 })
+        return
+      }
+
+      let timer = store.manaRegenTimer() + deltaMs
+      let mana = currentMana
+      while (timer >= manaRegenRate && mana < maxMana) {
+        timer -= manaRegenRate
+        mana++
+      }
+      if (mana >= maxMana) timer = 0
+
+      patchState(store, (state) => ({
+        manaRegenTimer: timer,
+        ...(mana !== currentMana ? { resources: { ...state.resources, mana } } : {}),
+      }))
     },
 
     /**
@@ -442,7 +465,7 @@ export const PlayerStore = signalStore(
      */
     craftItem(recipeId: RecipeID, times = 1): { crafted: number, installed: ItemID[] } {
       const recipeData = RECIPES_DATA[recipeId]
-      const { maxCraftable, blockReason } = evaluateRecipe(recipeData, store.inventory(), store.stats.inventorySlots(), store.stations(), store.unlockedRecipes())
+      const { maxCraftable, blockReason } = evaluateRecipe(recipeData, store.inventory(), store.stats().inventorySlots, store.stations(), store.unlockedRecipes())
       const count = Math.min(times, maxCraftable)
       if (blockReason || count < 1) return { crafted: 0, installed: [] }
 
@@ -548,8 +571,16 @@ export const PlayerStore = signalStore(
     onInit() {
       // Raising the inventorySlots stat grows the inventory; it never shrinks here.
       effect(() => {
-        const capacity = store.stats.inventorySlots()
+        const capacity = store.stats().inventorySlots
         patchState(store, (state) => ({ inventory: resizeInventory(state.inventory, capacity) }))
+      })
+
+      // Losing maxMana (buff expiry, unequip, respec) drops stored mana with it, so it can't come back later.
+      effect(() => {
+        const { maxMana } = store.stats()
+        if (store.resources().mana > maxMana) {
+          patchState(store, (state) => ({ resources: { ...state.resources, mana: maxMana } }))
+        }
       })
 
       for (const rule of UNLOCK_RULES) {
