@@ -33,18 +33,16 @@ export const hasItems = (inventory: Inventory, items: ItemStack[]): boolean =>
 export const maxAffordable = (inventory: Inventory, items: ItemStack[]): number =>
   Math.min(...items.map(({ id, amount }) => Math.floor(countItem(inventory, id) / amount)))
 
-/** Whether `id` can be added without being discarded: it stacks onto an existing stack or takes a free slot. */
-export const canFit = (inventory: Inventory, id: ItemID, tier?: ItemTier): boolean =>
-  findStackIndex(inventory, id, tier ?? ITEM_DATA[id].tier) !== -1 || inventory.includes(null)
-
-/** Stacks per id + tier. Items that do not fit in `capacity` slots are discarded. */
+/** Stacks per id + tier. Only the first `capacity` slots are used; items that do not fit are discarded. */
 export function addItems(inventory: Inventory, capacity: number, items: ItemStack[]): Inventory {
   const result = resizeInventory([...inventory], capacity)
 
   for (const { id, amount, tier } of items) {
     const itemData = ITEM_DATA[id]
     const itemTier = tier ?? itemData.tier
-    const stackIndex = findStackIndex(result, id, itemTier)
+    // The array never shrinks, so slots past `capacity` are locked and must stay untouched.
+    const usable = result.slice(0, capacity)
+    const stackIndex = findStackIndex(usable, id, itemTier)
 
     if (stackIndex !== -1) {
       const stack = result[stackIndex]!
@@ -52,7 +50,7 @@ export function addItems(inventory: Inventory, capacity: number, items: ItemStac
       continue
     }
 
-    const emptyIndex = result.findIndex(slot => slot === null)
+    const emptyIndex = usable.findIndex(slot => slot === null)
     if (emptyIndex !== -1) result[emptyIndex] = { id, type: itemData.type, tier: itemTier, amount }
   }
 
@@ -80,7 +78,7 @@ export function removeItems(inventory: Inventory, items: ItemStack[]): Inventory
 }
 
 /** True when `adding` fits in `capacity` slots once `removing` has been taken out first. */
-export function canFitStacks(inventory: Inventory, capacity: number, adding: ItemStack[], removing: ItemStack[] = []): boolean {
+export function canFit(inventory: Inventory, capacity: number, adding: ItemStack[], removing: ItemStack[] = []): boolean {
   const after = removeItems(inventory, removing).slice(0, capacity)
   const freeSlots = after.filter(slot => slot === null).length + Math.max(0, capacity - after.length)
 

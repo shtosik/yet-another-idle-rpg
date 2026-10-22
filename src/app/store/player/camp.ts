@@ -4,7 +4,7 @@ import { StationID } from '../../../enums/ids/station-id.enum'
 import { RecipeID } from '../../../enums/ids/recipe-id.enum'
 import { CraftingRecipe } from '../../../data/recipes-data'
 import ITEM_DATA from '../../../data/items-data'
-import { canFit, Inventory, ItemStack, maxAffordable, removeItems } from './inventory'
+import { canFit, Inventory, ItemStack, maxAffordable } from './inventory'
 
 /** Installed level per station; a missing key means the station is not owned. */
 export type Stations = Partial<Record<StationID, number>>
@@ -62,6 +62,7 @@ export function installStations(stations: Stations, items: ItemStack[]): { stati
 export function evaluateRecipe(
   recipe: CraftingRecipe,
   inventory: Inventory,
+  capacity: number,
   stations: Stations,
   unlockedRecipes: RecipeID[],
 ): RecipeEvaluation {
@@ -79,7 +80,7 @@ export function evaluateRecipe(
   else if (upgrade && !canInstall(stations, upgrade)) blockReason = 'stationOrder'
   else if (maxCraftable < 1) blockReason = 'missingItems'
   // Station gear never takes a slot. Paying for one craft can free a slot, so check after paying.
-  else if (!upgrade && !canFit(removeItems(inventory, recipe.itemsNeeded), recipe.itemId)) blockReason = 'inventoryFull'
+  else if (!upgrade && !canFit(inventory, capacity, [{ id: recipe.itemId, amount: 1 }], recipe.itemsNeeded)) blockReason = 'inventoryFull'
 
   return { visible, maxCraftable: blockReason ? 0 : maxCraftable, blockReason }
 }

@@ -27,7 +27,7 @@ import { TownID } from '../../../enums/map/town-id.enum'
 import { DamageElement } from '../../../enums/damage-element.enum'
 import { withDevtools } from '@angular-architects/ngrx-toolkit'
 import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
-import { addItems, canFitStacks, countItem, createInventory, fitsCapacity, ItemStack, removeItems, resizeInventory } from './inventory'
+import { addItems, canFit, countItem, createInventory, fitsCapacity, ItemStack, removeItems, resizeInventory } from './inventory'
 import { canInstall, evaluateRecipe, installStations, Stations } from './camp'
 import { StationID } from '../../../enums/ids/station-id.enum'
 import { UNLOCK_RULES, UnlockCondition, UnlockTarget } from '../../../data/unlock-conditions'
@@ -217,7 +217,7 @@ export const PlayerStore = signalStore(
 
     /** Whether `adding` fits after `removing` is taken out first. */
     canFitItems(adding: ItemStack[], removing: ItemStack[] = []): boolean {
-      return canFitStacks(store.inventory(), store.stats.inventorySlots(), adding, removing)
+      return canFit(store.inventory(), store.stats.inventorySlots(), adding, removing)
     },
 
     /**
@@ -227,7 +227,7 @@ export const PlayerStore = signalStore(
     canChangeInventorySlots(delta: number, adding: ItemStack[] = [], removing: ItemStack[] = []): boolean {
       const capacity = store.stats.inventorySlots() + delta
       return fitsCapacity(removeItems(store.inventory(), removing), capacity)
-        && canFitStacks(store.inventory(), capacity, adding, removing)
+        && canFit(store.inventory(), capacity, adding, removing)
     },
 
     updateUnlockedNodes(id: SkillNodeID, amount: number) {
@@ -442,7 +442,7 @@ export const PlayerStore = signalStore(
      */
     craftItem(recipeId: RecipeID, times = 1): { crafted: number, installed: ItemID[] } {
       const recipeData = RECIPES_DATA[recipeId]
-      const { maxCraftable, blockReason } = evaluateRecipe(recipeData, store.inventory(), store.stations(), store.unlockedRecipes())
+      const { maxCraftable, blockReason } = evaluateRecipe(recipeData, store.inventory(), store.stats.inventorySlots(), store.stations(), store.unlockedRecipes())
       const count = Math.min(times, maxCraftable)
       if (blockReason || count < 1) return { crafted: 0, installed: [] }
 
