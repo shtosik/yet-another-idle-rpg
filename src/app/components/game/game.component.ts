@@ -24,6 +24,7 @@ import { WorldMapComponent } from './world-map/world-map.component'
 import { BestiaryComponent } from './bestiary/bestiary.component'
 import { ShopStore } from '../../store/shop/shop.store'
 import { CampStore } from '../../store/camp/camp.store'
+import { OfflineStore } from '../../store/offline/offline.store'
 import { SpellbookComponent } from './spellbook/spellbook.component'
 import { ZoneID } from 'enums/ids/zone-id.enum'
 import { ItemID } from 'enums/ids/item-id.enum'
@@ -65,6 +66,7 @@ export class GameComponent {
   townsStore = inject(TownsStore)
   shopStore = inject(ShopStore)
   campStore = inject(CampStore)
+  offlineStore = inject(OfflineStore)
   dialogueManagerService = inject(DialogueManagerService)
   // Created here so unlock rules start watching as soon as the game is on screen.
   private unlockService = inject(UnlockService)
@@ -82,6 +84,7 @@ export class GameComponent {
     this.townsStore.resetState()
     this.shopStore.resetState()
     this.campStore.resetState()
+    this.offlineStore.resetState()
   }
 
   resetQuests() {

@@ -63,6 +63,7 @@ Angular 20 standalone components, zoneless change detection, `OnPush` on every c
 | skill tree, respec | `docs/systems/skill-tree.md` |
 | spells, buffs, mana | `docs/systems/spells-and-buffs.md` |
 | Camp, stations, recipes, food, potions | `docs/systems/consumables-camp-crafting.md` |
+| offline progress, welcome-back modal | `docs/systems/offline-progress.md` |
 | zones, waves, town/feature unlocks | `docs/systems/zones-waves-unlocks.md` |
 | towns, buildings, shops, Exploration Guild | `docs/systems/towns-shops-guild.md` |
 | enemies, shinies, pets, bestiary | `docs/systems/enemies-shiny-pets-bestiary.md` |

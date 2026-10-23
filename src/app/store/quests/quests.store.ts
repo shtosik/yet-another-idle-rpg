@@ -1,7 +1,7 @@
 import { QuestProgression, QuestStep } from '../../../types/quests/quest-progression.type'
 import { patchState, signalStore, withHooks, withMethods, withState } from '@ngrx/signals'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
-import { withDevtools } from '@angular-architects/ngrx-toolkit'
+import { withDevtools } from '../helpers/devtools'
 import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
 import QUEST_DATA, { QUEST_STEP_AFTER_COMPLETED, QuestProps } from '../../../data/quests-data'
 import { inject } from '@angular/core'

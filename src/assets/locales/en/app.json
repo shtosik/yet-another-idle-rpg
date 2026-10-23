@@ -22,6 +22,7 @@
     "xpMultiplier": "XP Multiplier",
     "goldCoins": "Gold",
     "goldCoinsMultiplier": "Gold Multiplier",
+    "offlineProgressRate": "Offline Progress Rate",
     "unspentSkillPoints": "Skill points",
     "extraFireDamageMultiplier": "Fire Damage",
     "extraAirDamageMultiplier": "Air Damage",
@@ -90,5 +91,18 @@
     "page": "Page {{page}}",
     "previousPage": "Previous page",
     "nextPage": "Next page"
+  },
+  "offline": {
+    "title": "Welcome back!",
+    "away": "You were away for {{hours}}h {{minutes}}m. Your hero kept fighting.",
+    "kills_one": "{{count}} enemy defeated",
+    "kills_other": "{{count}} enemies defeated",
+    "shinies_one": "{{count}} shiny found!",
+    "shinies_other": "{{count}} shinies found!",
+    "levels_one": "Gained {{count}} level",
+    "levels_other": "Gained {{count}} levels",
+    "lostDrops_one": "Your inventory was full: {{count}} item was lost.",
+    "lostDrops_other": "Your inventory was full: {{count}} items were lost.",
+    "collect": "Collect"
   }
 }

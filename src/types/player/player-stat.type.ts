@@ -51,6 +51,7 @@ export type PlayerStat =
     | 'inventorySlots'
     | 'maxTaskSlots'
     | 'taskDoubleKillChance'
+    | 'offlineProgressRate'
 
 export const multiplierStats: PlayerStat[] = [
     'critMulti',

@@ -1,5 +1,5 @@
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals'
-import { withDevtools } from '@angular-architects/ngrx-toolkit'
+import { withDevtools } from '../helpers/devtools'
 import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
 import { StationID } from '../../../enums/ids/station-id.enum'
 import { RecipeID } from '../../../enums/ids/recipe-id.enum'

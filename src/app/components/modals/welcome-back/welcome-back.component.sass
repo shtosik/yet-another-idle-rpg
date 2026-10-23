@@ -1,0 +1,41 @@
+@use 'palette'
+@use '../../../../styles/mixins' as mixins
+
+:host
+  display: block
+  position: relative
+
+app-close-button
+  position: absolute
+  right: 1rem
+  top: 1rem
+
+.welcome-back
+  padding: 3rem
+
+  &__title
+    margin-bottom: 0.5rem
+
+  &__away
+    margin-bottom: 1.5rem
+    opacity: 0.85
+
+  &__stats
+    margin-bottom: 1.5rem
+    line-height: 1.6
+
+  &__shiny
+    color: palette.$yellow
+
+  &__items
+    display: flex
+    flex-wrap: wrap
+    gap: 1rem
+    margin-bottom: 1.5rem
+
+  &__lost
+    margin-bottom: 1.5rem
+    opacity: 0.85
+
+  &__cta
+    @include mixins.button

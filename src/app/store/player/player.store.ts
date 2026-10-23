@@ -5,16 +5,15 @@ import { calculateXp } from './experience'
 import { initialEquipmentState, statsInitialState } from './player'
 import { EquipmentItem, InventoryItem, RecipeItem } from 'interfaces/item.interface'
 import { ItemID } from 'enums/ids/item-id.enum'
+import { ItemTier } from 'enums/items/item-tier.enum'
 import { EquipmentType } from 'interfaces/player/equipment.type'
 import { ZonesProgression } from '../../../types/player/zones-progression.type'
 import { UnlockedContent } from '../../../types/player/unlocked-content.type'
 import { UnlockedNodes } from '../../../types/player/unlocked-nodes.type'
 import { UnlockedSpellsType } from '../../../types/player/unlocked-spells.type'
-import { Enemy } from '../../../interfaces/enemy.interface'
-import { EnemyDrop } from '../../../interfaces/enemy-drop.interface'
 import ITEM_DATA from '../../../data/items-data'
 import ZONES_DATA from '../../../data/zones-data'
-import { waveMultipliers } from '../battle/wave-scaling'
+import { killReward, rollEnemyDrops } from './kill-rewards'
 import { sellPrice } from '../shop/shop-prices'
 import { ShopID } from '../../../enums/ids/shop-id.enum'
 import ENEMIES_DATA from '../../../data/enemies-data'
@@ -29,7 +28,7 @@ import { SpellID } from '../../../enums/ids/spell-id.enum'
 import { ZoneID } from '../../../enums/ids/zone-id.enum'
 import { TownID } from '../../../enums/map/town-id.enum'
 import { DamageElement } from '../../../enums/damage-element.enum'
-import { withDevtools } from '@angular-architects/ngrx-toolkit'
+import { withDevtools } from '../helpers/devtools'
 import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
 import { addItems, canFit, countItem, createInventory, fitsCapacity, ItemStack, missingSlots, removeItems, resizeInventory } from './inventory'
 import { canInstall, evaluateRecipe, installStations, Stations } from './camp'
@@ -46,6 +45,7 @@ import {
   equipmentModifiers,
   initialResources,
   isResourceStat,
+  PlayerStatsType,
   Resources,
   sameIds,
   skillNodeModifiers,
@@ -131,34 +131,40 @@ const handleExperience = (resources: Resources) => {
   handleExperience(resources)
 }
 
-const rollDropList = (
-  drops: EnemyDrop[],
-  rolls: number,
-  accumulator: Map<string, InventoryItem>,
-  activeQuestIds?: Set<QuestID>,
-) => {
-  for (let r = 0; r < rolls; r++) {
-    drops.forEach(drop => {
-      if (drop.requiredActiveQuestId !== undefined && !activeQuestIds?.has(drop.requiredActiveQuestId)) return
+const stackAmount = (inventory: (InventoryItem | null)[], id: ItemID, tier: ItemTier): number =>
+  inventory.reduce((sum, slot) => slot?.id === id && slot.tier === tier ? sum + slot.amount : sum, 0)
 
-      const roll = Math.ceil(Math.random() * drop.chance)
-      if (roll !== drop.chance) return
+type StatSources = { [K in 'resources' | 'permanentBonuses' | 'equipment' | 'unlockedNodes']: () => PlayerState[K] }
 
-      const amount = Math.floor(Math.random() * (drop.maxAmount - drop.minAmount + 1) + drop.minAmount)
-      const { type, tier } = ITEM_DATA[drop.id]
-      const key = `${drop.id}:${tier}`
-      const existing = accumulator.get(key)
-      if (existing) existing.amount += amount
-      else accumulator.set(key, { id: drop.id, type, tier, amount })
-    })
-  }
+const deriveStatsWith = (store: StatSources, buffSpellIds: SpellID[], consumableItemIds: ItemID[]) =>
+  deriveStats(store.resources(), [
+    ...bonusModifiers(store.permanentBonuses()),
+    ...equipmentModifiers(store.equipment()),
+    ...skillNodeModifiers(store.unlockedNodes()),
+    ...buffModifiers(buffSpellIds),
+    ...consumableModifiers(consumableItemIds),
+  ])
+
+/** Totals of a batch of kills (an offline claim), applied in one store update. */
+export interface KillBatch {
+  zoneId: ZoneID
+  wave: number
+  kills: number
+  killsByEnemy: Partial<Record<EnemyID, number>>
+  /** Task counts per enemy, Bounty Mark doubles included; capped at each task's target when applied. */
+  taskCountsByEnemy: Partial<Record<EnemyID, number>>
+  experience: number
+  gold: number
+  items: InventoryItem[]
 }
 
-const calculateEnemyDrops = (enemy: Enemy, rolls: number, isShiny = false, activeQuestIds?: Set<QuestID>): InventoryItem[] => {
-  const accumulator = new Map<string, InventoryItem>()
-  rollDropList(enemy.drops, rolls, accumulator, activeQuestIds)
-  if (isShiny && enemy.shinyDrops?.length) rollDropList(enemy.shinyDrops, 1, accumulator, activeQuestIds)
-  return [...accumulator.values()]
+export interface KillBatchResult {
+  levelsGained: number
+  /** Drops that landed in the inventory (not the lost ones, not installed station upgrades). */
+  receivedItems: InventoryItem[]
+  /** Item amounts that didn't fit in the inventory and were lost. */
+  lostDrops: number
+  installedStations: ItemID[]
 }
 
 const STORE_KEY = 'playerStore'
@@ -175,13 +181,7 @@ export const PlayerStore = signalStore(
 
     return {
       /** Base stats plus every source; never stored (docs/adr/0002-player-stats-derived-from-sources.md). */
-      stats: computed(() => deriveStats(store.resources(), [
-        ...bonusModifiers(store.permanentBonuses()),
-        ...equipmentModifiers(store.equipment()),
-        ...skillNodeModifiers(store.unlockedNodes()),
-        ...buffModifiers(activeBuffs()),
-        ...consumableModifiers(activeConsumables()),
-      ])),
+      stats: computed(() => deriveStatsWith(store, activeBuffs(), activeConsumables())),
     }
   }),
   withComputed((store) => ({
@@ -382,21 +382,14 @@ export const PlayerStore = signalStore(
   withMethods((store) => ({
     processBattleEnd(enemyId: EnemyID, zoneId: ZoneID, currentWave: number, isShiny: boolean, activeQuestIds?: Set<QuestID>) {
       const enemy = ENEMIES_DATA[enemyId]
-      const stats = store.stats()
-
-      // A shiny pays from the unscaled base, so low waves stay the place to hunt shinies.
-      const { reward: waveReward } = waveMultipliers(ZONES_DATA[zoneId], currentWave)
-      const xpMultiplier = isShiny ? 5 : waveReward
-      const goldMultiplier = isShiny ? 10 : waveReward
-      const dropRolls = isShiny ? 10 : 1
-
-      const xpGained = Math.ceil(enemy.experience * stats.xpMultiplier * xpMultiplier)
-      const goldGained = Math.ceil(enemy.gold * stats.goldCoinsMultiplier * goldMultiplier)
-      const itemsToUpdate = calculateEnemyDrops(enemy, dropRolls, isShiny, activeQuestIds)
+      const { experience, gold, dropRolls } = killReward(enemy, ZONES_DATA[zoneId], currentWave, isShiny, store.stats())
+      const drops = new Map<string, InventoryItem>()
+      rollEnemyDrops(enemy, dropRolls, isShiny, drops, activeQuestIds)
+      const itemsToUpdate = [...drops.values()]
 
       store.updatePlayerStats([
-        { stat: 'experience', amount: xpGained },
-        { stat: 'goldCoins', amount: goldGained },
+        { stat: 'experience', amount: experience },
+        { stat: 'goldCoins', amount: gold },
       ])
 
       store.updateZoneProgression(zoneId, currentWave)
@@ -404,6 +397,63 @@ export const PlayerStore = signalStore(
       store.updateTaskProgress(enemyId)
 
       if (itemsToUpdate.length) store.addItems(itemsToUpdate)
+    },
+
+    /** `stats` as it would be with only these buffs and consumable effects running (offline buff segments). */
+    statsFor(buffSpellIds: SpellID[], consumableItemIds: ItemID[]): PlayerStatsType {
+      return deriveStatsWith(store, buffSpellIds, consumableItemIds)
+    },
+
+    /**
+     * Applies many kills in one state update: XP (with level-ups), gold, wave and enemy kill counts, task progress
+     * and drops. Drops that don't fit are lost, as online.
+     */
+    applyKillBatch(batch: KillBatch): KillBatchResult {
+      const startLevel = store.resources().level
+      const capacity = store.stats().inventorySlots
+      const { stations, rest, installed } = installStations(store.stations(), batch.items)
+      const inventoryBefore = store.inventory()
+      const inventory = addItems(inventoryBefore, capacity, rest)
+      // Each stack arrives whole or not at all; `rest` holds one entry per id + tier (rolled into a map).
+      const receivedItems: InventoryItem[] = rest.flatMap(({ id, tier: requestedTier }) => {
+        const tier = requestedTier ?? ITEM_DATA[id].tier
+        const amount = stackAmount(inventory, id, tier) - stackAmount(inventoryBefore, id, tier)
+        return amount > 0 ? [{ id, type: ITEM_DATA[id].type, tier, amount }] : []
+      })
+      const received = receivedItems.reduce((sum, item) => sum + item.amount, 0)
+      const lostDrops = rest.reduce((sum, item) => sum + item.amount, 0) - received
+
+      patchState(store, (state) => {
+        const resources = { ...state.resources }
+        resources.goldCoins += batch.gold
+        resources.experience += batch.experience
+        handleExperience(resources)
+
+        const enemyKillCounts = { ...state.enemyKillCounts }
+        for (const [id, kills] of Object.entries(batch.killsByEnemy) as [string, number][]) {
+          const enemyId = Number(id) as EnemyID
+          enemyKillCounts[enemyId] = (enemyKillCounts[enemyId] ?? 0) + kills
+        }
+
+        const zoneProgression = state.zonesProgression[batch.zoneId]
+        return {
+          resources,
+          enemyKillCounts,
+          stations,
+          inventory,
+          zonesProgression: {
+            ...state.zonesProgression,
+            [batch.zoneId]: { ...zoneProgression, [batch.wave]: (zoneProgression?.[batch.wave] ?? 0) + batch.kills },
+          },
+          activeTasks: state.activeTasks.map(task => {
+            const counts = batch.taskCountsByEnemy[task.monsterId]
+            if (!counts || isTaskDone(task)) return task
+            return { ...task, currentCount: Math.min(task.targetCount, task.currentCount + counts) }
+          }),
+        }
+      })
+
+      return { levelsGained: store.resources().level - startLevel, receivedItems, lostDrops, installedStations: installed }
     },
 
     /** Sells up to `amount` from one stack at `shopId`'s price (`sellPrice`). No-op when that shop won't buy it. */

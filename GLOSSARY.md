@@ -83,6 +83,10 @@ _Avoid_: Reset, refund
 
 ## Progression
 
+**Offline claim**:
+Kills paid for time the game wasn't running (closed tab, sleeping device), on the wave the player left on, shown in the welcome-back modal.
+_Avoid_: AFK rewards, idle rewards
+
 **Quest**:
 A multi-step story objective given by an NPC, with rewards on completion.
 _Avoid_: Mission, task

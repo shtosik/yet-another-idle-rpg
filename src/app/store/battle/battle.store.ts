@@ -5,7 +5,7 @@ import { ActiveBuff, EquippedSpell } from '../../../interfaces/spells/equipped-s
 import ZONES_DATA from 'data/zones-data'
 import ENEMIES_DATA from 'data/enemies-data'
 import { SpellID } from '../../../enums/ids/spell-id.enum'
-import { withDevtools } from '@angular-architects/ngrx-toolkit'
+import { withDevtools } from '../helpers/devtools'
 import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
 import { toShinyUrl } from 'utils/shiny-url'
 import { waveMultipliers } from './wave-scaling'
@@ -194,8 +194,8 @@ export const BattleStore = signalStore(
       }))
     },
 
-    /** Advances consumable effects and slot locks by one second. */
-    tickConsumables(): void {
+    /** Advances consumable effects and slot locks by `seconds` (one per tick second; the whole gap offline). */
+    tickConsumables(seconds = 1): void {
       const slots = { ...store.consumableSlots() }
       let changed = false
 
@@ -205,8 +205,8 @@ export const BattleStore = signalStore(
 
         slots[slot] = {
           ...active,
-          effectRemaining: Math.max(0, active.effectRemaining - 1),
-          lockRemaining: Math.max(0, active.lockRemaining - 1),
+          effectRemaining: Math.max(0, active.effectRemaining - seconds),
+          lockRemaining: Math.max(0, active.lockRemaining - seconds),
         }
         changed = true
       }

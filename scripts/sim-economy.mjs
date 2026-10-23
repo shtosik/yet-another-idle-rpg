@@ -52,8 +52,8 @@ const SPEED_NODE_LEVELS = 5
 const GEAR_POWER_BY_TIER = { 1: 0, 2: 2, 3: 5, 4: 8, 5: 12, 6: 16, 7: 20 }
 const BASE_ATTACK_POWER = 1
 const BASE_ATTACK_SECONDS = 3
-// The game-interval service pulls in Angular, so its respawn constant is read from source.
-const RESPAWN_SECONDS = Number(readFileSync(join(SRC, 'app/services/game-interval.service.ts'), 'utf8')
+// The combat timing module is TypeScript, so its respawn constant is read from source.
+const RESPAWN_SECONDS = Number(readFileSync(join(SRC, 'app/services/combat-timing.ts'), 'utf8')
   .match(/RESPAWN_DELAY_IN_MS = (\d+)/)[1]) / 1000
 
 /** First-hour targets from docs/ideas/progression-pacing.md, in minutes. */

@@ -15,11 +15,18 @@ Saves game state to `localStorage` (at most once a second per store) and restore
 | `townsStore` | `src/app/store/towns/towns.store.ts:TownsStore` | selected town/building, open shop |
 | `shopStore` | `src/app/store/shop/shop.store.ts:ShopStore` | stock and refresh timers |
 | `campStore` | `src/app/store/camp/camp.store.ts:CampStore` | Camp tab UI selection |
+| `offlineStore` | `src/app/store/offline/offline.store.ts:OfflineStore` | `lastSeenAt` (host time, high-water mark), the kill window (recent online kill intervals on one zone and wave, `offline-progress.md`) |
 
 ## Data flow
-1. Store `onInit`: read `localStorage[key]`, `JSON.parse`, keep only top-level keys that exist in `initialState`, drop `transientKeys`, then `merge({}, initialState, parsed)` (lodash deep merge) and `patchState`.
-2. An `effect` marks the store dirty on every state change; a 1 s interval writes `JSON.stringify` of the state without `transientKeys`, inside `try/catch`. Up to 1 s of progress is lost on close.
+1. Store `onInit`: read `localStorage[key]`, decode it if it starts with `z:` (see Save format), `JSON.parse`, keep only top-level keys that exist in `initialState`, drop `transientKeys`, then `merge({}, initialState, parsed)` (lodash deep merge) and `patchState`.
+2. An `effect` marks the store dirty on every state change; a 1 s interval writes `JSON.stringify` of the state without `transientKeys`, inside `try/catch`. Up to 1 s of progress is lost on close. `saveGameStateNow()` writes every store at once, skipping the interval (used by the offline claim).
 3. `GameComponent.resetState` calls `resetState()` on every store, which patches `initialState` back in.
+
+## Save format
+- **Dev builds** (`isDevMode()`): plain JSON, readable and editable in DevTools.
+- **Production builds**: `z:` + lz-string `compressToUTF16(json)`. It keeps casual edits out and makes saves smaller. It is obfuscation, not protection: the decoder ships in the bundle.
+- **No DevTools in production.** `angular.json` `fileReplacements` swaps `store/helpers/devtools.ts` for `devtools.prod.ts`: `withDevToolsStub` and no `provideStoreDevtools`, so Redux DevTools can't read or edit state and its code isn't bundled.
+- Loading accepts both formats in either build, so a dev save opens in prod and the other way round. The next save rewrites it in the build's own format.
 
 ## Invariants & gotchas
 - **Pre-release: save compatibility is not required.** Renames and renumbers are allowed. After a breaking state change, clear `localStorage` (DevTools → Application → Local Storage).
@@ -32,10 +39,10 @@ Saves game state to `localStorage` (at most once a second per store) and restore
 
 ## Known issues
 - No save version or migration step. Corrupt values (`NaN`, `null`) are never repaired.
-- `withDevtools` is active on every store in production builds.
+- A store whose save can't be read (bad JSON, failed decode, not an object) logs an error, runs from `initialState` and doesn't save for that session, so the unreadable save is never overwritten. "reset state" doesn't save that store either until a reload.
 
 ## Pre-release TODO
 - Add a save version per store and a migration table before the first public release; drop junk keys during migration.
 
 ## How to extend
-New persisted store: follow the `signalStore(withState, withGameStateSync(KEY, initialState), withDevtools(KEY), …)` pattern, add a `resetState()` method, and call it from `GameComponent.resetState`.
+New persisted store: follow the `signalStore(withState, withGameStateSync(KEY, initialState), withDevtools(KEY), …)` pattern (import `withDevtools` from `store/helpers/devtools.ts`, never from the toolkit), add a `resetState()` method, and call it from `GameComponent.resetState`.
