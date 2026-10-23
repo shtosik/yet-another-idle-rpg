@@ -24,4 +24,29 @@ export const RewardsItemsData: Partial<Record<ItemID, Item>> = {
       },
     ],
   },
+  // Explorer Token shop upgrades. Icons are placeholders until their art is generated.
+  [ItemID.guildSatchel]: {
+    id: ItemID.guildSatchel,
+    tier: ItemTier.rare,
+    url: './assets/img/items/silk.png',
+    value: -1,
+    type: ItemType.rewardsStats,
+    stats: [{ id: 'inventorySlots', amount: 5 }],
+  },
+  [ItemID.secondContract]: {
+    id: ItemID.secondContract,
+    tier: ItemTier.legendary,
+    url: './assets/img/items/letter.png',
+    value: -1,
+    type: ItemType.rewardsStats,
+    stats: [{ id: 'maxTaskSlots', amount: 1 }],
+  },
+  [ItemID.bountyMark]: {
+    id: ItemID.bountyMark,
+    tier: ItemTier.legendary,
+    url: './assets/img/items/gnollTrophy.png',
+    value: -1,
+    type: ItemType.rewardsStats,
+    stats: [{ id: 'taskDoubleKillChance', amount: 10 }],
+  },
 }

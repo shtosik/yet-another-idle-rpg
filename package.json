@@ -9,7 +9,8 @@
         "test": "ng test",
         "tile": "node scripts/tile-map.mjs",
         "test:assets": "node --test \"scripts/asset-gen/test/*.test.mjs\"",
-        "validate": "node scripts/validate-data.mjs"
+        "validate": "node scripts/validate-data.mjs",
+        "sim": "node scripts/sim-economy.mjs"
     },
     "prettier": {
         "overrides": [

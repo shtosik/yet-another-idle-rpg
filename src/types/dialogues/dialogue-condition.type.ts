@@ -89,7 +89,12 @@ interface ItemCondition {
 
 interface GuildCondition {
   type: 'guild'
-  condition: 'hasActiveTask' | 'taskComplete' | 'noActiveTask'
+  /**
+   * Any task in progress / any task finished / no tasks / room for another task (`maxTaskSlots`) /
+   * the task at `taskIndex` in `activeTasks` exists and is unfinished.
+   */
+  condition: 'hasActiveTask' | 'taskComplete' | 'noActiveTask' | 'hasFreeTaskSlot' | 'taskInProgressAt'
+  taskIndex?: number
 }
 
 interface ManyItemsCondition {

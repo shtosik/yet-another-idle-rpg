@@ -4,7 +4,8 @@
 Zones are the combat areas; each has waves of regular enemies ending in a boss. Progress opens new zones, towns and features (Camp, skill tree, world map).
 
 ## Key files
-- `src/data/zones-data.ts:ZONES_DATA` — per zone: background `url`, `enemies` (regulars), `bossEnemyId`, `maxWave`, `enemiesPerWave`, `nextZoneId`, `previousZoneId`.
+- `src/data/zones-data.ts:ZONES_DATA` — per zone: background `url`, `enemies` (regulars), `bossEnemyId`, `maxWave`, `enemiesPerWave`, `nextZoneId`, `previousZoneId`, `tier` (progression order; a side zone takes its place in the quest line: Traders' Basement 1, Deepwood 6, Upper Canopy 7).
+- `src/app/store/battle/wave-scaling.ts:waveMultipliers` — per-wave HP and reward multipliers.
 - `src/enums/ids/zone-id.enum.ts:ZoneID`.
 - `src/data/unlock-conditions.ts:UNLOCK_RULES` — town and feature unlocks (condition → target → optional notification); `ZONE_UNLOCK_NOTIFICATIONS` — popup per newly opened zone.
 - `src/app/store/battle/battle.store.ts` — `currentZoneId`, `currentWave`, `changeWave`, `setZone`, `requiredKillCountOnCurrentWave`.
@@ -14,6 +15,10 @@ Zones are the combat areas; each has waves of regular enemies ending in a boss. 
 
 ## Data flow
 **Waves**: waves `1..maxWave-1` spawn random regulars and need `enemiesPerWave` kills to unlock the next wave. The last wave spawns only the boss and needs 1 kill. Kills are counted in `zonesProgression[zone][wave]`. The battle nav arrows move between waves; past the last wave they cross into `nextZoneId` (if unlocked), before wave 1 into `previousZoneId` (last wave). Auto wave progression (node + toggle) advances after each kill once the count is met.
+
+**Wave scaling** (`waveMultipliers`): with `t = (wave - 1) / (lastRegularWave - 1)`, HP is `× (1 + WAVE_HP_SCALING·t)` and XP/gold `× (1 + WAVE_REWARD_SCALING·t)` (1.0 and 1.2: the last regular wave has ×2 HP and ×2.2 rewards, so pushing waves pays per second). `startBattle` saves the scaled `maxHp` on the enemy; `processBattleEnd` applies the reward multiplier. Not scaled: the boss wave, drop chances, the shiny chance and shiny rewards (a shiny pays ×5 XP / ×10 gold of the unscaled base), so low waves are where materials and shinies come from. The multipliers aren't shown in the UI (owner decision: too much info for the nav bar).
+
+**Zone chain**: each tier's mean regular-enemy HP, XP and gold is ×1, ×3, ×6, ×12, ×24, ×48, ×96 of Horseshoe Beach's (4 HP, 6 XP, 3 gold); a boss has 25× its zone's mean HP and 10× its rewards. No enemy is shared between zones. Tune with `npm run sim` (`docs/ideas/progression-pacing.md`).
 
 **Zone unlocks**, two paths:
 1. **Chain**: killing the boss of a zone adds its `nextZoneId` to `unlockedContent.zones` and shows `ZONE_UNLOCK_NOTIFICATIONS[next]`. Chain: Horseshoe Beach → Plains → The Long Path → Mountain Pass → Elderwood Wilds.
@@ -33,7 +38,7 @@ On load, `PlayerStore.onInit` re-applies every rule already met, silently, so ne
 ## Known issues
 - Unlock rules are only evaluated on kills; a level-up from a quest reward unlocks nothing until the next kill.
 - The two `waveReached` checks disagree: on load, kills on exactly that wave; at runtime, any wave `>=` it.
-- Waves inside a zone are identical (no per-wave scaling); the HP/XP curve across zones isn't monotonic.
+- Waves inside a zone have the same enemy pool (no elites or mixed boss waves yet, `docs/ideas/wave-variety.md`).
 - `elderwoodWilds` has no `nextZoneId`; Deepwood and Upper Canopy are reached only through Mawood.
 
 ## How to extend

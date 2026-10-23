@@ -1,6 +1,6 @@
 # Wave variety, wave scaling & boss waves
 
-**Scope:** M · **Status:** Wave scaling accepted (2026-10-22); variety proposed
+**Scope:** M · **Status:** Wave scaling done 2026-10-22 (`feat/gold-selling`); variety proposed
 
 Later waves in a zone scale enemy HP and rewards; waves can also get a mixed enemy pool, an elite every N waves, and a zone-boss wave with a guaranteed drop.
 
@@ -19,7 +19,7 @@ Waves inside a zone are identical (repo audit 3.3), and zone HP/XP isn't monoton
 - **Bosses get no wave multiplier**; they scale per zone only.
 - **Not scaled:** drop chances, the shiny chance and shiny rewards (×5 XP, ×10 gold, ×10 drop rolls use the unscaled base). Low waves kill faster, so they give more drops and more shiny rolls per hour. High waves = XP and gold; low waves = materials and shinies.
 - HP rounds at spawn (`Math.round`); gold rounds up.
-- The battle UI shows the current wave's multipliers (e.g. "Wave 7 · HP ×1.67 · Rewards ×1.8").
+- The multipliers are not shown in the battle UI (dropped 2026-10-22: too much info for the nav bar).
 
 ## Variety (proposed)
 Mixed wave pools, elites every N waves, a boss wave with a guaranteed drop.

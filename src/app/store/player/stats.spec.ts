@@ -25,7 +25,7 @@ describe('deriveStats', () => {
     const haste = buffModifiers([SpellID.haste])
     const stats = deriveStats(initialResources(), [...haste, ...equipmentModifiers(withRing)])
 
-    expect(stats.attackSpeed).toBe(2.6)
+    expect(stats.attackSpeed).toBe(2.32)
   })
 
   it('never shows mana above maxMana', () => {

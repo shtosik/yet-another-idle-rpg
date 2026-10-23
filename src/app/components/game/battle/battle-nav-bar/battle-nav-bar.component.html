@@ -1,5 +1,4 @@
 @let currentZoneData = currentZone();
-@let task = taskIndicator();
 
 <div class="battle-nav-bar">
   <div>
@@ -7,12 +6,19 @@
     <h3 class="killcount"> {{ 'killCount' | i18next }}: {{ this.killCountToShow() }}</h3>
   </div>
   <div class="right-side">
-    <span>{{ 'wave' | i18next }}: {{ currentWave() }}/{{ currentZoneData.maxWave }}</span>
-  </div>
+    <span>{{ 'wave' | i18next }}: {{ currentWave() }}/{{ currentZoneData.maxWave }}</span>  </div>
 </div>
 
-@if (task) {
-  <div class="task-indicator" [class.task-indicator--complete]="task.complete">
+@for (task of taskIndicators(); track task.id) {
+  <div
+    class="task-indicator"
+    [class.task-indicator--complete]="task.complete"
+    [attr.role]="task.complete ? 'button' : null"
+    [attr.tabindex]="task.complete ? 0 : null"
+    [attr.title]="task.complete ? 'Talk to Marvin' : null"
+    (click)="task.complete && claimAtMarvin()"
+    (keydown.enter)="task.complete && claimAtMarvin()"
+  >
     <img
       class="task-indicator__icon"
       [ngSrc]="task.enemyUrl"

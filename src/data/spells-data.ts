@@ -24,7 +24,8 @@ const SPELLS_DATA: Record<SpellID, SpellProps> = {
       type: SpellType.buff,
       duration: 60,
       stat: 'attackSpeed',
-      amount: 0.3,
+      amount: 0.2,
+      percent: true,
     },
   },
   [SpellID.doubleAttack]: {

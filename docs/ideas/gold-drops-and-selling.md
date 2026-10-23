@@ -1,6 +1,6 @@
 # Gold drops & selling
 
-**Scope:** S · **Status:** Accepted (2026-10-22)
+**Scope:** S · **Status:** Done (2026-10-22, `feat/gold-selling`)
 
 Enemies drop their own gold amount; loot can be sold at shops.
 

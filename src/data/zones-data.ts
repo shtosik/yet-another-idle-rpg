@@ -5,6 +5,7 @@ import { Zone } from 'interfaces/zone.interface'
 const ZONES_DATA: Record<ZoneID, Zone> = {
   [ZoneID.horseshoeBeach]: {
     id: ZoneID.horseshoeBeach,
+    tier: 1,
     url: './assets/img/backgrounds/horseshoeBeach-vertical.png',
     enemies: [EnemyID.crab, EnemyID.seagull, EnemyID.turtle],
     maxWave: 10,
@@ -14,6 +15,7 @@ const ZONES_DATA: Record<ZoneID, Zone> = {
   },
   [ZoneID.tradersBasement]: {
     id: ZoneID.tradersBasement,
+    tier: 1,
     url: './assets/img/backgrounds/tradersBasement.png',
     enemies: [EnemyID.rat],
     maxWave: 6,
@@ -22,6 +24,7 @@ const ZONES_DATA: Record<ZoneID, Zone> = {
   },
   [ZoneID.plains]: {
     id: ZoneID.plains,
+    tier: 2,
     url: './assets/img/backgrounds/plains-vertical.png',
     enemies: [EnemyID.blueSlime, EnemyID.redSlime, EnemyID.greenSlime],
     maxWave: 10,
@@ -32,6 +35,7 @@ const ZONES_DATA: Record<ZoneID, Zone> = {
   },
   [ZoneID.theLongPath]: {
     id: ZoneID.theLongPath,
+    tier: 3,
     url: './assets/img/backgrounds/the-long-path-vertical.png',
     enemies: [EnemyID.deer, EnemyID.wolf, EnemyID.goblinScout],
     maxWave: 20,
@@ -42,6 +46,7 @@ const ZONES_DATA: Record<ZoneID, Zone> = {
   },
   [ZoneID.mountainPass]: {
     id: ZoneID.mountainPass,
+    tier: 4,
     url: './assets/img/backgrounds/mountain-pass.png',
     enemies: [EnemyID.goat, EnemyID.mountainBat, EnemyID.goblinScavenger],
     maxWave: 15,
@@ -52,8 +57,9 @@ const ZONES_DATA: Record<ZoneID, Zone> = {
   },
   [ZoneID.elderwoodWilds]: {
     id: ZoneID.elderwoodWilds,
+    tier: 5,
     url: './assets/img/backgrounds/elderwood-wilds.png',
-    enemies: [EnemyID.forestSpider, EnemyID.gnollScout, EnemyID.corruptedSapling, EnemyID.wolf],
+    enemies: [EnemyID.forestSpider, EnemyID.gnollScout, EnemyID.corruptedSapling],
     maxWave: 15,
     enemiesPerWave: 10,
     bossEnemyId: EnemyID.gnollWarchief,
@@ -61,6 +67,7 @@ const ZONES_DATA: Record<ZoneID, Zone> = {
   },
   [ZoneID.deepwood]: {
     id: ZoneID.deepwood,
+    tier: 6,
     url: './assets/img/backgrounds/the-deepwood.png',
     enemies: [EnemyID.elderSpider, EnemyID.forestBear, EnemyID.bogSkeleton, EnemyID.treantSprout],
     maxWave: 20,
@@ -69,8 +76,9 @@ const ZONES_DATA: Record<ZoneID, Zone> = {
   },
   [ZoneID.upperCanopy]: {
     id: ZoneID.upperCanopy,
+    tier: 7,
     url: './assets/img/backgrounds/the-upper-canopy.png',
-    enemies: [EnemyID.harpy, EnemyID.giantEagle, EnemyID.canopyBandit, EnemyID.seagull],
+    enemies: [EnemyID.harpy, EnemyID.giantEagle, EnemyID.canopyBandit],
     maxWave: 15,
     enemiesPerWave: 8,
     bossEnemyId: EnemyID.harpyMatriarch,

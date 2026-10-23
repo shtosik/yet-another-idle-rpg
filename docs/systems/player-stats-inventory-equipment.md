@@ -35,11 +35,12 @@
 - The mana regen timer (`PlayerStore.manaRegenTimer`) is not a stat and is not saved.
 - Stat units: multipliers are factors (`critMulti` 1.2 = ×1.2); `critChance` and `shinyChance` are percent; `damageVs*` are additive fractions (0.2 = +20%).
 - Every `PlayerStat` needs an `app:playerStats.<stat>` label (`npm run validate` checks).
+- **Gold per kill** is `ceil(Enemy.gold × goldCoinsMultiplier × 10 if shiny)` (`processBattleEnd`).
+- **Item `value`** is the sell price (`sellItem`, any shop). `value <= 0` is unsellable: books, recipes, station gear, quest items and pets must stay there, and a shop's price must be above the item's `value` (`npm run validate` checks both).
 - `addItems` silently discards what doesn't fit. Callers that must not lose items check `canFit` first.
 
 ## Known issues
 - `unequipItem` does not check for space; unequipping with a full inventory destroys the item (violates the owner decision above).
-- `goldCoinsMultiplier` is granted by items but never applied to gold gains (see `game-loop-and-combat.md`).
 
 ## How to extend
 New equipment: the `add-equipment-item` skill. New stat: add it to `PlayerStat`, `statsInitialState`, the right display list, and `app:playerStats`; if lower is better, add it to `INVERTED_STATS` in `stats.ts`; if it is earned and spent rather than granted, add it to `RESOURCE_STATS`.

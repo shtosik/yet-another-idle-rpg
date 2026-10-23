@@ -34,7 +34,6 @@ Battle nodes read in code: `autoWaveProgression`, `autoEat`, `weaknesses`, `spel
 
 ## Known issues
 - Ctrl-click buying a cost-0 node (origin) with 0 skill points computes `0/0` and saves `NaN`.
-- `goldGain` grants `goldCoins` (+0.1 gold per level) instead of `goldCoinsMultiplier`; the multiplier isn't applied anywhere anyway.
 - `manaRegen` lowers `manaRegenRate` by 2 ms per level on a 30 000 ms base, so it does nothing noticeable.
 - Auto wave progression keeps working after its node is refunded or respecced (only the toggle is checked).
 - Every refresh rebuilds every marker's icon and tooltip, closing open tooltips.

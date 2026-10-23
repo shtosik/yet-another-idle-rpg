@@ -1,6 +1,6 @@
 import { DialogueNode } from '../../interfaces/dialogues/dialogue-node.interface'
 import { computed, inject, Injectable, signal } from '@angular/core'
-import { PlayerStore } from '../store/player/player.store'
+import { isTaskDone, PlayerStore } from '../store/player/player.store'
 import { DialogueEffect, QuestEffect } from '../../types/dialogues/dialogue-effect.type'
 import { QuestsStore } from '../store/quests/quests.store'
 import { DialogueOption, DialogueResult } from '../../interfaces/dialogues/dialogue-option.type'
@@ -190,14 +190,18 @@ export class DialogueManagerService {
             req.step,
           ),
         )
-      case 'guild': {
-        const task = this.playerStore.activeTask()
+      case 'guild':
         switch (c.condition) {
-          case 'hasActiveTask':  return !!task && task.currentCount < task.targetCount
-          case 'taskComplete':   return !!task && task.currentCount >= task.targetCount
-          case 'noActiveTask':   return !task
+          case 'hasActiveTask':   return this.playerStore.hasTaskInProgress()
+          case 'taskComplete':    return this.playerStore.hasCompletedTask()
+          case 'noActiveTask':    return this.playerStore.activeTasks().length === 0
+          case 'hasFreeTaskSlot': return this.playerStore.hasAvailableTaskSlot()
+          case 'taskInProgressAt': {
+            const task = this.playerStore.activeTasks()[c.taskIndex ?? 0]
+            return !!task && !isTaskDone(task)
+          }
         }
-      }
+        return false
       default:
         return false
     }
@@ -268,16 +272,12 @@ export class DialogueManagerService {
             case 'acceptTask':
               this.guildService.acceptTask(effect.taskLength)
               break
-            case 'abandonTask': {
-              const task = this.playerStore.activeTask()
-              if (task) this.playerStore.abandonTask(task.id)
+            case 'abandonTask':
+              this.playerStore.abandonTask(effect.taskIndex ?? 0)
               break
-            }
-            case 'claimTask': {
-              const task = this.playerStore.activeTask()
-              if (task) this.playerStore.claimTaskReward(task.id)
+            case 'claimTask':
+              this.playerStore.claimCompletedTasks()
               break
-            }
           }
           break
       }
