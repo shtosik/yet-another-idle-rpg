@@ -1,6 +1,6 @@
 # Offline progress
 
-**Scope:** M · **Status:** Accepted (2026-10-23)
+**Scope:** M · **Status:** Done (2026-10-23). Current behavior: `docs/systems/offline-progress.md`. Prod saves are lz-string compressed (`docs/systems/persistence.md`). DevTools are stubbed in production builds. Not done from the anti-cheat table: sanity-clamping saves on load.
 
 On load, simulate the time since the last save as kills in the current zone and wave, at a fraction of the player's kill rate, capped at 24 h. Show a "welcome back" modal with an XP / gold / loot / kills summary.
 

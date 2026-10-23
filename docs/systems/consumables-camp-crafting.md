@@ -30,6 +30,7 @@ Then ingredients are removed and the result added (×`createsAmount` × count). 
 2. Locks the slot for `cooldown` seconds with an effect lasting `min(duration, cooldown)` seconds, and restores mana.
 3. Each second `tickConsumables` counts down the effect and the lock. While the effect runs, the item's `effect.stats` are part of the derived player stats; they disappear when it ends.
 4. **Auto-eat** (needs the `autoEat` node and the toggle): when the food slot's lock ends, eats the same food again if any is left.
+5. **While away**: the effect and the lock count down by the whole gap (`tickConsumables(seconds)`) and auto-eat doesn't run, so food that expires offline stays expired (`offline-progress.md`).
 
 ## Invariants & gotchas
 - One lock per slot: swapping food can't stack effects. The effect never outlasts the lock.

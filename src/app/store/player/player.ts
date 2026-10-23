@@ -44,6 +44,8 @@ export const statsInitialState: PlayerStatsType = {
     // Exploration Guild
     maxTaskSlots: 1,
     taskDoubleKillChance: 0, // percent: chance a kill counts twice toward tasks
+    // Offline progress: fraction of the online kill rate earned while away
+    offlineProgressRate: 0.5,
     // damage vs enemy type (additive, fraction: 0.2 = +20% of total damage)
     damageVsCrab: 0,
     damageVsBird: 0,

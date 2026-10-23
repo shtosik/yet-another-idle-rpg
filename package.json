@@ -43,6 +43,7 @@
         "js-abbreviation-number": "^1.4.0",
         "leaflet": "^1.9.4",
         "lodash-es": "^4.17.22",
+        "lz-string": "^1.5.0",
         "ngx-tooltip-directives": "^20.2.0",
         "rxjs": "~7.8.0",
         "tslib": "^2.3.0",

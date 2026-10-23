@@ -52,6 +52,12 @@
                   "maximumError": "8kB"
                 }
               ],
+              "fileReplacements": [
+                {
+                  "replace": "src/app/store/helpers/devtools.ts",
+                  "with": "src/app/store/helpers/devtools.prod.ts"
+                }
+              ],
               "outputHashing": "all"
             },
             "development": {

@@ -16,6 +16,7 @@ import { resolveHit } from './hit-resolution'
 import { ItemID } from '../../enums/ids/item-id.enum'
 import ITEM_DATA from '../../data/items-data'
 import { isConsumableItem } from '../../interfaces/item.interface'
+import { OfflineStore } from '../store/offline/offline.store'
 
 /** Cooldown reduction can't push a spell below this. */
 const MIN_SPELL_COOLDOWN_IN_SECONDS = 1
@@ -28,6 +29,7 @@ export class BattleManagerService {
   private questsStore = inject(QuestsStore)
   private animations = inject(AnimationsService)
   private modalService = inject(ModalService)
+  private offlineStore = inject(OfflineStore)
 
   currentWaveKillCount = computed(() => {
     const zoneProgression = this.playerStore.zonesProgression()[this.battleStore.currentZoneId()] || {}
@@ -189,10 +191,11 @@ export class BattleManagerService {
 
     const isShiny = this.battleStore.isShinyEnemy()
     this.battleStore.endBattle()
+    this.offlineStore.recordKill(performance.now(), zoneId, wave)
     const activeQuestIds = getActiveQuestIds(this.questsStore.questStepProgression())
     this.playerStore.processBattleEnd(enemy.id, zoneId, wave, isShiny, activeQuestIds)
 
-    this.checkUnlocks(wave)
+    this.checkKillUnlocks(wave)
 
     const currentKillCount = this.currentWaveKillCount()
     const isAutoEnabled = this.battleStore.autoWaveProgressionEnabled()
@@ -204,7 +207,8 @@ export class BattleManagerService {
     }
   }
 
-  private checkUnlocks(wave: number): void {
+  /** After a kill on `wave` of the current zone: the boss unlocks the next zone, then progression unlocks. */
+  checkKillUnlocks(wave: number): void {
     const zoneData = this.battleStore.currentZoneData()
     const isBossWave = wave === zoneData.maxWave
 

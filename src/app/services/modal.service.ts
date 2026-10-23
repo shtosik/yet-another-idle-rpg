@@ -6,6 +6,8 @@ import { RespecConfirmComponent } from '../components/modals/respec-confirm/resp
 import { UnlockNotificationComponent } from '../components/modals/unlock-notification/unlock-notification.component'
 import { UnlockNotification } from '../../data/unlock-conditions'
 import { ItemID } from '../../enums/ids/item-id.enum'
+import { WelcomeBackComponent } from '../components/modals/welcome-back/welcome-back.component'
+import type { OfflineSummary } from './offline-progress.service'
 
 @Injectable({ providedIn: 'root' })
 export class ModalService {
@@ -40,6 +42,18 @@ export class ModalService {
   openStationInstalled(itemId: ItemID) {
     const key = `unlocks:stations.${ItemID[itemId]}`
     return this.openUnlockNotification({ titleKey: `${key}.title`, bodyKey: `${key}.body` })
+  }
+
+  openWelcomeBack(summary: OfflineSummary) {
+    return this.dialog.open(WelcomeBackComponent, {
+      enterAnimationDuration: '300ms',
+      panelClass: 'modal',
+      minWidth: '800px',
+      position: { top: '200px' },
+      hasBackdrop: true,
+      disableClose: false,
+      data: summary,
+    })
   }
 
   openRespecConfirm() {

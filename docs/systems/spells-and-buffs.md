@@ -19,7 +19,7 @@ Active abilities on a 5-slot spell bar under the battle view. Spells cost mana a
    - melee: `doDamage` with double attack;
    - magic: `doDamage` with `baseDamage` and the spell's element (see `game-loop-and-combat.md`);
    - buff: add to `activeBuffs` for `duration + increasedSpellDuration` seconds. The stat is derived from `activeBuffs`, nothing is added to stats directly. A buff with `percent: true` scales the stat after every flat modifier (Haste: attack interval −20%), so it keeps its strength as gear improves.
-4. **Tick** (every game tick, by the real time elapsed): slot cooldowns and buffs count down in ms; a buff is removed when it reaches 0 and its stat disappears with it.
+4. **Tick** (every game tick, by the real time elapsed): slot cooldowns and buffs count down in ms; a buff is removed when it reaches 0 and its stat disappears with it. While away, cooldowns and buffs count down by the whole gap, and no spells are cast offline (`offline-progress.md`).
 5. **Mana** regenerates 1 point per `manaRegenRate` ms up to `maxMana`.
 
 ## Invariants & gotchas
