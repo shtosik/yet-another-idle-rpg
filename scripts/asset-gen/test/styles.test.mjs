@@ -65,6 +65,11 @@ test('validation reports a missing reference, target drift and an unknown family
     assert.throws(() => assertRegistry(bad), /Invalid Style Family registry/)
 })
 
+test('validation rejects a live src/assets reference: only frozen copies under refs/ may anchor a family', () => {
+    const live = { 'item-pixel': { ...FAMILIES['item-pixel'], references: ['src/assets/img/items/cheese.png'] } }
+    assert.match(validateRegistry(live, REPO_ROOT).join('\n'), /not a frozen copy .*items\/cheese\.png/)
+})
+
 test('applyOverrides tunes a copy and leaves the registry untouched', () => {
     const base = FAMILIES['item-pixel']
     const tuned = applyOverrides(base, { steps: '30', cfg: '7', ipWeight: '0.5', grid: '40', colors: '12' })

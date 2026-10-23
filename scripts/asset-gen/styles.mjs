@@ -52,7 +52,9 @@ const ENVIRONMENT_NEGATIVE = 'grass, dirt mound, soil, rocks at the feet, puddle
 const GRITTY_NEGATIVE = 'cute, chibi, kawaii, plush toy, cartoon, mascot, big round eyes, childish, cheerful'
 const NEGATIVE_BASE = 'text, watermark, signature, frame, border, ui, blurry, photo, realistic, 3d render'
 
-const ITEM_REFS = ['cheese', 'machete', 'vialOfWater', 'stone', 'fish', 'wolfFangs'].map((n) => `src/assets/img/items/${n}.png`)
+const ITEM_REFS = ['cheese', 'machete', 'vialOfWater', 'stone', 'fish', 'wolfFangs'].map((n) => `scripts/asset-gen/refs/item/${n}.png`)
+/** Every family reference must be a frozen copy under this folder (registry validation enforces it). */
+export const REFS_DIR = 'scripts/asset-gen/refs/'
 
 export const FAMILIES = {
     'item-pixel': {
@@ -104,8 +106,10 @@ FAMILIES['enemy-pixel'] = {
     // Art-pixel size is fixed (2 output px, matching the legacy ~69×113 sprites shown at half size), so a smaller
     // tier simply has fewer art pixels. Outline and palette are applied on the cell grid, then blocks are scaled up.
     // `alpha` cleans the LayerDiffuse alpha; a job without `layer` (a `source` repaint) swaps it back to `matte`.
+    // `unshadow` drops the opaque grey ground shadow LayerDiffuse paints under the feet.
     post: [
         ['alpha'],
+        ['unshadow'],
         ['trim'],
         ['pixelate', { grid: '$inner', pad: 1 }],
         ['outline', { px: 1 }],
@@ -125,7 +129,7 @@ FAMILIES['zone-pixel'] = {
         'pixel art game background, side-view landscape scene, no characters, no text, detailed environment, ' +
         'limited colour palette, crisp hard pixels, atmospheric depth',
     negative: `${NEGATIVE_BASE}, characters, people, creatures, ui, anti-aliased, smooth gradient, photograph`,
-    references: ['plains-vertical', 'horseshoeBeach-vertical', 'the-long-path-vertical'].map((n) => `src/assets/img/backgrounds/${n}.png`),
+    references: ['plains-vertical', 'horseshoeBeach-vertical', 'the-long-path-vertical'].map((n) => `scripts/asset-gen/refs/zone/${n}.png`),
     gen: [832, 1216],
     target: [832, 1248],
     pixel: true,
@@ -166,8 +170,8 @@ FAMILIES['portrait-pixel'] = {
         'dark fantasy pixel art character portrait, realistic proportions, medieval clothing, head and shoulders bust, facing the viewer, dark outline, limited colour palette, ' +
         'crisp hard pixels, plain flat solid light grey background',
     negative: `${NEGATIVE_BASE}, full body, multiple characters, gradient background, anti-aliased, smooth shading, ink drawing, sketch, ${GRITTY_NEGATIVE}, modern clothing, hoodie, zipper, t-shirt, sneakers, ${ANATOMY_NEGATIVE}`,
-    // No pixel portraits exist yet: bootstrap from humanoid enemy-pixel refs; add the first accepted portraits here.
-    references: ['bandit', 'troll', 'goblinScavenger'].map((n) => `src/assets/img/enemies/${n}.png`),
+    // frozen copies of six shipped busts in one consistent gritty look (Elara's anime face is left out on purpose)
+    references: ['laHarparJosh', 'laHarparMarvin', 'laHarparTrader', 'mawoodBrenn', 'mawoodElarion', 'mawoodFinn'].map((n) => `scripts/asset-gen/refs/portrait/${n}.png`),
     gen: [1024, 1024],
     target: [256, 256],
     pixel: true,
@@ -229,6 +233,8 @@ export function validateRegistry(families = FAMILIES, root = REPO_ROOT) {
         }
         for (const ref of f.references ?? []) {
             if (!existsSync(join(root, ref))) problems.push(`${id}: reference not found: ${ref}`)
+            // a live src/assets file changes when it is regenerated, and one bad sprite then leaks into every later job
+            if (!ref.startsWith(REFS_DIR)) problems.push(`${id}: reference is not a frozen copy under ${REFS_DIR}: ${ref}`)
         }
         for (const step of f.post ?? []) {
             if (!Array.isArray(step) || typeof step[0] !== 'string') problems.push(`${id}: malformed post step ${JSON.stringify(step)}`)

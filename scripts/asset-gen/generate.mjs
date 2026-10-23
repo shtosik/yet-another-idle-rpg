@@ -16,10 +16,12 @@
 //   node scripts/asset-gen/generate.mjs --make-control goblinArcher --from .tmp-gen/zimage-goblinScoutBow/candidate-4.png
 //        [--thicken 8]   # freezes a checked structure image and its silhouette in refs/control; then --control goblinArcher works
 //        # --thicken grows the outline by N px so thin lines (bowstring) survive the pixelate step
+//        [--hand x,y [--grip-angle 20] [--weapon-scale 1]]   # stores the hand anchor (control px) so --weapon works
+//   ... --control biped --weapon knife|sword|club|axe|spear|staff   # code draws a straight weapon into the control at its hand
 //   ... --source scripts/asset-gen/refs/control/crab-source.png --no-layer [--denoise 0.45]   # SDXL repaints a frozen source in the family's style
 //        # enemy-pixel generates with LayerDiffuse (transparent) by default; --no-layer matts instead, which a repaint needs
 //
-// Tuning overrides (A/B runs): --steps --cfg --ip-weight --sampler --grid --colors --tag <suffix for the slug>
+// Tuning overrides (A/B runs): --steps --cfg --ip-weight --ip-type "<IP-Adapter weight type>" --ip-combine average|concat --sampler --grid --colors --tag <suffix for the slug>
 // --style "<prompt>" replaces the family's style prompt for this job; --negative "<terms>" adds to its negative prompt
 // --ref <repo path> (repeatable) replaces the family's reference images for this job, e.g. a species-specific set
 // Progress goes to stderr; the result is a single JSON document on stdout.
@@ -49,13 +51,15 @@ const log = (...args) => console.error('[asset-gen]', ...args)
 export const slugFor = (familyId, target, tag) => `${familyId}-${basename(target, extname(target))}${tag ? `-${tag}` : ''}`
 
 /** Returns a family copy with CLI tuning overrides applied (never mutates the registry). */
-export function applyOverrides(family, { steps, cfg, ipWeight, sampler, grid, colors, refs, stylePrompt, negative, layer, lora, erode, fillHoles }) {
+export function applyOverrides(family, { steps, cfg, ipWeight, ipWeightType, ipCombine, sampler, grid, colors, refs, stylePrompt, negative, layer, lora, erode, fillHoles }) {
     const next = { ...family, sampler: { ...family.sampler }, post: family.post.map(([name, params]) => [name, { ...params }]) }
     if (lora !== undefined) next.lora = lora
     if (steps !== undefined) next.sampler.steps = Number(steps)
     if (cfg !== undefined) next.sampler.cfg = Number(cfg)
     if (sampler !== undefined) next.sampler.sampler_name = sampler
     if (ipWeight !== undefined) next.ipWeight = Number(ipWeight)
+    if (ipWeightType !== undefined) next.ipWeightType = ipWeightType
+    if (ipCombine !== undefined) next.ipCombine = ipCombine
     if (refs?.length) next.references = refs
     if (stylePrompt) next.stylePrompt = stylePrompt
     if (negative) next.negative = `${family.negative}, ${negative}`
@@ -83,9 +87,9 @@ export function applyOverrides(family, { steps, cfg, ipWeight, sampler, grid, co
  * Flags never block a pick: they say where to look.
  * @returns {Promise<{n: number, flags: {code: string, detail: string}[], metrics: object}[]>}
  */
-async function runQc({ family, raws, candidates, control }) {
+async function runQc({ family, raws, candidates, control, weapon }) {
     if (!family.alpha) return []
-    const controlBuf = control ? await controlImage(control) : undefined
+    const controlBuf = control ? await controlImage(control, { weapon }) : undefined
     return Promise.all(raws.map(async (raw, i) => ({ n: i + 1, ...(await qcCandidate({ raw, candidate: candidates[i], control: controlBuf })) })))
 }
 
@@ -93,8 +97,9 @@ async function runQc({ family, raws, candidates, control }) {
  * Generates `count` candidates for one job into `.tmp-gen/<slug>/` and writes candidate PNGs, sheet and meta.
  * @returns {Promise<object>} the JSON result printed on stdout
  */
-export async function generateJob({ comfy, familyId, target, subject, seed, count = 4, useRef = true, tag, tier, control, source, keepRaw = true, overrides = {}, tmpDir = TMP_DIR }) {
+export async function generateJob({ comfy, familyId, target, subject, seed, count = 4, useRef = true, tag, tier, control, weapon, source, keepRaw = true, overrides = {}, tmpDir = TMP_DIR }) {
     const family = applyOverrides(getFamily(familyId), overrides)
+    if (weapon && !control) throw new Error('--weapon needs --control: the weapon is drawn into the control at its hand anchor')
     if (source && family.layer) throw new Error(`${familyId} generates with LayerDiffuse by default, which is untested with "source": pass layer: false (--no-layer) so the family's matte step cuts out the repaint`)
     for (const ref of family.references) {
         if (!existsSync(resolve(REPO_ROOT, ref))) throw new Error(`Reference not found: ${ref}`)
@@ -112,7 +117,7 @@ export async function generateJob({ comfy, familyId, target, subject, seed, coun
         family, subject, seed, count, useRef,
         refsBase64: refs.map((r) => r.base64),
         control: control
-            ? { base64: (await controlImage(control)).toString('base64'), type: CONTROL_TYPES[control], strength: overrides.controlStrength, end: overrides.controlEnd }
+            ? { base64: (await controlImage(control, { weapon })).toString('base64'), type: CONTROL_TYPES[control], strength: overrides.controlStrength, end: overrides.controlEnd }
             : undefined,
         source: source ? { base64: (await prepareSource(source, family.gen, REPO_ROOT)).toString('base64'), denoise: overrides.denoise } : undefined,
         prefix: `asset-gen/${slug}`,
@@ -128,12 +133,12 @@ export async function generateJob({ comfy, familyId, target, subject, seed, coun
         writeFileSync(file, buf)
         files.push(file)
     }
-    const qc = await runQc({ family, raws, candidates, control })
+    const qc = await runQc({ family, raws, candidates, control, weapon })
     const sheet = join(dir, 'sheet.png')
     writeFileSync(sheet, await makeSheet({ refs: useRef ? refs.map((r) => r.buffer) : [], candidates, target: family.target, pixel: !!family.pixel, flagged: qc.filter((c) => c.flags.length).map((c) => c.n) }))
 
     const seconds = Math.round((Date.now() - started) / 100) / 10
-    const meta = { slug, family: familyId, target, subject, seed, count: files.length, useRef, tag: tag ?? null, tier: usedTier, control: control ?? null, source: source ?? null, denoise: source ? (overrides.denoise ?? SOURCE_DENOISE) : null, layer: !!family.layer, sizeGuessed, seconds, qc }
+    const meta = { slug, family: familyId, target, subject, seed, count: files.length, useRef, tag: tag ?? null, tier: usedTier, control: control ?? null, weapon: weapon ?? null, source: source ?? null, denoise: source ? (overrides.denoise ?? SOURCE_DENOISE) : null, layer: !!family.layer, sizeGuessed, seconds, qc }
     writeFileSync(join(dir, 'meta.json'), JSON.stringify(meta, null, 2))
     return { ...meta, candidates: files, sheet, refs: useRef ? refs.map((r) => r.path) : [] }
 }
@@ -158,7 +163,7 @@ export async function reprocessJob({ slug, tmpDir = TMP_DIR, overrides = {} }) {
         candidates.push(await runPipeline(raws[i - 1], post))
         writeFileSync(join(dir, `candidate-${i}.png`), candidates[i - 1])
     }
-    const qc = await runQc({ family, raws, candidates, control: meta.control })
+    const qc = await runQc({ family, raws, candidates, control: meta.control, weapon: meta.weapon ?? undefined })
     writeFileSync(join(dir, 'meta.json'), JSON.stringify({ ...meta, qc }, null, 2))
     const sheet = join(dir, 'sheet.png')
     writeFileSync(sheet, await makeSheet({ refs: refs.map((r) => r.buffer), candidates, target: family.target, pixel: !!family.pixel, flagged: qc.filter((c) => c.flags.length).map((c) => c.n) }))
@@ -217,10 +222,11 @@ const OPTIONS = {
     count: { type: 'string' }, seed: { type: 'string' }, 'no-ref': { type: 'boolean' }, tag: { type: 'string' }, tier: { type: 'string' },
     pick: { type: 'string' }, slug: { type: 'string' }, batch: { type: 'string' },
     'list-families': { type: 'boolean' }, stop: { type: 'boolean' }, reprocess: { type: 'boolean' }, control: { type: 'string' },
-    steps: { type: 'string' }, cfg: { type: 'string' }, 'ip-weight': { type: 'string' }, sampler: { type: 'string' },
+    steps: { type: 'string' }, cfg: { type: 'string' }, 'ip-weight': { type: 'string' }, 'ip-type': { type: 'string' }, 'ip-combine': { type: 'string' }, sampler: { type: 'string' },
     grid: { type: 'string' }, colors: { type: 'string' }, ref: { type: 'string', multiple: true }, 'control-strength': { type: 'string' }, 'control-end': { type: 'string' }, style: { type: 'string' }, negative: { type: 'string' }, layer: { type: 'boolean' }, 'no-layer': { type: 'boolean' },
     source: { type: 'string' }, denoise: { type: 'string' }, zimage: { type: 'string' }, name: { type: 'string' },
     'make-control': { type: 'string' }, from: { type: 'string' }, erode: { type: 'string' }, 'fill-holes': { type: 'string' }, thicken: { type: 'string' },
+    weapon: { type: 'string' }, hand: { type: 'string' }, 'grip-angle': { type: 'string' }, 'weapon-scale': { type: 'string' },
 }
 
 export async function main(argv = process.argv.slice(2)) {
@@ -250,7 +256,9 @@ export async function main(argv = process.argv.slice(2)) {
     }
     if (v['make-control']) {
         if (!v.from) throw new Error('--make-control <name> needs --from <image> (a checked structure image or cutout)')
-        return makeControl({ name: v['make-control'], from: resolve(REPO_ROOT, v.from), thicken: v.thicken === undefined ? 0 : Number(v.thicken), dir: join(REPO_ROOT, 'scripts', 'asset-gen', 'refs', 'control') })
+        const hand = v.hand?.split(',').map(Number)
+        if (hand && (hand.length !== 2 || hand.some((n) => !Number.isFinite(n)))) throw new Error('--hand must be x,y in the 1024² control')
+        return makeControl({ name: v['make-control'], from: resolve(REPO_ROOT, v.from), thicken: v.thicken === undefined ? 0 : Number(v.thicken), hand, angle: v['grip-angle'] === undefined ? undefined : Number(v['grip-angle']), scale: v['weapon-scale'] === undefined ? undefined : Number(v['weapon-scale']), dir: join(REPO_ROOT, 'scripts', 'asset-gen', 'refs', 'control') })
     }
     if (v.zimage) {
         if (!v.name) throw new Error('--zimage needs --name (the frozen source becomes refs/control/<name>-source.png)')
@@ -277,8 +285,8 @@ export async function main(argv = process.argv.slice(2)) {
     const seed = v.seed !== undefined ? Number(v.seed) : Math.floor(Math.random() * 2 ** 31)
     const result = await generateJob({
         comfy, familyId: v.family, target: v.target, subject: v.subject, seed,
-        count: v.count ? Number(v.count) : 4, useRef: !v['no-ref'], tag: v.tag, tier: v.tier, control: v.control, source: v.source,
-        overrides: { denoise: v.denoise === undefined ? undefined : Number(v.denoise), steps: v.steps, cfg: v.cfg, ipWeight: v['ip-weight'], sampler: v.sampler, grid: v.grid, colors: v.colors, refs: v.ref, stylePrompt: v.style, negative: v.negative, layer: v['no-layer'] ? false : v.layer, erode: v.erode, fillHoles: v['fill-holes'], controlStrength: v['control-strength'] === undefined ? undefined : Number(v['control-strength']), controlEnd: v['control-end'] === undefined ? undefined : Number(v['control-end']) },
+        count: v.count ? Number(v.count) : 4, useRef: !v['no-ref'], tag: v.tag, tier: v.tier, control: v.control, weapon: v.weapon, source: v.source,
+        overrides: { denoise: v.denoise === undefined ? undefined : Number(v.denoise), steps: v.steps, cfg: v.cfg, ipWeight: v['ip-weight'], ipWeightType: v['ip-type'], ipCombine: v['ip-combine'], sampler: v.sampler, grid: v.grid, colors: v.colors, refs: v.ref, stylePrompt: v.style, negative: v.negative, layer: v['no-layer'] ? false : v.layer, erode: v.erode, fillHoles: v['fill-holes'], controlStrength: v['control-strength'] === undefined ? undefined : Number(v['control-strength']), controlEnd: v['control-end'] === undefined ? undefined : Number(v['control-end']) },
     })
     return { ...result, serverStarted: started, bootSeconds }
 }

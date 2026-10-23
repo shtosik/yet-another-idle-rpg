@@ -12,13 +12,20 @@ export const LINEART_TYPE = 'canny/lineart/anime_lineart/mlsd'
 export const LAYER_CONFIG = 'SDXL, Attention Injection'
 /** How far img2img repaints a frozen source: lower keeps its shapes, above ~0.6 the model starts redrawing anatomy. */
 export const SOURCE_DENOISE = 0.45
+/**
+ * IP-Adapter defaults. 'style transfer' injects the references into the SDXL style block only; 'style transfer
+ * precise' and 'strong style transfer' are the other style-only modes. 'average' blends all references into one
+ * embedding, 'concat' keeps each one (stronger, and slower with many references).
+ */
+export const IP_WEIGHT_TYPE = 'style transfer'
+export const IP_COMBINE = 'average'
 
 const DEFAULT_SAMPLER = { steps: 8, cfg: 5.5, sampler_name: 'euler', scheduler: 'sgm_uniform' }
 
 /**
  * @param {object} p
  * @param {{checkpoint: string, stylePrompt: string, negative: string, gen: [number, number], ipWeight?: number,
- *          sampler?: Partial<typeof DEFAULT_SAMPLER>}} p.family
+ *          ipWeightType?: string, ipCombine?: string, sampler?: Partial<typeof DEFAULT_SAMPLER>}} p.family
  * @param {string} p.subject      content only (what is depicted); style comes from the family
  * @param {number} p.seed
  * @param {string[]} [p.refsBase64] reference images, base64 PNG, already prepared for CLIP vision
@@ -82,8 +89,8 @@ export function buildGraph({ family, subject, seed, refsBase64 = [], count = 1, 
                 clip_vision: ['clipVision', 0],
                 image: batchRef,
                 weight: family.ipWeight ?? 1,
-                weight_type: 'style transfer',
-                combine_embeds: 'average',
+                weight_type: family.ipWeightType ?? IP_WEIGHT_TYPE,
+                combine_embeds: family.ipCombine ?? IP_COMBINE,
                 start_at: 0,
                 end_at: 1,
                 embeds_scaling: 'V only',

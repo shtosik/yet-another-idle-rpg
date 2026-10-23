@@ -30,6 +30,12 @@ test('reference graph: checkpoint -> lora -> ip-adapter -> sampler -> decode -> 
     assert.equal(g.sampler.inputs.seed, 5)
 })
 
+test('a family can pick another IP-Adapter weight type and keep each reference embedding (concat)', () => {
+    const g = buildGraph({ family: family({ ipWeightType: 'style transfer precise', ipCombine: 'concat' }), subject: 's', seed: 1, refsBase64: ['AAA', 'BBB'] })
+    assert.equal(g.ipadapter.inputs.weight_type, 'style transfer precise')
+    assert.equal(g.ipadapter.inputs.combine_embeds, 'concat')
+})
+
 test('three references are loaded and folded into one ImageBatch chain', () => {
     const g = buildGraph({ family: family(), subject: 's', seed: 1, refsBase64: ['AAA', 'BBB', 'CCC'] })
     assert.equal(classes(g).filter((c) => c === 'ETN_LoadImageBase64').length, 3)
