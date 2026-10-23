@@ -63,7 +63,7 @@
         },
         "manaRegen": {
             "name": "Mana Regen",
-            "desc": "Increases mana regen rate by 2 seconds."
+            "desc": "Regenerates mana 10% faster per level."
         },
         "magicDamage": {
             "name": "Magic Damage",

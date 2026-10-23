@@ -17,7 +17,15 @@ export type DialogueCondition = { hidden?: boolean } & (
   | WaveKillCountCondition
   | ManyWavesKillCountCondition
   | GuildCondition
+  | FlagCondition
   )
+
+/** A dialogue flag (set by a `flag` effect) is set, or with `isSet: false`, not set yet. */
+interface FlagCondition {
+  type: 'flag'
+  name: string
+  isSet: boolean
+}
 
 interface QuestCondition {
   type: 'quest'

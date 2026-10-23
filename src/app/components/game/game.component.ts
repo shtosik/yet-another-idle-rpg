@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core'
 import { PanelComponent } from '../shared/panel/panel.component'
 import { GameNavigationService } from '../../services/game-navigation.service'
+import { UnlockService } from '../../services/unlock.service'
 import { GameTab } from 'enums/ids/game-tab.enum'
 import { AsyncPipe, CommonModule } from '@angular/common'
 import { PlayerStat } from '../../../types/player/player-stat.type'
@@ -65,6 +66,8 @@ export class GameComponent {
   shopStore = inject(ShopStore)
   campStore = inject(CampStore)
   dialogueManagerService = inject(DialogueManagerService)
+  // Created here so unlock rules start watching as soon as the game is on screen.
+  private unlockService = inject(UnlockService)
   private navigation = inject(GameNavigationService)
   gameTab = this.navigation.tab
 

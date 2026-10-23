@@ -153,16 +153,16 @@ export class DialogueComponent {
   isOptionDisabled(option: DialogueOption<any>): boolean {
     const result = this.dialogueService.getActiveResult(option)
     if (!result) return false
-    if (this.isInventoryBlocked(option)) return true
+    if (!this.dialogueService.canApplyResult(result)) return true
     if (!result.requirementsNeeded) return false
     return !result.requirementsNeeded.every(req => this.dialogueService.checkCondition(req))
   }
 
-  isInventoryBlocked(option: DialogueOption<any>): boolean {
-    return this.missingSlots(option) > 0
-  }
-
   missingSlots(option: DialogueOption<any>): number {
     return this.dialogueService.missingSlots(this.dialogueService.getActiveResult(option))
+  }
+
+  missingGold(option: DialogueOption<any>): number {
+    return this.dialogueService.missingGold(this.dialogueService.getActiveResult(option))
   }
 }

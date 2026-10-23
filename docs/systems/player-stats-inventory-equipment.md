@@ -40,7 +40,7 @@
 - `addItems` silently discards what doesn't fit. Callers that must not lose items check `canFit` first.
 
 ## Known issues
-- `unequipItem` does not check for space; unequipping with a full inventory destroys the item (violates the owner decision above).
+- None open here; see `docs/ideas/known-issues.md`.
 
 ## How to extend
 New equipment: the `add-equipment-item` skill. New stat: add it to `PlayerStat`, `statsInitialState`, the right display list, and `app:playerStats`; if lower is better, add it to `INVERTED_STATS` in `stats.ts`; if it is earned and spent rather than granted, add it to `RESOURCE_STATS`.

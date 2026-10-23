@@ -592,15 +592,17 @@ export const PlayerStore = signalStore(
       }
     },
 
-    /** Conditions that depend only on saved player state. `waveReached` is judged by the caller. */
-    isPlayerStateConditionMet(condition: UnlockCondition): boolean {
+    /** One rule for load and play. `waveReached`: something was killed on that wave or a later one of the zone. */
+    isUnlockConditionMet(condition: UnlockCondition): boolean {
       switch (condition.type) {
         case 'hasItem':
           return store.inventory().some(i => i?.id === condition.itemId)
         case 'levelReached':
           return store.stats().level >= condition.level
-        case 'waveReached':
-          return false
+        case 'waveReached': {
+          const waves = store.zonesProgression()[condition.zoneId] ?? {}
+          return Object.entries(waves).some(([wave, kills]) => Number(wave) >= condition.wave && kills > 0)
+        }
       }
     },
   })),
@@ -621,12 +623,9 @@ export const PlayerStore = signalStore(
         }
       })
 
+      // UnlockService takes over (with notifications) once the game runs.
       for (const rule of UNLOCK_RULES) {
-        const { condition } = rule
-        const isMet = condition.type === 'waveReached'
-          ? store.getKillCountByZoneAndWave(condition.zoneId, condition.wave) > 0
-          : store.isPlayerStateConditionMet(condition)
-        if (isMet) store.applyUnlockTarget(rule.target)
+        if (store.isUnlockConditionMet(rule.condition)) store.applyUnlockTarget(rule.target)
       }
     },
   })),

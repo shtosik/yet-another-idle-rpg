@@ -48,7 +48,9 @@ export const equipmentModifiers = (equipment: EquipmentType): StatModifier[] =>
 export const skillNodeModifiers = (unlockedNodes: UnlockedNodes): StatModifier[] =>
   Object.entries(unlockedNodes).flatMap(([id, level]) => {
     const node = ALL_SKILLS[Number(id) as SkillNodeID]
-    return level && node?.type === SkillNodeType.stat ? [{ stat: node.stat, amount: node.statAmount * level }] : []
+    return level && node?.type === SkillNodeType.stat
+      ? [{ stat: node.stat, amount: node.statAmount * level, percent: node.statPercent }]
+      : []
   })
 
 /** Spells whose buff is running. Pass through `sameIds` so a countdown alone doesn't recompute stats. */

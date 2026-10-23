@@ -22,6 +22,7 @@ export enum JoshDialogue {
 export type LaHarparJoshDialogueType = Record<JoshDialogue, DialogueNode<JoshDialogue>>
 
 const NS = 'dialogues/laHarparJosh'
+const PAID_BEER_FLAG = 'josh_paid_beer'
 
 const LA_HARPAR_JOSH: LaHarparJoshDialogueType = {
   [JoshDialogue.default]: {
@@ -30,7 +31,11 @@ const LA_HARPAR_JOSH: LaHarparJoshDialogueType = {
     options: [
       {
         responseKey: `${NS}:greeting.opt1`,
-        results: [{ next: JoshDialogue.payBeer }],
+        // One beer buys his company for good.
+        results: [
+          { visibilityConditions: [{ type: 'flag', name: PAID_BEER_FLAG, isSet: true }], next: JoshDialogue.talkReady },
+          { next: JoshDialogue.payBeer },
+        ],
       },
       {
         responseKey: `${NS}:greeting.opt2`,
@@ -47,7 +52,10 @@ const LA_HARPAR_JOSH: LaHarparJoshDialogueType = {
         results: [
           {
             next: JoshDialogue.talkReady,
-            effects: [{ type: 'stat', action: 'deduct', stats: [{ stat: 'goldCoins', amount: 20 }] }],
+            effects: [
+              { type: 'stat', action: 'deduct', stats: [{ stat: 'goldCoins', amount: 20 }] },
+              { type: 'flag', name: PAID_BEER_FLAG },
+            ],
           },
         ],
       },

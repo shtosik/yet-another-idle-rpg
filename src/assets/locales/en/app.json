@@ -79,6 +79,7 @@
   "requires": "Requires",
   "required": "required",
   "costs": "Costs",
+  "goldNeeded": "{{count}} more gold needed",
   "quest": "Quest",
   "completed": "completed!",
   "inventory": {
