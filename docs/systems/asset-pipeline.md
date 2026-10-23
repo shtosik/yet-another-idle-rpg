@@ -156,7 +156,7 @@ For repairs after generation, use `node scripts/asset-gen/edit.mjs <command>` (`
 
 ### Automatic QC (`lib/qc.mjs`)
 
-Every job for a transparent family gets a `qc` list in its JSON result and `meta.json`: per candidate `{n, flags: [{code, detail}], metrics}`. A flagged candidate has a **red number badge** on the sheet. **Flags only point at where to look; nothing is blocked**, and `--pick` still works and echoes the picked candidate's `qcFlags`. `--reprocess` recomputes QC from the saved raws.
+Every job for a transparent family gets a `qc` list in its JSON result and `.tmp-gen/<slug>/meta.json`: per candidate `{n, flags: [{code, detail}], metrics}`. A flagged candidate has a **red number badge** on the sheet. **Flags only point at where to look; nothing is blocked**, and `--pick` still works and echoes the picked candidate's `qcFlags`. `--reprocess` recomputes QC from the saved raws.
 
 | Flag | Meaning | Rule |
 |---|---|---|
