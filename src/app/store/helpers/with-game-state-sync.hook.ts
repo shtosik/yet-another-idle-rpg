@@ -29,12 +29,37 @@ export function saveGameStateNow(): void {
     immediateSavers.forEach(save => save())
 }
 
+/** What is written to `localStorage` (before encoding). */
+interface SaveEnvelope {
+    /** The store's save version when it was written. */
+    v: number
+    state: object
+}
+
+/** Saves from before versioning are a bare state object; they count as version 1. */
+const LEGACY_SAVE_VERSION = 1
+
+const isEnvelope = (data: object): data is SaveEnvelope =>
+    typeof (data as SaveEnvelope).v === 'number' && typeof (data as SaveEnvelope).state === 'object'
+
+export interface GameStateSyncOptions<T> {
+    /**
+     * Bump when a change to the saved state shape would break loading an older save. A save with another
+     * version is ignored and the store starts from `initialState` (pre-release; a migration table comes later).
+     */
+    version?: number
+    /** Never saved; always start from `initialState` (timers that change every tick). Changing them doesn't trigger a save. */
+    transientKeys?: (keyof T & string)[]
+}
+
 /**
  * Rehydrates the store from `localStorage` and saves it on change.
- * `transientKeys` are never saved and always start from `initialState` (timers that change every tick).
  * Saved keys missing from `initialState` are dropped, so removed state doesn't linger in saves.
  */
-export function withGameStateSync<T extends object>(key: string, initialState: T, transientKeys: (keyof T & string)[] = []) {
+export function withGameStateSync<T extends object>(key: string, initialState: T, options: GameStateSyncOptions<T> = {}) {
+    const { version = LEGACY_SAVE_VERSION, transientKeys = [] } = options
+    const savedKeys = Object.keys(initialState).filter(k => !(transientKeys as string[]).includes(k))
+
     return signalStoreFeature(
         withHooks({
             onInit(store) {
@@ -46,9 +71,13 @@ export function withGameStateSync<T extends object>(key: string, initialState: T
                     try {
                         const data = JSON.parse(decodeSave(saved))
                         if (typeof data !== 'object' || data === null) throw new Error('save is not an object')
-                        const parsed = omit(pick(data, Object.keys(initialState)), transientKeys)
-                        const patched = merge({}, initialState, parsed)
-                        patchState(store, patched)
+                        const { v, state } = isEnvelope(data) ? data : { v: LEGACY_SAVE_VERSION, state: data }
+
+                        if (v === version) {
+                            patchState(store, merge({}, initialState, pick(state, savedKeys)))
+                        } else {
+                            console.info(`${key}: save version ${v}, expected ${version}; starting fresh`)
+                        }
                     } catch (e) {
                         canSave = false
                         console.error(`Failed to rehydrate ${key}; it won't be saved this session`, e)
@@ -60,7 +89,8 @@ export function withGameStateSync<T extends object>(key: string, initialState: T
                     if (!canSave || (!isDirty && !force)) return
                     isDirty = false
                     try {
-                        localStorage.setItem(key, encodeSave(JSON.stringify(omit(getState(store), transientKeys))))
+                        const envelope: SaveEnvelope = { v: version, state: omit(getState(store), transientKeys) }
+                        localStorage.setItem(key, encodeSave(JSON.stringify(envelope)))
                     } catch (e) {
                         console.error(`Failed to save ${key}`, e)
                     }
@@ -71,8 +101,10 @@ export function withGameStateSync<T extends object>(key: string, initialState: T
                 // Forced: the dirty-marking effect may not have run yet for a change made this turn.
                 immediateSavers.add(() => save(true))
 
+                // Tracks saved keys only, so a transient timer ticking doesn't rewrite the whole store every second.
+                const stateSignals = store as unknown as Record<string, () => unknown>
                 effect(() => {
-                    getState(store)
+                    savedKeys.forEach(k => stateSignals[k]())
                     isDirty = true
                 })
             },

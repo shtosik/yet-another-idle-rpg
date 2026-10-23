@@ -44,7 +44,7 @@ Damage (`resolveHit`), in order, kept fractional throughout:
 - **Respawn delay is fixed at 2 s** and independent of `attackSpeed`. The first attack on a new enemy lands one full attack interval after it spawns.
 - Changing wave or zone clears the enemy; the next one spawns after the respawn delay.
 - Buff and consumable durations in data are **seconds**; buffs and spell cooldowns count down in ms at runtime, consumables in whole seconds. `manaRegenRate` and `shopRefreshCooldown` are in **ms**.
-- `BattleState.enemy` stores a full copy of the enemy data, and it is saved. After editing `ENEMIES_DATA`, the enemy alive in a save keeps the old values until it dies.
+- `BattleState` saves only `enemyId`, `isShinyEnemy` and `currentEnemyHp`; the computed `BattleStore.enemy` rebuilds the enemy from `ENEMIES_DATA` with the wave-scaled max HP and shiny sprite, so data edits apply to a saved fight.
 - The weapon's `damageType` sets the auto-attack element (`PlayerStore.equippedWeaponDamageType`, default physical).
 - Stats are derived from their sources (equipment, nodes, buffs, consumables), see `player-stats-inventory-equipment.md`.
 

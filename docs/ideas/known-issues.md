@@ -24,13 +24,9 @@ Remaining plans: `progression-pacing.md` (tuning with `npm run sim`).
 (22–25 fixed 2026-10-22: 2 s respawn delay with wall-clock ticks, single damage rounding, spell guards and slot cooldown lock, derived stats, throttled saves.)
 
 ## Persistence and performance
-26. No save version or migrations; full enemy object persisted (stale after data edits); `activeShopId` persisted. Fixed 2026-10-23: `withDevtools` is stubbed in production.
+26. Fixed 2026-10-23: `withDevtools` stubbed in production; saves versioned (`{ v, state }`, a version bump resets that store); enemy and town building saved as ids; `activeShopId` not saved; transient keys (mana regen timer) no longer trigger saves. Still open: a migration table before release (`persistence.md`).
 
-**Possible fixes** (reviewed 2026-10-22). `feat/combat-fixes` (uncommitted when reviewed) already moves the attack/respawn timers to `GameIntervalService`, makes `manaRegenTimer` a transient key, throttles saves to 1 s with `try/catch`, and drops unknown top-level keys on load. Still open after it lands:
-- **Buffs recompute `stats` at 10 Hz.** `tickSpellTimers` rewrites `activeBuffs` (`msRemaining`) every tick and derived `stats` reads it, so every `stats()` reader re-runs while a buff is active. Store `expiresAt` instead of a countdown, or feed `buffModifiers` from a buff-id list with an `equal` check.
-- **Persist ids, not data.** `battleStore` saves `enemyId` + `isShiny` + HP and rebuilds the enemy from `ENEMIES_DATA`; `townsStore` saves a building id instead of `selectedTownBuilding` and stops saving `activeShopId`. Add an optional `persist` projection to `withGameStateSync`.
-- **Save version.** Save `{ v, state }`; on mismatch reset that store to `initialState` (pre-release), later a migration table. Replaces "clear `localStorage` and reload within a second".
-- **Mana regen timer** still dirties `playerStore` (the largest store) once a second while mana regenerates; move it to `GameIntervalService` like the attack timer.
+(Buffs no longer recompute `stats` every tick: `PlayerStore` reads buff and consumable ids through `sameIds` equality checks.)
 
 ## UI, build and platform
 27. Damage popups lost when several hits land in one tick; popup array mutated in place; popup ids wrap at 100 (duplicate track keys).

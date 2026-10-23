@@ -5,6 +5,7 @@ import { ActiveBuff, EquippedSpell } from '../../../interfaces/spells/equipped-s
 import ZONES_DATA from 'data/zones-data'
 import ENEMIES_DATA from 'data/enemies-data'
 import { SpellID } from '../../../enums/ids/spell-id.enum'
+import { EnemyID } from '../../../enums/ids/enemy-id.enum'
 import { withDevtools } from '../helpers/devtools'
 import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
 import { toShinyUrl } from 'utils/shiny-url'
@@ -13,7 +14,8 @@ import { ActiveConsumable, CONSUMABLE_SLOTS, ConsumableSlot } from '../../../int
 
 export interface BattleState {
   isInCombat: boolean;
-  enemy: Enemy | null;
+  /** The enemy alive now; its data is rebuilt from `ENEMIES_DATA` (computed `enemy`), so data edits apply to saves. */
+  enemyId: EnemyID | null;
   currentEnemyHp: number;
   currentZoneId: ZoneID;
   currentWave: number;
@@ -27,7 +29,7 @@ export interface BattleState {
 
 export const initialState: BattleState = {
   isInCombat: false,
-  enemy: null,
+  enemyId: null,
   currentEnemyHp: 0,
   currentZoneId: ZoneID.horseshoeBeach,
   currentWave: 1,
@@ -40,16 +42,26 @@ export const initialState: BattleState = {
 }
 
 const STORE_KEY = 'battleStore'
+/** 2: the enemy is saved as `enemyId`, not as a copy of its data. */
+const SAVE_VERSION = 2
 
 export const BattleStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
-  withGameStateSync(STORE_KEY, initialState),
+  withGameStateSync(STORE_KEY, initialState, { version: SAVE_VERSION }),
   withDevtools(STORE_KEY),
   withComputed((store) => ({
     currentZoneData: () => ZONES_DATA[store.currentZoneId()],
   })),
   withComputed((store) => ({
+    /** The current enemy with its wave-scaled max HP and, if shiny, the shiny sprite. */
+    enemy: (): Enemy | null => {
+      const enemyId = store.enemyId()
+      if (enemyId === null) return null
+      const enemy = ENEMIES_DATA[enemyId]
+      const maxHp = Math.round(enemy.maxHp * waveMultipliers(store.currentZoneData(), store.currentWave()).hp)
+      return { ...enemy, maxHp, url: store.isShinyEnemy() ? toShinyUrl(enemy.url) : enemy.url }
+    },
     requiredKillCountOnCurrentWave: () => store.currentWave() === store.currentZoneData().maxWave ? 1 : store.currentZoneData().enemiesPerWave,
   })),
   withMethods((store) => ({
@@ -69,12 +81,11 @@ export const BattleStore = signalStore(
         }
 
         const isShiny = shinyChance > 0 && Math.random() * 100 < shinyChance
-        // The scaled max HP is saved with the enemy, so the HP bar and a reload agree.
         const maxHp = Math.round(enemy.maxHp * waveMultipliers(zoneData, state.currentWave).hp)
 
         return {
           isInCombat: true,
-          enemy: { ...enemy, maxHp, url: isShiny ? toShinyUrl(enemy.url) : enemy.url },
+          enemyId: enemy.id,
           currentEnemyHp: maxHp,
           isShinyEnemy: isShiny,
         }
@@ -95,7 +106,7 @@ export const BattleStore = signalStore(
 
           return {
             currentEnemyHp: 0,
-            enemy: null,
+            enemyId: null,
             isInCombat: false,
             isShinyEnemy: false,
             currentWave: wave,
@@ -112,7 +123,7 @@ export const BattleStore = signalStore(
 
           return {
             currentEnemyHp: 0,
-            enemy: null,
+            enemyId: null,
             isInCombat: false,
             isShinyEnemy: false,
             currentWave: wave,
@@ -129,7 +140,7 @@ export const BattleStore = signalStore(
     endBattle(): void {
       patchState(store, {
         currentEnemyHp: 0,
-        enemy: null,
+        enemyId: null,
         isInCombat: false,
         isShinyEnemy: false,
       })
@@ -223,7 +234,7 @@ export const BattleStore = signalStore(
         currentZoneId: zoneId,
         currentWave: 1,
         currentEnemyHp: 0,
-        enemy: null,
+        enemyId: null,
         isInCombat: false,
         isShinyEnemy: false,
       })
