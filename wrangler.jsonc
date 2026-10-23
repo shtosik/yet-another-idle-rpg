@@ -1,0 +1,8 @@
+{
+  "name": "yet-another-idle-rpg",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist/yari/browser",
+    "not_found_handling": "single-page-application"
+  }
+}
