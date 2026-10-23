@@ -146,10 +146,55 @@ export function registerFrozenControls(dir = CONTROL_DIR, controls = CONTROLS) {
 }
 registerFrozenControls()
 
-/** @returns {Promise<Buffer>} PNG of the named control image */
-export async function controlImage(name) {
+/**
+ * Straight weapon silhouettes drawn by code, so SDXL only paints the weapon and cannot bend, double or merge it.
+ * Each is SVG with the grip at (0, 0) and the business end pointing up (-y), sized for a figure about 880 px tall at
+ * 1024: a blade stays at least 2-3 art pixels wide after the pixelate step. `upright` weapons (long shafts gripped
+ * mid-shaft) always stand straight up from the hand, the others follow the control's grip angle.
+ */
+export const WEAPONS = {
+    knife: { svg: '<rect x="-12" y="-25" width="24" height="60"/><rect x="-30" y="-37" width="60" height="12"/><path d="M -13,-37 L -13,-200 L 0,-228 L 13,-200 L 13,-37 Z"/>' },
+    sword: {
+        svg:
+            '<rect x="-13" y="-30" width="26" height="80"/><circle cx="0" cy="60" r="18"/><rect x="-62" y="-46" width="124" height="16"/>' +
+            '<path d="M -16,-46 L -16,-400 L 0,-432 L 16,-400 L 16,-46 Z"/>',
+    },
+    club: { svg: '<path d="M -14,45 L 14,45 L 36,-280 Q 36,-325 0,-330 Q -36,-325 -36,-280 Z"/>' },
+    axe: { svg: '<rect x="-12" y="-385" width="24" height="445"/><path d="M 12,-385 L 110,-420 Q 132,-345 118,-282 L 12,-318 Z"/>' },
+    spear: { svg: '<rect x="-10" y="-420" width="20" height="680"/><path d="M 0,-548 L 28,-470 L 0,-415 L -28,-470 Z"/>', upright: true },
+    staff: { svg: '<rect x="-13" y="-385" width="26" height="685"/><circle cx="0" cy="-405" r="34"/>', upright: true },
+}
+
+/** Hand anchor of a frozen control (`refs/control/<name>.json`: {hand: [x, y], angle?, scale?}), written by --make-control --hand. */
+export function controlMeta(name, dir = CONTROL_DIR) {
+    const file = join(dir, `${name}.json`)
+    return existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : {}
+}
+
+/**
+ * Draws `weapon` into a control image at its hand anchor: rotated `angle` degrees clockwise from upright, scaled by
+ * `scale` for figures that fill the frame more or less than usual.
+ */
+export async function withWeapon(controlPng, weapon, { hand, angle = 0, scale = 1 }) {
+    const shape = WEAPONS[weapon]
+    if (!shape) throw new Error(`Unknown weapon "${weapon}". Known: ${Object.keys(WEAPONS).join(', ')}`)
+    if (!hand) throw new Error(`The control has no hand anchor for a weapon: freeze it with --make-control ... --hand x,y`)
+    const overlay = svgFill(`<g transform="translate(${hand[0]} ${hand[1]}) rotate(${shape.upright ? 0 : angle}) scale(${scale})">${shape.svg}</g>`)
+    return sharp(controlPng).composite([{ input: Buffer.from(overlay), blend: 'lighten' }]).greyscale().png().toBuffer()
+}
+
+/** Filled white shapes on a transparent 1024² canvas. */
+const svgFill = (body) => `<svg xmlns="http://www.w3.org/2000/svg" width="${SIZE}" height="${SIZE}"><g fill="white">${body}</g></svg>`
+
+/**
+ * @param {string} name
+ * @param {{weapon?: string, dir?: string}} [opts] weapon: draw this weapon at the control's hand anchor
+ * @returns {Promise<Buffer>} PNG of the named control image
+ */
+export async function controlImage(name, { weapon, dir = CONTROL_DIR } = {}) {
     const make = CONTROLS[name]
     if (!make) throw new Error(`Unknown control "${name}". Known: ${Object.keys(CONTROLS).join(', ')}`)
     const source = make()
-    return sharp(Buffer.isBuffer(source) ? source : Buffer.from(source)).png().toBuffer()
+    const png = await sharp(Buffer.isBuffer(source) ? source : Buffer.from(source)).png().toBuffer()
+    return weapon ? withWeapon(png, weapon, controlMeta(name, dir)) : png
 }
