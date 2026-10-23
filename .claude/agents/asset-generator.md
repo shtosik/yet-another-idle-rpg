@@ -61,7 +61,7 @@ whose count defines the species need a fixed structure. The `enemy-pixel` family
   checked spider (batch field `control`). Only the outline is fixed, so colour and markings come from the subject; the
   weaker `--ip-weight` keeps the subject's colours (the family default 0.8 washes them out).
 - **Crabs and other creatures Z-Image draws correctly** (claws, stalks, body plan): draw the structure first,
-  `--zimage "<prompt>" --name <creature>`, `Read` its `sheet.png`, count the parts, then freeze the best one with
+  `--zimage "<prompt>" --name <creature>`, `Read` its `.tmp-gen/<slug>/sheet.png`, count the parts, then freeze the best one with
   `--pick <n> --slug zimage-<creature>`, and repaint it with `--source scripts/asset-gen/refs/control/<creature>-source.png --no-layer --ip-weight 0.5` (batch: `layer: false`; a repaint is matted, and the run is rejected without that).
   Choose a source with no face or marks on the shell, since the repaint keeps them. State in your report which source you froze.
 - **Four-legged animals:** `--control quadruped` (hand-drawn side-view skeleton; not yet tried with Z-Image).
