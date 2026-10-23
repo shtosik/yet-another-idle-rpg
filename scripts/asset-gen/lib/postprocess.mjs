@@ -228,6 +228,70 @@ export async function alpha(buf, { threshold = 128, minArea = 0.001, holeArea = 
     return png(data, width, height)
 }
 
+/**
+ * Removes the cast shadow under the feet. LayerDiffuse paints it as an opaque, flat, grey patch (raw alpha ≥ 224,
+ * so no alpha threshold separates it from the body). Seeds are grey pixels in the bottom `seedBand` of the sprite;
+ * a flood fill grows through pixels close to the seeds' mean colour, inside the bottom `band` of the sprite. A patch
+ * is removed only when it spans at least `minWidth` of the sprite's width, so a grey paw or boot on the bottom row stays.
+ * Then specks left at the patch edge are dropped (see cleanMask).
+ */
+export async function unshadow(buf, { band = 0.14, seedBand = 0.02, tolerance = 30, maxSaturation = 0.3, minWidth = 0.3, minArea = 0.001, keepRatio = 0.2 } = {}) {
+    const { data, width, height } = await raw(buf)
+    let top = height, bottom = -1, left = width, right = -1
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            if (data[(y * width + x) * 4 + 3] < 128) continue
+            top = Math.min(top, y), bottom = Math.max(bottom, y), left = Math.min(left, x), right = Math.max(right, x)
+        }
+    }
+    if (bottom < 0) return buf
+    const h = bottom - top + 1
+    const bandTop = bottom - Math.round(h * band)
+    const greyAt = (p) => {
+        const r = data[p * 4], g = data[p * 4 + 1], b = data[p * 4 + 2]
+        const mx = Math.max(r, g, b), luma = 0.3 * r + 0.59 * g + 0.11 * b
+        // near-black is the outline, not shadow
+        return data[p * 4 + 3] >= 128 && luma > 25 && luma < 160 && (mx - Math.min(r, g, b)) / mx <= maxSaturation
+    }
+    const seeds = []
+    for (let y = bottom - Math.round(h * seedBand); y <= bottom; y++) {
+        for (let x = left; x <= right; x++) if (greyAt(y * width + x)) seeds.push(y * width + x)
+    }
+    if (!seeds.length) return buf
+    const mean = [0, 1, 2].map((c) => seeds.reduce((s, p) => s + data[p * 4 + c], 0) / seeds.length)
+    const near = (p) => greyAt(p) && Math.hypot(data[p * 4] - mean[0], data[p * 4 + 1] - mean[1], data[p * 4 + 2] - mean[2]) <= tolerance
+
+    const seen = new Uint8Array(width * height)
+    const mask = new Uint8Array(width * height)
+    for (let p = 0; p < mask.length; p++) mask[p] = data[p * 4 + 3] >= 128 ? 1 : 0
+    let removed = false
+    for (const seed of seeds) {
+        if (seen[seed] || !near(seed)) continue
+        const patch = [seed]
+        seen[seed] = 1
+        let minX = width, maxX = -1
+        for (let i = 0; i < patch.length; i++) {
+            const p = patch[i], x = p % width, y = (p - x) / width
+            minX = Math.min(minX, x), maxX = Math.max(maxX, x)
+            for (const [nx, ny] of [[x - 1, y], [x + 1, y], [x, y - 1], [x, y + 1]]) {
+                if (nx < 0 || nx >= width || ny < bandTop || ny > bottom) continue
+                const q = ny * width + nx
+                if (!seen[q] && near(q)) {
+                    seen[q] = 1
+                    patch.push(q)
+                }
+            }
+        }
+        if (maxX - minX + 1 < minWidth * (right - left + 1)) continue
+        for (const p of patch) mask[p] = 0
+        removed = true
+    }
+    if (!removed) return buf
+    cleanMask(mask, width, height, { minArea: Math.round(minArea * width * height), holeArea: 0, keepRatio, erode: 0 })
+    for (let p = 0; p < mask.length; p++) data[p * 4 + 3] = mask[p] ? 255 : 0
+    return png(data, width, height)
+}
+
 /** Crops to the bounding box of pixels with alpha above `alphaMin`, plus `pad` transparent pixels. */
 export async function trim(buf, { alphaMin = 8, pad = 0 } = {}) {
     const { data, width, height } = await raw(buf)
@@ -392,7 +456,7 @@ export async function tile(buf, { radius = 20, rim = 8, shade = 0.55 } = {}) {
     return png(data, width, height)
 }
 
-export const STEPS = { matte, alpha, keyout, trim, pixelate, upscale, quantize, outline, cover, shave, fit, tile }
+export const STEPS = { matte, alpha, unshadow, keyout, trim, pixelate, upscale, quantize, outline, cover, shave, fit, tile }
 
 /** Runs a family `post` list: `[['keyout', {…}], ['trim'], …]`. */
 export async function runPipeline(buf, steps) {

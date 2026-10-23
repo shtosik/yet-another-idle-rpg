@@ -65,6 +65,11 @@ whose count defines the species need a fixed structure. The `enemy-pixel` family
   `--pick <n> --slug zimage-<creature>`, and repaint it with `--source scripts/asset-gen/refs/control/<creature>-source.png --no-layer --ip-weight 0.5` (batch: `layer: false`; a repaint is matted, and the run is rejected without that).
   Choose a source with no face or marks on the shell, since the repaint keeps them. State in your report which source you froze.
 - **Four-legged animals:** `--control quadruped` (hand-drawn side-view skeleton; not yet tried with Z-Image).
+- **Humanoids with a weapon:** lean ones (goblin, bandit, skeleton): `--control bipedLean --weapon knife|sword|club|axe|spear|staff`;
+  a troll or ogre with an axe: `--control bulkyAxe` (the axe is part of the pose, no `--weapon`). Both with
+  `--control-strength 0.75 --control-end 0.8` (batch fields `control`, `weapon`). Still name the weapon and its hand in
+  the subject. Any other bulky weapon, or a bow: report that a pose is needed (the doc § Weapons says how to make one)
+  instead of using the `bipedBulky` overlay, which looks pasted on.
 
 Z-Image cannot count many identical thin limbs (spider legs): do not use it as a spider structure source without
 counting every leg on the candidate.
@@ -77,6 +82,11 @@ a flagged candidate (all of them were flagged), say so and why in the report; `-
 
 Raw generations are kept, so if only the cutout is wrong, `--reprocess --slug <slug>` re-runs post-processing without the GPU. The JSON result lists `sheet` (references on top, numbered candidates below). `Read` the sheet and choose the candidate
 that best matches the references and the subject: clean silhouette, readable at game size, no stray fragments or text. **Count limbs, heads and eyes against the creature** (a bear has four legs, a spider eight, a crab two claws and eight legs, a humanoid one head), and reject candidates with duplicated or floating parts, holes or empty patches inside the body, a pale or grey backdrop slab (LayerDiffuse sometimes fails to cut the background out: the sprite sits on a flat rectangle or a lilac haze), cut-off edges, a **metallic or plated look on a creature that should be organic**, a face painted on a shell, a weapon that changes shape along its length (a blade that turns into a bow), is doubled, floats away from the hand or passes through the body, or several copies of the subject. Look at the candidate itself, not just the sheet thumbnail (and judge transparency on a magenta backdrop, which shows residue that a grey sheet hides).
+**Before you pick, write a checklist for every candidate**, one line each, from looking at it (not from QC):
+`#n heads 1 | limbs 2 arms 2 legs | weapon 1 straight in right hand | copies 1 | ground none | holes none | face/metal none | style matches refs: yes → OK`.
+Fill in the counts the creature defines (legs, claws, eyes, wings). A candidate with any wrong value is rejected, however good
+the rest looks. Put the lines in your report, so the user can see why one was chosen.
+
 If none is usable, do **one** re-roll (new `--seed`, or a clearer subject) and choose again. Then:
 
 ```
