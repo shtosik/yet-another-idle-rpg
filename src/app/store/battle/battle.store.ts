@@ -1,4 +1,4 @@
-import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals'
+import { patchState, signalStore, withComputed, withHooks, withMethods, withState } from '@ngrx/signals'
 import { ZoneID } from 'enums/ids/zone-id.enum'
 import { Enemy } from 'interfaces/enemy.interface'
 import { ActiveBuff, EquippedSpell } from '../../../interfaces/spells/equipped-spell.interface'
@@ -58,7 +58,9 @@ export const BattleStore = signalStore(
     enemy: (): Enemy | null => {
       const enemyId = store.enemyId()
       if (enemyId === null) return null
+      // An id the data no longer has (enemy removed or renumbered): no enemy; the fight is ended on load.
       const enemy = ENEMIES_DATA[enemyId]
+      if (!enemy) return null
       const maxHp = Math.round(enemy.maxHp * waveMultipliers(store.currentZoneData(), store.currentWave()).hp)
       return { ...enemy, maxHp, url: store.isShinyEnemy() ? toShinyUrl(enemy.url) : enemy.url }
     },
@@ -244,5 +246,18 @@ export const BattleStore = signalStore(
       patchState(store, initialState)
     },
 
+  })),
+  withHooks((store) => ({
+    // Runs after the save is loaded: a saved fight must still match the data, which may have changed since.
+    onInit() {
+      const enemy = store.enemy()
+      if (store.isInCombat() && !enemy) {
+        // Otherwise combat stalls: no enemy to hit, and no respawn while "in combat".
+        store.endBattle()
+      } else if (enemy && store.currentEnemyHp() > enemy.maxHp) {
+        // Max HP is rebuilt from data; a lowered one must not leave the bar over 100%.
+        store.updateEnemyHp(enemy.maxHp)
+      }
+    },
   })),
 )

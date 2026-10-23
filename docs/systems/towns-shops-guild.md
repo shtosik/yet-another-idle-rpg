@@ -30,7 +30,7 @@ Towns are non-combat hubs. Each town has **buildings**; a building holds NPCs (d
 ## Invariants & gotchas
 - `TownBuildingID` keys name the building's i18n label (`map:buildings.<key>`) and its button; a zone entrance has no `url`.
 - Runtime shop items are aligned with `SHOPS_DATA[shop].items` by index after `ensureShop`; `buyItem` and refresh use the index.
-- The selected town and building id are saved; `activeShopId` isn't, so a reload never reopens a shop. Selecting a town or building (including leaving the town tab, which clears both) closes the shop.
+- The selected town and building id are saved; `activeShopId` isn't, so a reload never reopens a shop. Selecting a town or building (including leaving the town tab, which clears both) closes the shop; selecting a town also clears the building.
 
 ## Known issues
 - The town picker hard-codes La Harpar; other towns are reached only from the world map.
