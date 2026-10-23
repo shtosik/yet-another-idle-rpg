@@ -31,6 +31,8 @@ export interface SkillNode {
     type: SkillNodeType
     stat?: PlayerStat
     statAmount?: number
+    /** `statAmount` per level is a fraction of the stat (0.1 = 10% better), applied after flat modifiers. */
+    statPercent?: boolean
     special?: boolean
     spellId?: SpellID
 }

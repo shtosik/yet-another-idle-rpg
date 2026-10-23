@@ -57,9 +57,18 @@ export class DialogueManagerService {
     )
   }
 
-  /** False when the result's item or quest-completion rewards would not fit in the inventory. */
+  /** False when the result's rewards would not fit in the inventory, or its gold fee can't be paid. */
   canApplyResult(result: DialogueResult<any> | undefined): boolean {
-    return this.missingSlots(result) === 0
+    return this.missingSlots(result) === 0 && this.missingGold(result) === 0
+  }
+
+  /** Gold still needed to pay the result's `deduct` effects (owner decision: gold never goes negative). */
+  missingGold(result: DialogueResult<any> | undefined): number {
+    const fee = (result?.effects ?? []).reduce((sum, effect) =>
+      effect.type === 'stat' && effect.action === 'deduct'
+        ? sum + effect.stats.filter(s => s.stat === 'goldCoins').reduce((s, g) => s + g.amount, 0)
+        : sum, 0)
+    return Math.max(0, fee - this.playerStore.stats().goldCoins)
   }
 
   /** Slots the player must free before the result's item or quest-completion rewards fit. */
@@ -146,6 +155,8 @@ export class DialogueManagerService {
 
   checkCondition(c: DialogueCondition): boolean {
     switch (c.type) {
+      case 'flag':
+        return !!this.questStore.dialogueFlags()[c.name] === c.isSet
       case 'stat':
         return c.comparison === 'gte'
           ? (this.playerStore.stats()[c.stat] as number) >= c.amount

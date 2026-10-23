@@ -16,7 +16,7 @@ Data-driven NPC conversations. Each NPC has a graph of nodes; options branch on 
 ## Data flow
 1. `startDialogue(npcId)`: if the `met_<npcId>` flag is not set and the NPC has `firstMeetNodeId`, start there; otherwise at `startNodeId ?? 0`. The first-meet node's options must set that flag themselves with a `flag` effect named `met_` + the `NpcID` value.
 2. For each option, the shown branch is `getActiveResult`: the **first** result whose `visibilityConditions` all pass, skipping results that start a quest which isn't `available`. An option with no matching result is hidden.
-3. `requirementsNeeded` on that result are shown as labels; if any fail, the option is disabled. If the result's item gains (`give` effects, quest item rewards) don't fit after its removals, the option is disabled with an "N slots needed" tag (`DialogueManagerService.missingSlots`).
+3. `requirementsNeeded` on that result are shown as labels; if any fail, the option is disabled. If the result's item gains (`give` effects, quest item rewards) don't fit after its removals, the option is disabled with an "N slots needed" tag (`DialogueManagerService.missingSlots`). If its `deduct` gold effects cost more than the player has, it is disabled with an "N more gold needed" tag (`missingGold`): gold never goes negative.
 4. On click, `selectOption` runs the same `getActiveResult` branch: it applies `effects` in order, then closes (`closeDialogue: true`) or moves to `next`.
 
 ## Conditions (quest)
@@ -36,7 +36,7 @@ Kill-count requirements inside quest conditions count kills since the quest reac
 - Every `next` must exist and every node should be reachable. `npm run validate` checks both (unreachable = warning).
 - Dialogue text keys are `dialogues/<npcKey>:<node>.<field>`, and the namespace must be registered in `app.config.ts` (see `localization.md`).
 - Adding a condition or effect variant means extending the union **and** the switch in `checkCondition`/`applyEffects`, plus `getConditionLabel` in the component if it can be a requirement. Use the `add-dialogue-effect` skill.
-- Flags (`{ type: 'flag' }`) are write-only for data: no condition reads them. Only the engine reads `met_<npcId>`.
+- Flags: a `flag` effect sets one; the `flag` condition (`name`, `isSet`) reads it, e.g. to charge a fee only once (the Bartender's three paid answers and Josh's beer: `bartender_paid_for_*`, `josh_paid_beer`). The engine reads `met_<npcId>`.
 
 ## Known issues
 - Gold fees in dialogue (`stat` `deduct` of `goldCoins`, Bartender and Josh) are not gated, so gold can go negative. Owner decision: block spending when the player can't afford it (`player-stats-inventory-equipment.md`).

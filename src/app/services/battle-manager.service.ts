@@ -8,7 +8,7 @@ import { SpellID } from '../../enums/ids/spell-id.enum'
 import SPELLS_DATA from '../../data/spells-data'
 import { SpellType } from '../../enums/spell-type.enum'
 import { Enemy } from '../../interfaces/enemy.interface'
-import { UNLOCK_RULES, ZONE_UNLOCK_NOTIFICATIONS } from '../../data/unlock-conditions'
+import { ZONE_UNLOCK_NOTIFICATIONS } from '../../data/unlock-conditions'
 import { ModalService } from './modal.service'
 import { DamageElement } from '../../enums/damage-element.enum'
 import { getActiveQuestIds } from './quest-status'
@@ -195,10 +195,12 @@ export class BattleManagerService {
     const activeQuestIds = getActiveQuestIds(this.questsStore.questStepProgression())
     this.playerStore.processBattleEnd(enemy.id, zoneId, wave, isShiny, activeQuestIds)
 
-    this.checkKillUnlocks(wave)
+    this.unlockNextZone(wave)
 
     const currentKillCount = this.currentWaveKillCount()
+    // The toggle alone isn't enough: the node may have been refunded since it was switched on.
     const isAutoEnabled = this.battleStore.autoWaveProgressionEnabled()
+      && this.playerStore.hasSkillUnlocked(SkillNodeID.autoWaveProgression)
     const requiredKills = this.battleStore.requiredKillCountOnCurrentWave()
     const isEnoughKillCountToProgress = currentKillCount >= requiredKills
 
@@ -207,8 +209,11 @@ export class BattleManagerService {
     }
   }
 
-  /** After a kill on `wave` of the current zone: the boss unlocks the next zone, then progression unlocks. */
-  checkKillUnlocks(wave: number): void {
+  /**
+   * A kill on `wave` of the current zone: the boss opens the next zone (online kills and offline claims).
+   * Town and feature unlocks (`UNLOCK_RULES`) are `UnlockService`'s job.
+   */
+  unlockNextZone(wave: number): void {
     const zoneData = this.battleStore.currentZoneData()
     const isBossWave = wave === zoneData.maxWave
 
@@ -216,25 +221,6 @@ export class BattleManagerService {
       this.playerStore.unlockZone(zoneData.nextZoneId)
       const notification = ZONE_UNLOCK_NOTIFICATIONS[zoneData.nextZoneId]
       if (notification) this.modalService.openUnlockNotification(notification)
-    }
-
-    this.checkProgressionUnlocks(wave)
-  }
-
-  private checkProgressionUnlocks(wave: number): void {
-    const currentZoneId = this.battleStore.currentZoneId()
-
-    for (const rule of UNLOCK_RULES) {
-      const { condition, target } = rule
-      if (this.playerStore.isUnlockTargetUnlocked(target)) continue
-
-      const isMet = condition.type === 'waveReached'
-        ? currentZoneId === condition.zoneId && wave >= condition.wave
-        : this.playerStore.isPlayerStateConditionMet(condition)
-      if (!isMet) continue
-
-      this.playerStore.applyUnlockTarget(target)
-      if (rule.notification) this.modalService.openUnlockNotification(rule.notification)
     }
   }
 }

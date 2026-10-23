@@ -6,14 +6,12 @@
 1–11 fixed 2026-10-22 (`fix/quest-dialogue`): in-progress branches, hub order, start gating, store guards, step kill baselines, turn-ins consume `QUEST_DATA` step items, one result resolver, `many*` labels, dead ends, `started` filter.
 
 ## Owner decisions not enforced yet
-12. Gold can go negative via dialogue fees (Bartender, Josh); the Bartender charges 40 gold each time the Meat Shortage offer is opened.
-13. Full inventory destroys items on unequip, quest item rewards, and dialogue `give` effects.
-14. Buying the Spellbook is blocked on a full inventory although it never enters the inventory.
+12–14 fixed 2026-10-23: dialogue gold fees are blocked when unaffordable ("N more gold needed") and the Bartender's Meat Shortage tip is paid once (`flag` condition); unequip, quest item rewards, dialogue `give` and the Spellbook purchase were already guarded.
 
 ## Economy and progression
 15. Fixed 2026-10-22 (`feat/gold-selling`): enemies drop their own `gold` with `goldCoinsMultiplier` applied; `goldGain` grants the multiplier; loot sells at shops.
-16. Skill tree: ctrl-click buying a cost-0 node with 0 points saves `NaN`; `manaRegen` node is negligible (−2 ms on 30 000 ms); auto wave progression survives refund/respec.
-17. Unlock rules run only on kills; `waveReached` uses `==` on load and `>=` at runtime.
+16. Fixed 2026-10-23: buy-max on a free node, `manaRegen` is 10% faster regen per level, auto wave and auto eat toggles go off with their node.
+17. Fixed 2026-10-23: `UnlockService` applies unlock rules on any state change; one `waveReached` rule (that wave or later) for load and play.
 18. Fixed 2026-10-22 (`feat/gold-selling`): Guild rank, rank-gated task pool, tier-scaled tokens and the Guild store.
 19. Balance: XP curve uses the cumulative formula as a per-level delta (kept on purpose for now); Fire Strike weak; Harpy Matriarch plume drops every kill; gold shop prices not re-tuned. Fixed 2026-10-22: wave scaling, zone chain rescale, Haste as a percentage.
 20. Fixed 2026-10-22: Mountain Pass enemies have pets and shiny pets.

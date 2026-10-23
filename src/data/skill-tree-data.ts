@@ -202,7 +202,8 @@ const MAGIC_SKILLS_DATA: Partial<Record<SkillNodeID, SkillNode>> = {
     url: './assets/img/skills/manaRegen.png',
     type: SkillNodeType.stat,
     stat: 'manaRegenRate',
-    statAmount: 2,
+    statAmount: 0.1,
+    statPercent: true,
   },
   [SkillNodeID.magicDamage]: {
     id: SkillNodeID.magicDamage,

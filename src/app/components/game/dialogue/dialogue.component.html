@@ -54,6 +54,11 @@
                 <span class="meta-tag requirement">[{{ 'app:inventory.slotsNeeded' | i18next: { count: slotsNeeded } }}]</span>
               }
 
+              @let goldNeeded = missingGold(option);
+              @if (goldNeeded > 0) {
+                <span class="meta-tag requirement">[{{ 'app:goldNeeded' | i18next: { count: goldNeeded } }}]</span>
+              }
+
               @if (result?.effects) {
                 @for (eff of result.effects; track $index) {
                   @let label = getEffectLabel(eff);

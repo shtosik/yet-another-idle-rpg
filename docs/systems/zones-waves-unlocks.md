@@ -9,8 +9,9 @@ Zones are the combat areas; each has waves of regular enemies ending in a boss. 
 - `src/enums/ids/zone-id.enum.ts:ZoneID`.
 - `src/data/unlock-conditions.ts:UNLOCK_RULES` — town and feature unlocks (condition → target → optional notification); `ZONE_UNLOCK_NOTIFICATIONS` — popup per newly opened zone.
 - `src/app/store/battle/battle.store.ts` — `currentZoneId`, `currentWave`, `changeWave`, `setZone`, `requiredKillCountOnCurrentWave`.
-- `src/app/services/battle-manager.service.ts` — `canMoveToNextWave`, `canMoveToPreviousWave`, `checkUnlocks`, `checkProgressionUnlocks`.
-- `src/app/store/player/player.store.ts` — `zonesProgression` (kills per zone per wave), `unlockedContent` (`zones`, `towns`), `campUnlocked`, `skillTreeUnlocked`, `mapUnlocked`, `isUnlockTargetUnlocked`, `applyUnlockTarget`, `isPlayerStateConditionMet`.
+- `src/app/services/battle-manager.service.ts` — `canMoveToNextWave`, `canMoveToPreviousWave`, `unlockNextZone` (boss kill opens `nextZoneId`).
+- `src/app/services/unlock.service.ts:UnlockService` — applies `UNLOCK_RULES` with their notification whenever the player state they read changes.
+- `src/app/store/player/player.store.ts` — `zonesProgression` (kills per zone per wave), `unlockedContent` (`zones`, `towns`), `campUnlocked`, `skillTreeUnlocked`, `mapUnlocked`, `isUnlockTargetUnlocked`, `applyUnlockTarget`, `isUnlockConditionMet` (also re-applies rules silently on load).
 - `src/data/helpers/enemy-zones.ts:ZONES_BY_ENEMY` — reverse lookup (bestiary).
 
 ## Data flow
@@ -33,11 +34,10 @@ On load, `PlayerStore.onInit` re-applies every rule already met, silently, so ne
 - `UNLOCK_RULES` only target towns and features (`UnlockTarget`); zones unlock by the boss chain or a town entrance.
 - A zone's boss must not be listed in its `enemies` (`npm run validate` warns).
 - Horseshoe Beach is always unlocked (initial state and the `?? [horseshoeBeach]` fallbacks).
-- `waveReached` means "killed something on that wave", measured at kill time in the current zone.
+- `waveReached` means "killed something on that wave or a later one of the zone" (`zonesProgression`), the same on load and during play. Rules react to any change (kills, loot, quest XP), not only kills.
 
 ## Known issues
 - Unlock rules are only evaluated on kills; a level-up from a quest reward unlocks nothing until the next kill.
-- The two `waveReached` checks disagree: on load, kills on exactly that wave; at runtime, any wave `>=` it.
 - Waves inside a zone have the same enemy pool (no elites or mixed boss waves yet, `docs/ideas/wave-variety.md`).
 - `elderwoodWilds` has no `nextZoneId`; Deepwood and Upper Canopy are reached only through Mawood.
 

@@ -31,13 +31,14 @@ Battle nodes read in code: `autoWaveProgression`, `autoEat`, `weaknesses`, `spel
 - Stat nodes are read from `unlockedNodes` by the derived `stats`; buy and refund only change the level (see `player-stats-inventory-equipment.md`).
 - `skillPointCost` is per level. `levelsRefunded` counts levels, not points.
 - Every node needs `skill-tree:nodes.<key>.name` and `.desc`, and an icon under `assets/img/skills/` (`npm run validate` checks).
+- Refunding or respeccing `autoWaveProgression` or `autoEat` switches its toggle off; auto wave progression also checks the node when it fires.
+- Buy max on a free node (`skillPointCost` 0) fills it to `maxLevel`.
 
 ## Known issues
-- Ctrl-click buying a cost-0 node (origin) with 0 skill points computes `0/0` and saves `NaN`.
-- `manaRegen` lowers `manaRegenRate` by 2 ms per level on a 30 000 ms base, so it does nothing noticeable.
-- Auto wave progression keeps working after its node is refunded or respecced (only the toggle is checked).
 - Every refresh rebuilds every marker's icon and tooltip, closing open tooltips.
 - Tooltip text (requirements, refund cost) is hard-coded English.
 
 ## How to extend
+A stat node with `statPercent: true` scales the stat by `statAmount` per level after flat modifiers (`manaRegen`: 10% faster regen per level).
+
 New node: append a `SkillNodeID` in the branch's range, add the node to the branch's map in `skill-tree-data.ts` with `requires` pointing at its parent, add i18n and icon. For a `battle` node, read it with `hasSkillUnlocked(SkillNodeID.x)` where the mechanic lives.

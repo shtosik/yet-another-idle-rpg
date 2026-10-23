@@ -17,6 +17,9 @@ export enum BartenderDialogue {
 export type LaHarparBartenderDialogueType = Record<BartenderDialogue, DialogueNode<BartenderDialogue>>
 
 const NS = 'dialogues/laHarparBartender'
+const PAID_FOR_WORK_FLAG = 'bartender_paid_for_work'
+const PAID_FOR_PLACE_FLAG = 'bartender_paid_for_place'
+const PAID_FOR_TRAINER_FLAG = 'bartender_paid_for_trainer'
 
 const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
   [BartenderDialogue.introduction1]: {
@@ -64,20 +67,37 @@ const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
       },
       {
         responseKey: `${NS}:default.whatIsThisPlace`,
+        // Each paid answer costs gold once; asking again is free.
         results: [
           {
+            visibilityConditions: [{ type: 'flag', name: PAID_FOR_PLACE_FLAG, isSet: false }],
             next: BartenderDialogue.whatIsThisPlace1,
-            effects: [{ type: 'stat', action: 'deduct', stats: [{ stat: 'goldCoins', amount: 20 }] }],
+            effects: [
+              { type: 'stat', action: 'deduct', stats: [{ stat: 'goldCoins', amount: 20 }] },
+              { type: 'flag', name: PAID_FOR_PLACE_FLAG },
+            ],
           },
+          { next: BartenderDialogue.whatIsThisPlace1 },
         ],
       },
       {
         responseKey: `${NS}:default.anyWork`,
         results: [
+          // The 40-gold tip is paid once; after that he repeats the offer for free.
+          {
+            visibilityConditions: [
+              { type: 'quest', questId: QuestID.meatShortage, questState: QuestState.available },
+              { type: 'flag', name: PAID_FOR_WORK_FLAG, isSet: false },
+            ],
+            next: BartenderDialogue.anyWorkForMe1,
+            effects: [
+              { type: 'stat', action: 'deduct', stats: [{ stat: 'goldCoins', amount: 40 }] },
+              { type: 'flag', name: PAID_FOR_WORK_FLAG },
+            ],
+          },
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.meatShortage, questState: QuestState.available }],
             next: BartenderDialogue.anyWorkForMe1,
-            effects: [{ type: 'stat', action: 'deduct', stats: [{ stat: 'goldCoins', amount: 40 }] }],
           },
           // Started or completed: nothing new
           {
@@ -89,9 +109,14 @@ const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
         responseKey: `${NS}:default.anyTrainer`,
         results: [
           {
+            visibilityConditions: [{ type: 'flag', name: PAID_FOR_TRAINER_FLAG, isSet: false }],
             next: BartenderDialogue.anyoneWhoCanTrainMe1,
-            effects: [{ type: 'stat', action: 'deduct', stats: [{ stat: 'goldCoins', amount: 60 }] }],
+            effects: [
+              { type: 'stat', action: 'deduct', stats: [{ stat: 'goldCoins', amount: 60 }] },
+              { type: 'flag', name: PAID_FOR_TRAINER_FLAG },
+            ],
           },
+          { next: BartenderDialogue.anyoneWhoCanTrainMe1 },
         ],
       },
       {

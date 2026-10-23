@@ -34,9 +34,12 @@ export class SkillTreeService {
     if (!canBuyNode(skillData, unlocked, stats.unspentSkillPoints).ok) return
 
     const currentLevel = unlocked[id] || 0
-    const pointsToBuy = buyMax
-      ? Math.min(skillData.maxLevel - currentLevel, Math.floor(stats.unspentSkillPoints / skillData.skillPointCost))
-      : 1
+    const levelsLeft = skillData.maxLevel - currentLevel
+    // A free node (the origin) can't be divided into: buying max just fills it.
+    const affordable = skillData.skillPointCost > 0
+      ? Math.floor(stats.unspentSkillPoints / skillData.skillPointCost)
+      : levelsLeft
+    const pointsToBuy = buyMax ? Math.min(levelsLeft, affordable) : 1
 
     this.playerStore.updatePlayerStats([
       { stat: 'unspentSkillPoints', amount: -(pointsToBuy * skillData.skillPointCost) },
@@ -100,6 +103,7 @@ export class SkillTreeService {
       this.battleManagerService.unequipSpell(skillData.spellId, true)
     }
 
+    this.switchOffLostToggles()
     return true
   }
 
@@ -172,6 +176,13 @@ export class SkillTreeService {
     }
 
     this.playerStore.resetUnlockedNodes()
+    this.switchOffLostToggles()
     return true
+  }
+
+  /** Auto wave and auto eat toggles go off with their node, so re-buying it doesn't silently resume them. */
+  private switchOffLostToggles(): void {
+    if (!this.playerStore.hasSkillUnlocked(SkillNodeID.autoWaveProgression)) this.battleStore.toggleAutoWave(false)
+    if (!this.playerStore.hasSkillUnlocked(SkillNodeID.autoEat)) this.battleStore.toggleAutoEat(false)
   }
 }

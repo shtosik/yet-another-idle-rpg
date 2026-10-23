@@ -138,7 +138,8 @@ export class OfflineProgressService {
     })
 
     const { levelsGained, lostDrops, receivedItems, installedStations } = this.playerStore.applyKillBatch({ ...result, zoneId: zone.id, wave })
-    if (result.kills > 0) this.battleManager.checkKillUnlocks(wave)
+    // Town and feature unlocks follow from the new state on their own (UnlockService).
+    if (result.kills > 0) this.battleManager.unlockNextZone(wave)
     installedStations.forEach(itemId => this.modalService.openStationInstalled(itemId))
 
     return {
