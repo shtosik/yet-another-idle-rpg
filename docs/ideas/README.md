@@ -14,7 +14,7 @@ Owner decisions in force:
 | [Gold drops & selling](gold-drops-and-selling.md) | S | Accepted |
 | [Shop preferences](shop-preferences.md) | S | Proposed |
 | [Progression pacing & economy simulation](progression-pacing.md) | S-M | Accepted |
-| [Offline progress](offline-progress.md) | M | Proposed |
+| [Offline progress](offline-progress.md) | M | Accepted |
 | [Rune socketing](rune-socketing.md) | M | Proposed |
 | [Explorer Token shop & guild ranks](explorer-token-shop.md) | S-M | Accepted |
 | [Wave variety, wave scaling & boss waves](wave-variety.md) | M | Scaling accepted |
