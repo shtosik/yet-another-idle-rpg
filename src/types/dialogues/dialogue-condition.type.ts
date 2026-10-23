@@ -17,7 +17,15 @@ export type DialogueCondition = { hidden?: boolean } & (
   | WaveKillCountCondition
   | ManyWavesKillCountCondition
   | GuildCondition
+  | FlagCondition
   )
+
+/** A dialogue flag (set by a `flag` effect) is set, or with `isSet: false`, not set yet. */
+interface FlagCondition {
+  type: 'flag'
+  name: string
+  isSet: boolean
+}
 
 interface QuestCondition {
   type: 'quest'
@@ -89,7 +97,12 @@ interface ItemCondition {
 
 interface GuildCondition {
   type: 'guild'
-  condition: 'hasActiveTask' | 'taskComplete' | 'noActiveTask'
+  /**
+   * Any task in progress / any task finished / no tasks / room for another task (`maxTaskSlots`) /
+   * the task at `taskIndex` in `activeTasks` exists and is unfinished.
+   */
+  condition: 'hasActiveTask' | 'taskComplete' | 'noActiveTask' | 'hasFreeTaskSlot' | 'taskInProgressAt'
+  taskIndex?: number
 }
 
 interface ManyItemsCondition {

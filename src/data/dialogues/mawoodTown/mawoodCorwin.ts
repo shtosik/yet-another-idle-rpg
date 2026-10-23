@@ -2,7 +2,6 @@ import { DialogueNode } from '../../../interfaces/dialogues/dialogue-node.interf
 import { NpcID } from '../../../enums/map/npc-id.enum'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
-import { ItemID } from '../../../enums/ids/item-id.enum'
 
 export enum CorwinDialogue {
   default = 0,
@@ -21,6 +20,7 @@ export enum CorwinDialogue {
   questBlightedHeart,
   questBlightedHeartComplete,
   postQuestLore,
+  waitingForFinn,
 }
 
 export type MawoodCorwinDialogueType = Record<CorwinDialogue, DialogueNode<CorwinDialogue>>
@@ -40,7 +40,7 @@ const MAWOOD_CORWIN: MawoodCorwinDialogueType = {
         responseKey: `${NS}:intro1.opt2`,
         results: [
           {
-            next: CorwinDialogue.default,
+            next: CorwinDialogue.aboutMawood,
             effects: [{ type: 'flag', name: `met_${NpcID.mawoodCorwin}` }],
           },
         ],
@@ -79,46 +79,58 @@ const MAWOOD_CORWIN: MawoodCorwinDialogueType = {
       {
         responseKey: `${NS}:default.work`,
         results: [
+          // Questline done
+          {
+            visibilityConditions: [{ type: 'quest', questId: QuestID.theBlightedHeart, questState: QuestState.completed }],
+            next: CorwinDialogue.postQuestLore,
+          },
           // Quest 7 — The Blighted Heart: turn-in
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.theBlightedHeart, questState: QuestState.readyToAdvance, step: 1 }],
             next: CorwinDialogue.questBlightedHeartComplete,
-            requirementsNeeded: [{ type: 'item', itemId: ItemID.blightedHeartwood, amount: 1 }],
           },
-          // Quest 7 — in progress
+          // Quest 7 — in progress, or offer (questBlightedHeart starts it)
           {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.theBlightedHeart, questState: QuestState.readyToAdvance }],
+            visibilityConditions: [{ type: 'quest', questId: QuestID.theBlightedHeart, questState: QuestState.active }],
+            next: CorwinDialogue.questBlightedHeart,
+          },
+          {
+            visibilityConditions: [{ type: 'quest', questId: QuestID.theBlightedHeart, questState: QuestState.available }],
             next: CorwinDialogue.questBlightedHeart,
           },
           // Quest 6 — The Sap That Burns: turn-in
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.theSapThatBurns, questState: QuestState.readyToAdvance, step: 1 }],
             next: CorwinDialogue.questTheSapComplete,
-            requirementsNeeded: [{ type: 'item', itemId: ItemID.cursedSap, amount: 5 }],
           },
           // Quest 6 — in progress
           {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.theSapThatBurns, questState: QuestState.readyToAdvance }],
+            visibilityConditions: [{ type: 'quest', questId: QuestID.theSapThatBurns, questState: QuestState.active }],
             next: CorwinDialogue.questTheSapProgress,
           },
           // Quest 6 — offer (unlocked after Finn's fetishes quest completes)
           {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.fetchesAndFangs, questState: QuestState.completed }],
+            visibilityConditions: [{ type: 'quest', questId: QuestID.theSapThatBurns, questState: QuestState.available }],
             next: CorwinDialogue.questTheSap,
+          },
+          // Between quests — Fetches and Fangs runs through Finn
+          {
+            visibilityConditions: [{ type: 'quest', questId: QuestID.signsOfRot, questState: QuestState.completed }],
+            next: CorwinDialogue.waitingForFinn,
           },
           // Quest 4 — Signs of Rot: turn-in
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.signsOfRot, questState: QuestState.readyToAdvance, step: 1 }],
             next: CorwinDialogue.questSignsOfRotComplete,
-            requirementsNeeded: [{ type: 'item', itemId: ItemID.corruptedResin, amount: 3 }],
           },
           // Quest 4 — in progress
           {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.signsOfRot, questState: QuestState.readyToAdvance }],
+            visibilityConditions: [{ type: 'quest', questId: QuestID.signsOfRot, questState: QuestState.active }],
             next: CorwinDialogue.questSignsOfRotProgress,
           },
-          // Default — offer Signs of Rot
+          // Quest 4 — offer
           {
+            visibilityConditions: [{ type: 'quest', questId: QuestID.signsOfRot, questState: QuestState.available }],
             next: CorwinDialogue.questSignsOfRot,
           },
         ],
@@ -181,7 +193,13 @@ const MAWOOD_CORWIN: MawoodCorwinDialogueType = {
     options: [
       {
         responseKey: `${NS}:corruptionDetails.opt1`,
-        results: [{ next: CorwinDialogue.questSignsOfRot }],
+        results: [
+          {
+            visibilityConditions: [{ type: 'quest', questId: QuestID.signsOfRot, questState: QuestState.available }],
+            next: CorwinDialogue.questSignsOfRot,
+          },
+          { next: CorwinDialogue.default },
+        ],
       },
     ],
   },
@@ -229,7 +247,6 @@ const MAWOOD_CORWIN: MawoodCorwinDialogueType = {
             next: CorwinDialogue.default,
             effects: [
               { type: 'quest', action: 'end', questId: QuestID.signsOfRot },
-              { type: 'item', action: 'take', items: [{ itemId: ItemID.corruptedResin, amount: 3 }] },
             ],
           },
         ],
@@ -280,8 +297,6 @@ const MAWOOD_CORWIN: MawoodCorwinDialogueType = {
             next: CorwinDialogue.questBlightedHeart,
             effects: [
               { type: 'quest', action: 'end', questId: QuestID.theSapThatBurns },
-              { type: 'quest', action: 'start', questId: QuestID.theBlightedHeart },
-              { type: 'item', action: 'take', items: [{ itemId: ItemID.cursedSap, amount: 5 }] },
             ],
           },
         ],
@@ -295,7 +310,15 @@ const MAWOOD_CORWIN: MawoodCorwinDialogueType = {
     options: [
       {
         responseKey: `${NS}:questBlightedHeart.opt1`,
-        results: [{ next: CorwinDialogue.default, closeDialogue: true }],
+        results: [
+          // A start only shows once its quest is available, so it can't share a result with ending The Sap That Burns
+          {
+            next: CorwinDialogue.default,
+            closeDialogue: true,
+            effects: [{ type: 'quest', action: 'start', questId: QuestID.theBlightedHeart }],
+          },
+          { next: CorwinDialogue.default, closeDialogue: true },
+        ],
       },
     ],
   },
@@ -311,7 +334,6 @@ const MAWOOD_CORWIN: MawoodCorwinDialogueType = {
             next: CorwinDialogue.postQuestLore,
             effects: [
               { type: 'quest', action: 'end', questId: QuestID.theBlightedHeart },
-              { type: 'item', action: 'take', items: [{ itemId: ItemID.blightedHeartwood, amount: 1 }] },
             ],
           },
         ],
@@ -325,6 +347,17 @@ const MAWOOD_CORWIN: MawoodCorwinDialogueType = {
     options: [
       {
         responseKey: `${NS}:postQuestLore.opt1`,
+        results: [{ next: CorwinDialogue.default, closeDialogue: true }],
+      },
+    ],
+  },
+
+  [CorwinDialogue.waitingForFinn]: {
+    id: CorwinDialogue.waitingForFinn,
+    messageKey: `${NS}:waitingForFinn.message`,
+    options: [
+      {
+        responseKey: `${NS}:waitingForFinn.opt1`,
         results: [{ next: CorwinDialogue.default, closeDialogue: true }],
       },
     ],

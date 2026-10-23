@@ -1,7 +1,6 @@
 import { DialogueNode } from '../../../interfaces/dialogues/dialogue-node.interface'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { NpcID } from '../../../enums/map/npc-id.enum'
-import { EnemyID } from '../../../enums/ids/enemy-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
 
 export enum TraderDialogue {
@@ -95,7 +94,20 @@ const LA_HARPAR_TRADER: LaHarparTraderDialogueType = {
       { responseKey: `${NS}:default.opt3`, results: [{ next: TraderDialogue.aboutMe }] },
       { responseKey: `${NS}:default.opt4`, results: [{ next: TraderDialogue.aboutVillage }] },
       { responseKey: `${NS}:default.opt5`, results: [{ next: TraderDialogue.aboutPeople }] },
-      { responseKey: `${NS}:default.opt6`, results: [{ next: TraderDialogue.questOffer }] },
+      {
+        // Hidden while Rats Were Rats is in progress; opt1 is the turn-in
+        responseKey: `${NS}:default.opt6`,
+        results: [
+          {
+            visibilityConditions: [{ type: 'quest', questId: QuestID.ratsWereRats, questState: QuestState.completed }],
+            next: TraderDialogue.questCompleted,
+          },
+          {
+            visibilityConditions: [{ type: 'quest', questId: QuestID.ratsWereRats, questState: QuestState.available }],
+            next: TraderDialogue.questOffer,
+          },
+        ],
+      },
     ],
   },
   [TraderDialogue.aboutMe]: {
@@ -179,20 +191,6 @@ const LA_HARPAR_TRADER: LaHarparTraderDialogueType = {
       {
         responseKey: `${NS}:questOffer.opt1`,
         results: [
-          {
-            visibilityConditions: [
-              {
-                type: 'quest',
-                questId: QuestID.ratsWereRats,
-                questState: QuestState.readyToAdvance,
-                step: 1,
-                hidden: true,
-              },
-            ],
-            next: TraderDialogue.questCompleted,
-            requirementsNeeded: [{ type: 'killCount', enemyId: EnemyID.rat, amount: 50 }],
-            effects: [{ type: 'quest', action: 'end', questId: QuestID.ratsWereRats }],
-          },
           {
             next: TraderDialogue.default,
             closeDialogue: true,

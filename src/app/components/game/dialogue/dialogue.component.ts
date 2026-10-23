@@ -12,6 +12,7 @@ import { DialogueEffect } from '../../../../types/dialogues/dialogue-effect.type
 import { DialogueCondition } from '../../../../types/dialogues/dialogue-condition.type'
 import { ZoneID } from '../../../../enums/ids/zone-id.enum'
 import { CloseButtonComponent } from '../../shared/close-button/close-button.component'
+import { PlayerStore } from '../../../store/player/player.store'
 
 @Component({
   selector: 'app-dialogue',
@@ -25,6 +26,7 @@ import { CloseButtonComponent } from '../../shared/close-button/close-button.com
 })
 export class DialogueComponent {
   protected dialogueService = inject(DialogueManagerService)
+  private playerStore = inject(PlayerStore)
   protected readonly NpcID = NpcID
   protected readonly QuestID = QuestID
 
@@ -33,6 +35,20 @@ export class DialogueComponent {
 
   handleOptionClicked(option: DialogueOption<any>): void {
     this.dialogueService.selectOption(option)
+  }
+
+  /** Interpolation values for a response: a task-cancel option names its monster and the kills left. */
+  getResponseParams(option: DialogueOption<any>): Record<string, string | number> | undefined {
+    const effect = this.dialogueService.getActiveResult(option)?.effects
+      ?.find(e => e.type === 'guild' && e.action === 'abandonTask')
+    if (effect?.type !== 'guild') return undefined
+
+    const task = this.playerStore.activeTasks()[effect.taskIndex ?? 0]
+    if (!task) return undefined
+    return {
+      monster: i18next.t(`enemies:names.${EnemyID[task.monsterId]}`),
+      left: task.targetCount - task.currentCount,
+    }
   }
 
   getConditionLabel(condition: DialogueCondition): string {
@@ -61,12 +77,35 @@ export class DialogueComponent {
           zone,
         })
       }
+      case 'manyStat':
+        return condition.statsRequired
+          .map(req => this.getConditionLabel({ type: 'stat', ...req }))
+          .join(', ')
+      case 'manyItems':
+        return condition.itemIds
+          .map(itemId => this.getConditionLabel({ type: 'item', itemId, amount: condition.amounts[itemId] ?? 1 }))
+          .join(', ')
+      case 'manyKillCount':
+        return condition.enemiesRequired
+          .map(req => this.getConditionLabel({ type: 'killCount', ...req }))
+          .join(', ')
+      case 'manyWaveKillCount':
+        return condition.wavesRequired
+          .map(req => this.getConditionLabel({ type: 'waveKillCount', ...req }))
+          .join(', ')
+      case 'manyQuestCompleted':
+        return condition.questsRequired
+          .map(req => this.getConditionLabel({ type: 'quest', ...req }))
+          .join(', ')
       case 'guild':
         switch (condition.condition) {
           case 'hasActiveTask': return 'Active task in progress'
           case 'taskComplete':  return 'Task complete'
           case 'noActiveTask':  return 'No active task'
+          case 'hasFreeTaskSlot': return 'Free task slot'
+          case 'taskInProgressAt': return 'Task in progress'
         }
+        return ''
       default:
         return ''
     }
@@ -108,15 +147,22 @@ export class DialogueComponent {
   }
 
   isOptionVisible(option: DialogueOption<any>): boolean {
-    const result = this.dialogueService.getActiveResult(option)
-    if (!result) return false
-    if (!result.visibilityConditions) return true
-    return result.visibilityConditions.every(cond => this.dialogueService.checkCondition(cond))
+    return this.dialogueService.getActiveResult(option) !== undefined
   }
 
   isOptionDisabled(option: DialogueOption<any>): boolean {
     const result = this.dialogueService.getActiveResult(option)
-    if (!result || !result.requirementsNeeded) return false
+    if (!result) return false
+    if (!this.dialogueService.canApplyResult(result)) return true
+    if (!result.requirementsNeeded) return false
     return !result.requirementsNeeded.every(req => this.dialogueService.checkCondition(req))
+  }
+
+  missingSlots(option: DialogueOption<any>): number {
+    return this.dialogueService.missingSlots(this.dialogueService.getActiveResult(option))
+  }
+
+  missingGold(option: DialogueOption<any>): number {
+    return this.dialogueService.missingGold(this.dialogueService.getActiveResult(option))
   }
 }

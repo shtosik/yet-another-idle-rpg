@@ -1,7 +1,6 @@
 import { DialogueNode } from '../../../interfaces/dialogues/dialogue-node.interface'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
-import { ZoneID } from '../../../enums/ids/zone-id.enum'
 
 export enum JoshDialogue {
   default,
@@ -23,6 +22,7 @@ export enum JoshDialogue {
 export type LaHarparJoshDialogueType = Record<JoshDialogue, DialogueNode<JoshDialogue>>
 
 const NS = 'dialogues/laHarparJosh'
+const PAID_BEER_FLAG = 'josh_paid_beer'
 
 const LA_HARPAR_JOSH: LaHarparJoshDialogueType = {
   [JoshDialogue.default]: {
@@ -31,7 +31,11 @@ const LA_HARPAR_JOSH: LaHarparJoshDialogueType = {
     options: [
       {
         responseKey: `${NS}:greeting.opt1`,
-        results: [{ next: JoshDialogue.payBeer }],
+        // One beer buys his company for good.
+        results: [
+          { visibilityConditions: [{ type: 'flag', name: PAID_BEER_FLAG, isSet: true }], next: JoshDialogue.talkReady },
+          { next: JoshDialogue.payBeer },
+        ],
       },
       {
         responseKey: `${NS}:greeting.opt2`,
@@ -48,7 +52,10 @@ const LA_HARPAR_JOSH: LaHarparJoshDialogueType = {
         results: [
           {
             next: JoshDialogue.talkReady,
-            effects: [{ type: 'stat', action: 'deduct', stats: [{ stat: 'goldCoins', amount: 20 }] }],
+            effects: [
+              { type: 'stat', action: 'deduct', stats: [{ stat: 'goldCoins', amount: 20 }] },
+              { type: 'flag', name: PAID_BEER_FLAG },
+            ],
           },
         ],
       },
@@ -75,14 +82,22 @@ const LA_HARPAR_JOSH: LaHarparJoshDialogueType = {
               },
             ],
             next: JoshDialogue.talkReady,
-            requirementsNeeded: [{ type: 'waveKillCount', zoneId: ZoneID.horseshoeBeach, waveNumber: 7, amount: 50 }],
             effects: [{ type: 'quest', questId: QuestID.clearingOutTheBeach, action: 'advance' }],
           },
         ],
       },
       { responseKey: `${NS}:talkReady.opt2`, results: [{ next: JoshDialogue.intro }] },
       { responseKey: `${NS}:talkReady.opt3`, results: [{ next: JoshDialogue.placeInfo }] },
-      { responseKey: `${NS}:talkReady.opt4`, results: [{ next: JoshDialogue.workInfo }] },
+      {
+        responseKey: `${NS}:talkReady.opt4`,
+        results: [
+          {
+            visibilityConditions: [{ type: 'quest', questId: QuestID.clearingOutTheBeach, questState: QuestState.completed }],
+            next: JoshDialogue.missionCheck,
+          },
+          { next: JoshDialogue.workInfo },
+        ],
+      },
       { responseKey: `${NS}:talkReady.opt5`, results: [{ next: JoshDialogue.talkReady, closeDialogue: true }] },
     ],
   },
@@ -113,6 +128,8 @@ const LA_HARPAR_JOSH: LaHarparJoshDialogueType = {
             next: JoshDialogue.talkReady,
             effects: [{ type: 'quest', questId: QuestID.clearingOutTheBeach, action: 'start' }],
           },
+          // Already on it: workInfo doubles as the in-progress reminder
+          { next: JoshDialogue.talkReady },
         ],
       },
     ],

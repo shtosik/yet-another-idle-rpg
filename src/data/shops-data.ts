@@ -1,6 +1,7 @@
 import { ShopID } from '../enums/ids/shop-id.enum'
 import { ItemID } from '../enums/ids/item-id.enum'
 import { ItemTier } from '../enums/items/item-tier.enum'
+import { ItemType } from '../enums/items/item-type.enum'
 import { Shop } from '../types/shop/shop.type'
 
 const SHOPS_DATA: Record<ShopID, Shop> = {
@@ -15,6 +16,19 @@ const SHOPS_DATA: Record<ShopID, Shop> = {
       { itemId: ItemID.earthRuneRecipe, tier: ItemTier.uncommon,  price: 500,  maxStock: 1,  refreshable: false },
       { itemId: ItemID.magicStaff,      tier: ItemTier.uncommon,  price: 3000, maxStock: 1,  refreshable: false },
     ],
+    // A collector of the arcane: runes, gear and rare monster parts, nothing else.
+    buys: [ItemType.resource, ItemType.equipment],
+    sellMultipliers: {
+      items: {
+        [ItemID.fireRune]: 1.5,
+        [ItemID.airRune]: 1.5,
+        [ItemID.earthRune]: 1.5,
+        [ItemID.waterRune]: 1.5,
+        [ItemID.elderSilk]: 1.5,
+        [ItemID.harpyFeather]: 1.5,
+        [ItemID.matriarchPlume]: 1.25,
+      },
+    },
   },
   [ShopID.laHarparShop]: {
     id: ShopID.laHarparShop,
@@ -31,6 +45,16 @@ const SHOPS_DATA: Record<ShopID, Shop> = {
       { itemId: ItemID.waterRune,      tier: ItemTier.normal,    price: 20,   maxStock: 99, refreshable: true  },
       { itemId: ItemID.fishApplePieRecipe, tier: ItemTier.uncommon, price: 300, maxStock: 1, refreshable: false },
     ],
+    // A harbour trader: buys anything, pays best for the sea's catch and cooked food.
+    sellMultipliers: {
+      types: { [ItemType.food]: 1.25 },
+      items: {
+        [ItemID.fishMeat]: 1.5,
+        [ItemID.crabMeat]: 1.5,
+        [ItemID.turtleShell]: 1.5,
+        [ItemID.feather]: 1.5,
+      },
+    },
   },
   [ShopID.mawoodApothecary]: {
     id: ShopID.mawoodApothecary,
@@ -38,6 +62,38 @@ const SHOPS_DATA: Record<ShopID, Shop> = {
     items: [
       { itemId: ItemID.mortarAndPestle, tier: ItemTier.uncommon, price: 800, maxStock: 1,  refreshable: false },
       { itemId: ItemID.vialOfWater,     tier: ItemTier.normal,   price: 15,  maxStock: 99, refreshable: true  },
+    ],
+    // Only ingredients and remedies; reagents and potions pay best.
+    buys: [ItemType.resource, ItemType.potion, ItemType.food],
+    sellMultipliers: {
+      types: { [ItemType.potion]: 1.5 },
+      items: {
+        [ItemID.slimeResidue]: 2,
+        [ItemID.spiderFang]: 1.5,
+        [ItemID.spiderSilk]: 1.5,
+        [ItemID.ratTail]: 1.5,
+        [ItemID.boneFragment]: 1.5,
+        [ItemID.ancientWood]: 1.5,
+      },
+    },
+  },
+  [ShopID.explorersGuildStore]: {
+    id: ShopID.explorersGuildStore,
+    nameKey: 'shop:names.explorersGuildStore',
+    currency: 'explorerTokens',
+    buys: [],
+    items: [
+      // Rank 0: basics
+      { itemId: ItemID.minorManaPotion,     tier: ItemTier.normal,    price: 1,  maxStock: 10, refreshable: true },
+      { itemId: ItemID.crabStewRecipe,      tier: ItemTier.uncommon,  price: 4,  maxStock: 1,  refreshable: false },
+      { itemId: ItemID.cheesePlatterRecipe, tier: ItemTier.uncommon,  price: 6,  maxStock: 1,  refreshable: false },
+      { itemId: ItemID.skillPointBook,      tier: ItemTier.legendary, price: 15, maxStock: 1,  refreshable: true },
+      // Rank 1: more space and recipes
+      { itemId: ItemID.guildSatchel,        tier: ItemTier.rare,      price: 20, maxStock: 3,  refreshable: false, minRank: 1 },
+      { itemId: ItemID.huntersFeastRecipe,  tier: ItemTier.uncommon,  price: 12, maxStock: 1,  refreshable: false, minRank: 1 },
+      // Rank 2: combat-changers, bought once
+      { itemId: ItemID.secondContract,      tier: ItemTier.legendary, price: 40, maxStock: 1,  refreshable: false, minRank: 2 },
+      { itemId: ItemID.bountyMark,          tier: ItemTier.legendary, price: 40, maxStock: 1,  refreshable: false, minRank: 2 },
     ],
   },
 }

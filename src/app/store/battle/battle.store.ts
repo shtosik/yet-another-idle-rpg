@@ -1,27 +1,27 @@
-import { patchState, signalStore, withComputed, withMethods, withState } from '@ngrx/signals'
+import { patchState, signalStore, withComputed, withHooks, withMethods, withState } from '@ngrx/signals'
 import { ZoneID } from 'enums/ids/zone-id.enum'
 import { Enemy } from 'interfaces/enemy.interface'
 import { ActiveBuff, EquippedSpell } from '../../../interfaces/spells/equipped-spell.interface'
 import ZONES_DATA from 'data/zones-data'
 import ENEMIES_DATA from 'data/enemies-data'
 import { SpellID } from '../../../enums/ids/spell-id.enum'
-import { withDevtools } from '@angular-architects/ngrx-toolkit'
+import { EnemyID } from '../../../enums/ids/enemy-id.enum'
+import { withDevtools } from '../helpers/devtools'
 import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
-import { PlayerStore } from '../player/player.store'
-import { inject } from '@angular/core'
 import { toShinyUrl } from 'utils/shiny-url'
-import { ActiveConsumable, CONSUMABLE_SLOTS, ConsumableSlot, ConsumableStat } from '../../../interfaces/consumable.interface'
+import { waveMultipliers } from './wave-scaling'
+import { ActiveConsumable, CONSUMABLE_SLOTS, ConsumableSlot } from '../../../interfaces/consumable.interface'
 
 export interface BattleState {
   isInCombat: boolean;
-  enemy: Enemy | null;
+  /** The enemy alive now; its data is rebuilt from `ENEMIES_DATA` (computed `enemy`), so data edits apply to saves. */
+  enemyId: EnemyID | null;
   currentEnemyHp: number;
   currentZoneId: ZoneID;
   currentWave: number;
   autoWaveProgressionEnabled: boolean;
   equippedSpells: (EquippedSpell | null)[];
   activeBuffs: ActiveBuff[];
-  attackTimer: number;
   isShinyEnemy: boolean;
   consumableSlots: Record<ConsumableSlot, ActiveConsumable | null>;
   autoEatEnabled: boolean;
@@ -29,34 +29,46 @@ export interface BattleState {
 
 export const initialState: BattleState = {
   isInCombat: false,
-  enemy: null,
+  enemyId: null,
   currentEnemyHp: 0,
   currentZoneId: ZoneID.horseshoeBeach,
   currentWave: 1,
   autoWaveProgressionEnabled: false,
   equippedSpells: [null, null, null, null, null],
   activeBuffs: [],
-  attackTimer: 0,
   isShinyEnemy: false,
   consumableSlots: { food: null, potion: null },
   autoEatEnabled: false,
 }
 
 const STORE_KEY = 'battleStore'
+/** 2: the enemy is saved as `enemyId`, not as a copy of its data. */
+const SAVE_VERSION = 2
 
 export const BattleStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
-  withGameStateSync(STORE_KEY, initialState),
+  withGameStateSync(STORE_KEY, initialState, { version: SAVE_VERSION }),
   withDevtools(STORE_KEY),
   withComputed((store) => ({
     currentZoneData: () => ZONES_DATA[store.currentZoneId()],
   })),
   withComputed((store) => ({
+    /** The current enemy with its wave-scaled max HP and, if shiny, the shiny sprite. */
+    enemy: (): Enemy | null => {
+      const enemyId = store.enemyId()
+      if (enemyId === null) return null
+      // An id the data no longer has (enemy removed or renumbered): no enemy; the fight is ended on load.
+      const enemy = ENEMIES_DATA[enemyId]
+      if (!enemy) return null
+      const maxHp = Math.round(enemy.maxHp * waveMultipliers(store.currentZoneData(), store.currentWave()).hp)
+      return { ...enemy, maxHp, url: store.isShinyEnemy() ? toShinyUrl(enemy.url) : enemy.url }
+    },
     requiredKillCountOnCurrentWave: () => store.currentWave() === store.currentZoneData().maxWave ? 1 : store.currentZoneData().enemiesPerWave,
   })),
-  withMethods((store, playerStore = inject(PlayerStore)) => ({
-    startBattle(): void {
+  withMethods((store) => ({
+    /** `shinyChance` is the player's stat in percent (passed in: PlayerStore derives its stats from this store). */
+    startBattle(shinyChance: number): void {
       patchState(store, (state) => {
         const zoneData = store.currentZoneData()
         let enemy: Enemy
@@ -70,20 +82,16 @@ export const BattleStore = signalStore(
           enemy = ENEMIES_DATA[zoneData.bossEnemyId]
         }
 
-        const shinyChance = playerStore.stats().shinyChance ?? 0
         const isShiny = shinyChance > 0 && Math.random() * 100 < shinyChance
+        const maxHp = Math.round(enemy.maxHp * waveMultipliers(zoneData, state.currentWave).hp)
 
         return {
           isInCombat: true,
-          enemy: isShiny ? { ...enemy, url: toShinyUrl(enemy.url) } : enemy,
-          currentEnemyHp: enemy.maxHp,
+          enemyId: enemy.id,
+          currentEnemyHp: maxHp,
           isShinyEnemy: isShiny,
         }
       })
-    },
-
-    updateAttackTimer(attackTimer: number): void {
-      patchState(store, { attackTimer })
     },
 
     changeWave(next: boolean): void {
@@ -100,7 +108,7 @@ export const BattleStore = signalStore(
 
           return {
             currentEnemyHp: 0,
-            enemy: null,
+            enemyId: null,
             isInCombat: false,
             isShinyEnemy: false,
             currentWave: wave,
@@ -117,7 +125,7 @@ export const BattleStore = signalStore(
 
           return {
             currentEnemyHp: 0,
-            enemy: null,
+            enemyId: null,
             isInCombat: false,
             isShinyEnemy: false,
             currentWave: wave,
@@ -134,7 +142,7 @@ export const BattleStore = signalStore(
     endBattle(): void {
       patchState(store, {
         currentEnemyHp: 0,
-        enemy: null,
+        enemyId: null,
         isInCombat: false,
         isShinyEnemy: false,
       })
@@ -155,10 +163,10 @@ export const BattleStore = signalStore(
       })
     },
 
-    setSpellCooldown(spellId: SpellID, cooldown: number): void {
+    setSpellCooldown(spellId: SpellID, cooldownMs: number): void {
       patchState(store, (state) => ({
         equippedSpells: state.equippedSpells.map(s =>
-          s && s.spellId === spellId ? { ...s, cooldownRemaining: cooldown } : s,
+          s && s.spellId === spellId ? { ...s, cooldownRemainingMs: cooldownMs } : s,
         ),
       }))
     },
@@ -173,28 +181,24 @@ export const BattleStore = signalStore(
       }))
     },
 
-    tickCooldowns(): void {
-      patchState(store, (state) => ({
-        equippedSpells: state.equippedSpells.map(s =>
-          s && s.cooldownRemaining > 0 ? { ...s, cooldownRemaining: s.cooldownRemaining - 1 } : s,
-        ),
-      }))
-    },
-
-    tickBuffs(): SpellID[] {
-      const expired: SpellID[] = []
-      const remaining: ActiveBuff[] = []
-
-      for (const buff of store.activeBuffs()) {
-        if (buff.secondsRemaining <= 1) {
-          expired.push(buff.spellId)
-        } else {
-          remaining.push({ ...buff, secondsRemaining: buff.secondsRemaining - 1 })
-        }
+    /** Advances spell cooldowns and buffs by `deltaMs`. Writes only when something is running. */
+    tickSpellTimers(deltaMs: number): void {
+      const isCooling = store.equippedSpells().some(s => s && s.cooldownRemainingMs > 0)
+      if (isCooling) {
+        patchState(store, (state) => ({
+          equippedSpells: state.equippedSpells.map(s =>
+            s && s.cooldownRemainingMs > 0 ? { ...s, cooldownRemainingMs: Math.max(0, s.cooldownRemainingMs - deltaMs) } : s,
+          ),
+        }))
       }
 
-      patchState(store, { activeBuffs: remaining })
-      return expired
+      if (store.activeBuffs().length) {
+        patchState(store, (state) => ({
+          activeBuffs: state.activeBuffs
+            .map(buff => ({ ...buff, msRemaining: buff.msRemaining - deltaMs }))
+            .filter(buff => buff.msRemaining > 0),
+        }))
+      }
     },
 
     setConsumable(slot: ConsumableSlot, consumable: ActiveConsumable): void {
@@ -203,9 +207,8 @@ export const BattleStore = signalStore(
       }))
     },
 
-    /** Advances consumable effects and slot locks by one second. Returns the stats of effects that just expired. */
-    tickConsumables(): ConsumableStat[] {
-      const expired: ConsumableStat[] = []
+    /** Advances consumable effects and slot locks by `seconds` (one per tick second; the whole gap offline). */
+    tickConsumables(seconds = 1): void {
       const slots = { ...store.consumableSlots() }
       let changed = false
 
@@ -213,21 +216,15 @@ export const BattleStore = signalStore(
         const active = slots[slot]
         if (!active || (active.effectRemaining === 0 && active.lockRemaining === 0)) continue
 
-        const effectRemaining = Math.max(0, active.effectRemaining - 1)
-        const isEffectExpiring = active.effectRemaining > 0 && effectRemaining === 0
-        if (isEffectExpiring) expired.push(...active.stats)
-
         slots[slot] = {
           ...active,
-          effectRemaining,
-          lockRemaining: Math.max(0, active.lockRemaining - 1),
-          stats: isEffectExpiring ? [] : active.stats,
+          effectRemaining: Math.max(0, active.effectRemaining - seconds),
+          lockRemaining: Math.max(0, active.lockRemaining - seconds),
         }
         changed = true
       }
 
       if (changed) patchState(store, { consumableSlots: slots })
-      return expired
     },
 
     toggleAutoEat(enabled: boolean): void {
@@ -239,7 +236,7 @@ export const BattleStore = signalStore(
         currentZoneId: zoneId,
         currentWave: 1,
         currentEnemyHp: 0,
-        enemy: null,
+        enemyId: null,
         isInCombat: false,
         isShinyEnemy: false,
       })
@@ -249,5 +246,18 @@ export const BattleStore = signalStore(
       patchState(store, initialState)
     },
 
+  })),
+  withHooks((store) => ({
+    // Runs after the save is loaded: a saved fight must still match the data, which may have changed since.
+    onInit() {
+      const enemy = store.enemy()
+      if (store.isInCombat() && !enemy) {
+        // Otherwise combat stalls: no enemy to hit, and no respawn while "in combat".
+        store.endBattle()
+      } else if (enemy && store.currentEnemyHp() > enemy.maxHp) {
+        // Max HP is rebuilt from data; a lowered one must not leave the bar over 100%.
+        store.updateEnemyHp(enemy.maxHp)
+      }
+    },
   })),
 )

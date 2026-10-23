@@ -11,7 +11,6 @@ export type PlayerStat =
     | 'unspentSkillPoints'
     | 'goldCoinsMultiplier'
     | 'manaRegenRate'
-    | 'currentManaRegenTimer'
     | 'magicDamage'
     | 'spellCooldownReduction'
     | 'xpMultiplier'
@@ -50,6 +49,9 @@ export type PlayerStat =
     | 'damageVsHarpy'
     | 'magicDamageMultiplier'
     | 'inventorySlots'
+    | 'maxTaskSlots'
+    | 'taskDoubleKillChance'
+    | 'offlineProgressRate'
 
 export const multiplierStats: PlayerStat[] = [
     'critMulti',

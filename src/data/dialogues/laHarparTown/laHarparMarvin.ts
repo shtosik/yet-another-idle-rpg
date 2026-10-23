@@ -1,5 +1,6 @@
 import { DialogueNode } from '../../../interfaces/dialogues/dialogue-node.interface'
 import { NpcID } from '../../../enums/map/npc-id.enum'
+import { ShopID } from '../../../enums/ids/shop-id.enum'
 
 export enum MarvinDialogue {
   default = 0,
@@ -14,6 +15,9 @@ export enum MarvinDialogue {
 export type LaHarparMarvinDialogueType = Record<MarvinDialogue, DialogueNode<MarvinDialogue>>
 
 const NS = 'dialogues/laHarparMarvin'
+
+/** Task slots that get a cancel option: base 1 plus the Second Contract. Raise it if more slots are added. */
+const MAX_CANCELLABLE_TASKS = 2
 
 const LA_HARPAR_MARVIN: LaHarparMarvinDialogueType = {
   [MarvinDialogue.introduction1]: {
@@ -61,18 +65,39 @@ const LA_HARPAR_MARVIN: LaHarparMarvinDialogueType = {
         results: [{ next: MarvinDialogue.whatIsThisPlace1 }],
       },
       {
-        responseKey: `${NS}:default.taskIntro`,
+        responseKey: `${NS}:default.claimTasks`,
         results: [
           {
             visibilityConditions: [{ type: 'guild', condition: 'taskComplete' }],
             next: MarvinDialogue.taskClaimed,
           },
+        ],
+      },
+      {
+        responseKey: `${NS}:default.taskIntro`,
+        results: [
+          {
+            visibilityConditions: [{ type: 'guild', condition: 'hasFreeTaskSlot' }],
+            next: MarvinDialogue.taskIntro,
+          },
+        ],
+      },
+      {
+        responseKey: `${NS}:default.taskStatus`,
+        results: [
           {
             visibilityConditions: [{ type: 'guild', condition: 'hasActiveTask' }],
             next: MarvinDialogue.taskInProgress,
           },
+        ],
+      },
+      {
+        responseKey: `${NS}:default.store`,
+        results: [
           {
-            next: MarvinDialogue.taskIntro,
+            next: MarvinDialogue.default,
+            effects: [{ type: 'shop', shopId: ShopID.explorersGuildStore }],
+            closeDialogue: true,
           },
         ],
       },
@@ -156,15 +181,17 @@ const LA_HARPAR_MARVIN: LaHarparMarvinDialogueType = {
     id: MarvinDialogue.taskInProgress,
     messageKey: `${NS}:taskInProgress.message`,
     options: [
-      {
+      // One cancel option per task; the dialogue fills in which monster and how many kills are left.
+      ...Array.from({ length: MAX_CANCELLABLE_TASKS }, (_, taskIndex) => ({
         responseKey: `${NS}:taskInProgress.cancel`,
         results: [
           {
+            visibilityConditions: [{ type: 'guild' as const, condition: 'taskInProgressAt' as const, taskIndex }],
             next: MarvinDialogue.default,
-            effects: [{ type: 'guild', action: 'abandonTask' }],
+            effects: [{ type: 'guild' as const, action: 'abandonTask' as const, taskIndex }],
           },
         ],
-      },
+      })),
       {
         responseKey: `${NS}:taskInProgress.back`,
         results: [{ next: MarvinDialogue.default }],

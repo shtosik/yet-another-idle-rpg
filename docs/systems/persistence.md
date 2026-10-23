@@ -1,7 +1,7 @@
 # Persistence
 
 ## Purpose
-Saves game state to `localStorage` on every change and restores it on load. There is no backend and no save file.
+Saves game state to `localStorage` (at most once a second per store) and restores it on load. There is no backend and no save file.
 
 ## Key files
 - `src/app/store/helpers/with-game-state-sync.hook.ts:withGameStateSync` — the whole mechanism.
@@ -9,33 +9,43 @@ Saves game state to `localStorage` on every change and restores it on load. Ther
 
 | Key | Store | Holds |
 |---|---|---|
-| `playerStore` | `src/app/store/player/player.store.ts:PlayerStore` | stats, inventory, equipment, unlocked nodes, stations, recipes, tasks, unlocked content |
-| `battleStore` | `src/app/store/battle/battle.store.ts:BattleStore` | current zone/wave/enemy, spells, buffs, consumable slots |
+| `playerStore` | `src/app/store/player/player.store.ts:PlayerStore` | resources, permanent bonuses, inventory, equipment, unlocked nodes, stations, recipes, tasks, unlocked content |
+| `battleStore` (v2) | `src/app/store/battle/battle.store.ts:BattleStore` | current zone/wave, enemy id + shiny + HP, spells, buffs, consumable slots |
 | `questsStore` | `src/app/store/quests/quests.store.ts:QuestsStore` | quest step progression (completion is step 9999), dialogue flags |
-| `townsStore` | `src/app/store/towns/towns.store.ts:TownsStore` | selected town/building, open shop |
+| `townsStore` (v2) | `src/app/store/towns/towns.store.ts:TownsStore` | selected town and building id (the open shop isn't saved) |
 | `shopStore` | `src/app/store/shop/shop.store.ts:ShopStore` | stock and refresh timers |
 | `campStore` | `src/app/store/camp/camp.store.ts:CampStore` | Camp tab UI selection |
+| `offlineStore` | `src/app/store/offline/offline.store.ts:OfflineStore` | `lastSeenAt` (host time, high-water mark), the kill window (recent online kill intervals on one zone and wave, `offline-progress.md`) |
 
 ## Data flow
-1. Store `onInit`: read `localStorage[key]`, `JSON.parse`, then `merge({}, initialState, parsed)` (lodash deep merge) and `patchState`.
-2. An `effect` writes `JSON.stringify(getState(store))` back on every state change.
+1. Store `onInit`: read `localStorage[key]`, decode it if it starts with `z:` (see Save format), `JSON.parse` the envelope `{ v, state }`. If `v` matches the store's save version, keep only top-level keys that exist in `initialState`, drop `transientKeys`, then `merge({}, initialState, state)` (lodash deep merge) and `patchState`. An **older** version: the save is ignored, the store starts from `initialState` (`console.info`) and the next save overwrites it. A **newer** version (written by a newer build, for example another worktree on the same localhost port): the store starts from `initialState` but doesn't save this session, so the newer save survives (`console.warn`). The parsing is `readSave` (pure, covered by `with-game-state-sync.hook.spec.ts`).
+2. An `effect` marks the store dirty when a saved key changes (transient keys don't count); a 1 s interval writes `JSON.stringify({ v, state })` with the state minus `transientKeys`, inside `try/catch`. Up to 1 s of progress is lost on close. `saveGameStateNow()` writes every store at once, skipping the interval (used by the offline claim).
 3. `GameComponent.resetState` calls `resetState()` on every store, which patches `initialState` back in.
 
+## Save format
+- **Dev builds** (`isDevMode()`): plain JSON, readable and editable in DevTools.
+- **Production builds**: `z:` + lz-string `compressToUTF16(json)`. It keeps casual edits out and makes saves smaller. It is obfuscation, not protection: the decoder ships in the bundle.
+- **No DevTools in production.** `angular.json` `fileReplacements` swaps `store/helpers/devtools.ts` for `devtools.prod.ts`: `withDevToolsStub` and no `provideStoreDevtools`, so Redux DevTools can't read or edit state and its code isn't bundled.
+- **Versioned.** Every save is `{ v, state }`; `v` is the store's `version` option (default 1). A bare state object (saved before versioning) counts as version 1. An object with a `v` must be a valid envelope (`v` a number, `state` a plain object), or the save counts as unreadable.
+- Loading accepts both formats in either build, so a dev save opens in prod and the other way round. The next save rewrites it in the build's own format.
+
 ## Invariants & gotchas
-- **Pre-release: save compatibility is not required.** Renames and renumbers are allowed. After a breaking state change, clear `localStorage` (DevTools → Application → Local Storage).
-- **Renamed or removed keys linger.** The merge keeps every key in the saved JSON, so an old key stays in state (and gets saved again) forever. `resetState()` does not remove them either, because `patchState` only overwrites keys.
+- **Pre-release: save compatibility is not required.** Renames and renumbers are allowed. After a breaking change to a store's saved shape, bump its `version` (`withGameStateSync(KEY, initialState, { version: 2 })`): older saves of that store start fresh, the other stores keep theirs. Running an older branch afterwards leaves the newer save alone.
+- **Save ids, not data.** Store the id of an enemy, building or item and look the data up in a computed; a saved copy of static data goes stale after a data edit (`BattleStore.enemy`, `TownsStore.selectedTownBuilding`).
+- **A saved id can stop resolving.** Renumbering or removing an enum value leaves old saves pointing at nothing. The lookup computed returns `null` for an unknown id, and the store repairs what depends on it on load: `BattleStore` ends a fight whose `enemyId` no longer exists (combat would otherwise stall) and clamps `currentEnemyHp` to the rebuilt max HP. A new id-based lookup needs the same guard.
+- **Removed top-level keys are dropped on load.** Renamed or removed keys nested deeper (inside an object in state) still linger, because the merge keeps them.
 - **New keys pick up defaults.** A key added to `initialState` appears in old saves with its initial value, because of the merge.
 - **Arrays merge by index**, not replace. If `initialState` has a non-empty array and the save has a shorter one, the tail of the initial array survives. Keep initial arrays empty (or accept the effect).
 - **Enum values are what get saved**, never enum names. Renumbering an enum quietly points saved data at different entities.
-- Every state change triggers a full `JSON.stringify` of that store. Avoid high-frequency state updates for anything big (for example, don't put per-tick counters in `PlayerStore` if they can live in a non-persisted signal).
+- **Transient state**: pass per-tick timers and UI state a reload shouldn't restore as `transientKeys` (`{ transientKeys: ['manaRegenTimer'] }`, `activeShopId`), or keep them outside stores (the attack and respawn timers live on `GameIntervalService`). A transient key changing doesn't trigger a save.
+- Clearing `localStorage` by hand: reload within a second, or the next save writes the old state back.
 
 ## Known issues
-- No save version or migration step. Corrupt values (`NaN`, `null`) are never repaired.
-- Saves are written on every state change with no throttling and no `try/catch` around `setItem` (quota errors would throw). Transient timers (attack timer, mana regen timer, cooldowns) live in persisted state, so writes happen up to 10 times a second.
-- `withDevtools` is active on every store in production builds.
+- No migration step: a version bump resets that store. Corrupt values (`NaN`, `null`) are never repaired.
+- A store whose save can't be read (bad JSON, failed decode, not an object, malformed envelope) or is from a newer version logs it, runs from `initialState` and doesn't save for that session, so the unreadable save is never overwritten. "reset state" doesn't save that store either until a reload.
 
 ## Pre-release TODO
-- Add a save version per store and a migration table before the first public release; drop junk keys during migration.
+- Add a migration table (per store, from version N to N+1) before the first public release, so a version bump stops resetting players' progress; drop junk keys during migration.
 
 ## How to extend
-New persisted store: follow the `signalStore(withState, withGameStateSync(KEY, initialState), withDevtools(KEY), …)` pattern, add a `resetState()` method, and call it from `GameComponent.resetState`.
+New persisted store: follow the `signalStore(withState, withGameStateSync(KEY, initialState, { version, transientKeys }), withDevtools(KEY), …)` pattern (import `withDevtools` from `store/helpers/devtools.ts`, never from the toolkit), add a `resetState()` method, and call it from `GameComponent.resetState`.

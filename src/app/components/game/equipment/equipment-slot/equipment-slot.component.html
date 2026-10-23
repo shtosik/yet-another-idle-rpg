@@ -2,7 +2,7 @@
     <div
         class="item"
         [attr.data-tier]="ItemTier[tier]"
-        [tooltipContext]="{ item, tier }"
+        [tooltipContext]="{ item, tier, blocked: unequipBlocked }"
         [tooltipTemplate]="tooltip"
         placement="bottom"
         tooltipClass="tooltip-override"
@@ -24,6 +24,7 @@
     #tooltip
     let-item="item"
     let-tier="tier"
+    let-blocked="blocked"
 >
     <div class="item__tooltip">
         <span>{{ ('items:names.' + ItemID[item.id]) | i18next }}</span>
@@ -36,7 +37,11 @@
             @for (stat of $any(item.stats); track stat.id) {
                 <span class="stat">{{ stat.id | statToPercentage:stat.amount }} {{ ('app:playerStats.' + stat.id) | i18next }}</span>
             }
-            <span class="click">{{ 'items:clickToUnequip' | i18next }}</span>
+            @if (blocked) {
+                <span class="click">{{ 'items:unequipBlockedInventory' | i18next }}</span>
+            } @else {
+                <span class="click">{{ 'items:clickToUnequip' | i18next }}</span>
+            }
         }
     </div>
 </ng-template>

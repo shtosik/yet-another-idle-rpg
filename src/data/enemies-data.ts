@@ -18,9 +18,10 @@ const drop = (id: ItemID, minAmount: number, maxAmount: number, chance: number):
 const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   [EnemyID.greenSlime]: {
     id: EnemyID.greenSlime,
-    maxHp: 2,
+    maxHp: 10,
     weakness: DamageElement.fire,
-    experience: 5,
+    experience: 18,
+    gold: 9,
     drops: [
       drop(ItemID.slimeResidue, 1, 2, 3),
       drop(ItemID.waterRune, 1, 1, 5),
@@ -32,9 +33,10 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   },
   [EnemyID.redSlime]: {
     id: EnemyID.redSlime,
-    maxHp: 3,
+    maxHp: 15,
     weakness: DamageElement.water,
-    experience: 5,
+    experience: 18,
+    gold: 9,
     drops: [
       drop(ItemID.slimeResidue, 1, 2, 3),
       drop(ItemID.waterRune, 1, 1, 5),
@@ -46,9 +48,10 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   },
   [EnemyID.blueSlime]: {
     id: EnemyID.blueSlime,
-    maxHp: 2,
+    maxHp: 10,
     weakness: DamageElement.air,
-    experience: 5,
+    experience: 18,
+    gold: 9,
     drops: [
       drop(ItemID.slimeResidue, 1, 2, 3),
       drop(ItemID.waterRune, 1, 1, 5),
@@ -60,9 +63,10 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   },
   [EnemyID.kingSlime]: {
     id: EnemyID.kingSlime,
-    maxHp: 100,
+    maxHp: 300,
     weakness: DamageElement.fire,
-    experience: 40,
+    experience: 180,
+    gold: 90,
     drops: [
       drop(ItemID.slimeGoldenCrown, 1, 1, 10),
       drop(ItemID.slimeResidue, 1, 10, 1),
@@ -77,7 +81,8 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     id: EnemyID.crab,
     maxHp: 2,
     weakness: DamageElement.physical,
-    experience: 5,
+    experience: 4,
+    gold: 2,
     drops: [
       drop(ItemID.crabMeat, 1, 1, 2),
       drop(ItemID.stick, 1, 1, 4),
@@ -89,9 +94,10 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   },
   [EnemyID.seagull]: {
     id: EnemyID.seagull,
-    maxHp: 3,
+    maxHp: 4,
     weakness: DamageElement.physical,
-    experience: 8,
+    experience: 6,
+    gold: 3,
     drops: [
       drop(ItemID.feather, 1, 2, 2),
       drop(ItemID.stick, 1, 1, 4),
@@ -105,9 +111,10 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   },
   [EnemyID.turtle]: {
     id: EnemyID.turtle,
-    maxHp: 5,
+    maxHp: 6,
     weakness: DamageElement.fire,
-    experience: 10,
+    experience: 8,
+    gold: 4,
     drops: [
       drop(ItemID.turtleShell, 1, 1, 3),
       drop(ItemID.stick, 1, 1, 4),
@@ -119,9 +126,10 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   },
   [EnemyID.gangsterCrab]: {
     id: EnemyID.gangsterCrab,
-    maxHp: 50,
+    maxHp: 100,
     weakness: DamageElement.physical,
-    experience: 50,
+    experience: 60,
+    gold: 30,
     drops: [
       drop(ItemID.knife, 1, 1, 10),
       drop(ItemID.crabMeat, 1, 3, 1),
@@ -134,9 +142,10 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   },
   [EnemyID.rat]: {
     id: EnemyID.rat,
-    maxHp: 8,
+    maxHp: 4,
     weakness: DamageElement.fire,
-    experience: 11,
+    experience: 6,
+    gold: 3,
     drops: [
       drop(ItemID.ratTail, 1, 1, 1),
       drop(ItemID.cheese, 1, 1, 8),
@@ -148,9 +157,10 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   },
   [EnemyID.giantRat]: {
     id: EnemyID.giantRat,
-    maxHp: 75,
+    maxHp: 100,
     weakness: DamageElement.fire,
-    experience: 100,
+    experience: 60,
+    gold: 30,
     drops: [
       drop(ItemID.ratTail, 1, 1, 1),
       drop(ItemID.cheese, 1, 3, 2),
@@ -164,9 +174,10 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   },
   [EnemyID.wolf]: {
     id: EnemyID.wolf,
-    maxHp: 50,
+    maxHp: 34,
     weakness: DamageElement.fire,
-    experience: 30,
+    experience: 43,
+    gold: 22,
     drops: [
       drop(ItemID.wolfFangs, 1, 3, 2),
       petDrop(EnemyID.wolf),
@@ -177,9 +188,10 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   },
   [EnemyID.deer]: {
     id: EnemyID.deer,
-    maxHp: 25,
+    maxHp: 17,
     weakness: DamageElement.fire,
-    experience: 20,
+    experience: 29,
+    gold: 14,
     drops: [
       drop(ItemID.deerPelt, 1, 1, 4),
       drop(ItemID.venison, 1, 1, 3),
@@ -191,9 +203,10 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   },
   [EnemyID.bandit]: {
     id: EnemyID.bandit,
-    maxHp: 75,
+    maxHp: 600,
     weakness: DamageElement.air,
-    experience: 50,
+    experience: 360,
+    gold: 180,
     drops: [
       drop(ItemID.vialOfWater, 1, 1, 6),
       drop(ItemID.trophyNecklace, 1, 1, 100),
@@ -208,9 +221,10 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   },
   [EnemyID.goblinScout]: {
     id: EnemyID.goblinScout,
-    maxHp: 30,
+    maxHp: 21,
     weakness: DamageElement.fire,
-    experience: 25,
+    experience: 36,
+    gold: 18,
     drops: [petDrop(EnemyID.goblinScout)],
     shinyDrops: shinyPetDrops(EnemyID.goblinScout),
     url: './assets/img/enemies/goblinScout.png',
@@ -219,43 +233,52 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   // ── Mountain Pass (Zone 5) ────────────────────────────────────────────────
   [EnemyID.mountainBat]: {
     id: EnemyID.mountainBat,
-    maxHp: 45,
+    maxHp: 37,
     weakness: DamageElement.fire,
-    experience: 55,
-    drops: [drop(ItemID.vialOfWater, 1, 1, 8)],
+    experience: 64,
+    gold: 27,
+    drops: [drop(ItemID.vialOfWater, 1, 1, 8), petDrop(EnemyID.mountainBat)],
+    shinyDrops: shinyPetDrops(EnemyID.mountainBat),
     url: './assets/img/enemies/mountainBat.png',
     enemyTypes: [EnemyType.mammal],
   },
   [EnemyID.goat]: {
     id: EnemyID.goat,
-    maxHp: 60,
+    maxHp: 49,
     weakness: DamageElement.physical,
-    experience: 60,
+    experience: 70,
+    gold: 27,
     drops: [
       drop(ItemID.deerPelt, 1, 1, 4),
+      petDrop(EnemyID.goat),
       drop(ItemID.venison, 1, 1, 3),
       drop(ItemID.venisonRoastRecipe, 1, 1, 12),
     ],
+    shinyDrops: shinyPetDrops(EnemyID.goat),
     url: './assets/img/enemies/goat.png',
     enemyTypes: [EnemyType.mammal],
   },
   [EnemyID.goblinScavenger]: {
     id: EnemyID.goblinScavenger,
-    maxHp: 70,
+    maxHp: 58,
     weakness: DamageElement.fire,
-    experience: 70,
+    experience: 82,
+    gold: 54,
     drops: [
       drop(ItemID.stick, 1, 1, 4),
       drop(ItemID.stone, 1, 2, 3),
+      petDrop(EnemyID.goblinScavenger),
     ],
+    shinyDrops: shinyPetDrops(EnemyID.goblinScavenger),
     url: './assets/img/enemies/goblinScavenger.png',
     enemyTypes: [EnemyType.goblin, EnemyType.humanoid],
   },
   [EnemyID.troll]: {
     id: EnemyID.troll,
-    maxHp: 200,
+    maxHp: 1200,
     weakness: DamageElement.water,
-    experience: 500,
+    experience: 720,
+    gold: 360,
     drops: [petDrop(EnemyID.troll)],
     shinyDrops: shinyPetDrops(EnemyID.troll),
     url: './assets/img/enemies/troll.png',
@@ -264,9 +287,10 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   // ── Elderwood Wilds (Zone 6) ──────────────────────────────────────────────
   [EnemyID.forestSpider]: {
     id: EnemyID.forestSpider,
-    maxHp: 20,
+    maxHp: 82,
     weakness: DamageElement.fire,
-    experience: 18,
+    experience: 130,
+    gold: 65,
     drops: [
       drop(ItemID.spiderSilk, 1, 2, 3),
       drop(ItemID.vialOfWater, 1, 1, 8),
@@ -278,9 +302,10 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   },
   [EnemyID.gnollScout]: {
     id: EnemyID.gnollScout,
-    maxHp: 35,
+    maxHp: 144,
     weakness: DamageElement.physical,
-    experience: 28,
+    experience: 202,
+    gold: 108,
     drops: [
       drop(ItemID.wolfFangs, 1, 1, 3),
       drop(ItemID.stick, 1, 1, 4),
@@ -293,9 +318,10 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   },
   [EnemyID.corruptedSapling]: {
     id: EnemyID.corruptedSapling,
-    maxHp: 15,
+    maxHp: 62,
     weakness: DamageElement.fire,
-    experience: 14,
+    experience: 101,
+    gold: 43,
     drops: [
       drop(ItemID.stick, 1, 2, 3),
       drop(ItemID.apple, 1, 1, 5),
@@ -308,9 +334,10 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   },
   [EnemyID.gnollWarchief]: {
     id: EnemyID.gnollWarchief,
-    maxHp: 250,
+    maxHp: 2400,
     weakness: DamageElement.air,
-    experience: 350,
+    experience: 1440,
+    gold: 720,
     drops: [
       drop(ItemID.gnollTrophy, 1, 1, 2),
       drop(ItemID.wolfFangs, 1, 3, 1),
@@ -325,9 +352,10 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   // ── The Deepwood (Zone 7) ─────────────────────────────────────────────────
   [EnemyID.elderSpider]: {
     id: EnemyID.elderSpider,
-    maxHp: 55,
+    maxHp: 206,
     weakness: DamageElement.fire,
-    experience: 60,
+    experience: 294,
+    gold: 142,
     drops: [
       drop(ItemID.elderSilk, 1, 2, 3),
       drop(ItemID.spiderFang, 1, 1, 4),
@@ -339,9 +367,10 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   },
   [EnemyID.forestBear]: {
     id: EnemyID.forestBear,
-    maxHp: 80,
+    maxHp: 300,
     weakness: DamageElement.physical,
-    experience: 90,
+    experience: 441,
+    gold: 197,
     drops: [
       drop(ItemID.bearPelt, 1, 1, 4),
       drop(ItemID.earthRune, 1, 1, 5),
@@ -353,9 +382,10 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   },
   [EnemyID.bogSkeleton]: {
     id: EnemyID.bogSkeleton,
-    maxHp: 40,
+    maxHp: 150,
     weakness: DamageElement.fire,
-    experience: 45,
+    experience: 221,
+    gold: 158,
     drops: [
       drop(ItemID.boneFragment, 1, 2, 3),
       drop(ItemID.earthRune, 1, 1, 5),
@@ -367,9 +397,10 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   },
   [EnemyID.treantSprout]: {
     id: EnemyID.treantSprout,
-    maxHp: 30,
+    maxHp: 112,
     weakness: DamageElement.fire,
-    experience: 40,
+    experience: 196,
+    gold: 79,
     drops: [
       drop(ItemID.ancientWood, 1, 1, 3),
       drop(ItemID.earthRune, 1, 1, 5),
@@ -382,9 +413,10 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   },
   [EnemyID.gnarledTreant]: {
     id: EnemyID.gnarledTreant,
-    maxHp: 500,
+    maxHp: 4800,
     weakness: DamageElement.fire,
-    experience: 800,
+    experience: 2880,
+    gold: 1440,
     drops: [
       drop(ItemID.ancientWood, 1, 5, 1),
       drop(ItemID.heartwoodAmulet, 1, 1, 40),
@@ -399,9 +431,10 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   // ── The Upper Canopy (Zone 8) ─────────────────────────────────────────────
   [EnemyID.harpy]: {
     id: EnemyID.harpy,
-    maxHp: 45,
+    maxHp: 296,
     weakness: DamageElement.physical,
-    experience: 55,
+    experience: 453,
+    gold: 199,
     drops: [
       drop(ItemID.harpyFeather, 1, 2, 3),
       drop(ItemID.airRune, 1, 1, 5),
@@ -413,9 +446,10 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   },
   [EnemyID.giantEagle]: {
     id: EnemyID.giantEagle,
-    maxHp: 60,
+    maxHp: 395,
     weakness: DamageElement.physical,
-    experience: 75,
+    experience: 617,
+    gold: 222,
     drops: [
       drop(ItemID.eagleTalon, 1, 1, 4),
       drop(ItemID.airRune, 1, 1, 5),
@@ -427,9 +461,10 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   },
   [EnemyID.canopyBandit]: {
     id: EnemyID.canopyBandit,
-    maxHp: 70,
+    maxHp: 461,
     weakness: DamageElement.air,
-    experience: 80,
+    experience: 658,
+    gold: 443,
     drops: [
       drop(ItemID.vialOfWater, 1, 1, 6),
       drop(ItemID.machete, 1, 1, 80),
@@ -441,9 +476,10 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   },
   [EnemyID.harpyMatriarch]: {
     id: EnemyID.harpyMatriarch,
-    maxHp: 600,
+    maxHp: 9600,
     weakness: DamageElement.physical,
-    experience: 1200,
+    experience: 5760,
+    gold: 2880,
     drops: [
       drop(ItemID.matriarchPlume, 1, 1, 1),
       drop(ItemID.stoneArrow, 2, 5, 1),

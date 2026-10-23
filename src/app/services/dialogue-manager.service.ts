@@ -1,14 +1,18 @@
 import { DialogueNode } from '../../interfaces/dialogues/dialogue-node.interface'
 import { computed, inject, Injectable, signal } from '@angular/core'
-import { PlayerStore } from '../store/player/player.store'
+import { isTaskDone, PlayerStore } from '../store/player/player.store'
 import { DialogueEffect, QuestEffect } from '../../types/dialogues/dialogue-effect.type'
 import { QuestsStore } from '../store/quests/quests.store'
 import { DialogueOption, DialogueResult } from '../../interfaces/dialogues/dialogue-option.type'
 import { DialogueCondition } from '../../types/dialogues/dialogue-condition.type'
 import { NpcID } from '../../enums/map/npc-id.enum'
 import npcData, { NPCProps } from '../../data/npc-data'
-import { RequirementProps } from '../../data/quests-data'
-import { matchesQuestState } from './quest-status'
+import QUEST_DATA, { RequirementProps } from '../../data/quests-data'
+import { getQuestStatus, getStepItems, matchesQuestState } from './quest-status'
+import { QuestID } from '../../enums/ids/quest-id.enum'
+import { QuestState } from '../../enums/quest-state.enum'
+import { QuestStep } from '../../types/quests/quest-progression.type'
+import { ItemStack } from '../store/player/inventory'
 import { ExplorationGuildService } from './exploration-guild.service'
 import { TownsStore } from '../store/towns/towns.store'
 
@@ -30,6 +34,7 @@ export class DialogueManagerService {
 
   activeNpc = signal<NPCProps | null>(null)
 
+  /** The shown and executed branch: the first result whose conditions pass, skipping quest starts that aren't available. */
   getActiveResult<T>(option: DialogueOption<T>): DialogueResult<T> | undefined {
     if (!option.results || option.results.length === 0) return undefined
 
@@ -37,27 +42,76 @@ export class DialogueManagerService {
       const questStart = result.effects?.find(
         (e): e is QuestEffect => e.type === 'quest' && e.action === 'start',
       )
-      if (questStart && this.questStore.getQuestStep(questStart.questId) !== undefined) {
-        return false
-      }
+      if (questStart && !this.isQuestAvailable(questStart.questId)) return false
 
-      if (!result.visibilityConditions || result.visibilityConditions.length === 0) return true
-
-      return result.visibilityConditions.every(condition => this.checkCondition(condition))
+      return this.checkConditions(result.visibilityConditions)
     })
   }
 
-  selectOption(option: DialogueOption<any>) {
-    const validResult = option.results.find(res =>
-      this.checkConditions(res.visibilityConditions),
+  private isQuestAvailable(questId: QuestID): boolean {
+    return matchesQuestState(
+      this.questStore.questStepProgression(),
+      questId,
+      QuestState.available,
+      req => this.checkRequirement(req, questId),
     )
+  }
+
+  /** False when the result's rewards would not fit in the inventory, or its gold fee can't be paid. */
+  canApplyResult(result: DialogueResult<any> | undefined): boolean {
+    return this.missingSlots(result) === 0 && this.missingGold(result) === 0
+  }
+
+  /** Gold still needed to pay the result's `deduct` effects (owner decision: gold never goes negative). */
+  missingGold(result: DialogueResult<any> | undefined): number {
+    const fee = (result?.effects ?? []).reduce((sum, effect) =>
+      effect.type === 'stat' && effect.action === 'deduct'
+        ? sum + effect.stats.filter(s => s.stat === 'goldCoins').reduce((s, g) => s + g.amount, 0)
+        : sum, 0)
+    return Math.max(0, fee - this.playerStore.stats().goldCoins)
+  }
+
+  /** Slots the player must free before the result's item or quest-completion rewards fit. */
+  missingSlots(result: DialogueResult<any> | undefined): number {
+    if (!result?.effects) return 0
+
+    const adding: ItemStack[] = []
+    const removing: ItemStack[] = []
+
+    for (const effect of result.effects) {
+      if (effect.type === 'item') {
+        const stacks = effect.items.map(i => ({ id: i.itemId, amount: i.amount }))
+        if (effect.action === 'give') adding.push(...stacks)
+        else removing.push(...stacks)
+      } else if (effect.type === 'quest' && effect.action !== 'start') {
+        const status = getQuestStatus(this.questStore.questStepProgression(), effect.questId)
+        if (status.state !== QuestState.active) continue
+
+        removing.push(...getStepItems(effect.questId, status.step))
+        adding.push(...this.questCompletionRewards(effect, status.step))
+      }
+    }
+
+    return adding.length === 0 ? 0 : this.playerStore.missingSlotsFor(adding, removing)
+  }
+
+  private questCompletionRewards(effect: QuestEffect, step: QuestStep): ItemStack[] {
+    const questData = QUEST_DATA[effect.questId]
+    const completes = effect.action === 'end' || step >= questData.steps.length
+    if (!completes) return []
+
+    return questData.rewards.flatMap(r => r.type === 'item' ? [{ id: r.itemId, amount: r.amount }] : [])
+  }
+
+  selectOption(option: DialogueOption<any>) {
+    const validResult = this.getActiveResult(option)
 
     if (!validResult) {
       console.error('No valid branch found for option:', option.responseKey)
       return
     }
 
-    if (!this.checkConditions(validResult.requirementsNeeded)) {
+    if (!this.checkConditions(validResult.requirementsNeeded) || !this.canApplyResult(validResult)) {
       return
     }
 
@@ -101,6 +155,8 @@ export class DialogueManagerService {
 
   checkCondition(c: DialogueCondition): boolean {
     switch (c.type) {
+      case 'flag':
+        return !!this.questStore.dialogueFlags()[c.name] === c.isSet
       case 'stat':
         return c.comparison === 'gte'
           ? (this.playerStore.stats()[c.stat] as number) >= c.amount
@@ -116,7 +172,7 @@ export class DialogueManagerService {
           this.questStore.questStepProgression(),
           c.questId,
           c.questState,
-          req => this.checkRequirement(req),
+          req => this.checkRequirement(req, c.questId),
           c.step,
         )
       case 'item':
@@ -141,24 +197,29 @@ export class DialogueManagerService {
             this.questStore.questStepProgression(),
             req.questId,
             req.questState,
-            r => this.checkRequirement(r),
+            r => this.checkRequirement(r, req.questId),
             req.step,
           ),
         )
-      case 'guild': {
-        const task = this.playerStore.activeTask()
+      case 'guild':
         switch (c.condition) {
-          case 'hasActiveTask':  return !!task && task.currentCount < task.targetCount
-          case 'taskComplete':   return !!task && task.currentCount >= task.targetCount
-          case 'noActiveTask':   return !task
+          case 'hasActiveTask':   return this.playerStore.hasTaskInProgress()
+          case 'taskComplete':    return this.playerStore.hasCompletedTask()
+          case 'noActiveTask':    return this.playerStore.activeTasks().length === 0
+          case 'hasFreeTaskSlot': return this.playerStore.hasAvailableTaskSlot()
+          case 'taskInProgressAt': {
+            const task = this.playerStore.activeTasks()[c.taskIndex ?? 0]
+            return !!task && !isTaskDone(task)
+          }
         }
-      }
+        return false
       default:
         return false
     }
   }
 
-  private checkRequirement(req: RequirementProps): boolean {
+  /** Kill requirements of `questId` count kills since its current step started. */
+  private checkRequirement(req: RequirementProps, questId: QuestID): boolean {
     switch (req.type) {
       case 'stat':
         const stats = this.playerStore.stats()
@@ -167,7 +228,7 @@ export class DialogueManagerService {
       case 'item':
         return this.playerStore.itemCount(req.itemId) >= req.amount
       case 'enemy':
-        return this.playerStore.enemyKillCounts()[req.enemyId] >= req.amount
+        return this.questStore.questEnemyKills(questId, req.enemyId) >= req.amount
       case 'quest':
         const currentProgress = this.questStore.getQuestStep(req.questId)
 
@@ -175,7 +236,7 @@ export class DialogueManagerService {
 
         return req.step !== undefined ? currentProgress === req.step : true
       case 'wave':
-        return this.playerStore.getKillCountByZoneAndWave(req.zoneId, req.wave) >= req.amount
+        return this.questStore.questWaveKills(questId, req.zoneId, req.wave) >= req.amount
       default:
         return false
     }
@@ -222,16 +283,12 @@ export class DialogueManagerService {
             case 'acceptTask':
               this.guildService.acceptTask(effect.taskLength)
               break
-            case 'abandonTask': {
-              const task = this.playerStore.activeTask()
-              if (task) this.playerStore.abandonTask(task.id)
+            case 'abandonTask':
+              this.playerStore.abandonTask(effect.taskIndex ?? 0)
               break
-            }
-            case 'claimTask': {
-              const task = this.playerStore.activeTask()
-              if (task) this.playerStore.claimTaskReward(task.id)
+            case 'claimTask':
+              this.playerStore.claimCompletedTasks()
               break
-            }
           }
           break
       }

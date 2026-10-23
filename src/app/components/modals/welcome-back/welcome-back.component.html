@@ -1,0 +1,38 @@
+<app-close-button (onClose)="close()"/>
+<div class="welcome-back">
+  <h2 class="welcome-back__title">{{ 'app:offline.title' | i18next }}</h2>
+  <p class="welcome-back__away">{{ 'app:offline.away' | i18next: { hours, minutes } }}</p>
+
+  <ul class="welcome-back__stats">
+    <li>{{ 'app:offline.kills' | i18next: { count: summary.kills } }}</li>
+    @if (summary.shinies) {
+      <li class="welcome-back__shiny">{{ 'app:offline.shinies' | i18next: { count: summary.shinies } }}</li>
+    }
+    <li>+{{ summary.experience | number }} {{ 'app:playerStats.experience' | i18next }}</li>
+    @if (summary.levelsGained) {
+      <li>{{ 'app:offline.levels' | i18next: { count: summary.levelsGained } }}</li>
+    }
+    <li>+{{ summary.gold | number }} {{ 'app:playerStats.goldCoins' | i18next }}</li>
+  </ul>
+
+  @if (summary.items.length) {
+    <div class="welcome-back__items">
+      @for (item of summary.items; track item.id + ':' + item.tier) {
+        <app-slot>
+          <app-inventory-slot
+            [item]="ITEM_DATA[item.id]"
+            [tier]="item.tier"
+            [amount]="item.amount"
+            [clickable]="false"
+          />
+        </app-slot>
+      }
+    </div>
+  }
+
+  @if (summary.lostDrops) {
+    <p class="welcome-back__lost">{{ 'app:offline.lostDrops' | i18next: { count: summary.lostDrops } }}</p>
+  }
+
+  <button class="welcome-back__cta" (click)="close()">{{ 'app:offline.collect' | i18next }}</button>
+</div>

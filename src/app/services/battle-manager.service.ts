@@ -7,9 +7,8 @@ import { SkillNodeID } from '../../enums/ids/skill-node-id.enum'
 import { SpellID } from '../../enums/ids/spell-id.enum'
 import SPELLS_DATA from '../../data/spells-data'
 import { SpellType } from '../../enums/spell-type.enum'
-import { SpellBuffEffectProps } from '../../interfaces/spell.interface'
 import { Enemy } from '../../interfaces/enemy.interface'
-import { UNLOCK_RULES, ZONE_UNLOCK_NOTIFICATIONS } from '../../data/unlock-conditions'
+import { ZONE_UNLOCK_NOTIFICATIONS } from '../../data/unlock-conditions'
 import { ModalService } from './modal.service'
 import { DamageElement } from '../../enums/damage-element.enum'
 import { getActiveQuestIds } from './quest-status'
@@ -17,6 +16,11 @@ import { resolveHit } from './hit-resolution'
 import { ItemID } from '../../enums/ids/item-id.enum'
 import ITEM_DATA from '../../data/items-data'
 import { isConsumableItem } from '../../interfaces/item.interface'
+import { OfflineStore } from '../store/offline/offline.store'
+
+/** Cooldown reduction can't push a spell below this. */
+const MIN_SPELL_COOLDOWN_IN_SECONDS = 1
+const MS_PER_SECOND = 1000
 
 @Injectable({ providedIn: 'root' })
 export class BattleManagerService {
@@ -25,6 +29,7 @@ export class BattleManagerService {
   private questsStore = inject(QuestsStore)
   private animations = inject(AnimationsService)
   private modalService = inject(ModalService)
+  private offlineStore = inject(OfflineStore)
 
   currentWaveKillCount = computed(() => {
     const zoneProgression = this.playerStore.zonesProgression()[this.battleStore.currentZoneId()] || {}
@@ -77,25 +82,32 @@ export class BattleManagerService {
     return this.playerStore.stats().mana >= spellData.baseManaCost
   }
 
-  castSpell(spellId: SpellID) {
-    const spellData = SPELLS_DATA[spellId]
-    const stats = this.playerStore.stats()
-    const cooldown = spellData.baseCooldown - stats.spellCooldownReduction
+  /** Seconds, after `spellCooldownReduction`, never below `MIN_SPELL_COOLDOWN_IN_SECONDS`. */
+  spellCooldown(spellId: SpellID): number {
+    const reduced = SPELLS_DATA[spellId].baseCooldown - this.playerStore.stats().spellCooldownReduction
+    return Math.max(MIN_SPELL_COOLDOWN_IN_SECONDS, reduced)
+  }
 
-    // for buff re-cast: don't charge costs, but keep existing cooldown behaviour
-    if (spellData.effect.type === SpellType.buff) {
-      const alreadyActive = this.battleStore.activeBuffs().some(b => b.spellId === spellId)
-      if (alreadyActive) {
-        this.battleStore.setSpellCooldown(spellId, cooldown)
-        return
-      }
+  /**
+   * Equipped, off cooldown and affordable. Damage spells need a living enemy; buffs can be cast between fights
+   * but not while already active.
+   */
+  canCast(spellId: SpellID): boolean {
+    const slot = this.battleStore.equippedSpells().find(s => s?.spellId === spellId)
+    if (!slot || slot.cooldownRemainingMs > 0 || !this.canAffordSpell(spellId)) return false
+
+    if (SPELLS_DATA[spellId].effect.type === SpellType.buff) {
+      return !this.battleStore.activeBuffs().some(b => b.spellId === spellId)
     }
+    return this.battleStore.isInCombat()
+  }
 
-    if (!this.canAffordSpell(spellId)) return
+  castSpell(spellId: SpellID) {
+    if (!this.canCast(spellId)) return
 
+    const spellData = SPELLS_DATA[spellId]
     this.playerStore.updatePlayerStats([{ stat: 'mana', amount: -spellData.baseManaCost }])
-
-    this.battleStore.setSpellCooldown(spellId, cooldown)
+    this.battleStore.setSpellCooldown(spellId, this.spellCooldown(spellId) * MS_PER_SECOND)
 
     switch (spellData.effect.type) {
       case SpellType.melee:
@@ -105,36 +117,38 @@ export class BattleManagerService {
         this.doDamage(spellData.effect.baseDamage, false, spellData.effect.damageType)
         break
       case SpellType.buff: {
-        const seconds = spellData.effect.duration + stats.increasedSpellDuration
-        this.battleStore.addActiveBuff({ spellId, secondsRemaining: seconds })
-        this.playerStore.updatePlayerStats([{ stat: spellData.effect.stat, amount: spellData.effect.amount }])
+        // The stat change itself is derived from activeBuffs (PlayerStore.stats).
+        const seconds = spellData.effect.duration + this.playerStore.stats().increasedSpellDuration
+        this.battleStore.addActiveBuff({ spellId, msRemaining: seconds * MS_PER_SECOND })
         break
       }
     }
   }
 
-  equipSpell(spellId: SpellID) {
-    if (this.battleStore.equippedSpells().some(s => s?.spellId === spellId)) return
-    this.battleStore.addSpell({ spellId, cooldownRemaining: 0 })
+  /** A slot holding a spell on cooldown can't be emptied or given another spell. */
+  isSpellSlotLocked(spellId: SpellID): boolean {
+    return this.battleStore.equippedSpells().some(s => s?.spellId === spellId && s.cooldownRemainingMs > 0)
   }
 
-  unequipSpell(spellId: SpellID) {
+  equipSpell(spellId: SpellID) {
+    if (this.battleStore.equippedSpells().some(s => s?.spellId === spellId)) return
+    this.battleStore.addSpell({ spellId, cooldownRemainingMs: 0 })
+  }
+
+  /** Skips a spell on cooldown unless `force` (refund and respec remove the spell itself). */
+  unequipSpell(spellId: SpellID, force = false) {
+    if (!force && this.isSpellSlotLocked(spellId)) return
     const remaining = this.battleStore.equippedSpells().map(s => s?.spellId === spellId ? null : s)
     this.battleStore.setAllEquippedSpells(remaining)
   }
 
-  tickSpells(): void {
-    this.battleStore.tickCooldowns()
-    const expired = this.battleStore.tickBuffs()
-    for (const spellId of expired) {
-      const effect = SPELLS_DATA[spellId].effect as SpellBuffEffectProps
-      this.playerStore.updatePlayerStats([{ stat: effect.stat, amount: -effect.amount }])
-    }
+  tickSpells(deltaMs: number): void {
+    this.battleStore.tickSpellTimers(deltaMs)
+  }
 
-    const expiredConsumableStats = this.battleStore.tickConsumables()
-    if (expiredConsumableStats.length) {
-      this.playerStore.updatePlayerStats(expiredConsumableStats.map(({ stat, amount }) => ({ stat, amount: -amount })))
-    }
+  /** Once per second: consumable effects and locks, then auto-eat. */
+  tickConsumables(): void {
+    this.battleStore.tickConsumables()
     this.autoEat()
   }
 
@@ -153,15 +167,11 @@ export class BattleManagerService {
     // Don't waste a pure mana potion at full mana.
     if (manaRestore > 0 && !stats.length && manaGained <= 0) return
 
-    // The effect can never outlast the slot lock.
+    // The effect can never outlast the slot lock. Its stats are derived from the slot (PlayerStore.stats).
     const effectRemaining = Math.min(duration, cooldown)
-    const appliedStats = effectRemaining > 0 ? stats : []
 
-    this.playerStore.updatePlayerStats([
-      ...appliedStats,
-      ...(manaGained > 0 ? [{ stat: 'mana' as const, amount: manaGained }] : []),
-    ])
-    this.battleStore.setConsumable(slot, { itemId, effectRemaining, lockRemaining: cooldown, stats: appliedStats })
+    this.battleStore.setConsumable(slot, { itemId, effectRemaining, lockRemaining: cooldown })
+    if (manaGained > 0) this.playerStore.updatePlayerStats([{ stat: 'mana', amount: manaGained }])
     this.playerStore.removeItems([{ id: itemId, amount: 1 }])
   }
 
@@ -181,13 +191,16 @@ export class BattleManagerService {
 
     const isShiny = this.battleStore.isShinyEnemy()
     this.battleStore.endBattle()
+    this.offlineStore.recordKill(performance.now(), zoneId, wave)
     const activeQuestIds = getActiveQuestIds(this.questsStore.questStepProgression())
     this.playerStore.processBattleEnd(enemy.id, zoneId, wave, isShiny, activeQuestIds)
 
-    this.checkUnlocks(wave)
+    this.unlockNextZone(wave)
 
     const currentKillCount = this.currentWaveKillCount()
+    // The toggle alone isn't enough: the node may have been refunded since it was switched on.
     const isAutoEnabled = this.battleStore.autoWaveProgressionEnabled()
+      && this.playerStore.hasSkillUnlocked(SkillNodeID.autoWaveProgression)
     const requiredKills = this.battleStore.requiredKillCountOnCurrentWave()
     const isEnoughKillCountToProgress = currentKillCount >= requiredKills
 
@@ -196,7 +209,11 @@ export class BattleManagerService {
     }
   }
 
-  private checkUnlocks(wave: number): void {
+  /**
+   * A kill on `wave` of the current zone: the boss opens the next zone (online kills and offline claims).
+   * Town and feature unlocks (`UNLOCK_RULES`) are `UnlockService`'s job.
+   */
+  unlockNextZone(wave: number): void {
     const zoneData = this.battleStore.currentZoneData()
     const isBossWave = wave === zoneData.maxWave
 
@@ -204,25 +221,6 @@ export class BattleManagerService {
       this.playerStore.unlockZone(zoneData.nextZoneId)
       const notification = ZONE_UNLOCK_NOTIFICATIONS[zoneData.nextZoneId]
       if (notification) this.modalService.openUnlockNotification(notification)
-    }
-
-    this.checkProgressionUnlocks(wave)
-  }
-
-  private checkProgressionUnlocks(wave: number): void {
-    const currentZoneId = this.battleStore.currentZoneId()
-
-    for (const rule of UNLOCK_RULES) {
-      const { condition, target } = rule
-      if (this.playerStore.isUnlockTargetUnlocked(target)) continue
-
-      const isMet = condition.type === 'waveReached'
-        ? currentZoneId === condition.zoneId && wave >= condition.wave
-        : this.playerStore.isPlayerStateConditionMet(condition)
-      if (!isMet) continue
-
-      this.playerStore.applyUnlockTarget(target)
-      if (rule.notification) this.modalService.openUnlockNotification(rule.notification)
     }
   }
 }

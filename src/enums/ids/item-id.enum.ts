@@ -136,8 +136,19 @@ export enum ItemID {
     cookingPot = 122,
     mortarAndPestle = 123,
     runeAltar = 124,
+    // Mountain Pass pets
+    petMountainBat = 125,
+    petGoat = 126,
+    petGoblinScavenger = 127,
+    shinyPetMountainBat = 128,
+    shinyPetGoat = 129,
+    shinyPetGoblinScavenger = 130,
+    // Explorer Token shop
+    guildSatchel = 131,
+    secondContract = 132,
+    bountyMark = 133,
     // venison roast
-    venison = 125,
-    venisonRoast = 126,
-    venisonRoastRecipe = 127,
+    venison = 134,
+    venisonRoast = 135,
+    venisonRoastRecipe = 136,
 }

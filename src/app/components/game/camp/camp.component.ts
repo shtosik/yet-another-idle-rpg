@@ -55,6 +55,7 @@ export class CampComponent {
     if (!active) return []
 
     const inventory = this.playerStore.inventory()
+    const capacity = this.playerStore.stats().inventorySlots
     const stations = this.playerStore.stations()
     const unlockedRecipes = this.playerStore.unlockedRecipes()
 
@@ -63,7 +64,7 @@ export class CampComponent {
       .map(recipe => ({
         recipe,
         item: ITEM_DATA[recipe.itemId]!,
-        evaluation: evaluateRecipe(recipe, inventory, stations, unlockedRecipes),
+        evaluation: evaluateRecipe(recipe, inventory, capacity, stations, unlockedRecipes),
       }))
       .filter(view => view.evaluation.visible)
   })

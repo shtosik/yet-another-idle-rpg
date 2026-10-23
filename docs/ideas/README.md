@@ -11,11 +11,13 @@ Owner decisions in force:
 | [Batch crafting](batch-crafting.md) | S | Implemented |
 | [Camp & crafting stations](crafting-stations.md) | M | Accepted |
 | [Crafting recipes](crafting-recipes.md) | M | Proposed |
-| [Gold drops & selling](gold-drops-and-selling.md) | S | Proposed |
-| [Offline progress](offline-progress.md) | M | Proposed |
+| [Gold drops & selling](gold-drops-and-selling.md) | S | Done |
+| [Shop preferences](shop-preferences.md) | S | Done |
+| [Progression pacing & economy simulation](progression-pacing.md) | S-M | Simulation done, tuning ongoing |
+| [Offline progress](offline-progress.md) | M | Done (save clamping open) |
 | [Rune socketing](rune-socketing.md) | M | Proposed |
-| [Explorer Token shop & guild ranks](explorer-token-shop.md) | S-M | Proposed |
-| [Wave variety & boss waves](wave-variety.md) | M | Proposed |
+| [Explorer Token shop & guild ranks](explorer-token-shop.md) | S-M | Done (Ambush, extra consumable slot open) |
+| [Wave variety, wave scaling & boss waves](wave-variety.md) | M | Scaling done; variety proposed |
 | [Rune rifts (challenge dungeons)](rune-rifts.md) | M | Proposed |
 | [Prestige / rebirth](prestige.md) | M-L | Proposed |
 | [Pet leveling & collection bonuses](pet-leveling-collection.md) | S-M | Proposed |

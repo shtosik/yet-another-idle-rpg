@@ -57,13 +57,17 @@ export async function makeSilhouette(buf, { thicken = 0 } = {}) {
 /**
  * Freezes `from` as `<dir>/<name>-source.png` and its silhouette as `<dir>/<name>.png`, which then loads as
  * `--control <name>` (see lib/controls.mjs). Overwrites a control of the same name.
+ * `hand` ([x, y] in the 1024² silhouette, with `angle` and `scale`) is stored as `<name>.json` so `--weapon` can draw
+ * a weapon into an empty-handed pose.
  */
-export async function makeControl({ name, from, dir, thicken = 0 }) {
+export async function makeControl({ name, from, dir, thicken = 0, hand, angle, scale }) {
     if (!/^[A-Za-z][A-Za-z0-9]*$/.test(name)) throw new Error(`Control name "${name}" must be letters and digits only`)
     const source = readFileSync(from)
     const silhouette = await makeSilhouette(source, { thicken })
     mkdirSync(dir, { recursive: true })
     copyFileSync(from, join(dir, `${name}-source.png`))
     writeFileSync(join(dir, `${name}.png`), silhouette)
-    return { name, source: join(dir, `${name}-source.png`), control: join(dir, `${name}.png`) }
+    const meta = hand ? { hand, ...(angle !== undefined && { angle }), ...(scale !== undefined && { scale }) } : null
+    if (meta) writeFileSync(join(dir, `${name}.json`), `${JSON.stringify(meta)}\n`)
+    return { name, source: join(dir, `${name}-source.png`), control: join(dir, `${name}.png`), meta }
 }

@@ -31,6 +31,7 @@ export class QuestsComponent {
     const filters = this.questFilters()
 
     if (filters === 'completed') return questsArray.filter(([_, step]) => step === QUEST_STEP_AFTER_COMPLETED)
+    if (filters === 'started') return questsArray.filter(([_, step]) => step !== QUEST_STEP_AFTER_COMPLETED)
 
     return questsArray
   })

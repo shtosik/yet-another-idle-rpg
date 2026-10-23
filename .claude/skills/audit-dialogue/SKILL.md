@@ -21,9 +21,9 @@ Background: `docs/systems/dialogue.md` (engine rules, `QuestState` meanings, kno
 **Quest hubs** — for each option with several results, results are tried top to bottom and the first visible one wins:
 - Order must be turn-in (`readyToAdvance`) → in progress (`active`) → offer (`available`) → fallback. A broader result above a narrower one shadows it.
 - A result meant for "quest in progress" must use `QuestState.active`; `readyToAdvance` only fires when the step's requirements are met.
-- Every quest-start effect sits behind an `available` condition, including starts reached through lore links.
-- A turn-in's `requirementsNeeded` and `item` `take` amounts match the step's `requirements` in `src/data/quests-data.ts:QUEST_DATA`.
-- `take` effects come before `advance`/`end` in the same result, so freed slots count toward rewards.
+- Every route to an offer node sits behind an `available` condition, including lore links (which also need a fallback result).
+- A quest `start` never shares a result with the `end` that unlocks it (the start is hidden until the quest is available, which hides the whole result).
+- Turn-ins don't restate the step: no `requirementsNeeded` or `item` `take` for quest requirements. The store takes the step's items.
 
 **Paths**
 - The first-meet node (`firstMeetNodeId` in `src/data/npc-data.ts`) has every path set the `met_<NpcID>` flag.
@@ -32,8 +32,5 @@ Background: `docs/systems/dialogue.md` (engine rules, `QuestState` meanings, kno
 
 **Costs**
 - A `stat` `deduct` of `goldCoins` has a matching `requirementsNeeded` gold check, and a repeated fallback doesn't charge on every click.
-
-**Labels**
-- Requirements using `many*` conditions render without a label (`getConditionLabel` lacks them); flag them so the author knows.
 
 Done when every node's options have been checked against every rule above, and `npm run validate` and `npx ng build` pass.

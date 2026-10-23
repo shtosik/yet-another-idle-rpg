@@ -15,9 +15,9 @@ Data-driven NPC conversations. Each NPC has a graph of nodes; options branch on 
 
 ## Data flow
 1. `startDialogue(npcId)`: if the `met_<npcId>` flag is not set and the NPC has `firstMeetNodeId`, start there; otherwise at `startNodeId ?? 0`. The first-meet node's options must set that flag themselves with a `flag` effect named `met_` + the `NpcID` value.
-2. For each option, the shown branch is `getActiveResult`: the **first** result whose `visibilityConditions` all pass, skipping results that start a quest which has already started. An option with no matching result is hidden.
-3. `requirementsNeeded` on that result are shown as labels; if any fail, the option is disabled.
-4. On click, `selectOption` applies `effects` in order, then closes (`closeDialogue: true`) or moves to `next`.
+2. For each option, the shown branch is `getActiveResult`: the **first** result whose `visibilityConditions` all pass, skipping results that start a quest which isn't `available`. An option with no matching result is hidden.
+3. `requirementsNeeded` on that result are shown as labels; if any fail, the option is disabled. If the result's item gains (`give` effects, quest item rewards) don't fit after its removals, the option is disabled with an "N slots needed" tag (`DialogueManagerService.missingSlots`). If its `deduct` gold effects cost more than the player has, it is disabled with an "N more gold needed" tag (`missingGold`): gold never goes negative.
+4. On click, `selectOption` runs the same `getActiveResult` branch: it applies `effects` in order, then closes (`closeDialogue: true`) or moves to `next`.
 
 ## Conditions (quest)
 `{ type: 'quest', questId, questState, step? }` uses `QuestState`:
@@ -26,23 +26,20 @@ Data-driven NPC conversations. Each NPC has a graph of nodes; options branch on 
 - `active` — started (optionally at `step`).
 - `readyToAdvance` — active (optionally at `step`) **and** the current step's requirements are met. Use this for turn-in branches.
 
+Kill-count requirements inside quest conditions count kills since the quest reached its current step (see `quests.md`).
+
 ## Invariants & gotchas
-- **Order results from most specific to least.** Quest hubs go: turn-in (`readyToAdvance`) → in progress (`active`) → offer (`available`) → fallback.
+- **Order results from most specific to least.** Quest hubs go: turn-in (`readyToAdvance`) → in progress (`active`) → offer (`available`) → fallback. An NPC with several questlines (Finn) lists every turn-in, then every in-progress, then every offer.
+- A turn-in result is just `readyToAdvance` + `advance`/`end`. The store takes the step's items; don't restate them as `requirementsNeeded` or `take`.
+- Lore links into an offer node also need an `available` result, plus a fallback result so the option stays usable.
 - Node ids are the enum values; `default = 0` is the start node for returning players.
 - Every `next` must exist and every node should be reachable. `npm run validate` checks both (unreachable = warning).
 - Dialogue text keys are `dialogues/<npcKey>:<node>.<field>`, and the namespace must be registered in `app.config.ts` (see `localization.md`).
 - Adding a condition or effect variant means extending the union **and** the switch in `checkCondition`/`applyEffects`, plus `getConditionLabel` in the component if it can be a requirement. Use the `add-dialogue-effect` skill.
-- Flags (`{ type: 'flag' }`) are write-only for data: no condition reads them. Only the engine reads `met_<npcId>`.
+- Flags: a `flag` effect sets one; the `flag` condition (`name`, `isSet`) reads it, e.g. to charge a fee only once (the Bartender's three paid answers and Josh's beer: `bartender_paid_for_*`, `josh_paid_beer`). The engine reads `met_<npcId>`.
 
 ## Known issues
-- **In-progress branches are unreachable.** The trees were written with `active` meaning "in progress" while the engine treated it as "ready to advance". The rename to `readyToAdvance` kept that behavior, so results meant for "quest in progress" still use `readyToAdvance`. They need switching to `active`.
-- Finn's quest hub lists the Big Game offer before the Fetches and Fangs turn-in, so Fetches and Fangs can't be turned in (blocks the Mawood questline).
-- `getConditionLabel` has no labels for the `many*` conditions (Sylvie's and Brenna's turn-ins show unlabeled requirements).
-- Nodes with no visible options after a quest starts: Josh `workInfo`, Milo `questWhatLurksAccept`.
-- `selectOption` picks its result by visibility only. It does not skip already-started quest starts the way `getActiveResult` does, so the executed branch can differ from the shown one.
 - Gold fees in dialogue (`stat` `deduct` of `goldCoins`, Bartender and Josh) are not gated, so gold can go negative. Owner decision: block spending when the player can't afford it (`player-stats-inventory-equipment.md`).
-- `item` `give` effects (quest rewards in dialogue) don't check inventory space; overflow is discarded.
-- Unreachable nodes: Josh `missionCheck`, Corwin `aboutMawood` (`npm run validate` warnings).
 
 ## How to extend
 New NPC or new branches: the `add-npc-dialogue` skill. New quests: `add-quest`. Check a tree: `audit-dialogue`.

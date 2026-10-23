@@ -11,12 +11,16 @@ export type { TaskLength }
 export class ExplorationGuildService {
   private playerStore = inject(PlayerStore)
 
-  /** Task targets come from the regular enemies of every zone the player has unlocked (bosses are not in `enemies`). */
-  private taskTargets = computed(() =>
-    this.playerStore.unlockedContent().zones.flatMap(zoneId =>
-      ZONES_DATA[zoneId].enemies.map(monsterId => ({ monsterId, zoneId })),
-    ),
-  )
+  /**
+   * Task targets: regular enemies (bosses are not in `enemies`) of zones that are unlocked and within Guild rank.
+   * Rank 0 allows tier 1 (Horseshoe Beach); each rank adds the next tier. Old zones stay in the pool.
+   */
+  private taskTargets = computed(() => {
+    const maxTier = this.playerStore.guildRank() + 1
+    return this.playerStore.unlockedContent().zones
+      .filter(zoneId => ZONES_DATA[zoneId].tier <= maxTier)
+      .flatMap(zoneId => ZONES_DATA[zoneId].enemies.map(monsterId => ({ monsterId, zoneId })))
+  })
 
   /** Rolls a random monster from the task target pool */
   private rollMonsterId(): { monsterId: EnemyID; zoneId: ZoneID } {
@@ -36,8 +40,12 @@ export class ExplorationGuildService {
     }
   }
 
-  /** Returns the token reward for a given task length */
-  private getTokenReward(length: TaskLength): number {
+  /** Length reward × the tier of the zone the target lives in. */
+  private getTokenReward(length: TaskLength, zoneId: ZoneID): number {
+    return this.lengthReward(length) * ZONES_DATA[zoneId].tier
+  }
+
+  private lengthReward(length: TaskLength): number {
     switch (length) {
       case 'short':
         return 1
@@ -55,7 +63,7 @@ export class ExplorationGuildService {
 
   /** Creates a new task based on the selected length */
   generateTask(length: TaskLength): Task | null {
-    if (!this.playerStore.hasAvailableTaskSlot()) return null
+    if (!this.playerStore.hasAvailableTaskSlot() || !this.taskTargets().length) return null
 
     const { monsterId, zoneId } = this.rollMonsterId()
     const task: Task = {
@@ -63,7 +71,7 @@ export class ExplorationGuildService {
       monsterId,
       targetCount: this.rollTargetCount(length),
       currentCount: 0,
-      rewardTokens: this.getTokenReward(length),
+      rewardTokens: this.getTokenReward(length, zoneId),
       zoneId,
     }
 

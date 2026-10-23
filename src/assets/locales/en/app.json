@@ -5,7 +5,6 @@
     "mana": "Mana",
     "maxMana": "Max Mana",
     "manaRegenRate": "Mana Regen",
-    "currentManaRegenTimer": "Mana Regen Timer",
     "magicDamage": "Magic Damage",
     "magicDamageMultiplier": "Magic Damage Multiplier",
     "spellCooldownReduction": "Spell Cooldown Reduction",
@@ -14,6 +13,8 @@
     "currentShopRefreshCooldown": "Shop Refresh Timer",
     "shinyChance": "Shiny Chance",
     "inventorySlots": "Inventory Slots",
+    "maxTaskSlots": "Guild Task Slots",
+    "taskDoubleKillChance": "Bounty Mark Chance",
     "critChance": "Crit Chance",
     "critMulti": "Crit Multiplier",
     "experience": "XP",
@@ -21,6 +22,7 @@
     "xpMultiplier": "XP Multiplier",
     "goldCoins": "Gold",
     "goldCoinsMultiplier": "Gold Multiplier",
+    "offlineProgressRate": "Offline Progress Rate",
     "unspentSkillPoints": "Skill points",
     "extraFireDamageMultiplier": "Fire Damage",
     "extraAirDamageMultiplier": "Air Damage",
@@ -64,8 +66,7 @@
     "dark": "Weak to Dark",
     "physical": "Weak to Physical"
   },
-  "wave": "Wave",
-  "killCount": "Kill count",
+  "wave": "Wave",  "killCount": "Kill count",
   "gameTabs": {
     "main": "Battle",
     "map": "Map",
@@ -79,6 +80,29 @@
   "requires": "Requires",
   "required": "required",
   "costs": "Costs",
+  "goldNeeded": "{{count}} more gold needed",
   "quest": "Quest",
-  "completed": "completed!"
+  "completed": "completed!",
+  "inventory": {
+    "slotsNeeded_one": "{{count}} slot needed",
+    "slotsNeeded_other": "{{count}} slots needed",
+    "freeSlots": "Free slots: {{free}} / {{total}}",
+    "lockedSlot": "Locked slot",
+    "page": "Page {{page}}",
+    "previousPage": "Previous page",
+    "nextPage": "Next page"
+  },
+  "offline": {
+    "title": "Welcome back!",
+    "away": "You were away for {{hours}}h {{minutes}}m. Your hero kept fighting.",
+    "kills_one": "{{count}} enemy defeated",
+    "kills_other": "{{count}} enemies defeated",
+    "shinies_one": "{{count}} shiny found!",
+    "shinies_other": "{{count}} shinies found!",
+    "levels_one": "Gained {{count}} level",
+    "levels_other": "Gained {{count}} levels",
+    "lostDrops_one": "Your inventory was full: {{count}} item was lost.",
+    "lostDrops_other": "Your inventory was full: {{count}} items were lost.",
+    "collect": "Collect"
+  }
 }

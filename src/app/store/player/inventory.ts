@@ -33,18 +33,16 @@ export const hasItems = (inventory: Inventory, items: ItemStack[]): boolean =>
 export const maxAffordable = (inventory: Inventory, items: ItemStack[]): number =>
   Math.min(...items.map(({ id, amount }) => Math.floor(countItem(inventory, id) / amount)))
 
-/** Whether `id` can be added without being discarded: it stacks onto an existing stack or takes a free slot. */
-export const canFit = (inventory: Inventory, id: ItemID, tier?: ItemTier): boolean =>
-  findStackIndex(inventory, id, tier ?? ITEM_DATA[id].tier) !== -1 || inventory.includes(null)
-
-/** Stacks per id + tier. Items that do not fit in `capacity` slots are discarded. */
+/** Stacks per id + tier. Only the first `capacity` slots are used; items that do not fit are discarded. */
 export function addItems(inventory: Inventory, capacity: number, items: ItemStack[]): Inventory {
   const result = resizeInventory([...inventory], capacity)
 
   for (const { id, amount, tier } of items) {
     const itemData = ITEM_DATA[id]
     const itemTier = tier ?? itemData.tier
-    const stackIndex = findStackIndex(result, id, itemTier)
+    // The array never shrinks, so slots past `capacity` are locked and must stay untouched.
+    const usable = result.slice(0, capacity)
+    const stackIndex = findStackIndex(usable, id, itemTier)
 
     if (stackIndex !== -1) {
       const stack = result[stackIndex]!
@@ -52,7 +50,7 @@ export function addItems(inventory: Inventory, capacity: number, items: ItemStac
       continue
     }
 
-    const emptyIndex = result.findIndex(slot => slot === null)
+    const emptyIndex = usable.findIndex(slot => slot === null)
     if (emptyIndex !== -1) result[emptyIndex] = { id, type: itemData.type, tier: itemTier, amount }
   }
 
@@ -78,3 +76,38 @@ export function removeItems(inventory: Inventory, items: ItemStack[]): Inventory
 
   return result
 }
+
+/** Slots still to free before `adding` fits in `capacity` slots, once `removing` has been taken out first. */
+export function missingSlots(inventory: Inventory, capacity: number, adding: ItemStack[], removing: ItemStack[] = []): number {
+  const after = removeItems(inventory, removing).slice(0, capacity)
+  const freeSlots = after.filter(slot => slot === null).length + Math.max(0, capacity - after.length)
+
+  const newStacks = new Set<string>()
+  for (const { id, tier } of adding) {
+    const itemTier = tier ?? ITEM_DATA[id].tier
+    if (findStackIndex(after, id, itemTier) === -1) newStacks.add(`${id}:${itemTier}`)
+  }
+
+  return Math.max(0, newStacks.size - freeSlots)
+}
+
+/** True when `adding` fits in `capacity` slots once `removing` has been taken out first. */
+export const canFit = (inventory: Inventory, capacity: number, adding: ItemStack[], removing: ItemStack[] = []): boolean =>
+  missingSlots(inventory, capacity, adding, removing) === 0
+
+/** True when no item sits at or beyond slot `capacity`. */
+export function fitsCapacity(inventory: Inventory, capacity: number): boolean {
+  for (let i = capacity; i < inventory.length; i++) {
+    if (inventory[i] !== null) return false
+  }
+  return true
+}
+
+/** A Page is a 40-slot view of the inventory. */
+export const INVENTORY_PAGE_SIZE = 40
+
+export const pageCount = (capacity: number): number => Math.max(1, Math.ceil(capacity / INVENTORY_PAGE_SIZE))
+
+/** Empty usable slots across all pages. */
+export const countFreeSlots = (inventory: Inventory, capacity: number): number =>
+  inventory.slice(0, capacity).filter(slot => slot === null).length

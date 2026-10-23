@@ -38,6 +38,7 @@ export { TownID } from 'enums/map/town-id.enum'
 export { TownBuildingID } from 'enums/map/town-building-id.enum'
 export { DamageElement } from 'enums/damage-element.enum'
 export { ItemTier } from 'enums/items/item-tier.enum'
+export { ItemType } from 'enums/items/item-type.enum'
 export { default as ITEM_DATA } from 'data/items-data'
 export { default as ENEMIES_DATA } from 'data/enemies-data'
 export { default as ZONES_DATA } from 'data/zones-data'
@@ -51,6 +52,7 @@ export { default as TOWNS_DATA } from 'data/towns-data'
 export { ALL_SKILLS } from 'data/skill-tree-data'
 export { UNLOCK_RULES, ZONE_UNLOCK_NOTIFICATIONS } from 'data/unlock-conditions'
 export { WORLD_MAP_DATA } from 'data/world-map-data'
+export { sellPrice } from 'app/store/shop/shop-prices'
 `
 
 const outDir = join(ROOT, 'node_modules', '.cache', 'validate-data')
@@ -167,6 +169,27 @@ for (const zone of Object.values(D.ZONES_DATA)) {
     warn('src/data/zones-data.ts', `${idName(D.ZoneID, zone.id)} lists its boss ${idName(D.EnemyID, zone.bossEnemyId)} as a regular enemy`)
   }
 }
+// Economy: no buy-sell profit at any pair of shops, and kinds that must never be sold stay at value <= 0.
+const shops = Object.values(D.SHOPS_DATA)
+for (const shop of shops) {
+  if ((shop.currency ?? 'gold') !== 'gold') continue
+  for (const entry of shop.items) {
+    for (const buyer of shops) {
+      const price = D.sellPrice(buyer.id, entry.itemId)
+      if (price >= entry.price) {
+        error('src/data/shops-data.ts', `${idName(D.ShopID, shop.id)} sells ${idName(D.ItemID, entry.itemId)} for ${entry.price}g but ${idName(D.ShopID, buyer.id)} buys it for ${price}g`)
+      }
+    }
+  }
+}
+const UNSELLABLE_TYPES = new Set([D.ItemType.book, D.ItemType.recipe, D.ItemType.stationUpgrade, D.ItemType.quest])
+for (const item of Object.values(D.ITEM_DATA)) {
+  const name = idName(D.ItemID, item.id)
+  if (item.value > 0 && (UNSELLABLE_TYPES.has(item.type) || /^(shiny)?pet[A-Z]/i.test(name))) {
+    error('src/data/items', `${name} must be unsellable (value <= 0)`)
+  }
+}
+
 for (const recipe of Object.values(D.RECIPES_DATA)) {
   for (const cost of recipe.itemsNeeded) {
     if (!has(D.ITEM_DATA, cost.id)) error('src/data/recipes-data.ts', `${idName(D.RecipeID, recipe.id)} needs unknown ItemID ${cost.id}`)

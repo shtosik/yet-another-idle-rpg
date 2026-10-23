@@ -1,6 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core'
+import { calculateXp } from '../store/player/experience'
 
-export const calculateXp = (level: number) => (50 * (Math.pow(level, 3) - 6 * Math.pow(level, 2) + 17 * level - 12)) / 3
+export { calculateXp }
 
 @Pipe({
     name: 'calculateXp',

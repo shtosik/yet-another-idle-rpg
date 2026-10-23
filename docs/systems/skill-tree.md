@@ -18,27 +18,27 @@ A radial tree of nodes the player unlocks with skill points (1 per level). Nodes
 ## Data flow
 - **Buy** (`buyNode`, ctrl-click = max): `canBuyNode` checks max level, cost, and `requires` (only for the first level). Spends `skillPointCost` per level, then by type: `stat` adds `statAmount × levels` to `stats`; `spell` levels up the spell and auto-equips it into a free spell slot; `battle` nodes have no direct effect and are read with `PlayerStore.hasSkillUnlocked`.
 - **Refund one node** (`refundNode`, ctrl-click = all levels): blocked if a direct dependent would lose its requirement. Costs `goldCostPerLevel` gold per level refunded.
-- **Full respec** (`respecEntireTree`): costs `fullResetGoldCost(allocatedLevels)` = 500 + 50 per level; rolls back every stat and spell, clears `unlockedNodes`.
+- **Full respec** (`respecEntireTree`): costs `fullResetGoldCost(allocatedLevels)` = 500 + 50 per level; removes every spell, clears `unlockedNodes` (node stats disappear with them).
 - **Layout**: the origin has an explicit `position`. Other nodes chain out from their prerequisite in the branch's launch direction (`BRANCH_LAUNCH`), `turn` fans siblings, nodes with several prerequisites sit at their midpoint.
 
 Battle nodes read in code: `autoWaveProgression`, `autoEat`, `weaknesses`, `spellCrit`.
 
 ## Intended behavior (owner decisions)
-- **Overkill** (node exists, `maxLevel` 4, no effect yet): overflow damage, or the kill itself, lets the player hit the next monster immediately instead of waiting for the respawn. Implementation approach still open; related to the respawn downtime in `game-loop-and-combat.md`.
+- **Overkill** (node exists, `maxLevel` 4, no effect yet): overflow damage, or the kill itself, lets the player hit the next monster sooner instead of waiting for the 2 s respawn delay (`RESPAWN_DELAY_IN_MS`, see `game-loop-and-combat.md`). Implementation approach still open.
 
 ## Invariants & gotchas
 - Saved state is `PlayerState.unlockedNodes` (`SkillNodeID` → level). Skill points are the `unspentSkillPoints` stat.
-- Stat nodes mutate persisted `stats`; buy and refund must mirror each other exactly (see `player-stats-inventory-equipment.md`).
+- Stat nodes are read from `unlockedNodes` by the derived `stats`; buy and refund only change the level (see `player-stats-inventory-equipment.md`).
 - `skillPointCost` is per level. `levelsRefunded` counts levels, not points.
 - Every node needs `skill-tree:nodes.<key>.name` and `.desc`, and an icon under `assets/img/skills/` (`npm run validate` checks).
+- Refunding or respeccing `autoWaveProgression` or `autoEat` switches its toggle off; auto wave progression also checks the node when it fires.
+- Buy max on a free node (`skillPointCost` 0) fills it to `maxLevel`.
 
 ## Known issues
-- Ctrl-click buying a cost-0 node (origin) with 0 skill points computes `0/0` and saves `NaN`.
-- `goldGain` grants `goldCoins` (+0.1 gold per level) instead of `goldCoinsMultiplier`; the multiplier isn't applied anywhere anyway.
-- `manaRegen` lowers `manaRegenRate` by 2 ms per level on a 30 000 ms base, so it does nothing noticeable.
-- Auto wave progression keeps working after its node is refunded or respecced (only the toggle is checked).
 - Every refresh rebuilds every marker's icon and tooltip, closing open tooltips.
 - Tooltip text (requirements, refund cost) is hard-coded English.
 
 ## How to extend
+A stat node with `statPercent: true` scales the stat by `statAmount` per level after flat modifiers (`manaRegen`: 10% faster regen per level).
+
 New node: append a `SkillNodeID` in the branch's range, add the node to the branch's map in `skill-tree-data.ts` with `requires` pointing at its parent, add i18n and icon. For a `battle` node, read it with `hasSkillUnlocked(SkillNodeID.x)` where the mechanic lives.

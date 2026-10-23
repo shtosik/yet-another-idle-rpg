@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, OnInit, output } from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, inject, input, OnInit, output, signal } from '@angular/core'
+import { InventoryItem } from '../../../../../interfaces/item.interface'
 import { ShopStore } from '../../../../store/shop/shop.store'
 import { PlayerStore } from '../../../../store/player/player.store'
 import { ShopID } from '../../../../../enums/ids/shop-id.enum'
@@ -12,8 +13,11 @@ import { InventoryItemComponent } from '../../inventory/inventory-slot/inventory
 import { CloseButtonComponent } from '../../../shared/close-button/close-button.component'
 import { ModalService } from '../../../../services/modal.service'
 import { canInstall, isInstalled, stationUpgradeOf } from '../../../../store/player/camp'
+import { isPreferredBy, sellPrice } from '../../../../store/shop/shop-prices'
 
-type BuyBlockReason = 'stock' | 'gold' | 'inventory' | 'station' | null
+/** `gold` means the shop's currency (gold or Explorer Tokens) runs short. */
+type BuyBlockReason = 'stock' | 'rank' | 'gold' | 'inventory' | 'station' | null
+type ShopTab = 'buy' | 'sell'
 
 @Component({
   selector: 'app-shop',
@@ -45,6 +49,26 @@ export class ShopComponent implements OnInit {
     }))
   })
 
+  tab = signal<ShopTab>('buy')
+
+  currency = computed(() => SHOPS_DATA[this.shopId()].currency ?? 'gold')
+  /** Shops with `buys: []` (the guild store) have no Sell tab. */
+  canSell = computed(() => SHOPS_DATA[this.shopId()].buys?.length !== 0)
+  guildRank = this.playerStore.guildRank
+  balance = computed(() =>
+    this.currency() === 'explorerTokens' ? this.playerStore.explorerTokens() : this.playerStore.stats().goldCoins,
+  )
+
+  /** Inventory stacks this shop buys, at its price. */
+  sellable = computed(() => {
+    const shopId = this.shopId()
+    return this.playerStore.inventory().flatMap(slot => {
+      if (!slot) return []
+      const price = sellPrice(shopId, slot.id)
+      return price > 0 ? [{ slot, itemData: ITEM_DATA[slot.id], price, preferred: isPreferredBy(shopId, slot.id) }] : []
+    })
+  })
+
   cooldownLabel = computed(() => {
     const runtime = this.shopStore.shops()[this.shopId()]
     const ms = runtime?.cooldownRemainingMs ?? 0
@@ -61,18 +85,19 @@ export class ShopComponent implements OnInit {
 
     if (entry.runtime.currentStock <= 0) return 'stock'
 
-    if (this.playerStore.stats().goldCoins < entry.staticItem.price) return 'gold'
+    if ((entry.staticItem.minRank ?? 0) > this.guildRank()) return 'rank'
+
+    if (this.balance() < entry.staticItem.price) return 'gold'
 
     // Station gear installs on purchase and never takes a slot, but must follow the previous level.
     const upgrade = stationUpgradeOf(entry.staticItem.itemId)
     if (upgrade) return canInstall(this.playerStore.stations(), upgrade) ? null : 'station'
 
-    const inventory = this.playerStore.inventory()
-    const hasStack = inventory.some(
-      slot => slot?.id === entry.staticItem.itemId && slot?.tier === entry.staticItem.tier,
-    )
-    const hasEmpty = inventory.some(slot => slot === null)
-    if (!hasStack && !hasEmpty) return 'inventory'
+    // The spellbook unlocks a tab and never enters the inventory.
+    const { itemId, tier } = entry.staticItem
+    if (itemId !== ItemID.spellbook && !this.playerStore.canFitItems([{ id: itemId, tier, amount: 1 }])) {
+      return 'inventory'
+    }
 
     return null
   }
@@ -87,7 +112,11 @@ export class ShopComponent implements OnInit {
     const entry = this.items()[index]
     const { itemId, tier, price } = entry.staticItem
 
-    this.playerStore.updatePlayerStats([{ stat: 'goldCoins', amount: -price }])
+    if (this.currency() === 'explorerTokens') {
+      if (!this.playerStore.spendTokens(price)) return
+    } else {
+      this.playerStore.updatePlayerStats([{ stat: 'goldCoins', amount: -price }])
+    }
     this.shopStore.buyItem(this.shopId(), index)
 
     // Spellbook unlocks the tab immediately and is not added to inventory
@@ -98,6 +127,11 @@ export class ShopComponent implements OnInit {
 
     const installed = this.playerStore.addItems([{ id: itemId, tier, amount: 1 }])
     installed.forEach(id => this.modalService.openStationInstalled(id))
+  }
+
+  /** Click sells one; Ctrl/Cmd-click sells the whole stack. */
+  sellItem(item: InventoryItem, event: MouseEvent): void {
+    this.playerStore.sellItem(item, this.shopId(), event.ctrlKey || event.metaKey ? item.amount : 1)
   }
 
   /** Station gear the player already owns is hidden from shops. */

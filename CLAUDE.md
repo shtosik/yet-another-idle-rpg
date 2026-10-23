@@ -8,6 +8,7 @@ Guidance for Claude Code in this repository: a browser idle RPG (auto-battle in 
 npm start            # dev server (ng serve)
 npm run build        # production build
 npm run validate     # data, i18n, asset and doc-reference checks (scripts/validate-data.mjs)
+npm run sim          # economy simulation: zone times, first-hour ladder, reward flags (scripts/sim-economy.mjs)
 npm run tile         # regenerate world map tiles (node scripts/tile-map.mjs)
 npm run test:assets  # asset-gen pipeline tests (node:test, no GPU needed)
 ```
@@ -30,6 +31,7 @@ Several Claude sessions often run in parallel on this repo, sharing the main che
 
 - **Never switch branches (`git checkout` / `git switch`) in the main checkout.** It moves every other session onto your branch and mixes uncommitted work.
 - For a new feature branch, create a worktree instead: `git worktree add ../yari-<name> -b feat/<name>` (or start the session with `claude --worktree <name>`), and work only inside it.
+- Right after `git worktree add`, switch the session into the worktree with the `EnterWorktree` tool (`path: ../yari-<name>`). The desktop app's diff pane only shows the session's own folder, so edits made in a worktree the session never entered don't show up there.
 - Run `npm install` in the new worktree. **Do not** junction/symlink `node_modules` from the main checkout — removing the worktree has deleted the real `node_modules` before.
 - Only stage files you changed yourself; other sessions' uncommitted work may be in the tree.
 
@@ -39,8 +41,8 @@ Angular 20 standalone components, zoneless change detection, `OnPush` on every c
 
 ## Gotchas
 
-- **Pre-release: save compatibility is not required.** Rename and renumber freely; clear `localStorage` after a breaking state change.
-- **Stats are accumulated, not derived.** Every source does `+=` into persisted `stats`; equip/unequip, buff expiry and respec must apply the exact mirror `−=`.
+- **Pre-release: save compatibility is not required.** Rename and renumber freely; after a breaking change to a store's saved shape, bump its save `version` (`withGameStateSync(KEY, initialState, { version })`) instead of clearing `localStorage` (`docs/systems/persistence.md`).
+- **Stats are derived, not stored.** `PlayerStore.stats()` is computed from base + equipment + skill nodes + buffs + consumables + permanent bonuses. `updatePlayerStats` only earns/spends resources or adds a permanent bonus; a new stat source goes into the `stats` computed (ADR 0002).
 - **New i18n namespace → register it** in the `translations` list in `src/app/app.config.ts`. Template pipe is `| i18next`.
 - **Item data lives in `src/data/items/<category>-items.data.ts`**; `src/data/items-data.ts` only merges them.
 - **Quest conditions**: `QuestState.active` = started; `QuestState.readyToAdvance` = started and current step's requirements met (turn-ins).
@@ -61,6 +63,7 @@ Angular 20 standalone components, zoneless change detection, `OnPush` on every c
 | skill tree, respec | `docs/systems/skill-tree.md` |
 | spells, buffs, mana | `docs/systems/spells-and-buffs.md` |
 | Camp, stations, recipes, food, potions | `docs/systems/consumables-camp-crafting.md` |
+| offline progress, welcome-back modal | `docs/systems/offline-progress.md` |
 | zones, waves, town/feature unlocks | `docs/systems/zones-waves-unlocks.md` |
 | towns, buildings, shops, Exploration Guild | `docs/systems/towns-shops-guild.md` |
 | enemies, shinies, pets, bestiary | `docs/systems/enemies-shiny-pets-bestiary.md` |

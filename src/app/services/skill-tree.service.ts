@@ -8,7 +8,6 @@ import { BattleManagerService } from './battle-manager.service'
 import { canBuyNode } from '../../utils/skill-tree-requirements'
 import { canRefundNode, CanRefundResult } from '../../utils/skill-tree-refund'
 import { SKILL_TREE_GRAPH } from '../../data/skill-tree-graph'
-import { PlayerStat } from '../../types/player/player-stat.type'
 import { SpellID } from '../../enums/ids/spell-id.enum'
 
 @Injectable({ providedIn: 'root' })
@@ -35,19 +34,16 @@ export class SkillTreeService {
     if (!canBuyNode(skillData, unlocked, stats.unspentSkillPoints).ok) return
 
     const currentLevel = unlocked[id] || 0
-    const pointsToBuy = buyMax
-      ? Math.min(skillData.maxLevel - currentLevel, Math.floor(stats.unspentSkillPoints / skillData.skillPointCost))
-      : 1
+    const levelsLeft = skillData.maxLevel - currentLevel
+    // A free node (the origin) can't be divided into: buying max just fills it.
+    const affordable = skillData.skillPointCost > 0
+      ? Math.floor(stats.unspentSkillPoints / skillData.skillPointCost)
+      : levelsLeft
+    const pointsToBuy = buyMax ? Math.min(levelsLeft, affordable) : 1
 
     this.playerStore.updatePlayerStats([
       { stat: 'unspentSkillPoints', amount: -(pointsToBuy * skillData.skillPointCost) },
     ])
-
-    if (skillData.type === SkillNodeType.stat) {
-      this.playerStore.updatePlayerStats([
-        { stat: skillData.stat, amount: skillData.statAmount * pointsToBuy },
-      ])
-    }
 
     this.playerStore.updateUnlockedNodes(id, pointsToBuy)
 
@@ -62,7 +58,18 @@ export class SkillTreeService {
   }
 
   previewRefund(id: SkillNodeID, levels: number | 'all'): CanRefundResult {
-    return canRefundNode(id, levels, this.playerStore.unlockedNodes(), SKILL_TREE_GRAPH)
+    const check = canRefundNode(id, levels, this.playerStore.unlockedNodes(), SKILL_TREE_GRAPH)
+    if (!check.ok) return check
+
+    const node = ALL_SKILLS[id]
+    const slotsLost = node.type === SkillNodeType.stat && node.stat === 'inventorySlots'
+      ? node.statAmount * check.levelsRefunded
+      : 0
+    if (!this.playerStore.canChangeInventorySlots(-slotsLost)) {
+      return { ok: false, reason: 'inventory-in-use', blockers: [] }
+    }
+
+    return check
   }
 
   refundGoldCost(levelsRefunded: number): number {
@@ -89,19 +96,14 @@ export class SkillTreeService {
       { stat: 'goldCoins', amount: -goldCost },
     ])
 
-    if (skillData.type === SkillNodeType.stat) {
-      this.playerStore.updatePlayerStats([
-        { stat: skillData.stat, amount: -(skillData.statAmount * refundedLevels) },
-      ])
-    }
-
     this.playerStore.updateUnlockedNodes(id, -refundedLevels)
 
     if (skillData.type === SkillNodeType.spell && newLevel === 0) {
       this.playerStore.levelDownSpell(skillData.spellId, refundedLevels)
-      this.battleManagerService.unequipSpell(skillData.spellId)
+      this.battleManagerService.unequipSpell(skillData.spellId, true)
     }
 
+    this.switchOffLostToggles()
     return true
   }
 
@@ -110,6 +112,7 @@ export class SkillTreeService {
     skillPointsToReturn: number
     goldCost: number
     canAfford: boolean
+    inventoryBlocked: boolean
   } {
     const unlocked = this.playerStore.unlockedNodes()
     let allocatedLevels = 0
@@ -123,14 +126,27 @@ export class SkillTreeService {
     }
     const goldCost = SKILL_TREE_DATA.respec.fullResetGoldCost({ allocatedLevels: allocatedLevels })
     const canAfford = this.playerStore.stats().goldCoins >= goldCost
-    return { allocatedLevels, skillPointsToReturn, goldCost, canAfford }
+    const inventoryBlocked = !this.playerStore.canChangeInventorySlots(-this.inventorySlotsGranted())
+    return { allocatedLevels, skillPointsToReturn, goldCost, canAfford, inventoryBlocked }
+  }
+
+  private inventorySlotsGranted(): number {
+    let slots = 0
+    for (const [idStr, level] of Object.entries(this.playerStore.unlockedNodes())) {
+      const node = ALL_SKILLS[Number(idStr) as SkillNodeID]
+      if (level && node?.type === SkillNodeType.stat && node.stat === 'inventorySlots') {
+        slots += node.statAmount * level
+      }
+    }
+    return slots
   }
 
   respecEntireTree(): boolean {
+    if (!this.playerStore.canChangeInventorySlots(-this.inventorySlotsGranted())) return false
+
     const unlocked = this.playerStore.unlockedNodes()
     let allocatedLevels = 0
     let skillPointsToReturn = 0
-    const statRollbacks: Array<{ stat: PlayerStat; amount: number }> = []
     const spellRollbacks: Array<{ spellId: SpellID; levels: number }> = []
 
     for (const [idStr, level] of Object.entries(unlocked)) {
@@ -139,9 +155,6 @@ export class SkillTreeService {
       if (!node) continue
       allocatedLevels += level
       skillPointsToReturn += level * node.skillPointCost
-      if (node.type === SkillNodeType.stat && node.stat) {
-        statRollbacks.push({ stat: node.stat, amount: -(node.statAmount * level) })
-      }
       if (node.type === SkillNodeType.spell && node.spellId !== undefined) {
         spellRollbacks.push({ spellId: node.spellId, levels: level })
       }
@@ -153,17 +166,23 @@ export class SkillTreeService {
     if (this.playerStore.stats().goldCoins < goldCost) return false
 
     this.playerStore.updatePlayerStats([
-      ...statRollbacks,
       { stat: 'unspentSkillPoints', amount: skillPointsToReturn },
       { stat: 'goldCoins', amount: -goldCost },
     ])
 
     for (const { spellId, levels } of spellRollbacks) {
       this.playerStore.levelDownSpell(spellId, levels)
-      this.battleManagerService.unequipSpell(spellId)
+      this.battleManagerService.unequipSpell(spellId, true)
     }
 
     this.playerStore.resetUnlockedNodes()
+    this.switchOffLostToggles()
     return true
+  }
+
+  /** Auto wave and auto eat toggles go off with their node, so re-buying it doesn't silently resume them. */
+  private switchOffLostToggles(): void {
+    if (!this.playerStore.hasSkillUnlocked(SkillNodeID.autoWaveProgression)) this.battleStore.toggleAutoWave(false)
+    if (!this.playerStore.hasSkillUnlocked(SkillNodeID.autoEat)) this.battleStore.toggleAutoEat(false)
   }
 }

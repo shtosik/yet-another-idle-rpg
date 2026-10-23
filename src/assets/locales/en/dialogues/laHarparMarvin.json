@@ -5,13 +5,16 @@
     "opt2": "I'll figure it out myself. Just show me the tasks."
   },
   "introduction2": {
-    "message": "The Exploration Guild assigns hunting contracts to capable adventurers. Slay the target, earn Explorer Tokens. Simple as that. The more tasks you complete, the further I'll send you — new territories unlock every 5 completions.",
+    "message": "The Exploration Guild assigns hunting contracts to capable adventurers. Slay the target, earn Explorer Tokens. Simple as that. Every 5 completed contracts raise your Guild rank — I'll send you into new territory and open more of the guild store.",
     "opt1": "Sounds good. Let's get started."
   },
   "default": {
     "message": "Back for more work, or just browsing? The guild always has contracts available.",
     "whatIsThisPlace": "What is the Exploration Guild?",
+    "claimTasks": "I've finished a contract.",
     "taskIntro": "I'd like a hunt task.",
+    "taskStatus": "How are my contracts going?",
+    "store": "Show me the guild store.",
     "goodbye": "See you around, Marvin."
   },
   "whatIsThisPlace1": {
@@ -19,20 +22,20 @@
     "opt1": "Got it. Thanks, Marvin."
   },
   "taskIntro": {
-    "message": "Pick a contract length and I'll assign you a target from the regions you've unlocked. The longer the contract, the bigger the token payout.",
-    "short": "Short contract — 25 to 50 kills, 1 Token.",
-    "medium": "Medium contract — 50 to 200 kills, 2 Tokens.",
-    "long": "Long contract — 200 to 400 kills, 3 Tokens.",
+    "message": "Pick a contract length and I'll assign you a target from the regions your rank allows. Tougher regions pay more tokens per contract.",
+    "short": "Short contract — 25 to 50 kills, 1 Token per region tier.",
+    "medium": "Medium contract — 50 to 200 kills, 2 Tokens per region tier.",
+    "long": "Long contract — 200 to 400 kills, 3 Tokens per region tier.",
     "back": "Actually, never mind."
   },
   "taskInProgress": {
-    "message": "You're still on your current contract. Keep at it — finish the hunt and come back to collect your tokens.",
-    "cancel": "Cancel my current task.",
+    "message": "Still hunting. Keep at it — finish the contract and come back to collect your tokens.",
+    "cancel": "Cancel the {{monster}} contract ({{left}} kills left).",
     "back": "Right, I'll keep going."
   },
   "taskClaimed": {
-    "message": "Fine work out there! Your tokens have been added. Keep this up and I'll have new territories for you before long.",
-    "claim": "Claim my reward.",
+    "message": "Fine work out there! Hand over your finished contracts and I'll pay out the tokens.",
+    "claim": "Claim my rewards.",
     "back": "Actually, not yet."
   }
 }

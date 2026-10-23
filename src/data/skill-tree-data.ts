@@ -53,7 +53,7 @@ const EXPLORATION_SKILLS_DATA: Partial<Record<SkillNodeID, SkillNode>> = {
     maxLevel: 5,
     url: './assets/img/skills/goldGain.png',
     type: SkillNodeType.stat,
-    stat: 'goldCoins',
+    stat: 'goldCoinsMultiplier',
     statAmount: 0.1,
   },
   [SkillNodeID.knowledge]: {
@@ -202,7 +202,8 @@ const MAGIC_SKILLS_DATA: Partial<Record<SkillNodeID, SkillNode>> = {
     url: './assets/img/skills/manaRegen.png',
     type: SkillNodeType.stat,
     stat: 'manaRegenRate',
-    statAmount: 2,
+    statAmount: 0.1,
+    statPercent: true,
   },
   [SkillNodeID.magicDamage]: {
     id: SkillNodeID.magicDamage,

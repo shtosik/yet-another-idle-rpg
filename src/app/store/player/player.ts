@@ -1,7 +1,7 @@
 import { EquipmentSlotKey } from 'enums/equipment-slot.enum'
 import { ItemID } from 'enums/ids/item-id.enum'
 import { ItemTier } from 'enums/items/item-tier.enum'
-import { PlayerStatsType } from './player.store'
+import type { PlayerStatsType } from './stats'
 
 export const statsInitialState: PlayerStatsType = {
     // exp
@@ -20,7 +20,6 @@ export const statsInitialState: PlayerStatsType = {
     magicDamageMultiplier: 1,
     mana: 5,
     maxMana: 5,
-    currentManaRegenTimer: 0,
     manaRegenRate: 30 * 1000, // 30 seconds
     spellCooldownReduction: 0,
     increasedSpellDuration: 0,
@@ -42,6 +41,11 @@ export const statsInitialState: PlayerStatsType = {
     shinyChance: 0,
     // inventory
     inventorySlots: 40,
+    // Exploration Guild
+    maxTaskSlots: 1,
+    taskDoubleKillChance: 0, // percent: chance a kill counts twice toward tasks
+    // Offline progress: fraction of the online kill rate earned while away
+    offlineProgressRate: 0.5,
     // damage vs enemy type (additive, fraction: 0.2 = +20% of total damage)
     damageVsCrab: 0,
     damageVsBird: 0,

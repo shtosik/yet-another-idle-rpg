@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core'
 import { PanelComponent } from '../shared/panel/panel.component'
-import { BehaviorSubject } from 'rxjs'
+import { GameNavigationService } from '../../services/game-navigation.service'
+import { UnlockService } from '../../services/unlock.service'
 import { GameTab } from 'enums/ids/game-tab.enum'
 import { AsyncPipe, CommonModule } from '@angular/common'
 import { PlayerStat } from '../../../types/player/player-stat.type'
@@ -23,6 +24,7 @@ import { WorldMapComponent } from './world-map/world-map.component'
 import { BestiaryComponent } from './bestiary/bestiary.component'
 import { ShopStore } from '../../store/shop/shop.store'
 import { CampStore } from '../../store/camp/camp.store'
+import { OfflineStore } from '../../store/offline/offline.store'
 import { SpellbookComponent } from './spellbook/spellbook.component'
 import { ZoneID } from 'enums/ids/zone-id.enum'
 import { ItemID } from 'enums/ids/item-id.enum'
@@ -64,8 +66,12 @@ export class GameComponent {
   townsStore = inject(TownsStore)
   shopStore = inject(ShopStore)
   campStore = inject(CampStore)
+  offlineStore = inject(OfflineStore)
   dialogueManagerService = inject(DialogueManagerService)
-  gameTab = new BehaviorSubject<GameTab>(GameTab.main)
+  // Created here so unlock rules start watching as soon as the game is on screen.
+  private unlockService = inject(UnlockService)
+  private navigation = inject(GameNavigationService)
+  gameTab = this.navigation.tab
 
   hasDialogueActive = computed(() => this.dialogueManagerService.activeNpc())
 
@@ -78,6 +84,7 @@ export class GameComponent {
     this.townsStore.resetState()
     this.shopStore.resetState()
     this.campStore.resetState()
+    this.offlineStore.resetState()
   }
 
   resetQuests() {
@@ -89,7 +96,7 @@ export class GameComponent {
   }
 
   changeTab(tab: GameTab) {
-    this.gameTab.next(tab)
+    this.navigation.changeTab(tab)
   }
 
   giveStat(stat: PlayerStat) {
