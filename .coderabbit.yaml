@@ -29,7 +29,8 @@ reviews:
     - path: "src/app/**/*.html"
       instructions: >-
         Use built-in control flow (@if, @for with track, @switch, @defer). User-facing text goes
-        through the i18next pipe, not hardcoded strings.
+        through the i18next pipe, not hardcoded strings. Exception: the dev-only cheat bar
+        (src/app/components/game/dev-cheats) stays in plain English.
     - path: "src/data/**"
       instructions: >-
         Static game content keyed by numeric enums in src/enums. Check ids match their keys,
