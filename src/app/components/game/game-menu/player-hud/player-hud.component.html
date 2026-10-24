@@ -19,7 +19,7 @@
   <ul class="hud__currencies">
     <li class="hud__currency hud__currency--gold" [attr.aria-label]="'playerStats.goldCoins' | i18next">
       <span class="hud__coin" aria-hidden="true"></span>
-      <span class="hud__currency-value">{{ gold() | abbr }}</span>
+      <span class="hud__currency-value" aria-live="polite">{{ gold() | abbr }}</span>
 
       @for (change of goldChanges(); track change.id) {
         <span

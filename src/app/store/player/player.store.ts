@@ -197,6 +197,18 @@ export const PlayerStore = signalStore(
       stats: computed(() => deriveStatsWith(store, activeBuffs(), activeConsumables())),
     }
   }),
+  withComputed((store, battleStore = inject(BattleStore)) => {
+    /** Learned spells not on the spell bar and not yet viewed: what the Spellbook palette shows as new. */
+    const unseenSpells = computed(() => {
+      const equipped = battleStore.equippedSpells().map(slot => slot?.spellId)
+      return unseen(knownSpells(store.unlockedSpells()), store.seenSpells()).filter(id => !equipped.includes(id))
+    })
+
+    return {
+      unseenSpells,
+      unseenSpellCount: () => unseenSpells().length,
+    }
+  }),
   withComputed((store) => ({
     /** One rank per `TASKS_PER_GUILD_RANK` completed tasks, no cap. Each rank adds a zone tier to the task pool. */
     guildRank: () => Math.floor(store.totalTasksCompleted() / TASKS_PER_GUILD_RANK),
@@ -204,7 +216,6 @@ export const PlayerStore = signalStore(
     hasCompletedTask: () => store.activeTasks().some(isTaskDone),
     hasTaskInProgress: () => store.activeTasks().some(task => !isTaskDone(task)),
     unseenEnemyCount: () => unseen(revealedEnemies(store.enemyKillCounts()), store.seenEnemies()).length,
-    unseenSpellCount: () => unseen(knownSpells(store.unlockedSpells()), store.seenSpells()).length,
     equippedWeaponDamageType: () => {
       const weapon = store.equipment().weapon
       if (!weapon) return DamageElement.physical
@@ -640,7 +651,7 @@ export const PlayerStore = signalStore(
     },
 
     markSpellsSeen(): void {
-      const fresh = unseen(knownSpells(store.unlockedSpells()), store.seenSpells())
+      const fresh = store.unseenSpells()
       if (fresh.length) patchState(store, { seenSpells: [...store.seenSpells(), ...fresh] })
     },
   })),

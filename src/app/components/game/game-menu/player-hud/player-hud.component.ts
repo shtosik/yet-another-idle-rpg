@@ -20,7 +20,7 @@ export class PlayerHudComponent {
 
   protected level = this.playerStore.resources.level
   protected experience = this.playerStore.resources.experience
-  protected gold = computed(() => this.playerStore.stats().goldCoins)
+  protected gold = this.playerStore.resources.goldCoins
 
   protected xpForNextLevel = computed(() => calculateXp(this.level() + 1))
   protected xpPercent = computed(() => Math.min(100, (this.experience() / this.xpForNextLevel()) * 100))

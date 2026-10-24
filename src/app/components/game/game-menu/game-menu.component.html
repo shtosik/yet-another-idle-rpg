@@ -8,7 +8,7 @@
           type="button"
           [class.game-menu__tab--active]="active"
           [class.game-menu__tab--locked]="!entry.unlocked"
-          [disabled]="!entry.unlocked"
+          [attr.aria-disabled]="entry.unlocked ? null : 'true'"
           [attr.aria-current]="active ? 'page' : null"
           [attr.title]="entry.unlocked ? null : ('gameTabs.locked' | i18next)"
           (click)="select(entry)"
@@ -20,6 +20,9 @@
             </svg>
           }
           {{ ('gameTabs.' + GameTab[entry.tab]) | i18next }}
+          @if (!entry.unlocked) {
+            <span class="game-menu__sr-only">({{ 'gameTabs.locked' | i18next }})</span>
+          }
           @if (entry.unlocked && entry.badge) {
             <span class="game-menu__badge">{{ entry.badge }}</span>
           }
