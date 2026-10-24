@@ -1,4 +1,5 @@
-import { Injectable, signal } from '@angular/core'
+import { Injectable } from '@angular/core'
+import { Subject } from 'rxjs'
 
 export interface DamageEvent {
     damage: number;
@@ -8,9 +9,11 @@ export interface DamageEvent {
 
 @Injectable({ providedIn: 'root' })
 export class AnimationsService {
-    damageEvent = signal<DamageEvent>(null)
+    // A stream, not a signal: several hits in one tick must each reach the popup.
+    private readonly damageEvents = new Subject<DamageEvent>()
+    readonly damageEvents$ = this.damageEvents.asObservable()
 
     showDamage(damage: number, isCriticalHit: boolean = false, isStrong: boolean = false) {
-        this.damageEvent.set({ damage, isCriticalHit, isStrong })
+        this.damageEvents.next({ damage, isCriticalHit, isStrong })
     }
 }

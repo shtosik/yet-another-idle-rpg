@@ -1,4 +1,9 @@
 name: Deploy
+# Run title names the target environment, e.g. "testing ← fix/damage-popups".
+run-name: >-
+  ${{ github.event_name == 'workflow_dispatch' && format('testing ← {0}', github.ref_name)
+  || github.ref_name == 'main' && format('production ← {0}', github.event.head_commit.message)
+  || format('staging ← {0}', github.event.head_commit.message) }}
 
 # main -> production, staging -> staging, manual run (any branch) -> testing.
 # Each GitHub environment holds a DOMAIN variable; the Workers are in wrangler.jsonc. See docs/deployment.md.
