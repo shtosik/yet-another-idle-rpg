@@ -5,7 +5,7 @@
     <h2 class="shop__name">{{ staticShop.nameKey | i18next }}</h2>
     <span class="shop__cooldown">{{ 'shop:ui.nextRefresh' | i18next: { time: cooldownLabel() } }}</span>
     @if (currency() === 'explorerTokens') {
-      <span class="shop__balance">{{ 'shop:ui.tokenBalance' | i18next: { amount: balance(), rank: guildRank() } }}</span>
+      <span class="shop__balance">{{ 'shop:ui.guildRank' | i18next: { rank: guildRank() } }}</span>
     }
   </div>
 

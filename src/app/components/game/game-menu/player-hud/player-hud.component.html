@@ -15,20 +15,30 @@
     </div>
   </div>
 
-  <!-- One entry per currency; more (tokens, runes…) slot in here later. -->
   <ul class="hud__currencies">
-    <li class="hud__currency hud__currency--gold" [attr.aria-label]="'playerStats.goldCoins' | i18next">
-      <span class="hud__coin" aria-hidden="true"></span>
-      <span class="hud__currency-value" aria-live="polite">{{ gold() | abbr }}</span>
+    @for (entry of currencies(); track entry.currency) {
+      <li
+        class="hud__currency"
+        [class]="'hud__currency--' + entry.currency"
+        [attr.aria-label]="entry.labelKey | i18next"
+        [attr.title]="entry.labelKey | i18next"
+      >
+        @if (entry.currency === 'explorerTokens') {
+          <img class="hud__icon" src="./assets/img/icons/explorationToken.png" alt="" aria-hidden="true" width="14" height="14">
+        } @else {
+          <span class="hud__coin" aria-hidden="true"></span>
+        }
+        <span class="hud__currency-value" aria-live="polite">{{ entry.amount | abbr }}</span>
 
-      @for (change of goldChanges(); track change.id) {
-        <span
-          class="hud__float"
-          aria-hidden="true"
-          [class.hud__float--gain]="change.amount > 0"
-          [class.hud__float--loss]="change.amount < 0"
-        >{{ change.amount > 0 ? '+' : '−' }}{{ (change.amount < 0 ? -change.amount : change.amount) | abbr }}</span>
-      }
-    </li>
+        @for (change of entry.changes; track change.id) {
+          <span
+            class="hud__float"
+            aria-hidden="true"
+            [class.hud__float--gain]="change.amount > 0"
+            [class.hud__float--loss]="change.amount < 0"
+          >{{ change.amount > 0 ? '+' : '−' }}{{ (change.amount < 0 ? -change.amount : change.amount) | abbr }}</span>
+        }
+      </li>
+    }
   </ul>
 </div>

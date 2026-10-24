@@ -79,7 +79,8 @@
     "locked": "Locked"
   },
   "hud": {
-    "level": "Lv {{level}}"
+    "level": "Lv {{level}}",
+    "explorerTokens": "Explorer Tokens"
   },
   "starts": "Starts",
   "requires": "Requires",

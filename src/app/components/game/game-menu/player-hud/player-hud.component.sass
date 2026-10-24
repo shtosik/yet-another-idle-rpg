@@ -59,6 +59,9 @@
     &--gold
       color: palette.$yellow
 
+    &--explorerTokens
+      color: #7dd3fc
+
   &__coin
     width: 0.7rem
     height: 0.7rem
@@ -66,11 +69,21 @@
     background: palette.$yellow
     box-shadow: inset -2px -2px 0 #a16207
 
-  // Floats right of the value, inside the strip, so it never covers the tabs or the XP bar.
+  &__icon
+    width: 0.9rem
+    height: 0.9rem
+    image-rendering: pixelated
+
+  // Drops below its own value, so it never runs into the next currency or covers the tabs.
   &__float
     position: absolute
-    left: 100%
-    margin-left: 0.5rem
+    top: 100%
+    left: 50%
+    z-index: 10
+    padding: 0.1rem 0.35rem
+    border-radius: vars.$panelBorderRadius
+    // Readable over whatever panel sits under the strip.
+    background: rgba(0, 0, 0, 0.8)
     font-weight: 600
     text-shadow: vars.$textShadow
     pointer-events: none
@@ -85,10 +98,10 @@
 @keyframes currency-float
   0%
     opacity: 0
-    transform: translateX(-0.4rem)
+    transform: translate(-50%, -0.4rem)
   15%
     opacity: 1
-    transform: translateX(0)
+    transform: translate(-50%, 0)
   100%
     opacity: 0
-    transform: translateX(0.8rem)
+    transform: translate(-50%, 0.8rem)
