@@ -23,7 +23,7 @@ To put any branch on testing: GitHub → Actions → **Deploy** → **Run workfl
 
 ## Workflows
 
-- `.github/workflows/ci.yml` runs on PRs into `main` and `staging`: `npm run validate`, `npm run test:assets`, `npm run build`.
+- `.github/workflows/ci.yml` runs on PRs into `main` and `staging`: `npm run validate`, `npm run build`. `npm run test:assets` stays local: it needs the matting model under `krita/`, which is not in git.
 - `.github/workflows/deploy.yml` runs `npm run validate`, the build for the environment, then `wrangler deploy --env=<environment> --domain $DOMAIN`. A deploy creates the Worker and its custom domain on first run.
 
 GitHub's standard runners are free for public repos, and `wrangler deploy` uploads a finished build, so deploys don't use Cloudflare's build minutes.
