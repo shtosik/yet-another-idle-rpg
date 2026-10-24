@@ -1,5 +1,5 @@
 import { compressToUTF16 } from 'lz-string'
-import { readSave } from './with-game-state-sync.hook'
+import { classifySave, readSave } from './with-game-state-sync.hook'
 
 describe('readSave', () => {
   const state = { gold: 5 }
@@ -35,5 +35,23 @@ describe('readSave', () => {
     expect(() => readSave(envelope(1, 'x'), 1)).toThrow()
     expect(() => readSave(envelope(1, []), 1)).toThrow()
     expect(() => readSave(envelope('1'), 1)).toThrow()
+  })
+})
+
+describe('classifySave (save import check)', () => {
+  const envelope = (v: number) => JSON.stringify({ v, state: { gold: 5 } })
+
+  it('says how each save would load into a store of the given version', () => {
+    expect(classifySave(envelope(2), 2)).toBe('load')
+    expect(classifySave(envelope(1), 2)).toBe('outdated')
+    expect(classifySave(envelope(3), 2)).toBe('newer')
+    expect(classifySave('z:' + compressToUTF16(envelope(2)), 2)).toBe('load')
+  })
+
+  it('marks anything it cannot read as unreadable instead of throwing', () => {
+    expect(classifySave('{not json', 1)).toBe('unreadable')
+    expect(classifySave('z:garbage', 1)).toBe('unreadable')
+    expect(classifySave(42, 1)).toBe('unreadable')
+    expect(classifySave(null, 1)).toBe('unreadable')
   })
 })

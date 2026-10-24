@@ -1,9 +1,15 @@
-import { ChangeDetectionStrategy, Component, effect, inject, Input, signal } from '@angular/core'
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, Input, signal } from '@angular/core'
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { AnimationsService } from '../../../services/animations.service'
 import { I18nextPipe } from '../../../pipes/i18next.pipe'
 
+const POPUP_LIFETIME_IN_MS = 1000
+// Hits in the same tick start at the same spot; a small sideways jitter keeps them readable.
+const POPUP_JITTER_IN_PX = 24
+
 interface FloatingDamage {
   id: number // for tracking in template loop
+  offsetX: number
   damage: number;
   isCriticalHit: boolean;
   isStrong: boolean;
@@ -14,7 +20,7 @@ interface FloatingDamage {
   templateUrl: './damage-popup.component.html',
   styleUrls: ['./damage-popup.component.sass'],
   imports: [I18nextPipe],
-  changeDetection: ChangeDetectionStrategy.Default,
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DamagePopupComponent {
   @Input() x: number
@@ -22,32 +28,30 @@ export class DamagePopupComponent {
 
   floatingDamages = signal<FloatingDamage[]>([])
   private animationsService = inject(AnimationsService)
-  private idCounter: number = 0
+  private nextId = 0
+  private removeTimers = new Set<ReturnType<typeof setTimeout>>()
 
   constructor() {
-    effect(() => {
-      const damageEvent = this.animationsService.damageEvent()
-      if (!damageEvent) return
+    this.animationsService.damageEvents$
+      .pipe(takeUntilDestroyed())
+      .subscribe(event => this.addPopup({
+        id: this.nextId++,
+        offsetX: Math.round((Math.random() * 2 - 1) * POPUP_JITTER_IN_PX),
+        damage: event.damage,
+        isCriticalHit: !!event.isCriticalHit,
+        isStrong: !!event.isStrong,
+      }))
 
-      const newDamage = {
-        id: this.idCounter,
-        damage: damageEvent.damage,
-        isCriticalHit: !!damageEvent.isCriticalHit,
-        isStrong: !!damageEvent.isStrong,
-      }
+    inject(DestroyRef).onDestroy(() => this.removeTimers.forEach(clearTimeout))
+  }
 
-      this.idCounter++
+  private addPopup(popup: FloatingDamage) {
+    this.floatingDamages.update(current => [...current, popup])
 
-      if (this.idCounter >= 100) this.idCounter = 0
-
-      this.floatingDamages.update(current => [...current, newDamage])
-
-      setTimeout(() => {
-        this.floatingDamages.update(current => {
-          current.shift()
-          return current
-        })
-      }, 1000)
-    })
+    const timer = setTimeout(() => {
+      this.removeTimers.delete(timer)
+      this.floatingDamages.update(current => current.filter(p => p.id !== popup.id))
+    }, POPUP_LIFETIME_IN_MS)
+    this.removeTimers.add(timer)
   }
 }

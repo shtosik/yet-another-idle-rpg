@@ -44,3 +44,6 @@ Thumbs.db
 
 # asset-generator agent scratch scripts
 .tmp-gen/
+
+# wrangler dev local state
+/.wrangler
