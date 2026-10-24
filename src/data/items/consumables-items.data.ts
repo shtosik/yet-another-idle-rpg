@@ -149,7 +149,7 @@ export const ConsumablesItemsData: Partial<Record<ItemID, Item>> = {
     id: ItemID.venisonRoastRecipe,
     tier: ItemTier.uncommon,
     url: './assets/img/items/cookingRecipe.png',
-    value: 150,
+    value: -1,
     type: ItemType.recipe,
     recipeId: RecipeID.venisonRoast,
   },

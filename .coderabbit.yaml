@@ -1,0 +1,47 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# CodeRabbit PR review config. CLAUDE.md is read as review guidelines by default.
+language: en-US
+
+reviews:
+  profile: chill
+  poem: false
+  in_progress_fortune: false
+  auto_review:
+    enabled: true
+    drafts: false
+    # main (default branch) is always reviewed; most PRs target staging.
+    base_branches:
+      - staging
+  path_filters:
+    - "!package-lock.json"
+    - "!dist/**"
+    - "!src/assets/**/*.png"
+    - "!src/assets/**/*.webp"
+    - "!src/assets/maps/**"
+    - "!public/**"
+    - "!docs/archive/**"
+  path_instructions:
+    - path: "src/app/**/*.ts"
+      instructions: >-
+        Angular 20 standalone, zoneless. Expect OnPush, inject(), signal input()/output() and
+        signals/computed over RxJS for state. State lives in NgRx Signal Stores (src/app/store).
+        Player stats are derived in PlayerStore.stats(); flag code that stores a derived stat.
+    - path: "src/app/**/*.html"
+      instructions: >-
+        Use built-in control flow (@if, @for with track, @switch, @defer). User-facing text goes
+        through the i18next pipe, not hardcoded strings.
+    - path: "src/data/**"
+      instructions: >-
+        Static game content keyed by numeric enums in src/enums. Check ids match their keys,
+        i18n keys exist, and balance values look sane compared to neighbouring entries.
+    - path: "src/assets/locales/**"
+      instructions: "Check every key used in code exists in each language and placeholders match."
+    - path: ".github/workflows/**"
+      instructions: >-
+        Public repo. Never pass untrusted input (branch names, PR titles) straight into run:
+        scripts; secrets only on the steps that need them.
+
+knowledge_base:
+  code_guidelines:
+    filePatterns:
+      - GLOSSARY.md

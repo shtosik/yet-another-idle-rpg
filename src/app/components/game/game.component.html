@@ -52,12 +52,9 @@
     <app-spellbook class="spellbook"/>
   }
 </div>
-<div style="margin-top: 1rem; display: flex; gap: 0.2rem;">
-  <button (click)="resetState()">reset state</button>
-  <button (click)="giveStat('unspentSkillPoints')">give skill points</button>
-  <button (click)="giveStat('experience')">give xp</button>
-  <button (click)="resetQuests()">reset quests</button>
-  <button (click)="resetShops()">reset shops</button>
-  <button (click)="unlockAllZones()">unlock all zones</button>
-  <button (click)="giveMachete()">give machete</button>
-</div>
+@if (cheats) {
+  <!-- Deferred so the cheat code lands in its own chunk that production never loads. -->
+  @defer {
+    <app-dev-cheats/>
+  }
+}

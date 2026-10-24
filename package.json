@@ -5,6 +5,7 @@
         "ng": "ng",
         "start": "ng serve",
         "build": "ng build",
+        "build:testing": "ng build --configuration production,testing",
         "watch": "ng build --watch --configuration development",
         "test": "ng test",
         "tile": "node scripts/tile-map.mjs",
@@ -64,6 +65,7 @@
         "karma-jasmine": "~5.1.0",
         "karma-jasmine-html-reporter": "~2.1.0",
         "sharp": "^0.34.5",
-        "typescript": "~5.8.2"
+        "typescript": "~5.8.2",
+        "wrangler": "4.152.0"
     }
 }
