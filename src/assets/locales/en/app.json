@@ -148,6 +148,7 @@
   "update": {
     "newVersion": "Version {{version}} is out.",
     "newBuild": "A new build of the game is out.",
-    "reload": "Reload"
+    "reload": "Reload",
+    "saveFailed": "Your progress couldn't be saved, so the game didn't reload. Free some browser storage and try again."
   }
 }

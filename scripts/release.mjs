@@ -68,7 +68,7 @@ function notes(version = currentVersion()) {
   const section = changelogSections(readFileSync(CHANGELOG, 'utf8')).find(s => s.version === version)
   if (!section) fail(`CHANGELOG.md: no section for ${version}`)
   // `- [buff] text` reads as `- **Buff**: text` in a GitHub release.
-  console.log(section.body.replace(new RegExp(NOTE_RE.source, 'gm'), (line, type, text) => `- **${NOTE_TYPES[type] ?? type}**: ${text}`))
+  console.log(section.body.replace(new RegExp(NOTE_RE.source, 'gm'), (line, type, text) => `- **${Object.hasOwn(NOTE_TYPES, type) ? NOTE_TYPES[type] : type}**: ${text}`))
 }
 
 function checkBump(base) {

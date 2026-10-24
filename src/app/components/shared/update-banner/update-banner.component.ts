@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core'
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core'
 import { I18nextPipe } from '../../../pipes/i18next.pipe'
 import { VersionCheckService } from '../../../services/version-check.service'
 import { APP_VERSION } from '../../../version'
@@ -16,8 +16,9 @@ export class UpdateBannerComponent {
 
     readonly available = this.versionCheck.available
     readonly currentVersion = APP_VERSION
+    readonly saveFailed = signal(false)
 
     reload(): void {
-        this.versionCheck.reload()
+        this.saveFailed.set(!this.versionCheck.reload())
     }
 }

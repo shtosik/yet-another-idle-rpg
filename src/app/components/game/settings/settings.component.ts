@@ -23,6 +23,9 @@ export class SettingsComponent {
     readonly importErrorKey = signal<string | null>(null)
     readonly exported = signal(false)
 
+    /** Bumped per file pick, so a slower read of an earlier pick can't replace a newer one. */
+    private pickId = 0
+
     openChangelog(): void {
         this.modalService.openChangelog()
     }
@@ -38,8 +41,13 @@ export class SettingsComponent {
         input.value = ''
         if (!blob) return
 
+        const pickId = ++this.pickId
+        // The previous pick can't be confirmed while this one is read.
+        this.pendingImport.set(null)
+        this.importErrorKey.set(null)
         this.exported.set(false)
         const result = await this.saveTransfer.readFile(blob)
+        if (pickId !== this.pickId) return
         this.pendingImport.set('import' in result ? result.import : null)
         this.importErrorKey.set('errorKey' in result ? result.errorKey : null)
     }

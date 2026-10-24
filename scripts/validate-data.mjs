@@ -474,7 +474,7 @@ for (const doc of DOC_FILES) {
     for (const line of s.lines.filter(l => l.trim())) {
       const note = NOTE_RE.exec(line)
       if (!note) error('CHANGELOG.md', `[${s.version}] '${line}' is not '- [type] text'`)
-      else if (!(note[1] in NOTE_TYPES)) error('CHANGELOG.md', `[${s.version}] unknown note type '${note[1]}' (${Object.keys(NOTE_TYPES).join(', ')})`)
+      else if (!Object.hasOwn(NOTE_TYPES, note[1])) error('CHANGELOG.md', `[${s.version}] unknown note type '${note[1]}' (${Object.keys(NOTE_TYPES).join(', ')})`)
     }
   }
 }

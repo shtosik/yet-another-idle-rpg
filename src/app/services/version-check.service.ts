@@ -33,10 +33,14 @@ export class VersionCheckService {
         })
     }
 
-    /** Saves first, so the reload loses no progress. */
-    reload(): void {
-        saveGameStateNow()
+    /**
+     * Saves first, so the reload loses no progress. A failed save (storage full or blocked) cancels the reload and
+     * returns false: the game keeps running on its in-memory state and keeps retrying the save.
+     */
+    reload(): boolean {
+        if (!saveGameStateNow()) return false
         location.reload()
+        return true
     }
 
     private async check(): Promise<void> {

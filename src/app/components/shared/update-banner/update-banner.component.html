@@ -7,6 +7,9 @@
                 {{ 'app:update.newBuild' | i18next }}
             }
         </span>
+        @if (saveFailed()) {
+            <span class="update-banner__warning">{{ 'app:update.saveFailed' | i18next }}</span>
+        }
         <button class="update-banner__reload" (click)="reload()">{{ 'app:update.reload' | i18next }}</button>
     </div>
 }
