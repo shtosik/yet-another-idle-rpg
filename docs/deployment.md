@@ -21,6 +21,8 @@ Feature branch → PR into `staging` → merge (deploys staging) → PR `staging
 
 To put any branch on testing: GitHub → Actions → **Deploy** → **Run workflow** → pick the branch. The branch must contain `.github/workflows/deploy.yml`. Testing holds one build at a time; the next run replaces it.
 
+Run titles in the Actions tab name the target: `testing ← <branch>`, `staging ← <commit>`, `production ← <commit>`. What is live on an environment right now: GitHub → Deployments → filter by environment.
+
 ## Workflows
 
 - `.github/workflows/ci.yml` runs on PRs into `main` and `staging`: `npm run validate`, `npm run build`. `npm run test:assets` stays local: it needs the matting model under `krita/`, which is not in git.
