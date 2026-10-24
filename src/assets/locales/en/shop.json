@@ -18,7 +18,7 @@
     "sellPrice": "{{amount}}g each",
     "preferred": "Pays more",
     "tokenPrice": "{{amount}} tokens",
-    "tokenBalance": "{{amount}} Explorer Tokens · Guild rank {{rank}}",
+    "guildRank": "Guild rank {{rank}}",
     "needsRank": "Rank {{rank}}",
     "sellHint": "Click to sell one. Ctrl-click to sell the whole stack.",
     "nothingToSell": "Nothing to sell.",

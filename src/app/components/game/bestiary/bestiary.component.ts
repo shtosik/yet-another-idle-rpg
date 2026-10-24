@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, untracked } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { I18nextPipe } from '../../../pipes/i18next.pipe'
 import { HalfSizeSpriteDirective } from '../../shared/half-size-sprite/half-size-sprite.directive'
@@ -61,6 +61,13 @@ export class BestiaryComponent {
     })
 
     shinyUnlocked = computed<boolean>(() => (this.playerStore.stats().shinyChance ?? 0) > 0)
+
+    constructor() {
+        // Entries revealed while the tab is open count as seen too, so the navbar badge stays clear.
+        effect(() => {
+            if (this.playerStore.unseenEnemyCount()) untracked(() => this.playerStore.markEnemiesSeen())
+        })
+    }
 
     selectMonster(entry: MonsterEntry) {
         if (!entry.isUnlocked) return

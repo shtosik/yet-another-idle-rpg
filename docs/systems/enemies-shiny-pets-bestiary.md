@@ -16,7 +16,7 @@ Enemy definitions and their loot. A **shiny** is a rare recolored spawn with muc
 - **Shiny roll** at spawn: `Math.random() * 100 < stats.shinyChance` (percent; 0 by default, raised by the `shinyHunter` node). Bosses can be shiny. The enemy's sprite swaps to `toShinyUrl(url)`; no other visual cue.
 - **Shiny rewards**: XP ×5, gold ×10, normal drop table rolled 10 times, plus `shinyDrops` rolled once.
 - **Pets**: each enemy in `PETS` gets `petDrop` in `drops` (1/2000) and `shinyPetDrops` as its `shinyDrops`. Pets are `EquipmentSlot.pet` items using the enemy sprite (shiny pets the shiny sprite); normal pets are rare tier, shiny pets legendary.
-- **Bestiary**: an enemy is revealed after its first kill (`enemyKillCounts`); until then it shows `enemies/unknown.png`. The detail view shows HP, zones, kill count, drop tables and a normal/shiny sprite toggle.
+- **Bestiary**: an enemy is revealed after its first kill (`enemyKillCounts`); until then it shows `enemies/unknown.png`. Revealed enemies not yet in `seenEnemies` count toward the navbar badge; the bestiary tab marks them seen while it's open (`markEnemiesSeen`). The detail view shows HP, zones, kill count, drop tables and a normal/shiny sprite toggle.
 
 ## Invariants & gotchas
 - An enemy with `shinyDrops` needs a `-shiny.png` sprite next to its normal one (`npm run validate` checks).

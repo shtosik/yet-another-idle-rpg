@@ -15,6 +15,7 @@ import { QuestStep } from '../../types/quests/quest-progression.type'
 import { ItemStack } from '../store/player/inventory'
 import { ExplorationGuildService } from './exploration-guild.service'
 import { TownsStore } from '../store/towns/towns.store'
+import { CurrencyFeedService } from './currency-feed.service'
 
 @Injectable({ providedIn: 'root' })
 export class DialogueManagerService {
@@ -22,6 +23,7 @@ export class DialogueManagerService {
   private questStore = inject(QuestsStore)
   private guildService = inject(ExplorationGuildService)
   private townsStore = inject(TownsStore)
+  private currencyFeed = inject(CurrencyFeedService)
 
   private currentConversation = signal<Record<any, DialogueNode<any>> | null>(null)
   private currentNodeId = signal<any>(null)
@@ -286,9 +288,12 @@ export class DialogueManagerService {
             case 'abandonTask':
               this.playerStore.abandonTask(effect.taskIndex ?? 0)
               break
-            case 'claimTask':
+            case 'claimTask': {
+              const tokensBefore = this.playerStore.explorerTokens()
               this.playerStore.claimCompletedTasks()
+              this.currencyFeed.show('explorerTokens', this.playerStore.explorerTokens() - tokensBefore)
               break
+            }
           }
           break
       }

@@ -1,7 +1,7 @@
 # World map
 
 ## Purpose
-A pannable, zoomable painted map (Leaflet) with markers for unlocked towns and zones. Clicking a marker travels there. The map tab appears once the first town unlocks.
+A pannable, zoomable painted map (Leaflet) with markers for unlocked towns and zones. Clicking a marker travels there. The map tab unlocks with the first town (shown locked in the navbar before that).
 
 ## Key files
 - `src/app/components/game/world-map/world-map.component.ts:WorldMapComponent` — Leaflet map with a custom `PIXEL_CRS`, tile layer, marker sync.

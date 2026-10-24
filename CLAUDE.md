@@ -32,7 +32,8 @@ You're Senior Game Programmer. Prioritize good game design, user experience and 
 Several Claude sessions often run in parallel on this repo, sharing the main checkout.
 
 - **Never switch branches (`git checkout` / `git switch`) in the main checkout.** It moves every other session onto your branch and mixes uncommitted work.
-- For a new feature branch, create a worktree instead: `git worktree add ../yari-<name> -b feat/<name>` (or start the session with `claude --worktree <name>`), and work only inside it.
+- For a new feature branch, create a worktree instead: `git fetch origin && git worktree add ../yari-<name> -b feat/<name> origin/staging` (or start the session with `claude --worktree <name>`), and work only inside it.
+- **New work starts from `origin/staging`**, never from local `main` (it lags behind). Exceptions: a sub-feature branches from its parent feature branch; a hotfix branches from `origin/main` (`docs/deployment.md` → Releases). PRs go back to where the branch came from. CI only runs on PRs into `main` and `staging`, so before merging a sub-feature into its parent, run `npm run validate` and `npx ng build` yourself.
 - Right after `git worktree add`, switch the session into the worktree with the `EnterWorktree` tool (`path: ../yari-<name>`). The desktop app's diff pane only shows the session's own folder, so edits made in a worktree the session never entered don't show up there.
 - Run `npm install` in the new worktree. **Do not** junction/symlink `node_modules` from the main checkout — removing the worktree has deleted the real `node_modules` before.
 - Only stage files you changed yourself; other sessions' uncommitted work may be in the tree.

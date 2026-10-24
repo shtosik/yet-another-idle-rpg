@@ -88,6 +88,9 @@ interface PlayerState {
   mapUnlocked: boolean;
   unlockedRecipes: RecipeID[];
   spellbookUnlocked: boolean;
+  /** Bestiary entries and spells the player has looked at; the rest show as a navbar badge. */
+  seenEnemies: EnemyID[];
+  seenSpells: SpellID[];
 }
 
 export const initialState: PlayerState = {
@@ -113,7 +116,17 @@ export const initialState: PlayerState = {
   mapUnlocked: false,
   unlockedRecipes: [],
   spellbookUnlocked: false,
+  seenEnemies: [],
+  seenSpells: [],
 }
+
+const revealedEnemies = (kills: PlayerState['enemyKillCounts']): EnemyID[] =>
+  (Object.keys(kills).map(Number) as EnemyID[]).filter(id => (kills[id] ?? 0) > 0)
+
+const knownSpells = (spells: UnlockedSpellsType): SpellID[] =>
+  (Object.keys(spells).map(Number) as SpellID[]).filter(id => (spells[id] ?? 0) > 0)
+
+const unseen = <T>(ids: T[], seen: T[]): T[] => ids.filter(id => !seen.includes(id))
 
 const equipmentInventorySlots = (itemId: ItemID): number =>
   (ITEM_DATA[itemId] as EquipmentItem).stats
@@ -184,12 +197,25 @@ export const PlayerStore = signalStore(
       stats: computed(() => deriveStatsWith(store, activeBuffs(), activeConsumables())),
     }
   }),
+  withComputed((store, battleStore = inject(BattleStore)) => {
+    /** Learned spells not on the spell bar and not yet viewed: what the Spellbook palette shows as new. */
+    const unseenSpells = computed(() => {
+      const equipped = battleStore.equippedSpells().map(slot => slot?.spellId)
+      return unseen(knownSpells(store.unlockedSpells()), store.seenSpells()).filter(id => !equipped.includes(id))
+    })
+
+    return {
+      unseenSpells,
+      unseenSpellCount: () => unseenSpells().length,
+    }
+  }),
   withComputed((store) => ({
     /** One rank per `TASKS_PER_GUILD_RANK` completed tasks, no cap. Each rank adds a zone tier to the task pool. */
     guildRank: () => Math.floor(store.totalTasksCompleted() / TASKS_PER_GUILD_RANK),
     hasAvailableTaskSlot: () => store.activeTasks().length < store.stats().maxTaskSlots,
     hasCompletedTask: () => store.activeTasks().some(isTaskDone),
     hasTaskInProgress: () => store.activeTasks().some(task => !isTaskDone(task)),
+    unseenEnemyCount: () => unseen(revealedEnemies(store.enemyKillCounts()), store.seenEnemies()).length,
     equippedWeaponDamageType: () => {
       const weapon = store.equipment().weapon
       if (!weapon) return DamageElement.physical
@@ -617,6 +643,16 @@ export const PlayerStore = signalStore(
 
     unlockSpellbook(): void {
       patchState(store, { spellbookUnlocked: true })
+    },
+
+    markEnemiesSeen(): void {
+      const fresh = unseen(revealedEnemies(store.enemyKillCounts()), store.seenEnemies())
+      if (fresh.length) patchState(store, { seenEnemies: [...store.seenEnemies(), ...fresh] })
+    },
+
+    markSpellsSeen(): void {
+      const fresh = store.unseenSpells()
+      if (fresh.length) patchState(store, { seenSpells: [...store.seenSpells(), ...fresh] })
     },
   })),
   withMethods((store) => ({

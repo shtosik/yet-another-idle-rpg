@@ -1,0 +1,107 @@
+@use 'palette' as palette
+@use 'variables' as vars
+
+:host
+  display: block
+
+.hud
+  height: 1.75rem
+  display: flex
+  align-items: center
+  justify-content: flex-start
+  gap: 1.5rem
+  padding: 0 0.75rem
+  font-size: 0.75rem
+  white-space: nowrap
+
+  &__progress
+    display: flex
+    align-items: center
+    gap: 0.6rem
+
+  &__level
+    color: palette.$cyan
+
+  &__xp
+    position: relative
+    width: 12rem
+    height: 0.9rem
+    border: vars.$panelBorder
+    border-radius: vars.$panelBorderRadius
+    background: vars.$panelBackgroundColor
+    overflow: hidden
+
+  &__xp-fill
+    height: 100%
+    background: rgba(6, 182, 212, 0.45)
+    transition: width 0.3s ease
+
+  &__xp-text
+    position: absolute
+    inset: 0
+    display: flex
+    align-items: center
+    justify-content: center
+    font-size: 0.6rem
+    text-shadow: vars.$textShadow
+
+  &__currencies
+    display: flex
+    align-items: center
+    gap: 1.25rem
+
+  &__currency
+    position: relative
+    display: flex
+    align-items: center
+    gap: 0.4rem
+
+    &--gold
+      color: palette.$yellow
+
+    &--explorerTokens
+      color: #7dd3fc
+
+  &__coin
+    width: 0.7rem
+    height: 0.7rem
+    border-radius: 50%
+    background: palette.$yellow
+    box-shadow: inset -2px -2px 0 #a16207
+
+  &__icon
+    width: 0.9rem
+    height: 0.9rem
+    image-rendering: pixelated
+
+  // Drops below its own value, so it never runs into the next currency or covers the tabs.
+  &__float
+    position: absolute
+    top: 100%
+    left: 50%
+    z-index: 10
+    padding: 0.1rem 0.35rem
+    border-radius: vars.$panelBorderRadius
+    // Readable over whatever panel sits under the strip.
+    background: rgba(0, 0, 0, 0.8)
+    font-weight: 600
+    text-shadow: vars.$textShadow
+    pointer-events: none
+    animation: currency-float 1.2s ease-out forwards
+
+    &--gain
+      color: #2ecc71
+
+    &--loss
+      color: #e74c3c
+
+@keyframes currency-float
+  0%
+    opacity: 0
+    transform: translate(-50%, -0.4rem)
+  15%
+    opacity: 1
+    transform: translate(-50%, 0)
+  100%
+    opacity: 0
+    transform: translate(-50%, 0.8rem)

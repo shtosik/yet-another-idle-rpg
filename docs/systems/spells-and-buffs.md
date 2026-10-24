@@ -14,7 +14,7 @@ Active abilities on a 5-slot spell bar under the battle view. Spells cost mana a
 
 ## Data flow
 1. **Unlock**: buying a `spell` skill node levels the spell in `unlockedSpells` and auto-equips it into a free slot (see `skill-tree.md`).
-2. **Spellbook tab**: appears after buying the Spellbook item in the Mawood Magic Shop (`ShopComponent` calls `unlockSpellbook`). It lists unlocked, unequipped spells; dragging moves them on and off the bar.
+2. **Spellbook tab**: unlocks after buying the Spellbook item in the Mawood Magic Shop (`ShopComponent` calls `unlockSpellbook`). It lists unlocked, unequipped spells; dragging moves them on and off the bar. Unlocked spells that are off the spell bar and not yet in `seenSpells` count toward the navbar badge (`unseenSpells`); the tab marks them seen while it's open (`markSpellsSeen`). A spell auto-equipped on learning only counts once it is unequipped.
 3. **Cast** (`castSpell`), only when `canCast`: the spell is equipped, its slot is off cooldown, the player can pay the mana, and either an enemy is alive (melee, magic) or the buff isn't already active (buffs work between fights). Then: pay `baseManaCost`, set the slot's cooldown to `spellCooldown` = `max(1, baseCooldown − spellCooldownReduction)` seconds, and:
    - melee: `doDamage` with double attack;
    - magic: `doDamage` with `baseDamage` and the spell's element (see `game-loop-and-combat.md`);

@@ -9,7 +9,7 @@ Saves game state to `localStorage` (at most once a second per store) and restore
 
 | Key | Store | Holds |
 |---|---|---|
-| `playerStore` | `src/app/store/player/player.store.ts:PlayerStore` | resources, permanent bonuses, inventory, equipment, unlocked nodes, stations, recipes, tasks, unlocked content |
+| `playerStore` | `src/app/store/player/player.store.ts:PlayerStore` | resources, permanent bonuses, inventory, equipment, unlocked nodes, stations, recipes, tasks, unlocked content, seen bestiary entries and spells |
 | `battleStore` (v2) | `src/app/store/battle/battle.store.ts:BattleStore` | current zone/wave, enemy id + shiny + HP, spells, buffs, consumable slots |
 | `questsStore` | `src/app/store/quests/quests.store.ts:QuestsStore` | quest step progression (completion is step 9999), dialogue flags |
 | `townsStore` (v2) | `src/app/store/towns/towns.store.ts:TownsStore` | selected town and building id (the open shop isn't saved) |
