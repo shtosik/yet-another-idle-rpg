@@ -28,11 +28,11 @@ export class GameMenuComponent {
   /** Fixed order; locked tabs keep their slot so the bar doesn't shift as features unlock. */
   protected tabs = computed<NavTab[]>(() => [
     { tab: GameTab.main, unlocked: true, badge: 0 },
-    { tab: GameTab.map, unlocked: this.playerStore.mapUnlocked(), badge: 0 },
     { tab: GameTab.skillTree, unlocked: this.playerStore.skillTreeUnlocked(), badge: this.playerStore.resources.unspentSkillPoints() },
     { tab: GameTab.camp, unlocked: this.playerStore.campUnlocked(), badge: 0 },
-    { tab: GameTab.bestiary, unlocked: true, badge: this.playerStore.unseenEnemyCount() },
     { tab: GameTab.spellbook, unlocked: this.playerStore.spellbookUnlocked(), badge: this.playerStore.unseenSpellCount() },
+    { tab: GameTab.map, unlocked: this.playerStore.mapUnlocked(), badge: 0 },
+    { tab: GameTab.bestiary, unlocked: true, badge: this.playerStore.unseenEnemyCount() },
     { tab: GameTab.settings, unlocked: true, badge: 0 },
   ])
 
