@@ -147,4 +147,8 @@ export enum ItemID {
     guildSatchel = 131,
     secondContract = 132,
     bountyMark = 133,
+    // venison roast
+    venison = 134,
+    venisonRoast = 135,
+    venisonRoastRecipe = 136,
 }

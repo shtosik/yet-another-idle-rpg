@@ -9,6 +9,7 @@ import { build } from 'esbuild'
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync } from 'node:fs'
 import { dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
+import { changelogSections, compareVersions, NOTE_RE, NOTE_TYPES, parseVersion } from './release.mjs'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const SRC = join(ROOT, 'src')
@@ -53,6 +54,7 @@ export { ALL_SKILLS } from 'data/skill-tree-data'
 export { UNLOCK_RULES, ZONE_UNLOCK_NOTIFICATIONS } from 'data/unlock-conditions'
 export { WORLD_MAP_DATA } from 'data/world-map-data'
 export { sellPrice } from 'app/store/shop/shop-prices'
+export { CHANGELOG_NOTE_TYPES } from 'app/components/modals/changelog/changelog'
 `
 
 const outDir = join(ROOT, 'node_modules', '.cache', 'validate-data')
@@ -435,6 +437,44 @@ for (const doc of DOC_FILES) {
     if (symbol && statSync(resolved).isFile()) {
       const name = symbol.split('.').pop().replace(/\(.*$/, '')
       if (!readFileSync(resolved, 'utf8').includes(name)) error(rel, `'${path}' does not contain '${symbol}'`)
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 7. Version and changelog: package.json `version` is MAJOR.MINOR.PATCH and CHANGELOG.md has its section.
+
+{
+  const { version } = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8'))
+  if (!parseVersion(version)) error('package.json', `version '${version}' is not MAJOR.MINOR.PATCH`)
+
+  const sections = changelogSections(readFileSync(join(ROOT, 'CHANGELOG.md'), 'utf8'))
+  if (sections[0]?.version !== 'Unreleased') error('CHANGELOG.md', `first section must be '## [Unreleased]'`)
+  const released = sections.filter(s => s.version && s.version !== 'Unreleased')
+  if (!released.some(s => s.version === version)) error('CHANGELOG.md', `no '## [${version}] - YYYY-MM-DD' section for package.json version`)
+  released.forEach((s, i) => {
+    if (!parseVersion(s.version)) error('CHANGELOG.md', `'${s.version}' is not MAJOR.MINOR.PATCH`)
+    else if (i > 0 && parseVersion(released[i - 1].version) && compareVersions(released[i - 1].version, s.version) <= 0)
+      error('CHANGELOG.md', `${s.version} must come after ${released[i - 1].version} (newest first)`)
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(s.date ?? '')) error('CHANGELOG.md', `${s.version} needs a date: '## [${s.version}] - YYYY-MM-DD'`)
+    if (!s.body) error('CHANGELOG.md', `${s.version} has no entries`)
+  })
+  // Note types live in three places: release notes labels, the game's parser, and the badge labels.
+  const types = Object.keys(NOTE_TYPES)
+  const sameTypes = (other) => other.length === types.length && types.every(t => other.includes(t))
+  if (!sameTypes([...D.CHANGELOG_NOTE_TYPES]))
+    error('src/app/components/modals/changelog/changelog.ts', `CHANGELOG_NOTE_TYPES (${D.CHANGELOG_NOTE_TYPES.join(', ')}) differ from NOTE_TYPES in scripts/release.mjs (${types.join(', ')})`)
+  const badges = lookup('app:changelog.badge') ?? {}
+  if (!sameTypes(Object.keys(badges))) error('src/assets/locales/en/app.json', `changelog.badge keys (${Object.keys(badges).join(', ')}) differ from note types (${types.join(', ')})`)
+  for (const t of types) {
+    if (badges[t] !== undefined && badges[t] !== NOTE_TYPES[t]) error('scripts/release.mjs', `NOTE_TYPES.${t} '${NOTE_TYPES[t]}' differs from app.json changelog.badge.${t} '${badges[t]}'`)
+  }
+
+  for (const s of sections.filter(s => s.version)) {
+    for (const line of s.lines.filter(l => l.trim())) {
+      const note = NOTE_RE.exec(line)
+      if (!note) error('CHANGELOG.md', `[${s.version}] '${line}' is not '- [type] text'`)
+      else if (!Object.hasOwn(NOTE_TYPES, note[1])) error('CHANGELOG.md', `[${s.version}] unknown note type '${note[1]}' (${Object.keys(NOTE_TYPES).join(', ')})`)
     }
   }
 }

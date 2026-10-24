@@ -17,4 +17,5 @@ export enum RecipeID {
     huntersFeast = 16,
     minorManaPotion = 17,
     firePit = 18,
+    venisonRoast = 19,
 }

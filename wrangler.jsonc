@@ -1,0 +1,27 @@
+// Static-assets Worker, one per environment. Deployed by .github/workflows/deploy.yml (see docs/deployment.md).
+// Custom domains come from the DOMAIN variable of each GitHub environment, passed as `wrangler deploy --domain`.
+//   production: wrangler deploy --env=""
+//   staging:    wrangler deploy --env staging
+//   testing:    wrangler deploy --env testing
+{
+  "name": "yet-another-idle-rpg",
+  "compatibility_date": "2026-10-01",
+  "assets": {
+    "directory": "./dist/yari/browser",
+    "not_found_handling": "single-page-application"
+  },
+  "workers_dev": false,
+  "preview_urls": false,
+  "env": {
+    "staging": {
+      "name": "yet-another-idle-rpg-staging",
+      "workers_dev": false,
+      "preview_urls": false
+    },
+    "testing": {
+      "name": "yet-another-idle-rpg-testing",
+      "workers_dev": false,
+      "preview_urls": false
+    }
+  }
+}

@@ -2,7 +2,7 @@ import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import sharp from 'sharp'
 import { existsSync } from 'node:fs'
-import { MATTE_MODEL, alpha, cleanMask, cover, fit, shave, keyout, matte, outline, pixelate, quantize, runPipeline, tile, trim } from '../lib/postprocess.mjs'
+import { MATTE_MODEL, alpha, cleanMask, cover, fit, shave, keyout, matte, outline, pixelate, quantize, runPipeline, tile, trim, unshadow } from '../lib/postprocess.mjs'
 
 const rawOf = async (buf) => {
     const { data, info } = await sharp(buf).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
@@ -24,6 +24,30 @@ const colourCount = async (buf) => {
     for (let i = 0; i < data.length; i += 4) seen.add(data.readUInt32LE(i))
     return seen.size
 }
+
+/** A green 100×300 body on transparency, with `extra` composited at the bottom (a shadow patch or a grey foot). */
+const figure = async (extra) => {
+    const rect = (w, h, [r, g, b]) => ({ create: { width: w, height: h, channels: 4, background: { r, g, b, alpha: 255 } } })
+    return sharp({ create: { width: 300, height: 360, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
+        .composite([{ input: rect(100, 300, [40, 150, 60]), left: 100, top: 20 }, ...extra.map(([w, h, colour, left, top]) => ({ input: rect(w, h, colour), left, top }))])
+        .png()
+        .toBuffer()
+}
+
+test('unshadow removes a wide flat grey patch under the feet and keeps the body', async () => {
+    // shadow: 260 px wide, 20 px tall, grey, below and around the body's bottom edge
+    const out = await rawOf(await unshadow(await figure([[260, 20, [70, 72, 70], 20, 316]])))
+    assert.equal(alphaAt(out, 30, 330), 0, 'shadow beside the feet is gone')
+    assert.equal(alphaAt(out, 150, 335), 0, 'shadow under the body is gone')
+    assert.equal(alphaAt(out, 150, 200), 255, 'body stays')
+})
+
+test('unshadow keeps a narrow grey foot and leaves an image without grey at the bottom untouched', async () => {
+    const foot = await rawOf(await unshadow(await figure([[20, 30, [90, 90, 90], 140, 316]])))
+    assert.equal(alphaAt(foot, 150, 330), 255, 'a grey foot narrower than minWidth stays')
+    const plain = await figure([])
+    assert.equal(await unshadow(plain), plain)
+})
 
 test('keyout removes the solid background around a square and keeps the square', async () => {
     const out = await rawOf(await keyout(await squareOnBg(64, 24, [0, 255, 0], [200, 30, 30]), { feather: 0 }))

@@ -4,7 +4,7 @@
 
 > **Follow-up:** recipes move into Camp stations (Cooking, Alchemy). Potions/elixirs unlock in Mawood. See [Camp & crafting stations](crafting-stations.md).
 
-v1 recipe sources: Grilled Fish, Baked Apple, Minor Mana Potion known from the start; Crab Stew scroll (Gangster Crab 1/10), Cheese Platter scroll (Giant Rat 1/10), Hunter's Feast scroll (Bandit 1/15), Fish & Apple Pie scroll (La Harpar shop, 300g, once). Auto-eat = skill node "Hearty Appetite" (after Bookworm), re-eats the last food. Icons are placeholders.
+v1 recipe sources: Grilled Fish, Baked Apple, Minor Mana Potion known from the start; Crab Stew scroll (Gangster Crab 1/10), Cheese Platter scroll (Giant Rat 1/10), Hunter's Feast scroll (Bandit 1/15), Fish & Apple Pie scroll (La Harpar shop, 300g, once), Venison Roast scroll (Goat 1/12; venison ×3 + apple ×1 at Cooking 2, critMulti +0.2; venison drops from Deer and Goat 1/3). Auto-eat = skill node "Hearty Appetite" (after Bookworm), re-eats the last food. Icons are placeholders.
 
 Craftable food, potions and elixirs that apply timed stat buffs through **buff slots**. Gives crafting a recurring output instead of one-time gear.
 

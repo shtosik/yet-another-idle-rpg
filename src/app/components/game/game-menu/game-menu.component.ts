@@ -33,6 +33,7 @@ export class GameMenuComponent {
     { tab: GameTab.camp, unlocked: this.playerStore.campUnlocked(), badge: 0 },
     { tab: GameTab.bestiary, unlocked: true, badge: this.playerStore.unseenEnemyCount() },
     { tab: GameTab.spellbook, unlocked: this.playerStore.spellbookUnlocked(), badge: this.playerStore.unseenSpellCount() },
+    { tab: GameTab.settings, unlocked: true, badge: 0 },
   ])
 
   /** Towns are reached through the map, so the map tab stays lit inside a town. */

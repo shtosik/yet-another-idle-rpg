@@ -5,7 +5,8 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import sharp from 'sharp'
 import { parseJobs } from '../lib/batch.mjs'
-import { CONTROL_TYPES, CONTROLS, controlImage } from '../lib/controls.mjs'
+import { CONTROL_TYPES, CONTROLS, controlImage, controlMeta, registerFrozenControls, WEAPONS, withWeapon } from '../lib/controls.mjs'
+import { makeControl } from '../lib/silhouette.mjs'
 import { eatAttachedBackground } from '../lib/postprocess.mjs'
 import { hueShift } from '../lib/shiny.mjs'
 import { buildGraph, CONTROLNET_NAME, LINEART_TYPE } from '../lib/workflow.mjs'
@@ -122,4 +123,49 @@ test('legacy crab references ship in the repo and batch jobs accept refs/style/c
     for (const name of ['legacy-crab', 'legacy-gangsterCrab']) assert.ok(existsSync(`scripts/asset-gen/refs/${name}.png`), name)
     const [job] = parseJobs([{ family: 'enemy-pixel', target: 'a.png', subject: 's', control: 'crabFront', refs: ['scripts/asset-gen/refs/legacy-crab.png'], style: 'x', controlStrength: 0.4 }])
     assert.deepEqual(job.refs, ['scripts/asset-gen/refs/legacy-crab.png'])
+})
+
+const litAt = async (png, points) => {
+    const { data, info } = await sharp(png).greyscale().raw().toBuffer({ resolveWithObject: true })
+    return points.map(([x, y]) => data[y * info.width + x] > 200)
+}
+const blank = () => sharp({ create: { width: 1024, height: 1024, channels: 3, background: '#000' } }).png().toBuffer()
+
+test('withWeapon draws a straight weapon from the hand anchor, rotated by the grip angle', async () => {
+    const upright = await withWeapon(await blank(), 'sword', { hand: [500, 700] })
+    // blade straight up from the hand, nothing to the side
+    assert.deepEqual(await litAt(upright, [[500, 600], [500, 400], [700, 600]]), [true, true, false])
+    const tilted = await withWeapon(await blank(), 'sword', { hand: [500, 700], angle: 90 })
+    // rotated 90° clockwise: the blade now points right
+    assert.deepEqual(await litAt(tilted, [[700, 700], [500, 400]]), [true, false])
+    // a staff stands upright whatever the grip angle
+    const staff = await withWeapon(await blank(), 'staff', { hand: [500, 700], angle: 90 })
+    assert.deepEqual(await litAt(staff, [[500, 400], [700, 700]]), [true, false])
+    for (const weapon of Object.keys(WEAPONS)) assert.ok((await withWeapon(await blank(), weapon, { hand: [512, 700] })).length > 0, weapon)
+    await assert.rejects(withWeapon(await blank(), 'whip', { hand: [1, 1] }), /Unknown weapon "whip"/)
+    await assert.rejects(withWeapon(await blank(), 'knife', {}), /no hand anchor/)
+})
+
+test('makeControl stores the hand anchor, controlImage draws the weapon there, and batch jobs check it', async () => {
+    const dir = mkdtempSync(join(tmpdir(), 'controls-'))
+    const from = join(dir, 'figure.png')
+    // a cutout: a filled body on transparency
+    const body = await sharp({ create: { width: 200, height: 600, channels: 4, background: '#808080' } }).png().toBuffer()
+    await sharp({ create: { width: 400, height: 800, channels: 4, background: { r: 0, g: 0, b: 0, alpha: 0 } } })
+        .composite([{ input: body, left: 100, top: 100 }])
+        .png()
+        .toFile(from)
+    const out = join(dir, 'controls')
+    const made = await makeControl({ name: 'testBiped', from, dir: out, hand: [300, 600], angle: 30 })
+    assert.deepEqual(made.meta, { hand: [300, 600], angle: 30 })
+    assert.deepEqual(controlMeta('testBiped', out), { hand: [300, 600], angle: 30 })
+    registerFrozenControls(out, CONTROLS)
+    try {
+        const armed = await controlImage('testBiped', { weapon: 'spear', dir: out })
+        assert.notEqual(armed.toString('base64'), (await controlImage('testBiped', { dir: out })).toString('base64'))
+    } finally {
+        delete CONTROLS.testBiped
+    }
+    assert.throws(() => parseJobs([{ family: 'enemy-pixel', target: 'a.png', subject: 's', control: 'spider', weapon: 'whip' }]), /unknown weapon "whip"/)
+    assert.throws(() => parseJobs([{ family: 'enemy-pixel', target: 'a.png', subject: 's', control: 'spider', weapon: 'knife' }]), /hand anchor/)
 })

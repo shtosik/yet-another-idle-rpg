@@ -24,18 +24,14 @@ Remaining plans: `progression-pacing.md` (tuning with `npm run sim`).
 (22–25 fixed 2026-10-22: 2 s respawn delay with wall-clock ticks, single damage rounding, spell guards and slot cooldown lock, derived stats, throttled saves.)
 
 ## Persistence and performance
-26. No save version or migrations; full enemy object persisted (stale after data edits); `activeShopId` persisted. Fixed 2026-10-23: `withDevtools` is stubbed in production.
+26. Fixed 2026-10-23: `withDevtools` stubbed in production; saves versioned (`{ v, state }`, a version bump resets that store); enemy and town building saved as ids; `activeShopId` not saved; transient keys (mana regen timer) no longer trigger saves. Still open: a migration table before release (`persistence.md`).
 
-**Possible fixes** (reviewed 2026-10-22). `feat/combat-fixes` (uncommitted when reviewed) already moves the attack/respawn timers to `GameIntervalService`, makes `manaRegenTimer` a transient key, throttles saves to 1 s with `try/catch`, and drops unknown top-level keys on load. Still open after it lands:
-- **Buffs recompute `stats` at 10 Hz.** `tickSpellTimers` rewrites `activeBuffs` (`msRemaining`) every tick and derived `stats` reads it, so every `stats()` reader re-runs while a buff is active. Store `expiresAt` instead of a countdown, or feed `buffModifiers` from a buff-id list with an `equal` check.
-- **Persist ids, not data.** `battleStore` saves `enemyId` + `isShiny` + HP and rebuilds the enemy from `ENEMIES_DATA`; `townsStore` saves a building id instead of `selectedTownBuilding` and stops saving `activeShopId`. Add an optional `persist` projection to `withGameStateSync`.
-- **Save version.** Save `{ v, state }`; on mismatch reset that store to `initialState` (pre-release), later a migration table. Replaces "clear `localStorage` and reload within a second".
-- **Mana regen timer** still dirties `playerStore` (the largest store) once a second while mana regenerates; move it to `GameIntervalService` like the attack timer.
+(Buffs no longer recompute `stats` every tick: `PlayerStore` reads buff and consumable ids through `sameIds` equality checks.)
 
 ## UI, build and platform
-27. Damage popups lost when several hits land in one tick; popup array mutated in place; popup ids wrap at 100 (duplicate track keys).
-28. Dialogue and shop templates call functions per change detection; a few components lack OnPush (battle-side-buttons, dialogue, quest-completed, damage-popup); all pipes `pure: false`.
+27. Fixed 2026-10-24: damage popups arrive through a stream (every hit in a tick shows, with a small sideways jitter), are removed by id without mutating the array, and ids no longer wrap.
+28. Dialogue and shop templates call functions per change detection; a few components lack OnPush (battle-side-buttons, dialogue, quest-completed); all pipes `pure: false`.
 29. Hard-coded English: skill tree tooltips, dialogue labels, battle nav, spellbook, world map marker labels; map points of interest show raw `i18nKey`; quest step descriptions not i18n; spell/skill descriptions hard-code numbers from data; no item descriptions.
 30. Map source art (`source.png` 4 MB, `.kra` 10 MB) ships; backgrounds 28 MB of PNG (convert to webp); initial bundle 902 kB vs 500 kB budget (`@defer` heavy tabs); ~20 unused asset files.
-31. Debug buttons in production (guard with `isDevMode()`); no responsive layout; no keyboard, ARIA or touch support (clickable divs, right-click-only item use).
+31. Debug buttons fixed 2026-10-24: the cheat bar shows only in dev and testing builds (`docs/deployment.md`). Still open: no responsive layout; no keyboard, ARIA or touch support (clickable divs, right-click-only item use).
 32. Stores open dialogs directly with no dialog queue; `setTimeout` never cleared (world map, skill tree); `app.config` has deprecated `APP_INITIALIZER`, a no-op `importProvidersFrom`, unused `@ngrx/store`/effects/store-devtools (store-devtools is dev-only since 2026-10-23) and an empty router; `@Input`/`@Output` decorators remain in older components; town picker hard-codes La Harpar; `strictNullChecks`/`noImplicitAny` off; no ESLint.

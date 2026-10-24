@@ -185,7 +185,7 @@ const STORE_KEY = 'playerStore'
 export const PlayerStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
-  withGameStateSync(STORE_KEY, initialState, ['manaRegenTimer']),
+  withGameStateSync(STORE_KEY, initialState, { transientKeys: ['manaRegenTimer'] }),
   withDevtools(STORE_KEY),
   withComputed((store, battleStore = inject(BattleStore)) => {
     // Buff and consumable timers tick constantly; only a change in what's active should recompute stats.

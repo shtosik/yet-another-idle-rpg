@@ -6,11 +6,13 @@ Guidance for Claude Code in this repository: a browser idle RPG (auto-battle in 
 
 ```bash
 npm start            # dev server (ng serve)
-npm run build        # production build
+npm run build        # production build (also staging)
+npm run build:testing # production build with the cheat bar (testing environment)
 npm run validate     # data, i18n, asset and doc-reference checks (scripts/validate-data.mjs)
 npm run sim          # economy simulation: zone times, first-hour ladder, reward flags (scripts/sim-economy.mjs)
 npm run tile         # regenerate world map tiles (node scripts/tile-map.mjs)
 npm run test:assets  # asset-gen pipeline tests (node:test, no GPU needed)
+npm run release -- minor  # on a release/* branch: bump version, date the changelog (docs/deployment.md)
 ```
 
 **Done** = `npm run validate` and `npx ng build` both pass.
@@ -30,7 +32,8 @@ You're Senior Game Programmer. Prioritize good game design, user experience and 
 Several Claude sessions often run in parallel on this repo, sharing the main checkout.
 
 - **Never switch branches (`git checkout` / `git switch`) in the main checkout.** It moves every other session onto your branch and mixes uncommitted work.
-- For a new feature branch, create a worktree instead: `git worktree add ../yari-<name> -b feat/<name>` (or start the session with `claude --worktree <name>`), and work only inside it.
+- For a new feature branch, create a worktree instead: `git fetch origin && git worktree add ../yari-<name> -b feat/<name> origin/staging` (or start the session with `claude --worktree <name>`), and work only inside it.
+- **New work starts from `origin/staging`**, never from local `main` (it lags behind). Exceptions: a sub-feature branches from its parent feature branch; a hotfix branches from `origin/main` (`docs/deployment.md` → Releases). PRs go back to where the branch came from.
 - Right after `git worktree add`, switch the session into the worktree with the `EnterWorktree` tool (`path: ../yari-<name>`). The desktop app's diff pane only shows the session's own folder, so edits made in a worktree the session never entered don't show up there.
 - Run `npm install` in the new worktree. **Do not** junction/symlink `node_modules` from the main checkout — removing the worktree has deleted the real `node_modules` before.
 - Only stage files you changed yourself; other sessions' uncommitted work may be in the tree.
@@ -41,7 +44,7 @@ Angular 20 standalone components, zoneless change detection, `OnPush` on every c
 
 ## Gotchas
 
-- **Pre-release: save compatibility is not required.** Rename and renumber freely; clear `localStorage` after a breaking state change.
+- **Pre-release: save compatibility is not required.** Rename and renumber freely; after a breaking change to a store's saved shape, bump its save `version` (`withGameStateSync(KEY, initialState, { version })`) instead of clearing `localStorage` (`docs/systems/persistence.md`).
 - **Stats are derived, not stored.** `PlayerStore.stats()` is computed from base + equipment + skill nodes + buffs + consumables + permanent bonuses. `updatePlayerStats` only earns/spends resources or adds a permanent bonus; a new stat source goes into the `stats` computed (ADR 0002).
 - **New i18n namespace → register it** in the `translations` list in `src/app/app.config.ts`. Template pipe is `| i18next`.
 - **Item data lives in `src/data/items/<category>-items.data.ts`**; `src/data/items-data.ts` only merges them.
@@ -50,6 +53,7 @@ Angular 20 standalone components, zoneless change detection, `OnPush` on every c
 - **Language**: use the terms in `GLOSSARY.md` in code, docs and commits.
 - **`docs/archive/` is history.** Current behavior is in `docs/systems/`.
 - **Change a system → update its `docs/systems/` doc in the same commit.**
+- **Player-facing change → add a note under `## [Unreleased]` in `CHANGELOG.md`**: `- [feature|bug|buff|nerf] text`, plain English for players. Never edit `version` in `package.json` by hand; releases bump it (`docs/deployment.md`).
 
 ## Systems — read before touching
 
@@ -80,6 +84,7 @@ Art (icons, sprites, portraits, backgrounds): `/generate-2d-asset`, which briefs
 ## Other docs
 
 - `GLOSSARY.md` — domain language.
+- `docs/deployment.md` — environments (production, staging, testing), branch flow, CI/CD.
 - `docs/ideas/` — design backlog with status per idea.
 - `docs/ideas/known-issues.md` — open bugs and tech debt across systems.
 - `docs/adr/` — architecture decisions.

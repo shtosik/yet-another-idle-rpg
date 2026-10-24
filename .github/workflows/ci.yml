@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main, staging]
+
+concurrency:
+  group: ci-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # A PR into main is a release: it comes from release/* or hotfix/* and bumps the version (docs/deployment.md).
+      - name: Check release branch and version bump
+        if: github.base_ref == 'main'
+        run: |
+          case "$HEAD_REF" in
+            release/*|hotfix/*) ;;
+            *) echo "::error::PRs into main come from release/* or hotfix/* branches, not '$HEAD_REF'."; exit 1 ;;
+          esac
+          git fetch --depth=1 origin main
+          node scripts/release.mjs check-bump "$(git show origin/main:package.json | node -p 'JSON.parse(require("fs").readFileSync(0, "utf8")).version')"
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+      - run: npm run validate
+      # test:assets is left out: it needs the local matting model (krita/..., not in git).
+      - run: npm run build
