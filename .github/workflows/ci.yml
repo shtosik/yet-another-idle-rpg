@@ -19,6 +19,18 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      # A PR into main is a release: it comes from release/* or hotfix/* and bumps the version (docs/deployment.md).
+      - name: Check release branch and version bump
+        if: github.base_ref == 'main'
+        run: |
+          case "$HEAD_REF" in
+            release/*|hotfix/*) ;;
+            *) echo "::error::PRs into main come from release/* or hotfix/* branches, not '$HEAD_REF'."; exit 1 ;;
+          esac
+          git fetch --depth=1 origin main
+          node scripts/release.mjs check-bump "$(git show origin/main:package.json | node -p 'JSON.parse(require("fs").readFileSync(0, "utf8")).version')"
+        env:
+          HEAD_REF: ${{ github.head_ref }}
       - run: npm run validate
       # test:assets is left out: it needs the local matting model (krita/..., not in git).
       - run: npm run build

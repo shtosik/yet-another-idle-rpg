@@ -1,0 +1,39 @@
+<h2 class="settings__title">{{ 'app:settings.title' | i18next }}</h2>
+
+<section class="settings__group">
+    <h3 class="settings__heading">{{ 'app:settings.version.title' | i18next }}</h3>
+    <p>{{ 'app:settings.version.current' | i18next: { version } }}</p>
+    <button class="settings__button" (click)="openChangelog()">{{ 'app:settings.version.changelog' | i18next }}</button>
+</section>
+
+<section class="settings__group">
+    <h3 class="settings__heading">{{ 'app:settings.saves.title' | i18next }}</h3>
+    <p class="settings__hint">{{ 'app:settings.saves.hint' | i18next }}</p>
+    <div class="settings__actions">
+        <button class="settings__button" (click)="exportSave()">{{ 'app:settings.saves.export' | i18next }}</button>
+        <button class="settings__button" (click)="fileInput.click()">{{ 'app:settings.saves.import' | i18next }}</button>
+        <input #fileInput type="file" accept=".json,application/json" hidden (change)="chooseFile(fileInput)"/>
+    </div>
+
+    @if (exported()) {
+        <p class="settings__hint">{{ 'app:settings.saves.exported' | i18next }}</p>
+    }
+    @if (importErrorKey(); as errorKey) {
+        <p class="settings__warning">{{ errorKey | i18next }}</p>
+    }
+    @if (pendingImport(); as pending) {
+        <div class="settings__confirm">
+            <p>{{ 'app:settings.saves.confirm' | i18next: { date: exportedAtLabel(pending), version: pending.file.appVersion } }}</p>
+            @if (pending.outdatedStores) {
+                <p class="settings__warning">{{ 'app:settings.saves.outdatedWarning' | i18next: { count: pending.outdatedStores } }}</p>
+            }
+            <p class="settings__warning">{{ 'app:settings.saves.overwriteWarning' | i18next }}</p>
+            <div class="settings__actions">
+                <button class="settings__button" (click)="cancelImport()">{{ 'app:settings.saves.cancel' | i18next }}</button>
+                <button class="settings__button settings__button--danger" (click)="confirmImport()">
+                    {{ 'app:settings.saves.replace' | i18next }}
+                </button>
+            </div>
+        </div>
+    }
+</section>

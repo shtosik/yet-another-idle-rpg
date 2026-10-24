@@ -1,0 +1,12 @@
+@if (available(); as update) {
+    <div class="update-banner" role="status">
+        <span>
+            @if (update.version !== currentVersion) {
+                {{ 'app:update.newVersion' | i18next: { version: update.version } }}
+            } @else {
+                {{ 'app:update.newBuild' | i18next }}
+            }
+        </span>
+        <button class="update-banner__reload" (click)="reload()">{{ 'app:update.reload' | i18next }}</button>
+    </div>
+}

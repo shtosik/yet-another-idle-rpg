@@ -26,6 +26,7 @@ import { CampStore } from '../../store/camp/camp.store'
 import { OfflineStore } from '../../store/offline/offline.store'
 import { SpellbookComponent } from './spellbook/spellbook.component'
 import { DevCheatsComponent } from './dev-cheats/dev-cheats.component'
+import { SettingsComponent } from './settings/settings.component'
 import { environment } from '../../../environments/environment'
 
 const imports = [
@@ -54,6 +55,7 @@ const imports = [
     SpellbookComponent,
     CampComponent,
     DevCheatsComponent,
+    SettingsComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

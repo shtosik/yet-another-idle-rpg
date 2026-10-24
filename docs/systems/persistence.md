@@ -22,6 +22,13 @@ Saves game state to `localStorage` (at most once a second per store) and restore
 2. An `effect` marks the store dirty when a saved key changes (transient keys don't count); a 1 s interval writes `JSON.stringify({ v, state })` with the state minus `transientKeys`, inside `try/catch`. Up to 1 s of progress is lost on close. `saveGameStateNow()` writes every store at once, skipping the interval (used by the offline claim).
 3. `GameComponent.resetState` calls `resetState()` on every store, which patches `initialState` back in.
 
+## Export and import
+Settings → Save (`src/app/services/save-transfer.service.ts:SaveTransferService`).
+- **Export** writes every store now (`exportGameSaves`), then downloads `yari-save-v<version>-<date>.json`: `{ game: 'yari', appVersion, exportedAt, saves: { <key>: <raw localStorage value> } }`. Values stay in their saved format (encoded in production).
+- **Import** checks the file (`game` is `yari`, at least one known store key) and each store's save against that store's version (`checkImportedSave`): an unreadable save or one from a newer build refuses the file, since this build would run that store from scratch. Stores with an older save version would start fresh; the confirmation says how many. `replaceGameSaves` then writes the file's saves, clears stores the file lacks, and stops all saving for the rest of the page's life, so the running state can't be written back; the page reloads and loads the import like any save (versions apply as usual).
+- Only stores created by the time of the export or import count (`syncedVersions`); all are injected by `GameComponent`, so a new persisted store must be too.
+- The imported `offlineStore.lastSeenAt` is the export time, so the reload counts the time since as offline, under the usual offline rules (`offline-progress.md`).
+
 ## Save format
 - **Dev builds** (`isDevMode()`): plain JSON, readable and editable in DevTools.
 - **Production builds**: `z:` + lz-string `compressToUTF16(json)`. It keeps casual edits out and makes saves smaller. It is obfuscation, not protection: the decoder ships in the bundle.

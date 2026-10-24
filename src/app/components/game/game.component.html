@@ -51,6 +51,13 @@
   @if (tab === GameTab.spellbook) {
     <app-spellbook class="spellbook"/>
   }
+
+  @if (tab === GameTab.settings) {
+    <app-player-stats class="stats"/>
+    <app-panel class="resources"></app-panel>
+    <app-inventory class="inventory"/>
+    <app-settings class="settings"/>
+  }
 </div>
 @if (cheats) {
   <!-- Deferred so the cheat code lands in its own chunk that production never loads. -->

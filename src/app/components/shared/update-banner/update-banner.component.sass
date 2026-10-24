@@ -1,0 +1,23 @@
+@use 'palette'
+@use 'mixins'
+@use 'variables' as vars
+
+.update-banner
+    position: fixed
+    bottom: 1rem
+    left: 50%
+    transform: translateX(-50%)
+    z-index: 1000
+    display: flex
+    align-items: center
+    gap: 1rem
+    padding: 0.6rem 1rem
+    background: vars.$panelBackgroundColor
+    border: 1px solid palette.$yellow
+    border-radius: vars.$panelBorderRadius
+    box-shadow: vars.$panelShadow
+
+    &__reload
+        @include mixins.button
+        margin: 0
+        font-size: 1rem

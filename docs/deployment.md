@@ -17,14 +17,32 @@ Each domain is a separate origin, so saves in `localStorage` never mix between e
 
 ## Branch flow
 
-Feature branch → PR into `staging` → merge (deploys staging) → PR `staging` into `main` → merge (deploys production).
+Feature branch → PR into `staging` → merge (deploys staging). When a release is decided: `release/x.y.z` branch from `staging` → version bump → PR into `main` → merge (deploys production, tags `vx.y.z`, publishes a GitHub release) → merge `main` back into `staging`.
 
 To put any branch on testing: GitHub → Actions → **Deploy** → **Run workflow** → pick the branch. The branch must contain `.github/workflows/deploy.yml`. Testing holds one build at a time; the next run replaces it.
 
+## Releases
+
+The version is `version` in `package.json`, `MAJOR.MINOR.PATCH` ([semver](https://semver.org/)). It only changes on a release branch; `staging` carries the last released version plus unreleased work. 0.1.0 is the first.
+
+- **Every player-facing change** adds a note under `## [Unreleased]` in `CHANGELOG.md`, in the same PR: `- [type] text` with type `feature`, `bug` (a fix), `buff` or `nerf`. The game shows the changelog in Settings → What's new, each type as a colored badge; on staging, unreleased notes show as "Coming next". Notes are English only.
+- **Cut a release**: create `release/x.y.z` from `staging`, run `npm run release -- <major|minor|patch>` (bumps `package.json` and `package-lock.json`, moves the unreleased notes under `## [x.y.z] - <today>`), commit, open a PR into `main`. Fixes found while testing go on the release branch. The changelog date is the day the release is cut, not the day it ships.
+- **First release (0.1.0)**: `staging` is already at 0.1.0 with its changelog section, so `release/0.1.0` needs no `npm run release` (it would fail on the empty `[Unreleased]`). The CI bump check passes against `main`'s 0.0.0.
+- **Hotfix**: `hotfix/x.y.z` from `main`, the fix, a `bug` note, `npm run release -- patch`, PR into `main`.
+- **After either**: PR `main` into `staging`, so staging has the bump and any fixes.
+- CI on a PR into `main` fails unless the branch is `release/*` or `hotfix/*` and its version is above `main`'s (`node scripts/release.mjs check-bump`). `npm run validate` checks that `CHANGELOG.md` has a section for the current version and that every note has a known type.
+- After a production deploy, the `release` job in `deploy.yml` tags `v<version>` and publishes a GitHub release with that version's notes. A redeploy of an already tagged version skips it.
+
+### What the player sees
+
+- `npm run build` and `npm run build:testing` end with `scripts/write-version.mjs`, which writes `version.json` (`version`, `commit`, `builtAt`) next to the build.
+- `src/app/services/version-check.service.ts` fetches it on load, every 5 minutes and when the tab becomes visible. A different `commit` (any new deploy, also staging without a bump) or a `version` other than the bundle's shows a banner with a Reload button; the reload saves first. `npm start` has no `version.json`, so no banner in dev.
+- Settings shows the running version (`src/app/version.ts`, read from `package.json`).
+
 ## Workflows
 
-- `.github/workflows/ci.yml` runs on PRs into `main` and `staging`: `npm run validate`, `npm run build`. `npm run test:assets` stays local: it needs the matting model under `krita/`, which is not in git.
-- `.github/workflows/deploy.yml` runs `npm run validate`, the build for the environment, then `wrangler deploy --env=<environment> --domain $DOMAIN`. A deploy creates the Worker and its custom domain on first run.
+- `.github/workflows/ci.yml` runs on PRs into `main` and `staging`: the release check (PRs into `main` only), `npm run validate`, `npm run build`. `npm run test:assets` stays local: it needs the matting model under `krita/`, which is not in git.
+- `.github/workflows/deploy.yml` runs `npm run validate`, the build for the environment, then `wrangler deploy --env=<environment> --domain $DOMAIN`. A deploy creates the Worker and its custom domain on first run. Production deploys then run the `release` job.
 
 GitHub's standard runners are free for public repos, and `wrangler deploy` uploads a finished build, so deploys don't use Cloudflare's build minutes.
 
