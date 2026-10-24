@@ -109,7 +109,6 @@
   "settings": {
     "title": "Settings",
     "version": {
-      "title": "Game version",
       "current": "Version {{version}}",
       "changelog": "What's new"
     },
@@ -129,7 +128,9 @@
         "notJson": "That file can't be read. Pick a save file exported from this game.",
         "notSave": "That file isn't a save from this game.",
         "corrupt": "That save file is damaged and can't be loaded.",
-        "newerVersion": "That save is from a newer version of the game than this one, so it can't be loaded here."
+        "newerVersion": "That save is from a newer version of the game than this one, so it can't be loaded here.",
+        "exportFailed": "Your progress couldn't be saved, so nothing was exported. Free some browser storage and try again.",
+        "importFailed": "The save couldn't be stored, so your current progress was kept. Free some browser storage and try again."
       }
     }
   },

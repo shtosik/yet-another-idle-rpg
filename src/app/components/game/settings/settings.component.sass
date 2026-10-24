@@ -46,6 +46,20 @@
             color: palette.$red
             border-color: palette.$red
 
+    // Pinned to the bottom of the panel.
+    &__footer
+        margin-top: auto
+        display: flex
+        align-items: center
+        justify-content: space-between
+        gap: 0.5rem
+        padding-top: 0.75rem
+        border-top: 1px solid rgba(palette.$yellow, 0.25)
+
+    &__version
+        font-size: 0.85rem
+        opacity: 0.75
+
     &__confirm
         display: flex
         flex-direction: column

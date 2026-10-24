@@ -32,13 +32,15 @@ const error = (reason: string): SaveFileReadResult => ({ ok: false, errorKey: `a
 /** Save export to a file and import from one (Settings tab, docs/systems/persistence.md). */
 @Injectable({ providedIn: 'root' })
 export class SaveTransferService {
-    /** Downloads `yari-save-v<version>-<date>.json`. */
-    exportToFile(): void {
+    /** Downloads `yari-save-v<version>-<date>.json`. False when the current progress couldn't be saved first. */
+    exportToFile(): boolean {
+        const saves = exportGameSaves()
+        if (!saves) return false
         const file: SaveFile = {
             game: SAVE_FILE_GAME,
             appVersion: APP_VERSION,
             exportedAt: new Date().toISOString(),
-            saves: exportGameSaves(),
+            saves,
         }
         const blob = new Blob([JSON.stringify(file)], { type: 'application/json' })
         const url = URL.createObjectURL(blob)
@@ -48,6 +50,7 @@ export class SaveTransferService {
         link.click()
         // Revoked after the click is handled: some browsers cancel a download whose URL is revoked at once.
         setTimeout(() => URL.revokeObjectURL(url))
+        return true
     }
 
     /**
@@ -86,9 +89,13 @@ export class SaveTransferService {
         }
     }
 
-    /** Replaces the current progress with the file's and reloads. Stores the file lacks start fresh. */
-    importFile(file: SaveFile): void {
-        replaceGameSaves(file.saves)
+    /**
+     * Replaces the current progress with the file's and reloads. Stores the file lacks start fresh.
+     * False when storage couldn't take it; the current progress is kept and the page doesn't reload.
+     */
+    importFile(file: SaveFile): boolean {
+        if (!replaceGameSaves(file.saves)) return false
         location.reload()
+        return true
     }
 }
