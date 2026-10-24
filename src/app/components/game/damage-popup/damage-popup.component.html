@@ -2,6 +2,7 @@
   @for (dmg of floatingDamages(); track dmg.id) {
     <div
       class="damage-number"
+      [style.margin-left.px]="dmg.offsetX"
       [class.critical]="dmg.isCriticalHit"
       [class.strong]="dmg.isStrong"
     >
