@@ -6,7 +6,8 @@ Guidance for Claude Code in this repository: a browser idle RPG (auto-battle in 
 
 ```bash
 npm start            # dev server (ng serve)
-npm run build        # production build
+npm run build        # production build (also staging)
+npm run build:testing # production build with the cheat bar (testing environment)
 npm run validate     # data, i18n, asset and doc-reference checks (scripts/validate-data.mjs)
 npm run sim          # economy simulation: zone times, first-hour ladder, reward flags (scripts/sim-economy.mjs)
 npm run tile         # regenerate world map tiles (node scripts/tile-map.mjs)
@@ -80,6 +81,7 @@ Art (icons, sprites, portraits, backgrounds): `/generate-2d-asset`, which briefs
 ## Other docs
 
 - `GLOSSARY.md` — domain language.
+- `docs/deployment.md` — environments (production, staging, testing), branch flow, CI/CD.
 - `docs/ideas/` — design backlog with status per idea.
 - `docs/ideas/known-issues.md` — open bugs and tech debt across systems.
 - `docs/adr/` — architecture decisions.

@@ -1,0 +1,71 @@
+name: Deploy
+
+# main -> production, staging -> staging, manual run (any branch) -> testing.
+# Each GitHub environment holds a DOMAIN variable; the Workers are in wrangler.jsonc. See docs/deployment.md.
+on:
+  push:
+    branches: [main, staging]
+  workflow_dispatch:
+
+jobs:
+  target:
+    runs-on: ubuntu-latest
+    outputs:
+      name: ${{ steps.pick.outputs.name }}
+      wrangler-env: ${{ steps.pick.outputs.wrangler-env }}
+      build-script: ${{ steps.pick.outputs.build-script }}
+    steps:
+      - id: pick
+        run: |
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            echo "name=testing" >> "$GITHUB_OUTPUT"
+            echo "wrangler-env=testing" >> "$GITHUB_OUTPUT"
+            echo "build-script=build:testing" >> "$GITHUB_OUTPUT"
+          elif [ "$BRANCH" = "main" ]; then
+            echo "name=production" >> "$GITHUB_OUTPUT"
+            echo "wrangler-env=" >> "$GITHUB_OUTPUT"
+            echo "build-script=build" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=staging" >> "$GITHUB_OUTPUT"
+            echo "wrangler-env=staging" >> "$GITHUB_OUTPUT"
+            echo "build-script=build" >> "$GITHUB_OUTPUT"
+          fi
+        env:
+          EVENT: ${{ github.event_name }}
+          BRANCH: ${{ github.ref_name }}
+
+  deploy:
+    needs: target
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment:
+      name: ${{ needs.target.outputs.name }}
+      url: ${{ steps.deploy.outputs.url }}
+    concurrency:
+      group: deploy-${{ needs.target.outputs.name }}
+      cancel-in-progress: false
+    env:
+      DOMAIN: ${{ vars.DOMAIN }}
+    steps:
+      - name: Check DOMAIN variable
+        run: |
+          if [ -z "$DOMAIN" ]; then
+            echo "::error::Variable DOMAIN is not set on the '${{ needs.target.outputs.name }}' GitHub environment."
+            exit 1
+          fi
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run validate
+      - run: npm run ${{ needs.target.outputs.build-script }}
+      # An empty --env targets the top-level (production) Worker.
+      - id: deploy
+        run: |
+          npx wrangler deploy --env="${{ needs.target.outputs.wrangler-env }}" --domain "$DOMAIN"
+          echo "url=https://$DOMAIN" >> "$GITHUB_OUTPUT"
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
