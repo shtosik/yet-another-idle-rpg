@@ -20,7 +20,8 @@ export class SettingsComponent {
 
     /** A checked file waiting for the player to confirm that it replaces their progress. */
     readonly pendingImport = signal<SaveImport | null>(null)
-    readonly importErrorKey = signal<string | null>(null)
+    /** Full i18n key of the last export or import error. */
+    readonly errorKey = signal<string | null>(null)
     readonly exported = signal(false)
 
     /** Bumped per file pick, so a slower read of an earlier pick can't replace a newer one. */
@@ -31,8 +32,9 @@ export class SettingsComponent {
     }
 
     exportSave(): void {
-        this.saveTransfer.exportToFile()
-        this.exported.set(true)
+        const exported = this.saveTransfer.exportToFile()
+        this.exported.set(exported)
+        this.errorKey.set(exported ? null : 'app:settings.saves.errors.exportFailed')
     }
 
     async chooseFile(input: HTMLInputElement): Promise<void> {
@@ -44,17 +46,19 @@ export class SettingsComponent {
         const pickId = ++this.pickId
         // The previous pick can't be confirmed while this one is read.
         this.pendingImport.set(null)
-        this.importErrorKey.set(null)
+        this.errorKey.set(null)
         this.exported.set(false)
         const result = await this.saveTransfer.readFile(blob)
         if (pickId !== this.pickId) return
         this.pendingImport.set('import' in result ? result.import : null)
-        this.importErrorKey.set('errorKey' in result ? result.errorKey : null)
+        this.errorKey.set('errorKey' in result ? result.errorKey : null)
     }
 
     confirmImport(): void {
         const pending = this.pendingImport()
-        if (pending) this.saveTransfer.importFile(pending.file)
+        if (!pending || this.saveTransfer.importFile(pending.file)) return
+        this.pendingImport.set(null)
+        this.errorKey.set('app:settings.saves.errors.importFailed')
     }
 
     cancelImport(): void {

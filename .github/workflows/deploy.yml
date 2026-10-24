@@ -92,6 +92,8 @@ jobs:
             exit 0
           fi
           node scripts/release.mjs notes "$VERSION" > notes.md
-          gh release create "v$VERSION" --target "$GITHUB_SHA" --title "v$VERSION" --notes-file notes.md
+          # A parallel run may create it between the check and here; it's released either way.
+          gh release create "v$VERSION" --target "$GITHUB_SHA" --title "v$VERSION" --notes-file notes.md \
+            || gh release view "v$VERSION" > /dev/null
         env:
           GH_TOKEN: ${{ github.token }}
