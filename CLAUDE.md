@@ -12,6 +12,7 @@ npm run validate     # data, i18n, asset and doc-reference checks (scripts/valid
 npm run sim          # economy simulation: zone times, first-hour ladder, reward flags (scripts/sim-economy.mjs)
 npm run tile         # regenerate world map tiles (node scripts/tile-map.mjs)
 npm run test:assets  # asset-gen pipeline tests (node:test, no GPU needed)
+npm run release -- minor  # on a release/* branch: bump version, date the changelog (docs/deployment.md)
 ```
 
 **Done** = `npm run validate` and `npx ng build` both pass.
@@ -51,6 +52,7 @@ Angular 20 standalone components, zoneless change detection, `OnPush` on every c
 - **Language**: use the terms in `GLOSSARY.md` in code, docs and commits.
 - **`docs/archive/` is history.** Current behavior is in `docs/systems/`.
 - **Change a system → update its `docs/systems/` doc in the same commit.**
+- **Player-facing change → add a note under `## [Unreleased]` in `CHANGELOG.md`**: `- [feature|bug|buff|nerf] text`, plain English for players. Never edit `version` in `package.json` by hand; releases bump it (`docs/deployment.md`).
 
 ## Systems — read before touching
 

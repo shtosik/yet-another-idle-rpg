@@ -67,4 +67,16 @@ export class ModalService {
 
     return this.dialog.open(RespecConfirmComponent, config)
   }
+
+  /** Loaded on demand: the component carries the whole CHANGELOG.md text. */
+  async openChangelog() {
+    const { ChangelogComponent } = await import('../components/modals/changelog/changelog.component')
+    return this.dialog.open(ChangelogComponent, {
+      panelClass: 'modal',
+      minWidth: '800px',
+      position: { top: '120px' },
+      hasBackdrop: true,
+      disableClose: false,
+    })
+  }
 }

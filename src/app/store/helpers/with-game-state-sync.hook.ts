@@ -22,11 +22,62 @@ function decodeSave(saved: string): string {
     return json
 }
 
-const immediateSavers = new Set<() => void>()
+/** Each returns false when its write failed (storage full or blocked). */
+const immediateSavers = new Set<() => boolean>()
 
-/** Writes every synced store now, skipping the batch interval (an offline claim must land before its modal opens). */
-export function saveGameStateNow(): void {
-    immediateSavers.forEach(save => save())
+/** Save version of every synced store by `localStorage` key; all of them are created with `GameComponent`. */
+const syncedVersions = new Map<string, number>()
+
+/** Set once saves are replaced by an import: no store may write its old state back before the reload. */
+let savesSuspended = false
+
+/**
+ * Writes every synced store now, skipping the batch interval (an offline claim must land before its modal opens).
+ * Returns false when any write failed; that store stays dirty, so the interval retries it.
+ */
+export function saveGameStateNow(): boolean {
+    let saved = true
+    immediateSavers.forEach(save => saved = save() && saved)
+    return saved
+}
+
+/** Every synced store's raw save, written fresh first. Raw means still encoded; `readSave` loads either format. */
+export function exportGameSaves(): Record<string, string> {
+    saveGameStateNow()
+    const saves: Record<string, string> = {}
+    syncedVersions.forEach((_, key) => {
+        const raw = localStorage.getItem(key)
+        if (raw !== null) saves[key] = raw
+    })
+    return saves
+}
+
+/**
+ * How a raw save would load into a store of save version `version`: `load`, `outdated` (the store would start
+ * fresh), `newer` (written by a newer build; the store would start fresh and not save) or `unreadable`.
+ */
+export function classifySave(raw: unknown, version: number): SaveReadResult['kind'] | 'unreadable' {
+    if (typeof raw !== 'string') return 'unreadable'
+    try {
+        return readSave(raw, version).kind
+    } catch {
+        return 'unreadable'
+    }
+}
+
+/** `classifySave` against the store saved under `key` in this build; `unknown` when no store uses that key. */
+export function checkImportedSave(key: string, raw: unknown): ReturnType<typeof classifySave> | 'unknown' {
+    const version = syncedVersions.get(key)
+    return version === undefined ? 'unknown' : classifySave(raw, version)
+}
+
+/**
+ * Replaces every synced store's save with `saves` (a store missing from it is cleared) and stops all saving,
+ * so the running state can't overwrite the import. The caller reloads the page right after.
+ */
+export function replaceGameSaves(saves: Record<string, string>): void {
+    savesSuspended = true
+    syncedVersions.forEach((_, key) => key in saves ? localStorage.setItem(key, saves[key]) : localStorage.removeItem(key))
 }
 
 /** What is written to `localStorage` (before encoding). */
@@ -120,16 +171,22 @@ export function withGameStateSync<T extends object>(key: string, initialState: T
                     }
                 }
 
+                syncedVersions.set(key, version)
                 let isDirty = false
-                const save = (force = false) => {
-                    if (!canSave || (!isDirty && !force)) return
+                // False only when a write failed; a store that doesn't save this session has nothing to lose.
+                const save = (force = false): boolean => {
+                    if (savesSuspended || !canSave || (!isDirty && !force)) return true
                     isDirty = false
                     try {
                         const envelope: SaveEnvelope = { v: version, state: omit(getState(store), transientKeys) }
                         localStorage.setItem(key, encodeSave(JSON.stringify(envelope)))
                     } catch (e) {
                         console.error(`Failed to save ${key}`, e)
+                        // Still unsaved: the interval retries it.
+                        isDirty = true
+                        return false
                     }
+                    return true
                 }
 
                 // No flush on page hide: it would re-save over a `localStorage.clear()` done before a reload.

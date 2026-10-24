@@ -74,7 +74,8 @@
     "camp": "Camp",
     "towns": "Towns",
     "bestiary": "Bestiary",
-    "spellbook": "Spellbook"
+    "spellbook": "Spellbook",
+    "settings": "Settings"
   },
   "starts": "Starts",
   "requires": "Requires",
@@ -104,5 +105,50 @@
     "lostDrops_one": "Your inventory was full: {{count}} item was lost.",
     "lostDrops_other": "Your inventory was full: {{count}} items were lost.",
     "collect": "Collect"
+  },
+  "settings": {
+    "title": "Settings",
+    "version": {
+      "title": "Game version",
+      "current": "Version {{version}}",
+      "changelog": "What's new"
+    },
+    "saves": {
+      "title": "Save",
+      "hint": "Export your save to back it up or move it to another browser. Importing replaces your current progress.",
+      "export": "Export save",
+      "import": "Import save",
+      "exported": "Save file downloaded.",
+      "confirm": "Load the save from {{date}} (version {{version}})?",
+      "overwriteWarning": "Your current progress will be replaced. Export it first if you want to keep it.",
+      "outdatedWarning_one": "{{count}} part of this save is from an older game version and will start fresh.",
+      "outdatedWarning_other": "{{count}} parts of this save are from an older game version and will start fresh.",
+      "cancel": "Cancel",
+      "replace": "Replace progress",
+      "errors": {
+        "notJson": "That file can't be read. Pick a save file exported from this game.",
+        "notSave": "That file isn't a save from this game.",
+        "corrupt": "That save file is damaged and can't be loaded.",
+        "newerVersion": "That save is from a newer version of the game than this one, so it can't be loaded here."
+      }
+    }
+  },
+  "changelog": {
+    "title": "What's new",
+    "version": "Version {{version}}",
+    "unreleased": "Coming next",
+    "current": "current",
+    "badge": {
+      "feature": "Feature",
+      "bug": "Bug fix",
+      "buff": "Buff",
+      "nerf": "Nerf"
+    }
+  },
+  "update": {
+    "newVersion": "Version {{version}} is out.",
+    "newBuild": "A new build of the game is out.",
+    "reload": "Reload",
+    "saveFailed": "Your progress couldn't be saved, so the game didn't reload. Free some browser storage and try again."
   }
 }

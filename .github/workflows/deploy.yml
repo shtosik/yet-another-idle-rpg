@@ -74,3 +74,24 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+  # After a production deploy: tag v<version> and publish a GitHub release with that version's CHANGELOG.md notes.
+  # Skipped when the tag already exists (a redeploy of the same version).
+  release:
+    needs: [target, deploy]
+    if: needs.target.outputs.name == 'production'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if gh release view "v$VERSION" > /dev/null 2>&1; then
+            echo "v$VERSION is already released."
+            exit 0
+          fi
+          node scripts/release.mjs notes "$VERSION" > notes.md
+          gh release create "v$VERSION" --target "$GITHUB_SHA" --title "v$VERSION" --notes-file notes.md
+        env:
+          GH_TOKEN: ${{ github.token }}

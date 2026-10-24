@@ -1,0 +1,31 @@
+<app-close-button (onClose)="close()"/>
+<div class="changelog">
+    <h2 class="changelog__title">{{ 'app:changelog.title' | i18next }}</h2>
+    <div class="changelog__releases">
+        @for (release of releases; track release.version) {
+            <section class="changelog__release">
+                <h3 class="changelog__version">
+                    @if (release.version === 'Unreleased') {
+                        {{ 'app:changelog.unreleased' | i18next }}
+                    } @else {
+                        {{ 'app:changelog.version' | i18next: { version: release.version } }}
+                    }
+                    @if (release.date) {
+                        <span class="changelog__date">{{ release.date }}</span>
+                    }
+                    @if (release.version === currentVersion) {
+                        <span class="changelog__current">{{ 'app:changelog.current' | i18next }}</span>
+                    }
+                </h3>
+                <ul class="changelog__notes">
+                    @for (note of release.notes; track $index) {
+                        <li class="changelog__note">
+                            <span class="badge badge--{{ note.type }}">{{ ('app:changelog.badge.' + note.type) | i18next }}</span>
+                            <span>{{ note.text }}</span>
+                        </li>
+                    }
+                </ul>
+            </section>
+        }
+    </div>
+</div>

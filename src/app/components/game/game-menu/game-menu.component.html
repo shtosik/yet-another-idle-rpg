@@ -44,5 +44,10 @@
       >{{ ('gameTabs.' + GameTab[GameTab.spellbook]) | i18next }}
       </li>
     }
+    <li
+      class="game-menu__tab game-menu__tab--end"
+      (click)="changeTab.emit(GameTab.settings)"
+    >{{ ('gameTabs.' + GameTab[GameTab.settings]) | i18next }}
+    </li>
   </ul>
 </nav>
