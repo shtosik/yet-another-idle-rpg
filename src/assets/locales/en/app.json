@@ -109,7 +109,6 @@
   "settings": {
     "title": "Settings",
     "version": {
-      "title": "Game version",
       "current": "Version {{version}}",
       "changelog": "What's new"
     },

@@ -1,12 +1,6 @@
 <h2 class="settings__title">{{ 'app:settings.title' | i18next }}</h2>
 
 <section class="settings__group">
-    <h3 class="settings__heading">{{ 'app:settings.version.title' | i18next }}</h3>
-    <p>{{ 'app:settings.version.current' | i18next: { version } }}</p>
-    <button class="settings__button" (click)="openChangelog()">{{ 'app:settings.version.changelog' | i18next }}</button>
-</section>
-
-<section class="settings__group">
     <h3 class="settings__heading">{{ 'app:settings.saves.title' | i18next }}</h3>
     <p class="settings__hint">{{ 'app:settings.saves.hint' | i18next }}</p>
     <div class="settings__actions">
@@ -37,3 +31,8 @@
         </div>
     }
 </section>
+
+<footer class="settings__footer">
+    <span class="settings__version">{{ 'app:settings.version.current' | i18next: { version } }}</span>
+    <button class="settings__button" (click)="openChangelog()">{{ 'app:settings.version.changelog' | i18next }}</button>
+</footer>
