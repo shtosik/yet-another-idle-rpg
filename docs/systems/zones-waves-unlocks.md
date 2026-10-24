@@ -30,6 +30,8 @@ Zones are the combat areas; each has waves of regular enemies ending in a boss. 
 - `waveReached` Horseshoe Beach 5 → La Harpar (+ world map); Elderwood Wilds 4 → Mawood.
 On load, `PlayerStore.onInit` re-applies every rule already met, silently, so new rules reach old saves.
 
+**Navbar** (`src/app/components/game/game-menu/`): tabs in a fixed order (Battle, Map, Skill tree, Camp, Bestiary, Spellbook). A locked feature keeps its slot, greyed with a lock and disabled, so the bar doesn't shift as features unlock: Map ← `mapUnlocked`, Skill tree ← `skillTreeUnlocked`, Camp ← `campUnlocked`, Spellbook ← `spellbookUnlocked`; Battle and Bestiary are always open. The open tab (`GameNavigationService.tab`) is highlighted; inside a town the Map tab stays lit, since towns are reached through the map. Badges: unspent skill points on Skill tree, `unseenEnemyCount` on Bestiary, `unseenSpellCount` on Spellbook. A slim resource strip under the tabs (`player-hud/`) shows, left-aligned, level, the XP bar and currencies (gold for now; more currencies go in its list). Buying or selling in a shop floats `+N` (green) or `−N` (red) beside the gold (`GoldFeedService`; same-sign changes within 400 ms merge). Kill gold doesn't float.
+
 ## Invariants & gotchas
 - `UNLOCK_RULES` only target towns and features (`UnlockTarget`); zones unlock by the boss chain or a town entrance.
 - A zone's boss must not be listed in its `enemies` (`npm run validate` warns).

@@ -1,0 +1,34 @@
+<div class="hud">
+  <div class="hud__progress">
+    <span class="hud__level">{{ 'hud.level' | i18next: { level: level() } }}</span>
+
+    <div
+      class="hud__xp"
+      role="progressbar"
+      [attr.aria-label]="'playerStats.experience' | i18next"
+      [attr.aria-valuenow]="experience()"
+      [attr.aria-valuemax]="xpForNextLevel()"
+      aria-valuemin="0"
+    >
+      <div class="hud__xp-fill" [style.width.%]="xpPercent()"></div>
+      <span class="hud__xp-text">{{ experience() | number: '1.0-0' }} / {{ xpForNextLevel() | number: '1.0-0' }}</span>
+    </div>
+  </div>
+
+  <!-- One entry per currency; more (tokens, runes…) slot in here later. -->
+  <ul class="hud__currencies">
+    <li class="hud__currency hud__currency--gold" [attr.aria-label]="'playerStats.goldCoins' | i18next">
+      <span class="hud__coin" aria-hidden="true"></span>
+      <span class="hud__currency-value">{{ gold() | abbr }}</span>
+
+      @for (change of goldChanges(); track change.id) {
+        <span
+          class="hud__float"
+          aria-hidden="true"
+          [class.hud__float--gain]="change.amount > 0"
+          [class.hud__float--loss]="change.amount < 0"
+        >{{ change.amount > 0 ? '+' : '−' }}{{ (change.amount < 0 ? -change.amount : change.amount) | abbr }}</span>
+      }
+    </li>
+  </ul>
+</div>

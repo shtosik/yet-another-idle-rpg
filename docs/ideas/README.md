@@ -26,4 +26,7 @@ Owner decisions in force:
 | [Town building upgrades](town-building-upgrades.md) | M | Proposed |
 | [Bounty board](bounty-board.md) | S-M | Proposed |
 | [Buffs and consumable effects](buffs-and-consumable-effects.md) | S-M | Open question |
+| [UI overhaul: navbar, HUD, shop, Camp, town, map](ui-overhaul.md) | M | Navbar + HUD done; rest accepted |
+| [Keybinds](keybinds.md) | S | Proposed |
+| [Responsive layout](responsive-layout.md) | M | Proposed |
 | [Known issues](known-issues.md) | — | Open bug and tech-debt list |

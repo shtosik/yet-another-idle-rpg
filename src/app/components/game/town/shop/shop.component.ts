@@ -12,6 +12,7 @@ import { SlotComponent } from '../../../shared/slot/slot.component'
 import { InventoryItemComponent } from '../../inventory/inventory-slot/inventory-slot.component'
 import { CloseButtonComponent } from '../../../shared/close-button/close-button.component'
 import { ModalService } from '../../../../services/modal.service'
+import { GoldFeedService } from '../../../../services/gold-feed.service'
 import { canInstall, isInstalled, stationUpgradeOf } from '../../../../store/player/camp'
 import { isPreferredBy, sellPrice } from '../../../../store/shop/shop-prices'
 
@@ -30,6 +31,7 @@ export class ShopComponent implements OnInit {
   private shopStore = inject(ShopStore)
   private playerStore = inject(PlayerStore)
   private modalService = inject(ModalService)
+  private goldFeed = inject(GoldFeedService)
 
   shopId = input.required<ShopID>()
   closed = output<void>()
@@ -116,6 +118,7 @@ export class ShopComponent implements OnInit {
       if (!this.playerStore.spendTokens(price)) return
     } else {
       this.playerStore.updatePlayerStats([{ stat: 'goldCoins', amount: -price }])
+      this.goldFeed.show(-price)
     }
     this.shopStore.buyItem(this.shopId(), index)
 
@@ -131,7 +134,9 @@ export class ShopComponent implements OnInit {
 
   /** Click sells one; Ctrl/Cmd-click sells the whole stack. */
   sellItem(item: InventoryItem, event: MouseEvent): void {
+    const goldBefore = this.playerStore.stats().goldCoins
     this.playerStore.sellItem(item, this.shopId(), event.ctrlKey || event.metaKey ? item.amount : 1)
+    this.goldFeed.show(this.playerStore.stats().goldCoins - goldBefore)
   }
 
   /** Station gear the player already owns is hidden from shops. */

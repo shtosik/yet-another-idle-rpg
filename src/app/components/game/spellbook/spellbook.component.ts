@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, effect, inject, untracked } from '@angular/core'
 import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop'
 import { PlayerStore } from '../../../store/player/player.store'
 import { BattleStore } from '../../../store/battle/battle.store'
@@ -36,6 +36,13 @@ export class SpellbookComponent {
       .map(key => Number(key) as SpellID)
       .filter(id => (unlocked[id] ?? 0) > 0 && !equippedIds.has(id))
   })
+
+  constructor() {
+    // Spells learned while the tab is open count as seen too, so the navbar badge stays clear.
+    effect(() => {
+      if (this.playerStore.unseenSpellCount()) untracked(() => this.playerStore.markSpellsSeen())
+    })
+  }
 
   onPaletteDrop(event: CdkDragDrop<SpellID[]>) {
     // Only handle drops coming from the spell-bar (unequip).

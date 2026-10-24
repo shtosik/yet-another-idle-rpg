@@ -74,7 +74,11 @@
     "camp": "Camp",
     "towns": "Towns",
     "bestiary": "Bestiary",
-    "spellbook": "Spellbook"
+    "spellbook": "Spellbook",
+    "locked": "Locked"
+  },
+  "hud": {
+    "level": "Lv {{level}}"
   },
   "starts": "Starts",
   "requires": "Requires",
