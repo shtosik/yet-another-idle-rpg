@@ -102,10 +102,12 @@ export class BestiaryComponent {
     readonly MAX_BESTIARY_RANK = MAX_BESTIARY_RANK
     readonly STAR_SLOTS = Array.from({ length: MAX_BESTIARY_RANK }, (_, i) => i)
 
-    /** Odds per roll, or "?" until the rank reveals them. */
+    /** Odds per roll with the rank's drop bonus, as `rollDropList` rolls them, or "?" until the rank reveals them. */
     dropOdds(drop: EnemyDrop, rank: number): string {
-        if (!RANK_BONUSES[rank].revealsDropOdds) return '?'
-        return `${(100 / drop.chance).toLocaleString('en-US', { maximumFractionDigits: 1 })}%`
+        const { revealsDropOdds, dropChance } = RANK_BONUSES[rank]
+        if (!revealsDropOdds) return '?'
+        const percent = (100 * (1 + dropChance)) / drop.chance
+        return `${percent.toLocaleString('en-US', { maximumSignificantDigits: 3 })}%`
     }
 
     dropTier(itemId: ItemID): ItemTier {

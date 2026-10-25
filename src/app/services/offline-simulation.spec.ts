@@ -3,6 +3,8 @@ import { deriveStats, initialResources } from '../store/player/stats'
 import ZONES_DATA from '../../data/zones-data'
 import { ZoneID } from '../../enums/ids/zone-id.enum'
 import { DamageElement } from '../../enums/damage-element.enum'
+import { EnemyID } from '../../enums/ids/enemy-id.enum'
+import { ItemID } from '../../enums/ids/item-id.enum'
 
 const HOUR_IN_MS = 60 * 60 * 1000
 
@@ -62,6 +64,17 @@ describe('simulateOfflineKills', () => {
 
     expect(kills).toBeGreaterThan((half / killMs) * 0.9)
     expect(kills).toBeLessThan((half / killMs) * 1.1)
+  })
+
+  it('rolls drops with the bestiary rank bonus', () => {
+    // Every roll is 0.74: wave 1 spawns the turtle (index 2 of 3), and its 1-in-4 stick roll
+    // (0.74 × 4 = 2.96) misses at rank 0 (hit above 3) but hits at rank 3 (hit above 2.85).
+    const constantRoll = () => 0.74
+    const sticks = (enemyKillCounts: OfflineSimulationInput['enemyKillCounts']) =>
+      simulateOfflineKills(input({ rng: constantRoll, enemyKillCounts })).items.filter(item => item.id === ItemID.stick).length
+
+    expect(sticks({})).toBe(0)
+    expect(sticks({ [EnemyID.turtle]: 10_000 })).toBe(1)
   })
 
   it('sums XP and gold per kill', () => {
