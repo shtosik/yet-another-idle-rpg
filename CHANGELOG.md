@@ -19,6 +19,7 @@ New notes go under `[Unreleased]`; `npm run release -- <major|minor|patch>` move
 - [feature] The Bestiary uses the full height of the middle area and shows each monster's XP and gold per kill, its types, its weakness (once you know the Weaknesses skill), and drops coloured by item tier. Stats and crafting text is slightly larger. On the map, town markers are as easy to see as zone markers and the zone you're fighting in is highlighted.
 - [feature] Bestiary ranks: each monster earns up to 3 stars from kills (100, 1,000 and 10,000; bosses 10, 100 and 500), and each star adds to your drop multiplier against that monster (+0.05, +0.1, +0.15), shinies included. Shiny kills count toward the stars. The Bestiary shows how many entries you've completed and how close you are to the next star. Drop odds are now hidden until a monster reaches 3 stars.
 - [bug] Bestiary: the monster picture no longer jumps when you show or hide the shiny drop table.
+- [feature] Zone mastery: every zone has 3 stars next to its name. Conqueror: defeat the boss 10 times. Hunter: get every enemy in the zone to 1 Bestiary star. Shiny Hunter: defeat 10 shinies there. Click a finished star to claim a chest of gold, Explorer Tokens and resources from the zone. Each zone with all 3 stars gives +2% gold. The world map shows each zone's stars.
 
 ## [0.1.0] - 2026-10-24
 - [feature] Battle: your hero auto-attacks through zone waves, with bosses, critical hits, strong hits and elemental weaknesses.

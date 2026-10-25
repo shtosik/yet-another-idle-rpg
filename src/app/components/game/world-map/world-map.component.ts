@@ -6,6 +6,7 @@ import { GameTab } from 'enums/ids/game-tab.enum'
 import { TownsStore } from 'app/store/towns/towns.store'
 import { BattleStore } from 'app/store/battle/battle.store'
 import { PlayerStore } from 'app/store/player/player.store'
+import { ZoneStarProgress } from 'app/store/player/zone-mastery'
 import { TownMarker, WORLD_MAP_DATA, WorldMapMarker } from 'data/world-map-data'
 import { ZoneID } from 'enums/ids/zone-id.enum'
 import { TownID } from 'enums/map/town-id.enum'
@@ -17,6 +18,12 @@ const PIXEL_CRS: L.CRS = L.Util.extend({}, L.CRS.Simple, {
   scale: (zoom: number) => Math.pow(2, zoom - WORLD_MAP_DATA.manifest.maxZoom),
   zoom: (scale: number) => Math.log2(scale) + WORLD_MAP_DATA.manifest.maxZoom,
 })
+
+/** Modifier for a map marker's mastery star (claimed stars use the base style). */
+function starModifier(progress: ZoneStarProgress): string {
+  if (progress.claimed) return ''
+  return progress.done ? 'map-marker__star--ready' : 'map-marker__star--empty'
+}
 
 @Component({
   selector: 'app-world-map',
@@ -63,6 +70,11 @@ export class WorldMapComponent {
       const currentZoneId = this.battleStore.currentZoneId()
       if (!this.map) return
       this.highlightZone(currentZoneId)
+    })
+    effect(() => {
+      this.playerStore.zoneMastery()
+      if (!this.map) return
+      this.showZoneStars()
     })
   }
 
@@ -148,6 +160,15 @@ export class WorldMapComponent {
     }
   }
 
+  /** Each zone marker's mastery stars: claimed, ready to claim (glowing), or not yet earned. */
+  private showZoneStars(): void {
+    const mastery = this.playerStore.zoneMastery()
+    for (const [zoneId, marker] of this.zoneMarkerMap) {
+      const stars = marker.getElement()?.querySelector('.map-marker__stars')
+      if (stars) stars.innerHTML = mastery[zoneId].map(p => `<span class="map-marker__star ${starModifier(p)}">★</span>`).join('')
+    }
+  }
+
   private syncZoneMarkers(unlockedZones: ZoneID[]): void {
     for (const data of WORLD_MAP_DATA.markers) {
       if (data.type !== 'zone') continue
@@ -167,6 +188,7 @@ export class WorldMapComponent {
     }
     this.syncMarkerVisibility()
     this.highlightZone(this.battleStore.currentZoneId())
+    this.showZoneStars()
   }
 
   private syncTownMarkers(unlockedTowns: TownID[]): void {
@@ -192,7 +214,9 @@ export class WorldMapComponent {
   private buildMarker(data: WorldMapMarker): L.Marker {
     const latLng = L.latLng(-data.position.y, data.position.x)
     const icon = L.divIcon({
-      html: `<div class="map-marker map-marker--${data.type}">${data.label}</div>`,
+      html: data.type === 'zone'
+        ? `<div class="map-marker map-marker--zone">${data.label}<span class="map-marker__stars"></span></div>`
+        : `<div class="map-marker map-marker--${data.type}">${data.label}</div>`,
       className: '',
       iconSize: [0, 0],
       iconAnchor: [0, 0],

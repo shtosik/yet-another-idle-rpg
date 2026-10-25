@@ -4,7 +4,7 @@
 A pannable, zoomable painted map (Leaflet) with markers for unlocked towns and zones. Clicking a marker travels there. The map tab unlocks with the first town (shown locked in the navbar before that).
 
 ## Key files
-- `src/app/components/game/world-map/world-map.component.ts:WorldMapComponent` — Leaflet map with a custom `PIXEL_CRS`, tile layer, marker sync.
+- `src/app/components/game/world-map/world-map.component.ts:WorldMapComponent` — Leaflet map with a custom `PIXEL_CRS`, tile layer, marker sync; zone markers show claimed zone mastery stars (`showZoneStars`).
 - `src/data/world-map-data.ts:WORLD_MAP_DATA` — tile path, image `manifest` (size, tile size, zoom range), default view, `markers` (`town` / `zone` / `poi`, position in source-image pixels, `label`, optional `minZoom`).
 - `scripts/tile-map.mjs` (`npm run tile`) — slices `src/assets/img/world/source.png` into `src/assets/maps/world/tiles/{z}/{x}/{y}.webp`.
 - `src/styles.sass` — global Leaflet positioning override (see gotchas).
