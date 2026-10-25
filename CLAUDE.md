@@ -2,30 +2,17 @@
 
 Guidance for Claude Code in this repository: a browser idle RPG (auto-battle in zones, skill tree, gear, quests, towns, crafting).
 
-## Commands
+## Checks
 
-```bash
-npm start            # dev server (ng serve)
-npm run build        # production build (also staging)
-npm run build:testing # production build with the cheat bar (testing environment)
-npm run validate     # data, i18n, asset and doc-reference checks (scripts/validate-data.mjs)
-npm run sim          # economy simulation: zone times, first-hour ladder, reward flags (scripts/sim-economy.mjs)
-npm run tile         # regenerate world map tiles (node scripts/tile-map.mjs)
-npm run test:assets  # asset-gen pipeline tests (node:test, no GPU needed)
-npm run release -- minor  # on a release/* branch: bump version, date the changelog (docs/deployment.md)
-```
+**Done** = `npm run validate`, `npm run lint`, `npm run test:ci` and `npx ng build` all pass (CI runs the same). `validate` covers data, i18n, assets, doc references, inline `<svg>` and BEM classes styled but never used. Review against `CODING_STANDARDS.md`.
 
-**Done** = `npm run validate` and `npx ng build` both pass.
+Other scripts are in `package.json`; `npm run sim` is the economy simulation, `npm run release -- minor` bumps a release branch (`docs/deployment.md`).
 
-## Role
+## Environment
 
-You're Senior Game Programmer. Prioritize good game design, user experience and optimization for web application. Write code that is readable with modern Angular standards, use signals. Ask questions if needed.
-
-## Communication Guidelines
-
-- Always think through the problem before executing code.
-- If a requirement is ambiguous or if you need more information to provide the best solution, **ask me a clarifying question** before proceeding.
-- Do not make assumptions about my project architecture if the answer isn't clear from the existing files.
+- No Python on this machine: write scripts in Node (`scripts/*.mjs`).
+- In a worktree session, run git as single plain commands (no `cd &&` chains or `$(…)` around git).
+- Checking UI in the dev build: the cheat build exposes `window.dev` (`tab`, `setZone`, `grantStat`, `learnSkill`, `giveItem`, `equip`, `unequip`, `openShop`; numeric enum IDs) in `src/app/components/game/dev-cheats/dev-cheats.component.ts`.
 
 ## Git workflow
 
@@ -46,8 +33,8 @@ Angular 20 standalone components, zoneless change detection, `OnPush` on every c
 
 - **Pre-release: save compatibility is not required.** Rename and renumber freely; after a breaking change to a store's saved shape, bump its save `version` (`withGameStateSync(KEY, initialState, { version })`) instead of clearing `localStorage` (`docs/systems/persistence.md`).
 - **Stats are derived, not stored.** `PlayerStore.stats()` is computed from base + equipment + skill nodes + buffs + consumables + permanent bonuses. `updatePlayerStats` only earns/spends resources or adds a permanent bonus; a new stat source goes into the `stats` computed (ADR 0002).
-- **Ternaries only pick between two simple values** (`selected ? 0 : -1`). No nested ternaries, and no ternaries that carry logic (choosing what to compute or call, several conditions): use `if`/`switch` in a small named method instead.
-- **No inline `<svg>` in templates.** Icons are files under `src/assets/img/icons/` used through `<img>` (`ngSrc`), with the colour baked into the file.
+- **Icons are files** under `src/assets/img/icons/`, used through `<img ngSrc>` with the colour baked into the file.
+- **Tab layout lives in `game.component.html`/`.sass`**: which panels show on which tab, placed by host class (`.stats`, `.inventory`, ...).
 - **New i18n namespace → register it** in the `translations` list in `src/app/app.config.ts`. Template pipe is `| i18next`.
 - **Item data lives in `src/data/items/<category>-items.data.ts`**; `src/data/items-data.ts` only merges them.
 - **Quest conditions**: `QuestState.active` = started; `QuestState.readyToAdvance` = started and current step's requirements met (turn-ins).

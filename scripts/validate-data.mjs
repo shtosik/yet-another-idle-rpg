@@ -498,6 +498,44 @@ for (const doc of DOC_FILES) {
 }
 
 // ---------------------------------------------------------------------------
+// 8. Component styles and templates: icons are files, not inline <svg>; every BEM class
+//    (block__element, block--modifier) a component's styles define is used by its template or code.
+
+const repoPath = f => relative(ROOT, f).replace(/\\/g, '/')
+const APP = join(SRC, 'app')
+
+for (const f of walkFiles(APP, '.html')) {
+  if (/<svg[\s>]/i.test(readFileSync(f, 'utf8'))) error(repoPath(f), 'inline <svg>: use an icon file under src/assets/img/icons/ with <img ngSrc>')
+}
+for (const f of walkFiles(APP, '.ts')) {
+  if (/template:\s*`[^`]*<svg[\s>]/i.test(readFileSync(f, 'utf8'))) error(repoPath(f), 'inline <svg> in the template: use an icon file under src/assets/img/icons/ with <img ngSrc>')
+}
+
+{
+  const sass = await import('sass')
+  const BEM_CLASS = /\.(-?[a-z][\w-]*?(?:__|--)[\w-]+)/gi
+  const styleFiles = [...walkFiles(APP, '.component.sass'), ...walkFiles(APP, '.component.scss')]
+  for (const styleFile of styleFiles) {
+    const base = styleFile.replace(/\.s[ac]ss$/, '')
+    const source = ['.html', '.ts'].map(ext => base + ext).filter(existsSync).map(f => readFileSync(f, 'utf8')).join('\n')
+    let css
+    try {
+      css = sass.compile(styleFile, { loadPaths: [join(SRC, 'styles')], style: 'expanded' }).css
+    } catch (e) {
+      error(repoPath(styleFile), `doesn't compile: ${e.message.split('\n')[0]}`)
+      continue
+    }
+    for (const name of new Set([...css.matchAll(BEM_CLASS)].map(m => m[1]))) {
+      if (source.includes(name)) continue
+      // A modifier built at runtime ('hud__currency--' + entry.currency) leaves only its prefix in the source.
+      const modifierAt = name.lastIndexOf('--')
+      if (modifierAt > 0 && source.includes(name.slice(0, modifierAt + 2))) continue
+      error(repoPath(styleFile), `.${name} is styled but neither the template nor the component code uses it`)
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
 
 for (const w of warnings) console.log(`warning ${w}`)
 for (const e of errors) console.log(`error   ${e}`)
