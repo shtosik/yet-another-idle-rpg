@@ -11,6 +11,18 @@
         "fireStrike": {
             "name": "Fire Strike",
             "desc": "A weak fire spell that deals 15 base damage."
+        },
+        "tidalLash": {
+            "name": "Tidal Lash",
+            "desc": "A lash of seawater that deals 14 base water damage. Cheap on mana."
+        },
+        "galeCut": {
+            "name": "Gale Cut",
+            "desc": "A quick blade of wind that deals 9 base air damage, with a short cooldown."
+        },
+        "stoneSpike": {
+            "name": "Stone Spike",
+            "desc": "A spike of stone that deals 26 base earth damage, with a long cooldown."
         }
     },
     "types": {

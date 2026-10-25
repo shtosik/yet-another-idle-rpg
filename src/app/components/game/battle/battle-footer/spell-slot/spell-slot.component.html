@@ -27,7 +27,7 @@
       <span [class]="SpellType[spell.effect?.type]">{{ ('spells:types.' + SpellType[spell.effect?.type])  | i18next }}</span>
     </div>
     <div class="spell__info">
-      <span class="mana">{{ 'spells:manaCost' | i18next: { cost: spell.baseManaCost } }}</span>
+      <span class="mana">{{ 'spells:manaCost' | i18next: { cost: manaCost() } }}</span>
       <span class="cooldown">{{ 'spells:cooldown' | i18next: { cooldown: spellCooldown } }}</span>
       @if (spell.effect.type === SpellType.buff) {
         <span class="duration">{{ 'spells:duration' | i18next: { duration: (spell.effect.duration + playerStats().increasedSpellDuration) } }}</span>

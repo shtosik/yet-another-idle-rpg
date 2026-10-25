@@ -34,6 +34,7 @@ export { SpellID } from 'enums/ids/spell-id.enum'
 export { StationID } from 'enums/ids/station-id.enum'
 export { SkillNodeID } from 'enums/ids/skill-node-id.enum'
 export { SkillBranch } from 'enums/ids/skill-branch.enum'
+export { SkillNodeType } from 'enums/skill-node-type.enum'
 export { NpcID } from 'enums/map/npc-id.enum'
 export { TownID } from 'enums/map/town-id.enum'
 export { TownBuildingID } from 'enums/map/town-building-id.enum'
@@ -238,6 +239,18 @@ for (const skill of Object.values(D.ALL_SKILLS)) {
   for (const id of reqs) {
     if (!has(D.ALL_SKILLS, id)) error('src/data/skill-tree-data.ts', `${idName(D.SkillNodeID, skill.id)} requires unknown node ${id}`)
   }
+  if (skill.anchor !== undefined && (!has(D.ALL_SKILLS, skill.anchor) || skill.anchor === skill.id)) {
+    error('src/data/skill-tree-data.ts', `${idName(D.SkillNodeID, skill.id)} has anchor ${skill.anchor}, which isn't another node`)
+  }
+}
+// A spell perk is a battle node read only through SpellProps.perk; a stat or spell node would also apply its own effect.
+for (const spell of Object.values(D.SPELLS_DATA)) {
+  if (!spell.perk) continue
+  const where = `${idName(D.SpellID, spell.id)} perk`
+  const node = D.ALL_SKILLS[spell.perk.nodeId]
+  if (!node) error('src/data/spells-data.ts', `${where} points at unknown node ${spell.perk.nodeId}`)
+  else if (node.type !== D.SkillNodeType.battle) error('src/data/spells-data.ts', `${where}: node ${idName(D.SkillNodeID, node.id)} must be a battle node`)
+  if (!spell.perk.cooldownPerLevel && !spell.perk.manaPerLevel) error('src/data/spells-data.ts', `${where} has neither cooldownPerLevel nor manaPerLevel`)
 }
 
 // ---------------------------------------------------------------------------

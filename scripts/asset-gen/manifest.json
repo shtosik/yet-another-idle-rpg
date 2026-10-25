@@ -639,6 +639,13 @@
     "seed": 1268499607,
     "date": "2026-10-21"
   },
+  "src/assets/img/skills/airMastery.png": {
+    "family": "skill-icon",
+    "tier": null,
+    "subject": "a round bronze medallion seen straight on, with a glowing pale green and white spiral wind swirl symbol embossed in its centre, on a dark green background",
+    "seed": 424242,
+    "date": "2026-10-25"
+  },
   "src/assets/img/skills/autoEat.png": {
     "family": "skill-icon",
     "tier": null,
@@ -646,11 +653,53 @@
     "seed": 2034600005,
     "date": "2026-10-21"
   },
+  "src/assets/img/skills/earthMastery.png": {
+    "family": "skill-icon",
+    "tier": null,
+    "subject": "a round bronze medallion seen straight on, with a glowing brown and ochre mountain peak symbol embossed in its centre, on a dark brown background",
+    "seed": 424242,
+    "date": "2026-10-25"
+  },
+  "src/assets/img/skills/fireMastery.png": {
+    "family": "skill-icon",
+    "tier": null,
+    "subject": "a round bronze medallion seen straight on, with a glowing red and orange flame symbol embossed in its centre, on a dark red background",
+    "seed": 424242,
+    "date": "2026-10-25"
+  },
+  "src/assets/img/skills/galeCut.png": {
+    "family": "skill-icon",
+    "tier": null,
+    "subject": "a single sharp crescent-shaped blade of pale green and white wind slicing diagonally across the frame, thin streaks of air and a few torn leaves trailing behind it, on a dark green background",
+    "seed": 155735757,
+    "date": "2026-10-25"
+  },
   "src/assets/img/skills/origin.png": {
     "family": "skill-icon",
     "tier": null,
     "subject": "a bright cosmic starburst in deep space: a glowing white-gold star core with radiating light rays, surrounded by a swirling purple and blue nebula and tiny scattered stars, the origin of everything",
     "seed": 1941022359,
     "date": "2026-10-21"
+  },
+  "src/assets/img/skills/stoneSpike.png": {
+    "family": "skill-icon",
+    "tier": null,
+    "subject": "a single jagged brown and ochre stone spike bursting upward out of cracked earth, rock shards and dust flying outward from its base, on a dark brown background",
+    "seed": 41095558,
+    "date": "2026-10-25"
+  },
+  "src/assets/img/skills/tidalLash.png": {
+    "family": "skill-icon",
+    "tier": null,
+    "subject": "a single long whip of blue and teal seawater lashing through the air in a sweeping curved arc, white foam and spray flying from its tip, on a deep blue background",
+    "seed": 1215728485,
+    "date": "2026-10-25"
+  },
+  "src/assets/img/skills/waterMastery.png": {
+    "family": "skill-icon",
+    "tier": null,
+    "subject": "a round bronze medallion seen straight on, with a glowing blue water droplet symbol embossed in its centre, on a dark blue background",
+    "seed": 424242,
+    "date": "2026-10-25"
   }
 }

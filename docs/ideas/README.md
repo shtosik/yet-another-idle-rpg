@@ -30,4 +30,7 @@ Owner decisions in force:
 | [Quest panel and reputation](quest-panel.md) | M | Quest list done; reputation tab empty |
 | [Keybinds](keybinds.md) | S | Proposed |
 | [Responsive layout](responsive-layout.md) | M | Proposed |
+| [Elemental spells & gear expansion](elemental-spells-gear.md) | M | Batch 1 (spells, element branches, weaknesses) done |
+| [Loadouts](loadouts.md) | S | Accepted |
+| [Auto-cast](auto-cast.md) | S-M | Proposed |
 | [Known issues](known-issues.md) | — | Open bug and tech-debt list |

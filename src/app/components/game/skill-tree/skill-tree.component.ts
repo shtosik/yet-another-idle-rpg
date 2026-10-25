@@ -94,7 +94,7 @@ export class SkillTreeComponent {
 
   private placeEdges(): void {
     const edgeGroup = L.layerGroup().addTo(this.map)
-    for (const [fromId, dependents] of SKILL_TREE_GRAPH.forwardEdges) {
+    for (const [fromId, dependents] of SKILL_TREE_GRAPH.drawnEdges) {
       const fromPos = SKILL_TREE_GRAPH.positions.get(fromId)
       if (!fromPos) continue
       for (const toId of dependents) {

@@ -32,6 +32,8 @@ export class SpellSlotComponent {
 
   spellData = computed(() => SPELLS_DATA[this.equippedSpell().spellId])
   canAfford = computed(() => this.battleManagerService.canAffordSpell(this.equippedSpell().spellId))
+  /** After the spell's perk. */
+  manaCost = computed(() => this.battleManagerService.manaCost(this.equippedSpell().spellId))
   /** Seconds, after cooldown reduction. */
   cooldown = computed(() => this.battleManagerService.spellCooldown(this.equippedSpell().spellId))
   secondsUntilReady = computed(() => Math.ceil(this.equippedSpell().cooldownRemainingMs / MS_PER_SECOND))
