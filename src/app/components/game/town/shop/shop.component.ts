@@ -17,10 +17,17 @@ import { ModalService } from '../../../../services/modal.service'
 import { CurrencyFeedService } from '../../../../services/currency-feed.service'
 import { canInstall, isInstalled, stationUpgradeOf } from '../../../../store/player/camp'
 import { isPreferredBy, sellPrice } from '../../../../store/shop/shop-prices'
+import { ShopCurrency } from '../../../../../types/shop/shop.type'
 
-/** `gold` means the shop's currency (gold or Explorer Tokens) runs short. */
-type BuyBlockReason = 'stock' | 'rank' | 'gold' | 'inventory' | 'station' | null
+/** `currency`: the player has too little of the shop's currency. */
+type BuyBlockReason = 'stock' | 'rank' | 'currency' | 'inventory' | 'station' | null
 type ShopTab = 'buy' | 'sell'
+
+/** Icon and price text per currency; a new `ShopCurrency` won't compile until it has an entry here. */
+const CURRENCY_UI: Record<ShopCurrency, { icon: string; priceKey: string }> = {
+  gold: { icon: './assets/img/icons/coin.svg', priceKey: 'shop:ui.price' },
+  explorerTokens: { icon: './assets/img/icons/explorationToken.png', priceKey: 'shop:ui.tokenPrice' },
+}
 
 @Component({
   selector: 'app-shop',
@@ -55,15 +62,14 @@ export class ShopComponent implements OnInit {
 
   tab = signal<ShopTab>('buy')
 
-  currency = computed(() => SHOPS_DATA[this.shopId()].currency ?? 'gold')
-  currencyIcon = computed(() =>
-    this.currency() === 'explorerTokens' ? './assets/img/icons/explorationToken.png' : './assets/img/icons/coin.svg')
+  currency = computed<ShopCurrency>(() => SHOPS_DATA[this.shopId()].currency ?? 'gold')
+  currencyIcon = computed(() => CURRENCY_UI[this.currency()].icon)
   /** Shops with `buys: []` (the guild store) have no Sell tab. */
   canSell = computed(() => SHOPS_DATA[this.shopId()].buys?.length !== 0)
+  /** Shops with rank-gated stock (the guild store) show the player's Guild rank. */
+  showsGuildRank = computed(() => SHOPS_DATA[this.shopId()].items.some(item => item.minRank !== undefined))
   guildRank = this.playerStore.guildRank
-  balance = computed(() =>
-    this.currency() === 'explorerTokens' ? this.playerStore.explorerTokens() : this.playerStore.stats().goldCoins,
-  )
+  balance = computed(() => this.balanceOf(this.currency()))
 
   /** Inventory stacks this shop buys, at its price. */
   sellable = computed(() => {
@@ -93,7 +99,7 @@ export class ShopComponent implements OnInit {
 
     if ((entry.staticItem.minRank ?? 0) > this.guildRank()) return 'rank'
 
-    if (this.balance() < entry.staticItem.price) return 'gold'
+    if (this.balance() < entry.staticItem.price) return 'currency'
 
     // Station gear installs on purchase and never takes a slot, but must follow the previous level.
     const upgrade = stationUpgradeOf(entry.staticItem.itemId)
@@ -136,35 +142,52 @@ export class ShopComponent implements OnInit {
         return `${name}: ${i18next.t('shop:ui.needsRank', { rank: minRank })}`
       case 'station':
         return `${name}: ${i18next.t('shop:ui.needsStation', { level: this.requiredStationLevel(index) })}`
-      case 'gold':
-        return `${name}: ${i18next.t('shop:ui.cantAfford', { price: this.priceLabel(price) })}`
+      case 'currency':
+        return `${name}: ${i18next.t('shop:ui.cantAfford', { price: this.priceLabel(this.currency(), price) })}`
       case 'inventory':
         return `${name}: ${i18next.t('shop:ui.inventoryFull')}`
       default:
-        return `${name}: ${this.priceLabel(price)}`
+        return `${name}: ${this.priceLabel(this.currency(), price)}`
     }
   }
 
+  /** Shops always pay gold for what they buy. */
   sellLabel(itemId: ItemID, price: number, preferred: boolean): string {
-    const label = `${i18next.t(`items:names.${ItemID[itemId]}`)}: ${this.priceLabel(price)}`
+    const label = `${i18next.t(`items:names.${ItemID[itemId]}`)}: ${this.priceLabel('gold', price)}`
     if (!preferred) return label
     return `${label}, ${i18next.t('shop:ui.preferred')}`
   }
 
-  private priceLabel(amount: number): string {
-    if (this.currency() === 'explorerTokens') return i18next.t('shop:ui.tokenPrice', { amount })
-    return i18next.t('shop:ui.price', { amount })
+  private priceLabel(currency: ShopCurrency, amount: number): string {
+    return i18next.t(CURRENCY_UI[currency].priceKey, { amount })
+  }
+
+  // No default in these switches: with noImplicitReturns a new ShopCurrency fails to compile until it's handled.
+  private balanceOf(currency: ShopCurrency): number {
+    switch (currency) {
+      case 'gold':
+        return this.playerStore.stats().goldCoins
+      case 'explorerTokens':
+        return this.playerStore.explorerTokens()
+    }
+  }
+
+  /** Takes `amount` of `currency`; false when the player can't pay. */
+  private spend(currency: ShopCurrency, amount: number): boolean {
+    switch (currency) {
+      case 'gold':
+        this.playerStore.updatePlayerStats([{ stat: 'goldCoins', amount: -amount }])
+        return true
+      case 'explorerTokens':
+        return this.playerStore.spendTokens(amount)
+    }
   }
 
   /** Pays for and hands over one item; false when the payment fails. */
   private buyOne(index: number): boolean {
     const { itemId, tier, price } = this.items()[index].staticItem
 
-    if (this.currency() === 'explorerTokens') {
-      if (!this.playerStore.spendTokens(price)) return false
-    } else {
-      this.playerStore.updatePlayerStats([{ stat: 'goldCoins', amount: -price }])
-    }
+    if (!this.spend(this.currency(), price)) return false
     this.shopStore.buyItem(this.shopId(), index)
 
     // Spellbook unlocks the tab immediately and is not added to inventory

@@ -14,7 +14,7 @@
     "price": "{{amount}} gold",
     "buy": "Buy",
     "sell": "Sell",
-    "buyHint": "Click to buy one. Shift-click to buy five.",
+    "buyHint": "Click to buy one. Shift-click to buy up to five.",
     "rankShort": "R{{rank}}",
     "levelShort": "Lv {{level}}",
     "preferred": "Pays more",

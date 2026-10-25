@@ -4,7 +4,7 @@
   <div class="shop__header">
     <h2 class="shop__name">{{ staticShop.nameKey | i18next }}</h2>
     <span class="shop__cooldown">{{ 'shop:ui.nextRefresh' | i18next: { time: cooldownLabel() } }}</span>
-    @if (currency() === 'explorerTokens') {
+    @if (showsGuildRank()) {
       <span class="shop__balance">{{ 'shop:ui.guildRank' | i18next: { rank: guildRank() } }}</span>
     }
   </div>
@@ -61,7 +61,7 @@
               type="button"
               class="shop__item"
               [class.shop__item--sold-out]="reason === 'stock'"
-              [class.shop__item--no-gold]="reason === 'gold'"
+              [class.shop__item--cant-afford]="reason === 'currency'"
               [class.shop__item--full]="reason === 'inventory'"
               [class.shop__item--locked]="reason === 'rank' || reason === 'station'"
               [attr.aria-label]="buyLabel(i, reason)"
@@ -87,7 +87,7 @@
                 </span>
               }
               </app-slot>
-              <span class="shop__price" [class.shop__price--unaffordable]="reason === 'gold'">
+              <span class="shop__price" [class.shop__price--unaffordable]="reason === 'currency'">
                 <img alt="" height="12" [ngSrc]="currencyIcon()" width="12">
                 {{ entry.staticItem.price }}
               </span>
