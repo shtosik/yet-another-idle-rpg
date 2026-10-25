@@ -114,6 +114,12 @@
     gap: 0.6rem
     padding: 0.8rem
     overflow-y: auto
+    // Keeps the scrollbar's space when the shiny drop table toggles it, so the sprite doesn't shift.
+    scrollbar-gutter: stable
+
+    // Overflow scrolls instead of squeezing the sprite box, which would move the sprite up.
+    > *
+      flex-shrink: 0
 
   &__title
     margin: 0
