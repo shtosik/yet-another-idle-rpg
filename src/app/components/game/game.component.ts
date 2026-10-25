@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core'
 import TOWNS_DATA from '../../../data/towns-data'
-import { PanelComponent } from '../shared/panel/panel.component'
 import { GameNavigationService } from '../../services/game-navigation.service'
 import { UnlockService } from '../../services/unlock.service'
 import { GameTab } from 'enums/ids/game-tab.enum'
@@ -29,7 +28,6 @@ import { SettingsComponent } from './settings/settings.component'
 import { environment } from '../../../environments/environment'
 
 const imports = [
-  PanelComponent,
   AsyncPipe,
   CommonModule,
   TownsComponent,

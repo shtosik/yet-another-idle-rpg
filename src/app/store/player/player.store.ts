@@ -49,6 +49,7 @@ import {
   Resources,
   sameIds,
   skillNodeModifiers,
+  SourcedModifiers,
 } from './stats'
 
 export type { PlayerStatsType } from './stats'
@@ -149,14 +150,14 @@ const stackAmount = (inventory: (InventoryItem | null)[], id: ItemID, tier: Item
 
 type StatSources = { [K in 'resources' | 'permanentBonuses' | 'equipment' | 'unlockedNodes']: () => PlayerState[K] }
 
-const deriveStatsWith = (store: StatSources, buffSpellIds: SpellID[], consumableItemIds: ItemID[]) =>
-  deriveStats(store.resources(), [
-    ...bonusModifiers(store.permanentBonuses()),
-    ...equipmentModifiers(store.equipment()),
-    ...skillNodeModifiers(store.unlockedNodes()),
-    ...buffModifiers(buffSpellIds),
-    ...consumableModifiers(consumableItemIds),
-  ])
+/** Every stat modifier, grouped by where it comes from (the stats panel's breakdown order). */
+const sourcedModifiersOf = (store: StatSources, buffSpellIds: SpellID[], consumableItemIds: ItemID[]): SourcedModifiers => ({
+  equipment: equipmentModifiers(store.equipment()),
+  skills: skillNodeModifiers(store.unlockedNodes()),
+  buffs: buffModifiers(buffSpellIds),
+  consumables: consumableModifiers(consumableItemIds),
+  bonuses: bonusModifiers(store.permanentBonuses()),
+})
 
 /** Totals of a batch of kills (an offline claim), applied in one store update. */
 export interface KillBatch {
@@ -192,9 +193,12 @@ export const PlayerStore = signalStore(
     const activeBuffs = computed(() => activeBuffSpellIds(battleStore.activeBuffs()), { equal: sameIds })
     const activeConsumables = computed(() => activeConsumableItemIds(battleStore.consumableSlots()), { equal: sameIds })
 
+    const sourcedModifiers = computed(() => sourcedModifiersOf(store, activeBuffs(), activeConsumables()))
+
     return {
+      sourcedModifiers,
       /** Base stats plus every source; never stored (docs/adr/0002-player-stats-derived-from-sources.md). */
-      stats: computed(() => deriveStatsWith(store, activeBuffs(), activeConsumables())),
+      stats: computed(() => deriveStats(store.resources(), Object.values(sourcedModifiers()).flat())),
     }
   }),
   withComputed((store, battleStore = inject(BattleStore)) => {
@@ -427,7 +431,7 @@ export const PlayerStore = signalStore(
 
     /** `stats` as it would be with only these buffs and consumable effects running (offline buff segments). */
     statsFor(buffSpellIds: SpellID[], consumableItemIds: ItemID[]): PlayerStatsType {
-      return deriveStatsWith(store, buffSpellIds, consumableItemIds)
+      return deriveStats(store.resources(), Object.values(sourcedModifiersOf(store, buffSpellIds, consumableItemIds)).flat())
     },
 
     /**

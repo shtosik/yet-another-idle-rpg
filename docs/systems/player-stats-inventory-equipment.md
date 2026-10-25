@@ -5,7 +5,8 @@
 
 ## Key files
 - `src/app/store/player/player.store.ts:PlayerStore` — state, the derived `stats`, `updatePlayerStats`, `addItems`/`removeItems`, `equipItem`/`unequipItem`, `useItem`, `processBattleEnd`, unlock flags.
-- `src/app/store/player/stats.ts` — `deriveStats`, the modifier sources (`equipmentModifiers`, `skillNodeModifiers`, `buffModifiers`, `consumableModifiers`, `bonusModifiers`), `RESOURCE_STATS`, inverted stats.
+- `src/app/store/player/stats.ts` — `deriveStats`, the modifier sources (`equipmentModifiers`, `skillNodeModifiers`, `buffModifiers`, `consumableModifiers`, `bonusModifiers`), `SourcedModifiers` and `statContributions` (per-source breakdown), `RESOURCE_STATS`, inverted stats.
+- `src/app/components/game/player-stats/` — the stats panel: groups and rows from `stat-rows.ts:STAT_GROUPS`, each row's tooltip breaks the stat down by source.
 - `src/app/store/player/player.ts:statsInitialState` — every stat's base value (and its unit, in comments).
 - `docs/adr/0002-player-stats-derived-from-sources.md` — why stats are derived.
 - `src/app/store/player/inventory.ts` — pure inventory helpers: `addItems`, `removeItems`, `canFit`, `countItem`, `maxAffordable`, `resizeInventory`.
@@ -15,7 +16,8 @@
 - `src/app/services/skill-tree.service.ts:SkillTreeService` — skill node buy/refund/respec (see `skill-tree.md`).
 
 ## Data flow
-- **Stats** (`PlayerStore.stats()`) are a computed `Record<PlayerStat, number>`: `statsInitialState` + equipped gear + stat skill nodes × level + active buffs (`BattleStore.activeBuffs`) + active consumable effects (`BattleStore.consumableSlots`) + `permanentBonuses`, with saved **resources** on top. Nothing stores the total.
+- **Stats** (`PlayerStore.stats()`) are a computed `Record<PlayerStat, number>`: `statsInitialState` + equipped gear + stat skill nodes × level + active buffs (`BattleStore.activeBuffs`) + active consumable effects (`BattleStore.consumableSlots`) + `permanentBonuses`, with saved **resources** on top. Nothing stores the total. `PlayerStore.sourcedModifiers()` keeps the modifiers grouped by source (gear, skills, buffs, food and potions, permanent bonuses); `stats` flattens it, and the stats panel's tooltip reads it through `statContributions`.
+- **Stats panel** (main and Settings tabs, spanning both middle columns): Combat, Magic, Progress, Weakness damage and Damage vs enemy types. A row shows when marked `always` in `STAT_GROUPS` or when its value differs from `statsInitialState`; "Show all stats" lists every row. Level, XP and gold live in the HUD, not here. Hovering or focusing a row shows Base, each source's flat and percent part, and Total; on inverted stats a positive data amount shows as a minus.
 - **Resources** (`PlayerState.resources`: `experience`, `level`, `unspentSkillPoints`, `goldCoins`, `mana`) are earned and spent with `updatePlayerStats([{ stat, amount }])`. The same call with any other stat adds a **permanent bonus** (`PlayerState.permanentBonuses`): used reward items, quest stat rewards, dialogue stat effects. Gear, nodes, buffs and consumables never call it.
 - **XP**: adding `experience` runs `handleExperience`, which levels up (possibly several times) and grants 1 skill point per level. Formula: `src/app/pipes/calculate-xp.pipe.ts`.
 - **Inventory**: a fixed-length array of slots (`InventoryItem | null`), length = `stats.inventorySlots` (default 40, grows when the stat rises, never shrinks). Items stack per `id + tier`. `removeItems` takes across every stack of an id.
@@ -43,4 +45,4 @@
 - None open here; see `docs/ideas/known-issues.md`.
 
 ## How to extend
-New equipment: the `add-equipment-item` skill. New stat: add it to `PlayerStat`, `statsInitialState`, the right display list, and `app:playerStats`; if lower is better, add it to `INVERTED_STATS` in `stats.ts`; if it is earned and spent rather than granted, add it to `RESOURCE_STATS`.
+New equipment: the `add-equipment-item` skill. New stat: add it to `PlayerStat`, `statsInitialState`, the right display list, a row in `STAT_GROUPS` (`player-stats/stat-rows.ts`), and `app:playerStats`; if lower is better, add it to `INVERTED_STATS` in `stats.ts`; if it is earned and spent rather than granted, add it to `RESOURCE_STATS`.

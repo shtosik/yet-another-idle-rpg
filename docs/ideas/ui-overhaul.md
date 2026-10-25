@@ -14,7 +14,7 @@ A pass over every tab found the same problems in several places: no feedback on 
 - Level, XP bar and gold live in the navbar on every tab.
 - Gold changes from buying or selling show floating text next to the gold value: green `+N` on gain, red `−N` on loss.
 - The shop does **not** show the player's gold; the HUD covers it.
-- The empty `.resources` panel on the main view goes away or takes the stats it used to sit next to.
+- The empty `.resources` panel on the main view goes away or takes the stats it used to sit next to. Done (`feat/stats-panel`): removed; the stats panel spans both columns, grouped, with a per-source breakdown tooltip.
 
 ## Shop
 - Dense grid of inventory-sized slots: icon, stock in the slot's corner badge, price under the icon. The "99 / 99" stock line goes.

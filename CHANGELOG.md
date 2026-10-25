@@ -15,6 +15,7 @@ New notes go under `[Unreleased]`; `npm run release -- <major|minor|patch>` move
 - [feature] Shops are now a compact item grid: hover an item for details, prices show the shop's currency icon (coins, or tokens in the Guild store), and the slot shows why you can't buy (red border: can't afford, lock: rank or station level, faded: sold out). Shift-click buys up to five.
 - [bug] Item tooltips in shops and reward windows no longer say "Click to equip" or "Right-click to use".
 - [feature] Towns: conversations open inside the town view so your inventory stays visible, shopkeepers get a Shop button once you've browsed their wares, the town name is shown, building labels light up on hover, and backgrounds no longer pop in.
+- [feature] Stats panel: stats are grouped (Combat, Magic, Progress, weakness and enemy-type damage) with clear units, more stats are shown once something changes them ("Show all stats" lists everything), and hovering a stat shows where it comes from: base, gear, skills, buffs, food and potions, and permanent bonuses. Level, XP and gold moved to the bar under the tabs.
 
 ## [0.1.0] - 2026-10-24
 - [feature] Battle: your hero auto-attacks through zone waves, with bosses, critical hits, strong hits and elemental weaknesses.
