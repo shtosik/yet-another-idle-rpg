@@ -26,11 +26,11 @@ Data-driven NPC conversations. Each NPC has a graph of nodes; options branch on 
 - `active` — started (optionally at `step`).
 - `readyToAdvance` — active (optionally at `step`) **and** the current step's requirements are met. Use this for turn-in branches.
 
-Kill-count requirements inside quest conditions count kills since the quest reached its current step (see `quests.md`).
+Kill-count requirements inside quest conditions count kills since the quest reached its current step (see `quests.md`). Quest requirements are checked by `QuestsStore.requirementProgress`, the same check the quest panel uses for its progress and Ready tag.
 
 ## Invariants & gotchas
 - **Order results from most specific to least.** Quest hubs go: turn-in (`readyToAdvance`) → in progress (`active`) → offer (`available`) → fallback. An NPC with several questlines (Finn) lists every turn-in, then every in-progress, then every offer.
-- A turn-in result is just `readyToAdvance` + `advance`/`end`. The store takes the step's items; don't restate them as `requirementsNeeded` or `take`.
+- A turn-in result is just `readyToAdvance` + `advance`/`end`. The store takes the step's items; don't restate them as `requirementsNeeded` or `take`. Put `step` on the turn-in's `readyToAdvance` condition when different steps turn in at different NPCs: the quest panel's "Talk to" link reads it to pick the NPC for the current step.
 - Lore links into an offer node also need an `available` result, plus a fallback result so the option stays usable.
 - Node ids are the enum values; `default = 0` is the start node for returning players.
 - Every `next` must exist and every node should be reachable. `npm run validate` checks both (unreachable = warning).

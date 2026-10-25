@@ -6,12 +6,15 @@ import { NpcID } from '../../enums/map/npc-id.enum'
 import TOWNS_DATA from '../../data/towns-data'
 import { TownsStore } from '../store/towns/towns.store'
 import { DialogueManagerService } from './dialogue-manager.service'
+import { BattleStore } from '../store/battle/battle.store'
+import { ZoneID } from '../../enums/ids/zone-id.enum'
 
 /** The open game tab, and shortcuts that jump straight to a place in the game. */
 @Injectable({ providedIn: 'root' })
 export class GameNavigationService {
   private townsStore = inject(TownsStore)
   private dialogueManager = inject(DialogueManagerService)
+  private battleStore = inject(BattleStore)
 
   readonly tab = signal(GameTab.main)
 
@@ -29,6 +32,12 @@ export class GameNavigationService {
     this.townsStore.selectTownBuilding(building)
     this.tab.set(GameTab.towns)
     this.dialogueManager.startDialogue(npcId)
+  }
+
+  /** Opens the battle tab in `zoneId`. Moving to another zone starts it from wave 1; staying keeps the current wave. */
+  fightIn(zoneId: ZoneID): void {
+    if (this.battleStore.currentZoneId() !== zoneId) this.battleStore.setZone(zoneId)
+    this.tab.set(GameTab.main)
   }
 
   /** Marvin, to claim finished Exploration Guild tasks. */

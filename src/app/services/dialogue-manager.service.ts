@@ -222,26 +222,8 @@ export class DialogueManagerService {
 
   /** Kill requirements of `questId` count kills since its current step started. */
   private checkRequirement(req: RequirementProps, questId: QuestID): boolean {
-    switch (req.type) {
-      case 'stat':
-        const stats = this.playerStore.stats()
-
-        return (stats[req.key] as number) >= req.amount
-      case 'item':
-        return this.playerStore.itemCount(req.itemId) >= req.amount
-      case 'enemy':
-        return this.questStore.questEnemyKills(questId, req.enemyId) >= req.amount
-      case 'quest':
-        const currentProgress = this.questStore.getQuestStep(req.questId)
-
-        if (!currentProgress) return false
-
-        return req.step !== undefined ? currentProgress === req.step : true
-      case 'wave':
-        return this.questStore.questWaveKills(questId, req.zoneId, req.wave) >= req.amount
-      default:
-        return false
-    }
+    const { current, target } = this.questStore.requirementProgress(questId, req)
+    return current >= target
   }
 
   private applyEffects(effects: DialogueEffect[]) {

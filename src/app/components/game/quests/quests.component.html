@@ -1,29 +1,126 @@
-@let filters = questFilters();
-
-<div class="quests__filters">
+<div class="panel__tabs" role="tablist" [attr.aria-label]="'quests:panel.label' | i18next">
   <button
-    [class.active]="filters === 'all'"
-    (click)="changeFilter('all')"
-  >{{ 'quests:filters.all' | i18next }}
-  </button>
+    aria-controls="quest-panel-body"
+    class="panel__tab"
+    id="quest-panel-tab-quests"
+    role="tab"
+    type="button"
+    [attr.aria-selected]="tab() === 'quests'"
+    [class.panel__tab--active]="tab() === 'quests'"
+    (click)="selectTab('quests')"
+  >{{ 'quests:panel.quests' | i18next }}</button>
   <button
-    [class.active]="filters === 'started'"
-    (click)="changeFilter('started')"
-  >{{ 'quests:filters.started' | i18next }}
-  </button>
-  <button
-    [class.active]="filters === 'completed'"
-    (click)="changeFilter('completed')"
-  >{{ 'quests:filters.completed' | i18next }}
-  </button>
+    aria-controls="quest-panel-body"
+    class="panel__tab"
+    id="quest-panel-tab-reputation"
+    role="tab"
+    type="button"
+    [attr.aria-selected]="tab() === 'reputation'"
+    [class.panel__tab--active]="tab() === 'reputation'"
+    (click)="selectTab('reputation')"
+  >{{ 'quests:panel.reputation' | i18next }}</button>
 </div>
-<ul class="quests__list">
-  @for (quest of questsArray(); track quest[0]) {
-    <li (click)="setActiveDescription(quest[0], quest[1])">
-      <h3 [class.completed]="quest[1] === QUEST_STEP_AFTER_COMPLETED">{{ 'quests:names.' + QuestID[quest[0]] | i18next }}</h3>
-      @if (clickedQuest() && quest[0] === clickedQuest()) {
-        <p>{{ questDescription() }}</p>
+
+<div
+  class="panel__body"
+  id="quest-panel-body"
+  role="tabpanel"
+  [attr.aria-labelledby]="'quest-panel-tab-' + tab()"
+>
+  @if (tab() === 'quests') {
+    <ul class="quests">
+      @for (quest of activeQuests(); track quest.id) {
+        @let expanded = expandedQuest() === quest.id;
+        @let questName = ('quests:names.' + QuestID[quest.id]) | i18next;
+        <li class="quest" [class.quest--ready]="quest.ready">
+          <div class="quest__top">
+            <button
+              class="quest__header"
+              type="button"
+              [attr.aria-expanded]="expanded"
+              (click)="toggleQuest(quest.id)"
+            >
+              <span class="quest__name">{{ questName }}</span>
+              @if (quest.ready) {
+                <span class="quest__ready">{{ 'quests:panel.ready' | i18next }}</span>
+              }
+            </button>
+            <button
+              class="quest__icon-button"
+              type="button"
+              [attr.aria-label]="'quests:panel.pin' | i18next:{ quest: questName }"
+              [attr.aria-pressed]="quest.pinned"
+              [class.quest__icon-button--shown]="quest.pinned"
+              [title]="(quest.pinned ? 'quests:panel.unpin' : 'quests:panel.pin') | i18next:{ quest: questName }"
+              (click)="togglePin(quest.id)"
+            >
+              <img alt="" height="14" width="14" [ngSrc]="quest.pinned ? './assets/img/icons/pin-active.svg' : './assets/img/icons/pin.svg'">
+            </button>
+          </div>
+
+          @if (expanded) {
+            <p class="quest__description">{{ quest.description }}</p>
+          }
+
+          <ul class="quest__requirements">
+            @for (req of quest.requirements; track $index) {
+              @let done = req.current >= req.target;
+              <li class="requirement" [class.requirement--done]="done">
+                <span class="requirement__label">
+                  <span class="requirement__text">{{ req.label }}</span>
+                  @if (req.zoneId !== null && !done) {
+                    @let zoneName = ('zones:names.' + ZoneID[req.zoneId]) | i18next;
+                    <button
+                      class="requirement__zone"
+                      type="button"
+                      [attr.aria-label]="'quests:panel.fightIn' | i18next:{ zone: zoneName }"
+                      [title]="'quests:panel.fightIn' | i18next:{ zone: zoneName }"
+                      (click)="fightIn(req.zoneId)"
+                    >
+                      <img alt="" height="12" ngSrc="./assets/img/icons/location.svg" width="12">
+                    </button>
+                  }
+                </span>
+                @if (req.target > 1) {
+                  <span class="requirement__count">{{ done ? req.target : req.current }} / {{ req.target }}</span>
+                  <span class="requirement__bar" aria-hidden="true">
+                    <span class="requirement__fill" [style.width.%]="(done ? 1 : req.current / req.target) * 100"></span>
+                  </span>
+                } @else {
+                  <span class="requirement__count">{{ (done ? 'quests:panel.done' : 'quests:panel.notDone') | i18next }}</span>
+                }
+              </li>
+            }
+          </ul>
+
+          @if (quest.giver; as giver) {
+            <button class="quest__giver" type="button" (click)="talkTo(giver)">
+              {{ 'quests:panel.talkTo' | i18next:{ npc: ('npc:names.' + NpcID[giver.npcId]) | i18next } }}
+            </button>
+          }
+        </li>
+      } @empty {
+        <li class="quests__empty">{{ 'quests:panel.empty' | i18next }}</li>
       }
-    </li>
+    </ul>
+
+    @if (completedQuests().length) {
+      <button
+        class="completed__toggle"
+        type="button"
+        [attr.aria-expanded]="showCompleted()"
+        (click)="toggleCompleted()"
+      >{{ (showCompleted() ? 'quests:panel.hideCompleted' : 'quests:panel.showCompleted') | i18next:{ count: completedQuests().length } }}</button>
+
+      @if (showCompleted()) {
+        <ul class="completed">
+          @for (id of completedQuests(); track id) {
+            <li class="completed__quest">{{ ('quests:names.' + QuestID[id]) | i18next }}</li>
+          }
+        </ul>
+      }
+    }
+  } @else {
+    <p class="panel__empty">{{ 'quests:panel.reputationEmpty' | i18next }}</p>
   }
-</ul>
+</div>
