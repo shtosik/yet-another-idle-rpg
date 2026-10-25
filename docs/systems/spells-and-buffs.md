@@ -4,10 +4,10 @@
 Active abilities on a 5-slot spell bar under the battle view. Spells cost mana and have cooldowns. They deal melee or magic damage, or grant a timed **buff** that raises a stat.
 
 ## Key files
-- `src/data/spells-data.ts:SPELLS_DATA` — per spell: `baseManaCost`, `baseCooldown` (seconds), icon `url`, `effect`.
+- `src/data/spells-data.ts:SPELLS_DATA` — per spell: `baseManaCost`, `baseCooldown` (seconds), icon `url`, `effect`, optional `perk` (skill node that cuts the spell's cooldown or mana per level). Strike spells: Fire Strike (fire), Tidal Lash (water, 1 mana), Gale Cut (air, 35 s), Stone Spike (earth, 26 damage, 90 s); plus Haste and Double Attack.
 - `src/interfaces/spell.interface.ts:SpellProps` — `effect` is `SpellMeleeEffectProps` (double attack), `SpellMagicEffectProps` (`baseDamage`, `damageType`) or `SpellBuffEffectProps` (`stat`, `amount`, `duration` in seconds).
 - `src/enums/ids/spell-id.enum.ts:SpellID`, `src/enums/spell-type.enum.ts:SpellType`.
-- `src/app/services/battle-manager.service.ts` — `canCast`, `castSpell`, `spellCooldown`, `isSpellSlotLocked`, `equipSpell`, `unequipSpell`, `tickSpells`.
+- `src/app/services/battle-manager.service.ts` — `canCast`, `castSpell`, `manaCost`, `spellCooldown`, `isSpellSlotLocked`, `equipSpell`, `unequipSpell`, `tickSpells`.
 - `src/app/store/battle/battle.store.ts` — `equippedSpells` (5 slots, each `{ spellId, cooldownRemainingMs }`), `activeBuffs` (`{ spellId, msRemaining }`), `tickSpellTimers`.
 - `src/app/store/player/player.store.ts` — `unlockedSpells` (spell → level), `spellbookUnlocked`, mana and `regenMana`; `stats` includes active buffs.
 - `src/app/components/game/battle/battle-footer/` — spell bar and `spell-slot/`; `src/app/components/game/spellbook/` — palette for drag-and-drop equipping.
@@ -15,7 +15,7 @@ Active abilities on a 5-slot spell bar under the battle view. Spells cost mana a
 ## Data flow
 1. **Unlock**: buying a `spell` skill node levels the spell in `unlockedSpells` and auto-equips it into a free slot (see `skill-tree.md`).
 2. **Spellbook tab**: unlocks after buying the Spellbook item in the Mawood Magic Shop (`ShopComponent` calls `unlockSpellbook`). It lists unlocked, unequipped spells; dragging moves them on and off the bar. Unlocked spells that are off the spell bar and not yet in `seenSpells` count toward the navbar badge (`unseenSpells`); the tab marks them seen while it's open (`markSpellsSeen`). A spell auto-equipped on learning only counts once it is unequipped.
-3. **Cast** (`castSpell`), only when `canCast`: the spell is equipped, its slot is off cooldown, the player can pay the mana, and either an enemy is alive (melee, magic) or the buff isn't already active (buffs work between fights). Then: pay `baseManaCost`, set the slot's cooldown to `spellCooldown` = `max(1, baseCooldown − spellCooldownReduction)` seconds, and:
+3. **Cast** (`castSpell`), only when `canCast`: the spell is equipped, its slot is off cooldown, the player can pay the mana, and either an enemy is alive (melee, magic) or the buff isn't already active (buffs work between fights). Then: pay `manaCost` = `max(1, baseManaCost − perk.manaPerLevel × perk level)`, set the slot's cooldown to `spellCooldown` = `max(1, baseCooldown − spellCooldownReduction − perk.cooldownPerLevel × perk level)` seconds, and:
    - melee: `doDamage` with double attack;
    - magic: `doDamage` with `baseDamage` and the spell's element (see `game-loop-and-combat.md`);
    - buff: add to `activeBuffs` for `duration + increasedSpellDuration` seconds. The stat is derived from `activeBuffs`, nothing is added to stats directly. A buff with `percent: true` scales the stat after every flat modifier (Haste: attack interval −20%), so it keeps its strength as gear improves.
@@ -32,4 +32,4 @@ Active abilities on a 5-slot spell bar under the battle view. Spells cost mana a
 - Fire Strike barely beats auto-attacks (spell numbers wait for magic gear); spell descriptions hard-code numbers from data.
 
 ## How to extend
-New spell: append a `SpellID`, add a `SPELLS_DATA` entry, a `spell` skill node with `spellId`, icon under `assets/img/skills/`, and `spells:names` keys. A new effect shape needs a new `SpellEffectProps` variant and a `castSpell` case (and a `canCast` rule if it needs a target).
+New spell: append a `SpellID`, add a `SPELLS_DATA` entry (a `perk` needs its skill node), a `spell` skill node with `spellId` (a strike spell starts its element branch, see `skill-tree.md`), icon under `assets/img/skills/`, and `spells:names` keys. A new effect shape needs a new `SpellEffectProps` variant and a `castSpell` case (and a `canCast` rule if it needs a target).

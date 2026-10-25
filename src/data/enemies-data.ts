@@ -64,7 +64,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   [EnemyID.kingSlime]: {
     id: EnemyID.kingSlime,
     maxHp: 300,
-    weakness: DamageElement.fire,
+    weakness: DamageElement.earth,
     experience: 180,
     gold: 90,
     drops: [
@@ -95,7 +95,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   [EnemyID.seagull]: {
     id: EnemyID.seagull,
     maxHp: 4,
-    weakness: DamageElement.physical,
+    weakness: DamageElement.air,
     experience: 6,
     gold: 3,
     drops: [
@@ -112,7 +112,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   [EnemyID.turtle]: {
     id: EnemyID.turtle,
     maxHp: 6,
-    weakness: DamageElement.fire,
+    weakness: DamageElement.earth,
     experience: 8,
     gold: 4,
     drops: [
@@ -158,7 +158,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   [EnemyID.giantRat]: {
     id: EnemyID.giantRat,
     maxHp: 100,
-    weakness: DamageElement.fire,
+    weakness: DamageElement.earth,
     experience: 60,
     gold: 30,
     drops: [
@@ -189,7 +189,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   [EnemyID.deer]: {
     id: EnemyID.deer,
     maxHp: 17,
-    weakness: DamageElement.fire,
+    weakness: DamageElement.earth,
     experience: 29,
     gold: 14,
     drops: [
@@ -222,7 +222,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   [EnemyID.goblinScout]: {
     id: EnemyID.goblinScout,
     maxHp: 21,
-    weakness: DamageElement.fire,
+    weakness: DamageElement.water,
     experience: 36,
     gold: 18,
     drops: [petDrop(EnemyID.goblinScout)],
@@ -234,7 +234,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   [EnemyID.mountainBat]: {
     id: EnemyID.mountainBat,
     maxHp: 37,
-    weakness: DamageElement.fire,
+    weakness: DamageElement.air,
     experience: 64,
     gold: 27,
     drops: [drop(ItemID.vialOfWater, 1, 1, 8), petDrop(EnemyID.mountainBat)],
@@ -261,7 +261,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   [EnemyID.goblinScavenger]: {
     id: EnemyID.goblinScavenger,
     maxHp: 58,
-    weakness: DamageElement.fire,
+    weakness: DamageElement.water,
     experience: 82,
     gold: 54,
     drops: [
@@ -276,7 +276,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   [EnemyID.troll]: {
     id: EnemyID.troll,
     maxHp: 1200,
-    weakness: DamageElement.water,
+    weakness: DamageElement.fire,
     experience: 720,
     gold: 360,
     drops: [petDrop(EnemyID.troll)],
@@ -319,7 +319,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   [EnemyID.corruptedSapling]: {
     id: EnemyID.corruptedSapling,
     maxHp: 62,
-    weakness: DamageElement.fire,
+    weakness: DamageElement.air,
     experience: 101,
     gold: 43,
     drops: [
@@ -335,7 +335,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   [EnemyID.gnollWarchief]: {
     id: EnemyID.gnollWarchief,
     maxHp: 2400,
-    weakness: DamageElement.air,
+    weakness: DamageElement.water,
     experience: 1440,
     gold: 720,
     drops: [
@@ -353,7 +353,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   [EnemyID.elderSpider]: {
     id: EnemyID.elderSpider,
     maxHp: 206,
-    weakness: DamageElement.fire,
+    weakness: DamageElement.water,
     experience: 294,
     gold: 142,
     drops: [
@@ -368,7 +368,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   [EnemyID.forestBear]: {
     id: EnemyID.forestBear,
     maxHp: 300,
-    weakness: DamageElement.physical,
+    weakness: DamageElement.earth,
     experience: 441,
     gold: 197,
     drops: [
@@ -383,7 +383,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   [EnemyID.bogSkeleton]: {
     id: EnemyID.bogSkeleton,
     maxHp: 150,
-    weakness: DamageElement.fire,
+    weakness: DamageElement.physical,
     experience: 221,
     gold: 158,
     drops: [
@@ -432,7 +432,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   [EnemyID.harpy]: {
     id: EnemyID.harpy,
     maxHp: 296,
-    weakness: DamageElement.physical,
+    weakness: DamageElement.earth,
     experience: 453,
     gold: 199,
     drops: [
@@ -447,7 +447,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   [EnemyID.giantEagle]: {
     id: EnemyID.giantEagle,
     maxHp: 395,
-    weakness: DamageElement.physical,
+    weakness: DamageElement.air,
     experience: 617,
     gold: 222,
     drops: [
@@ -462,7 +462,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
   [EnemyID.canopyBandit]: {
     id: EnemyID.canopyBandit,
     maxHp: 461,
-    weakness: DamageElement.air,
+    weakness: DamageElement.water,
     experience: 658,
     gold: 443,
     drops: [

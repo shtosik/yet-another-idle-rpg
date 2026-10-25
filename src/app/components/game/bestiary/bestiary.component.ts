@@ -106,7 +106,8 @@ export class BestiaryComponent {
     dropOdds(drop: EnemyDrop, rank: number): string {
         const { revealsDropOdds, dropChance } = RANK_BONUSES[rank]
         if (!revealsDropOdds) return '?'
-        const percent = (100 * (1 + dropChance)) / drop.chance
+        // A 1-in-1 drop with a bonus still drops once per roll, so cap at 100%.
+        const percent = Math.min(100, (100 * (1 + dropChance)) / drop.chance)
         return `${percent.toLocaleString('en-US', { maximumSignificantDigits: 3 })}%`
     }
 

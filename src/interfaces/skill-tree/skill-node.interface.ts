@@ -19,11 +19,18 @@ export interface SkillNode {
     branch: SkillBranch
     // Layout strategy (resolved at module load by skill-tree-graph):
     //   - explicit `position` wins (origin, or unconnected special nodes)
-    //   - else if single node prereq: chain-inherit direction from prereq + (turn ?? 0), step by STEP_DISTANCE
+    //   - else if single node prereq: chain-inherit direction from prereq + (turn ?? 0), step by STEP_DISTANCE × (distance ?? 1)
     //   - else if multiple prereqs: auto-midpoint of all prereqs' positions
     //   - else: authoring error
     position?: SkillNodePosition
     turn?: number
+    /** Chain step length in steps (default 1); spreads siblings that leave the same parent close together. */
+    distance?: number
+    /**
+     * Lay out and draw the node from this node instead of its requirements, so an `any` requirement spread across
+     * the tree shows one line rather than a web. Unlocking still follows `requires`.
+     */
+    anchor?: SkillNodeID
     skillPointCost: number
     maxLevel: number
     requires: NodeRequirement | null

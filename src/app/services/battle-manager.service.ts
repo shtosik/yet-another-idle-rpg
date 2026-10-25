@@ -78,13 +78,26 @@ export class BattleManagerService {
   }
 
   canAffordSpell(spellId: SpellID): boolean {
-    const spellData = SPELLS_DATA[spellId]
-    return this.playerStore.stats().mana >= spellData.baseManaCost
+    return this.playerStore.stats().mana >= this.manaCost(spellId)
   }
 
-  /** Seconds, after `spellCooldownReduction`, never below `MIN_SPELL_COOLDOWN_IN_SECONDS`. */
+  /** Levels of the spell's perk node (`SpellProps.perk`); 0 without one. */
+  private perkLevel(spellId: SpellID): number {
+    const perk = SPELLS_DATA[spellId].perk
+    return perk ? this.playerStore.unlockedNodes()[perk.nodeId] ?? 0 : 0
+  }
+
+  /** `baseManaCost` minus the perk's mana per level, never below 1. */
+  manaCost(spellId: SpellID): number {
+    const { baseManaCost, perk } = SPELLS_DATA[spellId]
+    return Math.max(1, baseManaCost - (perk?.manaPerLevel ?? 0) * this.perkLevel(spellId))
+  }
+
+  /** Seconds, after `spellCooldownReduction` and the spell's perk, never below `MIN_SPELL_COOLDOWN_IN_SECONDS`. */
   spellCooldown(spellId: SpellID): number {
-    const reduced = SPELLS_DATA[spellId].baseCooldown - this.playerStore.stats().spellCooldownReduction
+    const { baseCooldown, perk } = SPELLS_DATA[spellId]
+    const perkReduction = (perk?.cooldownPerLevel ?? 0) * this.perkLevel(spellId)
+    const reduced = baseCooldown - this.playerStore.stats().spellCooldownReduction - perkReduction
     return Math.max(MIN_SPELL_COOLDOWN_IN_SECONDS, reduced)
   }
 
@@ -106,7 +119,7 @@ export class BattleManagerService {
     if (!this.canCast(spellId)) return
 
     const spellData = SPELLS_DATA[spellId]
-    this.playerStore.updatePlayerStats([{ stat: 'mana', amount: -spellData.baseManaCost }])
+    this.playerStore.updatePlayerStats([{ stat: 'mana', amount: -this.manaCost(spellId) }])
     this.battleStore.setSpellCooldown(spellId, this.spellCooldown(spellId) * MS_PER_SECOND)
 
     switch (spellData.effect.type) {
