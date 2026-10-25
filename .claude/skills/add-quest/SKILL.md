@@ -17,12 +17,16 @@ Background: `docs/systems/quests.md` (step encoding, flow) and `docs/systems/dia
      questId: QuestID.wolfProblem,
      startRequirements: [{ type: 'quest', questId: QuestID.previousQuest, step: QUEST_STEP_AFTER_COMPLETED }],
      steps: [
-       { description: 'Corwin wants 10 wolf pelts.', requirements: [{ type: 'item', itemId: ItemID.wolfPelt, amount: 10 }] },
+       {
+         description: 'Corwin wants 10 wolf pelts.',
+         turnInNpc: NpcID.mawoodCorwin,
+         requirements: [{ type: 'item', itemId: ItemID.wolfPelt, amount: 10 }],
+       },
      ],
      rewards: [{ type: 'stat', key: 'unspentSkillPoints', amount: 1 }, { type: 'item', itemId: ItemID.x, amount: 1 }],
    },
    ```
-   Requirement types: `item` (taken from the inventory on turn-in), `stat`, `enemy` and `wave` (kills since the quest reached the step), `quest`. A quest with no prerequisite uses `{ type: 'stat', key: 'level', amount: 1 }`.
+   `turnInNpc` is who the player talks to about that step (the quest panel's "Talk to" link); their dialogue must handle the quest (step 4), which `npm run validate` checks. Requirement types: `item` (taken from the inventory on turn-in), `stat`, `enemy` and `wave` (kills since the quest reached the step), `quest`. A quest with no prerequisite uses `{ type: 'stat', key: 'level', amount: 1 }`.
 
 3. **Name** — `quests:names.<questKey>` in `src/assets/locales/en/quests.json`.
 

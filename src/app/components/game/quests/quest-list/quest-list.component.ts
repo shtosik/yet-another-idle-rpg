@@ -5,7 +5,7 @@ import { QuestsStore } from '../../../../store/quests/quests.store'
 import { PlayerStore } from '../../../../store/player/player.store'
 import { GameNavigationService } from '../../../../services/game-navigation.service'
 import QUEST_DATA, { RequirementProps } from '../../../../../data/quests-data'
-import { questGiverFor, QuestGiver } from '../../../../../data/helpers/quest-givers'
+import { npcPlace, NpcPlace } from '../../../../../data/helpers/npc-places'
 import { ZONES_BY_ENEMY } from '../../../../../data/helpers/enemy-zones'
 import { QuestID } from '../../../../../enums/ids/quest-id.enum'
 import { QuestState } from '../../../../../enums/quest-state.enum'
@@ -32,7 +32,7 @@ interface ActiveQuestRow {
   ready: boolean
   pinned: boolean
   /** Who to talk to, once the Map and their town are unlocked. */
-  giver: QuestGiver | null
+  giver: NpcPlace | null
 }
 
 /** Quests tab of the quest panel: active quests with progress, pins and links, then completed ones. */
@@ -82,7 +82,7 @@ export class QuestListComponent {
     this.showCompleted.update(show => !show)
   }
 
-  talkTo(giver: QuestGiver): void {
+  talkTo(giver: NpcPlace): void {
     this.navigation.talkTo(giver.townId, giver.buildingId, giver.npcId)
   }
 
@@ -109,7 +109,7 @@ export class QuestListComponent {
       requirements,
       ready: requirements.every(({ current, target }) => current >= target),
       pinned: pins.includes(id),
-      giver: this.reachableGiver(id, status.step),
+      giver: this.reachableGiver(step.turnInNpc),
     }]
   }
 
@@ -121,8 +121,8 @@ export class QuestListComponent {
   }
 
   /** Towns open through the Map tab, so the link waits for the Map like the tab does. */
-  private reachableGiver(id: QuestID, step: number): QuestGiver | null {
-    const giver = questGiverFor(id, step)
+  private reachableGiver(npcId: NpcID): NpcPlace | null {
+    const giver = npcPlace(npcId)
     if (!giver || !this.playerStore.mapUnlocked()) return null
     if (!this.playerStore.isTownUnlocked(giver.townId)) return null
     return giver

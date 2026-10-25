@@ -15,7 +15,7 @@ The panel shows the **current step only**. No step number, no step count, no rew
 - Completed quests collapse behind a "Completed (N)" toggle at the bottom.
 - The panel body scrolls; rows are buttons with `aria-expanded`.
 - One requirement check (`QuestsStore.requirementProgress`) serves both the panel and dialogue.
-- **Talk to the giver:** "Talk to {NPC}" opens that NPC's building and starts the conversation. The NPC is derived from dialogue data (the one who turns in the current step, else any turn-in NPC, else the one who starts it; `src/data/helpers/quest-givers.ts`), so quest data has no giver field. Shown once the Map and the NPC's town are unlocked.
+- **Talk to the giver:** "Talk to {NPC}" opens that NPC's building and starts the conversation. The NPC is the current step's `turnInNpc` in quest data; `npm run validate` checks they stand in a town and their dialogue handles the quest. Shown once the Map and the NPC's town are unlocked.
 - **Zone link on kill steps:** a location icon next to an unfinished enemy or wave requirement opens the battle in the first unlocked zone with that enemy (or the wave's zone); already being there keeps the current wave.
 - **Pins:** a pin button (shown on hover, always when pinned) keeps a quest at the top, in pin order. Pins are saved and dropped when the quest completes.
 
@@ -38,4 +38,4 @@ Candidate types, none decided:
 Needs before building: reputation state in `PlayerStore`, ways to earn it (quest rewards, an `addReputation` dialogue effect), and what each type unlocks.
 
 ## Touch-points
-`quests` component, `QuestsStore`, `quest-givers.ts`, `GameNavigationService` (`talkTo`, `fightIn`), `PlayerStore` (reputation).
+`quests` component, `QuestsStore`, `npc-places.ts`, `GameNavigationService` (`talkTo`, `fightIn`), `PlayerStore` (reputation).
