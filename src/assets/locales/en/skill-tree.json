@@ -91,19 +91,19 @@
         },
         "fireStrikeCooldown": {
             "name": "Kindling",
-            "desc": "Fire Strike's cooldown is 5 seconds shorter."
+            "desc": "Fire Strike's cooldown is 5 seconds shorter per level."
         },
         "tidalLashCooldown": {
             "name": "Undertow",
-            "desc": "Tidal Lash's cooldown is 5 seconds shorter."
+            "desc": "Tidal Lash's cooldown is 5 seconds shorter per level."
         },
         "galeCutCooldown": {
             "name": "Tailwind",
-            "desc": "Gale Cut's cooldown is 3 seconds shorter."
+            "desc": "Gale Cut's cooldown is 3 seconds shorter per level."
         },
         "stoneSpikeMana": {
             "name": "Bedrock",
-            "desc": "Stone Spike costs 1 less mana."
+            "desc": "Stone Spike costs 1 less mana per level."
         },
         "maxMana": {
             "name": "Max Mana",

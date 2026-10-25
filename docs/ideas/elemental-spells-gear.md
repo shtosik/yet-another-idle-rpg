@@ -14,7 +14,7 @@ More spells and more gear, magic and non-magic, for the zones that exist today. 
 - **Weakness gate**: the Weaknesses skill still gates weakness damage; fine, since the whole tree is visible once unlocked.
 - **Auto-cast** is its own feature with 5 levels from different sources ([auto-cast](auto-cast.md)). New spells need nothing special for it.
 - **Melee weapons** can carry an element, not only staves and wands.
-- **Balance** through `npm run sim`.
+- **Balance** through `npm run sim`; weakness and spell kill speed through `npm run sim -- --weaknesses` (the plain sim models neither).
 
 ## Skill tree: element branches
 Magic is reorganised so each element is its own branch:
@@ -37,7 +37,7 @@ Magic is reorganised so each element is its own branch:
 Light and dark stay unused until later zones need them.
 
 ## Weakness rebalance
-Spread weaknesses so each zone has 2+ elements; target about 6 enemies per element (fire, water, air, earth, physical). Use `/add-monster-weakness`, check with `npm run sim`, CHANGELOG as `nerf`/`buff` where kill speed shifts.
+Spread weaknesses so each zone has 2+ elements; target about 6 enemies per element (fire, water, air, earth, physical). Use `/add-monster-weakness`, check kill speed with `npm run sim -- --weaknesses` (the plain `npm run sim` covers progression only), CHANGELOG as `nerf`/`buff` where kill speed shifts.
 
 ## Gear
 Two build paths:
