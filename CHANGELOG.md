@@ -12,6 +12,8 @@ New notes go under `[Unreleased]`; `npm run release -- <major|minor|patch>` move
 - [feature] Quest panel: shows progress for each objective, marks quests ready to turn in, lets you pin quests to the top, jumps to the quest giver or the zone to fight in, keeps completed quests in a collapsible list, and has a Reputation tab for later.
 - [feature] Map: opens zoomed in on the zone you're fighting in, has buttons to jump straight to unlocked towns, and its markers are easier to click.
 - [feature] Skill tree opens zoomed in, so nodes no longer overlap.
+- [feature] Shops are now a compact item grid: hover an item for details, prices use a coin icon, and the slot shows why you can't buy (red border: can't afford, lock: rank or station level, faded: sold out). Shift-click buys five.
+- [bug] Item tooltips in shops and reward windows no longer say "Click to equip" or "Right-click to use".
 
 ## [0.1.0] - 2026-10-24
 - [feature] Battle: your hero auto-attacks through zone waves, with bosses, critical hits, strong hits and elemental weaknesses.

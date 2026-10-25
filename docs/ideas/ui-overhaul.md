@@ -1,6 +1,6 @@
 # UI overhaul: navbar, HUD, shop, Camp, town, map
 
-**Scope:** M · **Status:** Accepted 2026-10-24; navbar + HUD done (`feat/navbar-hud`); Camp grid done (`feat/camp-icon-grid`); Map and Skill tree done (`feat/map-skill-tree-zoom`)
+**Scope:** M · **Status:** Accepted 2026-10-24; navbar + HUD done (`feat/navbar-hud`); Camp grid done (`feat/camp-icon-grid`); Map and Skill tree done (`feat/map-skill-tree-zoom`); Shop grid done (`feat/shop-grid`)
 
 A pass over every tab found the same problems in several places: no feedback on where you are, resources only visible on the main view, and lists that stop working once they hold more than a handful of items.
 

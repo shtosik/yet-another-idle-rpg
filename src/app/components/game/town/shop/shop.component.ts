@@ -1,4 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, OnInit, output, signal } from '@angular/core'
+import { NgOptimizedImage } from '@angular/common'
+import i18next from 'i18next'
 import { InventoryItem } from '../../../../../interfaces/item.interface'
 import { ShopStore } from '../../../../store/shop/shop.store'
 import { PlayerStore } from '../../../../store/player/player.store'
@@ -25,7 +27,7 @@ type ShopTab = 'buy' | 'sell'
   templateUrl: './shop.component.html',
   styleUrl: './shop.component.sass',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [I18nextPipe, SlotComponent, InventoryItemComponent, CloseButtonComponent],
+  imports: [NgOptimizedImage, I18nextPipe, SlotComponent, InventoryItemComponent, CloseButtonComponent],
 })
 export class ShopComponent implements OnInit {
   private shopStore = inject(ShopStore)
@@ -54,6 +56,8 @@ export class ShopComponent implements OnInit {
   tab = signal<ShopTab>('buy')
 
   currency = computed(() => SHOPS_DATA[this.shopId()].currency ?? 'gold')
+  currencyIcon = computed(() =>
+    this.currency() === 'explorerTokens' ? './assets/img/icons/explorationToken.png' : './assets/img/icons/coin.svg')
   /** Shops with `buys: []` (the guild store) have no Sell tab. */
   canSell = computed(() => SHOPS_DATA[this.shopId()].buys?.length !== 0)
   guildRank = this.playerStore.guildRank
@@ -108,29 +112,70 @@ export class ShopComponent implements OnInit {
     return this.buyBlockReason(index) === null
   }
 
-  buyItem(index: number): void {
-    if (!this.canBuy(index)) return
+  /** Click buys one; Shift-click buys up to 5, stopping at the first block (stock, currency, space). */
+  buyItem(index: number, event: MouseEvent): void {
+    const count = event.shiftKey ? 5 : 1
+    let spent = 0
+    for (let bought = 0; bought < count && this.canBuy(index); bought++) {
+      if (!this.buyOne(index)) break
+      spent += this.items()[index].staticItem.price
+    }
+    if (spent) this.currencyFeed.show(this.currency(), -spent)
+  }
 
-    const entry = this.items()[index]
-    const { itemId, tier, price } = entry.staticItem
+  /** Name plus what blocks the purchase, for screen readers (sighted players get the slot's border, lock or fade). */
+  buyLabel(index: number, reason: BuyBlockReason): string {
+    const { itemId, price, minRank } = this.items()[index].staticItem
+    const name = i18next.t(`items:names.${ItemID[itemId]}`)
+    switch (reason) {
+      case 'stock': {
+        const key = this.isNonRefreshableSoldOut(index) ? 'shop:ui.soldOut' : 'shop:ui.restocking'
+        return `${name}: ${i18next.t(key)}`
+      }
+      case 'rank':
+        return `${name}: ${i18next.t('shop:ui.needsRank', { rank: minRank })}`
+      case 'station':
+        return `${name}: ${i18next.t('shop:ui.needsStation', { level: this.requiredStationLevel(index) })}`
+      case 'gold':
+        return `${name}: ${i18next.t('shop:ui.cantAfford', { price: this.priceLabel(price) })}`
+      case 'inventory':
+        return `${name}: ${i18next.t('shop:ui.inventoryFull')}`
+      default:
+        return `${name}: ${this.priceLabel(price)}`
+    }
+  }
+
+  sellLabel(itemId: ItemID, price: number, preferred: boolean): string {
+    const label = `${i18next.t(`items:names.${ItemID[itemId]}`)}: ${this.priceLabel(price)}`
+    if (!preferred) return label
+    return `${label}, ${i18next.t('shop:ui.preferred')}`
+  }
+
+  private priceLabel(amount: number): string {
+    if (this.currency() === 'explorerTokens') return i18next.t('shop:ui.tokenPrice', { amount })
+    return i18next.t('shop:ui.price', { amount })
+  }
+
+  /** Pays for and hands over one item; false when the payment fails. */
+  private buyOne(index: number): boolean {
+    const { itemId, tier, price } = this.items()[index].staticItem
 
     if (this.currency() === 'explorerTokens') {
-      if (!this.playerStore.spendTokens(price)) return
-      this.currencyFeed.show('explorerTokens', -price)
+      if (!this.playerStore.spendTokens(price)) return false
     } else {
       this.playerStore.updatePlayerStats([{ stat: 'goldCoins', amount: -price }])
-      this.currencyFeed.show('gold', -price)
     }
     this.shopStore.buyItem(this.shopId(), index)
 
     // Spellbook unlocks the tab immediately and is not added to inventory
     if (itemId === ItemID.spellbook) {
       this.playerStore.unlockSpellbook()
-      return
+      return true
     }
 
     const installed = this.playerStore.addItems([{ id: itemId, tier, amount: 1 }])
     installed.forEach(id => this.modalService.openStationInstalled(id))
+    return true
   }
 
   /** Click sells one; Ctrl/Cmd-click sells the whole stack. */
