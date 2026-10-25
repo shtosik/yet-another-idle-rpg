@@ -17,4 +17,10 @@ export interface MonsterEntry {
     shinyDrops: EnemyDrop[]
     killCount: number
     isUnlocked: boolean
+    /** Bestiary stars reached, 0 to 3. */
+    rank: number
+    /** Kills at the current star (0 before the first); the progress bar starts here. */
+    rankStartKills: number
+    /** Kills needed for the next star; null at max rank. */
+    nextRankKills: number | null
 }

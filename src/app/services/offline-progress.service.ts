@@ -133,6 +133,7 @@ export class OfflineProgressService {
       hasWeaknessSkill: this.playerStore.hasSkillUnlocked(SkillNodeID.weaknesses),
       activeQuestIds: getActiveQuestIds(this.questsStore.questStepProgression()),
       taskEnemyIds: new Set(this.playerStore.activeTasks().filter(task => !isTaskDone(task)).map(task => task.monsterId)),
+      enemyKillCounts: this.playerStore.enemyKillCounts(),
       rollingKillMs: this.offlineStore.rollingKillMs(zone.id, wave),
       rng: seededRng(seed),
     })

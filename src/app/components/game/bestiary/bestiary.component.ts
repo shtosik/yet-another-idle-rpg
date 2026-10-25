@@ -17,6 +17,7 @@ import { DamageElement } from 'enums/damage-element.enum'
 import { EnemyType } from 'enums/enemy-type.enum'
 import { SkillNodeID } from 'enums/ids/skill-node-id.enum'
 import { WEAKNESS_ICONS } from '../battle/enemy/monster-debuff-bar/monster-debuff-bar.component'
+import { bestiaryRank, MAX_BESTIARY_RANK, RANK_BONUSES, rankThresholds } from '../../../store/player/bestiary-rank'
 
 const LOCKED_SPRITE = './assets/img/enemies/unknown.png'
 
@@ -45,6 +46,7 @@ export class BestiaryComponent {
         const kills = this.playerStore.enemyKillCounts()
         return Object.values(ENEMIES_DATA).map(e => {
             const killCount = kills[e.id] ?? 0
+            const rank = bestiaryRank(e.id, killCount)
             return {
                 id: e.id,
                 url: e.url,
@@ -58,8 +60,22 @@ export class BestiaryComponent {
                 shinyDrops: byDropRate(e.shinyDrops ?? []),
                 killCount,
                 isUnlocked: killCount > 0,
+                rank,
+                rankStartKills: rankThresholds(e.id)[rank - 1] ?? 0,
+                nextRankKills: rankThresholds(e.id)[rank] ?? null,
             }
         })
+    })
+
+    /** Entries with every star, and stars earned across all entries. */
+    completion = computed(() => {
+        const monsters = this.monsters()
+        return {
+            completed: monsters.filter(m => m.rank === MAX_BESTIARY_RANK).length,
+            total: monsters.length,
+            stars: monsters.reduce((sum, m) => sum + m.rank, 0),
+            maxStars: monsters.length * MAX_BESTIARY_RANK,
+        }
     })
 
     selectedMonster = computed<MonsterEntry | null>(() => {
@@ -82,6 +98,17 @@ export class BestiaryComponent {
     readonly DamageElement = DamageElement
     readonly EnemyType = EnemyType
     readonly ItemTier = ItemTier
+    readonly RANK_BONUSES = RANK_BONUSES
+    readonly MAX_BESTIARY_RANK = MAX_BESTIARY_RANK
+    readonly STAR_SLOTS = Array.from({ length: MAX_BESTIARY_RANK }, (_, i) => i)
+
+    /** Odds per roll with the rank's drop bonus, as `rollDropList` rolls them, or "?" until the rank reveals them. */
+    dropOdds(drop: EnemyDrop, rank: number): string {
+        const { revealsDropOdds, dropChance } = RANK_BONUSES[rank]
+        if (!revealsDropOdds) return '?'
+        const percent = (100 * (1 + dropChance)) / drop.chance
+        return `${percent.toLocaleString('en-US', { maximumSignificantDigits: 3 })}%`
+    }
 
     dropTier(itemId: ItemID): ItemTier {
         return ITEM_DATA[itemId].tier
