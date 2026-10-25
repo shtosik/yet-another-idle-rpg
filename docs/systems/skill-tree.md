@@ -12,7 +12,7 @@ A radial tree of nodes the player unlocks with skill points (1 per level). Nodes
 - `src/data/skill-tree-graph.ts:SKILL_TREE_GRAPH` — built at module load: node map, forward edges, prerequisite edges, layout positions.
 - `src/utils/skill-tree-requirements.ts:canBuyNode`, `src/utils/skill-tree-refund.ts:canRefundNode` — pure rules.
 - `src/app/services/skill-tree.service.ts:SkillTreeService` — `buyNode`, `refundNode`, `respecPreview`, `respecEntireTree`.
-- `src/app/components/game/skill-tree/skill-tree.component.ts` — Leaflet `CRS.Simple` canvas with one marker per node and polylines for edges.
+- `src/app/components/game/skill-tree/skill-tree.component.ts` — Leaflet `CRS.Simple` canvas with one marker per node and polylines for edges. Opens at zoom 0 (native layout); node icons are a fixed 80 px, so they overlap at zoom −1.
 - `src/app/components/modals/respec-confirm/` — full reset dialog.
 
 ## Data flow

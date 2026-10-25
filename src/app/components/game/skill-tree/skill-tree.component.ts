@@ -42,7 +42,7 @@ export class SkillTreeComponent {
     attributionControl: false,
     zoomControl: true,
     center: L.latLng(-400, 700),
-    zoom: -1,
+    zoom: 0,
     doubleClickZoom: false,
     zoomAnimation: true,
   }

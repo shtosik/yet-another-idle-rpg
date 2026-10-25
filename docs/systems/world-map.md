@@ -11,9 +11,9 @@ A pannable, zoomable painted map (Leaflet) with markers for unlocked towns and z
 
 ## Data flow
 1. `PIXEL_CRS` makes 1 CRS unit = 1 source pixel at `maxZoom`, so marker positions are authored as raw image pixels (`x` right, `y` down → `latLng(-y, x)`).
-2. `onMapReady` waits a tick, calls `invalidateSize`, then adds the tile layer bounded to the image.
-3. Effects on `PlayerStore.unlockedContent().zones` / `.towns` add markers for unlocked entries only. `minZoom` hides a marker when zoomed out.
-4. Town marker click: `TownsStore.selectTown` + switch to the towns tab. Zone marker click: `BattleStore.setZone` + switch to battle.
+2. `onMapReady` waits a tick, calls `invalidateSize`, then adds the tile layer bounded to the image and zooms to where the image fills the panel (`getBoundsZoom(bounds, true)`). It centers on the current zone's marker (`BattleStore.currentZoneId`); a zone without a marker falls back to `defaultView.center`. `defaultView.zoom` is overridden. Max bounds are exactly the image, so a zone near the edge opens clamped to the edge rather than centered.
+3. Effects on `PlayerStore.unlockedContent().zones` / `.towns` add markers for unlocked entries only. `minZoom` hides a marker when zoomed out. Markers have an invisible 8 px hit area around the label.
+4. Town marker click, or a town in the top-right Towns list (a toggle, closed on open; unlocked towns that have a marker): `openTown` = `TownsStore.selectTown` + switch to the towns tab. Zone marker click: `BattleStore.setZone` + switch to battle.
 
 ## Invariants & gotchas
 - **Tile gaps**: Leaflet's bundled `position: absolute` rules don't apply in this build, so `src/styles.sass` forces them on `.leaflet-pane`, `.leaflet-tile`, `.leaflet-tile-container` and related elements, plus fixed 256 px tile size. Remove it and every tile renders a tile apart and containers jump during zoom. Component-level `::ng-deep` doesn't reach these elements reliably.

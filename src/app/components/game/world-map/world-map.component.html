@@ -3,3 +3,25 @@
      [leafletOptions]="mapOptions"
      (leafletMapReady)="onMapReady($event)">
 </div>
+@if (unlockedTowns().length) {
+  <div class="towns">
+    <button type="button" class="towns__toggle"
+            [class.towns__toggle--open]="showTowns()"
+            [attr.aria-expanded]="showTowns()"
+            aria-controls="map-town-list"
+            (click)="toggleTowns()">
+      {{ 'map:townsLabel' | i18next }}
+    </button>
+    @if (showTowns()) {
+      <ul id="map-town-list" class="towns__list">
+        @for (townId of unlockedTowns(); track townId) {
+          <li>
+            <button type="button" class="towns__town" (click)="openTown(townId)">
+              {{ 'map:towns.' + TownID[townId] | i18next }}
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+}
