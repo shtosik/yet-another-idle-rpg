@@ -4,7 +4,8 @@
 Zones are the combat areas; each has waves of regular enemies ending in a boss. Progress opens new zones, towns and features (Camp, skill tree, world map).
 
 ## Key files
-- `src/data/zones-data.ts:ZONES_DATA` — per zone: background `url`, `enemies` (regulars), `bossEnemyId`, `maxWave`, `enemiesPerWave`, `nextZoneId`, `previousZoneId`, `tier` (progression order; a side zone takes its place in the quest line: Traders' Basement 1, Deepwood 6, Upper Canopy 7).
+- `src/data/zones-data.ts:ZONES_DATA` — per zone: background `url`, `enemies` (regulars), `bossEnemyId`, `maxWave`, `enemiesPerWave`, `nextZoneId`, `previousZoneId`, `tier` (progression order; a side zone takes its place in the quest line: Traders' Basement 1, Deepwood 6, Upper Canopy 7), `masteryReward` (chest per mastery star).
+- `src/app/store/player/zone-mastery.ts` — `ZONE_STARS`, `zoneStarProgress`, `masteryModifiers`; `PlayerStore.zoneMastery`, `canClaimZoneStar`, `claimZoneStar`; header stars in `src/app/components/game/battle/battle-nav-bar/zone-mastery/`.
 - `src/app/store/battle/wave-scaling.ts:waveMultipliers` — per-wave HP and reward multipliers.
 - `src/enums/ids/zone-id.enum.ts:ZoneID`.
 - `src/data/unlock-conditions.ts:UNLOCK_RULES` — town and feature unlocks (condition → target → optional notification); `ZONE_UNLOCK_NOTIFICATIONS` — popup per newly opened zone.
@@ -24,6 +25,8 @@ Zones are the combat areas; each has waves of regular enemies ending in a boss. 
 **Zone unlocks**, two paths:
 1. **Chain**: killing the boss of a zone adds its `nextZoneId` to `unlockedContent.zones` and shows `ZONE_UNLOCK_NOTIFICATIONS[next]`. Chain: Horseshoe Beach → Plains → The Long Path → Mountain Pass → Elderwood Wilds.
 2. **Town entrance**: a town building with `zoneId` and `questRequirement` sends the player straight into that zone (`setZone`). Starting the quest adds the zone to `unlockedContent.zones` (`QuestsStore.startQuest` via `src/data/helpers/entrance-zones.ts:ENTRANCE_ZONES_BY_QUEST`; re-applied on load). Traders' Basement (La Harpar, Rats Were Rats), Deepwood (Mawood, The Sap That Burns), Upper Canopy (Mawood, Feathers for a Kite). Deepwood and Upper Canopy also get world map markers once unlocked; Traders' Basement has none on purpose (it's a basement under the La Harpar market, reached only through the town). `npm run validate` errors on an entrance building without `questRequirement`.
+
+**Zone mastery**: every zone has 3 stars. **Conqueror**: kill the zone boss 10 times (`enemyKillCounts[bossEnemyId]`). **Hunter**: every regular enemy and the boss at bestiary ★ or better (`bestiaryRank`). **Shiny Hunter**: kill 10 shinies in the zone (`PlayerState.shinyKillsByZone`, counted in `processBattleEnd` and `applyKillBatch` from the offline `shinies`). Conqueror and Hunter are derived from kill counts; only shiny kills and claims (`PlayerState.claimedZoneStars`) are saved. A finished star is claimed by clicking it next to the zone name (its tooltip shows the goal, progress and chest); the claim pays the zone's `masteryReward` (gold, Explorer Tokens, zone resources) once and is refused while the items don't fit. Each zone with all 3 stars claimed adds +0.02 to `goldCoinsMultiplier` through the `mastery` stat source (`masteryModifiers`, derived from the claims, ADR 0002). Zone markers on the world map show the claimed stars. Rewards are placeholders (gold 50 × tier², tokens 3 × tier).
 
 **Town and feature unlocks** (`UNLOCK_RULES`), checked after every kill:
 - `hasItem` Turtle Shell → Camp; `levelReached` 2 → skill tree;

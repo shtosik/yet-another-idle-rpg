@@ -13,7 +13,8 @@
       "skills": "Skills",
       "buffs": "Buffs",
       "consumables": "Food & potions",
-      "bonuses": "Permanent bonuses"
+      "bonuses": "Permanent bonuses",
+      "mastery": "Zone mastery"
     },
     "descriptions": {
       "attackPower": "Damage of each auto-attack, before crits and bonuses.",

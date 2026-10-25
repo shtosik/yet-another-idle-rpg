@@ -34,7 +34,7 @@ const INVERTED_STATS = new Set<PlayerStat>(['attackSpeed', 'manaRegenRate', 'sho
 export const isInvertedStat = (stat: PlayerStat): boolean => INVERTED_STATS.has(stat)
 
 /** Where a stat modifier comes from; the stats panel breaks each stat down by these. */
-export type StatSource = 'equipment' | 'skills' | 'buffs' | 'consumables' | 'bonuses'
+export type StatSource = 'equipment' | 'skills' | 'buffs' | 'consumables' | 'bonuses' | 'mastery'
 export type SourcedModifiers = Record<StatSource, StatModifier[]>
 
 export interface StatContribution {

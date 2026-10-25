@@ -42,7 +42,7 @@ describe('deriveStats', () => {
 })
 
 describe('statContributions', () => {
-  const none = { equipment: [], skills: [], buffs: [], consumables: [], bonuses: [] }
+  const none = { equipment: [], skills: [], buffs: [], consumables: [], bonuses: [], mastery: [] }
 
   it('sums flat and percent amounts per source and skips sources without the stat', () => {
     const contributions = statContributions('attackPower', {
