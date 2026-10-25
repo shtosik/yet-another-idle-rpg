@@ -18,11 +18,23 @@
     "whatLurksAtTheTop": "What Lurks at the Top"
   },
   "requirements": {
-    "waveKillCount": "{{ amount }} KC on wave {{ wave }} in {{ zone }}"
+    "waveKillCount": "{{ amount }} KC on wave {{ wave }} in {{ zone }}",
+    "wave": "{{ zone }} wave {{ wave }}"
   },
-  "filters": {
-    "all": "All",
-    "started": "In progress",
-    "completed": "Completed"
+  "panel": {
+    "label": "Quest panel",
+    "quests": "Quests",
+    "reputation": "Reputation",
+    "ready": "Ready",
+    "done": "Done",
+    "notDone": "Not yet",
+    "pin": "Pin {{quest}} to the top",
+    "unpin": "Unpin {{quest}}",
+    "fightIn": "Fight in {{zone}}",
+    "talkTo": "Talk to {{npc}}",
+    "empty": "No quests in progress.",
+    "showCompleted": "Completed ({{count}})",
+    "hideCompleted": "Hide completed ({{count}})",
+    "reputationEmpty": "No reputation yet."
   }
 }

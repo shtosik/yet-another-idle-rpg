@@ -40,7 +40,7 @@ All player-facing text comes from i18next JSON files, so content can be added an
 - i18next is not reactive. Text computed into a signal once won't change if the language changes (not an issue while only `en` exists).
 
 ## Known issues
-- Quest step descriptions are hard-coded English in `src/data/quests-data.ts` (`steps[].description`), shown directly by the quests tab.
+- Quest step descriptions are hard-coded English in `src/data/quests-data.ts` (`steps[].description`), shown directly by the quest panel.
 - World map labels are hard-coded in `src/data/world-map-data.ts` (`label`).
 - Spell and skill descriptions repeat numbers that live in data (haste amount, fireStrike damage), so they drift when balance changes. Use interpolation params instead.
 - `ItemData.description` exists but is never set; there are no item descriptions.

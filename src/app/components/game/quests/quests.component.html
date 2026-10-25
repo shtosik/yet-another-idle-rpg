@@ -1,29 +1,36 @@
-@let filters = questFilters();
-
-<div class="quests__filters">
-  <button
-    [class.active]="filters === 'all'"
-    (click)="changeFilter('all')"
-  >{{ 'quests:filters.all' | i18next }}
-  </button>
-  <button
-    [class.active]="filters === 'started'"
-    (click)="changeFilter('started')"
-  >{{ 'quests:filters.started' | i18next }}
-  </button>
-  <button
-    [class.active]="filters === 'completed'"
-    (click)="changeFilter('completed')"
-  >{{ 'quests:filters.completed' | i18next }}
-  </button>
-</div>
-<ul class="quests__list">
-  @for (quest of questsArray(); track quest[0]) {
-    <li (click)="setActiveDescription(quest[0], quest[1])">
-      <h3 [class.completed]="quest[1] === QUEST_STEP_AFTER_COMPLETED">{{ 'quests:names.' + QuestID[quest[0]] | i18next }}</h3>
-      @if (clickedQuest() && quest[0] === clickedQuest()) {
-        <p>{{ questDescription() }}</p>
-      }
-    </li>
+<div class="panel__tabs" role="tablist" [attr.aria-label]="'quests:panel.label' | i18next">
+  @for (entry of TABS; track entry) {
+    @let selected = tab() === entry;
+    <button
+      #tabButton
+      aria-controls="quest-panel-body"
+      class="panel__tab"
+      role="tab"
+      type="button"
+      [attr.aria-selected]="selected"
+      [attr.id]="'quest-panel-tab-' + entry"
+      [attr.tabindex]="selected ? 0 : -1"
+      [class.panel__tab--active]="selected"
+      (click)="selectTab(entry)"
+      (keydown)="onTabKeydown($event)"
+    >{{ ('quests:panel.' + entry) | i18next }}</button>
   }
-</ul>
+</div>
+
+<!-- Focusable itself: the Reputation tab has nothing focusable inside yet. -->
+<div
+  class="panel__body"
+  id="quest-panel-body"
+  role="tabpanel"
+  tabindex="0"
+  [attr.aria-labelledby]="'quest-panel-tab-' + tab()"
+>
+  @switch (tab()) {
+    @case ('quests') {
+      <app-quest-list/>
+    }
+    @case ('reputation') {
+      <app-reputation/>
+    }
+  }
+</div>

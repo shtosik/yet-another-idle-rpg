@@ -213,6 +213,24 @@ for (const town of Object.values(D.TOWNS_DATA)) {
     }
   }
 }
+// A step's turnInNpc backs the quest panel's "Talk to" link: the NPC must stand in a town
+// and their dialogue must start, advance or end that quest.
+const placedNpcs = new Set(Object.values(D.TOWNS_DATA).flatMap(t => t.buildings.flatMap(b => b.npcs.map(n => n.id))))
+const questsInDialogue = npcId => new Set(Object.values(D.NPC_DATA[npcId]?.dialogue ?? {})
+  .flatMap(node => node.options ?? [])
+  .flatMap(option => option.results ?? [])
+  .flatMap(result => result.effects ?? [])
+  .filter(effect => effect.type === 'quest')
+  .map(effect => effect.questId))
+for (const quest of Object.values(D.QUEST_DATA)) {
+  quest.steps.forEach((step, i) => {
+    const where = `${idName(D.QuestID, quest.questId)} step ${i + 1}`
+    const npc = idName(D.NpcID, step.turnInNpc)
+    if (!has(D.NPC_DATA, step.turnInNpc)) error('src/data/quests-data.ts', `${where} has unknown turnInNpc ${step.turnInNpc}`)
+    else if (!placedNpcs.has(step.turnInNpc)) error('src/data/quests-data.ts', `${where}: turnInNpc ${npc} isn't in any town building`)
+    else if (!questsInDialogue(step.turnInNpc).has(quest.questId)) error('src/data/quests-data.ts', `${where}: turnInNpc ${npc}'s dialogue never starts, advances or ends this quest`)
+  })
+}
 for (const skill of Object.values(D.ALL_SKILLS)) {
   const reqs = []
   const collect = r => { if (!r) return; if (r.kind === 'node') reqs.push(r.id); else r.of.forEach(collect) }

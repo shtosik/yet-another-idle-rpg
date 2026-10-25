@@ -27,6 +27,7 @@ Owner decisions in force:
 | [Bounty board](bounty-board.md) | S-M | Proposed |
 | [Buffs and consumable effects](buffs-and-consumable-effects.md) | S-M | Open question |
 | [UI overhaul: navbar, HUD, shop, Camp, town, map](ui-overhaul.md) | M | Navbar, HUD, Camp grid done; rest accepted |
+| [Quest panel and reputation](quest-panel.md) | M | Quest list done; reputation tab empty |
 | [Keybinds](keybinds.md) | S | Proposed |
 | [Responsive layout](responsive-layout.md) | M | Proposed |
 | [Known issues](known-issues.md) | — | Open bug and tech-debt list |

@@ -3,7 +3,7 @@ import { patchState, signalStore, withHooks, withMethods, withState } from '@ngr
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { withDevtools } from '../helpers/devtools'
 import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
-import QUEST_DATA, { QUEST_STEP_AFTER_COMPLETED, QuestProps } from '../../../data/quests-data'
+import QUEST_DATA, { QUEST_STEP_AFTER_COMPLETED, QuestProps, RequirementProps } from '../../../data/quests-data'
 import { inject } from '@angular/core'
 import { ModalService } from '../../services/modal.service'
 import { PlayerStore } from '../player/player.store'
@@ -24,12 +24,15 @@ export interface QuestsState {
   questStepProgression: QuestProgression
   stepKillBaselines: Partial<Record<QuestID, KillBaseline>>
   dialogueFlags: Record<string, boolean>
+  /** Active quests pinned to the top of the quest panel, in pin order. Dropped on completion. */
+  pinnedQuests: QuestID[]
 }
 
 export const initialState: QuestsState = {
   questStepProgression: {},
   stepKillBaselines: {},
   dialogueFlags: {},
+  pinnedQuests: [],
 }
 
 const STORE_KEY = 'questsStore'
@@ -62,6 +65,7 @@ export const QuestsStore = signalStore(
         }
       })
 
+      patchState(store, (state) => ({ pinnedQuests: state.pinnedQuests.filter(id => id !== data.questId) }))
       modalService.openQuestCompleted(data)
       playerStore.updatePlayerStats(statsToUpdate)
       playerStore.addItems(itemsToUpdate)
@@ -109,7 +113,28 @@ export const QuestsStore = signalStore(
       return lifetime - (store.stepKillBaselines()[questId]?.waves[waveKey(zoneId, wave)] ?? 0)
     },
   })),
-  withMethods((store) => ({
+  withMethods((store, playerStore = inject(PlayerStore)) => ({
+      /** How far a requirement is; kill requirements count since `questId` reached its current step. Met when `current >= target`. */
+      requirementProgress(questId: QuestID, req: RequirementProps): { current: number, target: number } {
+        switch (req.type) {
+          case 'stat':
+            return { current: playerStore.stats()[req.key] as number, target: req.amount }
+          case 'item':
+            return { current: playerStore.itemCount(req.itemId), target: req.amount }
+          case 'enemy':
+            return { current: store.questEnemyKills(questId, req.enemyId), target: req.amount }
+          case 'wave':
+            return { current: store.questWaveKills(questId, req.zoneId, req.wave), target: req.amount }
+          case 'quest': {
+            const step = store.questStepProgression()[req.questId]
+            const met = !!step && (req.step === undefined || step === req.step)
+            return { current: met ? 1 : 0, target: 1 }
+          }
+          default:
+            return { current: 0, target: 1 }
+        }
+      },
+
       resetState(): void {
         patchState(store, initialState)
       },
@@ -127,6 +152,14 @@ export const QuestsStore = signalStore(
 
       getQuestStep(questId: QuestID) {
         return store.questStepProgression()[questId]
+      },
+
+      togglePin(questId: QuestID) {
+        patchState(store, (state) => ({
+          pinnedQuests: state.pinnedQuests.includes(questId)
+            ? state.pinnedQuests.filter(id => id !== questId)
+            : [...state.pinnedQuests, questId],
+        }))
       },
 
       setDialogueFlag(flag: string) {
