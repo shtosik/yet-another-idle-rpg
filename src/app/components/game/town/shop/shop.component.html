@@ -4,7 +4,7 @@
   <div class="shop__header">
     <h2 class="shop__name">{{ staticShop.nameKey | i18next }}</h2>
     <span class="shop__cooldown">{{ 'shop:ui.nextRefresh' | i18next: { time: cooldownLabel() } }}</span>
-    @if (currency() === 'explorerTokens') {
+    @if (showsGuildRank()) {
       <span class="shop__balance">{{ 'shop:ui.guildRank' | i18next: { rank: guildRank() } }}</span>
     }
   </div>
@@ -22,84 +22,79 @@
     <p class="shop__hint">{{ 'shop:ui.sellHint' | i18next }}</p>
 
     @if (sellable().length) {
-      <div class="shop__grid">
+      <ul class="shop__grid">
         @for (entry of sellable(); track entry.slot.id + '-' + entry.slot.tier) {
-          <div class="shop__item" (click)="sellItem(entry.slot, $event)">
-            <app-slot>
-              <app-inventory-slot
-                [item]="entry.itemData"
-                [tier]="entry.slot.tier"
-                [amount]="entry.slot.amount"
-                [clickable]="false"
-              />
-            </app-slot>
-
-            <div class="shop__item-info">
-              <span class="shop__item-name">{{ 'items:names.' + ItemID[entry.slot.id] | i18next }}</span>
-              <span class="shop__item-price">{{ 'shop:ui.sellPrice' | i18next: { amount: entry.price } }}</span>
-            </div>
-
-            @if (entry.preferred) {
-              <div class="shop__badge shop__badge--preferred">{{ 'shop:ui.preferred' | i18next }}</div>
-            }
-          </div>
+          <li>
+            <button type="button" class="shop__item" [attr.aria-label]="sellLabel(entry.slot.id, entry.price, entry.preferred)"
+                    (click)="sellItem(entry.slot, $event)">
+              <app-slot>
+                <app-inventory-slot
+                  [item]="entry.itemData"
+                  [tier]="entry.slot.tier"
+                  [amount]="entry.slot.amount"
+                  [clickable]="false"
+                />
+              </app-slot>
+              <span class="shop__price" [class.shop__price--preferred]="entry.preferred"
+                    [attr.title]="entry.preferred ? ('shop:ui.preferred' | i18next) : null">
+                <img alt="" height="12" ngSrc="./assets/img/icons/coin.svg" width="12">
+                {{ entry.price }}
+              </span>
+            </button>
+          </li>
         }
-      </div>
+      </ul>
     } @else {
       <p class="shop__empty">{{ 'shop:ui.nothingToSell' | i18next }}</p>
     }
   } @else {
-    <div class="shop__grid">
+    <p class="shop__hint">{{ 'shop:ui.buyHint' | i18next }}</p>
+
+    <ul class="shop__grid">
       @for (entry of items(); track entry.staticItem.itemId; let i = $index) {
         <!-- Station gear the player already owns is not for sale. -->
         @if (!isInstalledStation(i)) {
           @let reason = buyBlockReason(i);
-          @let soldOut = isNonRefreshableSoldOut(i);
 
-          <div
-            class="shop__item"
-            [class.shop__item--disabled]="reason === 'stock'"
-            [class.shop__item--no-gold]="reason === 'gold'"
-            [class.shop__item--full]="reason === 'inventory' || reason === 'station' || reason === 'rank'"
-            (click)="buyItem(i)"
-          >
-            <app-slot>
-              <app-inventory-slot
-                [item]="entry.itemData"
-                [tier]="entry.staticItem.tier"
-                [amount]="entry.runtime.currentStock"
-                [clickable]="false"
-              />
-            </app-slot>
-
-            <div class="shop__item-info">
-              <span class="shop__item-name">{{ 'items:names.' + ItemID[entry.staticItem.itemId] | i18next }}</span>
-              <span class="shop__item-price" [class.shop__item-price--unaffordable]="reason === 'gold'">
-                {{ (currency() === 'explorerTokens' ? 'shop:ui.tokenPrice' : 'shop:ui.price') | i18next: { amount: entry.staticItem.price } }}
+          <li>
+            <button
+              type="button"
+              class="shop__item"
+              [class.shop__item--sold-out]="reason === 'stock'"
+              [class.shop__item--cant-afford]="reason === 'currency'"
+              [class.shop__item--full]="reason === 'inventory'"
+              [class.shop__item--locked]="reason === 'rank' || reason === 'station'"
+              [attr.aria-label]="buyLabel(i, reason)"
+              (click)="buyItem(i, $event)"
+            >
+              <app-slot>
+                <app-inventory-slot
+                  [item]="entry.itemData"
+                  [tier]="entry.staticItem.tier"
+                  [amount]="entry.runtime.currentStock"
+                  [clickable]="false"
+                />
+              @if (reason === 'rank') {
+                <span class="shop__lock" aria-hidden="true">
+                  <img alt="" height="10" ngSrc="./assets/img/icons/lock.svg" width="10">
+                  {{ 'shop:ui.rankShort' | i18next: { rank: entry.staticItem.minRank } }}
+                </span>
+              }
+              @if (reason === 'station') {
+                <span class="shop__lock" aria-hidden="true">
+                  <img alt="" height="10" ngSrc="./assets/img/icons/lock.svg" width="10">
+                  {{ 'shop:ui.levelShort' | i18next: { level: requiredStationLevel(i) } }}
+                </span>
+              }
+              </app-slot>
+              <span class="shop__price" [class.shop__price--unaffordable]="reason === 'currency'">
+                <img alt="" height="12" [ngSrc]="currencyIcon()" width="12">
+                {{ entry.staticItem.price }}
               </span>
-              <span class="shop__item-stock">
-                @if (soldOut) {
-                  {{ 'shop:ui.soldOut' | i18next }}
-                } @else if (reason === 'stock') {
-                  {{ 'shop:ui.restocking' | i18next }}
-                } @else {
-                  {{ 'shop:ui.stock' | i18next: { current: entry.runtime.currentStock, max: entry.staticItem.maxStock } }}
-                }
-              </span>
-            </div>
-
-            @if (reason === 'inventory') {
-              <div class="shop__badge shop__badge--full">{{ 'shop:ui.inventoryFull' | i18next }}</div>
-            }
-            @if (reason === 'rank') {
-              <div class="shop__badge shop__badge--full">{{ 'shop:ui.needsRank' | i18next: { rank: entry.staticItem.minRank } }}</div>
-            }
-            @if (reason === 'station') {
-              <div class="shop__badge shop__badge--full">{{ 'shop:ui.needsStation' | i18next: { level: requiredStationLevel(i) } }}</div>
-            }
-          </div>
+            </button>
+          </li>
         }
       }
-    </div>
+    </ul>
   }
 </div>
