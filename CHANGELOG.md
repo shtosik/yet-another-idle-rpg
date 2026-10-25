@@ -8,6 +8,7 @@ New notes go under `[Unreleased]`; `npm run release -- <major|minor|patch>` move
 ## [Unreleased]
 - [feature] New navbar: the open tab is highlighted, locked features show greyed out, and Bestiary and Spellbook show a badge for new entries.
 - [feature] Level, XP, gold and Explorer Tokens are always visible in a bar under the tabs; buying, selling and claiming Guild tasks show what you gained or spent.
+- [feature] Camp recipes are now a compact icon grid with a Craftable filter; pick a recipe to see its ingredients and craft it.
 
 ## [0.1.0] - 2026-10-24
 - [feature] Battle: your hero auto-attacks through zone waves, with bosses, critical hits, strong hits and elemental weaknesses.

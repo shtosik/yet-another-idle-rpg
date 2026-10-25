@@ -35,8 +35,12 @@
     "max": "Max {{count}}",
     "build": "Build {{item}}",
     "locked": "Locked",
-    "quickCraft": "Craft one {{item}}",
-    "quickBuild": "Build {{item}}",
+    "slotLocked": "{{item}}, locked until Lv {{level}}",
+    "filters": {
+        "label": "Recipe filters",
+        "craftable": "Craftable",
+        "empty": "No recipes match these filters."
+    },
     "crafted": "+{{count}} {{item}}",
     "appliesOnCraft": "Takes effect on craft · takes no inventory slot",
     "reasons": {

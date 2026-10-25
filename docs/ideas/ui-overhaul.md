@@ -1,6 +1,6 @@
 # UI overhaul: navbar, HUD, shop, Camp, town, map
 
-**Scope:** M · **Status:** Accepted 2026-10-24; navbar + HUD done on `feat/navbar-hud`
+**Scope:** M · **Status:** Accepted 2026-10-24; navbar + HUD done (`feat/navbar-hud`); Camp grid done (`feat/camp-icon-grid`)
 
 A pass over every tab found the same problems in several places: no feedback on where you are, resources only visible on the main view, and lists that stop working once they hold more than a handful of items.
 
@@ -27,7 +27,7 @@ A pass over every tab found the same problems in several places: no feedback on 
 - Recipe list becomes a grid of icon-only slots. No name, no ingredients, no "×N craftable" badge, no quick-craft button, no double-click craft.
 - Slot states: lock and level number when the station level is too low, dimmed when ingredients are missing.
 - The detail panel on the right keeps name, ingredients and craft ×1 / ×5 / ×10 / max.
-- Filters above the grid: craftable only, and category (equipment, food, station gear).
+- One filter above the grid: craftable only. No category filter (it wouldn't scale with more recipes).
 
 ## Town and NPCs
 - Dialogue opens in the town panel (or as an overlay), so the inventory stays visible during turn-ins.

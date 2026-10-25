@@ -9,12 +9,15 @@ export interface CampState {
   selectedStationId: StationID
   selectedRecipes: Partial<Record<StationID, RecipeID>>
   batchSize: number | 'max'
+  /** Recipe grid filter: hide recipes that can't be crafted right now. */
+  craftableOnly: boolean
 }
 
 const initialState: CampState = {
   selectedStationId: StationID.workbench,
   selectedRecipes: {},
   batchSize: 1,
+  craftableOnly: false,
 }
 
 const STORE_KEY = 'campStore'
@@ -36,6 +39,9 @@ export const CampStore = signalStore(
     },
     setBatchSize(batchSize: number | 'max'): void {
       patchState(store, { batchSize })
+    },
+    toggleCraftableOnly(): void {
+      patchState(store, (state) => ({ craftableOnly: !state.craftableOnly }))
     },
   })),
 )
