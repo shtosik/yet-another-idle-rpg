@@ -97,7 +97,8 @@ export class WorldMapComponent {
         noWrap: true,
       }).addTo(map)
 
-      map.setMaxBounds(bounds.pad(0.05))
+      // Exactly the image: padding would let an edge zone's centering show the background past the image.
+      map.setMaxBounds(bounds)
       // Open at the zoom where the image fills the panel; the default view's zoom only fits its width.
       map.setView(this.openingCenter(), map.getBoundsZoom(bounds, true), { animate: false })
 
