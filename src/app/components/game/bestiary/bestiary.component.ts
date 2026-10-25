@@ -10,6 +10,12 @@ import ENEMIES_DATA from '../../../../data/enemies-data'
 import { MonsterEntry } from 'interfaces/bestiary/monster-entry.interface'
 import { toShinyUrl } from 'utils/shiny-url'
 import { ZONES_BY_ENEMY } from '../../../../data/helpers/enemy-zones'
+import ITEM_DATA from '../../../../data/items-data'
+import { ItemTier } from 'enums/items/item-tier.enum'
+import { DamageElement } from 'enums/damage-element.enum'
+import { EnemyType } from 'enums/enemy-type.enum'
+import { SkillNodeID } from 'enums/ids/skill-node-id.enum'
+import { WEAKNESS_ICONS } from '../battle/enemy/monster-debuff-bar/monster-debuff-bar.component'
 
 const LOCKED_SPRITE = './assets/img/enemies/unknown.png'
 
@@ -39,6 +45,10 @@ export class BestiaryComponent {
                 id: e.id,
                 url: e.url,
                 maxHp: e.maxHp,
+                experience: e.experience,
+                gold: e.gold,
+                weakness: e.weakness,
+                enemyTypes: e.enemyTypes,
                 zones: ZONES_BY_ENEMY[e.id] ?? [],
                 drops: e.drops,
                 shinyDrops: e.shinyDrops ?? [],
@@ -61,6 +71,17 @@ export class BestiaryComponent {
     })
 
     shinyUnlocked = computed<boolean>(() => (this.playerStore.stats().shinyChance ?? 0) > 0)
+    /** Weaknesses stay hidden until the Weaknesses skill, as in battle. */
+    weaknessKnown = computed(() => this.playerStore.hasSkillUnlocked(SkillNodeID.weaknesses))
+
+    readonly WEAKNESS_ICONS = WEAKNESS_ICONS
+    readonly DamageElement = DamageElement
+    readonly EnemyType = EnemyType
+    readonly ItemTier = ItemTier
+
+    dropTier(itemId: ItemID): ItemTier {
+        return ITEM_DATA[itemId].tier
+    }
 
     constructor() {
         // Entries revealed while the tab is open count as seen too, so the navbar badge stays clear.

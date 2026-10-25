@@ -60,6 +60,30 @@
         <dt>{{ 'bestiary:baseHp' | i18next }}</dt>
         <dd>{{ m.maxHp }}</dd>
 
+        <dt>{{ 'bestiary:rewards' | i18next }}</dt>
+        <dd>{{ 'bestiary:rewardsPerKill' | i18next: { xp: m.experience, gold: m.gold } }}</dd>
+
+        <dt>{{ 'bestiary:types' | i18next }}</dt>
+        <dd>
+          @for (type of m.enemyTypes; track type; let last = $last) {
+            {{ ('bestiary:enemyTypes.' + EnemyType[type]) | i18next }}{{ last ? '' : ', ' }}
+          }
+        </dd>
+
+        <dt>{{ 'bestiary:weakness' | i18next }}</dt>
+        <dd>
+          @if (!weaknessKnown()) {
+            <span class="bestiary__muted">{{ 'bestiary:weaknessLocked' | i18next }}</span>
+          } @else if (m.weakness !== undefined) {
+            <span class="bestiary__weakness">
+              <img alt="" height="14" width="14" [src]="WEAKNESS_ICONS[m.weakness]">
+              {{ ('bestiary:elements.' + DamageElement[m.weakness]) | i18next }}
+            </span>
+          } @else {
+            {{ 'bestiary:noWeakness' | i18next }}
+          }
+        </dd>
+
         <dt>{{ 'bestiary:foundIn' | i18next }}</dt>
         <dd>
           @if (m.zones.length) {
@@ -77,7 +101,7 @@
         <ul class="bestiary__drops">
           @for (drop of m.drops; track drop.id) {
             <li class="bestiary__drop">
-              <span>{{ ('items:names.' + ItemID[drop.id]) | i18next }}</span>
+              <span class="bestiary__drop-name" [attr.data-tier]="ItemTier[dropTier(drop.id)]">{{ ('items:names.' + ItemID[drop.id]) | i18next }}</span>
               <span>{{ (100 / drop.chance) | number:'1.0-1' }}%</span>
             </li>
           }
@@ -93,7 +117,7 @@
         <ul class="bestiary__drops">
           @for (drop of m.shinyDrops; track drop.id) {
             <li class="bestiary__drop bestiary__drop--shiny">
-              <span>{{ ('items:names.' + ItemID[drop.id]) | i18next }}</span>
+              <span class="bestiary__drop-name" [attr.data-tier]="ItemTier[dropTier(drop.id)]">{{ ('items:names.' + ItemID[drop.id]) | i18next }}</span>
               <span>{{ (100 / drop.chance) | number:'1.0-1' }}%</span>
             </li>
           }
