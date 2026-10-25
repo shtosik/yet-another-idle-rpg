@@ -15,6 +15,28 @@
       "consumables": "Food & potions",
       "bonuses": "Permanent bonuses"
     },
+    "descriptions": {
+      "attackPower": "Damage of each auto-attack, before crits and bonuses.",
+      "attackSpeed": "Seconds between auto-attacks. Lower is faster.",
+      "critChance": "Chance for a hit to be a critical hit. Spells crit only with the Spell Crit skill.",
+      "critMulti": "Damage multiplier of a critical hit.",
+      "magicDamage": "Added to every damaging spell's base damage.",
+      "magicDamageMultiplier": "Multiplies spell damage, after Magic Damage is added.",
+      "maxMana": "Mana spells cost to cast. Refills one point at a time up to the maximum.",
+      "manaRegenRate": "Seconds to regain one mana point. Lower is faster.",
+      "spellCooldownReduction": "Seconds taken off every spell's cooldown.",
+      "increasedSpellDuration": "Seconds added to every buff spell's duration.",
+      "xpMultiplier": "Multiplies XP from kills.",
+      "goldCoinsMultiplier": "Multiplies gold from kills.",
+      "offlineProgressRate": "Share of your normal kill rate you keep while away.",
+      "shinyChance": "Chance for an enemy to spawn as a shiny.",
+      "inventorySlots": "Slots in your inventory.",
+      "maxTaskSlots": "Exploration Guild tasks you can have at once.",
+      "taskDoubleKillChance": "Chance for a kill to count twice toward Guild tasks.",
+      "shopRefreshCooldown": "Time between shop restocks.",
+      "weakness": "Damage multiplier when you hit an enemy's elemental weakness with this element. Needs the Weaknesses skill.",
+      "damageVs": "Extra damage against enemies of this type, added on top of everything else."
+    },
     "total": "Total",
     "showAll": "Show all stats",
     "showChanged": "Show changed stats"

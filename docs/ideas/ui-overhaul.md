@@ -1,6 +1,6 @@
 # UI overhaul: navbar, HUD, shop, Camp, town, map
 
-**Scope:** M · **Status:** Accepted 2026-10-24; navbar + HUD done (`feat/navbar-hud`); Camp grid done (`feat/camp-icon-grid`); Map and Skill tree done (`feat/map-skill-tree-zoom`); Shop grid done (`feat/shop-grid`); Town and NPCs done (`feat/town-ui`)
+**Scope:** M · **Status:** Done 2026-10-25. Navbar + HUD (`feat/navbar-hud`), Camp grid (`feat/camp-icon-grid`), Map and Skill tree (`feat/map-skill-tree-zoom`), Shop grid (`feat/shop-grid`), Town and NPCs (`feat/town-ui`), stats panel (`feat/stats-panel`), Bestiary layout and map/stat polish (`feat/ui-polish`)
 
 A pass over every tab found the same problems in several places: no feedback on where you are, resources only visible on the main view, and lists that stop working once they hold more than a handful of items.
 
@@ -41,8 +41,8 @@ A pass over every tab found the same problems in several places: no feedback on 
 ## Skill tree
 - Opens zoomed in further. Node design stays as is.
 
-## Open questions
-- Bestiary and Spellbook only use the top half of the middle columns, with the inventory below. Should they span both rows (hiding the inventory on those tabs), or stay as is? The Spellbook needs the inventory less than the Bestiary does.
+## Decided
+- Bestiary spans both rows of the middle columns; the inventory is hidden on that tab. The Spellbook keeps the top half with the inventory below, for now.
 
 ## Out of scope
 Keybinds ([keybinds](keybinds.md)) and window-size scaling ([responsive layout](responsive-layout.md)) are separate ideas. Debug buttons stay as they are.

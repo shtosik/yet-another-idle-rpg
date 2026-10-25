@@ -13,6 +13,8 @@ export interface StatRow {
   format: StatFormat
   /** Shown even at its base value; other rows appear once something changes them, or with "Show all". */
   always?: boolean
+  /** `app:statsPanel.descriptions.<key>`; defaults to the stat. Rows of one kind share a key. */
+  description?: string
 }
 
 export interface StatGroup {
@@ -59,18 +61,18 @@ export const STAT_GROUPS: StatGroup[] = [
   {
     key: 'weaknesses',
     rows: [
-      { stat: 'extraPhysicalDamageMultiplier', format: 'multiplier' },
-      { stat: 'extraFireDamageMultiplier', format: 'multiplier' },
-      { stat: 'extraWaterDamageMultiplier', format: 'multiplier' },
-      { stat: 'extraAirDamageMultiplier', format: 'multiplier' },
-      { stat: 'extraEarthDamageMultiplier', format: 'multiplier' },
-      { stat: 'extraLightDamageMultiplier', format: 'multiplier' },
-      { stat: 'extraDarkDamageMultiplier', format: 'multiplier' },
+      { stat: 'extraPhysicalDamageMultiplier', format: 'multiplier', description: 'weakness' },
+      { stat: 'extraFireDamageMultiplier', format: 'multiplier', description: 'weakness' },
+      { stat: 'extraWaterDamageMultiplier', format: 'multiplier', description: 'weakness' },
+      { stat: 'extraAirDamageMultiplier', format: 'multiplier', description: 'weakness' },
+      { stat: 'extraEarthDamageMultiplier', format: 'multiplier', description: 'weakness' },
+      { stat: 'extraLightDamageMultiplier', format: 'multiplier', description: 'weakness' },
+      { stat: 'extraDarkDamageMultiplier', format: 'multiplier', description: 'weakness' },
     ],
   },
   {
     key: 'vsEnemies',
-    rows: additivePercentStats.map(stat => ({ stat, format: 'bonus' as const })),
+    rows: additivePercentStats.map(stat => ({ stat, format: 'bonus' as const, description: 'damageVs' })),
   },
 ]
 

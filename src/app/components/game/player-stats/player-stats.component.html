@@ -32,7 +32,8 @@
 
 <ng-template #breakdownTooltip let-row="row">
   <div class="breakdown">
-    <span class="breakdown__title">{{ 'playerStats.' + row.stat | i18next }}</span>
+    <span class="breakdown__title">{{ 'playerStats.' + (row.format === 'mana' ? 'mana' : row.stat) | i18next }}</span>
+    <span class="breakdown__description">{{ 'statsPanel.descriptions.' + (row.description ?? row.stat) | i18next }}</span>
     @for (line of breakdown(row); track line.key) {
       <span class="breakdown__line">
         <span>{{ 'statsPanel.sources.' + line.key | i18next }}</span>

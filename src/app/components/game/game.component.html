@@ -24,7 +24,10 @@
 
     <app-equipment class="equipment"/>
 
-    <app-inventory class="inventory"/>
+    <!-- The Bestiary takes both rows instead. -->
+    @if (tab !== GameTab.bestiary) {
+      <app-inventory class="inventory"/>
+    }
     <app-quests class="quests"/>
   }
 
