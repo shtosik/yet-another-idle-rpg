@@ -8,6 +8,7 @@ import { ItemID } from 'enums/ids/item-id.enum'
 import { ZoneID } from 'enums/ids/zone-id.enum'
 import ENEMIES_DATA from '../../../../data/enemies-data'
 import { MonsterEntry } from 'interfaces/bestiary/monster-entry.interface'
+import { EnemyDrop } from 'interfaces/enemy-drop.interface'
 import { toShinyUrl } from 'utils/shiny-url'
 import { ZONES_BY_ENEMY } from '../../../../data/helpers/enemy-zones'
 import ITEM_DATA from '../../../../data/items-data'
@@ -18,6 +19,9 @@ import { SkillNodeID } from 'enums/ids/skill-node-id.enum'
 import { WEAKNESS_ICONS } from '../battle/enemy/monster-debuff-bar/monster-debuff-bar.component'
 
 const LOCKED_SPRITE = './assets/img/enemies/unknown.png'
+
+/** Most common first: `chance` is "1 in N", so a smaller N drops more often. */
+const byDropRate = (drops: EnemyDrop[]): EnemyDrop[] => [...drops].sort((a, b) => a.chance - b.chance)
 
 @Component({
     selector: 'app-bestiary',
@@ -50,8 +54,8 @@ export class BestiaryComponent {
                 weakness: e.weakness,
                 enemyTypes: e.enemyTypes,
                 zones: ZONES_BY_ENEMY[e.id] ?? [],
-                drops: e.drops,
-                shinyDrops: e.shinyDrops ?? [],
+                drops: byDropRate(e.drops),
+                shinyDrops: byDropRate(e.shinyDrops ?? []),
                 killCount,
                 isUnlocked: killCount > 0,
             }
