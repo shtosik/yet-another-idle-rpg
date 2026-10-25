@@ -8,12 +8,29 @@
       [class.zone-mastery__star--locked]="isLocked(progress)"
       [attr.aria-disabled]="!canClaim(progress.star)"
       [attr.aria-label]="'zones:mastery.stars.' + progress.star + '.name' | i18next"
+      [attr.aria-describedby]="'zone-star-desc-' + progress.star"
       placement="bottom"
       tooltipClass="tooltip-override"
       [tooltipContext]="{ progress }"
       [tooltipTemplate]="starTooltip"
       (click)="claim(progress.star)"
     >★</button>
+    <!-- Screen readers hear the goal, progress and state; the tooltip only shows on hover and focus. -->
+    <span class="zone-mastery__sr-only" [id]="'zone-star-desc-' + progress.star">
+      {{ 'zones:mastery.stars.' + progress.star + '.goal' | i18next: { count: progress.target } }}
+      @if (isLocked(progress)) {
+        {{ 'zones:mastery.shinyLocked' | i18next }}
+      } @else {
+        {{ 'zones:mastery.progress' | i18next: { current: progress.current, target: progress.target } }}
+      }
+      @if (progress.claimed) {
+        {{ 'zones:mastery.claimed' | i18next }}
+      } @else if (canClaim(progress.star)) {
+        {{ 'zones:mastery.clickToClaim' | i18next }}
+      } @else if (isBlocked(progress)) {
+        {{ 'zones:mastery.inventoryFull' | i18next }}
+      }
+    </span>
   }
 </div>
 
