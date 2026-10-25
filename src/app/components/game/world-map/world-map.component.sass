@@ -1,8 +1,66 @@
+@use 'palette'
+@use 'variables' as vars
+
 :host
   display: block
   width: 100%
   height: 100%
   overflow: hidden
+  position: relative
+
+// Game UI panel styling, not map-marker styling, so it doesn't read as part of the map.
+// Above Leaflet's panes and controls (z-index up to 1000).
+.towns
+  position: absolute
+  top: 10px
+  right: 10px
+  z-index: 1001
+  display: flex
+  flex-direction: column
+  align-items: flex-end
+  gap: 4px
+  font-size: 0.75rem
+
+  &__toggle, &__town
+    border: 0
+    background: transparent
+    color: inherit
+    font: inherit
+    cursor: pointer
+
+  &__toggle
+    padding: 0.375rem 0.75rem
+    background: vars.$panelBackgroundColor
+    border: vars.$panelBorder
+    border-radius: vars.$panelBorderRadius
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6)
+
+    &:hover
+      background: vars.$hoverBackground
+
+    &--open
+      color: palette.$yellow
+
+  &__list
+    margin: 0
+    padding: 0.25rem
+    list-style: none
+    min-width: 8rem
+    background: vars.$panelBackgroundColor
+    border: vars.$panelBorder
+    border-radius: vars.$panelBorderRadius
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6)
+
+  &__town
+    display: block
+    width: 100%
+    padding: 0.375rem 0.5rem
+    text-align: left
+    border-radius: vars.$panelBorderRadius
+
+    &:hover, &:focus-visible
+      background: vars.$hoverBackground
+      color: palette.$yellow
 
 ::ng-deep .leaflet-container
   width: 100%
@@ -26,6 +84,13 @@
   opacity: 0.6
   transform: scale(var(--marker-scale, 1))
   transform-origin: 0 0
+  position: relative
+
+  // Invisible padding so the small label is easier to hit
+  &::after
+    content: ''
+    position: absolute
+    inset: -8px
 
   &:hover
     background: rgba(36, 18, 4, 0.96)
@@ -40,6 +105,10 @@
   &--zone
     border-color: #4880b8
     color: #b8d4ee
+    opacity: 0.85
+
+    &:hover
+      opacity: 1
 
   &--poi
     border-color: #48b870

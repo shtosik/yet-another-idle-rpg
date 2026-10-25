@@ -1,11 +1,12 @@
-import { ChangeDetectionStrategy, Component, effect, EventEmitter, inject, Output } from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, effect, EventEmitter, inject, Output, signal } from '@angular/core'
 import { LeafletModule } from '@bluehalo/ngx-leaflet'
+import { I18nextPipe } from 'app/pipes/i18next.pipe'
 import * as L from 'leaflet'
 import { GameTab } from 'enums/ids/game-tab.enum'
 import { TownsStore } from 'app/store/towns/towns.store'
 import { BattleStore } from 'app/store/battle/battle.store'
 import { PlayerStore } from 'app/store/player/player.store'
-import { WORLD_MAP_DATA, WorldMapMarker } from 'data/world-map-data'
+import { TownMarker, WORLD_MAP_DATA, WorldMapMarker } from 'data/world-map-data'
 import { ZoneID } from 'enums/ids/zone-id.enum'
 import { TownID } from 'enums/map/town-id.enum'
 
@@ -21,7 +22,7 @@ const PIXEL_CRS: L.CRS = L.Util.extend({}, L.CRS.Simple, {
   selector: 'app-world-map',
   templateUrl: './world-map.component.html',
   styleUrl: './world-map.component.sass',
-  imports: [LeafletModule],
+  imports: [LeafletModule, I18nextPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WorldMapComponent {
@@ -35,6 +36,17 @@ export class WorldMapComponent {
   private activeMarkers: { marker: L.Marker; minZoom: number }[] = []
   private zoneMarkerMap = new Map<ZoneID, L.Marker>()
   private townMarkerMap = new Map<TownID, L.Marker>()
+
+  protected readonly TownID = TownID
+  showTowns = signal(false)
+  /** Unlocked towns that have a map marker, in marker order; stub towns and stale saved IDs have none. */
+  readonly unlockedTowns = computed(() => {
+    const unlocked = this.playerStore.unlockedContent().towns ?? []
+    return WORLD_MAP_DATA.markers
+      .filter((m): m is TownMarker => m.type === 'town')
+      .map(m => m.townId)
+      .filter(townId => unlocked.includes(townId))
+  })
 
   constructor() {
     effect(() => {
@@ -86,10 +98,29 @@ export class WorldMapComponent {
       }).addTo(map)
 
       map.setMaxBounds(bounds.pad(0.05))
+      // Open at the zoom where the image fills the panel; the default view's zoom only fits its width.
+      map.setView(this.openingCenter(), map.getBoundsZoom(bounds, true), { animate: false })
 
       this.placeMarkers()
       this.syncMarkerVisibility()
     })
+  }
+
+  toggleTowns(): void {
+    this.showTowns.update(show => !show)
+  }
+
+  openTown(townId: TownID): void {
+    this.townsStore.selectTown(townId)
+    this.changeTab.emit(GameTab.towns)
+  }
+
+  /** The current zone's marker, or the default view's center for a zone without one. */
+  private openingCenter(): L.LatLng {
+    const zoneId = this.battleStore.currentZoneId()
+    const marker = WORLD_MAP_DATA.markers.find(m => m.type === 'zone' && m.zoneId === zoneId)
+    const { x, y } = marker?.position ?? WORLD_MAP_DATA.defaultView.center
+    return L.latLng(-y, x)
   }
 
   private placeMarkers(): void {
@@ -155,10 +186,7 @@ export class WorldMapComponent {
     const marker = L.marker(latLng, { icon })
 
     if (data.type === 'town') {
-      marker.on('click', () => {
-        this.townsStore.selectTown(data.townId)
-        this.changeTab.emit(GameTab.towns)
-      })
+      marker.on('click', () => this.openTown(data.townId))
     } else if (data.type === 'zone') {
       marker.on('click', () => {
         this.battleStore.setZone(data.zoneId)

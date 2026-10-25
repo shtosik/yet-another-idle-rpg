@@ -10,6 +10,8 @@ New notes go under `[Unreleased]`; `npm run release -- <major|minor|patch>` move
 - [feature] Level, XP, gold and Explorer Tokens are always visible in a bar under the tabs; buying, selling and claiming Guild tasks show what you gained or spent.
 - [feature] Camp recipes are now a compact icon grid with a Craftable filter; pick a recipe to see its ingredients and craft it.
 - [feature] Quest panel: shows progress for each objective, marks quests ready to turn in, lets you pin quests to the top, jumps to the quest giver or the zone to fight in, keeps completed quests in a collapsible list, and has a Reputation tab for later.
+- [feature] Map: opens zoomed in on the zone you're fighting in, has buttons to jump straight to unlocked towns, and its markers are easier to click.
+- [feature] Skill tree opens zoomed in, so nodes no longer overlap.
 
 ## [0.1.0] - 2026-10-24
 - [feature] Battle: your hero auto-attacks through zone waves, with bosses, critical hits, strong hits and elemental weaknesses.
