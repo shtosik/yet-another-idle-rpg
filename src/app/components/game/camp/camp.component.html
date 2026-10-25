@@ -28,62 +28,49 @@
           <span class="camp__station-level">{{ 'camp:levelProgress' | i18next:{ level: active.level, max: active.station.maxLevel } }}</span>
         </header>
 
-        <ul class="camp__list">
-          @for (view of recipes(); track view.recipe.id) {
+        <div class="camp__filters" role="group" [attr.aria-label]="'camp:filters.label' | i18next">
+          <button
+            class="camp__filter"
+            type="button"
+            [attr.aria-pressed]="craftableOnly()"
+            [class.camp__filter--active]="craftableOnly()"
+            (click)="toggleCraftableOnly()"
+          >{{ 'camp:filters.craftable' | i18next }}</button>
+        </div>
+
+        <ul class="camp__grid">
+          @for (view of filteredRecipes(); track view.recipe.id) {
             @let itemName = ('items:names.' + ItemID[view.recipe.itemId]) | i18next;
             @let locked = view.evaluation.blockReason === 'stationLevel';
-            @let canCraft = view.evaluation.maxCraftable > 0;
-            @let isStation = view.item.type === ItemType.stationUpgrade;
+            @let selected = view.recipe.id === selectedRecipe()?.recipe?.id;
 
-            <li
-              class="row"
-              [class.row--selected]="view.recipe.id === selectedRecipe()?.recipe?.id"
-            >
+            <li>
               <button
-                class="row__select"
+                class="slot"
                 type="button"
-                [attr.aria-pressed]="view.recipe.id === selectedRecipe()?.recipe?.id"
+                [attr.aria-label]="locked ? ('camp:slotLocked' | i18next:{ item: itemName, level: view.recipe.stationLevel }) : itemName"
+                [attr.aria-pressed]="selected"
+                [attr.data-tier]="ItemTier[view.item.tier]"
+                [class.slot--dim]="!locked && view.evaluation.maxCraftable < 1"
+                [class.slot--locked]="locked"
+                [class.slot--selected]="selected"
+                [title]="itemName"
                 (click)="selectRecipe(view)"
               >
-                <span class="row__icon" [attr.data-tier]="ItemTier[view.item.tier]" [class.row__icon--locked]="locked">
-                  <img alt="" disableOptimizedSrcset height="26" width="26" [ngSrc]="view.item.url">
-                </span>
-                <span class="row__name" [class.row__name--muted]="!canCraft">{{ itemName }}</span>
-                <span class="row__ingredients">
-                  @for (ingredient of view.recipe.itemsNeeded; track ingredient.id) {
-                    <span class="row__ingredient">
-                      <img alt="" disableOptimizedSrcset height="16" width="16" [ngSrc]="ITEM_DATA[ingredient.id]!.url">
-                      ×{{ ingredient.amount }}
-                    </span>
-                  }
-                </span>
-                <span
-                  class="row__badge"
-                  [class.row__badge--locked]="locked"
-                  [class.row__badge--ready]="canCraft"
-                >
-                  @if (locked) {
-                    <svg aria-hidden="true" fill="none" height="12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="12">
+                <img alt="" class="slot__img" disableOptimizedSrcset height="30" width="30" [ngSrc]="view.item.url">
+                @if (locked) {
+                  <span class="slot__lock" aria-hidden="true">
+                    <svg fill="none" height="10" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="10">
                       <rect height="10" rx="2" width="14" x="5" y="11"/>
                       <path d="M8 11V8a4 4 0 0 1 8 0v3"/>
                     </svg>
                     {{ view.recipe.stationLevel }}
-                  } @else {
-                    ×{{ view.evaluation.maxCraftable }}
-                  }
-                </span>
-              </button>
-              <button
-                class="row__quick"
-                type="button"
-                [attr.aria-label]="(isStation ? 'camp:quickBuild' : 'camp:quickCraft') | i18next:{ item: itemName }"
-                [disabled]="!canCraft"
-                [title]="(isStation ? 'camp:quickBuild' : 'camp:quickCraft') | i18next:{ item: itemName }"
-                (click)="craft(view, 1)"
-              >
-                <app-station-icon [stationId]="active.station.id"/>
+                  </span>
+                }
               </button>
             </li>
+          } @empty {
+            <li class="camp__empty">{{ 'camp:filters.empty' | i18next }}</li>
           }
         </ul>
       </section>

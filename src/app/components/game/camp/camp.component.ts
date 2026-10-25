@@ -12,7 +12,6 @@ import { evaluateRecipe, stationLevel } from '../../../store/player/camp'
 import { StationID } from '../../../../enums/ids/station-id.enum'
 import { ItemID } from '../../../../enums/ids/item-id.enum'
 import { ItemTier } from '../../../../enums/items/item-tier.enum'
-import { ItemType } from '../../../../enums/items/item-type.enum'
 import { StationIconComponent } from './station-icon/station-icon.component'
 import { RecipeDetailComponent } from './recipe-detail/recipe-detail.component'
 import { RecipeView } from './recipe-view'
@@ -69,11 +68,17 @@ export class CampComponent {
       .filter(view => view.evaluation.visible)
   })
 
+  craftableOnly = this.campStore.craftableOnly
+
+  filteredRecipes = computed(() =>
+    this.craftableOnly() ? this.recipes().filter(view => view.evaluation.maxCraftable > 0) : this.recipes())
+
+  /** Stays on the chosen recipe even when a filter hides it, so crafting the last batch doesn't swap the detail. */
   selectedRecipe = computed(() => {
     const recipes = this.recipes()
     const active = this.activeStation()
     const selectedId = active && this.campStore.selectedRecipes()[active.station.id]
-    return recipes.find(view => view.recipe.id === selectedId) ?? recipes[0] ?? null
+    return recipes.find(view => view.recipe.id === selectedId) ?? this.filteredRecipes()[0] ?? recipes[0] ?? null
   })
 
   toast = signal<string | null>(null)
@@ -82,8 +87,6 @@ export class CampComponent {
   protected readonly StationID = StationID
   protected readonly ItemID = ItemID
   protected readonly ItemTier = ItemTier
-  protected readonly ItemType = ItemType
-  protected readonly ITEM_DATA = ITEM_DATA
 
   constructor() {
     inject(DestroyRef).onDestroy(() => clearTimeout(this.toastTimer))
@@ -95,6 +98,10 @@ export class CampComponent {
 
   selectRecipe(view: RecipeView): void {
     this.campStore.selectRecipe(view.recipe.stationId, view.recipe.id)
+  }
+
+  toggleCraftableOnly(): void {
+    this.campStore.toggleCraftableOnly()
   }
 
   craft(view: RecipeView, times: number): void {
