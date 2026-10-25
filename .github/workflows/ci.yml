@@ -32,5 +32,8 @@ jobs:
         env:
           HEAD_REF: ${{ github.head_ref }}
       - run: npm run validate
+      - run: npm run lint
+      # Unit specs (*.spec.ts) in headless Chrome, which ubuntu-latest ships.
+      - run: npm run test:ci
       # test:assets is left out: it needs the local matting model (krita/..., not in git).
       - run: npm run build

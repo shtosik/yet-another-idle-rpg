@@ -103,7 +103,8 @@ export const BattleStore = signalStore(
           const isMaxWave = state.currentWave === zoneData.maxWave
           const shouldGoNextZone = nextZone && isMaxWave
 
-          const wave = shouldGoNextZone ? 1 : (isMaxWave ? zoneData.maxWave : state.currentWave + 1)
+          // Past the last wave: the next zone's first wave, or stay on the last one when there's no next zone.
+          const wave = shouldGoNextZone ? 1 : Math.min(state.currentWave + 1, zoneData.maxWave)
           const zone = shouldGoNextZone ? nextZone : state.currentZoneId
 
           return {
@@ -120,7 +121,8 @@ export const BattleStore = signalStore(
           const isFirstWave = state.currentWave === 1
           const shouldGoPreviousZone = !!(previousZoneId && isFirstWave)
 
-          const wave = shouldGoPreviousZone ? previousZoneData.maxWave : (isFirstWave ? state.currentWave : state.currentWave - 1)
+          // Before wave 1: the previous zone's last wave, or stay on wave 1 when there's no previous zone.
+          const wave = shouldGoPreviousZone ? previousZoneData.maxWave : Math.max(state.currentWave - 1, 1)
           const zone = shouldGoPreviousZone ? previousZoneId : state.currentZoneId
 
           return {

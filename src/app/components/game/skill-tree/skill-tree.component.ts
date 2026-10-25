@@ -133,12 +133,20 @@ export class SkillTreeComponent {
     }
 
     for (const edge of this.edges) {
-      const toState = stateById.get(edge.to)
-      const styleKey: 'locked' | 'available' | 'allocated' =
-        (toState === 'allocated' || toState === 'maxed') ? 'allocated'
-          : (toState === 'available') ? 'available'
-            : 'locked'
-      edge.polyline.setStyle(EDGE_STYLE[styleKey])
+      edge.polyline.setStyle(EDGE_STYLE[this.edgeStyle(stateById.get(edge.to))])
+    }
+  }
+
+  /** An edge is styled by the node it leads to. */
+  private edgeStyle(toState: NodeState | undefined): keyof typeof EDGE_STYLE {
+    switch (toState) {
+      case 'allocated':
+      case 'maxed':
+        return 'allocated'
+      case 'available':
+        return 'available'
+      default:
+        return 'locked'
     }
   }
 
