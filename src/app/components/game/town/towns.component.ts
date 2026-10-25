@@ -1,4 +1,6 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, EventEmitter, inject, Output } from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, EventEmitter, inject, Output } from '@angular/core'
+import { DialogueManagerService } from '../../../services/dialogue-manager.service'
+import { DialogueComponent } from '../dialogue/dialogue.component'
 import { TownID } from '../../../../enums/map/town-id.enum'
 import { I18nextPipe } from '../../../pipes/i18next.pipe'
 import TOWNS_DATA from '../../../../data/towns-data'
@@ -22,6 +24,7 @@ import { ShopComponent } from './shop/shop.component'
     CloseButtonComponent,
     TownBuildingComponent,
     ShopComponent,
+    DialogueComponent,
   ],
 })
 export class TownsComponent {
@@ -32,9 +35,11 @@ export class TownsComponent {
   private battleStore = inject(BattleStore)
   private questsStore = inject(QuestsStore)
   private destroyRef = inject(DestroyRef)
+  private dialogueManager = inject(DialogueManagerService)
   selectedTownId = this.townsStore.selectedTownId
   selectedTownBuilding = this.townsStore.selectedTownBuilding
   activeShopId = this.townsStore.activeShopId
+  dialogueActive = computed(() => this.dialogueManager.activeNpc() !== null)
 
   @Output() changeTab = new EventEmitter<GameTab>()
 

@@ -6,6 +6,7 @@
     "explorersGuildStore": "Exploration Guild Store"
   },
   "ui": {
+    "openShop": "Shop",
     "nextRefresh": "Next refresh in {{time}}",
     "soldOut": "Sold Out",
     "restocking": "Restocking…",

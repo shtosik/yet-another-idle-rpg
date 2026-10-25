@@ -14,6 +14,7 @@ New notes go under `[Unreleased]`; `npm run release -- <major|minor|patch>` move
 - [feature] Skill tree opens zoomed in, so nodes no longer overlap.
 - [feature] Shops are now a compact item grid: hover an item for details, prices show the shop's currency icon (coins, or tokens in the Guild store), and the slot shows why you can't buy (red border: can't afford, lock: rank or station level, faded: sold out). Shift-click buys up to five.
 - [bug] Item tooltips in shops and reward windows no longer say "Click to equip" or "Right-click to use".
+- [feature] Towns: conversations open inside the town view so your inventory stays visible, shopkeepers get a Shop button once you've browsed their wares, the town name is shown, building labels light up on hover, and backgrounds no longer pop in.
 
 ## [0.1.0] - 2026-10-24
 - [feature] Battle: your hero auto-attacks through zone waves, with bosses, critical hits, strong hits and elemental weaknesses.

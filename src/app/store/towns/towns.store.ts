@@ -5,6 +5,7 @@ import { TownBuilding } from '../../../interfaces/town.interface'
 import { withDevtools } from '../helpers/devtools'
 import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
 import { ShopID } from '../../../enums/ids/shop-id.enum'
+import { NpcID } from '../../../enums/map/npc-id.enum'
 import TOWNS_DATA from '../../../data/towns-data'
 
 export interface TownsState {
@@ -13,12 +14,15 @@ export interface TownsState {
     selectedTownBuildingId: TownBuildingID | null;
     /** Not saved: a reload never reopens a shop. */
     activeShopId: ShopID | null;
+    /** Shops the player has opened through an NPC's dialogue; that NPC's frame then offers a direct Shop button. */
+    npcShops: Partial<Record<NpcID, ShopID>>;
 }
 
 const initialState: TownsState = {
     selectedTownId: null,
     selectedTownBuildingId: null,
     activeShopId: null,
+    npcShops: {},
 }
 
 const STORE_KEY = 'townsStore'
@@ -49,11 +53,12 @@ export const TownsStore = signalStore(
         selectTownBuilding(townBuilding: TownBuilding | null): void {
             patchState(store, { selectedTownBuildingId: townBuilding?.buildingId ?? null, activeShopId: null })
         },
-        resetSelection(): void {
-            patchState(store, initialState)
-        },
         openShop(shopId: ShopID): void {
             patchState(store, { activeShopId: shopId })
+        },
+        rememberNpcShop(npcId: NpcID, shopId: ShopID): void {
+            if (store.npcShops()[npcId] === shopId) return
+            patchState(store, { npcShops: { ...store.npcShops(), [npcId]: shopId } })
         },
         closeShop(): void {
             patchState(store, { activeShopId: null })
