@@ -1,4 +1,24 @@
 {
+  "statsPanel": {
+    "groups": {
+      "combat": "Combat",
+      "magic": "Magic",
+      "progress": "Progress",
+      "weaknesses": "Weakness damage",
+      "vsEnemies": "Damage vs enemy types"
+    },
+    "sources": {
+      "base": "Base",
+      "equipment": "Gear",
+      "skills": "Skills",
+      "buffs": "Buffs",
+      "consumables": "Food & potions",
+      "bonuses": "Permanent bonuses"
+    },
+    "total": "Total",
+    "showAll": "Show all stats",
+    "showChanged": "Show changed stats"
+  },
   "playerStats": {
     "attackSpeed": "Attack Speed",
     "attackPower": "Attack Power",
