@@ -6,13 +6,14 @@ Guidance for Claude Code in this repository: a browser idle RPG (auto-battle in 
 
 **Done** = `npm run validate`, `npm run lint`, `npm run test:ci` and `npx ng build` all pass (CI runs the same). `validate` covers data, i18n, assets, doc references, inline `<svg>` and BEM classes styled but never used. Review against `CODING_STANDARDS.md`.
 
-Other scripts are in `package.json`; `npm run sim` is the economy simulation, `npm run release -- minor` bumps a release branch (`docs/deployment.md`).
+Other scripts are in `package.json`; `npm run sim` is the economy simulation (`-- --weaknesses` adds kill times with weaknesses and strike spells), `npm run release -- minor` bumps a release branch (`docs/deployment.md`). PR review comments: `node scripts/pr-comments.mjs <PR>` prints CodeRabbit's findings (inline and nitpicks) without the HTML.
 
 ## Environment
 
 - No Python on this machine: write scripts in Node (`scripts/*.mjs`).
 - In a worktree session, run git as single plain commands (no `cd &&` chains or `$(…)` around git).
-- Checking UI: builds with cheats on (`npm start`, `build:testing`) expose `window.dev` once the cheat bar's deferred chunk loads, a moment after the page (`tab`, `setZone`, `grantStat`, `learnSkill`, `giveItem`, `equip`, `unequip`, `openShop`; numeric enum IDs) in `src/app/components/game/dev-cheats/dev-cheats.component.ts`.
+- Dev server in a worktree: other worktrees may hold 4200 and stopped servers can keep their port on Windows, so run `npx ng serve --port 0` in the background (any free port) and wait until that task's output contains `localhost:` (the `Local:` label has colour codes inside it, so grepping for `Local:` never matches); the port follows, after more colour codes.
+- Checking UI: builds with cheats on (`npm start`, `build:testing`) expose `window.dev` once the cheat bar's deferred chunk loads, a moment after the page (`tab`, `setZone`, `grantStat`, `learnSkill`, `giveItem`, `equip`, `unequip`, `openShop`, `setKills`, `addShinyKills`, `unlock`; numeric enum IDs) in `src/app/components/game/dev-cheats/dev-cheats.component.ts`. Set game state through these, not by editing `localStorage`.
 
 ## Git workflow
 

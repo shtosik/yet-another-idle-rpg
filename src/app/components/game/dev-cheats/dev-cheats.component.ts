@@ -21,6 +21,10 @@ import { PlayerStat } from '../../../../types/player/player-stat.type'
 import { ZoneID } from 'enums/ids/zone-id.enum'
 import { ItemID } from 'enums/ids/item-id.enum'
 import { ItemTier } from 'enums/items/item-tier.enum'
+import { EnemyID } from 'enums/ids/enemy-id.enum'
+
+/** Features `window.dev.unlock` can open. */
+type DevFeature = 'camp' | 'skillTree' | 'map' | 'spellbook'
 
 // Cheat buttons for dev and testing builds. GameComponent renders it only when environment.cheats is on.
 @Component({
@@ -47,7 +51,7 @@ export class DevCheatsComponent {
 
   /**
    * `window.dev` in the browser console: puts the game into a state in one call when checking UI.
-   * IDs are the enum numbers (`ShopID`, `ZoneID`, `SkillNodeID`, `ItemID`, `GameTab`).
+   * IDs are the enum numbers (`ShopID`, `ZoneID`, `SkillNodeID`, `ItemID`, `EnemyID`, `GameTab`).
    */
   private readonly devTools = {
     tab: (tab: GameTab) => this.navigation.changeTab(tab),
@@ -85,6 +89,23 @@ export class DevCheatsComponent {
       this.townsStore.selectTownBuilding(TOWNS_DATA[TownID.laHarpar].buildings[0])
       this.townsStore.openShop(shopId)
     },
+    /** Sets an enemy's lifetime kill count (bestiary ranks, zone mastery, quest kill steps). */
+    setKills: (enemyId: EnemyID, count: number) =>
+      this.playerStore.updateEnemyKillCount(enemyId, count - (this.playerStore.enemyKillCounts()[enemyId] ?? 0)),
+    /** Adds shiny kills in a zone (zone mastery's Shiny Hunter star). */
+    addShinyKills: (zoneId: ZoneID, count: number) => this.playerStore.applyKillBatch({
+      zoneId, wave: 1, kills: 0, shinies: count, killsByEnemy: {}, taskCountsByEnemy: {}, experience: 0, gold: 0, items: [],
+    }),
+    unlock: (feature: DevFeature) => this.unlockFeature(feature),
+  }
+
+  private unlockFeature(feature: DevFeature): void {
+    switch (feature) {
+      case 'camp': return this.playerStore.unlockCamp()
+      case 'skillTree': return this.playerStore.unlockSkillTree()
+      case 'map': return this.playerStore.unlockMap()
+      case 'spellbook': return this.playerStore.unlockSpellbook()
+    }
   }
 
   private learnSkill(nodeId: SkillNodeID, level: number): boolean {

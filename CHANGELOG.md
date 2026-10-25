@@ -23,6 +23,7 @@ New notes go under `[Unreleased]`; `npm run release -- <major|minor|patch>` move
 - [feature] Three new spells, one per element: Tidal Lash (water, cheap on mana), Gale Cut (air, short cooldown) and Stone Spike (earth, hits hard, long cooldown). Each one, and Fire Strike, starts its own branch in the skill tree with an Element Mastery node (stronger weakness hits, once you know the Weaknesses skill) and a perk that makes the spell faster or cheaper.
 - [feature] Magic in the skill tree now starts with any of the four strike spells; Max Mana, Mana Regen, Magic Damage, Spell Crit and Spell Cooldown open once you have one.
 - [nerf] Monster weaknesses are spread across all elements instead of mostly fire: about six monsters each are weak to fire, water, air, earth and physical, and every zone mixes at least two. Seagulls, forest bears, harpies and giant eagles are no longer weak to physical attacks.
+- [bug] Bestiary: drop odds never show above 100%.
 
 ## [0.1.0] - 2026-10-24
 - [feature] Battle: your hero auto-attacks through zone waves, with bosses, critical hits, strong hits and elemental weaknesses.
