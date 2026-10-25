@@ -59,6 +59,11 @@ export class WorldMapComponent {
       if (!this.map) return
       this.syncTownMarkers(unlockedTowns)
     })
+    effect(() => {
+      const currentZoneId = this.battleStore.currentZoneId()
+      if (!this.map) return
+      this.highlightZone(currentZoneId)
+    })
   }
 
   // center/zoom give Leaflet a valid initial view; tile layer is added later
@@ -136,6 +141,13 @@ export class WorldMapComponent {
     this.syncTownMarkers(this.playerStore.unlockedContent().towns)
   }
 
+  /** Marks the zone the player is fighting in; a marker's element exists only once it's on the map. */
+  private highlightZone(currentZoneId: ZoneID): void {
+    for (const [zoneId, marker] of this.zoneMarkerMap) {
+      marker.getElement()?.querySelector('.map-marker')?.classList.toggle('map-marker--current', zoneId === currentZoneId)
+    }
+  }
+
   private syncZoneMarkers(unlockedZones: ZoneID[]): void {
     for (const data of WORLD_MAP_DATA.markers) {
       if (data.type !== 'zone') continue
@@ -154,6 +166,7 @@ export class WorldMapComponent {
       }
     }
     this.syncMarkerVisibility()
+    this.highlightZone(this.battleStore.currentZoneId())
   }
 
   private syncTownMarkers(unlockedTowns: TownID[]): void {

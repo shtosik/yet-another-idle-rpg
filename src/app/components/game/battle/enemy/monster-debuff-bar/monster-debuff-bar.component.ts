@@ -6,7 +6,7 @@ import { SkillNodeID } from '../../../../../../enums/ids/skill-node-id.enum'
 import { DamageElement } from '../../../../../../enums/damage-element.enum'
 import { I18nextPipe } from '../../../../../pipes/i18next.pipe'
 
-const WEAKNESS_ICONS: Record<DamageElement, string> = {
+export const WEAKNESS_ICONS: Record<DamageElement, string> = {
   [DamageElement.fire]: './assets/img/icons/fireWeakness.png',
   [DamageElement.water]: './assets/img/icons/waterWeakness.png',
   [DamageElement.air]: './assets/img/icons/airWeakness.png',

@@ -9,7 +9,7 @@ $muted: #a3a3a3
   position: relative
   width: 100%
   flex-direction: column
-  font-size: 0.75rem
+  font-size: 0.8125rem
 
 // Groups sit in as many columns as fit; the panel scrolls down once they outgrow it.
 // Not `.stats`: the game grid already puts that class on this component's host.
@@ -28,7 +28,7 @@ $muted: #a3a3a3
     padding-bottom: 2px
     border-bottom: vars.$panelBorder
     color: palette.$yellow
-    font-size: 0.75rem
+    font-size: 0.8125rem
 
   &__row
     display: flex
@@ -62,7 +62,7 @@ $muted: #a3a3a3
     background: vars.$panelBackgroundColor
     color: $muted
     font: inherit
-    font-size: 0.7rem
+    font-size: 0.7625rem
     cursor: pointer
 
     &:hover, &:focus-visible
@@ -76,6 +76,13 @@ $muted: #a3a3a3
 
   &__title
     color: palette.$yellow
+
+  &__description
+    max-width: 16rem
+    margin-bottom: 0.25rem
+    color: $muted
+    font-size: 0.7625rem
+    line-height: 1.3
 
   &__line
     display: flex

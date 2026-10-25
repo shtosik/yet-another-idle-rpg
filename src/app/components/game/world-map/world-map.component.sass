@@ -81,7 +81,7 @@
   user-select: none
   transition: background 0.12s, border-color 0.12s
   width: fit-content
-  opacity: 0.6
+  opacity: 0.85
   transform: scale(var(--marker-scale, 1))
   transform-origin: 0 0
   position: relative
@@ -95,7 +95,7 @@
   &:hover
     background: rgba(36, 18, 4, 0.96)
     border-color: #c8a050
-    opacity: 0.9
+    opacity: 1
 
   &--town
     border-color: #c8a050
@@ -105,10 +105,13 @@
   &--zone
     border-color: #4880b8
     color: #b8d4ee
-    opacity: 0.85
 
-    &:hover
-      opacity: 1
+  // The zone the player is fighting in.
+  &--current
+    opacity: 1
+    border-color: #facc15
+    color: #fef9c3
+    box-shadow: 0 0 0 1px #facc15, 0 0 8px rgba(250, 204, 21, 0.7)
 
   &--poi
     border-color: #48b870
