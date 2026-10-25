@@ -103,6 +103,8 @@ export class CampComponent {
   }
 
   craft(view: RecipeView, times: number): void {
+    // Pin it: a fallback selection would otherwise jump once crafting hides it from the Craftable filter.
+    this.selectRecipe(view)
     const { crafted, installed } = this.playerStore.craftItem(view.recipe.id, times)
     if (!crafted) return
 
