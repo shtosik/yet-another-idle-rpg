@@ -20,5 +20,18 @@
       "PowerShell(git diff*)",
       "PowerShell(git log*)"
     ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "bash",
+            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"SessionStart\",\"additionalContext\":\"Angular repo: before writing or reviewing Angular code (components, templates, signals, stores, routing, forms, tests), load the angular-developer skill with the Skill tool once per session.\"}}'"
+          }
+        ]
+      }
+    ]
   }
 }
