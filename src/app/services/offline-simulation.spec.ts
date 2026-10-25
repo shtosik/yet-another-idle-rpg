@@ -16,6 +16,7 @@ describe('simulateOfflineKills', () => {
     hasWeaknessSkill: false,
     activeQuestIds: new Set(),
     taskEnemyIds: new Set(),
+    enemyKillCounts: {},
     rollingKillMs: null,
     rng: seededRng(42),
     ...overrides,

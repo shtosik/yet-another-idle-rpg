@@ -14,6 +14,7 @@ export type Rng = () => number
 export const rollDropList = (
   drops: EnemyDrop[],
   rolls: number,
+  dropChanceBonus: number,
   accumulator: Map<string, InventoryItem>,
   activeQuestIds?: Set<QuestID>,
   rng: Rng = Math.random,
@@ -22,8 +23,8 @@ export const rollDropList = (
     drops.forEach(drop => {
       if (drop.requiredActiveQuestId !== undefined && !activeQuestIds?.has(drop.requiredActiveQuestId)) return
 
-      const roll = Math.ceil(rng() * drop.chance)
-      if (roll !== drop.chance) return
+      // Hits with probability (1 + bonus) / chance.
+      if (rng() * drop.chance <= drop.chance - 1 - dropChanceBonus) return
 
       const amount = Math.floor(rng() * (drop.maxAmount - drop.minAmount + 1) + drop.minAmount)
       const { type, tier } = ITEM_DATA[drop.id]
@@ -55,15 +56,16 @@ export function killReward(enemy: Enemy, zone: Zone, wave: number, isShiny: bool
   }
 }
 
-/** Rolls one kill's drops into `accumulator`. */
+/** Rolls one kill's drops into `accumulator`. `dropChanceBonus` comes from the bestiary rank (`rankBonus`). */
 export function rollEnemyDrops(
   enemy: Enemy,
   rolls: number,
   isShiny: boolean,
+  dropChanceBonus: number,
   accumulator: Map<string, InventoryItem>,
   activeQuestIds?: Set<QuestID>,
   rng: Rng = Math.random,
 ) {
-  rollDropList(enemy.drops, rolls, accumulator, activeQuestIds, rng)
-  if (isShiny && enemy.shinyDrops?.length) rollDropList(enemy.shinyDrops, 1, accumulator, activeQuestIds, rng)
+  rollDropList(enemy.drops, rolls, dropChanceBonus, accumulator, activeQuestIds, rng)
+  if (isShiny && enemy.shinyDrops?.length) rollDropList(enemy.shinyDrops, 1, dropChanceBonus, accumulator, activeQuestIds, rng)
 }

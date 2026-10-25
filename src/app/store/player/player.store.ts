@@ -14,6 +14,7 @@ import { UnlockedSpellsType } from '../../../types/player/unlocked-spells.type'
 import ITEM_DATA from '../../../data/items-data'
 import ZONES_DATA from '../../../data/zones-data'
 import { killReward, rollEnemyDrops } from './kill-rewards'
+import { rankBonus } from './bestiary-rank'
 import { sellPrice } from '../shop/shop-prices'
 import { ShopID } from '../../../enums/ids/shop-id.enum'
 import ENEMIES_DATA from '../../../data/enemies-data'
@@ -417,7 +418,8 @@ export const PlayerStore = signalStore(
       const enemy = ENEMIES_DATA[enemyId]
       const { experience, gold, dropRolls } = killReward(enemy, ZONES_DATA[zoneId], currentWave, isShiny, store.stats())
       const drops = new Map<string, InventoryItem>()
-      rollEnemyDrops(enemy, dropRolls, isShiny, drops, activeQuestIds)
+      const { dropChance } = rankBonus(enemyId, store.enemyKillCounts()[enemyId] ?? 0)
+      rollEnemyDrops(enemy, dropRolls, isShiny, dropChance, drops, activeQuestIds)
       const itemsToUpdate = [...drops.values()]
 
       store.updatePlayerStats([
