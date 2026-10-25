@@ -46,6 +46,7 @@ Angular 20 standalone components, zoneless change detection, `OnPush` on every c
 
 - **Pre-release: save compatibility is not required.** Rename and renumber freely; after a breaking change to a store's saved shape, bump its save `version` (`withGameStateSync(KEY, initialState, { version })`) instead of clearing `localStorage` (`docs/systems/persistence.md`).
 - **Stats are derived, not stored.** `PlayerStore.stats()` is computed from base + equipment + skill nodes + buffs + consumables + permanent bonuses. `updatePlayerStats` only earns/spends resources or adds a permanent bonus; a new stat source goes into the `stats` computed (ADR 0002).
+- **Ternaries only pick between two simple values** (`selected ? 0 : -1`). No nested ternaries, and no ternaries that carry logic (choosing what to compute or call, several conditions): use `if`/`switch` in a small named method instead.
 - **No inline `<svg>` in templates.** Icons are files under `src/assets/img/icons/` used through `<img>` (`ngSrc`), with the colour baked into the file.
 - **New i18n namespace → register it** in the `translations` list in `src/app/app.config.ts`. Template pipe is `| i18next`.
 - **Item data lives in `src/data/items/<category>-items.data.ts`**; `src/data/items-data.ts` only merges them.
