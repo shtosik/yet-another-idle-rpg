@@ -14,10 +14,7 @@
           (click)="select(entry)"
         >
           @if (!entry.unlocked) {
-            <svg class="game-menu__lock" aria-hidden="true" fill="none" height="12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="12">
-              <rect height="10" rx="2" width="14" x="5" y="11"/>
-              <path d="M8 11V8a4 4 0 0 1 8 0v3"/>
-            </svg>
+            <img alt="" height="12" ngSrc="./assets/img/icons/lock.svg" width="12">
           }
           {{ ('gameTabs.' + GameTab[entry.tab]) | i18next }}
           @if (!entry.unlocked) {

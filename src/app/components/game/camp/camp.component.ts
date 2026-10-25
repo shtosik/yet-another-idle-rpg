@@ -12,7 +12,6 @@ import { evaluateRecipe, stationLevel } from '../../../store/player/camp'
 import { StationID } from '../../../../enums/ids/station-id.enum'
 import { ItemID } from '../../../../enums/ids/item-id.enum'
 import { ItemTier } from '../../../../enums/items/item-tier.enum'
-import { StationIconComponent } from './station-icon/station-icon.component'
 import { RecipeDetailComponent } from './recipe-detail/recipe-detail.component'
 import { RecipeView } from './recipe-view'
 
@@ -26,7 +25,6 @@ const TOAST_MS = 1800
   imports: [
     NgOptimizedImage,
     I18nextPipe,
-    StationIconComponent,
     RecipeDetailComponent,
   ],
 })

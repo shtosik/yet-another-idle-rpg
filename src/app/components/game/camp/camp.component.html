@@ -9,7 +9,7 @@
         [class.camp__tab--active]="entry.station.id === activeStation()?.station?.id"
         (click)="selectStation(entry.station.id)"
       >
-        <app-station-icon [stationId]="entry.station.id"/>
+        <img alt="" disableOptimizedSrcset height="16" width="16" [ngSrc]="'./assets/img/icons/stations/' + stationKey + '.svg'">
         <span>{{ ('camp:stations.' + stationKey + '.name') | i18next }}</span>
         <span class="camp__tab-level">{{ 'camp:level' | i18next:{ level: entry.level } }}</span>
       </button>
@@ -60,10 +60,7 @@
                 <img alt="" class="slot__img" disableOptimizedSrcset height="30" width="30" [ngSrc]="view.item.url">
                 @if (locked) {
                   <span class="slot__lock" aria-hidden="true">
-                    <svg fill="none" height="10" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="10">
-                      <rect height="10" rx="2" width="14" x="5" y="11"/>
-                      <path d="M8 11V8a4 4 0 0 1 8 0v3"/>
-                    </svg>
+                    <img alt="" height="10" ngSrc="./assets/img/icons/lock.svg" width="10">
                     {{ view.recipe.stationLevel }}
                   </span>
                 }
