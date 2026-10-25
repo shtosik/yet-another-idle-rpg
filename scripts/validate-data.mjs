@@ -509,7 +509,8 @@ for (const f of walkFiles(APP, '.html')) {
   if (/<svg[\s>]/i.test(readFileSync(f, 'utf8'))) error(repoPath(f), 'inline <svg>: use an icon file under src/assets/img/icons/ with <img ngSrc>')
 }
 for (const f of walkFiles(APP, '.ts')) {
-  if (/template:\s*`[^`]*<svg[\s>]/i.test(readFileSync(f, 'utf8'))) error(repoPath(f), 'inline <svg> in the template: use an icon file under src/assets/img/icons/ with <img ngSrc>')
+  // Inline templates in any quote style: template: `…`, '…' or "…".
+  if (/template:\s*(['"`])(?:(?!\1)[\s\S])*?<svg[\s>]/i.test(readFileSync(f, 'utf8'))) error(repoPath(f), 'inline <svg> in the template: use an icon file under src/assets/img/icons/ with <img ngSrc>')
 }
 
 {

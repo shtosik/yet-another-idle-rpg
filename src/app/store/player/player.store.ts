@@ -402,7 +402,10 @@ export const PlayerStore = signalStore(
     },
 
     canEquip(item: InventoryItem): boolean {
-      const slotKey = EquipmentSlot[(ITEM_DATA[item.id] as EquipmentItem).slot] as EquipmentSlotKey
+      // Only items with an equipment slot can be equipped; anything else would land under an undefined slot key.
+      const slot = (ITEM_DATA[item.id] as EquipmentItem).slot
+      if (slot === undefined) return false
+      const slotKey = EquipmentSlot[slot] as EquipmentSlotKey
       const equipped = store.equipment()[slotKey]
       const delta = equipmentInventorySlots(item.id) - (equipped ? equipmentInventorySlots(equipped.id) : 0)
       const adding = equipped ? [{ id: equipped.id, tier: equipped.tier, amount: 1 }] : []
