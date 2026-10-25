@@ -1,15 +1,25 @@
+@let npcData = NPC_Data[npc.id];
 <div
     class="npc"
     [style.top.%]="npc.position.y"
     [style.left.%]="npc.position.x"
-    (click)="openDialogue.emit(npc.id)"
 >
-    @let npcData = NPC_Data[npc.id];
-    <img
-        [ngSrc]="npcData.url"
-        alt=""
-        height="128"
-        width="128"
-        loading="lazy"
+    <button
+        type="button"
+        class="npc__portrait"
+        [attr.aria-label]="'npc:names.' + NpcID[npc.id] | i18next"
+        (click)="openDialogue.emit(npc.id)"
     >
+        <img
+            [ngSrc]="npcData.url"
+            alt=""
+            height="128"
+            width="128"
+            loading="lazy"
+        >
+    </button>
+    <!-- Shown once the player has opened this NPC's shop through dialogue. -->
+    @if (shopId !== undefined) {
+        <button type="button" class="npc__shop" (click)="openShop.emit(shopId)">{{ 'shop:ui.openShop' | i18next }}</button>
+    }
 </div>

@@ -283,6 +283,8 @@ export class DialogueManagerService {
   }
 
   private openShop(shopId: number) {
+    const npc = this.activeNpc()
+    if (npc) this.townsStore.rememberNpcShop(npc.id, shopId)
     this.townsStore.openShop(shopId)
   }
 }
