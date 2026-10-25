@@ -60,19 +60,29 @@ export class DevCheatsComponent {
     learnSkill: (nodeId: SkillNodeID): boolean => this.learnSkill(nodeId, 1),
     giveItem: (itemId: ItemID, amount = 1, tier = ITEM_DATA[itemId].tier) =>
       this.playerStore.addItems([{ id: itemId, tier, amount }]),
-    equip: (itemId: ItemID, tier = ITEM_DATA[itemId].tier) => {
-      this.playerStore.addItems([{ id: itemId, tier, amount: 1 }])
-      this.playerStore.equipItem({ id: itemId, tier, amount: 1, type: ITEM_DATA[itemId].type })
+    /** Gives the item and equips it; false (with a console warning) when there's no room or it can't be equipped. */
+    equip: (itemId: ItemID, tier = ITEM_DATA[itemId].tier): boolean => {
+      const stack = { id: itemId, tier, amount: 1 }
+      if (!this.playerStore.canFitItems([stack])) {
+        console.warn('dev.equip: no inventory space for the item')
+        return false
+      }
+      this.playerStore.addItems([stack])
+      const item = { ...stack, type: ITEM_DATA[itemId].type }
+      if (!this.playerStore.canEquip(item)) {
+        this.playerStore.removeItems([stack])
+        console.warn('dev.equip: the item can\'t be equipped (not equipment, or no room to swap out the current one)')
+        return false
+      }
+      this.playerStore.equipItem(item)
+      return true
     },
     unequip: (slot: EquipmentSlotKey) => this.playerStore.unequipItem(slot),
-    /** Opens the shop in La Harpar's first building when no town building is open yet. */
+    /** Opens the shop over La Harpar's first building, whatever town or building was open. */
     openShop: (shopId: ShopID) => {
       this.navigation.changeTab(GameTab.towns)
-      if (!this.townsStore.selectedTownBuilding()) {
-        this.townsStore.selectTown(TownID.laHarpar)
-        this.townsStore.selectTownBuilding(TOWNS_DATA[TownID.laHarpar].buildings[0])
-      }
-      this.townsStore.closeShop()
+      this.townsStore.selectTown(TownID.laHarpar)
+      this.townsStore.selectTownBuilding(TOWNS_DATA[TownID.laHarpar].buildings[0])
       this.townsStore.openShop(shopId)
     },
   }
@@ -84,7 +94,11 @@ export class DevCheatsComponent {
       this.playerStore.updatePlayerStats([{ stat: 'unspentSkillPoints', amount: node.skillPointCost }])
       const before = this.playerStore.unlockedNodes()[nodeId] ?? 0
       this.skillTree.buyNode(nodeId, false)
-      if ((this.playerStore.unlockedNodes()[nodeId] ?? 0) === before) return false
+      if ((this.playerStore.unlockedNodes()[nodeId] ?? 0) === before) {
+        // Refused (a prerequisite didn't take): take back the points granted for it.
+        this.playerStore.updatePlayerStats([{ stat: 'unspentSkillPoints', amount: -node.skillPointCost }])
+        return false
+      }
     }
     return true
   }

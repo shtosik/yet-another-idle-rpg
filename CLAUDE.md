@@ -12,7 +12,7 @@ Other scripts are in `package.json`; `npm run sim` is the economy simulation, `n
 
 - No Python on this machine: write scripts in Node (`scripts/*.mjs`).
 - In a worktree session, run git as single plain commands (no `cd &&` chains or `$(…)` around git).
-- Checking UI in the dev build: the cheat build exposes `window.dev` (`tab`, `setZone`, `grantStat`, `learnSkill`, `giveItem`, `equip`, `unequip`, `openShop`; numeric enum IDs) in `src/app/components/game/dev-cheats/dev-cheats.component.ts`.
+- Checking UI: builds with cheats on (`npm start`, `build:testing`) expose `window.dev` once the cheat bar's deferred chunk loads, a moment after the page (`tab`, `setZone`, `grantStat`, `learnSkill`, `giveItem`, `equip`, `unequip`, `openShop`; numeric enum IDs) in `src/app/components/game/dev-cheats/dev-cheats.component.ts`.
 
 ## Git workflow
 

@@ -502,6 +502,7 @@ for (const doc of DOC_FILES) {
 //    (block__element, block--modifier) a component's styles define is used by its template or code.
 
 const repoPath = f => relative(ROOT, f).replace(/\\/g, '/')
+const escapeRegExp = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 const APP = join(SRC, 'app')
 
 for (const f of walkFiles(APP, '.html')) {
@@ -526,10 +527,13 @@ for (const f of walkFiles(APP, '.ts')) {
       continue
     }
     for (const name of new Set([...css.matchAll(BEM_CLASS)].map(m => m[1]))) {
-      if (source.includes(name)) continue
-      // A modifier built at runtime ('hud__currency--' + entry.currency) leaves only its prefix in the source.
+      // Whole names only: `.btn--a` isn't used by `btn--ab`.
+      if (new RegExp(`(^|[^\\w-])${escapeRegExp(name)}(?![\\w-])`).test(source)) continue
+      // A modifier built at runtime ('hud__currency--' + x, `map-marker--${x}`, badge--{{ x }}) leaves its prefix
+      // right before a quote, `${` or `{{`.
       const modifierAt = name.lastIndexOf('--')
-      if (modifierAt > 0 && source.includes(name.slice(0, modifierAt + 2))) continue
+      const prefix = escapeRegExp(name.slice(0, modifierAt + 2))
+      if (modifierAt > 0 && new RegExp(`(^|[^\\w-])${prefix}(?=['"\`]|\\$\\{|\\{\\{)`).test(source)) continue
       error(repoPath(styleFile), `.${name} is styled but neither the template nor the component code uses it`)
     }
   }
