@@ -16,6 +16,8 @@
         class="spellbook__spell"
         cdkDrag
         [cdkDragData]="spellId"
+        [attr.aria-label]="('spells:names.' + SpellID[spellId] + '.name') | i18next"
+        role="img"
         [style.background-image]="spellData.url | url"
         [tooltipTemplate]="tooltip"
         [tooltipContext]="{ spellId }"
