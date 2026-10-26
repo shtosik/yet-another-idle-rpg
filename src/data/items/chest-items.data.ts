@@ -53,7 +53,7 @@ export const ChestItemsData: Partial<Record<ItemID, Item>> = {
     id: ItemID.sageRobe,
     tier: ItemTier.rare,
     url: './assets/img/items/sageRobe.png',
-    value: 3000,
+    value: 330,
     type: ItemType.equipment,
     slot: EquipmentSlot.chest,
     stats: [

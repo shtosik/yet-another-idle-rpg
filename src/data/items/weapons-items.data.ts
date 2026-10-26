@@ -181,7 +181,7 @@ export const WeaponsItemsData: Partial<Record<ItemID, Item>> = {
     id: ItemID.rootwoodStaff,
     tier: ItemTier.rare,
     url: './assets/img/items/rootwoodStaff.png',
-    value: 3500,
+    value: 255,
     type: ItemType.equipment,
     slot: EquipmentSlot.weapon,
     damageType: DamageElement.earth,
