@@ -201,7 +201,7 @@ for (const recipe of Object.values(D.RECIPES_DATA)) {
   const item = D.ITEM_DATA[recipe.itemId]
   const materials = recipe.itemsNeeded.reduce((sum, cost) => sum + Math.max(0, D.ITEM_DATA[cost.id]?.value ?? 0) * cost.amount, 0)
   if (item?.type === D.ItemType.equipment && item.value * recipe.createsAmount > 2 * materials) {
-    error('src/data/items', `${idName(D.ItemID, item.id)} sells for ${item.value}g but its recipe's materials are worth ${materials}g (max 2×)`)
+    error('src/data/items', `${idName(D.ItemID, item.id)} sells for ${item.value * recipe.createsAmount}g per craft but its recipe's materials are worth ${materials}g (max 2×)`)
   }
   const station = D.STATIONS_DATA[recipe.stationId]
   if (station && recipe.stationLevel > station.maxLevel) {

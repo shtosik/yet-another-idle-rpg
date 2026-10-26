@@ -24,6 +24,7 @@ export class SpellbookComponent {
   private battleManagerService = inject(BattleManagerService)
 
   protected readonly SPELLS_DATA = SPELLS_DATA
+  protected readonly SpellID = SpellID
 
   // Connect the palette to every spellbar slot so spells can be equipped onto any position.
   slotDropIds = Array.from({ length: 5 }, (_, i) => `spell-slot-${i}`)
