@@ -611,6 +611,13 @@ export const PlayerStore = signalStore(
         return
       }
 
+      if (itemData.type === ItemType.spellScroll) {
+        if (store.knownSpellIds().includes(itemData.spellId)) return
+        store.levelUpSpell(itemData.spellId)
+        store.removeItems([{ id: item.id, tier: item.tier, amount: 1 }])
+        return
+      }
+
       if (itemData.type !== ItemType.rewardsStats) return
 
       const statsToUpdate = itemData.stats.map(s => ({ stat: s.id, amount: s.amount }))

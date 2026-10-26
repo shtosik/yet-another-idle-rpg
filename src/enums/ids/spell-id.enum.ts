@@ -6,4 +6,5 @@ export enum SpellID {
     galeCut = 4,
     stoneSpike = 5,
     thunderstorm = 6,
+    ambush = 7,
 }

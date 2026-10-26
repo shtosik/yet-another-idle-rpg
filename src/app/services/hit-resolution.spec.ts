@@ -33,6 +33,14 @@ describe('resolveHit', () => {
     expect(hit.damage).toBe(4)
   })
 
+  it('crits when forced, even at 0 crit chance', () => {
+    const neverCrit = () => 0.99
+    const hit = resolveHit({ ...input({ attackPower: 10, critChance: 0, critMulti: 2 }), forceCrit: true }, neverCrit)
+
+    expect(hit.isCrit).toBeTrue()
+    expect(hit.damage).toBe(20)
+  })
+
   it('deals at least 1', () => {
     expect(resolveHit(input({ attackPower: 0 })).damage).toBe(1)
   })

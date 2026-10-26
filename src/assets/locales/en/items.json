@@ -163,7 +163,8 @@
         "trollHideVest": "Troll Hide Vest",
         "bearhideGloves": "Bearhide Gloves",
         "silkweaveLegs": "Silkweave Legs",
-        "gnollWarbelt": "Gnoll Warbelt"
+        "gnollWarbelt": "Gnoll Warbelt",
+        "ambushScroll": "Ambush Scroll"
     },
     "tiers": {
         "trash": "Trash",
@@ -192,5 +193,6 @@
         "unlocks": "Unlocks {{station}}",
         "upgrades": "Upgrades {{station}} to Lv {{level}}",
         "needsPrevious": "Needs {{station}} Lv {{level}} first"
-    }
+    },
+    "teachesSpell": "Teaches the spell {{spell}}"
 }

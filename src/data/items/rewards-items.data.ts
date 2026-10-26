@@ -1,3 +1,4 @@
+import { SpellID } from '../../enums/ids/spell-id.enum'
 import { ItemID } from '../../enums/ids/item-id.enum'
 import { Item } from '../../interfaces/item.interface'
 import { ItemTier } from '../../enums/items/item-tier.enum'
@@ -23,6 +24,15 @@ export const RewardsItemsData: Partial<Record<ItemID, Item>> = {
         amount: 1,
       },
     ],
+  },
+  // Guild store spell scroll.
+  [ItemID.ambushScroll]: {
+    id: ItemID.ambushScroll,
+    tier: ItemTier.rare,
+    url: './assets/img/items/ambushScroll.png',
+    value: -1,
+    type: ItemType.spellScroll,
+    spellId: SpellID.ambush,
   },
   // Explorer Token shop upgrades. Icons are placeholders until their art is generated.
   [ItemID.guildSatchel]: {
