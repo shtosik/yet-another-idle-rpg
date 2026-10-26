@@ -38,6 +38,7 @@ Then ingredients are removed and the result added (×`createsAmount` × count). 
 - Consumable effects are not **buffs** (see `GLOSSARY.md`); buffs come only from spells.
 - Durations in consumable data are seconds (`MINUTE = 60` helper).
 - Recipe visibility, not just craftability, depends on station level 0 vs owned.
+- Crafted equipment sells for about 1.5× its materials' value, never more than 2× (`npm run validate` checks), so crafting can't print gold from drops or shop-bought runes.
 
 ## Known issues
 - Raw ingredients (apple, cheese, fish meat, crab meat) are `ItemType.resource`, so they can't be eaten.

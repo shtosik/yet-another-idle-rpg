@@ -28,6 +28,10 @@ New notes go under `[Unreleased]`; `npm run release -- <major|minor|patch>` move
 - [feature] Stormcaller, a legendary staff from the Harpy Matriarch, teaches Thunderstorm while you hold it: a storm that strikes every 2 seconds for 10 seconds of fighting, pausing between enemies. Take the staff off and the spell leaves your spell bar once its cooldown is over.
 - [feature] A spell that's running (a buff or a storm) has a green border on the spell bar.
 - [feature] Item tooltips show a weapon's element.
+- [feature] Melee gear for every zone: a new weapon for each tier from the Plains to the Upper Canopy (Stone Axe, Fang Spear, Goblin Firebrand, Troll Club, Gnoll Cleaver, Bog Hammer, Talon Blade), three of them with an element. The Troll now drops loot.
+- [feature] Armor for the empty slots: a Leather set crafted from Deer Pelt that adds crit chance, Bearhide Gloves and Silkweave Legs at the Workbench, and the Bandit Bandana, Troll Hide Vest and Gnoll Warbelt as drops.
+- [nerf] The Canopy Bandit no longer drops the Machete; the Giant Eagle drops the Talon Blade instead.
+- [buff] The Weaknesses skill needs only 1 level of Money Maker instead of 5.
 - [feature] Hovering a spell in the Spellbook shows its tooltip (mana, cooldown, what it does), like on the spell bar.
 - [bug] Item tooltips show mana regen and attack speed as seconds off ("-3s Mana Regen") instead of raw numbers, and every bonus has its sign.
 

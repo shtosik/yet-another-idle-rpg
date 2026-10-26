@@ -73,7 +73,7 @@ const EXPLORATION_SKILLS_DATA: Partial<Record<SkillNodeID, SkillNode>> = {
     id: SkillNodeID.weaknesses,
     branch: SkillBranch.exploration,
     skillPointCost: 2,
-    requires: { kind: 'node', id: SkillNodeID.goldGain, minLevel: 5 },
+    requires: { kind: 'node', id: SkillNodeID.goldGain, minLevel: 1 },
     maxLevel: 1,
     url: './assets/img/skills/weaknesses.png',
     type: SkillNodeType.battle,

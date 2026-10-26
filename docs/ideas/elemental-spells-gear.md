@@ -1,6 +1,6 @@
 # Elemental spells & gear expansion
 
-**Scope:** M · **Status:** Accepted (2026-10-25), batch 1 implemented (`feat/elemental-spells`), batch 2 implemented (`feat/magic-gear`)
+**Scope:** M · **Status:** Accepted (2026-10-25), batch 1 implemented (`feat/elemental-spells`), batch 2 implemented (`feat/magic-gear`), batch 3 implemented (`feat/physical-gear`)
 
 More spells and more gear, magic and non-magic, for the zones that exist today. Shipped in batches.
 
@@ -51,7 +51,10 @@ Two build paths:
    - Slime Wand (water, Blue Slime), Ember Wand (fire, Goblin Scout), Gale Staff (air, Mountain Bat), Spellweaver Amulet (Elder Spider) and Stormcaller (air, unique, grants Thunderstorm, the first damage-over-time spell; Harpy Matriarch) drop.
    - Apprentice Robe (La Harpar shop), Mystic Hood (Mawood Magic Shop).
    - Rune Altar recipes: Rootwood Staff (earth), Mana Ring, Sage Robe.
-3. **Physical gear**: a weapon per zone tier (some with an element), empty armor slots filled with zone drops.
+3. **Physical gear** (done): a melee weapon for every tier from 2 to 7 that out-hits the staves, three of them with an element, and armor for the empty slots.
+   - Weapons: Stone Axe and Fang Spear (Workbench), Goblin Firebrand (fire, Goblin Scavenger), Troll Club (Troll), Gnoll Cleaver (Gnoll Warchief), Bog Hammer (earth, Bog Skeleton), Talon Blade (air, Giant Eagle; the Canopy Bandit no longer drops the tier 3 Machete).
+   - Armor: a Leather set from Deer Pelt (Workbench), light armor for crits (+1% crit chance per piece, +2% on the vest) so it isn't a later copy of the Turtle Shell set, Bandit Bandana (Bandit), Troll Hide Vest (Troll), Bearhide Gloves and Silkweave Legs (Workbench), Gnoll Warbelt (Gnoll Scout).
+   - Every Workbench recipe is level 1: nothing upgrades the Workbench yet. A Workbench upgrade item would let the late recipes move to levels 2 and 3.
 4. **Spell scrolls and Ambush**: a scroll item that unlocks a spell, Guild store entry.
 
 ## Touch-points

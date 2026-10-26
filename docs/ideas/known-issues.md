@@ -16,6 +16,8 @@
 19. Balance: XP curve uses the cumulative formula as a per-level delta (kept on purpose for now); Fire Strike weak; Harpy Matriarch plume drops every kill; gold shop prices not re-tuned. Fixed 2026-10-22: wave scaling, zone chain rescale, Haste as a percentage.
 20. Fixed 2026-10-22: Mountain Pass enemies have pets and shiny pets.
 
+21. Nothing upgrades the Workbench: `STATIONS_DATA` allows levels 2 and 3, but no `stationUpgrade` item exists for it, so every Workbench recipe is level 1 (a level 2 recipe could never be crafted). Needs an upgrade item (shop or recipe) before recipes move up (`elemental-spells-gear.md` batch 3).
+
 Remaining plans: `progression-pacing.md` (tuning with `npm run sim`).
 
 ## Combat and spells

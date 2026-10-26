@@ -177,7 +177,7 @@ The culmination. The Gnarled Treant must be destroyed.
 |---------|------|----|----------|-------|-------|
 | 27 | `harpy` | 45 | physical | harpy feather (resource, high value) | New type: `harpy`, `bird` (reuse) |
 | 28 | `giantEagle` | 60 | physical | eagle talon (resource) | New type: `bird` (reuse). Rare; territorial |
-| 29 | `canopyBandit` | 70 | air | vial of water, machete (low chance) | Reuse `bandit`, `human`. Outlaws who fled up here |
+| 29 | `canopyBandit` | 70 | air | vial of water (the machete drop was removed for the tier 7 Talon Blade on Giant Eagle) | Reuse `bandit`, `human`. Outlaws who fled up here |
 | 1 | `seagull` | 3 | physical | *(reuse)* | Lost stragglers, weak filler |
 
 **Boss (EnemyID 30): `harpyMatriarch`**

@@ -211,6 +211,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     drops: [
       drop(ItemID.vialOfWater, 1, 1, 6),
       drop(ItemID.trophyNecklace, 1, 1, 100),
+      drop(ItemID.banditBandana, 1, 1, 30),
       drop(ItemID.machete, 1, 1, 80),
       drop(ItemID.fireRune, 1, 1, 5),
       drop(ItemID.huntersFeastRecipe, 1, 1, 15),
@@ -268,6 +269,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     drops: [
       drop(ItemID.stick, 1, 1, 4),
       drop(ItemID.stone, 1, 2, 3),
+      drop(ItemID.goblinFirebrand, 1, 1, 80),
       petDrop(EnemyID.goblinScavenger),
     ],
     shinyDrops: shinyPetDrops(EnemyID.goblinScavenger),
@@ -280,7 +282,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     weakness: DamageElement.fire,
     experience: 720,
     gold: 360,
-    drops: [petDrop(EnemyID.troll)],
+    drops: [drop(ItemID.trollClub, 1, 1, 15), drop(ItemID.trollHideVest, 1, 1, 15), petDrop(EnemyID.troll)],
     shinyDrops: shinyPetDrops(EnemyID.troll),
     url: './assets/img/enemies/troll.png',
     enemyTypes: [EnemyType.troll, EnemyType.humanoid],
@@ -311,6 +313,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
       drop(ItemID.wolfFangs, 1, 1, 3),
       drop(ItemID.stick, 1, 1, 4),
       drop(ItemID.fireRune, 1, 1, 5),
+      drop(ItemID.gnollWarbelt, 1, 1, 60),
       petDrop(EnemyID.gnollScout),
     ],
     shinyDrops: shinyPetDrops(EnemyID.gnollScout),
@@ -343,6 +346,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
       drop(ItemID.gnollTrophy, 1, 1, 2),
       drop(ItemID.wolfFangs, 1, 3, 1),
       drop(ItemID.fireRune, 2, 4, 2),
+      drop(ItemID.gnollCleaver, 1, 1, 20),
       { id: ItemID.blightedFetish, minAmount: 1, maxAmount: 1, chance: 1, requiredActiveQuestId: QuestID.fetchesAndFangs },
       petDrop(EnemyID.gnollWarchief),
     ],
@@ -390,6 +394,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     gold: 158,
     drops: [
       drop(ItemID.boneFragment, 1, 2, 3),
+      drop(ItemID.bogHammer, 1, 1, 80),
       drop(ItemID.earthRune, 1, 1, 5),
       petDrop(EnemyID.bogSkeleton),
     ],
@@ -454,6 +459,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     gold: 222,
     drops: [
       drop(ItemID.eagleTalon, 1, 1, 4),
+      drop(ItemID.talonBlade, 1, 1, 80),
       drop(ItemID.airRune, 1, 1, 5),
       petDrop(EnemyID.giantEagle),
     ],
@@ -469,7 +475,6 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     gold: 443,
     drops: [
       drop(ItemID.vialOfWater, 1, 1, 6),
-      drop(ItemID.machete, 1, 1, 80),
       petDrop(EnemyID.canopyBandit),
     ],
     shinyDrops: shinyPetDrops(EnemyID.canopyBandit),

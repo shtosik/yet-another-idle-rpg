@@ -31,7 +31,7 @@ export const RingsItemsData: Partial<Record<ItemID, Item>> = {
     id: ItemID.manaRing,
     tier: ItemTier.uncommon,
     url: './assets/img/items/manaRing.png',
-    value: 1500,
+    value: 158,
     type: ItemType.equipment,
     slot: EquipmentSlot.ring,
     stats: [

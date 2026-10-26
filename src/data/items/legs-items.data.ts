@@ -19,4 +19,28 @@ export const LegsItemsData: Partial<Record<ItemID, Item>> = {
       },
     ],
   },
+  [ItemID.leatherPants]: {
+    id: ItemID.leatherPants,
+    tier: ItemTier.normal,
+    url: './assets/img/items/leatherPants.png',
+    value: 18,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.legs,
+    stats: [
+      { id: 'attackPower', amount: 1 },
+      { id: 'critChance', amount: 1 },
+    ],
+  },
+  [ItemID.silkweaveLegs]: {
+    id: ItemID.silkweaveLegs,
+    tier: ItemTier.rare,
+    url: './assets/img/items/silkweaveLegs.png',
+    value: 180,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.legs,
+    stats: [
+      { id: 'attackPower', amount: 3 },
+      { id: 'attackSpeed', amount: 0.1 },
+    ],
+  },
 }
