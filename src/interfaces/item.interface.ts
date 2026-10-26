@@ -68,6 +68,12 @@ export type ConsumableItem = FoodItem | PotionItem
 export const isConsumableItem = (item: Item): item is ConsumableItem =>
     item.type === ItemType.food || item.type === ItemType.potion
 
+/** Teaches `spellId` for good when used (right-click); a respec doesn't take it away. */
+export interface SpellScrollItem extends ItemData {
+    type: ItemType.spellScroll
+    spellId: SpellID
+}
+
 export interface RecipeItem extends ItemData {
     type: ItemType.recipe
     recipeId: RecipeID
@@ -83,7 +89,7 @@ export interface StationUpgradeItem extends ItemData {
 export const isStationUpgradeItem = (item: Item): item is StationUpgradeItem =>
     item.type === ItemType.stationUpgrade
 
-export type Item = EquipmentItem | ResourceItem | RewardsStatsItem | QuestItem | FoodItem | BookItem | PotionItem | RecipeItem | StationUpgradeItem
+export type Item = EquipmentItem | ResourceItem | RewardsStatsItem | QuestItem | FoodItem | BookItem | PotionItem | RecipeItem | StationUpgradeItem | SpellScrollItem
 
 export type UseItemProps = UseItemStatProps
 

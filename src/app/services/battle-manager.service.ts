@@ -58,9 +58,12 @@ export class BattleManagerService {
 
     if (!enemy) return
 
+    // Ambush: melee hits (auto-attacks and melee spells) use up the guaranteed crits; magic hits don't.
+    const forceCrit = magicDamage === 0 && this.battleStore.useEmpoweredHit()
     const { damage, isCrit, isWeaknessHit } = resolveHit({
       stats: this.playerStore.stats(),
       magicDamage,
+      forceCrit,
       isDoubleAttack,
       damageType: damageType ?? this.playerStore.equippedWeaponDamageType(),
       enemyWeakness: enemy.weakness,
@@ -103,8 +106,8 @@ export class BattleManagerService {
   }
 
   /**
-   * Equipped, off cooldown, known (a gear spell: its gear is on) and affordable. Damage spells need a living enemy; buffs can be cast between fights
-   * but not while already active.
+   * Equipped, off cooldown, known (a gear spell: its gear is on) and affordable. Damage spells need a living enemy; buffs and
+   * empower spells (Ambush) can be cast between fights but not while already active.
    */
   canCast(spellId: SpellID): boolean {
     const slot = this.battleStore.equippedSpells().find(s => s?.spellId === spellId)
@@ -117,6 +120,8 @@ export class BattleManagerService {
     }
     if (SPELLS_DATA[spellId].effect.type === SpellType.damageOverTime
       && this.battleStore.activeDamageOverTime().some(d => d.spellId === spellId)) return false
+    // Like a buff: castable between fights, not again while its crits are left.
+    if (SPELLS_DATA[spellId].effect.type === SpellType.empower) return this.battleStore.empowered()?.spellId !== spellId
     return this.battleStore.isInCombat()
   }
 
@@ -136,6 +141,9 @@ export class BattleManagerService {
         break
       case SpellType.damageOverTime:
         this.battleStore.addDamageOverTime(spellId)
+        break
+      case SpellType.empower:
+        this.battleStore.empower(spellId, spellData.effect.hits)
         break
       case SpellType.buff: {
         // The stat change itself is derived from activeBuffs (PlayerStore.stats).

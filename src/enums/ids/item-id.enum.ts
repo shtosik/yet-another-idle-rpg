@@ -180,4 +180,5 @@ export enum ItemID {
     bearhideGloves = 161,
     silkweaveLegs = 162,
     gnollWarbelt = 163,
+    ambushScroll = 164,
 }

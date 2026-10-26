@@ -79,6 +79,16 @@ const SPELLS_DATA: Record<SpellID, SpellProps> = {
       percent: true,
     },
   },
+  [SpellID.ambush]: {
+    id: SpellID.ambush,
+    baseManaCost: 2,
+    baseCooldown: 30,
+    url: './assets/img/skills/ambush.png',
+    effect: {
+      type: SpellType.empower,
+      hits: 5,
+    },
+  },
   [SpellID.doubleAttack]: {
     id: SpellID.doubleAttack,
     baseManaCost: 2,

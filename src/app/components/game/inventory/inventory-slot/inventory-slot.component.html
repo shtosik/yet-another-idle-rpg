@@ -68,8 +68,11 @@
         <span class="stat">{{ 'items:station.needsPrevious' | i18next:{ station, level: item.level - 1 } }}</span>
       }
     }
+    @if (item.type === ItemType.spellScroll) {
+      <span class="stat">{{ 'items:teachesSpell' | i18next:{ spell: ('spells:names.' + SpellID[item.spellId] + '.name') | i18next } }}</span>
+    }
     <!-- Shop and modal slots ignore clicks, so they show no click hints. -->
-    @if (clickable && (item.type === ItemType.food || item.type === ItemType.potion || item.type === ItemType.book || item.type === ItemType.stationUpgrade)) {
+    @if (clickable && (item.type === ItemType.food || item.type === ItemType.potion || item.type === ItemType.book || item.type === ItemType.stationUpgrade || item.type === ItemType.spellScroll)) {
       <span class="click">{{ 'items:rightClickToUse' | i18next }}</span>
     }
   </div>

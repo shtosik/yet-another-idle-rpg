@@ -27,13 +27,18 @@
         "thunderstorm": {
             "name": "Thunderstorm",
             "desc": "A storm that strikes the enemy every 2 seconds for 10 seconds, 8 base air damage per strike. It pauses between enemies and carries on to the next one. Only known while Stormcaller is equipped."
+        },
+        "ambush": {
+            "name": "Ambush",
+            "desc": "Your next 5 melee hits, auto-attacks and melee spells alike, are guaranteed critical hits."
         }
     },
     "types": {
         "melee": "Melee",
         "magic": "Magic",
         "buff": "Buff",
-        "damageOverTime": "Over time"
+        "damageOverTime": "Over time",
+        "empower": "Empower"
     },
     "manaCost": "Mana: {{ cost }}",
     "cooldown": "Cooldown: {{ cooldown }}",

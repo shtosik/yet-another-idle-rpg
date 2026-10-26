@@ -416,6 +416,13 @@
     "shinySaturation": 4,
     "shinyBrightness": 1.2
   },
+  "src/assets/img/items/ambushScroll.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single rolled pale parchment spell scroll lying diagonally, rolled up at both ends, wrapped with a dark purple ribbon and closed with one round dark red wax seal stamped with a small dagger shape",
+    "seed": 400079890,
+    "date": "2026-10-26"
+  },
   "src/assets/img/items/ancientWood.png": {
     "family": "item-pixel",
     "tier": null,
@@ -834,6 +841,13 @@
     "subject": "a round bronze medallion seen straight on, with a glowing pale green and white spiral wind swirl symbol embossed in its centre, on a dark green background",
     "seed": 424242,
     "date": "2026-10-25"
+  },
+  "src/assets/img/skills/ambush.png": {
+    "family": "skill-icon",
+    "tier": null,
+    "subject": "a single plain straight steel dagger with a short leather-wrapped hilt thrusting diagonally out of a swirl of black smoky shadow, one dark hooded arm holding it and nothing else, the blade lit with a thin white edge highlight, on a dark purple-black background",
+    "seed": 1334613516,
+    "date": "2026-10-26"
   },
   "src/assets/img/skills/autoEat.png": {
     "family": "skill-icon",

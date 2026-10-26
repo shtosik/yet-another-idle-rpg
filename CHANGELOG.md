@@ -32,6 +32,7 @@ New notes go under `[Unreleased]`; `npm run release -- <major|minor|patch>` move
 - [feature] Armor for the empty slots: a Leather set crafted from Deer Pelt that adds crit chance, Bearhide Gloves and Silkweave Legs at the Workbench, and the Bandit Bandana, Troll Hide Vest and Gnoll Warbelt as drops.
 - [nerf] The Canopy Bandit no longer drops the Machete; the Giant Eagle drops the Talon Blade instead.
 - [buff] The Weaknesses skill needs only 1 level of Money Maker instead of 5.
+- [feature] Ambush: a new spell that makes your next 5 melee hits, Double Attack included, guaranteed critical hits. Learn it from the Ambush Scroll in the Guild store (rank 1, 25 Explorer Tokens). Spell scrolls teach a spell for good, even through a respec.
 - [feature] Hovering a spell in the Spellbook shows its tooltip (mana, cooldown, what it does), like on the spell bar.
 - [bug] Item tooltips show mana regen and attack speed as seconds off ("-3s Mana Regen") instead of raw numbers, and every bonus has its sign.
 
