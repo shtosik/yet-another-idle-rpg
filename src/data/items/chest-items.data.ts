@@ -62,4 +62,28 @@ export const ChestItemsData: Partial<Record<ItemID, Item>> = {
       { id: 'magicDamageMultiplier', amount: 0.1 },
     ],
   },
+  [ItemID.leatherVest]: {
+    id: ItemID.leatherVest,
+    tier: ItemTier.normal,
+    url: './assets/img/items/leatherVest.png',
+    value: 23,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.chest,
+    stats: [
+      { id: 'attackPower', amount: 2 },
+      { id: 'critChance', amount: 2 },
+    ],
+  },
+  [ItemID.trollHideVest]: {
+    id: ItemID.trollHideVest,
+    tier: ItemTier.rare,
+    url: './assets/img/items/trollHideVest.png',
+    value: 2000,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.chest,
+    stats: [
+      { id: 'attackPower', amount: 3 },
+      { id: 'critMulti', amount: 0.15 },
+    ],
+  },
 }

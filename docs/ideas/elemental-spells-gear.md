@@ -1,6 +1,6 @@
 # Elemental spells & gear expansion
 
-**Scope:** M · **Status:** Accepted (2026-10-25), batch 1 implemented (`feat/elemental-spells`), batch 2 implemented (`feat/magic-gear`)
+**Scope:** M · **Status:** Accepted (2026-10-25), batch 1 implemented (`feat/elemental-spells`), batch 2 implemented (`feat/magic-gear`), batch 3 implemented (`feat/physical-gear`), batch 4 implemented (`feat/spell-scrolls`)
 
 More spells and more gear, magic and non-magic, for the zones that exist today. Shipped in batches.
 
@@ -21,7 +21,7 @@ Magic is reorganised so each element is its own branch:
 - **Root**: the four strike spells (Fire Strike, Tidal Lash, Gale Cut, Stone Spike) each require `origin` and fan out across the magic sector (launch 30°, spread with `turn`). The player starts magic by picking an element.
 - **Shared magic core** (max mana, mana regen, magic damage, spell crit, spell cooldown) requires `any` one strike spell. Today these hang off Fire Strike; they move, and get explicit positions between the element branches, since an `any` node is placed at the average of its prerequisites.
 - **Each element branch** (batch 1): strike spell → +10% damage of that element (max 5, the `extra<Element>DamageMultiplier` stat) → one spell perk (−cooldown or −mana for that spell).
-- Ambush (physical) belongs to the damage branch.
+- Ambush (physical) comes from a Guild store spell scroll, not the skill tree (owner decision 2026-10-26).
 - Possibly new `SkillBranch` values per element (colours, grouping); `BRANCH_LAUNCH` in `skill-tree-graph.ts` needs an entry per value.
 - Existing saves stay valid: Fire Strike still hangs off the origin, and the core accepts it as its spell. No save version bump.
 
@@ -32,7 +32,7 @@ Magic is reorganised so each element is its own branch:
 | Tidal Lash | water | as Fire Strike, slightly cheaper mana |
 | Gale Cut | air | lower damage, shorter cooldown |
 | Stone Spike | earth | higher damage, longer cooldown |
-| Ambush | physical | next hit is a guaranteed crit; spell scroll from the Guild store ([Explorer Token shop](explorer-token-shop.md)) |
+| Ambush | physical | next 5 melee hits (melee spells too) are guaranteed crits; spell scroll from the Guild store ([Explorer Token shop](explorer-token-shop.md)) |
 
 Light and dark stay unused until later zones need them.
 
@@ -51,8 +51,11 @@ Two build paths:
    - Slime Wand (water, Blue Slime), Ember Wand (fire, Goblin Scout), Gale Staff (air, Mountain Bat), Spellweaver Amulet (Elder Spider) and Stormcaller (air, unique, grants Thunderstorm, the first damage-over-time spell; Harpy Matriarch) drop.
    - Apprentice Robe (La Harpar shop), Mystic Hood (Mawood Magic Shop).
    - Rune Altar recipes: Rootwood Staff (earth), Mana Ring, Sage Robe.
-3. **Physical gear**: a weapon per zone tier (some with an element), empty armor slots filled with zone drops.
-4. **Spell scrolls and Ambush**: a scroll item that unlocks a spell, Guild store entry.
+3. **Physical gear** (done): a melee weapon for every tier from 2 to 7 that out-hits the staves, three of them with an element, and armor for the empty slots.
+   - Weapons: Stone Axe and Fang Spear (Workbench), Goblin Firebrand (fire, Goblin Scavenger), Troll Club (Troll), Gnoll Cleaver (Gnoll Warchief), Bog Hammer (earth, Bog Skeleton), Talon Blade (air, Giant Eagle; the Canopy Bandit no longer drops the tier 3 Machete).
+   - Armor: a Leather set from Deer Pelt (Workbench), light armor for crits (+1% crit chance per piece, +2% on the vest) so it isn't a later copy of the Turtle Shell set, Bandit Bandana (Bandit), Troll Hide Vest (Troll), Bearhide Gloves and Silkweave Legs (Workbench), Gnoll Warbelt (Gnoll Scout).
+   - Every Workbench recipe is level 1: nothing upgrades the Workbench yet. A Workbench upgrade item would let the late recipes move to levels 2 and 3.
+4. **Spell scrolls and Ambush** (done): a general spell scroll item (`ItemType.spellScroll`) that teaches its spell for good; Ambush, a new empower spell type, sold as a scroll in the Guild store at rank 1.
 
 ## Touch-points
 `spells-data.ts`, `spell-id.enum.ts`, `skill-tree-data.ts`, `skill-tree-graph.ts`, `skill-node-id.enum.ts`, `enemies-data.ts`, `src/data/items/*-items.data.ts`, `shops-data.ts`, `recipes-data.ts`, i18n, `docs/systems/spells-and-buffs.md`, `docs/systems/skill-tree.md`.

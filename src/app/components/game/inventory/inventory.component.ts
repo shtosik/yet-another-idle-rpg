@@ -59,6 +59,15 @@ export class InventoryWindow {
       return
     }
 
+    const itemData = ITEM_DATA[item.id]
+    if (itemData.type === ItemType.spellScroll) {
+      if (this.playerStore.knownSpellIds().includes(itemData.spellId)) return
+      this.playerStore.useItem(item)
+      // Like learning it from the skill tree: onto the spell bar if there's a free slot.
+      this.battleManagerService.equipSpell(itemData.spellId)
+      return
+    }
+
     this.playerStore.useItem(item)
   }
 }

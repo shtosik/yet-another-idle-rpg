@@ -21,4 +21,13 @@ export enum RecipeID {
     rootwoodStaff = 20,
     manaRing = 21,
     sageRobe = 22,
+    stoneAxe = 23,
+    fangSpear = 24,
+    leatherCap = 25,
+    leatherVest = 26,
+    leatherPants = 27,
+    leatherBoots = 28,
+    leatherGloves = 29,
+    bearhideGloves = 30,
+    silkweaveLegs = 31,
 }

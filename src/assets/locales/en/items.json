@@ -146,7 +146,25 @@
         "manaRing": "Mana Ring",
         "sageRobe": "Sage Robe",
         "spellweaverAmulet": "Spellweaver Amulet",
-        "stormcaller": "Stormcaller"
+        "stormcaller": "Stormcaller",
+        "stoneAxe": "Stone Axe",
+        "fangSpear": "Fang Spear",
+        "goblinFirebrand": "Goblin Firebrand",
+        "trollClub": "Troll Club",
+        "gnollCleaver": "Gnoll Cleaver",
+        "bogHammer": "Bog Hammer",
+        "talonBlade": "Talon Blade",
+        "leatherCap": "Leather Cap",
+        "leatherVest": "Leather Vest",
+        "leatherPants": "Leather Pants",
+        "leatherBoots": "Leather Boots",
+        "leatherGloves": "Leather Gloves",
+        "banditBandana": "Bandit Bandana",
+        "trollHideVest": "Troll Hide Vest",
+        "bearhideGloves": "Bearhide Gloves",
+        "silkweaveLegs": "Silkweave Legs",
+        "gnollWarbelt": "Gnoll Warbelt",
+        "ambushScroll": "Ambush Scroll"
     },
     "tiers": {
         "trash": "Trash",
@@ -175,5 +193,6 @@
         "unlocks": "Unlocks {{station}}",
         "upgrades": "Upgrades {{station}} to Lv {{level}}",
         "needsPrevious": "Needs {{station}} Lv {{level}} first"
-    }
+    },
+    "teachesSpell": "Teaches the spell {{spell}}"
 }

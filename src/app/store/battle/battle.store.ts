@@ -27,6 +27,8 @@ export interface BattleState {
   equippedSpells: (EquippedSpell | null)[];
   activeBuffs: ActiveBuff[];
   activeDamageOverTime: ActiveDamageOverTime[];
+  /** An empower spell's guaranteed crits left (Ambush); saved, and not time-based, so it waits across reloads and offline. */
+  empowered: { spellId: SpellID, hitsLeft: number } | null;
   isShinyEnemy: boolean;
   consumableSlots: Record<ConsumableSlot, ActiveConsumable | null>;
   autoEatEnabled: boolean;
@@ -42,6 +44,7 @@ export const initialState: BattleState = {
   equippedSpells: [null, null, null, null, null],
   activeBuffs: [],
   activeDamageOverTime: [],
+  empowered: null,
   isShinyEnemy: false,
   consumableSlots: { food: null, potion: null },
   autoEatEnabled: false,
@@ -222,6 +225,18 @@ export const BattleStore = signalStore(
       })
       patchState(store, { activeDamageOverTime: next })
       return { spellId, usedMs }
+    },
+
+    empower(spellId: SpellID, hits: number): void {
+      patchState(store, { empowered: { spellId, hitsLeft: hits } })
+    },
+
+    /** Uses one guaranteed crit; returns whether there was one. */
+    useEmpoweredHit(): boolean {
+      const empowered = store.empowered()
+      if (!empowered) return false
+      patchState(store, { empowered: empowered.hitsLeft > 1 ? { ...empowered, hitsLeft: empowered.hitsLeft - 1 } : null })
+      return true
     },
 
     clearDamageOverTime(): void {

@@ -29,11 +29,12 @@ export class SpellSlotComponent {
   equippedSpell = input.required<EquippedSpell>()
 
   spellData = computed(() => SPELLS_DATA[this.equippedSpell().spellId])
-  /** A buff or damage-over-time spell from this slot is running. */
+  /** A buff, damage-over-time or empower spell from this slot is running. */
   isActive = computed(() => {
     const spellId = this.equippedSpell().spellId
     return this.battleStore.activeBuffs().some(b => b.spellId === spellId)
       || this.battleStore.activeDamageOverTime().some(d => d.spellId === spellId)
+      || this.battleStore.empowered()?.spellId === spellId
   })
   /** False for a gear spell whose gear came off; it stays until its cooldown ends. */
   isKnown = computed(() => this.playerStore.knownSpellIds().includes(this.equippedSpell().spellId))

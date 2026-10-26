@@ -185,7 +185,7 @@ for (const shop of shops) {
     }
   }
 }
-const UNSELLABLE_TYPES = new Set([D.ItemType.book, D.ItemType.recipe, D.ItemType.stationUpgrade, D.ItemType.quest])
+const UNSELLABLE_TYPES = new Set([D.ItemType.book, D.ItemType.recipe, D.ItemType.stationUpgrade, D.ItemType.spellScroll, D.ItemType.quest])
 for (const item of Object.values(D.ITEM_DATA)) {
   const name = idName(D.ItemID, item.id)
   if (item.value > 0 && (UNSELLABLE_TYPES.has(item.type) || /^(shiny)?pet[A-Z]/i.test(name))) {
@@ -249,6 +249,21 @@ for (const skill of Object.values(D.ALL_SKILLS)) {
     error('src/data/skill-tree-data.ts', `${idName(D.SkillNodeID, skill.id)} has anchor ${skill.anchor}, which isn't another node`)
   }
 }
+// Owner rule: a spell comes from exactly one source (a skill node, a spell scroll or a piece of gear), so a respec,
+// a refund or taking gear off never has to guess which source a known spell came from.
+const spellSources = new Map()
+const addSpellSource = (spellId, source) => spellSources.set(spellId, [...(spellSources.get(spellId) ?? []), source])
+for (const skill of Object.values(D.ALL_SKILLS)) {
+  if (skill.type === D.SkillNodeType.spell) addSpellSource(skill.spellId, `skill node ${idName(D.SkillNodeID, skill.id)}`)
+}
+for (const item of Object.values(D.ITEM_DATA)) {
+  if (item.type === D.ItemType.spellScroll) addSpellSource(item.spellId, `spell scroll ${idName(D.ItemID, item.id)}`)
+  if (item.type === D.ItemType.equipment && item.spell !== undefined) addSpellSource(item.spell, `gear ${idName(D.ItemID, item.id)}`)
+}
+for (const [spellId, sources] of spellSources) {
+  if (sources.length > 1) error('src/data/spells-data.ts', `${idName(D.SpellID, spellId)} has more than one source (${sources.join(', ')}); a spell may come from only one`)
+}
+
 // A spell perk is a battle node read only through SpellProps.perk; a stat or spell node would also apply its own effect.
 for (const spell of Object.values(D.SPELLS_DATA)) {
   if (!spell.perk) continue

@@ -22,7 +22,7 @@ export type SpellPerk = {
     manaPerLevel?: number;
 };
 
-export type SpellEffectProps = SpellMeleeEffectProps | SpellMagicEffectProps | SpellBuffEffectProps | SpellDamageOverTimeEffectProps;
+export type SpellEffectProps = SpellMeleeEffectProps | SpellMagicEffectProps | SpellBuffEffectProps | SpellDamageOverTimeEffectProps | SpellEmpowerEffectProps;
 
 export type SpellMeleeEffectProps = {
     type: SpellType.melee;
@@ -41,6 +41,12 @@ export type SpellDamageOverTimeEffectProps = {
     damageType: DamageElement;
     duration: number;
     interval: number;
+};
+
+/** The next `hits` melee hits (auto-attacks and melee spells) are guaranteed crits. */
+export type SpellEmpowerEffectProps = {
+    type: SpellType.empower;
+    hits: number;
 };
 
 export type SpellBuffEffectProps = {
