@@ -1,12 +1,14 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common'
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core'
-import { EquipmentSlotKey } from 'enums/equipment-slot.enum'
+import { EquipmentSlot, EquipmentSlotKey } from 'enums/equipment-slot.enum'
 import { ItemTier } from 'enums/items/item-tier.enum'
 import { Item } from 'interfaces/item.interface'
 import { I18nextPipe } from '../../../../pipes/i18next.pipe'
 import { ItemID } from '../../../../../enums/ids/item-id.enum'
 import { TooltipTemplateDirective } from 'ngx-tooltip-directives'
 import { ItemType } from '../../../../../enums/items/item-type.enum'
+import { DamageElement } from '../../../../../enums/damage-element.enum'
+import { SpellID } from '../../../../../enums/ids/spell-id.enum'
 import { StatToPercentagePipe } from '../../../../pipes/stat-to-percentage.pipe'
 
 @Component({
@@ -28,4 +30,7 @@ export class EquipmentItemComponent {
     ItemTier = ItemTier
     protected readonly ItemID = ItemID
     protected readonly ItemType = ItemType
+    protected readonly DamageElement = DamageElement
+    protected readonly EquipmentSlot = EquipmentSlot
+    protected readonly SpellID = SpellID
 }

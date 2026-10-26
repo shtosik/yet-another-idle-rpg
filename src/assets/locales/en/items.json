@@ -136,7 +136,17 @@
         "runeAltar": "Rune Altar",
         "venison": "Venison",
         "venisonRoast": "Venison Roast",
-        "venisonRoastRecipe": "Venison Roast Recipe"
+        "venisonRoastRecipe": "Venison Roast Recipe",
+        "slimeWand": "Slime Wand",
+        "apprenticeRobe": "Apprentice Robe",
+        "emberWand": "Ember Wand",
+        "galeStaff": "Gale Staff",
+        "mysticHood": "Mystic Hood",
+        "rootwoodStaff": "Rootwood Staff",
+        "manaRing": "Mana Ring",
+        "sageRobe": "Sage Robe",
+        "spellweaverAmulet": "Spellweaver Amulet",
+        "stormcaller": "Stormcaller"
     },
     "tiers": {
         "trash": "Trash",
@@ -146,6 +156,7 @@
         "epic": "Epic",
         "legendary": "Legendary"
     },
+    "grantsSpell": "Grants the spell {{spell}} while equipped",
     "clickToEquip": "Click to equip",
     "clickToUnequip": "Click to unequip",
     "unequipBlockedInventory": "Cannot unequip: items occupy the slots this grants",

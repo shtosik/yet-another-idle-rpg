@@ -17,7 +17,10 @@
         cdkDrag
         [cdkDragData]="spellId"
         [style.background-image]="spellData.url | url"
-        [title]="('spells:names.' + SpellID[spellId] + '.name') | i18next"
+        [tooltipTemplate]="tooltip"
+        [tooltipContext]="{ spellId }"
+        placement="top"
+        tooltipClass="tooltip-override"
       ></div>
     }
     @if (!availableSpells().length) {
@@ -25,3 +28,10 @@
     }
   </div>
 </section>
+
+<ng-template
+  #tooltip
+  let-spellId="spellId"
+>
+  <app-spell-tooltip [spellId]="spellId"/>
+</ng-template>

@@ -18,4 +18,7 @@ export enum RecipeID {
     minorManaPotion = 17,
     firePit = 18,
     venisonRoast = 19,
+    rootwoodStaff = 20,
+    manaRing = 21,
+    sageRobe = 22,
 }

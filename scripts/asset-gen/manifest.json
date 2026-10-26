@@ -423,6 +423,13 @@
     "seed": 535645451,
     "date": "2026-10-17"
   },
+  "src/assets/img/items/apprenticeRobe.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a simple plain brown cloth robe with long sleeves and a rope belt, no decoration, nobody wearing it, single object",
+    "seed": 1833642526,
+    "date": "2026-10-26"
+  },
   "src/assets/img/items/ashwoodBow.png": {
     "family": "item-pixel",
     "tier": null,
@@ -521,6 +528,13 @@
     "seed": 1451607053,
     "date": "2026-10-17"
   },
+  "src/assets/img/items/emberWand.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a short straight dark wooden wand with a small glowing orange-red ember stone set in a metal claw on its tip, no flame, single object",
+    "seed": 1476461554,
+    "date": "2026-10-26"
+  },
   "src/assets/img/items/firePit.png": {
     "family": "item-pixel",
     "tier": null,
@@ -534,6 +548,13 @@
     "subject": "one round golden-brown baked pie with a crimped crust edge and a wedge cut out of the front, the filling inside shows apple slices with red and green skin and pale flesh, a small pale blue fish-shaped pastry decoration with a forked tail on the top crust, nothing beside the pie",
     "seed": 4242,
     "date": "2026-10-21"
+  },
+  "src/assets/img/items/galeStaff.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a long straight pale wooden staff whose head is a swirl of pale green wind with two white feathers tied to it, single object",
+    "seed": 1230513072,
+    "date": "2026-10-26"
   },
   "src/assets/img/items/gnollTrophy.png": {
     "family": "item-pixel",
@@ -577,6 +598,13 @@
     "seed": 1674236555,
     "date": "2026-10-21"
   },
+  "src/assets/img/items/manaRing.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single silver ring with one large glowing blue gem set on top, single object",
+    "seed": 1834476597,
+    "date": "2026-10-26"
+  },
   "src/assets/img/items/matriarchPlume.png": {
     "family": "item-pixel",
     "tier": null,
@@ -598,6 +626,20 @@
     "seed": 1581558275,
     "date": "2026-10-21"
   },
+  "src/assets/img/items/mysticHood.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single empty deep purple cloth hood with a short cape collar and a thin silver trim, nobody wearing it, single object",
+    "seed": 358365248,
+    "date": "2026-10-26"
+  },
+  "src/assets/img/items/rootwoodStaff.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a long staff made of twisted brown roots, the roots at the top clutching a round green-brown stone, single object",
+    "seed": 1660006269,
+    "date": "2026-10-26"
+  },
   "src/assets/img/items/runeAltar.png": {
     "family": "item-pixel",
     "tier": null,
@@ -605,12 +647,33 @@
     "seed": 1702929459,
     "date": "2026-10-21"
   },
+  "src/assets/img/items/sageRobe.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "an ornate deep blue robe with long wide sleeves, gold trim along the edges, gold star embroidery and a gold sash, nobody wearing it, single object",
+    "seed": 655647313,
+    "date": "2026-10-26"
+  },
   "src/assets/img/items/silverwoodChestplate.png": {
     "family": "item-pixel",
     "tier": null,
     "subject": "a chestplate armor made of pale silvery bark plates with leather straps, single object",
     "seed": 1032867683,
     "date": "2026-10-17"
+  },
+  "src/assets/img/items/slimeWand.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a short straight wooden wand with a round translucent blue slime blob stuck on its tip, single object",
+    "seed": 385478130,
+    "date": "2026-10-26"
+  },
+  "src/assets/img/items/spellweaverAmulet.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a round silver amulet pendant on a chain with glowing violet arcane runes and woven threads of light in its centre, single object",
+    "seed": 1375803952,
+    "date": "2026-10-26"
   },
   "src/assets/img/items/spiderFang.png": {
     "family": "item-pixel",
@@ -624,6 +687,13 @@
     "tier": null,
     "subject": "spider web drawn in code (spokes and sagging rings, 48px, hard pixels); SDXL could not draw a web with transparent gaps",
     "date": "2026-10-18"
+  },
+  "src/assets/img/items/stormcaller.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a long ornate dark staff whose head is a crackling storm orb with bright yellow lightning and swirling grey wind, two teal and brown harpy feathers hanging from the head, single object",
+    "seed": 125528548,
+    "date": "2026-10-26"
   },
   "src/assets/img/items/venison.png": {
     "family": "item-pixel",
@@ -687,6 +757,13 @@
     "subject": "a single jagged brown and ochre stone spike bursting upward out of cracked earth, rock shards and dust flying outward from its base, on a dark brown background",
     "seed": 41095558,
     "date": "2026-10-25"
+  },
+  "src/assets/img/skills/thunderstorm.png": {
+    "family": "skill-icon",
+    "tier": null,
+    "subject": "a jagged bright yellow-white lightning bolt striking down through the centre, with curved white gusts of wind blasting outward on both sides and small sparks, on a dark storm-grey sky background",
+    "seed": 1215728485,
+    "date": "2026-10-26"
   },
   "src/assets/img/skills/tidalLash.png": {
     "family": "skill-icon",

@@ -23,12 +23,17 @@
         "stoneSpike": {
             "name": "Stone Spike",
             "desc": "A spike of stone that deals 26 base earth damage, with a long cooldown."
+        },
+        "thunderstorm": {
+            "name": "Thunderstorm",
+            "desc": "A storm that strikes the enemy every 2 seconds for 10 seconds, 8 base air damage per strike. It pauses between enemies and carries on to the next one. Only known while Stormcaller is equipped."
         }
     },
     "types": {
         "melee": "Melee",
         "magic": "Magic",
-        "buff": "Buff"
+        "buff": "Buff",
+        "damageOverTime": "Over time"
     },
     "manaCost": "Mana: {{ cost }}",
     "cooldown": "Cooldown: {{ cooldown }}",

@@ -1,3 +1,4 @@
+import { SpellID } from '../../enums/ids/spell-id.enum'
 import { ItemID } from '../../enums/ids/item-id.enum'
 import { Item } from '../../interfaces/item.interface'
 import { ItemTier } from '../../enums/items/item-tier.enum'
@@ -132,6 +133,77 @@ export const WeaponsItemsData: Partial<Record<ItemID, Item>> = {
         id: 'magicDamageMultiplier',
         amount: 0.05,
       },
+    ],
+  },
+  [ItemID.slimeWand]: {
+    id: ItemID.slimeWand,
+    tier: ItemTier.uncommon,
+    url: './assets/img/items/slimeWand.png',
+    value: 400,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.weapon,
+    damageType: DamageElement.water,
+    stats: [
+      { id: 'attackPower', amount: 1 },
+      { id: 'magicDamage', amount: 2 },
+      { id: 'maxMana', amount: 1 },
+    ],
+  },
+  [ItemID.emberWand]: {
+    id: ItemID.emberWand,
+    tier: ItemTier.uncommon,
+    url: './assets/img/items/emberWand.png',
+    value: 900,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.weapon,
+    damageType: DamageElement.fire,
+    stats: [
+      { id: 'attackPower', amount: 1 },
+      { id: 'magicDamage', amount: 3 },
+      { id: 'magicDamageMultiplier', amount: 0.05 },
+    ],
+  },
+  [ItemID.galeStaff]: {
+    id: ItemID.galeStaff,
+    tier: ItemTier.rare,
+    url: './assets/img/items/galeStaff.png',
+    value: 2000,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.weapon,
+    damageType: DamageElement.air,
+    stats: [
+      { id: 'attackPower', amount: 2 },
+      { id: 'magicDamage', amount: 5 },
+      { id: 'spellCooldownReduction', amount: 3 },
+    ],
+  },
+  [ItemID.rootwoodStaff]: {
+    id: ItemID.rootwoodStaff,
+    tier: ItemTier.rare,
+    url: './assets/img/items/rootwoodStaff.png',
+    value: 3500,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.weapon,
+    damageType: DamageElement.earth,
+    stats: [
+      { id: 'attackPower', amount: 2 },
+      { id: 'magicDamage', amount: 7 },
+      { id: 'magicDamageMultiplier', amount: 0.1 },
+    ],
+  },
+  [ItemID.stormcaller]: {
+    id: ItemID.stormcaller,
+    tier: ItemTier.legendary,
+    url: './assets/img/items/stormcaller.png',
+    value: 8000,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.weapon,
+    damageType: DamageElement.air,
+    spell: SpellID.thunderstorm,
+    stats: [
+      { id: 'attackPower', amount: 3 },
+      { id: 'magicDamage', amount: 8 },
+      { id: 'magicDamageMultiplier', amount: 0.15 },
     ],
   },
 }

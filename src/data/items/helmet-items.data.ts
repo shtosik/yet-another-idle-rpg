@@ -59,4 +59,16 @@ export const HelmetItemsData: Partial<Record<ItemID, Item>> = {
       },
     ],
   },
+  [ItemID.mysticHood]: {
+    id: ItemID.mysticHood,
+    tier: ItemTier.uncommon,
+    url: './assets/img/items/mysticHood.png',
+    value: 1300,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.helmet,
+    stats: [
+      { id: 'magicDamage', amount: 3 },
+      { id: 'manaRegenRate', amount: 3000 },
+    ],
+  },
 }

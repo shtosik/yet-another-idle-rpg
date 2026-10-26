@@ -53,6 +53,19 @@ const SPELLS_DATA: Record<SpellID, SpellProps> = {
     },
     perk: { nodeId: SkillNodeID.stoneSpikeMana, manaPerLevel: 1 },
   },
+  [SpellID.thunderstorm]: {
+    id: SpellID.thunderstorm,
+    baseManaCost: 4,
+    baseCooldown: 45,
+    url: './assets/img/skills/thunderstorm.png',
+    effect: {
+      type: SpellType.damageOverTime,
+      damagePerHit: 8,
+      damageType: DamageElement.air,
+      duration: 10,
+      interval: 2,
+    },
+  },
   [SpellID.haste]: {
     id: SpellID.haste,
     baseManaCost: 5,

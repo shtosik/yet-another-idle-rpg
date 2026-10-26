@@ -1,6 +1,5 @@
 @use '../../../../../../styles/palette' as palette
 @use '../../../../../../styles/variables' as vars
-@use 'sass:map'
 
 .spell
   display: flex
@@ -26,6 +25,11 @@
     height: 100%
     width: 100%
 
+  &--active
+    outline: 2px solid palette.$green
+    outline-offset: -2px
+    border-radius: 8px
+
   &--disabled
     filter: grayscale(1)
     opacity: 0.45
@@ -39,42 +43,3 @@
     -ms-user-select: none
     user-select: none
 
-  &__tooltip
-    display: flex
-    flex-direction: column
-
-  &__header
-    display: flex
-    gap: 0.8rem
-    align-items: center
-    justify-content: space-between
-
-    span:first-child
-      color: palette.$cyan
-
-    .melee
-      color: map.get(palette.$spellTypePalette, melee)
-
-    .magic
-      color: map.get(palette.$spellTypePalette, magic)
-
-    .buff
-      color: map.get(palette.$spellTypePalette, buff)
-
-  &__desc
-    margin-top: 0.5rem
-    font-size: 0.8rem
-
-  &__info
-    display: flex
-    gap: 1rem
-    margin-top: 0.3rem
-
-    .mana
-      color: palette.$blue
-
-    .cooldown
-      color: palette.$yellow
-
-    .duration
-      color: palette.$cyan
