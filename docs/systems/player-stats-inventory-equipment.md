@@ -22,7 +22,7 @@
 - **XP**: adding `experience` runs `handleExperience`, which levels up (possibly several times) and grants 1 skill point per level. Formula: `src/app/pipes/calculate-xp.pipe.ts`.
 - **Inventory**: a fixed-length array of slots (`InventoryItem | null`), length = `stats.inventorySlots` (default 40, grows when the stat rises, never shrinks). Items stack per `id + tier`. `removeItems` takes across every stack of an id.
 - **Station upgrade items** never enter the inventory: `PlayerStore.addItems` installs them into `stations` instead (see `consumables-camp-crafting.md`).
-- **Equip**: the item leaves the inventory first, the old item goes back in; stats follow from `equipment`.
+- **Equip**: the item leaves the inventory first, the old item goes back in; stats follow from `equipment`. A weapon's `damageType` is the element of auto-attacks; an item's `spell` is known while it is equipped (`spells-and-buffs.md`). Item tooltips show both.
 - **Drops** (`calculateEnemyDrops` in `player.store.ts`): each `EnemyDrop` is a 1-in-`chance` roll, amount in `minAmount..maxAmount`; drops with `requiredActiveQuestId` only roll while that quest is active. Shinies roll the normal table 10 times plus `shinyDrops` once.
 
 ## Intended behavior (owner decisions)

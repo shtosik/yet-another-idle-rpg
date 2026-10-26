@@ -8,13 +8,15 @@ import SPELLS_DATA from '../../../../data/spells-data'
 import { UrlPipe } from '../../../pipes/url.pipe'
 import { I18nextPipe } from '../../../pipes/i18next.pipe'
 import { BattleManagerService } from '../../../services/battle-manager.service'
+import { TooltipTemplateDirective } from 'ngx-tooltip-directives'
+import { SpellTooltipComponent } from '../../shared/spell-tooltip/spell-tooltip.component'
 
 @Component({
   selector: 'app-spellbook',
   templateUrl: './spellbook.component.html',
   styleUrls: ['./spellbook.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CdkDropList, CdkDrag, UrlPipe, I18nextPipe],
+  imports: [CdkDropList, CdkDrag, UrlPipe, I18nextPipe, TooltipTemplateDirective, SpellTooltipComponent],
 })
 export class SpellbookComponent {
   private playerStore = inject(PlayerStore)
@@ -28,13 +30,10 @@ export class SpellbookComponent {
   slotDropIds = Array.from({ length: 5 }, (_, i) => `spell-slot-${i}`)
 
   availableSpells = computed(() => {
-    const unlocked = this.playerStore.unlockedSpells()
     const equippedIds = new Set(
       this.battleStore.equippedSpells().filter((s): s is EquippedSpell => !!s).map(s => s.spellId),
     )
-    return (Object.keys(unlocked) as unknown as SpellID[])
-      .map(key => Number(key) as SpellID)
-      .filter(id => (unlocked[id] ?? 0) > 0 && !equippedIds.has(id))
+    return this.playerStore.knownSpellIds().filter(id => !equippedIds.has(id))
   })
 
   constructor() {

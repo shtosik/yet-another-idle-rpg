@@ -24,7 +24,7 @@ import { ItemTier } from 'enums/items/item-tier.enum'
 import { EnemyID } from 'enums/ids/enemy-id.enum'
 
 /** Features `window.dev.unlock` can open. */
-type DevFeature = 'camp' | 'skillTree' | 'map' | 'spellbook'
+type DevFeature = 'camp' | 'skillTree' | 'map' | 'spellbook' | 'towns'
 
 // Cheat buttons for dev and testing builds. GameComponent renders it only when environment.cheats is on.
 @Component({
@@ -105,6 +105,7 @@ export class DevCheatsComponent {
       case 'skillTree': return this.playerStore.unlockSkillTree()
       case 'map': return this.playerStore.unlockMap()
       case 'spellbook': return this.playerStore.unlockSpellbook()
+      case 'towns': return Object.keys(TOWNS_DATA).forEach(id => this.playerStore.unlockTown(Number(id) as TownID))
     }
   }
 

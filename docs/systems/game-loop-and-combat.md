@@ -19,7 +19,8 @@ Every tick (`TICK_DURATION_IN_MS` = 100) measures the real time since the last t
    - A kill drops leftover attack time; the respawn delay starts at the kill.
 2. `PlayerStore.regenMana(delta)`.
 3. `tickSpells(delta)`: spell cooldowns and buffs count down in ms.
-4. For each full second elapsed: consumable slots tick, auto-eat runs, shop timers tick, `lastSeenAt` is marked.
+4. `tickDamageOverTime(delta)`: while an enemy is alive, running damage-over-time spells advance hit by hit and each hit is a `doDamage`; a kill stops their clock there (`spells-and-buffs.md`).
+5. For each full second elapsed: consumable slots tick, auto-eat runs, shop timers tick, `lastSeenAt` is marked.
 
 The attack, respawn and second timers are plain fields on `GameIntervalService`, not saved; a reload costs at most one attack interval or respawn.
 

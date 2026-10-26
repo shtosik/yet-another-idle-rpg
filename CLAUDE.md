@@ -13,7 +13,7 @@ Other scripts are in `package.json`; `npm run sim` is the economy simulation (`-
 - No Python on this machine: write scripts in Node (`scripts/*.mjs`).
 - In a worktree session, run git as single plain commands (no `cd &&` chains or `$(…)` around git).
 - Dev server in a worktree: other worktrees may hold 4200 and stopped servers can keep their port on Windows, so run `npx ng serve --port 0` in the background (any free port) and wait until that task's output contains `localhost:` (the `Local:` label has colour codes inside it, so grepping for `Local:` never matches); the port follows, after more colour codes.
-- Checking UI: builds with cheats on (`npm start`, `build:testing`) expose `window.dev` once the cheat bar's deferred chunk loads, a moment after the page (`tab`, `setZone`, `grantStat`, `learnSkill`, `giveItem`, `equip`, `unequip`, `openShop`, `setKills`, `addShinyKills`, `unlock`; numeric enum IDs) in `src/app/components/game/dev-cheats/dev-cheats.component.ts`. Set game state through these, not by editing `localStorage`.
+- Checking UI: builds with cheats on (`npm start`, `build:testing`) expose `window.dev` once the cheat bar's deferred chunk loads, a moment after the page (`tab`, `setZone`, `grantStat`, `learnSkill`, `giveItem`, `equip`, `unequip`, `openShop`, `setKills`, `addShinyKills`, `unlock` (features and towns); numeric enum IDs) in `src/app/components/game/dev-cheats/dev-cheats.component.ts`. Set game state through these, not by editing `localStorage`.
 
 ## Git workflow
 

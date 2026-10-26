@@ -22,7 +22,7 @@ export type SpellPerk = {
     manaPerLevel?: number;
 };
 
-export type SpellEffectProps = SpellMeleeEffectProps | SpellMagicEffectProps | SpellBuffEffectProps;
+export type SpellEffectProps = SpellMeleeEffectProps | SpellMagicEffectProps | SpellBuffEffectProps | SpellDamageOverTimeEffectProps;
 
 export type SpellMeleeEffectProps = {
     type: SpellType.melee;
@@ -32,6 +32,15 @@ export type SpellMagicEffectProps = {
     type: SpellType.magic;
     baseDamage: number;
     damageType: DamageElement;
+};
+
+/** Hits every `interval` seconds for `duration` seconds of combat; the clock stops while no enemy is alive. */
+export type SpellDamageOverTimeEffectProps = {
+    type: SpellType.damageOverTime;
+    damagePerHit: number;
+    damageType: DamageElement;
+    duration: number;
+    interval: number;
 };
 
 export type SpellBuffEffectProps = {

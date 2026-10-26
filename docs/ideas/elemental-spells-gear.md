@@ -1,6 +1,6 @@
 # Elemental spells & gear expansion
 
-**Scope:** M · **Status:** Accepted (2026-10-25), batch 1 implemented (`feat/elemental-spells`)
+**Scope:** M · **Status:** Accepted (2026-10-25), batch 1 implemented (`feat/elemental-spells`), batch 2 implemented (`feat/magic-gear`)
 
 More spells and more gear, magic and non-magic, for the zones that exist today. Shipped in batches.
 
@@ -47,7 +47,10 @@ Two build paths:
 
 ## Batches
 1. **Spells and weaknesses**: Tidal Lash, Gale Cut, Stone Spike; magic tree reorganised into element branches; weakness rebalance.
-2. **Magic gear**: a staff or wand per element, robes, ring, amulet; Mawood Magic Shop.
+2. **Magic gear** (done): owner direction 2026-10-26: magic weapons keep a small Attack Power (about a third of a melee weapon of the tier) so melee stays the auto-attack path; magic gear starts in the Plains; some comes from the Rune Altar; unique staves can grant a spell while equipped.
+   - Slime Wand (water, Blue Slime), Ember Wand (fire, Goblin Scout), Gale Staff (air, Mountain Bat), Spellweaver Amulet (Elder Spider) and Stormcaller (air, unique, grants Thunderstorm, the first damage-over-time spell; Harpy Matriarch) drop.
+   - Apprentice Robe (La Harpar shop), Mystic Hood (Mawood Magic Shop).
+   - Rune Altar recipes: Rootwood Staff (earth), Mana Ring, Sage Robe.
 3. **Physical gear**: a weapon per zone tier (some with an element), empty armor slots filled with zone drops.
 4. **Spell scrolls and Ambush**: a scroll item that unlocks a spell, Guild store entry.
 

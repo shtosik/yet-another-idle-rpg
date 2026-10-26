@@ -23,7 +23,7 @@
   <div class="detail__effects">
     @if (equipment(); as equipment) {
       @for (stat of equipment.stats; track stat.id) {
-        <span class="detail__effect">+{{ stat.id | statToPercentage:stat.amount }} {{ ('app:playerStats.' + stat.id) | i18next }}</span>
+        <span class="detail__effect">{{ stat.id | statToPercentage:stat.amount }} {{ ('app:playerStats.' + stat.id) | i18next }}</span>
       }
       <span class="detail__sub">
         @if (equippedName(); as equipped) {

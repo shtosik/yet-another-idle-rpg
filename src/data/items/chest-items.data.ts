@@ -37,4 +37,29 @@ export const ChestItemsData: Partial<Record<ItemID, Item>> = {
       },
     ],
   },
+  [ItemID.apprenticeRobe]: {
+    id: ItemID.apprenticeRobe,
+    tier: ItemTier.uncommon,
+    url: './assets/img/items/apprenticeRobe.png',
+    value: 500,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.chest,
+    stats: [
+      { id: 'maxMana', amount: 2 },
+      { id: 'magicDamage', amount: 2 },
+    ],
+  },
+  [ItemID.sageRobe]: {
+    id: ItemID.sageRobe,
+    tier: ItemTier.rare,
+    url: './assets/img/items/sageRobe.png',
+    value: 330,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.chest,
+    stats: [
+      { id: 'maxMana', amount: 3 },
+      { id: 'magicDamage', amount: 5 },
+      { id: 'magicDamageMultiplier', amount: 0.1 },
+    ],
+  },
 }

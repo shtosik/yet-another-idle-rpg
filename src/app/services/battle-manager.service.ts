@@ -7,6 +7,7 @@ import { SkillNodeID } from '../../enums/ids/skill-node-id.enum'
 import { SpellID } from '../../enums/ids/spell-id.enum'
 import SPELLS_DATA from '../../data/spells-data'
 import { SpellType } from '../../enums/spell-type.enum'
+import { SpellDamageOverTimeEffectProps } from '../../interfaces/spell.interface'
 import { Enemy } from '../../interfaces/enemy.interface'
 import { ZONE_UNLOCK_NOTIFICATIONS } from '../../data/unlock-conditions'
 import { ModalService } from './modal.service'
@@ -102,16 +103,20 @@ export class BattleManagerService {
   }
 
   /**
-   * Equipped, off cooldown and affordable. Damage spells need a living enemy; buffs can be cast between fights
+   * Equipped, off cooldown, known (a gear spell: its gear is on) and affordable. Damage spells need a living enemy; buffs can be cast between fights
    * but not while already active.
    */
   canCast(spellId: SpellID): boolean {
     const slot = this.battleStore.equippedSpells().find(s => s?.spellId === spellId)
     if (!slot || slot.cooldownRemainingMs > 0 || !this.canAffordSpell(spellId)) return false
+    // A gear spell waiting out its cooldown after the gear came off.
+    if (!this.playerStore.knownSpellIds().includes(spellId)) return false
 
     if (SPELLS_DATA[spellId].effect.type === SpellType.buff) {
       return !this.battleStore.activeBuffs().some(b => b.spellId === spellId)
     }
+    if (SPELLS_DATA[spellId].effect.type === SpellType.damageOverTime
+      && this.battleStore.activeDamageOverTime().some(d => d.spellId === spellId)) return false
     return this.battleStore.isInCombat()
   }
 
@@ -128,6 +133,9 @@ export class BattleManagerService {
         break
       case SpellType.magic:
         this.doDamage(spellData.effect.baseDamage, false, spellData.effect.damageType)
+        break
+      case SpellType.damageOverTime:
+        this.battleStore.addDamageOverTime(spellId)
         break
       case SpellType.buff: {
         // The stat change itself is derived from activeBuffs (PlayerStore.stats).
@@ -157,6 +165,19 @@ export class BattleManagerService {
 
   tickSpells(deltaMs: number): void {
     this.battleStore.tickSpellTimers(deltaMs)
+  }
+
+  /** Damage over time only runs while an enemy is alive, so a respawn doesn't use it up; it goes on to the next enemy. */
+  tickDamageOverTime(deltaMs: number): void {
+    let remainingMs = deltaMs
+    // Hit by hit, so a kill stops the clock right there: the time and hits left wait for the next enemy.
+    while (remainingMs > 0 && this.battleStore.isInCombat()) {
+      const { spellId, usedMs } = this.battleStore.advanceDamageOverTime(remainingMs)
+      remainingMs -= usedMs
+      if (spellId === null) return
+      const { damagePerHit, damageType } = SPELLS_DATA[spellId].effect as SpellDamageOverTimeEffectProps
+      this.doDamage(damagePerHit, false, damageType)
+    }
   }
 
   /** Once per second: consumable effects and locks, then auto-eat. */

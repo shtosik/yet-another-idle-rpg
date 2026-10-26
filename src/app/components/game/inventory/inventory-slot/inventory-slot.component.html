@@ -25,13 +25,26 @@
 >
   <div class="item__tooltip">
     <span>{{ ('items:names.' + ItemID[item.id]) | i18next }}</span>
-    <span
-      [attr.data-tier]="ItemTier[tier]"
-      class="tier"
-    >{{ ('items:tiers.' + ItemTier[tier]) | i18next }}</span>
+    <span class="tier-line">
+      <span
+        [attr.data-tier]="ItemTier[tier]"
+        class="tier"
+      >{{ ('items:tiers.' + ItemTier[tier]) | i18next }}</span>
+      @if (item.slot === EquipmentSlot.weapon) {
+        @let element = DamageElement[item.damageType ?? DamageElement.physical];
+        <span aria-hidden="true">·</span>
+        <span
+          [attr.data-element]="element"
+          class="element"
+        >{{ ('bestiary:elements.' + element) | i18next }}</span>
+      }
+    </span>
     @if (item.type === ItemType.equipment) {
       @for (stat of $any(item.stats); track stat.id) {
         <span class="stat">{{ stat.id | statToPercentage:stat.amount }} {{ ('app:playerStats.' + stat.id) | i18next }}</span>
+      }
+      @if (item.spell !== undefined) {
+        <span class="stat">{{ 'items:grantsSpell' | i18next:{ spell: ('spells:names.' + SpellID[item.spell] + '.name') | i18next } }}</span>
       }
       @if (clickable) {
         <span class="click">{{ 'items:clickToEquip' | i18next }}</span>
@@ -39,7 +52,7 @@
     }
     @if (item.type === ItemType.rewardsStats) {
       @for (stat of $any(item.stats); track stat.id) {
-        <span class="stat">+{{ stat.id | statToPercentage:stat.amount }} {{ ('app:playerStats.' + stat.id) | i18next }}</span>
+        <span class="stat">{{ stat.id | statToPercentage:stat.amount }} {{ ('app:playerStats.' + stat.id) | i18next }}</span>
       }
       @if (clickable) {
         <span class="click">{{ 'items:rightClickToUse' | i18next }}</span>

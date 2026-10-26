@@ -45,4 +45,16 @@ export const NeckItemsData: Partial<Record<ItemID, Item>> = {
       },
     ],
   },
+  [ItemID.spellweaverAmulet]: {
+    id: ItemID.spellweaverAmulet,
+    tier: ItemTier.rare,
+    url: './assets/img/items/spellweaverAmulet.png',
+    value: 4000,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.amulet,
+    stats: [
+      { id: 'magicDamageMultiplier', amount: 0.15 },
+      { id: 'spellCooldownReduction', amount: 5 },
+    ],
+  },
 }

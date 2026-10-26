@@ -56,6 +56,7 @@ export class GameIntervalService {
         this.advanceCombat(deltaMs)
         this.playerStore.regenMana(deltaMs)
         this.battleManagerService.tickSpells(deltaMs)
+        this.battleManagerService.tickDamageOverTime(deltaMs)
 
         this.secondTimer += deltaMs
         while (this.secondTimer >= MS_PER_SECOND) {

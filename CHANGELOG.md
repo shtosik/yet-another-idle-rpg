@@ -24,6 +24,12 @@ New notes go under `[Unreleased]`; `npm run release -- <major|minor|patch>` move
 - [feature] Magic in the skill tree now starts with any of the four strike spells; Max Mana, Mana Regen, Magic Damage, Spell Crit and Spell Cooldown open once you have one.
 - [nerf] Monster weaknesses are spread across all elements instead of mostly fire: about six monsters each are weak to fire, water, air, earth and physical, and every zone mixes at least two. Seagulls, forest bears, harpies and giant eagles are no longer weak to physical attacks.
 - [bug] Bestiary: drop odds never show above 100%.
+- [feature] Magic gear: wands and staves for each element (Slime Wand, Ember Wand, Gale Staff, Rootwood Staff), robes, a hood, a mana ring and a spell-cooldown amulet. They drop from the Plains onward, sell in La Harpar and the Mawood Magic Shop, and the Rune Altar crafts a few. A staff's element also applies to your auto-attacks.
+- [feature] Stormcaller, a legendary staff from the Harpy Matriarch, teaches Thunderstorm while you hold it: a storm that strikes every 2 seconds for 10 seconds of fighting, pausing between enemies. Take the staff off and the spell leaves your spell bar once its cooldown is over.
+- [feature] A spell that's running (a buff or a storm) has a green border on the spell bar.
+- [feature] Item tooltips show a weapon's element.
+- [feature] Hovering a spell in the Spellbook shows its tooltip (mana, cooldown, what it does), like on the spell bar.
+- [bug] Item tooltips show mana regen and attack speed as seconds off ("-3s Mana Regen") instead of raw numbers, and every bonus has its sign.
 
 ## [0.1.0] - 2026-10-24
 - [feature] Battle: your hero auto-attacks through zone waves, with bosses, critical hits, strong hits and elemental weaknesses.

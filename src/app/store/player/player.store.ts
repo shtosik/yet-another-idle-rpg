@@ -37,6 +37,7 @@ import { canInstall, evaluateRecipe, installStations, Stations } from './camp'
 import { StationID } from '../../../enums/ids/station-id.enum'
 import { UNLOCK_RULES, UnlockCondition, UnlockTarget } from '../../../data/unlock-conditions'
 import { BattleStore } from '../battle/battle.store'
+import { EquippedSpell } from '../../../interfaces/spells/equipped-spell.interface'
 import {
   activeBuffSpellIds,
   activeConsumableItemIds,
@@ -135,6 +136,13 @@ const revealedEnemies = (kills: PlayerState['enemyKillCounts']): EnemyID[] =>
 const knownSpells = (spells: UnlockedSpellsType): SpellID[] =>
   (Object.keys(spells).map(Number) as SpellID[]).filter(id => (spells[id] ?? 0) > 0)
 
+/** Spells granted by equipped gear (`EquipmentItem.spell`). */
+const equipmentSpells = (equipment: EquipmentType): SpellID[] =>
+  Object.values(equipment).flatMap(equipped => {
+    const spell = equipped ? (ITEM_DATA[equipped.id] as EquipmentItem).spell : undefined
+    return spell === undefined ? [] : [spell]
+  })
+
 const unseen = <T>(ids: T[], seen: T[]): T[] => ids.filter(id => !seen.includes(id))
 
 const equipmentInventorySlots = (itemId: ItemID): number =>
@@ -212,13 +220,19 @@ export const PlayerStore = signalStore(
     }
   }),
   withComputed((store, battleStore = inject(BattleStore)) => {
-    /** Learned spells not on the spell bar and not yet viewed: what the Spellbook palette shows as new. */
+    /** Spells from the skill tree plus spells from equipped gear. */
+    const knownSpellIds = computed(() => [
+      ...new Set([...knownSpells(store.unlockedSpells()), ...equipmentSpells(store.equipment())]),
+    ])
+
+    /** Known spells not on the spell bar and not yet viewed: what the Spellbook palette shows as new. */
     const unseenSpells = computed(() => {
       const equipped = battleStore.equippedSpells().map(slot => slot?.spellId)
-      return unseen(knownSpells(store.unlockedSpells()), store.seenSpells()).filter(id => !equipped.includes(id))
+      return unseen(knownSpellIds(), store.seenSpells()).filter(id => !equipped.includes(id))
     })
 
     return {
+      knownSpellIds,
       unseenSpells,
       unseenSpellCount: () => unseenSpells().length,
     }
@@ -758,6 +772,19 @@ export const PlayerStore = signalStore(
         const { maxMana } = store.stats()
         if (store.resources().mana > maxMana) {
           patchState(store, (state) => ({ resources: { ...state.resources, mana: maxMana } }))
+        }
+      })
+
+      // A spell from gear leaves the spell bar with the gear (unequip, swap), but only once its cooldown is over: the
+      // slot stays locked meanwhile (no free slot for another spell), and re-equipping the gear keeps the cooldown.
+      const battleStore = inject(BattleStore)
+      const isGone = (slot: EquippedSpell | null, known: SpellID[]) =>
+        !!slot && !known.includes(slot.spellId) && slot.cooldownRemainingMs <= 0
+      effect(() => {
+        const known = store.knownSpellIds()
+        const bar = battleStore.equippedSpells()
+        if (bar.some(slot => isGone(slot, known))) {
+          battleStore.setAllEquippedSpells(bar.map(slot => isGone(slot, known) ? null : slot))
         }
       })
 

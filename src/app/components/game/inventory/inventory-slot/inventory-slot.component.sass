@@ -17,9 +17,17 @@
         flex-direction: column
         gap: 0.4rem
 
-        .tier
+        .tier-line
+            display: flex
+            justify-content: center
+            gap: 0.4rem
             font-size: .8rem
+
+        .tier
             @include mixins.textColorByTier
+
+        .element
+            @include mixins.textColorByElement
 
         .stat
             font-size: .9rem

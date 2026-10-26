@@ -151,4 +151,15 @@ export enum ItemID {
     venison = 134,
     venisonRoast = 135,
     venisonRoastRecipe = 136,
+    // magic gear
+    slimeWand = 137,
+    apprenticeRobe = 138,
+    emberWand = 139,
+    galeStaff = 140,
+    mysticHood = 141,
+    rootwoodStaff = 142,
+    manaRing = 143,
+    sageRobe = 144,
+    spellweaverAmulet = 145,
+    stormcaller = 146,
 }

@@ -55,6 +55,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     drops: [
       drop(ItemID.slimeResidue, 1, 2, 3),
       drop(ItemID.waterRune, 1, 1, 5),
+      drop(ItemID.slimeWand, 1, 1, 60),
       petDrop(EnemyID.blueSlime),
     ],
     shinyDrops: shinyPetDrops(EnemyID.blueSlime),
@@ -225,7 +226,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     weakness: DamageElement.water,
     experience: 36,
     gold: 18,
-    drops: [petDrop(EnemyID.goblinScout)],
+    drops: [drop(ItemID.emberWand, 1, 1, 80), petDrop(EnemyID.goblinScout)],
     shinyDrops: shinyPetDrops(EnemyID.goblinScout),
     url: './assets/img/enemies/goblinScout.png',
     enemyTypes: [EnemyType.goblin, EnemyType.humanoid],
@@ -237,7 +238,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     weakness: DamageElement.air,
     experience: 64,
     gold: 27,
-    drops: [drop(ItemID.vialOfWater, 1, 1, 8), petDrop(EnemyID.mountainBat)],
+    drops: [drop(ItemID.vialOfWater, 1, 1, 8), drop(ItemID.galeStaff, 1, 1, 80), petDrop(EnemyID.mountainBat)],
     shinyDrops: shinyPetDrops(EnemyID.mountainBat),
     url: './assets/img/enemies/mountainBat.png',
     enemyTypes: [EnemyType.mammal],
@@ -359,6 +360,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     drops: [
       drop(ItemID.elderSilk, 1, 2, 3),
       drop(ItemID.spiderFang, 1, 1, 4),
+      drop(ItemID.spellweaverAmulet, 1, 1, 60),
       petDrop(EnemyID.elderSpider),
     ],
     shinyDrops: shinyPetDrops(EnemyID.elderSpider),
@@ -482,6 +484,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     gold: 2880,
     drops: [
       drop(ItemID.matriarchPlume, 1, 1, 1),
+      drop(ItemID.stormcaller, 1, 1, 20),
       drop(ItemID.stoneArrow, 2, 5, 1),
       drop(ItemID.harpyCrown, 1, 1, 10),
       drop(ItemID.airRune, 2, 4, 2),

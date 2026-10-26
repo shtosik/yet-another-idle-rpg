@@ -6,6 +6,13 @@ export interface EquippedSpell {
   cooldownRemainingMs: number
 }
 
+/** A damage-over-time spell running; `msElapsed` counts combat time only. */
+export interface ActiveDamageOverTime {
+  spellId: SpellID
+  msElapsed: number
+  hits: number
+}
+
 export interface ActiveBuff {
   spellId: SpellID
   msRemaining: number

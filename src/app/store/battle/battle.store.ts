@@ -1,7 +1,7 @@
 import { patchState, signalStore, withComputed, withHooks, withMethods, withState } from '@ngrx/signals'
 import { ZoneID } from 'enums/ids/zone-id.enum'
 import { Enemy } from 'interfaces/enemy.interface'
-import { ActiveBuff, EquippedSpell } from '../../../interfaces/spells/equipped-spell.interface'
+import { ActiveBuff, ActiveDamageOverTime, EquippedSpell } from '../../../interfaces/spells/equipped-spell.interface'
 import ZONES_DATA from 'data/zones-data'
 import ENEMIES_DATA from 'data/enemies-data'
 import { SpellID } from '../../../enums/ids/spell-id.enum'
@@ -11,6 +11,10 @@ import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
 import { toShinyUrl } from 'utils/shiny-url'
 import { waveMultipliers } from './wave-scaling'
 import { ActiveConsumable, CONSUMABLE_SLOTS, ConsumableSlot } from '../../../interfaces/consumable.interface'
+import SPELLS_DATA from '../../../data/spells-data'
+import { SpellDamageOverTimeEffectProps } from '../../../interfaces/spell.interface'
+
+const MS_PER_SECOND = 1000
 
 export interface BattleState {
   isInCombat: boolean;
@@ -22,6 +26,7 @@ export interface BattleState {
   autoWaveProgressionEnabled: boolean;
   equippedSpells: (EquippedSpell | null)[];
   activeBuffs: ActiveBuff[];
+  activeDamageOverTime: ActiveDamageOverTime[];
   isShinyEnemy: boolean;
   consumableSlots: Record<ConsumableSlot, ActiveConsumable | null>;
   autoEatEnabled: boolean;
@@ -36,6 +41,7 @@ export const initialState: BattleState = {
   autoWaveProgressionEnabled: false,
   equippedSpells: [null, null, null, null, null],
   activeBuffs: [],
+  activeDamageOverTime: [],
   isShinyEnemy: false,
   consumableSlots: { food: null, potion: null },
   autoEatEnabled: false,
@@ -181,6 +187,45 @@ export const BattleStore = signalStore(
       patchState(store, (state) => ({
         activeBuffs: [...state.activeBuffs.filter(b => b.spellId !== buff.spellId), buff],
       }))
+    },
+
+    addDamageOverTime(spellId: SpellID): void {
+      patchState(store, (state) => ({
+        activeDamageOverTime: [...state.activeDamageOverTime.filter(d => d.spellId !== spellId), { spellId, msElapsed: 0, hits: 0 }],
+      }))
+    },
+
+    /**
+     * Advances running damage-over-time spells up to the next hit, at most `maxMs` of combat. Returns the spell that
+     * hits there (null when none is due within `maxMs`) and the time used, so the caller can stop at a kill and the
+     * rest waits for the next enemy. A spell ends after its last hit (`duration` / `interval` hits).
+     */
+    advanceDamageOverTime(maxMs: number): { spellId: SpellID | null, usedMs: number } {
+      const running = store.activeDamageOverTime()
+      if (!running.length) return { spellId: null, usedMs: maxMs }
+
+      const timing = (spellId: SpellID) => {
+        const { duration, interval } = SPELLS_DATA[spellId].effect as SpellDamageOverTimeEffectProps
+        return { intervalMs: interval * MS_PER_SECOND, totalHits: Math.round(duration / interval) }
+      }
+      const usedMs = Math.min(maxMs, ...running.map(a => Math.max(0, (a.hits + 1) * timing(a.spellId).intervalMs - a.msElapsed)))
+
+      let spellId: SpellID | null = null
+      const next = running.flatMap(active => {
+        const { intervalMs, totalHits } = timing(active.spellId)
+        const advanced = { ...active, msElapsed: active.msElapsed + usedMs }
+        if (spellId === null && advanced.msElapsed >= (advanced.hits + 1) * intervalMs) {
+          spellId = active.spellId
+          advanced.hits++
+        }
+        return advanced.hits < totalHits ? [advanced] : []
+      })
+      patchState(store, { activeDamageOverTime: next })
+      return { spellId, usedMs }
+    },
+
+    clearDamageOverTime(): void {
+      patchState(store, { activeDamageOverTime: [] })
     },
 
     /** Advances spell cooldowns and buffs by `deltaMs`. Writes only when something is running. */
