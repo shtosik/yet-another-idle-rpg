@@ -7,7 +7,7 @@ Towns are non-combat hubs. Each town has **buildings**; a building holds NPCs (d
 - `src/data/towns-data.ts:TOWNS_DATA` — per town: `regionId`, background `url`, `buildings[]` (`buildingId`, `position` of the button on the town view, `npcs` with positions, `url` background, optional `zoneId` and `questRequirement`).
 - `src/enums/map/town-id.enum.ts:TownID`, `town-building-id.enum.ts:TownBuildingID`, `npc-id.enum.ts:NpcID`, `region-id.enum.ts:RegionID`.
 - `src/interfaces/town.interface.ts:Town`, `TownBuilding`.
-- `src/app/store/towns/towns.store.ts:TownsStore` — `selectedTownId`, `selectedTownBuilding`, `activeShopId`.
+- `src/app/store/towns/towns.store.ts:TownsStore` — `selectedTownId`, `selectedTownBuildingId` (computed `selectedTownBuilding` from `TOWNS_DATA`), `activeShopId` (not saved).
 - `src/app/components/game/town/towns.component.ts` — town view, building buttons, shop/building switch; `town-building/`, `npc-frame/`, `shop/`.
 - `src/data/shops-data.ts:SHOPS_DATA`, `src/types/shop/shop.type.ts:Shop`/`ShopItem` — static stock: `itemId`, `tier`, `price`, `maxStock`, `refreshable`, `minRank`; per shop `currency` (gold or `explorerTokens`), `buys` (item kinds it buys) and `sellMultipliers`.
 - `src/app/store/shop/shop-prices.ts:sellPrice` — what a shop pays for an item.
@@ -30,7 +30,7 @@ Towns are non-combat hubs. Each town has **buildings**; a building holds NPCs (d
 ## Invariants & gotchas
 - `TownBuildingID` keys name the building's i18n label (`map:buildings.<key>`) and its button; a zone entrance has no `url`.
 - Runtime shop items are aligned with `SHOPS_DATA[shop].items` by index after `ensureShop`; `buyItem` and refresh use the index.
-- `activeShopId` and the selected building are saved, so a shop can reopen after reload. Selecting a town or building (including leaving the town tab, which clears both) closes the shop.
+- The selected town and building id are saved; `activeShopId` isn't, so a reload never reopens a shop. Selecting a town or building (including leaving the town tab, which clears both) closes the shop; selecting a town also clears the building.
 
 ## Known issues
 - The town picker hard-codes La Harpar; other towns are reached only from the world map.

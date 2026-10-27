@@ -1,0 +1,68 @@
+@use 'mixins'
+@use 'palette'
+
+:host
+    @include mixins.panel
+    flex-direction: column
+    gap: 1.25rem
+    overflow-y: auto
+
+.settings
+    &__title
+        color: palette.$yellow
+        margin: 0
+
+    &__group
+        display: flex
+        flex-direction: column
+        gap: 0.5rem
+
+        p
+            margin: 0
+
+    &__heading
+        margin: 0
+        font-size: 1.1rem
+
+    &__hint
+        font-size: 0.85rem
+        opacity: 0.75
+
+    &__warning
+        color: palette.$red
+        font-size: 0.85rem
+
+    &__actions
+        display: flex
+        gap: 0.5rem
+        flex-wrap: wrap
+
+    &__button
+        @include mixins.button
+        margin: 0
+        font-size: 1rem
+
+        &--danger
+            color: palette.$red
+            border-color: palette.$red
+
+    // Pinned to the bottom of the panel.
+    &__footer
+        margin-top: auto
+        display: flex
+        align-items: center
+        justify-content: space-between
+        gap: 0.5rem
+        padding-top: 0.75rem
+        border-top: 1px solid rgba(palette.$yellow, 0.25)
+
+    &__version
+        font-size: 0.85rem
+        opacity: 0.75
+
+    &__confirm
+        display: flex
+        flex-direction: column
+        gap: 0.5rem
+        padding: 0.75rem
+        border: 1px solid rgba(palette.$red, 0.5)

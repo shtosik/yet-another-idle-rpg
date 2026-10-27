@@ -20,6 +20,9 @@
             "browser": "src/main.ts",
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "sass",
+            "loader": {
+              ".md": "text"
+            },
             "assets": [
               {
                 "glob": "**/*",
@@ -56,9 +59,25 @@
                 {
                   "replace": "src/app/store/helpers/devtools.ts",
                   "with": "src/app/store/helpers/devtools.prod.ts"
+                },
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
                 }
               ],
               "outputHashing": "all"
+            },
+            "testing": {
+              "fileReplacements": [
+                {
+                  "replace": "src/app/store/helpers/devtools.ts",
+                  "with": "src/app/store/helpers/devtools.prod.ts"
+                },
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.testing.ts"
+                }
+              ]
             },
             "development": {
               "optimization": false,

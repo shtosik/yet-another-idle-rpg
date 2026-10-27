@@ -194,6 +194,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     gold: 14,
     drops: [
       drop(ItemID.deerPelt, 1, 1, 4),
+      drop(ItemID.venison, 1, 1, 3),
       petDrop(EnemyID.deer),
     ],
     shinyDrops: shinyPetDrops(EnemyID.deer),
@@ -247,7 +248,12 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     weakness: DamageElement.physical,
     experience: 70,
     gold: 27,
-    drops: [drop(ItemID.deerPelt, 1, 1, 4), petDrop(EnemyID.goat)],
+    drops: [
+      drop(ItemID.deerPelt, 1, 1, 4),
+      petDrop(EnemyID.goat),
+      drop(ItemID.venison, 1, 1, 3),
+      drop(ItemID.venisonRoastRecipe, 1, 1, 12),
+    ],
     shinyDrops: shinyPetDrops(EnemyID.goat),
     url: './assets/img/enemies/goat.png',
     enemyTypes: [EnemyType.mammal],

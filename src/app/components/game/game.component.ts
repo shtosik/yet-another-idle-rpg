@@ -4,7 +4,6 @@ import { GameNavigationService } from '../../services/game-navigation.service'
 import { UnlockService } from '../../services/unlock.service'
 import { GameTab } from 'enums/ids/game-tab.enum'
 import { AsyncPipe, CommonModule } from '@angular/common'
-import { PlayerStat } from '../../../types/player/player-stat.type'
 import { TownsComponent } from './town/towns.component'
 import { InventoryWindow } from './inventory/inventory.component'
 import { EquipmentComponent } from './equipment/equipment.component'
@@ -26,9 +25,9 @@ import { ShopStore } from '../../store/shop/shop.store'
 import { CampStore } from '../../store/camp/camp.store'
 import { OfflineStore } from '../../store/offline/offline.store'
 import { SpellbookComponent } from './spellbook/spellbook.component'
-import { ZoneID } from 'enums/ids/zone-id.enum'
-import { ItemID } from 'enums/ids/item-id.enum'
-import { ItemTier } from 'enums/items/item-tier.enum'
+import { DevCheatsComponent } from './dev-cheats/dev-cheats.component'
+import { SettingsComponent } from './settings/settings.component'
+import { environment } from '../../../environments/environment'
 
 const imports = [
   PanelComponent,
@@ -55,6 +54,8 @@ const imports = [
     BestiaryComponent,
     SpellbookComponent,
     CampComponent,
+    DevCheatsComponent,
+    SettingsComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -76,40 +77,9 @@ export class GameComponent {
   hasDialogueActive = computed(() => this.dialogueManagerService.activeNpc())
 
   readonly GameTab = GameTab
-
-  resetState() {
-    this.playerStore.resetState()
-    this.battleStore.resetState()
-    this.questsStore.resetState()
-    this.townsStore.resetState()
-    this.shopStore.resetState()
-    this.campStore.resetState()
-    this.offlineStore.resetState()
-  }
-
-  resetQuests() {
-    this.questsStore.resetState()
-  }
-
-  resetShops() {
-    this.shopStore.resetState()
-  }
+  readonly cheats = environment.cheats
 
   changeTab(tab: GameTab) {
     this.navigation.changeTab(tab)
-  }
-
-  giveStat(stat: PlayerStat) {
-    this.playerStore.updatePlayerStats([{ stat, amount: 1000 }])
-  }
-
-  unlockAllZones() {
-    for (const id of Object.values(ZoneID)) {
-      if (typeof id === 'number') this.playerStore.unlockZone(id)
-    }
-  }
-
-  giveMachete() {
-    this.playerStore.addItems([{ id: ItemID.machete, tier: ItemTier.uncommon, amount: 1 }])
   }
 }
