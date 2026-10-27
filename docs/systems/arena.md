@@ -29,7 +29,7 @@ A timed gauntlet in Lirold: 20 fixed Waves against one clock, for a gold fee. Cl
 
 ## Invariants & gotchas
 - **The clock is wall time** (`Date.now()`), saved as `startedAt`/`endsAt`, so it runs while the game is closed and a run that expired offline ends on the first tick back (owner decision). A changed system clock moves it too.
-- **No offline progress for an arena run**: `OfflineProgressService.claim` skips the simulation while `arenaRun` is set, so the time away earns no Zone kills (owner decision). Spell and buff timers still run out.
+- **Offline**: a run that ran out while away ends as a timeout at its `endsAt`, and the rest of the absence is claimed as normal offline progress in the Zone the player entered from (`currentZoneId`/`currentWave` stay on it during a run; owner decision: no lost progress). A claim while the run is still going earns nothing. Spell and buff timers still run out.
 - `currentZoneId`/`currentWave` stay the Zone the player came from during a run; code that reads them for rewards must check `arenaRun` first.
 - A Leave or timeout keeps the XP and gold already paid per kill; the fee is never refunded.
 

@@ -9,6 +9,8 @@ import { ARENA } from '../../data/arena-data'
 import ENEMIES_DATA from '../../data/enemies-data'
 import { ItemID } from '../../enums/ids/item-id.enum'
 import { ZoneID } from '../../enums/ids/zone-id.enum'
+import { OfflineProgressService } from './offline-progress.service'
+import { OfflineStore } from '../store/offline/offline.store'
 
 describe('ArenaService', () => {
   let arena: ArenaService
@@ -88,5 +90,20 @@ describe('ArenaService', () => {
     expect(arena.run()?.kills).toBe(1)
     expect(playerStore.stats().goldCoins).toBeGreaterThan(goldBefore)
     expect(playerStore.zonesProgression()).toEqual({})
+  })
+
+  it('a run that ran out while away ends at its end time; the rest is claimed in the zone', async () => {
+    const hours = 5 * 60 * 60 * 1000
+    spyOn(window, 'fetch').and.resolveTo(new Response(null, { headers: { Date: new Date(hours).toUTCString() } }))
+    const welcomeBack = spyOn(TestBed.inject(ModalService), 'openWelcomeBack')
+    TestBed.inject(OfflineStore).setLastSeen(0)
+    arena.enter(0)
+
+    await TestBed.inject(OfflineProgressService).claim()
+
+    expect(arena.run()).toBeNull()
+    expect(openResult).toHaveBeenCalledWith(jasmine.objectContaining({ outcome: 'timeout', timeMs: ARENA.timeLimitMs }))
+    expect(welcomeBack).toHaveBeenCalled()
+    expect(playerStore.zonesProgression()[ZoneID.horseshoeBeach]).toBeDefined()
   })
 })
