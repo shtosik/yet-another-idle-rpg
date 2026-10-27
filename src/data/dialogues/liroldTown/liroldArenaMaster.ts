@@ -16,6 +16,7 @@ export enum ArenaMasterDialogue {
   aboutLudo,
   claimed,
   running,
+  cooldown,
 }
 
 export type LiroldArenaMasterDialogueType = Record<ArenaMasterDialogue, DialogueNode<ArenaMasterDialogue>>
@@ -67,7 +68,7 @@ const LIROLD_ARENA_MASTER: LiroldArenaMasterDialogueType = {
         responseKey: `${NS}:default.fight`,
         results: [
           {
-            visibilityConditions: [{ type: 'arena', state: 'idle', hidden: true }],
+            visibilityConditions: [{ type: 'arena', state: 'ready', hidden: true }],
             next: ArenaMasterDialogue.default,
             closeDialogue: true,
             effects: [
@@ -76,7 +77,9 @@ const LIROLD_ARENA_MASTER: LiroldArenaMasterDialogueType = {
             ],
           },
           // A run is already going on (the player walked back to town mid-fight).
-          { next: ArenaMasterDialogue.running },
+          { visibilityConditions: [{ type: 'arena', state: 'running', hidden: true }], next: ArenaMasterDialogue.running },
+          // The 30-minute entry cooldown.
+          { next: ArenaMasterDialogue.cooldown },
         ],
       },
       { responseKey: `${NS}:default.rules`, results: [{ next: ArenaMasterDialogue.rules }] },
@@ -153,6 +156,14 @@ const LIROLD_ARENA_MASTER: LiroldArenaMasterDialogueType = {
     messageKey: `${NS}:running.message`,
     options: [
       { responseKey: `${NS}:running.ok`, results: [{ next: ArenaMasterDialogue.default, closeDialogue: true }] },
+    ],
+  },
+
+  [ArenaMasterDialogue.cooldown]: {
+    id: ArenaMasterDialogue.cooldown,
+    messageKey: `${NS}:cooldown.message`,
+    options: [
+      { responseKey: `${NS}:cooldown.ok`, results: [{ next: ArenaMasterDialogue.default }] },
     ],
   },
 }

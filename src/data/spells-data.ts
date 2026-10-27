@@ -79,6 +79,19 @@ const SPELLS_DATA: Record<SpellID, SpellProps> = {
       percent: true,
     },
   },
+  // From the Arena Chest's War Cry Scroll only.
+  [SpellID.warCry]: {
+    id: SpellID.warCry,
+    baseManaCost: 3,
+    baseCooldown: 60,
+    url: './assets/img/skills/warCry.png',
+    effect: {
+      type: SpellType.buff,
+      duration: 15,
+      stat: 'meleeDamageMultiplier',
+      amount: 0.25,
+    },
+  },
   [SpellID.ambush]: {
     id: SpellID.ambush,
     baseManaCost: 2,

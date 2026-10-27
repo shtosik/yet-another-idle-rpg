@@ -26,6 +26,8 @@ const boss = (enemyId: EnemyID): ArenaWave => ({ enemies: [enemyId], count: 1 })
 export const ARENA = {
   entryFee: 10000,
   timeLimitMs: 10 * 60 * 1000,
+  /** From one entry to the next (owner decision). */
+  entryCooldownMs: 30 * 60 * 1000,
   /** Replaces the zones' 2 s respawn delay inside the arena. */
   respawnDelayMs: 500,
   waves: [

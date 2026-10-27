@@ -21,10 +21,10 @@ export type DialogueCondition = { hidden?: boolean } & (
   | ArenaCondition
   )
 
-/** No arena run going on / clear rewards waiting to be claimed. */
+/** Ready to enter (no run, cooldown over) / a run going on / clear rewards waiting to be claimed. */
 interface ArenaCondition {
   type: 'arena'
-  state: 'idle' | 'rewardsWaiting'
+  state: 'ready' | 'running' | 'rewardsWaiting'
 }
 
 /** A dialogue flag (set by a `flag` effect) is set, or with `isSet: false`, not set yet. */

@@ -61,8 +61,11 @@ describe('ArenaService', () => {
     expect(countOf(ItemID.moltenCape)).toBe(1)
     expect(countOf(ItemID.skillPointBook)).toBe(2)
 
-    arena.enter(0)
-    killThrough(totalKills)
+    // The next entry waits out the 30-minute cooldown.
+    arena.enter(ARENA.entryCooldownMs - 1)
+    expect(arena.run()).toBeNull()
+    arena.enter(ARENA.entryCooldownMs)
+    killThrough(totalKills, ARENA.entryCooldownMs + 1000)
     arena.claimRewards()
     expect(countOf(ItemID.moltenCape)).toBe(2)
     expect(countOf(ItemID.skillPointBook)).toBe(2)

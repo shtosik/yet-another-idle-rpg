@@ -5,7 +5,7 @@ import { QuestID } from 'enums/ids/quest-id.enum'
 import { Enemy } from 'interfaces/enemy.interface'
 import { EnemyDrop } from 'interfaces/enemy-drop.interface'
 import { EnemyType } from '../enums/enemy-type.enum'
-import { petDrop, shinyPetDrops } from './items/pet-items.data'
+import { arenaPetDrop, petDrop, shinyPetDrops } from './items/pet-items.data'
 
 /** One drop-table row: `chance` is 1 in N per roll. */
 const drop = (id: ItemID, minAmount: number, maxAmount: number, chance: number): EnemyDrop => ({
@@ -499,13 +499,13 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     url: './assets/img/enemies/harpyMatriarch.png',
     enemyTypes: [EnemyType.harpy, EnemyType.bird],
   },
-  // ── Combat Arena (Lirold): arena-only, no drops; the clear rewards are the arena's ──
+  // ── Combat Arena (Lirold): arena-only; each champion drops only its pet ──
   [EnemyID.arenaBrute]: {
     id: EnemyID.arenaBrute,
     maxHp: 900,
     experience: 540,
     gold: 270,
-    drops: [],
+    drops: [arenaPetDrop(EnemyID.arenaBrute)],
     url: './assets/img/enemies/arenaBrute.png',
     enemyTypes: [EnemyType.human, EnemyType.humanoid],
   },
@@ -514,7 +514,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     maxHp: 500,
     experience: 300,
     gold: 150,
-    drops: [],
+    drops: [arenaPetDrop(EnemyID.arenaArcanist)],
     url: './assets/img/enemies/arenaArcanist.png',
     enemyTypes: [EnemyType.human, EnemyType.humanoid],
   },
@@ -523,7 +523,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     maxHp: 700,
     experience: 420,
     gold: 210,
-    drops: [],
+    drops: [arenaPetDrop(EnemyID.arenaBurrower)],
     url: './assets/img/enemies/arenaBurrower.png',
     enemyTypes: [EnemyType.mammal],
   },
@@ -532,7 +532,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     maxHp: 1200,
     experience: 720,
     gold: 360,
-    drops: [],
+    drops: [arenaPetDrop(EnemyID.arenaYad)],
     url: './assets/img/enemies/arenaYad.png',
     enemyTypes: [EnemyType.humanoid],
   },

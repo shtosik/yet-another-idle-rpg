@@ -794,6 +794,13 @@
     "seed": 358365248,
     "date": "2026-10-26"
   },
+  "src/assets/img/items/patronGloves.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a pair of fine crimson leather gloves with round gold coin studs along the cuffs and gold stitching",
+    "seed": 1491485296,
+    "date": "2026-10-27"
+  },
   "src/assets/img/items/rootwoodStaff.png": {
     "family": "item-pixel",
     "tier": null,
@@ -974,6 +981,13 @@
     "subject": "a single long whip of blue and teal seawater lashing through the air in a sweeping curved arc, white foam and spray flying from its tip, on a deep blue background",
     "seed": 1215728485,
     "date": "2026-10-25"
+  },
+  "src/assets/img/skills/warCry.png": {
+    "family": "skill-icon",
+    "tier": null,
+    "subject": "a roaring warrior's wide open mouth shouting a battle cry, with curved red-orange sound waves bursting outward, crimson and gold colours",
+    "seed": 166127394,
+    "date": "2026-10-27"
   },
   "src/assets/img/skills/waterMastery.png": {
     "family": "skill-icon",

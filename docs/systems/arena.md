@@ -19,6 +19,11 @@ A timed gauntlet in Lirold: 20 fixed Waves against one clock, for a gold fee. Cl
 4. **End**: cleared, `timeout` (`tick` sees `now >= endsAt`) or `left` (Leave). `endArenaRun` clears the run (the zone fight respawns where the player left it); a clear counts in `arenaClears`, may set `arenaBestTimeMs`, and adds the clear rewards (plus the first-clear books) to `arenaRewards`. The result modal shows time, kills, XP, gold and the rewards.
 5. **Claim**: the modal's Claim, or the Arena Master's claim option (`arena` `claim` effect), moves `arenaRewards` into the inventory, only when all of it fits (owner rule). Rewards wait, saved, until then.
 
+## Entry cooldown, drops and the chest
+- **Cooldown**: 30 minutes from one entry to the next (`ARENA.entryCooldownMs`, saved `arenaReadyAt`, owner decision). `ArenaService.isReady` gates `enter`; Ludo's fight option falls back to a "come back later" node.
+- **Champion pets**: each champion drops its own pet at 1 in 50 per kill (`arenaPetDrop`, `ARENA_PET_DROP_CHANCE`); never shiny, since the arena rolls no shinies. `onKill` rolls the champion's drops; a full inventory loses them, like any drop.
+- **Arena Chest** (every clear): 4 picks; gold 3,000–6,000, Elder Silk, Harpy Feathers, Ancient Wood, mana potions, runes, the Hunter's Feast recipe, and two rare chest-only rewards: the War Cry Scroll (buff spell, +25% melee damage for 15 s) and Patron's Gloves (+10% gold and XP; a drops-and-progress choice against power gloves). Sized so a clear pays more than the fee.
+
 ## Champions' abilities
 `ArenaService.tick` runs `ArenaBossesService.tick` every game tick; a champion fight starts its timers when the champion is first seen alive. `doDamage` skips a hit on a burrowed champion and passes every other arena hit through `modifyHit` (after `resolveHit`). Numbers live in `ARENA_BOSSES`.
 - **The Brute** (wave 5): a weak point shows on the sprite 5 s in, for 3 s; clicking it gives +50% damage for 10 s. The next one comes 30 s after it was clicked or expired.

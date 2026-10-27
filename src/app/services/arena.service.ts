@@ -1,3 +1,5 @@
+import { rollEnemyDrops } from '../store/player/kill-rewards'
+import { InventoryItem } from '../../interfaces/item.interface'
 import { computed, inject, Injectable, Injector, signal } from '@angular/core'
 import { BattleStore } from '../store/battle/battle.store'
 import { PlayerStore } from '../store/player/player.store'
@@ -42,8 +44,13 @@ export class ArenaService {
   })
 
   /** Starts a run and shows the fight. The entry fee is the caller's (the Arena Master's `stat` deduct). */
+  /** No run going on and the entry cooldown is over. */
+  isReady(now = Date.now()): boolean {
+    return !this.run() && now >= this.battleStore.arenaReadyAt()
+  }
+
   enter(now = Date.now()): void {
-    if (this.run()) return
+    if (!this.isReady(now)) return
     this.battleStore.startArenaRun(now)
     this.injector.get(GameNavigationService).changeTab(GameTab.main)
   }
@@ -58,6 +65,10 @@ export class ArenaService {
       { stat: 'goldCoins', amount: gold },
     ])
     this.battleStore.recordArenaKill(experience, gold)
+    // Champions' pets; lost on a full inventory, like any drop.
+    const drops = new Map<string, InventoryItem>()
+    rollEnemyDrops(enemy, 1, false, 0, drops)
+    if (drops.size) this.playerStore.addItems([...drops.values()])
 
     if (this.run()!.wave > ARENA.waves.length) this.finish('cleared', now)
   }

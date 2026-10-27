@@ -166,7 +166,13 @@
         "gnollWarbelt": "Gnoll Warbelt",
         "ambushScroll": "Ambush Scroll",
         "moltenCape": "Molten Cape",
-        "arenaChest": "Arena Chest"
+        "arenaChest": "Arena Chest",
+        "warCryScroll": "War Cry Scroll",
+        "patronGloves": "Patron's Gloves",
+        "petArenaBrute": "Pet Brute",
+        "petArenaArcanist": "Pet Arcanist",
+        "petArenaBurrower": "Pet Burrower",
+        "petArenaYad": "Pet Yad"
     },
     "tiers": {
         "trash": "Trash",
@@ -197,7 +203,7 @@
         "needsPrevious": "Needs {{station}} Lv {{level}} first"
     },
     "teachesSpell": "Teaches the spell {{spell}}",
-    "chestRolls": "Holds {{count}} rewards: gold, materials, potions or a recipe",
+    "chestRolls": "Holds {{count}} rewards: gold, materials, runes, potions, a recipe, a spell or gear",
     "chestOpened": "Chest opened!",
     "chestFull": "Not enough inventory space to open the chest. Make room and try again.",
     "chestOk": "Nice"

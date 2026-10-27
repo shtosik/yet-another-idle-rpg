@@ -222,7 +222,12 @@ export class DialogueManagerService {
         }
         return false
       case 'arena':
-        return c.state === 'idle' ? !this.battleStore.arenaRun() : this.battleStore.arenaRewards().length > 0
+        switch (c.state) {
+          case 'ready': return this.arenaService.isReady()
+          case 'running': return !!this.battleStore.arenaRun()
+          case 'rewardsWaiting': return this.battleStore.arenaRewards().length > 0
+        }
+        return false
       default:
         return false
     }
