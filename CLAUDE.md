@@ -4,7 +4,7 @@
 
 **Ask me** a clarifying question when a requirement or the architecture is unclear from the existing files.
 
-**Before changing game behavior**, find its system doc in `docs/systems/README.md`; update that doc in the same commit.
+**Before changing game behavior** (combat, saves, stats, inventory, drops, gold, dialogue, quests, skill tree, spells, crafting, offline progress, zones, towns, shops, enemies, pets, world map, translations, art), find its system doc in `docs/systems/README.md`; update that doc in the same commit.
 
 **Player-facing change** → add a note under `## [Unreleased]` in `CHANGELOG.md`: `- [feature|bug|buff|nerf] text`, plain English for players. Releases own the `package.json` `version`; release, deploy and environment steps are in `docs/deployment.md`.
 
