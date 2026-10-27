@@ -391,6 +391,8 @@ for (const f of [...walkFiles(join(SRC, 'app'), '.ts'), ...walkFiles(join(SRC, '
 
 const DOC_FILES = [
   join(ROOT, 'CLAUDE.md'),
+  join(ROOT, 'CODING_STANDARDS.md'),
+  join(ROOT, 'docs', 'git-workflow.md'),
   ...(existsSync(join(ROOT, 'docs', 'systems')) ? walkFiles(join(ROOT, 'docs', 'systems'), '.md') : []),
   // angular-developer is a vendored generic skill; its paths describe other projects.
   ...walkFiles(join(ROOT, '.claude', 'skills'), '.md').filter(f => !/[\\/]angular-developer[\\/]/.test(f)),
