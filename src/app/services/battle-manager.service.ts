@@ -1,3 +1,4 @@
+import { ArenaService } from './arena.service'
 import { WeaponCategory } from '../../enums/weapon-category.enum'
 import { computed, inject, Injectable } from '@angular/core'
 import { BattleStore } from '../store/battle/battle.store'
@@ -27,6 +28,7 @@ const MS_PER_SECOND = 1000
 @Injectable({ providedIn: 'root' })
 export class BattleManagerService {
   private battleStore = inject(BattleStore)
+  private arenaService = inject(ArenaService)
   private playerStore = inject(PlayerStore)
   private questsStore = inject(QuestsStore)
   private animations = inject(AnimationsService)
@@ -232,6 +234,13 @@ export class BattleManagerService {
   }
 
   private handleEnemyDeath(enemy: Enemy) {
+    // Arena kills pay only XP and gold: no zone progress, kill counts, drops, tasks or offline kill rate.
+    if (this.battleStore.arenaRun()) {
+      this.battleStore.endBattle()
+      this.arenaService.onKill(enemy)
+      return
+    }
+
     const zoneId = this.battleStore.currentZoneId()
     const wave = this.battleStore.currentWave()
 

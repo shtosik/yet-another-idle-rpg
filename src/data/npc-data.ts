@@ -11,6 +11,7 @@ import MAWOOD_FINN from './dialogues/mawoodTown/mawoodFinn'
 import MAWOOD_BRENN from './dialogues/mawoodTown/mawoodBrenn'
 import MAWOOD_MILO from './dialogues/mawoodTown/mawoodMilo'
 import MAWOOD_ELARION from './dialogues/mawoodTown/mawoodElarion'
+import NORTH_LIROLD_ARENA_MASTER from './dialogues/northLiroldTown/northLiroldArenaMaster'
 
 export interface NPCProps {
   id: NpcID
@@ -83,6 +84,12 @@ const NPC_Data: Record<number, NPCProps> = {
     id: NpcID.mawoodElarion,
     url: './assets/img/avatars/mawood/mawoodElarion.png',
     dialogue: MAWOOD_ELARION,
+    firstMeetNodeId: 1,
+  },
+  [NpcID.northLiroldArenaMaster]: {
+    id: NpcID.northLiroldArenaMaster,
+    url: './assets/img/avatars/northLirold/northLiroldArenaMaster.png',
+    dialogue: NORTH_LIROLD_ARENA_MASTER,
     firstMeetNodeId: 1,
   },
 }

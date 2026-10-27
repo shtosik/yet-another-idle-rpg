@@ -10,18 +10,34 @@ import { isTaskDone, PlayerStore } from '../../../../store/player/player.store'
 import ENEMIES_DATA from '../../../../../data/enemies-data'
 import { NgOptimizedImage } from '@angular/common'
 import { ZoneMasteryComponent } from './zone-mastery/zone-mastery.component'
+import { DurationPipe } from '../../../../pipes/duration.pipe'
+import { ArenaService } from '../../../../services/arena.service'
+import { ARENA } from '../../../../../data/arena-data'
 
 @Component({
   selector: 'app-battle-nav-bar',
   templateUrl: 'battle-nav-bar.component.html',
   styleUrls: ['./battle-nav-bar.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, I18nextPipe, NgOptimizedImage, ZoneMasteryComponent],
+  imports: [CommonModule, I18nextPipe, NgOptimizedImage, ZoneMasteryComponent, DurationPipe],
 })
 export class BattleNavBarComponent {
   private battleStore = inject(BattleStore)
   private battleManagerService = inject(BattleManagerService)
   private playerStore = inject(PlayerStore)
+  private arenaService = inject(ArenaService)
+
+  arenaRun = this.arenaService.run
+  arenaSeconds = this.arenaService.remainingSeconds
+  arenaWaveKills = computed(() => {
+    const run = this.arenaRun()
+    return run ? ARENA.waves[run.wave - 1]?.count ?? 0 : 0
+  })
+  readonly arenaWaveCount = ARENA.waves.length
+
+  leaveArena(): void {
+    this.arenaService.leave()
+  }
 
   currentWave = this.battleStore.currentWave
   requiredKillCount = this.battleStore.requiredKillCountOnCurrentWave

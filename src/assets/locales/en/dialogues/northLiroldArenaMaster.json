@@ -1,0 +1,26 @@
+{
+  "intro1": {
+    "message": "A new face! Welcome to the Arena of North Lirold. I'm Varek. Thirty years I bled on that sand, and now I keep the gate. You look like you've cut down a troll or two. Want to know how it works here?",
+    "opt1": "Tell me."
+  },
+  "default": {
+    "message": "The sand's raked and the crowd's restless. You here to fight, or to talk?",
+    "fight": "I'll fight. (1,000 gold)",
+    "claim": "I've come for my winnings.",
+    "rules": "Remind me of the rules.",
+    "advice": "Any advice?",
+    "goodbye": "Another time."
+  },
+  "rules": {
+    "message": "One thousand gold buys you a gate. Twenty waves, one sandglass: ten minutes. Every fifth wave sends out one of our champions, and the last is Yad, the beast no challenger has beaten. Clear them all before the sand runs out and the Arena pays you in molten cloth, the cape every fighter in the capital wants. Walk out early or run out of time, and you keep what you earned from your kills, nothing more. The fee stays with me either way.",
+    "opt1": "Understood."
+  },
+  "advice": {
+    "message": "Our champions don't just stand there and bleed. Each one has a trick, and each trick wants a different answer. And Yad... Yad's guard shifts like the weather. A fighter with one trick won't last.",
+    "opt1": "I'll keep that in mind."
+  },
+  "running": {
+    "message": "You've got a fight going and the sand's still falling! Get back out there.",
+    "opt1": "On my way."
+  }
+}

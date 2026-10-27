@@ -499,6 +499,43 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     url: './assets/img/enemies/harpyMatriarch.png',
     enemyTypes: [EnemyType.harpy, EnemyType.bird],
   },
+  // ── Combat Arena (North Lirold): arena-only, no drops; the clear rewards are the arena's ──
+  [EnemyID.arenaBrute]: {
+    id: EnemyID.arenaBrute,
+    maxHp: 600,
+    experience: 360,
+    gold: 180,
+    drops: [],
+    url: './assets/img/enemies/arenaBrute.png',
+    enemyTypes: [EnemyType.human, EnemyType.humanoid],
+  },
+  [EnemyID.arenaArcanist]: {
+    id: EnemyID.arenaArcanist,
+    maxHp: 350,
+    experience: 210,
+    gold: 105,
+    drops: [],
+    url: './assets/img/enemies/arenaArcanist.png',
+    enemyTypes: [EnemyType.human, EnemyType.humanoid],
+  },
+  [EnemyID.arenaBurrower]: {
+    id: EnemyID.arenaBurrower,
+    maxHp: 450,
+    experience: 270,
+    gold: 135,
+    drops: [],
+    url: './assets/img/enemies/arenaBurrower.png',
+    enemyTypes: [EnemyType.mammal],
+  },
+  [EnemyID.arenaYad]: {
+    id: EnemyID.arenaYad,
+    maxHp: 800,
+    experience: 480,
+    gold: 240,
+    drops: [],
+    url: './assets/img/enemies/arenaYad.png',
+    enemyTypes: [EnemyType.humanoid],
+  },
 }
 
 export default ENEMIES_DATA

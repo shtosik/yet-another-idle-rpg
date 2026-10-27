@@ -18,7 +18,14 @@ export type DialogueCondition = { hidden?: boolean } & (
   | ManyWavesKillCountCondition
   | GuildCondition
   | FlagCondition
+  | ArenaCondition
   )
+
+/** No arena run going on / clear rewards waiting to be claimed. */
+interface ArenaCondition {
+  type: 'arena'
+  state: 'idle' | 'rewardsWaiting'
+}
 
 /** A dialogue flag (set by a `flag` effect) is set, or with `isSet: false`, not set yet. */
 interface FlagCondition {

@@ -49,12 +49,12 @@ const portStocksmarMarkers: WorldMapMarker[] = [
     label: 'La Harpar',
     position: { x: 410, y: 180 },
   },
-  // {
-  //   type: 'town',
-  //   townId: TownID.northLirold,
-  //   label: 'North Lirold',
-  //   position: { x: 730, y: 110 },
-  // },
+  {
+    type: 'town',
+    townId: TownID.northLirold,
+    label: 'North Lirold',
+    position: { x: 730, y: 110 },
+  },
   {
     type: 'zone',
     zoneId: ZoneID.horseshoeBeach,

@@ -80,6 +80,15 @@ export const UNLOCK_RULES: UnlockRule[] = [
       bodyKey:  'unlocks:towns.mawood.body',
     },
   },
+  {
+    // The Mountain Pass boss (its last wave) opens the road to the capital and its Arena.
+    condition: { type: 'waveReached', zoneId: ZoneID.mountainPass, wave: 15 },
+    target:    { type: 'town', townId: TownID.northLirold },
+    notification: {
+      titleKey: 'unlocks:towns.northLirold.title',
+      bodyKey:  'unlocks:towns.northLirold.body',
+    },
+  },
 ]
 
 export const ZONE_UNLOCK_NOTIFICATIONS: Partial<Record<ZoneID, UnlockNotification>> = {

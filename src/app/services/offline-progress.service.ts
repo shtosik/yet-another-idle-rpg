@@ -109,7 +109,9 @@ export class OfflineProgressService {
       const gapMs = lastSeen === null ? 0 : Math.max(0, claimEnd - lastSeen)
       const elapsedMs = Math.min(OFFLINE_CAP_IN_MS, gapMs)
 
-      const summary = elapsedMs >= MIN_OFFLINE_CLAIM_IN_MS ? this.applyOffline(elapsedMs, lastSeen!) : null
+      // An arena run held the fight while away: no zone kills for that time (its clock ran on; the tick ends it).
+      const isClaimable = elapsedMs >= MIN_OFFLINE_CLAIM_IN_MS && !this.battleStore.arenaRun()
+      const summary = isClaimable ? this.applyOffline(elapsedMs, lastSeen!) : null
       // Timers run out in real time even when the gap is too short to claim. After the simulation, which reads them.
       this.tickTimers(gapMs)
       if (!summary) return

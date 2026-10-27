@@ -1,3 +1,5 @@
+import { BattleStore } from '../store/battle/battle.store'
+import { ArenaService } from './arena.service'
 import { DialogueNode } from '../../interfaces/dialogues/dialogue-node.interface'
 import { computed, inject, Injectable, signal } from '@angular/core'
 import { isTaskDone, PlayerStore } from '../store/player/player.store'
@@ -24,6 +26,8 @@ export class DialogueManagerService {
   private guildService = inject(ExplorationGuildService)
   private townsStore = inject(TownsStore)
   private currencyFeed = inject(CurrencyFeedService)
+  private battleStore = inject(BattleStore)
+  private arenaService = inject(ArenaService)
 
   private currentConversation = signal<Record<any, DialogueNode<any>> | null>(null)
   private currentNodeId = signal<any>(null)
@@ -85,6 +89,8 @@ export class DialogueManagerService {
         const stacks = effect.items.map(i => ({ id: i.itemId, amount: i.amount }))
         if (effect.action === 'give') adding.push(...stacks)
         else removing.push(...stacks)
+      } else if (effect.type === 'arena' && effect.action === 'claim') {
+        adding.push(...this.battleStore.arenaRewards())
       } else if (effect.type === 'quest' && effect.action !== 'start') {
         const status = getQuestStatus(this.questStore.questStepProgression(), effect.questId)
         if (status.state !== QuestState.active) continue
@@ -215,6 +221,8 @@ export class DialogueManagerService {
           }
         }
         return false
+      case 'arena':
+        return c.state === 'idle' ? !this.battleStore.arenaRun() : this.battleStore.arenaRewards().length > 0
       default:
         return false
     }
@@ -277,6 +285,10 @@ export class DialogueManagerService {
               break
             }
           }
+          break
+        case 'arena':
+          if (effect.action === 'enter') this.arenaService.enter()
+          else this.arenaService.claimRewards()
           break
       }
     })

@@ -10,6 +10,10 @@
     "mawood": {
       "title": "Mawood Discovered!",
       "body": "Smoke and lantern-light flicker between the towering Silverwood Spires — a town built on platforms high above the forest floor. Travel there from the Map. Elder Corwin will want a word, and Sylvie, Finn and Brenna all have work for a capable fighter."
+    },
+    "northLirold": {
+      "title": "North Lirold Discovered!",
+      "body": "Past the troll's pass, the road drops to the capital of Port Stocksmar. Its great Arena takes challengers for a fee: twenty waves against the clock. Travel there from the Map and speak to Varek, the Arena Master."
     }
   },
   "zones": {

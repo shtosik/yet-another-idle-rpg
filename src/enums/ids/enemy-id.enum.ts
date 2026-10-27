@@ -33,4 +33,9 @@ export enum EnemyID {
   giantEagle = 28,
   canopyBandit = 29,
   harpyMatriarch = 30,
+  // Combat Arena (North Lirold)
+  arenaBrute = 31,
+  arenaArcanist = 32,
+  arenaBurrower = 33,
+  arenaYad = 34,
 }

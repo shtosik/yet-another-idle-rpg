@@ -19,6 +19,7 @@ export class BattleSideButtonsComponent {
   private battleManagerService = inject(BattleManagerService)
 
   canMoveToPreviousWave = this.battleManagerService.canMoveToPreviousWave
+  isInArena = computed(() => !!this.battleStore.arenaRun())
   canMoveToNextWave = this.battleManagerService.canMoveToNextWave
 
   hasAutoWaveProgressionEnabled = this.battleStore.autoWaveProgressionEnabled

@@ -156,6 +156,33 @@
     "lostDrops_other": "Your inventory was full: {{count}} items were lost.",
     "collect": "Collect"
   },
+  "arena": {
+    "title": "Arena",
+    "leave": "Leave",
+    "effects": {
+      "enter": "Enter the Arena",
+      "claim": "Claim arena rewards"
+    },
+    "result": {
+      "cleared": {
+        "title": "Arena cleared!",
+        "body": "Yad falls and the stands roar your name."
+      },
+      "timeout": {
+        "title": "Time's up!",
+        "body": "The sand ran out before the last champion fell. You keep what your kills earned."
+      },
+      "left": {
+        "title": "You left the Arena",
+        "body": "You walked out before the end. You keep what your kills earned."
+      },
+      "time": "Time: {{time}}",
+      "bestTime": "New best time!",
+      "inventoryFull": "Not enough inventory space. Make room, then claim your rewards here or from Varek in North Lirold.",
+      "claim": "Claim rewards",
+      "close": "Close"
+    }
+  },
   "settings": {
     "title": "Settings",
     "version": {
