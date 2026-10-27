@@ -50,6 +50,9 @@ export const ARENA_BOSSES = {
   arcanist: { secondsPerDamage: 0.2, maxPerHitMs: 5000, maxPerFightMs: 60000 },
   /** The Burrower: goes under, one of `mounds` shakes; the right pick stuns it, a wrong or no pick heals it. */
   burrower: { everyMs: 20000, pickMs: 4000, mounds: 3, stunMs: 5000, stunDamageBonus: 0.5, healFraction: 0.1 },
-  /** Yad: a shield of one element; only that element hurts it, and one such hit of `breakDamage` or more breaks it. */
-  yad: { minGapMs: 15000, maxGapMs: 30000, breakDamage: 50, elements: [DamageElement.fire, DamageElement.air, DamageElement.water] },
+  /**
+   * Yad: a shield of one element; only that element hurts it, and one such hit of `breakDamage` or more breaks it.
+   * 9 is the weakest strike spell (air), so any strike spell of the right element breaks it.
+   */
+  yad: { minGapMs: 15000, maxGapMs: 30000, breakDamage: 9, elements: [DamageElement.fire, DamageElement.air, DamageElement.water] },
 }
