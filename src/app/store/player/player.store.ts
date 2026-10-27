@@ -632,13 +632,14 @@ export const PlayerStore = signalStore(
       store.removeItems([{ id: item.id, tier: item.tier, amount: 1 }])
     },
 
-    /** Opens one chest: rolls its loot, then adds it; null (nothing changes) when the rolled items don't fit. */
+    /** Opens one chest: needs one empty slot per pick (the most new stacks it can give); null when there aren't enough. */
     openChest(item: InventoryItem, rng: () => number = Math.random): ChestContents | null {
       const itemData = ITEM_DATA[item.id]
       if (itemData.type !== ItemType.chest) return null
+      const emptySlots = store.stats().inventorySlots - store.inventory().filter(Boolean).length
+      if (emptySlots < itemData.rolls) return null
       const contents = rollChest(itemData, rng)
       const chest = { id: item.id, tier: item.tier, amount: 1 }
-      if (!store.canFitItems(contents.items, [chest])) return null
 
       store.removeItems([chest])
       if (contents.gold) store.updatePlayerStats([{ stat: 'goldCoins', amount: contents.gold }])

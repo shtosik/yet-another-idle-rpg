@@ -1,5 +1,3 @@
-import { rollEnemyDrops } from '../store/player/kill-rewards'
-import { InventoryItem } from '../../interfaces/item.interface'
 import { computed, inject, Injectable, Injector, signal } from '@angular/core'
 import { BattleStore } from '../store/battle/battle.store'
 import { PlayerStore } from '../store/player/player.store'
@@ -65,10 +63,6 @@ export class ArenaService {
       { stat: 'goldCoins', amount: gold },
     ])
     this.battleStore.recordArenaKill(experience, gold)
-    // Champions' pets; lost on a full inventory, like any drop.
-    const drops = new Map<string, InventoryItem>()
-    rollEnemyDrops(enemy, 1, false, 0, drops)
-    if (drops.size) this.playerStore.addItems([...drops.values()])
 
     if (this.run()!.wave > ARENA.waves.length) this.finish('cleared', now)
   }

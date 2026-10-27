@@ -17,8 +17,10 @@ import ITEM_DATA from '../../../../data/items-data'
 })
 export class ChestOpenedComponent {
   private modalRef = inject(MatDialogRef)
-  /** null: the chest didn't open (no room). */
-  readonly contents = inject<ChestContents | null>(MAT_DIALOG_DATA)
+  private readonly data = inject<{ contents: ChestContents | null, slotsNeeded: number }>(MAT_DIALOG_DATA)
+  /** null: the chest didn't open (not enough empty slots). */
+  readonly contents = this.data.contents
+  readonly slotsNeeded = this.data.slotsNeeded
 
   protected readonly ITEM_DATA = ITEM_DATA
 

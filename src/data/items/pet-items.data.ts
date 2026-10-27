@@ -284,16 +284,13 @@ function buildPetItem(p: PetEntry, shiny: boolean): EquipmentItem {
   }
 }
 
-/** Arena champions' pets: no shiny variant, since the arena rolls no shinies. */
+/** Arena champions' pets, from the Arena Chest; no shiny variant, since the arena rolls no shinies. */
 const ARENA_PETS: Omit<PetEntry, 'shinyId' | 'shinyStats'>[] = [
   { enemyId: EnemyID.arenaBrute, petId: ItemID.petArenaBrute, asset: 'arenaBrute', stats: [{ id: 'damageVsHuman', amount: 0.2 }] },
   { enemyId: EnemyID.arenaArcanist, petId: ItemID.petArenaArcanist, asset: 'arenaArcanist', stats: [{ id: 'magicDamageMultiplier', amount: 0.1 }] },
   { enemyId: EnemyID.arenaBurrower, petId: ItemID.petArenaBurrower, asset: 'arenaBurrower', stats: [{ id: 'damageVsMammal', amount: 0.2 }] },
   { enemyId: EnemyID.arenaYad, petId: ItemID.petArenaYad, asset: 'arenaYad', stats: [{ id: 'meleeDamageMultiplier', amount: 0.1 }] },
 ]
-/** 1 in 50 per champion kill. */
-export const ARENA_PET_DROP_CHANCE = 50
-
 export const PetItemsData: Partial<Record<ItemID, Item>> = Object.fromEntries([
   ...PETS.flatMap(p => [
     [p.petId, buildPetItem(p, false)],
@@ -301,11 +298,6 @@ export const PetItemsData: Partial<Record<ItemID, Item>> = Object.fromEntries([
   ]),
   ...ARENA_PETS.map(p => [p.petId, buildPetItem({ ...p, shinyId: p.petId, shinyStats: [] }, false)]),
 ])
-
-export const arenaPetDrop = (enemyId: EnemyID): EnemyDrop => {
-  const p = ARENA_PETS.find(pet => pet.enemyId === enemyId)!
-  return { id: p.petId, minAmount: 1, maxAmount: 1, chance: ARENA_PET_DROP_CHANCE }
-}
 
 const PETS_BY_ENEMY: Partial<Record<EnemyID, PetEntry>> = Object.fromEntries(
   PETS.map(p => [p.enemyId, p]),

@@ -21,8 +21,8 @@ A timed gauntlet in Lirold: 20 fixed Waves against one clock, for a gold fee. Cl
 
 ## Entry cooldown, drops and the chest
 - **Cooldown**: 30 minutes from one entry to the next (`ARENA.entryCooldownMs`, saved `arenaReadyAt`, owner decision). `ArenaService.isReady` gates `enter`; Ludo's fight option falls back to a "come back later" node.
-- **Champion pets**: each champion drops its own pet at 1 in 50 per kill (`arenaPetDrop`, `ARENA_PET_DROP_CHANCE`); never shiny, since the arena rolls no shinies. `onKill` rolls the champion's drops; a full inventory loses them, like any drop.
-- **Arena Chest** (every clear): 4 picks; gold 3,000–6,000, Elder Silk, Harpy Feathers, Ancient Wood, mana potions, runes, the Hunter's Feast recipe, and two rare chest-only rewards: the War Cry Scroll (buff spell, +25% melee damage for 15 s) and Patron's Gloves (+10% gold and XP; a drops-and-progress choice against power gloves). Sized so a clear pays more than the fee.
+- **Champion pets**: in the Arena Chest only (owner decision), about 1 in 47 per chest for each of the four; never shiny, since the arena rolls no shinies.
+- **Arena Chest** (every clear): 4 picks, and opening needs 4 empty slots (one per pick, the most new stacks it can give); gold 3,000–6,000, Elder Silk, Harpy Feathers, Ancient Wood, mana potions, runes, the Hunter's Feast recipe, and two rare chest-only rewards: the War Cry Scroll (buff spell, +25% melee damage for 15 s) and Patron's Gloves (+10% gold and XP; a drops-and-progress choice against power gloves). Sized so a clear pays more than the fee.
 
 ## Champions' abilities
 `ArenaService.tick` runs `ArenaBossesService.tick` every game tick; a champion fight starts its timers when the champion is first seen alive. `doDamage` skips a hit on a burrowed champion and passes every other arena hit through `modifyHit` (after `resolveHit`). Numbers live in `ARENA_BOSSES`.

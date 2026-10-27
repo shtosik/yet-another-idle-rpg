@@ -61,7 +61,7 @@ export class InventoryWindow {
 
     const itemData = ITEM_DATA[item.id]
     if (itemData.type === ItemType.chest) {
-      this.modalService.openChestOpened(this.playerStore.openChest(item))
+      this.modalService.openChestOpened({ contents: this.playerStore.openChest(item), slotsNeeded: itemData.rolls })
       return
     }
 
