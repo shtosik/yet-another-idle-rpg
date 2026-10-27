@@ -10,7 +10,7 @@
       [npc]="npc"
       [shopId]="npcShops()[npc.id]"
       (openDialogue)="openDialogue($event)"
-      (openShop)="openShop($event)"
+      (openShop)="openShop(npc.id, $event)"
     />
   }
 </section>

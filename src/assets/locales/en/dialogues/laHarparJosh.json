@@ -37,7 +37,7 @@
     "opt2": "Don't care. You'll trip over those chairs before you could catch me. Bye..."
   },
   "beachName": {
-    "message": "The name comes from the shape of the beach, you donkey. Horseshoe Beach and La Harpar are important trade partners to North Lirold, the capital of this region.",
+    "message": "The name comes from the shape of the beach, you donkey. Horseshoe Beach and La Harpar are important trade partners to Lirold, the capital of this region.",
     "opt1": "What exactly is La Harpar providing?",
     "opt2": "This region? How many regions are there?"
   },
@@ -46,7 +46,7 @@
     "opt1": "Got it."
   },
   "regionsInfo": {
-    "message": "There are 4 known regions to us: Southback, Port Stocksmar, Greefic Hill, and Saint Nestroud. La Harpar resides in Port Stocksmar.",
+    "message": "There are 4 known regions to us: Elderreach, Port Stocksmar, Greefic Hill, and Saint Nestroud. La Harpar resides in Port Stocksmar.",
     "opt1": "Known? Are there unknown regions?"
   },
   "unknownRegions": {

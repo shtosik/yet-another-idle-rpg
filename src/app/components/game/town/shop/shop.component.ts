@@ -43,6 +43,8 @@ export class ShopComponent implements OnInit {
   private currencyFeed = inject(CurrencyFeedService)
 
   shopId = input.required<ShopID>()
+  /** Stock stage the shop was opened at; items with a higher `minStage` are hidden. */
+  stage = input(0)
   closed = output<void>()
 
   get staticShop() { return SHOPS_DATA[this.shopId()] }
