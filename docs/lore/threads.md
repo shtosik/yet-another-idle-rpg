@@ -52,5 +52,6 @@ Fixed in this pass (clear factual errors):
 
 Left as is (draft or not contradicting):
 - Design: Corwin "half-blind" and "Druid"; Milo "Pickpocket"; Quest 2 reward has Corwin decode the fetish (shipped: Finn confirms, `Corwin#questTheSap`); "ward-torch", "Purifying Flame" item and Corwin's bark cure are unshipped; Prove Your Aim draft line asks for "gnoll ears".
-- `docs/ideas/la-harpar-quests.md` (not touched, other sessions own it): calls Elara "half-elf" and spells "Traders' Basement" (shipped: "Trader's Basement", `zones.json`).
-- `docs/ideas/crafting-stations.md`, `gathering-skills.md`, `item-sets.md`, `town-reputation.md` (not touched): "Hunter Lodge" (shipped: "Hunter's Lodge").
+- La Harpar quests draft (`la-harpar-quests.md`, not in `docs/ideas/` yet): calls Elara "half-elf" and spells "Traders' Basement" (shipped: "Trader's Basement", `zones.json`). Fix both when it lands.
+- Unmerged idea drafts `gathering-skills.md`, `item-sets.md`, `town-reputation.md`: "Hunter Lodge" (shipped: "Hunter's Lodge"). `docs/ideas/crafting-stations.md` is fixed.
+- Every idea doc: "Traders' Basement" → "Trader's Basement".
