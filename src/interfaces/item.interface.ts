@@ -1,3 +1,4 @@
+import { WeaponCategory } from '../enums/weapon-category.enum'
 import { DamageElement } from 'enums/damage-element.enum'
 import { EquipmentSlot } from 'enums/equipment-slot.enum'
 import { ItemID } from 'enums/ids/item-id.enum'
@@ -29,6 +30,8 @@ export interface EquipmentItem extends ItemData {
     stats: EquipmentItemPossibleStat[]
     slot: EquipmentSlot
     damageType?: DamageElement
+    /** Weapons only; melee when unset. Only melee auto-attacks use `meleeDamageMultiplier`. */
+    weaponCategory?: WeaponCategory
     /** Known while equipped (not in the skill tree); leaves the spell bar when unequipped. */
     spell?: SpellID
 }

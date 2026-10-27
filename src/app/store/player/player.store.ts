@@ -1,3 +1,4 @@
+import { WeaponCategory } from '../../../enums/weapon-category.enum'
 import { computed, effect, inject } from '@angular/core'
 import { patchState, signalStore, withComputed, withHooks, withMethods, withState } from '@ngrx/signals'
 import { PlayerStat } from '../../../types/player/player-stat.type'
@@ -248,6 +249,11 @@ export const PlayerStore = signalStore(
       const weapon = store.equipment().weapon
       if (!weapon) return DamageElement.physical
       return (ITEM_DATA[weapon.id] as EquipmentItem).damageType ?? DamageElement.physical
+    },
+    /** Melee without a weapon. */
+    equippedWeaponCategory: () => {
+      const weapon = store.equipment().weapon
+      return (weapon && (ITEM_DATA[weapon.id] as EquipmentItem).weaponCategory) ?? WeaponCategory.melee
     },
     /** Mastery star progress for every zone. */
     zoneMastery: computed(() => {

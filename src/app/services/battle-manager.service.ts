@@ -1,3 +1,4 @@
+import { WeaponCategory } from '../../enums/weapon-category.enum'
 import { computed, inject, Injectable } from '@angular/core'
 import { BattleStore } from '../store/battle/battle.store'
 import { PlayerStore } from '../store/player/player.store'
@@ -58,11 +59,14 @@ export class BattleManagerService {
 
     if (!enemy) return
 
-    // Ambush: melee hits (auto-attacks and melee spells) use up the guaranteed crits; magic hits don't.
-    const forceCrit = magicDamage === 0 && this.battleStore.useEmpoweredHit()
+    // Double Attack is the melee spell, melee whatever the weapon; an auto-attack is melee with a melee weapon.
+    const isMelee = magicDamage === 0 && (isDoubleAttack || this.playerStore.equippedWeaponCategory() === WeaponCategory.melee)
+    // Ambush: melee hits use up the guaranteed crits; ranged and magic hits don't.
+    const forceCrit = isMelee && this.battleStore.useEmpoweredHit()
     const { damage, isCrit, isWeaknessHit } = resolveHit({
       stats: this.playerStore.stats(),
       magicDamage,
+      isMelee,
       forceCrit,
       isDoubleAttack,
       damageType: damageType ?? this.playerStore.equippedWeaponDamageType(),

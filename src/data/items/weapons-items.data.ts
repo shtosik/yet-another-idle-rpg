@@ -5,6 +5,7 @@ import { ItemTier } from '../../enums/items/item-tier.enum'
 import { ItemType } from '../../enums/items/item-type.enum'
 import { EquipmentSlot } from '../../enums/equipment-slot.enum'
 import { DamageElement } from '../../enums/damage-element.enum'
+import { WeaponCategory } from '../../enums/weapon-category.enum'
 
 export const WeaponsItemsData: Partial<Record<ItemID, Item>> = {
   [ItemID.machete]: {
@@ -52,6 +53,7 @@ export const WeaponsItemsData: Partial<Record<ItemID, Item>> = {
     type: ItemType.equipment,
     slot: EquipmentSlot.weapon,
     damageType: DamageElement.physical,
+    weaponCategory: WeaponCategory.ranged,
     stats: [
       {
         id: 'attackPower',
@@ -101,6 +103,7 @@ export const WeaponsItemsData: Partial<Record<ItemID, Item>> = {
     type: ItemType.equipment,
     slot: EquipmentSlot.weapon,
     damageType: DamageElement.physical,
+    weaponCategory: WeaponCategory.ranged,
     stats: [
       {
         id: 'attackPower',
@@ -120,6 +123,7 @@ export const WeaponsItemsData: Partial<Record<ItemID, Item>> = {
     type: ItemType.equipment,
     slot: EquipmentSlot.weapon,
     damageType: DamageElement.physical,
+    weaponCategory: WeaponCategory.magic,
     stats: [
       {
         id: 'attackPower',
@@ -143,6 +147,7 @@ export const WeaponsItemsData: Partial<Record<ItemID, Item>> = {
     type: ItemType.equipment,
     slot: EquipmentSlot.weapon,
     damageType: DamageElement.water,
+    weaponCategory: WeaponCategory.magic,
     stats: [
       { id: 'attackPower', amount: 1 },
       { id: 'magicDamage', amount: 2 },
@@ -157,6 +162,7 @@ export const WeaponsItemsData: Partial<Record<ItemID, Item>> = {
     type: ItemType.equipment,
     slot: EquipmentSlot.weapon,
     damageType: DamageElement.fire,
+    weaponCategory: WeaponCategory.magic,
     stats: [
       { id: 'attackPower', amount: 1 },
       { id: 'magicDamage', amount: 3 },
@@ -171,6 +177,7 @@ export const WeaponsItemsData: Partial<Record<ItemID, Item>> = {
     type: ItemType.equipment,
     slot: EquipmentSlot.weapon,
     damageType: DamageElement.air,
+    weaponCategory: WeaponCategory.magic,
     stats: [
       { id: 'attackPower', amount: 2 },
       { id: 'magicDamage', amount: 5 },
@@ -185,6 +192,7 @@ export const WeaponsItemsData: Partial<Record<ItemID, Item>> = {
     type: ItemType.equipment,
     slot: EquipmentSlot.weapon,
     damageType: DamageElement.earth,
+    weaponCategory: WeaponCategory.magic,
     stats: [
       { id: 'attackPower', amount: 2 },
       { id: 'magicDamage', amount: 7 },
@@ -199,6 +207,7 @@ export const WeaponsItemsData: Partial<Record<ItemID, Item>> = {
     type: ItemType.equipment,
     slot: EquipmentSlot.weapon,
     damageType: DamageElement.air,
+    weaponCategory: WeaponCategory.magic,
     spell: SpellID.thunderstorm,
     stats: [
       { id: 'attackPower', amount: 3 },
@@ -295,6 +304,19 @@ export const WeaponsItemsData: Partial<Record<ItemID, Item>> = {
     stats: [
       { id: 'attackPower', amount: 17 },
       { id: 'critChance', amount: 5 },
+    ],
+  },
+  // Combat Arena clear reward (arena not built yet).
+  [ItemID.moltenCape]: {
+    id: ItemID.moltenCape,
+    tier: ItemTier.epic,
+    url: './assets/img/items/moltenCape.png',
+    value: 500,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.cape,
+    stats: [
+      { id: 'attackPower', amount: 6 },
+      { id: 'meleeDamageMultiplier', amount: 0.15 },
     ],
   },
 }

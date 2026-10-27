@@ -710,6 +710,13 @@
     "seed": 777,
     "date": "2026-10-21"
   },
+  "src/assets/img/items/moltenCape.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single empty black cape lying diagonally, a small dark iron clasp on the collar at the top right, jagged pointed hem at the bottom left, the cloth a honeycomb of dark hexagon cells separated by glowing orange and yellow lava borders",
+    "seed": 424242,
+    "date": "2026-10-27"
+  },
   "src/assets/img/items/mortarAndPestle.png": {
     "family": "item-pixel",
     "tier": null,

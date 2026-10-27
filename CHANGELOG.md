@@ -6,6 +6,8 @@ Versions follow [Semantic Versioning](https://semver.org/). Each note is `- [typ
 New notes go under `[Unreleased]`; `npm run release -- <major|minor|patch>` moves them into a version (docs/deployment.md).
 
 ## [Unreleased]
+- [feature] Weapons are now melee, ranged (bows) or magic (staves and wands). A new Melee Damage Multiplier stat boosts melee auto-attacks and Double Attack.
+- [nerf] Ambush's guaranteed crits now apply to melee hits only; bow and staff auto-attacks no longer use them up.
 - [feature] New navbar: the open tab is highlighted, locked features show greyed out, and Bestiary and Spellbook show a badge for new entries.
 - [feature] Level, XP, gold and Explorer Tokens are always visible in a bar under the tabs; buying, selling and claiming Guild tasks show what you gained or spent.
 - [feature] Camp recipes are now a compact icon grid with a Craftable filter; pick a recipe to see its ingredients and craft it.

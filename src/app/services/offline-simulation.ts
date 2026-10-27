@@ -24,6 +24,8 @@ export interface OfflineSimulationInput {
   /** In order; their durations add up to the claimed time. */
   segments: OfflineSegment[]
   damageType: DamageElement
+  /** The equipped weapon is melee (or none). */
+  isMeleeWeapon: boolean
   hasWeaknessSkill: boolean
   activeQuestIds: Set<QuestID>
   /** Enemies with an unfinished Exploration Guild task. */
@@ -69,6 +71,7 @@ const autoAttackInput = (stats: PlayerStatsType, enemy: Enemy, input: OfflineSim
   stats,
   magicDamage: 0,
   isDoubleAttack: false,
+  isMelee: input.isMeleeWeapon,
   damageType: input.damageType,
   enemyWeakness: enemy.weakness,
   enemyTypes: enemy.enemyTypes,

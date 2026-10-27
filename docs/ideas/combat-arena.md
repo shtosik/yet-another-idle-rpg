@@ -7,7 +7,8 @@ A timed gauntlet: clear 20 waves before the clock runs out. Fixed difficulty, so
 The arena is **not a zone**: no stars, no wave navigation, no `zonesProgression`. You go in and fight. The run ends when the timer runs out, when you click Leave, or when Yad dies. Played actively, can't run offline.
 
 ## Core loop
-- Entered from a town building (Arena) or a world-map marker. Unlocks at a tier gate (e.g. Mountain Pass boss killed).
+- Entered from the **Arena building in North Lirold**, the capital of Port Stocksmar (owner decision). Unlocks at a tier gate (e.g. Mountain Pass boss killed).
+- North Lirold exists in `towns-data.ts` with no buildings, and its world-map marker is commented out in `world-map-data.ts`. The arena build opens the town: map marker, town unlock, town background, and the Arena as its first building (`/add-town-building`).
 - **Entry fee**: gold, scaled to the unlock tier. Owner rule: blocked when the player can't afford it.
 - **Run**: 20 waves of fixed enemies, `enemiesPerWave` low (3–5). Mini-bosses on waves 5, 10 and 15, Yad, the Arena Champion, on wave 20. Waves advance automatically.
 - **Timer**: one clock for the whole run (e.g. 10 min).
@@ -35,18 +36,19 @@ Regular enemies use default behaviour (plain auto-attack targets). Each mini-bos
 - Magic hits on this boss **cost time**: 20% of the magic damage dealt, as seconds off the timer.
 - Capped so a big spell doesn't end the run: at most 5 s per hit and 60 s per fight.
 - Only magic spells count. Staff auto-attacks are `attackPower` hits and cost no time.
+- Damage-over-time ticks (Thunderstorm) count: each tick does its damage and costs time, capped per hit like any other. Casting it here is the player's call (owner decision).
 - Teaches: hold spells. It sets up Yad, where magic is needed again.
 
 ### Mini-boss 3 (wave 15): the Burrower: finding
 - Every 20 s it burrows and 3 dirt mounds appear. One has a small tell (it shakes).
 - Clicking the right mound brings it up stunned: +damage taken for 5 s.
 - A wrong pick, or none within 4 s, makes it resurface healed 10% of max HP.
-- While burrowed, attacks pause (nothing to hit).
+- While burrowed, attacks pause (nothing to hit), but the Burrower is still the current enemy and the player stays in combat. So a running damage-over-time spell (Thunderstorm) keeps counting down and its ticks are spent with nothing to hit, unlike between enemies, where its timer pauses (owner decision).
 - Teaches: read the tell and react.
 
 ### Yad, the Arena Champion (wave 20): elemental shields
 - At random intervals (e.g. every 15–30 s) Yad raises a **shield of fire, air or water** (random element, never the same one twice in a row). The element is shown clearly (icon, colour, aura on the sprite).
-- While shielded, only hits of the **shield's element** do damage. Every other hit lands **0** (shown as "0" or "Immune" in the damage popup).
+- While shielded, only hits of the **shield's element** do damage. Every other hit lands **0** (shown as "0" or "Immune" in the damage popup). An Ambush forced crit of the wrong element also lands 0 and still uses one of its charges.
 - Element hits break the shield (a shield HP bar, or a set number of hits). Then Yad takes normal damage until the next shield.
 - The player needs a weapon or spell of each of the three elements on hand. Swapping weapons mid-fight is fine, and a loadout makes it quick (`loadouts.md`). The Arena Master hints at this.
 
@@ -89,4 +91,4 @@ Leave or fail: no cape and no chest, only the gold and XP of the kills made.
 Later tiers (optional): Arena II and III with harder fixed rosters and a better cape (Molten Cape → Infernal Cape), reusing the same boss mechanics.
 
 ## Touch-points
-New `arena-data.ts` (roster, timer, fee, boss abilities), `BattleStore` (arena run state, timer, boss ability state), `GameIntervalService` (arena tick: timer, ability timers), boss-ability overlay component in `battle/` (weak point, dirt mounds, shield indicator), `resolveHit` (melee multiplier, shield immunity, Arcanist penalty), `PlayerStat`, weapon item data (`weaponCategory`), cape item data (`/add-equipment-item`), Arena Master NPC dialogue, openable item type and chest loot table, clear reward modal, Arena building or map marker, i18n namespace, offline progress (skip while in the arena), `docs/systems/game-loop-and-combat.md`.
+New `arena-data.ts` (roster, timer, fee, boss abilities), `BattleStore` (arena run state, timer, boss ability state), `GameIntervalService` (arena tick: timer, ability timers), boss-ability overlay component in `battle/` (weak point, dirt mounds, shield indicator), `resolveHit` (melee multiplier, shield immunity, Arcanist penalty), `PlayerStat`, weapon item data (`weaponCategory`), cape item data (`/add-equipment-item`), Arena Master NPC dialogue, openable item type and chest loot table, clear reward modal, North Lirold (`towns-data.ts` Arena building, `world-map-data.ts` marker, town unlock, background), Burrower case in the damage-over-time tick (`BattleManagerService.tickDamageOverTime`), i18n namespace, offline progress (skip while in the arena), `docs/systems/game-loop-and-combat.md`.

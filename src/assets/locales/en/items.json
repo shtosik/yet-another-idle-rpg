@@ -164,7 +164,8 @@
         "bearhideGloves": "Bearhide Gloves",
         "silkweaveLegs": "Silkweave Legs",
         "gnollWarbelt": "Gnoll Warbelt",
-        "ambushScroll": "Ambush Scroll"
+        "ambushScroll": "Ambush Scroll",
+        "moltenCape": "Molten Cape"
     },
     "tiers": {
         "trash": "Trash",

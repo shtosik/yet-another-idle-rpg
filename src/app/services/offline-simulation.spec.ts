@@ -15,6 +15,7 @@ describe('simulateOfflineKills', () => {
     wave: 1,
     segments: [{ durationMs: HOUR_IN_MS, stats }],
     damageType: DamageElement.physical,
+    isMeleeWeapon: true,
     hasWeaknessSkill: false,
     activeQuestIds: new Set(),
     taskEnemyIds: new Set(),

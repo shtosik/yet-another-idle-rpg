@@ -1,3 +1,4 @@
+import { WeaponCategory } from '../../enums/weapon-category.enum'
 import { inject, Injectable } from '@angular/core'
 import { setTimeout } from 'worker-timers'
 import { BattleStore } from '../store/battle/battle.store'
@@ -133,6 +134,7 @@ export class OfflineProgressService {
       wave,
       segments: this.segments(elapsedMs),
       damageType: this.playerStore.equippedWeaponDamageType(),
+      isMeleeWeapon: this.playerStore.equippedWeaponCategory() === WeaponCategory.melee,
       hasWeaknessSkill: this.playerStore.hasSkillUnlocked(SkillNodeID.weaknesses),
       activeQuestIds: getActiveQuestIds(this.questsStore.questStepProgression()),
       taskEnemyIds: new Set(this.playerStore.activeTasks().filter(task => !isTaskDone(task)).map(task => task.monsterId)),
