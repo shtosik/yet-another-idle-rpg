@@ -6,7 +6,8 @@ Versions follow [Semantic Versioning](https://semver.org/). Each note is `- [typ
 New notes go under `[Unreleased]`; `npm run release -- <major|minor|patch>` moves them into a version (docs/deployment.md).
 
 ## [Unreleased]
-- [feature] The Combat Arena opens in Lirold after the Mawood Zones: pay the Arena Master 1,000 gold, then clear 20 waves and four arena champions in 10 minutes to win the Molten Cape (and 2 Skill Point Books the first time). Leaving or running out of time keeps the gold and XP from your kills.
+- [feature] Each arena champion has a trick: click the Brute's weak point for +50% damage, hold your spells against the Arcanist (magic hits cost you time), pick the shaking mound when the Burrower digs in, and hit Yad with its shield's element (fire, air or water) to break it.
+- [feature] The Combat Arena opens in Lirold after the Mawood Zones: pay the Arena Master 10,000 gold, then clear 20 waves and four arena champions in 10 minutes to win the Molten Cape (and 2 Skill Point Books the first time). Leaving or running out of time keeps the gold and XP from your kills.
 - [feature] Lirold unlocks once the Harpy Matriarch falls; travel there from the Map's town buttons.
 - [feature] Weapons are now melee, ranged (bows) or magic (staves and wands). A new Melee Damage Multiplier stat boosts melee auto-attacks and Double Attack.
 - [nerf] Ambush's guaranteed crits now apply to melee hits only; bow and staff auto-attacks no longer use them up.

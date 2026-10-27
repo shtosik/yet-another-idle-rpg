@@ -383,6 +383,11 @@ export const BattleStore = signalStore(
       }))
     },
 
+    /** The Arcanist's toll: run time taken off the clock. */
+    shortenArenaRun(ms: number): void {
+      patchState(store, ({ arenaRun: run }) => (run ? { arenaRun: { ...run, endsAt: run.endsAt - ms } } : {}))
+    },
+
     addArenaRewards(items: ItemStack[]): void {
       patchState(store, (state) => ({ arenaRewards: [...state.arenaRewards, ...items] }))
     },

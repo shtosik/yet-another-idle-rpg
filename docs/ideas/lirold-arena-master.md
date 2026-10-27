@@ -58,7 +58,7 @@ Replaces the current text (which names Varek and says the road comes "past the t
 Options, in hub order (claim first, as a turn-in):
 1. "I've come for my winnings." → claimed · effect: arena `claim` (only if arena `rewardsWaiting`; hidden otherwise)
 2. "I'll fight." (the fee shows in the effect label) → one option, two results:
-   - close · effects: deduct 1,000 gold (`ARENA.entryFee`), arena `enter` (only if arena `idle`; the UI disables it when the player can't afford it)
+   - close · effects: deduct 10,000 gold (`ARENA.entryFee`), arena `enter` (only if arena `idle`; the UI disables it when the player can't afford it)
    - → running (fallback: a run is already going on)
 3. "Remind me of the rules." → rules
 4. "Tell me about your champions." → champions
@@ -66,7 +66,7 @@ Options, in hub order (claim first, as a turn-in):
 6. "Another time." → close
 
 ### rules
-> A thousand gold opens the gate, and the fee stays with me whatever happens. Twenty waves, one sandglass, ten minutes; every fifth wave is a champion, and the last is Yad. Beat the sand and you walk out in a Molten Cape, with something extra the first time; walk out early or run dry and you keep only what your kills paid.
+> Ten thousand gold opens the gate, and the fee stays with me whatever happens. Twenty waves, one sandglass, ten minutes; every fifth wave is a champion, and the last is Yad. Beat the sand and you walk out in a Molten Cape, with something extra the first time; walk out early or run dry and you keep only what your kills paid.
 
 1. "Tell me about your champions." → champions
 2. "Understood." → default

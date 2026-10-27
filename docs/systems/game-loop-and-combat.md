@@ -46,6 +46,7 @@ Damage (`resolveHit`), in order, kept fractional throughout:
 - Changing wave or zone clears the enemy; the next one spawns after the respawn delay.
 - Buff and consumable durations in data are **seconds**; buffs and spell cooldowns count down in ms at runtime, consumables in whole seconds. `manaRegenRate` and `shopRefreshCooldown` are in **ms**.
 - Of the current enemy, `BattleState` saves only `enemyId`, `isShinyEnemy` and `currentEnemyHp`; the computed `BattleStore.enemy` rebuilds it from `ENEMIES_DATA` with the wave-scaled max HP and shiny sprite, so data edits apply to a saved fight. On load, a fight whose `enemyId` no longer exists in the data is ended (`enemy` is `null`; combat would stall otherwise), and HP above the rebuilt max HP is clamped.
+- In an arena run, `doDamage` skips hits on a burrowed champion and passes the rest through `ArenaBossesService.modifyHit` (shields, bonuses, the Arcanist's toll; `arena.md`).
 - The weapon's `damageType` sets the auto-attack element (`PlayerStore.equippedWeaponDamageType`, default physical).
 - The weapon's `weaponCategory` (`WeaponCategory`: melee, ranged or magic; unset or no weapon = melee, `PlayerStore.equippedWeaponCategory`) decides if an auto-attack is a **melee hit**. Double Attack is always melee. Ranged and magic-weapon (staff, wand) auto-attacks use plain `attackPower`, not `magicDamage` (owner decision).
 - Stats are derived from their sources (equipment, nodes, buffs, consumables), see `player-stats-inventory-equipment.md`.

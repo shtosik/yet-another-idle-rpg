@@ -1,3 +1,4 @@
+import { ArenaBossesService } from '../../../../services/arena-bosses.service'
 import { CommonModule } from '@angular/common'
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core'
 import { I18nextPipe } from 'app/pipes/i18next.pipe'
@@ -29,6 +30,7 @@ export class BattleNavBarComponent {
 
   arenaRun = this.arenaService.run
   arenaSeconds = this.arenaService.remainingSeconds
+  timeLost = inject(ArenaBossesService).timeLostSeconds
   arenaWaveKills = computed(() => {
     const run = this.arenaRun()
     return run ? ARENA.waves[run.wave - 1]?.count ?? 0 : 0

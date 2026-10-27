@@ -13,6 +13,9 @@
     <div class="right-side">
       <span>{{ 'wave' | i18next }}: {{ run.wave }}/{{ arenaWaveCount }}</span>
       <span class="arena-timer" [class.arena-timer--low]="arenaSeconds() <= 60">{{ arenaSeconds() | duration }}</span>
+      @if (timeLost()) {
+        <span class="arena-time-lost">{{ 'app:arena.bosses.timeLost' | i18next: { seconds: timeLost() } }}</span>
+      }
       <button class="arena-leave" (click)="leaveArena()">{{ 'app:arena.leave' | i18next }}</button>
     </div>
   } @else {

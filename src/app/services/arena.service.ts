@@ -3,6 +3,7 @@ import { BattleStore } from '../store/battle/battle.store'
 import { PlayerStore } from '../store/player/player.store'
 import { ModalService } from './modal.service'
 import { GameNavigationService } from './game-navigation.service'
+import { ArenaBossesService } from './arena-bosses.service'
 import { ARENA } from '../../data/arena-data'
 import { Enemy } from '../../interfaces/enemy.interface'
 import { GameTab } from '../../enums/ids/game-tab.enum'
@@ -24,6 +25,7 @@ export class ArenaService {
   private battleStore = inject(BattleStore)
   private playerStore = inject(PlayerStore)
   private modalService = inject(ModalService)
+  private bosses = inject(ArenaBossesService)
   // Looked up on use: GameNavigationService → DialogueManagerService → ArenaService would be a cycle.
   private injector = inject(Injector)
 
@@ -65,6 +67,7 @@ export class ArenaService {
     this.now.set(now)
     const run = this.run()
     if (run && now >= run.endsAt) this.finish('timeout', now)
+    else this.bosses.tick(now)
   }
 
   leave(now = Date.now()): void {
