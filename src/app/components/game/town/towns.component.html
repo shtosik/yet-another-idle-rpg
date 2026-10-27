@@ -24,7 +24,7 @@
     }
   </div>
 } @else if (activeShopId() !== null) {
-  <app-shop [shopId]="activeShopId()" (closed)="closeShop()"/>
+  <app-shop [shopId]="activeShopId()" [stage]="activeShopStage()" (closed)="closeShop()"/>
 } @else {
   <app-close-button (onClose)="selectTownBuilding(null)"/>
   <app-town-building [building]="selectedTownBuilding()"/>

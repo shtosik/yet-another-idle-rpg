@@ -34,4 +34,6 @@ Owner decisions in force:
 | [Loadouts](loadouts.md) | S | Accepted |
 | [Auto-cast](auto-cast.md) | S-M | Proposed |
 | [Combat Arena](combat-arena.md) | M | Accepted design |
+| [Lirold & the Exploration Guild](north-lirold-and-exploration-guild.md) | M | Proposed |
+| [Slatefall & the Deeper Mines](slatefall-and-the-deeper-mines.md) | M-L | Proposed |
 | [Known issues](known-issues.md) | — | Open bug and tech-debt list |
