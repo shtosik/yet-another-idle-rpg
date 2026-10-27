@@ -1,22 +1,23 @@
 # Combat Arena
 
-**Scope:** M · **Status:** Accepted design (owner reviewed 2026-10-27)
+**Scope:** M · **Status:** In progress. Shipped: batch 1 (weapon categories, Melee Damage Multiplier, Molten Cape), batch 2 (the run, Lirold's Arena, the Arena Master; `docs/systems/arena.md`). Next: batch 3 (boss abilities), batch 4 (Arena Chest).
 
 A timed gauntlet: clear 20 waves before the clock runs out. Fixed difficulty, so it doesn't scale with player power. An overpowered player is meant to stomp it. The main reward is the **Molten Cape** (attack power + melee damage).
 
 The arena is **not a zone**: no stars, no wave navigation, no `zonesProgression`. You go in and fight. The run ends when the timer runs out, when you click Leave, or when Yad dies. Played actively, can't run offline.
 
 ## Core loop
-- Entered from the **Arena building in North Lirold**, the capital of Port Stocksmar (owner decision). Unlocks at a tier gate (e.g. Mountain Pass boss killed).
-- North Lirold exists in `towns-data.ts` with no buildings, and its world-map marker is commented out in `world-map-data.ts`. The arena build opens the town: map marker, town unlock, town background, and the Arena as its first building (`/add-town-building`).
-- **Entry fee**: gold, scaled to the unlock tier. Owner rule: blocked when the player can't afford it.
+- Entered from the **Arena building in Lirold**, the capital (owner decision). Lirold and the Arena unlock **after the Mawood Zones**, on the Harpy Matriarch's kill (owner decision, following `north-lirold-and-exploration-guild.md`). Lirold has no world-map marker yet; the map's town buttons reach it.
+- **Entry fee**: 1,000 gold (owner decision). Owner rule: blocked when the player can't afford it.
 - **Run**: 20 waves of fixed enemies, `enemiesPerWave` low (3–5). Mini-bosses on waves 5, 10 and 15, Yad, the Arena Champion, on wave 20. Waves advance automatically.
 - **Timer**: one clock for the whole run (e.g. 10 min).
 - **Zone combat pauses** while in the arena. One active battle, reusing `BattleStore`. Leaving returns the player to their zone.
 - **Fail state**: timer hits 0. Enemies still never hit back (`game-loop-and-combat.md`).
 - **Leave or fail**: no cape, partial gold/XP for kills made. Entry fee not refunded.
 - **Clear**: every clear gives a Molten Cape and an Arena Chest. The first clear also gives 2 Skill Point Books. A best-time record is kept. See Rewards below.
-- Respawn delay (2 s fixed) eats ~160 s of a 10 min run. Cut it to 0.5 s in the arena, or count it in the timer budget.
+- Respawn delay: 0.5 s in the arena (2 s in Zones).
+- **Away mid-run** (owner decision): the clock is wall time and keeps running; a run that expires while away fails on return with kill rewards kept. No offline Zone kills for that time.
+- Batch 2 rewards: the Molten Cape (every clear) and 2 Skill Point Books (first clear) wait in `arenaRewards` until they fit; the Arena Chest comes in batch 4.
 
 Sizing: a player at the gate tier with decent gear clears with ~20% to spare when they handle the boss mechanics well and fails when they ignore them. `npm run sim` can model the passive part.
 
@@ -91,4 +92,4 @@ Leave or fail: no cape and no chest, only the gold and XP of the kills made.
 Later tiers (optional): Arena II and III with harder fixed rosters and a better cape (Molten Cape → Infernal Cape), reusing the same boss mechanics.
 
 ## Touch-points
-New `arena-data.ts` (roster, timer, fee, boss abilities), `BattleStore` (arena run state, timer, boss ability state), `GameIntervalService` (arena tick: timer, ability timers), boss-ability overlay component in `battle/` (weak point, dirt mounds, shield indicator), `resolveHit` (melee multiplier, shield immunity, Arcanist penalty), `PlayerStat`, weapon item data (`weaponCategory`), cape item data (`/add-equipment-item`), Arena Master NPC dialogue, openable item type and chest loot table, clear reward modal, North Lirold (`towns-data.ts` Arena building, `world-map-data.ts` marker, town unlock, background), Burrower case in the damage-over-time tick (`BattleManagerService.tickDamageOverTime`), i18n namespace, offline progress (skip while in the arena), `docs/systems/game-loop-and-combat.md`.
+New `arena-data.ts` (roster, timer, fee, boss abilities), `BattleStore` (arena run state, timer, boss ability state), `GameIntervalService` (arena tick: timer, ability timers), boss-ability overlay component in `battle/` (weak point, dirt mounds, shield indicator), `resolveHit` (melee multiplier, shield immunity, Arcanist penalty), `PlayerStat`, weapon item data (`weaponCategory`), cape item data (`/add-equipment-item`), Arena Master NPC dialogue, openable item type and chest loot table, clear reward modal, Lirold (`towns-data.ts` Arena building, town unlock, background), Burrower case in the damage-over-time tick (`BattleManagerService.tickDamageOverTime`), i18n namespace, offline progress (skip while in the arena), `docs/systems/game-loop-and-combat.md`.

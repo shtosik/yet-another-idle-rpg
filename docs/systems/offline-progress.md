@@ -33,6 +33,7 @@ Rolling rate: every online kill calls `OfflineStore.recordKill(performance.now()
 - Stats are read per segment at claim start; level-ups during the claim don't change the rate.
 - The enemy alive when the page closed is untouched; the simulation starts from fresh spawns.
 - Shop refresh timers and mana regen don't advance offline.
+- **Not during an arena run**: a claim while `BattleStore.arenaRun` is set simulates nothing; the run's wall clock ran on and the next tick ends it if it ran out (`arena.md`).
 - Testing (dev build, plain JSON saves): subtract time from `state.lastSeenAt` in `localStorage.offlineStore` (saves are `{ v, state }`) and reload in the same script (the 1 s save would overwrite it otherwise). A plain JSON save also loads in a prod build.
 
 ## Known issues

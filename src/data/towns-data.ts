@@ -108,15 +108,15 @@ export const TOWNS_DATA: Record<TownID, Town> = {
   [TownID.lirold]: {
     id: TownID.lirold,
     regionId: RegionID.portStocksmar,
-    url: './assets/img/backgrounds/northLirold.png',
+    url: './assets/img/backgrounds/lirold.png',
     buildings: [
       {
-        buildingId: TownBuildingID.northLiroldArena,
+        buildingId: TownBuildingID.liroldArena,
         position: { x: 50, y: 55 },
         npcs: [
-          { id: NpcID.northLiroldArenaMaster, position: { x: 50, y: 50 } },
+          { id: NpcID.liroldArenaMaster, position: { x: 50, y: 50 } },
         ],
-        url: './assets/img/backgrounds/northLiroldArena.png',
+        url: './assets/img/backgrounds/liroldArena.png',
       },
     ],
   },

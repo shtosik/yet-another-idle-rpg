@@ -88,12 +88,12 @@ export const UNLOCK_RULES: UnlockRule[] = [
     },
   },
   {
-    // The Mountain Pass boss (its last wave) opens the road to the capital and its Arena.
-    condition: { type: 'waveReached', zoneId: ZoneID.mountainPass, wave: 15 },
-    target:    { type: 'town', townId: TownID.northLirold },
+    // After the Mawood Zones: from the Harpy Matriarch's nest the player sees the capital (docs/ideas/north-lirold-and-exploration-guild.md).
+    condition: { type: 'waveReached', zoneId: ZoneID.upperCanopy, wave: 15 },
+    target:    { type: 'town', townId: TownID.lirold },
     notification: {
-      titleKey: 'unlocks:towns.northLirold.title',
-      bodyKey:  'unlocks:towns.northLirold.body',
+      titleKey: 'unlocks:towns.lirold.title',
+      bodyKey:  'unlocks:towns.lirold.body',
     },
   },
 ]

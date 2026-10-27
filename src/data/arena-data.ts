@@ -9,17 +9,18 @@ export interface ArenaWave {
   count: number
 }
 
-const early = [EnemyID.deer, EnemyID.wolf, EnemyID.goblinScout]
-const middle = [EnemyID.goat, EnemyID.mountainBat, EnemyID.goblinScavenger]
-const late = [EnemyID.mountainBat, EnemyID.goblinScavenger, EnemyID.forestSpider, EnemyID.corruptedSapling]
-const final = [EnemyID.forestSpider, EnemyID.corruptedSapling]
+const early = [EnemyID.forestSpider, EnemyID.corruptedSapling]
+const middle = [EnemyID.forestSpider, EnemyID.corruptedSapling, EnemyID.gnollScout]
+const late = [EnemyID.gnollScout, EnemyID.treantSprout]
+const final = [EnemyID.treantSprout, EnemyID.bogSkeleton]
 const regular = (enemies: EnemyID[]): ArenaWave => ({ enemies, count: 3 })
 const boss = (enemyId: EnemyID): ArenaWave => ({ enemies: [enemyId], count: 1 })
 
 /**
- * The Combat Arena in North Lirold: fixed waves against one clock (docs/systems/arena.md).
- * Sized for a player just past the Mountain Pass boss (~30 Attack Power, 3 s per attack) who handles the bosses'
- * mechanics; arena enemies are never wave-scaled.
+ * The Combat Arena in Lirold: fixed waves against one clock (docs/systems/arena.md).
+ * Opens after the Mawood Zones. Sized for a player just past the Harpy Matriarch (~40 Attack Power, ~2.6 s per
+ * attack): about 9.5 min without the bosses' mechanics, so the clear depends on handling them. First pass; tune with
+ * the mechanics (batch 3). Arena enemies are never wave-scaled.
  */
 export const ARENA = {
   entryFee: 1000,
@@ -36,5 +37,6 @@ export const ARENA = {
   clearRewards: [{ id: ItemID.moltenCape, amount: 1 }] as ItemStack[],
   /** The first clear only, on top of `clearRewards`. */
   firstClearRewards: [{ id: ItemID.skillPointBook, amount: 2 }] as ItemStack[],
-  url: './assets/img/backgrounds/northLiroldArena.png',
+  /** The battle background (vertical, like the Zones'); the Arena building uses `liroldArena.png`. */
+  url: './assets/img/backgrounds/liroldArena-vertical.png',
 }

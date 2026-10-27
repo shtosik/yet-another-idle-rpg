@@ -30,7 +30,7 @@ Zones are the combat areas; each has waves of regular enemies ending in a boss. 
 
 **Town and feature unlocks** (`UNLOCK_RULES`), checked after every kill:
 - `hasItem` Turtle Shell → Camp; `levelReached` 2 → skill tree;
-- `waveReached` Horseshoe Beach 5 → La Harpar (+ world map); Elderwood Wilds 4 → Mawood.
+- `waveReached` Horseshoe Beach 5 → La Harpar (+ world map); Elderwood Wilds 4 → Mawood; Upper Canopy 15 (the Harpy Matriarch, after the Mawood Zones) → Lirold, reached from the map's town buttons (no marker yet).
 - `questCompleted` (`questId`) is also available: `UnlockService` checks it against `QuestsStore`, since `PlayerStore` can't read quests. No rule uses it yet.
 On load, `PlayerStore.onInit` re-applies every rule already met, silently, so new rules reach old saves. `questCompleted` rules are skipped there; a target they unlocked is already saved, and a new one fires (with its notification) once the game runs.
 

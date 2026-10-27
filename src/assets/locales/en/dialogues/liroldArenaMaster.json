@@ -1,0 +1,72 @@
+{
+  "intro1": {
+    "message": "Ha, a new challenger, and the whole city's heard about the harpy queen! Ludo Crane, Master of the Arena, eleven seasons champion of this sand. Want to hear how it works?",
+    "opt1": "Tell me.",
+    "opt2": "Maybe later."
+  },
+  "default": {
+    "message": "The sand's raked and the stands are filling. Fight, talk or gawk, challenger?",
+    "claim": "I've come for my winnings.",
+    "fight": "I'll fight. (1,000 gold)",
+    "rules": "Remind me of the rules.",
+    "champions": "Tell me about your champions.",
+    "aboutArena": "Who runs this place?",
+    "goodbye": "Another time."
+  },
+  "rules": {
+    "message": "A thousand gold opens the gate, and the fee stays with me whatever happens. Twenty waves, one sandglass, ten minutes; every fifth wave is a champion, and the last is Yad. Beat the sand and you walk out in a Molten Cape, with something extra the first time; walk out early or run dry and you keep only what your kills paid.",
+    "champions": "Tell me about your champions.",
+    "ok": "Understood."
+  },
+  "champions": {
+    "message": "Four of them, and none just stands there and bleeds. Each has a trick, and each trick wants a different answer. Who do you want to hear about?",
+    "brute": "The Brute.",
+    "arcanist": "The Arcanist.",
+    "burrower": "The Burrower.",
+    "yad": "Yad.",
+    "enough": "That's enough."
+  },
+  "aboutBrute": {
+    "message": "Wave five. The Brute's all iron and old scars, and his old wounds open up when he's working hard. Watch him, not your blade, and hit where it shows.",
+    "more": "Who else?",
+    "thanks": "Thanks, Ludo."
+  },
+  "aboutArcanist": {
+    "message": "Wave ten. The Arcanist wears a ward that drinks from your sandglass every time a spell hits her. Steel and staff don't bother it, so save your spells; you'll want them for Yad.",
+    "more": "Who else?",
+    "thanks": "Thanks, Ludo."
+  },
+  "aboutBurrower": {
+    "message": "Wave fifteen. Trappers dug it out of a turnip field south of the walls, and it still won't stay above ground. When it goes under, watch the mounds: the one that shakes has teeth in it, and a wrong guess sends it up fresher.",
+    "more": "Who else?",
+    "thanks": "Thanks, Ludo."
+  },
+  "aboutYad": {
+    "message": "Wave twenty, and the reason the stands fill. Yad's guard shifts like the weather: fire one minute, wind or water the next. A fighter with one trick won't last.",
+    "origin": "Where did Yad come from?",
+    "more": "Who else?",
+    "thanks": "Thanks, Ludo."
+  },
+  "yadOrigin": {
+    "message": "Came in a crate last spring, from trappers who took their pay and wouldn't say where they'd been. \"Yad\" was the one word chalked on the lid. When its guard goes up, the air in the stands turns like a storm's coming.",
+    "more": "Who else?",
+    "thanks": "Thanks, Ludo."
+  },
+  "aboutArena": {
+    "message": "The castle holds the Arena's charter; I keep the sand and the crowd happy. Trappers sell me whatever the Elderwood coughs up, so you'll know half the beasts out there. Champions sign on for the purse, all but Yad.",
+    "aboutLudo": "And you?",
+    "ok": "Got it."
+  },
+  "aboutLudo": {
+    "message": "Eleven seasons champion, never once beaten on this sand. Then a cart wheel took my knee on market day, and the castle gave me the gate. Now I shout louder than I swing!",
+    "ok": "Fair enough."
+  },
+  "claimed": {
+    "message": "Your winnings, challenger, every last stitch. The stands are still shouting your name.",
+    "ok": "Thanks, Ludo."
+  },
+  "running": {
+    "message": "You've got a fight going and the sand's still falling! Get back out there, challenger.",
+    "ok": "On my way."
+  }
+}

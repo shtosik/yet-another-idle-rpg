@@ -9,7 +9,7 @@ import { MawoodFinnDialogueType } from './mawoodTown/mawoodFinn'
 import { MawoodBrennDialogueType } from './mawoodTown/mawoodBrenn'
 import { MawoodMiloDialogueType } from './mawoodTown/mawoodMilo'
 import { MawoodElarionDialogueType } from './mawoodTown/mawoodElarion'
-import { NorthLiroldArenaMasterDialogueType } from './northLiroldTown/northLiroldArenaMaster'
+import { LiroldArenaMasterDialogueType } from './liroldTown/liroldArenaMaster'
 
 export type DialogueType =
   | LaHarparBartenderDialogueType
@@ -23,4 +23,4 @@ export type DialogueType =
   | MawoodBrennDialogueType
   | MawoodMiloDialogueType
   | MawoodElarionDialogueType
-  | NorthLiroldArenaMasterDialogueType
+  | LiroldArenaMasterDialogueType
