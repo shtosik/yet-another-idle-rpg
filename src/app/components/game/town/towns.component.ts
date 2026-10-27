@@ -39,6 +39,7 @@ export class TownsComponent {
   selectedTownId = this.townsStore.selectedTownId
   selectedTownBuilding = this.townsStore.selectedTownBuilding
   activeShopId = this.townsStore.activeShopId
+  activeShopStage = this.townsStore.activeShopStage
   dialogueActive = computed(() => this.dialogueManager.activeNpc() !== null)
 
   @Output() changeTab = new EventEmitter<GameTab>()

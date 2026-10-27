@@ -1,6 +1,6 @@
 {
   "regions": {
-    "southback": "Southback",
+    "elderreach": "Elderreach",
     "portStocksmar": "Port Stocksmar",
     "greeficHill": "Greefic Hill",
     "saintNestroud": "Saint Nestroud"
@@ -8,7 +8,7 @@
   "townsLabel": "Towns",
   "towns": {
     "laHarpar": "La Harpar",
-    "northLirold": "North Lirold",
+    "lirold": "Lirold",
     "mawood": "Mawood"
   },
   "buildings": {

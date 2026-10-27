@@ -105,8 +105,8 @@ export const TOWNS_DATA: Record<TownID, Town> = {
       },
     ],
   },
-  [TownID.northLirold]: {
-    id: TownID.northLirold,
+  [TownID.lirold]: {
+    id: TownID.lirold,
     regionId: RegionID.portStocksmar,
     url: './assets/img/backgrounds/northLirold.png',
     buildings: [
@@ -122,7 +122,7 @@ export const TOWNS_DATA: Record<TownID, Town> = {
   },
   [TownID.mawood]: {
     id: TownID.mawood,
-    regionId: RegionID.portStocksmar,
+    regionId: RegionID.elderreach,
     url: './assets/img/backgrounds/mawood.png',
     buildings: [
       {

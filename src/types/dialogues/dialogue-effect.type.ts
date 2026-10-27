@@ -34,6 +34,8 @@ export interface ItemEffect {
 export interface ShopEffect {
   type: 'shop'
   shopId: number
+  /** Stock stage to open at (default 0): items with a higher `minStage` stay hidden. */
+  stage?: number
 }
 
 export interface DialogueFlagEffect {

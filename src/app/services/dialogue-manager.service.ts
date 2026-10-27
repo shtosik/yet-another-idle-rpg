@@ -258,7 +258,7 @@ export class DialogueManagerService {
           }
           break
         case 'shop':
-          this.openShop(effect.shopId)
+          this.openShop(effect.shopId, effect.stage)
           break
         case 'flag':
           this.questStore.setDialogueFlag(effect.name)
@@ -294,9 +294,9 @@ export class DialogueManagerService {
     })
   }
 
-  private openShop(shopId: number) {
+  private openShop(shopId: number, stage = 0) {
     const npc = this.activeNpc()
-    if (npc) this.townsStore.rememberNpcShop(npc.id, shopId)
-    this.townsStore.openShop(shopId)
+    if (npc) this.townsStore.rememberNpcShop(npc.id, shopId, stage)
+    this.townsStore.openShop(shopId, stage)
   }
 }

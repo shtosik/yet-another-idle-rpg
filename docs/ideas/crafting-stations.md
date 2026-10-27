@@ -37,7 +37,7 @@ List order: always by `RecipeID`. No auto-sorting by state, so rows never jump a
 | Station | Lv 1 | Lv 2 | Lv 3 |
 |---|---|---|---|
 | Workbench | owned when Camp unlocks | Carpenter's Tools (La Harpar shop) | Carver's Bench (Mawood) |
-| Cooking | **Fire Pit**, crafted at the Workbench (stone + stick) | **Cooking Pot**, bought in La Harpar | Smoking Rack, Mawood Hunter Lodge |
+| Cooking | **Fire Pit**, crafted at the Workbench (stone + stick) | **Cooking Pot**, bought in La Harpar | Smoking Rack, Mawood Hunter's Lodge |
 | Alchemy | Mortar & Pestle, Mawood Apothecary: potions | Alembic: elixirs | later |
 | Rune Altar | bought in the Mawood magic shop next to the spellbook | later | later |
 

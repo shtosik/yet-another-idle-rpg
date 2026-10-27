@@ -7,4 +7,4 @@ Blunt, dry, busy — "in the middle of three projects." Proud craftswoman, sees 
 Sturdy woman, sleeves rolled, leather work apron, wood shavings/dust on forearms and in tousled tied-back hair. Small nicks/scars on hands. Carving knife tucked at belt. Confident half-smirk, pale bark strip shelving behind.
 
 ## Setting
-Design doc: "Brenna the Carver," shares the Hunter Lodge building with Finn. Works Silverwood bark into armor — background should show pale calcified bark strips/planks, not generic wood, distinct from Finn's hides-and-traps half of the same room.
+Design doc: "Brenna the Carver," shares the Hunter's Lodge building with Finn. Works Silverwood bark into armor — background should show pale calcified bark strips/planks, not generic wood, distinct from Finn's hides-and-traps half of the same room.

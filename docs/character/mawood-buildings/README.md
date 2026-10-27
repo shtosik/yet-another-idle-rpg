@@ -2,9 +2,9 @@
 
 Purpose, atmosphere, and background-art briefs for Mawood's town buildings, from `src/data/towns-data.ts` + `docs/design/mawood-and-elderwood-zones.md`.
 
-- [Elder Tree](elder-tree.md) — town center, Corwin
+- [Elder's Tree](elder-tree.md) — town center, Corwin
 - [Apothecary](apothecary.md) — Sylvie's shop, hollowed-trunk interior
-- [Hunter Lodge](hunter-lodge.md) — shared by Finn and Brenna, split workshop
+- [Hunter's Lodge](hunter-lodge.md) — shared by Finn and Brenna, split workshop
 - [Magic Shop](magic-shop.md) — Elarion's shop, arcane-veined heartwood
 - [High Platform](high-platform.md) — Milo's perch, open-sky contrast
 

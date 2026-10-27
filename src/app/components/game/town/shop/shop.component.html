@@ -52,8 +52,8 @@
 
     <ul class="shop__grid">
       @for (entry of items(); track entry.staticItem.itemId; let i = $index) {
-        <!-- Station gear the player already owns is not for sale. -->
-        @if (!isInstalledStation(i)) {
+        <!-- Station gear the player already owns, and stock above the opened stage, are not listed. -->
+        @if (!isInstalledStation(i) && (entry.staticItem.minStage ?? 0) <= stage()) {
           @let reason = buyBlockReason(i);
 
           <li>

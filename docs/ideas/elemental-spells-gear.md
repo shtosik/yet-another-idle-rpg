@@ -5,7 +5,7 @@
 More spells and more gear, magic and non-magic, for the zones that exist today. Shipped in batches.
 
 ## Why
-- 3 spells (Fire Strike, Haste, Double Attack); Fire Strike is the only element. Weaknesses are 16 fire, 9 physical, 4 air, 2 water, 0 earth (31 enemies). Traders' Basement and The Deepwood are almost all fire.
+- 3 spells (Fire Strike, Haste, Double Attack); Fire Strike is the only element. Weaknesses are 16 fire, 9 physical, 4 air, 2 water, 0 earth (31 enemies). Trader's Basement and The Deepwood are almost all fire.
 - Every element already has an `extra<Element>DamageMultiplier` stat and spells pass their `damageType` to `resolveHit`, so a new strike spell is data plus an icon.
 - 7 weapons, all `DamageElement.physical` (`magicStaff` too); one item in belt, boots, gloves, legs, ring and cape. No element gear exists.
 

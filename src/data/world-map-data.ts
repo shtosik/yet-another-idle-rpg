@@ -49,12 +49,12 @@ const portStocksmarMarkers: WorldMapMarker[] = [
     label: 'La Harpar',
     position: { x: 410, y: 180 },
   },
-  {
-    type: 'town',
-    townId: TownID.northLirold,
-    label: 'North Lirold',
-    position: { x: 730, y: 110 },
-  },
+  // {
+  //   type: 'town',
+  //   townId: TownID.lirold,
+  //   label: 'Lirold',
+  //   position: { x: 730, y: 110 },
+  // },
   {
     type: 'zone',
     zoneId: ZoneID.horseshoeBeach,
@@ -84,6 +84,9 @@ const portStocksmarMarkers: WorldMapMarker[] = [
     position: { x: 1250, y: 550 },
     minZoom: 2,
   },
+]
+
+const elderreachMarkers: WorldMapMarker[] = [
   {
     type: 'zone',
     zoneId: ZoneID.elderwoodWilds,
@@ -128,5 +131,6 @@ export const WORLD_MAP_DATA: WorldMap = {
   },
   markers: [
     ...portStocksmarMarkers,
+    ...elderreachMarkers,
   ],
 }

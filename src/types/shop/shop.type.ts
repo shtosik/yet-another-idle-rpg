@@ -29,4 +29,6 @@ export interface ShopItem {
   refreshable: boolean
   /** Exploration Guild rank needed to buy it (token shop tiers). */
   minRank?: number
+  /** Stock stage the shop must be opened at to list it (default 0); see `ShopEffect.stage`. */
+  minStage?: number
 }
