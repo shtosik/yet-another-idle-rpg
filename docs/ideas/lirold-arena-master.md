@@ -57,7 +57,7 @@ Replaces the current text (which names Varek and says the road comes "past the t
 
 Options, in hub order (claim first, as a turn-in):
 1. "I've come for my winnings." → claimed · effect: arena `claim` (only if arena `rewardsWaiting`; hidden otherwise)
-2. "I'll fight. (1,000 gold)" → one option, two results:
+2. "I'll fight." (the fee shows in the effect label) → one option, two results:
    - close · effects: deduct 1,000 gold (`ARENA.entryFee`), arena `enter` (only if arena `idle`; the UI disables it when the player can't afford it)
    - → running (fallback: a run is already going on)
 3. "Remind me of the rules." → rules

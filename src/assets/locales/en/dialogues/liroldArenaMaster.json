@@ -7,7 +7,7 @@
   "default": {
     "message": "The sand's raked and the stands are filling. Fight, talk or gawk, challenger?",
     "claim": "I've come for my winnings.",
-    "fight": "I'll fight. (1,000 gold)",
+    "fight": "I'll fight.",
     "rules": "Remind me of the rules.",
     "champions": "Tell me about your champions.",
     "aboutArena": "Who runs this place?",
