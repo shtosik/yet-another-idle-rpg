@@ -46,7 +46,10 @@
         appHalfSizeSprite
         [src]="currentEnemy().url"
         [class.enemy__sprite--shiny]="battleStore.isShinyEnemy()"
-        [class]="shield !== null ? 'enemy__sprite enemy__sprite--shield-' + DamageElement[shield] : 'enemy__sprite'"
+        [class.enemy__sprite--shield-fire]="shield === DamageElement.fire"
+        [class.enemy__sprite--shield-air]="shield === DamageElement.air"
+        [class.enemy__sprite--shield-water]="shield === DamageElement.water"
+        class="enemy__sprite"
         alt=""
       >
     }
