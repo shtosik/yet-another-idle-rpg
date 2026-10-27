@@ -1,29 +1,24 @@
 # CLAUDE.md
 
-Guidance for Claude Code in this repository: a browser idle RPG (auto-battle in zones, skill tree, gear, quests, towns, crafting).
+A browser idle RPG: auto-battle in zones, skill tree, gear, quests, towns, crafting.
 
 ## Commands
 
 ```bash
-npm start            # dev server (ng serve)
-npm run build        # production build
 npm run validate     # data, i18n, asset and doc-reference checks (scripts/validate-data.mjs)
 npm run sim          # economy simulation: zone times, first-hour ladder, reward flags (scripts/sim-economy.mjs)
-npm run tile         # regenerate world map tiles (node scripts/tile-map.mjs)
+npm run tile         # regenerate world map tiles
 npm run test:assets  # asset-gen pipeline tests (node:test, no GPU needed)
 ```
 
 **Done** = `npm run validate` and `npx ng build` both pass.
 
-## Role
+**Before writing or reviewing code**, read `CODING_STANDARDS.md`: stack conventions, where data lives, derived stats, i18n registration, save compatibility.
 
-You're Senior Game Programmer. Prioritize good game design, user experience and optimization for web application. Write code that is readable with modern Angular standards, use signals. Ask questions if needed.
+## Working with me
 
-## Communication Guidelines
-
-- Always think through the problem before executing code.
-- If a requirement is ambiguous or if you need more information to provide the best solution, **ask me a clarifying question** before proceeding.
-- Do not make assumptions about my project architecture if the answer isn't clear from the existing files.
+- If a requirement or the project architecture is unclear from the existing files, **ask me a clarifying question** before proceeding.
+- Prioritize game design and user experience.
 
 ## Git workflow
 
@@ -35,17 +30,8 @@ Several Claude sessions often run in parallel on this repo, sharing the main che
 - Run `npm install` in the new worktree. **Do not** junction/symlink `node_modules` from the main checkout — removing the worktree has deleted the real `node_modules` before.
 - Only stage files you changed yourself; other sessions' uncommitted work may be in the tree.
 
-## Stack
-
-Angular 20 standalone components, zoneless change detection, `OnPush` on every component (a few older ones still lack it), `inject()` for DI, signal `input()`/`output()` in new code (some older components still use decorators). State in NgRx Signal Stores (`src/app/store/`), persisted to `localStorage`. Angular Material dialogs, SASS, i18next, Leaflet. Static game content is typed TS data in `src/data/`, keyed by numeric enums in `src/enums/`.
-
 ## Gotchas
 
-- **Pre-release: save compatibility is not required.** Rename and renumber freely; clear `localStorage` after a breaking state change.
-- **Stats are derived, not stored.** `PlayerStore.stats()` is computed from base + equipment + skill nodes + buffs + consumables + permanent bonuses. `updatePlayerStats` only earns/spends resources or adds a permanent bonus; a new stat source goes into the `stats` computed (ADR 0002).
-- **New i18n namespace → register it** in the `translations` list in `src/app/app.config.ts`. Template pipe is `| i18next`.
-- **Item data lives in `src/data/items/<category>-items.data.ts`**; `src/data/items-data.ts` only merges them.
-- **Quest conditions**: `QuestState.active` = started; `QuestState.readyToAdvance` = started and current step's requirements met (turn-ins).
 - **Owner decisions**: block gold spending the player can't afford; block unequip, craft and quest turn-in when the result has no inventory space (enemy drops lost on a full inventory is intended). Details in `docs/systems/player-stats-inventory-equipment.md`.
 - **Language**: use the terms in `GLOSSARY.md` in code, docs and commits.
 - **`docs/archive/` is history.** Current behavior is in `docs/systems/`.
@@ -73,9 +59,9 @@ Angular 20 standalone components, zoneless change detection, `OnPush` on every c
 
 ## Skills and agents
 
-Adding content: `/add-enemy-and-zone`, `/add-quest`, `/add-recipe-or-consumable`, `/add-equipment-item`, `/add-shiny-variant`, `/add-monster-weakness`, `/add-npc-dialogue`, `/add-shop`, `/add-town-building`, `/add-dialogue-effect`. Checking a dialogue tree: `/audit-dialogue`.
-
-Art (icons, sprites, portraits, backgrounds): `/generate-2d-asset`, which briefs the `asset-generator` agent.
+- Adding content: `/add-enemy-and-zone`, `/add-quest`, `/add-recipe-or-consumable`, `/add-equipment-item`, `/add-shiny-variant`, `/add-monster-weakness`, `/add-npc-dialogue`, `/add-shop`, `/add-town-building`, `/add-dialogue-effect`.
+- Checking a dialogue tree: `/audit-dialogue`.
+- Art (icons, sprites, portraits, backgrounds): `/generate-2d-asset`, which briefs the `asset-generator` agent.
 
 ## Other docs
 
