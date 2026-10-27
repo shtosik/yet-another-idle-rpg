@@ -10,3 +10,4 @@ How code is written in this repo. Read before writing or reviewing code.
 - Dialogs use Angular Material.
 - Static game content is typed TS data in `src/data/`, keyed by numeric enums in `src/enums/`.
 - **Item data lives in `src/data/items/<category>-items.data.ts`**; `src/data/items-data.ts` only merges them.
+- **Stats are derived**: a new stat source goes into the `stats` computed in `PlayerStore`; see `docs/systems/player-stats-inventory-equipment.md`.
