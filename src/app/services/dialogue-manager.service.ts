@@ -15,6 +15,7 @@ import { QuestStep } from '../../types/quests/quest-progression.type'
 import { ItemStack } from '../store/player/inventory'
 import { ExplorationGuildService } from './exploration-guild.service'
 import { TownsStore } from '../store/towns/towns.store'
+import { CurrencyFeedService } from './currency-feed.service'
 
 @Injectable({ providedIn: 'root' })
 export class DialogueManagerService {
@@ -22,6 +23,7 @@ export class DialogueManagerService {
   private questStore = inject(QuestsStore)
   private guildService = inject(ExplorationGuildService)
   private townsStore = inject(TownsStore)
+  private currencyFeed = inject(CurrencyFeedService)
 
   private currentConversation = signal<Record<any, DialogueNode<any>> | null>(null)
   private currentNodeId = signal<any>(null)
@@ -220,26 +222,8 @@ export class DialogueManagerService {
 
   /** Kill requirements of `questId` count kills since its current step started. */
   private checkRequirement(req: RequirementProps, questId: QuestID): boolean {
-    switch (req.type) {
-      case 'stat':
-        const stats = this.playerStore.stats()
-
-        return (stats[req.key] as number) >= req.amount
-      case 'item':
-        return this.playerStore.itemCount(req.itemId) >= req.amount
-      case 'enemy':
-        return this.questStore.questEnemyKills(questId, req.enemyId) >= req.amount
-      case 'quest':
-        const currentProgress = this.questStore.getQuestStep(req.questId)
-
-        if (!currentProgress) return false
-
-        return req.step !== undefined ? currentProgress === req.step : true
-      case 'wave':
-        return this.questStore.questWaveKills(questId, req.zoneId, req.wave) >= req.amount
-      default:
-        return false
-    }
+    const { current, target } = this.questStore.requirementProgress(questId, req)
+    return current >= target
   }
 
   private applyEffects(effects: DialogueEffect[]) {
@@ -286,9 +270,12 @@ export class DialogueManagerService {
             case 'abandonTask':
               this.playerStore.abandonTask(effect.taskIndex ?? 0)
               break
-            case 'claimTask':
+            case 'claimTask': {
+              const tokensBefore = this.playerStore.explorerTokens()
               this.playerStore.claimCompletedTasks()
+              this.currencyFeed.show('explorerTokens', this.playerStore.explorerTokens() - tokensBefore)
               break
+            }
           }
           break
       }
@@ -296,6 +283,8 @@ export class DialogueManagerService {
   }
 
   private openShop(shopId: number) {
+    const npc = this.activeNpc()
+    if (npc) this.townsStore.rememberNpcShop(npc.id, shopId)
     this.townsStore.openShop(shopId)
   }
 }

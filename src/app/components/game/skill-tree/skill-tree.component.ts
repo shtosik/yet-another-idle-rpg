@@ -42,7 +42,7 @@ export class SkillTreeComponent {
     attributionControl: false,
     zoomControl: true,
     center: L.latLng(-400, 700),
-    zoom: -1,
+    zoom: 0,
     doubleClickZoom: false,
     zoomAnimation: true,
   }
@@ -94,7 +94,7 @@ export class SkillTreeComponent {
 
   private placeEdges(): void {
     const edgeGroup = L.layerGroup().addTo(this.map)
-    for (const [fromId, dependents] of SKILL_TREE_GRAPH.forwardEdges) {
+    for (const [fromId, dependents] of SKILL_TREE_GRAPH.drawnEdges) {
       const fromPos = SKILL_TREE_GRAPH.positions.get(fromId)
       if (!fromPos) continue
       for (const toId of dependents) {
@@ -133,12 +133,20 @@ export class SkillTreeComponent {
     }
 
     for (const edge of this.edges) {
-      const toState = stateById.get(edge.to)
-      const styleKey: 'locked' | 'available' | 'allocated' =
-        (toState === 'allocated' || toState === 'maxed') ? 'allocated'
-          : (toState === 'available') ? 'available'
-            : 'locked'
-      edge.polyline.setStyle(EDGE_STYLE[styleKey])
+      edge.polyline.setStyle(EDGE_STYLE[this.edgeStyle(stateById.get(edge.to))])
+    }
+  }
+
+  /** An edge is styled by the node it leads to. */
+  private edgeStyle(toState: NodeState | undefined): keyof typeof EDGE_STYLE {
+    switch (toState) {
+      case 'allocated':
+      case 'maxed':
+        return 'allocated'
+      case 'available':
+        return 'available'
+      default:
+        return 'locked'
     }
   }
 

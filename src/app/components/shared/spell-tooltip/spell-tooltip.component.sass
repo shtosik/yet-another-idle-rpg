@@ -1,0 +1,48 @@
+@use '../../../../styles/palette' as palette
+@use 'sass:map'
+
+.spell-tooltip
+  display: flex
+  flex-direction: column
+
+  &__header
+    display: flex
+    gap: 0.8rem
+    align-items: center
+    justify-content: space-between
+
+    span:first-child
+      color: palette.$cyan
+
+    .melee
+      color: map.get(palette.$spellTypePalette, melee)
+
+    .magic
+      color: map.get(palette.$spellTypePalette, magic)
+
+    .buff
+      color: map.get(palette.$spellTypePalette, buff)
+
+    .damageOverTime
+      color: map.get(palette.$spellTypePalette, damageOverTime)
+
+    .empower
+      color: map.get(palette.$spellTypePalette, empower)
+
+  &__desc
+    margin-top: 0.5rem
+    font-size: 0.8rem
+
+  &__info
+    display: flex
+    gap: 1rem
+    margin-top: 0.3rem
+
+    .mana
+      color: palette.$blue
+
+    .cooldown
+      color: palette.$yellow
+
+    .duration
+      color: palette.$cyan

@@ -26,4 +26,11 @@ Owner decisions in force:
 | [Town building upgrades](town-building-upgrades.md) | M | Proposed |
 | [Bounty board](bounty-board.md) | S-M | Proposed |
 | [Buffs and consumable effects](buffs-and-consumable-effects.md) | S-M | Open question |
+| [UI overhaul: navbar, HUD, shop, Camp, town, map](ui-overhaul.md) | M | Navbar, HUD, Camp grid done; rest accepted |
+| [Quest panel and reputation](quest-panel.md) | M | Quest list done; reputation tab empty |
+| [Keybinds](keybinds.md) | S | Proposed |
+| [Responsive layout](responsive-layout.md) | M | Proposed |
+| [Elemental spells & gear expansion](elemental-spells-gear.md) | M | Batch 1 (spells, element branches, weaknesses) done |
+| [Loadouts](loadouts.md) | S | Accepted |
+| [Auto-cast](auto-cast.md) | S-M | Proposed |
 | [Known issues](known-issues.md) | — | Open bug and tech-debt list |

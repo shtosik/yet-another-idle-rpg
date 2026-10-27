@@ -14,6 +14,8 @@ import { UnlockedSpellsType } from '../../../types/player/unlocked-spells.type'
 import ITEM_DATA from '../../../data/items-data'
 import ZONES_DATA from '../../../data/zones-data'
 import { killReward, rollEnemyDrops } from './kill-rewards'
+import { rankBonus } from './bestiary-rank'
+import { addShinyKills, masteryModifiers, ZoneStar, zoneStarProgress, ZoneStarProgress } from './zone-mastery'
 import { sellPrice } from '../shop/shop-prices'
 import { ShopID } from '../../../enums/ids/shop-id.enum'
 import ENEMIES_DATA from '../../../data/enemies-data'
@@ -35,6 +37,7 @@ import { canInstall, evaluateRecipe, installStations, Stations } from './camp'
 import { StationID } from '../../../enums/ids/station-id.enum'
 import { UNLOCK_RULES, UnlockCondition, UnlockTarget } from '../../../data/unlock-conditions'
 import { BattleStore } from '../battle/battle.store'
+import { EquippedSpell } from '../../../interfaces/spells/equipped-spell.interface'
 import {
   activeBuffSpellIds,
   activeConsumableItemIds,
@@ -49,6 +52,7 @@ import {
   Resources,
   sameIds,
   skillNodeModifiers,
+  SourcedModifiers,
 } from './stats'
 
 export type { PlayerStatsType } from './stats'
@@ -74,6 +78,10 @@ interface PlayerState {
   manaRegenTimer: number;
   zonesProgression: ZonesProgression;
   enemyKillCounts: Partial<Record<EnemyID, number>>
+  /** Shiny kills per zone, for the zone's shiny mastery star. */
+  shinyKillsByZone: Partial<Record<ZoneID, number>>
+  /** Mastery stars whose chest was claimed (`zone-mastery.ts`). */
+  claimedZoneStars: Partial<Record<ZoneID, ZoneStar[]>>
   inventory: (InventoryItem | null)[];
   equipment: EquipmentType;
   unlockedNodes: UnlockedNodes;
@@ -88,6 +96,9 @@ interface PlayerState {
   mapUnlocked: boolean;
   unlockedRecipes: RecipeID[];
   spellbookUnlocked: boolean;
+  /** Bestiary entries and spells the player has looked at; the rest show as a navbar badge. */
+  seenEnemies: EnemyID[];
+  seenSpells: SpellID[];
 }
 
 export const initialState: PlayerState = {
@@ -100,6 +111,8 @@ export const initialState: PlayerState = {
   unlockedNodes: {},
   unlockedSpells: {},
   enemyKillCounts: {},
+  shinyKillsByZone: {},
+  claimedZoneStars: {},
   activeTasks: [],
   totalTasksCompleted: 0,
   explorerTokens: 0,
@@ -113,7 +126,24 @@ export const initialState: PlayerState = {
   mapUnlocked: false,
   unlockedRecipes: [],
   spellbookUnlocked: false,
+  seenEnemies: [],
+  seenSpells: [],
 }
+
+const revealedEnemies = (kills: PlayerState['enemyKillCounts']): EnemyID[] =>
+  (Object.keys(kills).map(Number) as EnemyID[]).filter(id => (kills[id] ?? 0) > 0)
+
+const knownSpells = (spells: UnlockedSpellsType): SpellID[] =>
+  (Object.keys(spells).map(Number) as SpellID[]).filter(id => (spells[id] ?? 0) > 0)
+
+/** Spells granted by equipped gear (`EquipmentItem.spell`). */
+const equipmentSpells = (equipment: EquipmentType): SpellID[] =>
+  Object.values(equipment).flatMap(equipped => {
+    const spell = equipped ? (ITEM_DATA[equipped.id] as EquipmentItem).spell : undefined
+    return spell === undefined ? [] : [spell]
+  })
+
+const unseen = <T>(ids: T[], seen: T[]): T[] => ids.filter(id => !seen.includes(id))
 
 const equipmentInventorySlots = (itemId: ItemID): number =>
   (ITEM_DATA[itemId] as EquipmentItem).stats
@@ -134,22 +164,24 @@ const handleExperience = (resources: Resources) => {
 const stackAmount = (inventory: (InventoryItem | null)[], id: ItemID, tier: ItemTier): number =>
   inventory.reduce((sum, slot) => slot?.id === id && slot.tier === tier ? sum + slot.amount : sum, 0)
 
-type StatSources = { [K in 'resources' | 'permanentBonuses' | 'equipment' | 'unlockedNodes']: () => PlayerState[K] }
+type StatSources = { [K in 'resources' | 'permanentBonuses' | 'equipment' | 'unlockedNodes' | 'claimedZoneStars']: () => PlayerState[K] }
 
-const deriveStatsWith = (store: StatSources, buffSpellIds: SpellID[], consumableItemIds: ItemID[]) =>
-  deriveStats(store.resources(), [
-    ...bonusModifiers(store.permanentBonuses()),
-    ...equipmentModifiers(store.equipment()),
-    ...skillNodeModifiers(store.unlockedNodes()),
-    ...buffModifiers(buffSpellIds),
-    ...consumableModifiers(consumableItemIds),
-  ])
+/** Every stat modifier, grouped by where it comes from (the stats panel's breakdown order). */
+const sourcedModifiersOf = (store: StatSources, buffSpellIds: SpellID[], consumableItemIds: ItemID[]): SourcedModifiers => ({
+  equipment: equipmentModifiers(store.equipment()),
+  skills: skillNodeModifiers(store.unlockedNodes()),
+  buffs: buffModifiers(buffSpellIds),
+  consumables: consumableModifiers(consumableItemIds),
+  bonuses: bonusModifiers(store.permanentBonuses()),
+  mastery: masteryModifiers(store.claimedZoneStars()),
+})
 
 /** Totals of a batch of kills (an offline claim), applied in one store update. */
 export interface KillBatch {
   zoneId: ZoneID
   wave: number
   kills: number
+  shinies: number
   killsByEnemy: Partial<Record<EnemyID, number>>
   /** Task counts per enemy, Bounty Mark doubles included; capped at each task's target when applied. */
   taskCountsByEnemy: Partial<Record<EnemyID, number>>
@@ -179,9 +211,30 @@ export const PlayerStore = signalStore(
     const activeBuffs = computed(() => activeBuffSpellIds(battleStore.activeBuffs()), { equal: sameIds })
     const activeConsumables = computed(() => activeConsumableItemIds(battleStore.consumableSlots()), { equal: sameIds })
 
+    const sourcedModifiers = computed(() => sourcedModifiersOf(store, activeBuffs(), activeConsumables()))
+
     return {
+      sourcedModifiers,
       /** Base stats plus every source; never stored (docs/adr/0002-player-stats-derived-from-sources.md). */
-      stats: computed(() => deriveStatsWith(store, activeBuffs(), activeConsumables())),
+      stats: computed(() => deriveStats(store.resources(), Object.values(sourcedModifiers()).flat())),
+    }
+  }),
+  withComputed((store, battleStore = inject(BattleStore)) => {
+    /** Spells from the skill tree plus spells from equipped gear. */
+    const knownSpellIds = computed(() => [
+      ...new Set([...knownSpells(store.unlockedSpells()), ...equipmentSpells(store.equipment())]),
+    ])
+
+    /** Known spells not on the spell bar and not yet viewed: what the Spellbook palette shows as new. */
+    const unseenSpells = computed(() => {
+      const equipped = battleStore.equippedSpells().map(slot => slot?.spellId)
+      return unseen(knownSpellIds(), store.seenSpells()).filter(id => !equipped.includes(id))
+    })
+
+    return {
+      knownSpellIds,
+      unseenSpells,
+      unseenSpellCount: () => unseenSpells().length,
     }
   }),
   withComputed((store) => ({
@@ -190,11 +243,23 @@ export const PlayerStore = signalStore(
     hasAvailableTaskSlot: () => store.activeTasks().length < store.stats().maxTaskSlots,
     hasCompletedTask: () => store.activeTasks().some(isTaskDone),
     hasTaskInProgress: () => store.activeTasks().some(task => !isTaskDone(task)),
+    unseenEnemyCount: () => unseen(revealedEnemies(store.enemyKillCounts()), store.seenEnemies()).length,
     equippedWeaponDamageType: () => {
       const weapon = store.equipment().weapon
       if (!weapon) return DamageElement.physical
       return (ITEM_DATA[weapon.id] as EquipmentItem).damageType ?? DamageElement.physical
     },
+    /** Mastery star progress for every zone. */
+    zoneMastery: computed(() => {
+      const state = {
+        enemyKillCounts: store.enemyKillCounts(),
+        shinyKillsByZone: store.shinyKillsByZone(),
+        claimedZoneStars: store.claimedZoneStars(),
+      }
+      return Object.fromEntries(
+        (Object.keys(ZONES_DATA).map(Number) as ZoneID[]).map(id => [id, zoneStarProgress(id, state)]),
+      ) as Record<ZoneID, ZoneStarProgress[]>
+    }),
   })),
   withMethods((store) => ({
     resetState() {
@@ -372,11 +437,21 @@ export const PlayerStore = signalStore(
     },
 
     canEquip(item: InventoryItem): boolean {
-      const slotKey = EquipmentSlot[(ITEM_DATA[item.id] as EquipmentItem).slot] as EquipmentSlotKey
+      // Only items with an equipment slot can be equipped; anything else would land under an undefined slot key.
+      const slot = (ITEM_DATA[item.id] as EquipmentItem).slot
+      if (slot === undefined) return false
+      const slotKey = EquipmentSlot[slot] as EquipmentSlotKey
       const equipped = store.equipment()[slotKey]
       const delta = equipmentInventorySlots(item.id) - (equipped ? equipmentInventorySlots(equipped.id) : 0)
       const adding = equipped ? [{ id: equipped.id, tier: equipped.tier, amount: 1 }] : []
       return store.canChangeInventorySlots(delta, adding, [{ id: item.id, tier: item.tier, amount: 1 }])
+    },
+
+    /** Finished, unclaimed, and its chest's items fit in the inventory. */
+    canClaimZoneStar(zoneId: ZoneID, star: ZoneStar): boolean {
+      const progress = store.zoneMastery()[zoneId].find(p => p.star === star)
+      if (!progress?.done || progress.claimed) return false
+      return store.canFitItems(ZONES_DATA[zoneId].masteryReward.items)
     },
   })),
   withMethods((store) => ({
@@ -384,7 +459,8 @@ export const PlayerStore = signalStore(
       const enemy = ENEMIES_DATA[enemyId]
       const { experience, gold, dropRolls } = killReward(enemy, ZONES_DATA[zoneId], currentWave, isShiny, store.stats())
       const drops = new Map<string, InventoryItem>()
-      rollEnemyDrops(enemy, dropRolls, isShiny, drops, activeQuestIds)
+      const { dropChance } = rankBonus(enemyId, store.enemyKillCounts()[enemyId] ?? 0)
+      rollEnemyDrops(enemy, dropRolls, isShiny, dropChance, drops, activeQuestIds)
       const itemsToUpdate = [...drops.values()]
 
       store.updatePlayerStats([
@@ -395,13 +471,14 @@ export const PlayerStore = signalStore(
       store.updateZoneProgression(zoneId, currentWave)
       store.updateEnemyKillCount(enemyId)
       store.updateTaskProgress(enemyId)
+      if (isShiny) patchState(store, (state) => ({ shinyKillsByZone: addShinyKills(state.shinyKillsByZone, zoneId, 1) }))
 
       if (itemsToUpdate.length) store.addItems(itemsToUpdate)
     },
 
     /** `stats` as it would be with only these buffs and consumable effects running (offline buff segments). */
     statsFor(buffSpellIds: SpellID[], consumableItemIds: ItemID[]): PlayerStatsType {
-      return deriveStatsWith(store, buffSpellIds, consumableItemIds)
+      return deriveStats(store.resources(), Object.values(sourcedModifiersOf(store, buffSpellIds, consumableItemIds)).flat())
     },
 
     /**
@@ -439,6 +516,7 @@ export const PlayerStore = signalStore(
         return {
           resources,
           enemyKillCounts,
+          shinyKillsByZone: addShinyKills(state.shinyKillsByZone, batch.zoneId, batch.shinies),
           stations,
           inventory,
           zonesProgression: {
@@ -454,6 +532,20 @@ export const PlayerStore = signalStore(
       })
 
       return { levelsGained: store.resources().level - startLevel, receivedItems, lostDrops, installedStations: installed }
+    },
+
+    /** Pays the zone's mastery chest for a finished, unclaimed star. Refused when the items don't fit (`canClaimZoneStar`). */
+    claimZoneStar(zoneId: ZoneID, star: ZoneStar): boolean {
+      if (!store.canClaimZoneStar(zoneId, star)) return false
+      const { gold, explorerTokens, items } = ZONES_DATA[zoneId].masteryReward
+
+      store.updatePlayerStats([{ stat: 'goldCoins', amount: gold }])
+      store.addItems(items)
+      patchState(store, (state) => ({
+        explorerTokens: state.explorerTokens + explorerTokens,
+        claimedZoneStars: { ...state.claimedZoneStars, [zoneId]: [...(state.claimedZoneStars[zoneId] ?? []), star] },
+      }))
+      return true
     },
 
     /** Sells up to `amount` from one stack at `shopId`'s price (`sellPrice`). No-op when that shop won't buy it. */
@@ -515,6 +607,13 @@ export const PlayerStore = signalStore(
         const recipeData = itemData as RecipeItem
         if (store.unlockedRecipes().includes(recipeData.recipeId)) return
         patchState(store, state => ({ unlockedRecipes: [...state.unlockedRecipes, recipeData.recipeId] }))
+        store.removeItems([{ id: item.id, tier: item.tier, amount: 1 }])
+        return
+      }
+
+      if (itemData.type === ItemType.spellScroll) {
+        if (store.knownSpellIds().includes(itemData.spellId)) return
+        store.levelUpSpell(itemData.spellId)
         store.removeItems([{ id: item.id, tier: item.tier, amount: 1 }])
         return
       }
@@ -618,6 +717,16 @@ export const PlayerStore = signalStore(
     unlockSpellbook(): void {
       patchState(store, { spellbookUnlocked: true })
     },
+
+    markEnemiesSeen(): void {
+      const fresh = unseen(revealedEnemies(store.enemyKillCounts()), store.seenEnemies())
+      if (fresh.length) patchState(store, { seenEnemies: [...store.seenEnemies(), ...fresh] })
+    },
+
+    markSpellsSeen(): void {
+      const fresh = store.unseenSpells()
+      if (fresh.length) patchState(store, { seenSpells: [...store.seenSpells(), ...fresh] })
+    },
   })),
   withMethods((store) => ({
     isUnlockTargetUnlocked(target: UnlockTarget): boolean {
@@ -670,6 +779,19 @@ export const PlayerStore = signalStore(
         const { maxMana } = store.stats()
         if (store.resources().mana > maxMana) {
           patchState(store, (state) => ({ resources: { ...state.resources, mana: maxMana } }))
+        }
+      })
+
+      // A spell from gear leaves the spell bar with the gear (unequip, swap), but only once its cooldown is over: the
+      // slot stays locked meanwhile (no free slot for another spell), and re-equipping the gear keeps the cooldown.
+      const battleStore = inject(BattleStore)
+      const isGone = (slot: EquippedSpell | null, known: SpellID[]) =>
+        !!slot && !known.includes(slot.spellId) && slot.cooldownRemainingMs <= 0
+      effect(() => {
+        const known = store.knownSpellIds()
+        const bar = battleStore.equippedSpells()
+        if (bar.some(slot => isGone(slot, known))) {
+          battleStore.setAllEquippedSpells(bar.map(slot => isGone(slot, known) ? null : slot))
         }
       })
 

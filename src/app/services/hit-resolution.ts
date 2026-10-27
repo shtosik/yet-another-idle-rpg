@@ -18,6 +18,8 @@ export interface HitInput {
   enemyTypes: EnemyType[]
   hasWeaknessSkill: boolean
   hasSpellCritSkill: boolean
+  /** A guaranteed crit (Ambush), even at 0 crit chance. */
+  forceCrit?: boolean
 }
 
 const capitalize = (name: string) => name.charAt(0).toUpperCase() + name.slice(1)
@@ -35,7 +37,7 @@ export function resolveHit(input: HitInput, rng: () => number = Math.random): Hi
     : stats.attackPower
 
   const canCrit = stats.critChance > 0 && (!isMagic || input.hasSpellCritSkill)
-  const isCrit = canCrit && rng() * 100 <= stats.critChance
+  const isCrit = !!input.forceCrit || (canCrit && rng() * 100 <= stats.critChance)
   if (isCrit) damage *= stats.critMulti
 
   if (isDoubleAttack) damage *= 2

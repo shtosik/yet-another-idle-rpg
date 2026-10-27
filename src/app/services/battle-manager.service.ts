@@ -7,6 +7,7 @@ import { SkillNodeID } from '../../enums/ids/skill-node-id.enum'
 import { SpellID } from '../../enums/ids/spell-id.enum'
 import SPELLS_DATA from '../../data/spells-data'
 import { SpellType } from '../../enums/spell-type.enum'
+import { SpellDamageOverTimeEffectProps } from '../../interfaces/spell.interface'
 import { Enemy } from '../../interfaces/enemy.interface'
 import { ZONE_UNLOCK_NOTIFICATIONS } from '../../data/unlock-conditions'
 import { ModalService } from './modal.service'
@@ -57,9 +58,12 @@ export class BattleManagerService {
 
     if (!enemy) return
 
+    // Ambush: melee hits (auto-attacks and melee spells) use up the guaranteed crits; magic hits don't.
+    const forceCrit = magicDamage === 0 && this.battleStore.useEmpoweredHit()
     const { damage, isCrit, isWeaknessHit } = resolveHit({
       stats: this.playerStore.stats(),
       magicDamage,
+      forceCrit,
       isDoubleAttack,
       damageType: damageType ?? this.playerStore.equippedWeaponDamageType(),
       enemyWeakness: enemy.weakness,
@@ -78,27 +82,46 @@ export class BattleManagerService {
   }
 
   canAffordSpell(spellId: SpellID): boolean {
-    const spellData = SPELLS_DATA[spellId]
-    return this.playerStore.stats().mana >= spellData.baseManaCost
+    return this.playerStore.stats().mana >= this.manaCost(spellId)
   }
 
-  /** Seconds, after `spellCooldownReduction`, never below `MIN_SPELL_COOLDOWN_IN_SECONDS`. */
+  /** Levels of the spell's perk node (`SpellProps.perk`); 0 without one. */
+  private perkLevel(spellId: SpellID): number {
+    const perk = SPELLS_DATA[spellId].perk
+    return perk ? this.playerStore.unlockedNodes()[perk.nodeId] ?? 0 : 0
+  }
+
+  /** `baseManaCost` minus the perk's mana per level, never below 1. */
+  manaCost(spellId: SpellID): number {
+    const { baseManaCost, perk } = SPELLS_DATA[spellId]
+    return Math.max(1, baseManaCost - (perk?.manaPerLevel ?? 0) * this.perkLevel(spellId))
+  }
+
+  /** Seconds, after `spellCooldownReduction` and the spell's perk, never below `MIN_SPELL_COOLDOWN_IN_SECONDS`. */
   spellCooldown(spellId: SpellID): number {
-    const reduced = SPELLS_DATA[spellId].baseCooldown - this.playerStore.stats().spellCooldownReduction
+    const { baseCooldown, perk } = SPELLS_DATA[spellId]
+    const perkReduction = (perk?.cooldownPerLevel ?? 0) * this.perkLevel(spellId)
+    const reduced = baseCooldown - this.playerStore.stats().spellCooldownReduction - perkReduction
     return Math.max(MIN_SPELL_COOLDOWN_IN_SECONDS, reduced)
   }
 
   /**
-   * Equipped, off cooldown and affordable. Damage spells need a living enemy; buffs can be cast between fights
-   * but not while already active.
+   * Equipped, off cooldown, known (a gear spell: its gear is on) and affordable. Damage spells need a living enemy; buffs and
+   * empower spells (Ambush) can be cast between fights but not while already active.
    */
   canCast(spellId: SpellID): boolean {
     const slot = this.battleStore.equippedSpells().find(s => s?.spellId === spellId)
     if (!slot || slot.cooldownRemainingMs > 0 || !this.canAffordSpell(spellId)) return false
+    // A gear spell waiting out its cooldown after the gear came off.
+    if (!this.playerStore.knownSpellIds().includes(spellId)) return false
 
     if (SPELLS_DATA[spellId].effect.type === SpellType.buff) {
       return !this.battleStore.activeBuffs().some(b => b.spellId === spellId)
     }
+    if (SPELLS_DATA[spellId].effect.type === SpellType.damageOverTime
+      && this.battleStore.activeDamageOverTime().some(d => d.spellId === spellId)) return false
+    // Like a buff: castable between fights, not again while its crits are left.
+    if (SPELLS_DATA[spellId].effect.type === SpellType.empower) return this.battleStore.empowered()?.spellId !== spellId
     return this.battleStore.isInCombat()
   }
 
@@ -106,7 +129,7 @@ export class BattleManagerService {
     if (!this.canCast(spellId)) return
 
     const spellData = SPELLS_DATA[spellId]
-    this.playerStore.updatePlayerStats([{ stat: 'mana', amount: -spellData.baseManaCost }])
+    this.playerStore.updatePlayerStats([{ stat: 'mana', amount: -this.manaCost(spellId) }])
     this.battleStore.setSpellCooldown(spellId, this.spellCooldown(spellId) * MS_PER_SECOND)
 
     switch (spellData.effect.type) {
@@ -115,6 +138,12 @@ export class BattleManagerService {
         break
       case SpellType.magic:
         this.doDamage(spellData.effect.baseDamage, false, spellData.effect.damageType)
+        break
+      case SpellType.damageOverTime:
+        this.battleStore.addDamageOverTime(spellId)
+        break
+      case SpellType.empower:
+        this.battleStore.empower(spellId, spellData.effect.hits)
         break
       case SpellType.buff: {
         // The stat change itself is derived from activeBuffs (PlayerStore.stats).
@@ -144,6 +173,19 @@ export class BattleManagerService {
 
   tickSpells(deltaMs: number): void {
     this.battleStore.tickSpellTimers(deltaMs)
+  }
+
+  /** Damage over time only runs while an enemy is alive, so a respawn doesn't use it up; it goes on to the next enemy. */
+  tickDamageOverTime(deltaMs: number): void {
+    let remainingMs = deltaMs
+    // Hit by hit, so a kill stops the clock right there: the time and hits left wait for the next enemy.
+    while (remainingMs > 0 && this.battleStore.isInCombat()) {
+      const { spellId, usedMs } = this.battleStore.advanceDamageOverTime(remainingMs)
+      remainingMs -= usedMs
+      if (spellId === null) return
+      const { damagePerHit, damageType } = SPELLS_DATA[spellId].effect as SpellDamageOverTimeEffectProps
+      this.doDamage(damagePerHit, false, damageType)
+    }
   }
 
   /** Once per second: consumable effects and locks, then auto-eat. */

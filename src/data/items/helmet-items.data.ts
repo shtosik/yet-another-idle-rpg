@@ -59,4 +59,40 @@ export const HelmetItemsData: Partial<Record<ItemID, Item>> = {
       },
     ],
   },
+  [ItemID.mysticHood]: {
+    id: ItemID.mysticHood,
+    tier: ItemTier.uncommon,
+    url: './assets/img/items/mysticHood.png',
+    value: 1300,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.helmet,
+    stats: [
+      { id: 'magicDamage', amount: 3 },
+      { id: 'manaRegenRate', amount: 3000 },
+    ],
+  },
+  [ItemID.leatherCap]: {
+    id: ItemID.leatherCap,
+    tier: ItemTier.normal,
+    url: './assets/img/items/leatherCap.png',
+    value: 12,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.helmet,
+    stats: [
+      { id: 'attackPower', amount: 1 },
+      { id: 'critChance', amount: 1 },
+    ],
+  },
+  [ItemID.banditBandana]: {
+    id: ItemID.banditBandana,
+    tier: ItemTier.uncommon,
+    url: './assets/img/items/banditBandana.png',
+    value: 600,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.helmet,
+    stats: [
+      { id: 'attackPower', amount: 2 },
+      { id: 'goldCoinsMultiplier', amount: 0.15 },
+    ],
+  },
 }

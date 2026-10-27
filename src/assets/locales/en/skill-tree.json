@@ -2,7 +2,11 @@
     "branches": {
         "damage": "Damage",
         "exploration": "Exploration",
-        "magic": "Magic"
+        "magic": "Magic",
+        "fire": "Fire",
+        "water": "Water",
+        "air": "Air",
+        "earth": "Earth"
     },
     "nodes": {
         "origin": {
@@ -57,9 +61,53 @@
             "name": "Fire Strike",
             "desc": "Unlocks a Fire Strike spell."
         },
+        "tidalLash": {
+            "name": "Tidal Lash",
+            "desc": "Unlocks a Tidal Lash spell."
+        },
+        "galeCut": {
+            "name": "Gale Cut",
+            "desc": "Unlocks a Gale Cut spell."
+        },
+        "stoneSpike": {
+            "name": "Stone Spike",
+            "desc": "Unlocks a Stone Spike spell."
+        },
+        "fireMastery": {
+            "name": "Fire Mastery",
+            "desc": "Hits on a fire weakness deal more damage: +0.1 to the fire weakness multiplier. Needs the Weaknesses skill."
+        },
+        "waterMastery": {
+            "name": "Water Mastery",
+            "desc": "Hits on a water weakness deal more damage: +0.1 to the water weakness multiplier. Needs the Weaknesses skill."
+        },
+        "airMastery": {
+            "name": "Air Mastery",
+            "desc": "Hits on an air weakness deal more damage: +0.1 to the air weakness multiplier. Needs the Weaknesses skill."
+        },
+        "earthMastery": {
+            "name": "Earth Mastery",
+            "desc": "Hits on an earth weakness deal more damage: +0.1 to the earth weakness multiplier. Needs the Weaknesses skill."
+        },
+        "fireStrikeCooldown": {
+            "name": "Kindling",
+            "desc": "Fire Strike's cooldown is 5 seconds shorter per level."
+        },
+        "tidalLashCooldown": {
+            "name": "Undertow",
+            "desc": "Tidal Lash's cooldown is 5 seconds shorter per level."
+        },
+        "galeCutCooldown": {
+            "name": "Tailwind",
+            "desc": "Gale Cut's cooldown is 3 seconds shorter per level."
+        },
+        "stoneSpikeMana": {
+            "name": "Bedrock",
+            "desc": "Stone Spike costs 1 less mana per level."
+        },
         "maxMana": {
             "name": "Max Mana",
-            "desc": "Increases max mana by 1."
+            "desc": "Increases max mana by 1. Opens once you know any strike spell (Fire Strike, Tidal Lash, Gale Cut or Stone Spike)."
         },
         "manaRegen": {
             "name": "Mana Regen",

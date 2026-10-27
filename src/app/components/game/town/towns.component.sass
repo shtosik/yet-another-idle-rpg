@@ -44,17 +44,40 @@ app-close-button
   background-position: center
   position: relative
 
+  &__name
+    position: absolute
+    top: 1rem
+    left: 1rem
+    padding: 0.3rem 0.75rem
+    border-radius: vars.$panelBorderRadius
+    background: rgba(0, 0, 0, 0.6)
+    color: palette.$yellow
+    font-size: 1rem
+    text-shadow: vars.$textShadow
+    pointer-events: none
+
 .building-btn
   position: absolute
   transform: translate(-50%, -50%)
-  background-color: rgba(0, 0, 0, 0.2)
+  background-color: rgba(0, 0, 0, 0.45)
   color: white
-  border: none
+  border: 1px solid transparent
   border-radius: vars.$panelBorderRadius
   padding: 0.6rem 1rem
   cursor: pointer
+  font: inherit
   font-size: 0.9rem
-  transition: background-color 0.2s ease
+  text-shadow: vars.$textShadow
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.15s ease
 
-  &:hover
-    background-color: rgba(0, 0, 0, 0.7)
+  &:hover, &:focus-visible
+    background-color: rgba(0, 0, 0, 0.8)
+    border-color: palette.$yellow
+    color: palette.$yellow
+    transform: translate(-50%, -50%) scale(1.05)
+
+// Covers the building (and its close button) until the conversation ends.
+.dialogue
+  position: absolute
+  inset: 0
+  z-index: 20

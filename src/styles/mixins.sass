@@ -48,6 +48,12 @@
     color: map.get(palette.$itemPalette, quest)
 
 
+@mixin textColorByElement
+  @each $element, $color in palette.$elementPalette
+    &[data-element="#{$element}"]
+      color: $color
+
+
 @mixin panel
   display: flex
   height: 100%

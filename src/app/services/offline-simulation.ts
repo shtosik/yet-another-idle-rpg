@@ -9,6 +9,7 @@ import { waveMultipliers } from '../store/battle/wave-scaling'
 import { killReward, Rng, rollEnemyDrops } from '../store/player/kill-rewards'
 import type { PlayerStatsType } from '../store/player/stats'
 import { HitInput, resolveHit } from './hit-resolution'
+import { rankBonus } from '../store/player/bestiary-rank'
 import { RESPAWN_DELAY_IN_MS, timePerAttackMs } from './combat-timing'
 
 /** A stretch of offline time with one set of stats (buffs running or expired). */
@@ -27,6 +28,8 @@ export interface OfflineSimulationInput {
   activeQuestIds: Set<QuestID>
   /** Enemies with an unfinished Exploration Guild task. */
   taskEnemyIds: Set<EnemyID>
+  /** Kills when the claim starts; bestiary rank bonuses stay at these ranks for the whole claim. */
+  enemyKillCounts: Partial<Record<EnemyID, number>>
   /** Average ms per recent online kill; caps the rate at what the player really managed. `null` if unknown. */
   rollingKillMs: number | null
   rng: Rng
@@ -148,7 +151,8 @@ export function simulateOfflineKills(input: OfflineSimulationInput): OfflineSimu
     result.experience += reward.experience
     result.gold += reward.gold
     result.killsByEnemy[enemy.id] = (result.killsByEnemy[enemy.id] ?? 0) + 1
-    rollEnemyDrops(enemy, reward.dropRolls, isShiny, drops, input.activeQuestIds, rng)
+    const { dropChance } = rankBonus(enemy.id, input.enemyKillCounts[enemy.id] ?? 0)
+    rollEnemyDrops(enemy, reward.dropRolls, isShiny, dropChance, drops, input.activeQuestIds, rng)
 
     if (input.taskEnemyIds.has(enemy.id)) {
       const counts = rng() * 100 < stats.taskDoubleKillChance ? 2 : 1

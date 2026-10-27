@@ -140,3 +140,7 @@ _Avoid_: Blueprint, formula
 **Recipe scroll**:
 An item that, when used, permanently unlocks a recipe.
 _Avoid_: Recipe item, blueprint
+
+**Spell scroll**:
+An item that, when used, permanently teaches a spell (Ambush Scroll).
+_Avoid_: Spell book, tome

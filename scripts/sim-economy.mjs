@@ -2,8 +2,9 @@
 // Economy simulation: plays the main zone chain with a simple build and prints how fast the game opens up.
 // Reads enemy, zone and wave-scaling data from src/ (bundled with esbuild), so tuning a number there and
 // re-running this shows the effect. Expected values only: no shinies, no spells, no consumables.
+// --weaknesses adds a separate table: kill time per zone with the Weaknesses skill and one strike spell per element.
 //
-// Usage: npm run sim [-- --waves]   (--waves also prints every wave of every zone)
+// Usage: npm run sim [-- --waves] [-- --weaknesses]   (--waves also prints every wave of every zone)
 
 import { build } from 'esbuild'
 import { mkdirSync, readFileSync } from 'node:fs'
@@ -24,6 +25,9 @@ await build({
       export { default as ENEMIES_DATA } from 'data/enemies-data'
       export { default as ZONES_DATA } from 'data/zones-data'
       export { default as SPELLS_DATA } from 'data/spells-data'
+      export { DamageElement } from 'enums/damage-element.enum'
+      export { SpellType } from 'enums/spell-type.enum'
+      export { statsInitialState } from 'app/store/player/player'
       export { waveMultipliers } from 'app/store/battle/wave-scaling'
       export { calculateXp } from 'app/store/player/experience'
     `,
@@ -188,3 +192,47 @@ for (const t of TARGETS) {
 }
 
 console.log(flags.length ? `\nFlags\n${flags.map(f => `  - ${f}`).join('\n')}` : '\nNo flags.')
+
+// ---------------------------------------------------------------------------
+// Weaknesses and strike spells (--weaknesses)
+
+if (process.argv.includes('--weaknesses')) {
+  const capitalize = s => s.charAt(0).toUpperCase() + s.slice(1)
+  /** Weakness multiplier for an element at base stats (`extra<Element>DamageMultiplier`, 1.2), as `resolveHit` builds the name. */
+  const weaknessMultiplier = element => D.statsInitialState[`extra${capitalize(D.DamageElement[element])}DamageMultiplier`]
+  const strikeSpells = Object.values(D.SPELLS_DATA).filter(s => s.effect.type === D.SpellType.magic)
+
+  /**
+   * Average seconds per kill on wave 1 at the arrival build, continuous damage (no per-hit rounding), no magic gear.
+   * Physical auto-attacks; with `weaknesses`, physical-weak enemies take the weakness multiplier; `spell` is cast on
+   * every cooldown and also hits weaknesses (the Weaknesses skill assumed).
+   */
+  const secondsPerKill = (zone, build, { weaknesses, spell }) => {
+    const all = zone.enemies.map(id => {
+      const enemy = D.ENEMIES_DATA[id]
+      const hp = enemy.maxHp * D.waveMultipliers(zone, 1).hp
+      const autoMultiplier = weaknesses && enemy.weakness === D.DamageElement.physical ? weaknessMultiplier(enemy.weakness) : 1
+      let dps = build.attackPower * autoMultiplier / build.attackSeconds
+      if (spell) {
+        const spellMultiplier = enemy.weakness === spell.effect.damageType ? weaknessMultiplier(enemy.weakness) : 1
+        dps += spell.effect.baseDamage * spellMultiplier / spell.baseCooldown
+      }
+      return hp / dps + RESPAWN_SECONDS
+    })
+    return all.reduce((s, x) => s + x, 0) / all.length
+  }
+
+  const spellNames = strikeSpells.map(s => D.DamageElement[s.effect.damageType])
+  console.log('\nWeaknesses (wave 1 regulars, s/kill at arrival build; + element = Weaknesses skill and that strike spell on cooldown)')
+  console.log(`  zone             weak to                      phys  +weak  ${spellNames.map(n => `+${n}`.padStart(6)).join(' ')}`)
+  for (const r of zoneRows) {
+    const zone = D.ZONES_DATA[D.ZoneID[r.key]]
+    const weakTo = zone.enemies.map(id => D.DamageElement[D.ENEMIES_DATA[id].weakness] ?? '-').join(',')
+    const cells = [
+      secondsPerKill(zone, r.arrival, { weaknesses: false }),
+      secondsPerKill(zone, r.arrival, { weaknesses: true }),
+      ...strikeSpells.map(spell => secondsPerKill(zone, r.arrival, { weaknesses: true, spell })),
+    ]
+    console.log(`  ${r.key.padEnd(16)} ${weakTo.padEnd(28)} ${cells.map(c => c.toFixed(1).padStart(5)).join('  ')}`)
+  }
+}

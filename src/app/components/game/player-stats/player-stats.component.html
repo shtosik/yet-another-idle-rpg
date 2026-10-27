@@ -1,36 +1,48 @@
-@let playerStatsData = playerStats();
-
-<h3></h3>
-<ul>
-  <li class="level">
-    {{ 'playerStats.level' | i18next }}: {{ playerStatsData.level }}
-    @if (playerStatsData.unspentSkillPoints) {
-      <span> - {{ 'playerStats.unspentSkillPoints' | i18next }}: {{ playerStatsData.unspentSkillPoints }}</span>
-    }
-  </li>
-  <li class="cyan">
-    {{ 'playerStats.experience' | i18next }}: {{ playerStatsData.experience.toLocaleString('en-US') }} /
-    {{ (((playerStatsData.level || 0) + 1) | calculateXp).toLocaleString('en-US') }}
-  </li>
-  <li class="cyan">{{ 'playerStats.xpMultiplier' | i18next }}
-    : {{ 'xpMultiplier' | statToPercentage:playerStatsData.xpMultiplier }}
-  </li>
-  <li class="yellow">{{ 'playerStats.goldCoins' | i18next }}: {{ playerStatsData.goldCoins | abbr }}</li>
-  <li class="yellow">{{ 'playerStats.goldCoinsMultiplier' | i18next }}:
-    {{ 'goldCoinsMultiplier' | statToPercentage: playerStatsData.goldCoinsMultiplier }}
-  </li>
-  <li>
-    {{ 'playerStats.mana' | i18next }}: {{ playerStatsData.mana }}/{{ playerStatsData.maxMana }}
-    @if (secondsToNextMana() !== null) {
-      <span class="blue">{{ secondsToNextMana() }}s</span>
-    }
-  </li>
-  <li>{{ 'playerStats.attackPower' | i18next }}: {{ playerStatsData.attackPower }}</li>
-  <li>{{ 'playerStats.attackSpeed' | i18next }}: {{ playerStatsData.attackSpeed.toFixed(1) }}</li>
-  @if (playerStatsData.critChance) {
-    <li>{{ 'playerStats.critChance' | i18next }}: {{ 'critChance' | statToPercentage:(playerStatsData.critChance) }}
-    </li>
-    <li>{{ 'playerStats.critMulti' | i18next }}: {{ 'critMulti' | statToPercentage:(playerStatsData.critMulti) }}
-    </li>
+<div class="sheet">
+  @for (group of groups(); track group.key) {
+    <section class="sheet__group">
+      <h3 class="sheet__heading">{{ 'statsPanel.groups.' + group.key | i18next }}</h3>
+      <ul>
+        @for (entry of group.rows; track entry.row.stat) {
+          <li
+            class="sheet__row"
+            tabindex="0"
+            placement="right"
+            tooltipClass="tooltip-override"
+            [tooltipContext]="{ row: entry.row }"
+            [tooltipTemplate]="breakdownTooltip"
+          >
+            <span class="sheet__label">{{ 'playerStats.' + (entry.row.format === 'mana' ? 'mana' : entry.row.stat) | i18next }}</span>
+            <span class="sheet__value">
+              {{ entry.value }}
+              @if (entry.row.format === 'mana' && secondsToNextMana() !== null) {
+                <span class="sheet__regen">{{ secondsToNextMana() }}s</span>
+              }
+            </span>
+          </li>
+        }
+      </ul>
+    </section>
   }
-</ul>
+</div>
+
+<button type="button" class="sheet__toggle" [attr.aria-pressed]="showAll()" (click)="toggleShowAll()">
+  {{ (showAll() ? 'statsPanel.showChanged' : 'statsPanel.showAll') | i18next }}
+</button>
+
+<ng-template #breakdownTooltip let-row="row">
+  <div class="breakdown">
+    <span class="breakdown__title">{{ 'playerStats.' + (row.format === 'mana' ? 'mana' : row.stat) | i18next }}</span>
+    <span class="breakdown__description">{{ 'statsPanel.descriptions.' + (row.description ?? row.stat) | i18next }}</span>
+    @for (line of breakdown(row); track line.key) {
+      <span class="breakdown__line">
+        <span>{{ 'statsPanel.sources.' + line.key | i18next }}</span>
+        <span>{{ line.text }}</span>
+      </span>
+    }
+    <span class="breakdown__line breakdown__line--total">
+      <span>{{ 'statsPanel.total' | i18next }}</span>
+      <span>{{ totalLabel(row) }}</span>
+    </span>
+  </div>
+</ng-template>

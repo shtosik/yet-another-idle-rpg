@@ -2,6 +2,7 @@ import { SpellID } from 'enums/ids/spell-id.enum'
 import { DamageElement } from 'enums/damage-element.enum'
 import { SpellType } from 'enums/spell-type.enum'
 import { PlayerStat } from 'types/player/player-stat.type'
+import { SkillNodeID } from 'enums/ids/skill-node-id.enum'
 
 export type SpellProps = {
     id: SpellID;
@@ -9,9 +10,19 @@ export type SpellProps = {
     baseCooldown: number;
     url: string;
     effect: SpellEffectProps;
+    /** Skill node whose levels make this spell cheaper or faster (`BattleManagerService.manaCost`, `spellCooldown`). */
+    perk?: SpellPerk;
 };
 
-export type SpellEffectProps = SpellMeleeEffectProps | SpellMagicEffectProps | SpellBuffEffectProps;
+export type SpellPerk = {
+    nodeId: SkillNodeID;
+    /** Seconds off the cooldown per node level. */
+    cooldownPerLevel?: number;
+    /** Mana off the cost per node level (never below 1). */
+    manaPerLevel?: number;
+};
+
+export type SpellEffectProps = SpellMeleeEffectProps | SpellMagicEffectProps | SpellBuffEffectProps | SpellDamageOverTimeEffectProps | SpellEmpowerEffectProps;
 
 export type SpellMeleeEffectProps = {
     type: SpellType.melee;
@@ -21,6 +32,21 @@ export type SpellMagicEffectProps = {
     type: SpellType.magic;
     baseDamage: number;
     damageType: DamageElement;
+};
+
+/** Hits every `interval` seconds for `duration` seconds of combat; the clock stops while no enemy is alive. */
+export type SpellDamageOverTimeEffectProps = {
+    type: SpellType.damageOverTime;
+    damagePerHit: number;
+    damageType: DamageElement;
+    duration: number;
+    interval: number;
+};
+
+/** The next `hits` melee hits (auto-attacks and melee spells) are guaranteed crits. */
+export type SpellEmpowerEffectProps = {
+    type: SpellType.empower;
+    hits: number;
 };
 
 export type SpellBuffEffectProps = {

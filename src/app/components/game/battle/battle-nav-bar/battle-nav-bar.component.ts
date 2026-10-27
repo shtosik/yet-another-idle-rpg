@@ -9,13 +9,14 @@ import { GameNavigationService } from '../../../../services/game-navigation.serv
 import { isTaskDone, PlayerStore } from '../../../../store/player/player.store'
 import ENEMIES_DATA from '../../../../../data/enemies-data'
 import { NgOptimizedImage } from '@angular/common'
+import { ZoneMasteryComponent } from './zone-mastery/zone-mastery.component'
 
 @Component({
   selector: 'app-battle-nav-bar',
   templateUrl: 'battle-nav-bar.component.html',
   styleUrls: ['./battle-nav-bar.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, I18nextPipe, NgOptimizedImage],
+  imports: [CommonModule, I18nextPipe, NgOptimizedImage, ZoneMasteryComponent],
 })
 export class BattleNavBarComponent {
   private battleStore = inject(BattleStore)

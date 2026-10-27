@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-**Done** = `npm run validate` and `npx ng build` both pass.
+**Done** = `npm run validate`, `npm run lint`, `npm run test:ci` and `npx ng build` all pass (CI runs the same).
 
 **Ask me** a clarifying question when a requirement or the architecture is unclear from the existing files.
 
@@ -10,6 +10,10 @@
 
 **Before writing or reviewing code**, read `CODING_STANDARDS.md`.
 
-**Before creating a branch, switching branches or committing**, read `docs/git-workflow.md`: parallel sessions share this checkout.
+**Before creating a branch, switching branches, committing or opening a PR**, read `docs/git-workflow.md`: parallel sessions share this checkout.
 
 **Language**: use the terms in `GLOSSARY.md` in code, docs and commits.
+
+**Scripts are Node** (`scripts/*.mjs`): this machine has no Python.
+
+**Checking UI**: builds with cheats on (`npm start`, `build:testing`) expose `window.dev` a moment after page load, once the cheat bar's deferred chunk arrives. Set game state through it (commands in `src/app/components/game/dev-cheats/dev-cheats.component.ts`), not by editing `localStorage`.

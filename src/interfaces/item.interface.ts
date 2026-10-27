@@ -8,6 +8,7 @@ import { PlayerStat } from 'types/player/player-stat.type'
 import { RecipeID } from 'enums/ids/recipe-id.enum'
 import { ConsumableEffect } from './consumable.interface'
 import { StationID } from 'enums/ids/station-id.enum'
+import { SpellID } from 'enums/ids/spell-id.enum'
 
 export interface ItemData {
     id: ItemID
@@ -28,6 +29,8 @@ export interface EquipmentItem extends ItemData {
     stats: EquipmentItemPossibleStat[]
     slot: EquipmentSlot
     damageType?: DamageElement
+    /** Known while equipped (not in the skill tree); leaves the spell bar when unequipped. */
+    spell?: SpellID
 }
 
 export interface ResourceItem extends ItemData {
@@ -65,6 +68,12 @@ export type ConsumableItem = FoodItem | PotionItem
 export const isConsumableItem = (item: Item): item is ConsumableItem =>
     item.type === ItemType.food || item.type === ItemType.potion
 
+/** Teaches `spellId` for good when used (right-click); a respec doesn't take it away. */
+export interface SpellScrollItem extends ItemData {
+    type: ItemType.spellScroll
+    spellId: SpellID
+}
+
 export interface RecipeItem extends ItemData {
     type: ItemType.recipe
     recipeId: RecipeID
@@ -80,7 +89,7 @@ export interface StationUpgradeItem extends ItemData {
 export const isStationUpgradeItem = (item: Item): item is StationUpgradeItem =>
     item.type === ItemType.stationUpgrade
 
-export type Item = EquipmentItem | ResourceItem | RewardsStatsItem | QuestItem | FoodItem | BookItem | PotionItem | RecipeItem | StationUpgradeItem
+export type Item = EquipmentItem | ResourceItem | RewardsStatsItem | QuestItem | FoodItem | BookItem | PotionItem | RecipeItem | StationUpgradeItem | SpellScrollItem
 
 export type UseItemProps = UseItemStatProps
 

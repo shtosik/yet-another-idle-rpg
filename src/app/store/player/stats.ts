@@ -31,6 +31,37 @@ export interface StatModifier {
 /** Positive amounts lower these stats: lower is better (seconds per attack, ms per mana, ms per refresh). */
 const INVERTED_STATS = new Set<PlayerStat>(['attackSpeed', 'manaRegenRate', 'shopRefreshCooldown'])
 
+export const isInvertedStat = (stat: PlayerStat): boolean => INVERTED_STATS.has(stat)
+
+/** Where a stat modifier comes from; the stats panel breaks each stat down by these. */
+export type StatSource = 'equipment' | 'skills' | 'buffs' | 'consumables' | 'bonuses' | 'mastery'
+export type SourcedModifiers = Record<StatSource, StatModifier[]>
+
+export interface StatContribution {
+  source: StatSource
+  /** Sum of the source's flat amounts, as written in data (positive = better, also for inverted stats). */
+  flat: number
+  /** Sum of the source's percent amounts (0.1 = 10% better). */
+  percent: number
+}
+
+/** What each source adds to `stat`, in `SourcedModifiers` key order; sources adding nothing are left out. */
+export function statContributions(stat: PlayerStat, sources: SourcedModifiers): StatContribution[] {
+  return (Object.entries(sources) as [StatSource, StatModifier[]][]).flatMap(([source, modifiers]) => {
+    let flat = 0
+    let percent = 0
+    for (const modifier of modifiers) {
+      if (modifier.stat !== stat) continue
+      if (modifier.percent) percent += modifier.amount
+      else flat += modifier.amount
+    }
+    if (!flat && !percent) return []
+    return [{ source, flat: round(flat), percent: round(percent) }]
+  })
+}
+
+const round = (value: number): number => Math.round(value * STAT_PRECISION) / STAT_PRECISION
+
 /** Rounds away float drift from summing fractional modifiers (2.7000000000000006 -> 2.7). */
 const STAT_PRECISION = 1e6
 
@@ -91,7 +122,7 @@ export function deriveStats(resources: Resources, modifiers: StatModifier[]): Pl
     stats[stat] *= INVERTED_STATS.has(stat) ? 1 - amount : 1 + amount
   }
   for (const stat of Object.keys(stats) as PlayerStat[]) {
-    stats[stat] = Math.round(stats[stat] * STAT_PRECISION) / STAT_PRECISION
+    stats[stat] = round(stats[stat])
   }
 
   Object.assign(stats, resources)

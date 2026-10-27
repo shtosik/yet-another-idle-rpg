@@ -1,14 +1,12 @@
-@let spellCooldown = cooldown();
-
 <div
   class="spell"
   placement="top"
   tooltipClass="tooltip-override"
   [autoPlacement]="false"
-  [class.spell--disabled]="!canAfford()"
+  [class.spell--disabled]="(!canAfford() || !isKnown()) && !isActive()"
+  [class.spell--active]="isActive()"
   [style]="{ 'background-image': spellData().url | url }"
   [style.--time-left]="cooldownSweepDeg() + 'deg'"
-  [tooltipContext]="{ spellData: spellData() }"
   [tooltipTemplate]="tooltip"
   (click)="handleCastSpell()"
 >
@@ -17,23 +15,6 @@
   }
 </div>
 
-<ng-template
-  #tooltip
-  let-spell="spellData"
->
-  <div class="spell__tooltip">
-    <div class="spell__header">
-      <span>{{ ('spells:names.' + SpellID[spell.id] + '.name')  | i18next }}</span>
-      <span [class]="SpellType[spell.effect?.type]">{{ ('spells:types.' + SpellType[spell.effect?.type])  | i18next }}</span>
-    </div>
-    <div class="spell__info">
-      <span class="mana">{{ 'spells:manaCost' | i18next: { cost: spell.baseManaCost } }}</span>
-      <span class="cooldown">{{ 'spells:cooldown' | i18next: { cooldown: spellCooldown } }}</span>
-      @if (spell.effect.type === SpellType.buff) {
-        <span class="duration">{{ 'spells:duration' | i18next: { duration: (spell.effect.duration + playerStats().increasedSpellDuration) } }}</span>
-      }
-    </div>
-    <span class="spell__desc">{{ ('spells:names.' + SpellID[spell.id] + '.desc')  | i18next }}</span>
-
-  </div>
+<ng-template #tooltip>
+  <app-spell-tooltip [spellId]="equippedSpell().spellId"/>
 </ng-template>

@@ -113,6 +113,9 @@ export class OfflineProgressService {
       this.tickTimers(gapMs)
       if (!summary) return
 
+      // No spells run offline, so a storm in progress ends with a claimed absence; a shorter gap (a reload) only pauses it.
+      this.battleStore.clearDamageOverTime()
+
       // Rewards and the new `lastSeenAt` land together before the modal, so a reload can't claim twice.
       saveGameStateNow()
       if (summary.kills > 0) this.modalService.openWelcomeBack(summary)
@@ -133,6 +136,7 @@ export class OfflineProgressService {
       hasWeaknessSkill: this.playerStore.hasSkillUnlocked(SkillNodeID.weaknesses),
       activeQuestIds: getActiveQuestIds(this.questsStore.questStepProgression()),
       taskEnemyIds: new Set(this.playerStore.activeTasks().filter(task => !isTaskDone(task)).map(task => task.monsterId)),
+      enemyKillCounts: this.playerStore.enemyKillCounts(),
       rollingKillMs: this.offlineStore.rollingKillMs(zone.id, wave),
       rng: seededRng(seed),
     })

@@ -9,10 +9,10 @@ Saves game state to `localStorage` (at most once a second per store) and restore
 
 | Key | Store | Holds |
 |---|---|---|
-| `playerStore` | `src/app/store/player/player.store.ts:PlayerStore` | resources, permanent bonuses, inventory, equipment, unlocked nodes, stations, recipes, tasks, unlocked content |
+| `playerStore` | `src/app/store/player/player.store.ts:PlayerStore` | resources, permanent bonuses, inventory, equipment, unlocked nodes, stations, recipes, tasks, unlocked content, seen bestiary entries and spells, shiny kills per zone, claimed zone mastery stars |
 | `battleStore` (v2) | `src/app/store/battle/battle.store.ts:BattleStore` | current zone/wave, enemy id + shiny + HP, spells, buffs, consumable slots |
-| `questsStore` | `src/app/store/quests/quests.store.ts:QuestsStore` | quest step progression (completion is step 9999), dialogue flags |
-| `townsStore` (v2) | `src/app/store/towns/towns.store.ts:TownsStore` | selected town and building id (the open shop isn't saved) |
+| `questsStore` | `src/app/store/quests/quests.store.ts:QuestsStore` | quest step progression (completion is step 9999), dialogue flags, pinned quests |
+| `townsStore` (v2) | `src/app/store/towns/towns.store.ts:TownsStore` | selected town and building id, `npcShops` (NPC → shop opened through their dialogue; the open shop isn't saved) |
 | `shopStore` | `src/app/store/shop/shop.store.ts:ShopStore` | stock and refresh timers |
 | `campStore` | `src/app/store/camp/camp.store.ts:CampStore` | Camp tab UI selection |
 | `offlineStore` | `src/app/store/offline/offline.store.ts:OfflineStore` | `lastSeenAt` (host time, high-water mark), the kill window (recent online kill intervals on one zone and wave, `offline-progress.md`) |

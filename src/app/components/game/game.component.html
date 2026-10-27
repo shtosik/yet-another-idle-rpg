@@ -1,11 +1,10 @@
-<app-game-menu (changeTab)="changeTab($event)"/>
+<app-game-menu/>
 <div class="game">
   @let tab = gameTab();
   <app-battle class="battle"/>
 
   @if (tab === GameTab.main) {
     <app-player-stats class="stats"/>
-    <app-panel class="resources"></app-panel>
   }
 
   @if (tab === GameTab.main || tab === GameTab.camp || tab === GameTab.towns || tab === GameTab.bestiary || tab === GameTab.map || tab === GameTab.spellbook) {
@@ -25,10 +24,9 @@
 
     <app-equipment class="equipment"/>
 
-    @if (!hasDialogueActive()) {
+    <!-- The Bestiary takes both rows instead. -->
+    @if (tab !== GameTab.bestiary) {
       <app-inventory class="inventory"/>
-    } @else {
-      <app-dialogue class="dialogue"/>
     }
     <app-quests class="quests"/>
   }
@@ -54,7 +52,6 @@
 
   @if (tab === GameTab.settings) {
     <app-player-stats class="stats"/>
-    <app-panel class="resources"></app-panel>
     <app-inventory class="inventory"/>
     <app-settings class="settings"/>
   }

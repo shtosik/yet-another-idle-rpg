@@ -1,7 +1,7 @@
 import { patchState, signalStore, withComputed, withHooks, withMethods, withState } from '@ngrx/signals'
 import { ZoneID } from 'enums/ids/zone-id.enum'
 import { Enemy } from 'interfaces/enemy.interface'
-import { ActiveBuff, EquippedSpell } from '../../../interfaces/spells/equipped-spell.interface'
+import { ActiveBuff, ActiveDamageOverTime, EquippedSpell } from '../../../interfaces/spells/equipped-spell.interface'
 import ZONES_DATA from 'data/zones-data'
 import ENEMIES_DATA from 'data/enemies-data'
 import { SpellID } from '../../../enums/ids/spell-id.enum'
@@ -11,6 +11,10 @@ import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
 import { toShinyUrl } from 'utils/shiny-url'
 import { waveMultipliers } from './wave-scaling'
 import { ActiveConsumable, CONSUMABLE_SLOTS, ConsumableSlot } from '../../../interfaces/consumable.interface'
+import SPELLS_DATA from '../../../data/spells-data'
+import { SpellDamageOverTimeEffectProps } from '../../../interfaces/spell.interface'
+
+const MS_PER_SECOND = 1000
 
 export interface BattleState {
   isInCombat: boolean;
@@ -22,6 +26,9 @@ export interface BattleState {
   autoWaveProgressionEnabled: boolean;
   equippedSpells: (EquippedSpell | null)[];
   activeBuffs: ActiveBuff[];
+  activeDamageOverTime: ActiveDamageOverTime[];
+  /** An empower spell's guaranteed crits left (Ambush); saved, and not time-based, so it waits across reloads and offline. */
+  empowered: { spellId: SpellID, hitsLeft: number } | null;
   isShinyEnemy: boolean;
   consumableSlots: Record<ConsumableSlot, ActiveConsumable | null>;
   autoEatEnabled: boolean;
@@ -36,6 +43,8 @@ export const initialState: BattleState = {
   autoWaveProgressionEnabled: false,
   equippedSpells: [null, null, null, null, null],
   activeBuffs: [],
+  activeDamageOverTime: [],
+  empowered: null,
   isShinyEnemy: false,
   consumableSlots: { food: null, potion: null },
   autoEatEnabled: false,
@@ -103,7 +112,8 @@ export const BattleStore = signalStore(
           const isMaxWave = state.currentWave === zoneData.maxWave
           const shouldGoNextZone = nextZone && isMaxWave
 
-          const wave = shouldGoNextZone ? 1 : (isMaxWave ? zoneData.maxWave : state.currentWave + 1)
+          // Past the last wave: the next zone's first wave, or stay on the last one when there's no next zone.
+          const wave = shouldGoNextZone ? 1 : Math.min(state.currentWave + 1, zoneData.maxWave)
           const zone = shouldGoNextZone ? nextZone : state.currentZoneId
 
           return {
@@ -120,7 +130,8 @@ export const BattleStore = signalStore(
           const isFirstWave = state.currentWave === 1
           const shouldGoPreviousZone = !!(previousZoneId && isFirstWave)
 
-          const wave = shouldGoPreviousZone ? previousZoneData.maxWave : (isFirstWave ? state.currentWave : state.currentWave - 1)
+          // Before wave 1: the previous zone's last wave, or stay on wave 1 when there's no previous zone.
+          const wave = shouldGoPreviousZone ? previousZoneData.maxWave : Math.max(state.currentWave - 1, 1)
           const zone = shouldGoPreviousZone ? previousZoneId : state.currentZoneId
 
           return {
@@ -179,6 +190,57 @@ export const BattleStore = signalStore(
       patchState(store, (state) => ({
         activeBuffs: [...state.activeBuffs.filter(b => b.spellId !== buff.spellId), buff],
       }))
+    },
+
+    addDamageOverTime(spellId: SpellID): void {
+      patchState(store, (state) => ({
+        activeDamageOverTime: [...state.activeDamageOverTime.filter(d => d.spellId !== spellId), { spellId, msElapsed: 0, hits: 0 }],
+      }))
+    },
+
+    /**
+     * Advances running damage-over-time spells up to the next hit, at most `maxMs` of combat. Returns the spell that
+     * hits there (null when none is due within `maxMs`) and the time used, so the caller can stop at a kill and the
+     * rest waits for the next enemy. A spell ends after its last hit (`duration` / `interval` hits).
+     */
+    advanceDamageOverTime(maxMs: number): { spellId: SpellID | null, usedMs: number } {
+      const running = store.activeDamageOverTime()
+      if (!running.length) return { spellId: null, usedMs: maxMs }
+
+      const timing = (spellId: SpellID) => {
+        const { duration, interval } = SPELLS_DATA[spellId].effect as SpellDamageOverTimeEffectProps
+        return { intervalMs: interval * MS_PER_SECOND, totalHits: Math.round(duration / interval) }
+      }
+      const usedMs = Math.min(maxMs, ...running.map(a => Math.max(0, (a.hits + 1) * timing(a.spellId).intervalMs - a.msElapsed)))
+
+      let spellId: SpellID | null = null
+      const next = running.flatMap(active => {
+        const { intervalMs, totalHits } = timing(active.spellId)
+        const advanced = { ...active, msElapsed: active.msElapsed + usedMs }
+        if (spellId === null && advanced.msElapsed >= (advanced.hits + 1) * intervalMs) {
+          spellId = active.spellId
+          advanced.hits++
+        }
+        return advanced.hits < totalHits ? [advanced] : []
+      })
+      patchState(store, { activeDamageOverTime: next })
+      return { spellId, usedMs }
+    },
+
+    empower(spellId: SpellID, hits: number): void {
+      patchState(store, { empowered: { spellId, hitsLeft: hits } })
+    },
+
+    /** Uses one guaranteed crit; returns whether there was one. */
+    useEmpoweredHit(): boolean {
+      const empowered = store.empowered()
+      if (!empowered) return false
+      patchState(store, { empowered: empowered.hitsLeft > 1 ? { ...empowered, hitsLeft: empowered.hitsLeft - 1 } : null })
+      return true
+    },
+
+    clearDamageOverTime(): void {
+      patchState(store, { activeDamageOverTime: [] })
     },
 
     /** Advances spell cooldowns and buffs by `deltaMs`. Writes only when something is running. */

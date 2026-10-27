@@ -1,4 +1,6 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input, OnInit, output, signal } from '@angular/core'
+import { NgOptimizedImage } from '@angular/common'
+import i18next from 'i18next'
 import { InventoryItem } from '../../../../../interfaces/item.interface'
 import { ShopStore } from '../../../../store/shop/shop.store'
 import { PlayerStore } from '../../../../store/player/player.store'
@@ -12,24 +14,33 @@ import { SlotComponent } from '../../../shared/slot/slot.component'
 import { InventoryItemComponent } from '../../inventory/inventory-slot/inventory-slot.component'
 import { CloseButtonComponent } from '../../../shared/close-button/close-button.component'
 import { ModalService } from '../../../../services/modal.service'
+import { CurrencyFeedService } from '../../../../services/currency-feed.service'
 import { canInstall, isInstalled, stationUpgradeOf } from '../../../../store/player/camp'
 import { isPreferredBy, sellPrice } from '../../../../store/shop/shop-prices'
+import { ShopCurrency } from '../../../../../types/shop/shop.type'
 
-/** `gold` means the shop's currency (gold or Explorer Tokens) runs short. */
-type BuyBlockReason = 'stock' | 'rank' | 'gold' | 'inventory' | 'station' | null
+/** `currency`: the player has too little of the shop's currency. */
+type BuyBlockReason = 'stock' | 'rank' | 'currency' | 'inventory' | 'station' | null
 type ShopTab = 'buy' | 'sell'
+
+/** Icon and price text per currency; a new `ShopCurrency` won't compile until it has an entry here. */
+const CURRENCY_UI: Record<ShopCurrency, { icon: string; priceKey: string }> = {
+  gold: { icon: './assets/img/icons/coin.svg', priceKey: 'shop:ui.price' },
+  explorerTokens: { icon: './assets/img/icons/explorationToken.png', priceKey: 'shop:ui.tokenPrice' },
+}
 
 @Component({
   selector: 'app-shop',
   templateUrl: './shop.component.html',
   styleUrl: './shop.component.sass',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [I18nextPipe, SlotComponent, InventoryItemComponent, CloseButtonComponent],
+  imports: [NgOptimizedImage, I18nextPipe, SlotComponent, InventoryItemComponent, CloseButtonComponent],
 })
 export class ShopComponent implements OnInit {
   private shopStore = inject(ShopStore)
   private playerStore = inject(PlayerStore)
   private modalService = inject(ModalService)
+  private currencyFeed = inject(CurrencyFeedService)
 
   shopId = input.required<ShopID>()
   closed = output<void>()
@@ -51,13 +62,14 @@ export class ShopComponent implements OnInit {
 
   tab = signal<ShopTab>('buy')
 
-  currency = computed(() => SHOPS_DATA[this.shopId()].currency ?? 'gold')
+  currency = computed<ShopCurrency>(() => SHOPS_DATA[this.shopId()].currency ?? 'gold')
+  currencyIcon = computed(() => CURRENCY_UI[this.currency()].icon)
   /** Shops with `buys: []` (the guild store) have no Sell tab. */
   canSell = computed(() => SHOPS_DATA[this.shopId()].buys?.length !== 0)
+  /** Shops with rank-gated stock (the guild store) show the player's Guild rank. */
+  showsGuildRank = computed(() => SHOPS_DATA[this.shopId()].items.some(item => item.minRank !== undefined))
   guildRank = this.playerStore.guildRank
-  balance = computed(() =>
-    this.currency() === 'explorerTokens' ? this.playerStore.explorerTokens() : this.playerStore.stats().goldCoins,
-  )
+  balance = computed(() => this.balanceOf(this.currency()))
 
   /** Inventory stacks this shop buys, at its price. */
   sellable = computed(() => {
@@ -87,7 +99,7 @@ export class ShopComponent implements OnInit {
 
     if ((entry.staticItem.minRank ?? 0) > this.guildRank()) return 'rank'
 
-    if (this.balance() < entry.staticItem.price) return 'gold'
+    if (this.balance() < entry.staticItem.price) return 'currency'
 
     // Station gear installs on purchase and never takes a slot, but must follow the previous level.
     const upgrade = stationUpgradeOf(entry.staticItem.itemId)
@@ -106,32 +118,94 @@ export class ShopComponent implements OnInit {
     return this.buyBlockReason(index) === null
   }
 
-  buyItem(index: number): void {
-    if (!this.canBuy(index)) return
-
-    const entry = this.items()[index]
-    const { itemId, tier, price } = entry.staticItem
-
-    if (this.currency() === 'explorerTokens') {
-      if (!this.playerStore.spendTokens(price)) return
-    } else {
-      this.playerStore.updatePlayerStats([{ stat: 'goldCoins', amount: -price }])
+  /** Click buys one; Shift-click buys up to 5, stopping at the first block (stock, currency, space). */
+  buyItem(index: number, event: MouseEvent): void {
+    const count = event.shiftKey ? 5 : 1
+    let spent = 0
+    for (let bought = 0; bought < count && this.canBuy(index); bought++) {
+      if (!this.buyOne(index)) break
+      spent += this.items()[index].staticItem.price
     }
+    if (spent) this.currencyFeed.show(this.currency(), -spent)
+  }
+
+  /** Name plus what blocks the purchase, for screen readers (sighted players get the slot's border, lock or fade). */
+  buyLabel(index: number, reason: BuyBlockReason): string {
+    const { itemId, price, minRank } = this.items()[index].staticItem
+    const name = i18next.t(`items:names.${ItemID[itemId]}`)
+    switch (reason) {
+      case 'stock': {
+        const key = this.isNonRefreshableSoldOut(index) ? 'shop:ui.soldOut' : 'shop:ui.restocking'
+        return `${name}: ${i18next.t(key)}`
+      }
+      case 'rank':
+        return `${name}: ${i18next.t('shop:ui.needsRank', { rank: minRank })}`
+      case 'station':
+        return `${name}: ${i18next.t('shop:ui.needsStation', { level: this.requiredStationLevel(index) })}`
+      case 'currency':
+        return `${name}: ${i18next.t('shop:ui.cantAfford', { price: this.priceLabel(this.currency(), price) })}`
+      case 'inventory':
+        return `${name}: ${i18next.t('shop:ui.inventoryFull')}`
+      default:
+        return `${name}: ${this.priceLabel(this.currency(), price)}`
+    }
+  }
+
+  /** Shops always pay gold for what they buy. */
+  sellLabel(itemId: ItemID, price: number, preferred: boolean): string {
+    const label = `${i18next.t(`items:names.${ItemID[itemId]}`)}: ${this.priceLabel('gold', price)}`
+    if (!preferred) return label
+    return `${label}, ${i18next.t('shop:ui.preferred')}`
+  }
+
+  private priceLabel(currency: ShopCurrency, amount: number): string {
+    return i18next.t(CURRENCY_UI[currency].priceKey, { amount })
+  }
+
+  // No default in these switches: with noImplicitReturns a new ShopCurrency fails to compile until it's handled.
+  private balanceOf(currency: ShopCurrency): number {
+    switch (currency) {
+      case 'gold':
+        return this.playerStore.stats().goldCoins
+      case 'explorerTokens':
+        return this.playerStore.explorerTokens()
+    }
+  }
+
+  /** Takes `amount` of `currency`; false when the player can't pay. */
+  private spend(currency: ShopCurrency, amount: number): boolean {
+    switch (currency) {
+      case 'gold':
+        this.playerStore.updatePlayerStats([{ stat: 'goldCoins', amount: -amount }])
+        return true
+      case 'explorerTokens':
+        return this.playerStore.spendTokens(amount)
+    }
+  }
+
+  /** Pays for and hands over one item; false when the payment fails. */
+  private buyOne(index: number): boolean {
+    const { itemId, tier, price } = this.items()[index].staticItem
+
+    if (!this.spend(this.currency(), price)) return false
     this.shopStore.buyItem(this.shopId(), index)
 
     // Spellbook unlocks the tab immediately and is not added to inventory
     if (itemId === ItemID.spellbook) {
       this.playerStore.unlockSpellbook()
-      return
+      return true
     }
 
     const installed = this.playerStore.addItems([{ id: itemId, tier, amount: 1 }])
     installed.forEach(id => this.modalService.openStationInstalled(id))
+    return true
   }
 
   /** Click sells one; Ctrl/Cmd-click sells the whole stack. */
   sellItem(item: InventoryItem, event: MouseEvent): void {
+    const goldBefore = this.playerStore.resources.goldCoins()
     this.playerStore.sellItem(item, this.shopId(), event.ctrlKey || event.metaKey ? item.amount : 1)
+    this.currencyFeed.show('gold', this.playerStore.resources.goldCoins() - goldBefore)
   }
 
   /** Station gear the player already owns is hidden from shops. */

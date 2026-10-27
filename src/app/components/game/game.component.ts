@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core'
-import { PanelComponent } from '../shared/panel/panel.component'
+import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/core'
+import TOWNS_DATA from '../../../data/towns-data'
 import { GameNavigationService } from '../../services/game-navigation.service'
 import { UnlockService } from '../../services/unlock.service'
 import { GameTab } from 'enums/ids/game-tab.enum'
@@ -16,8 +16,6 @@ import { SkillTreeComponent } from './skill-tree/skill-tree.component'
 import { BattleStore } from '../../store/battle/battle.store'
 import { QuestsStore } from '../../store/quests/quests.store'
 import { TownsStore } from '../../store/towns/towns.store'
-import { DialogueManagerService } from '../../services/dialogue-manager.service'
-import { DialogueComponent } from './dialogue/dialogue.component'
 import { QuestsComponent } from './quests/quests.component'
 import { WorldMapComponent } from './world-map/world-map.component'
 import { BestiaryComponent } from './bestiary/bestiary.component'
@@ -30,7 +28,6 @@ import { SettingsComponent } from './settings/settings.component'
 import { environment } from '../../../environments/environment'
 
 const imports = [
-  PanelComponent,
   AsyncPipe,
   CommonModule,
   TownsComponent,
@@ -48,7 +45,6 @@ const imports = [
   styleUrls: ['./game.component.sass'],
   imports: [
     imports,
-    DialogueComponent,
     QuestsComponent,
     WorldMapComponent,
     BestiaryComponent,
@@ -68,16 +64,28 @@ export class GameComponent {
   shopStore = inject(ShopStore)
   campStore = inject(CampStore)
   offlineStore = inject(OfflineStore)
-  dialogueManagerService = inject(DialogueManagerService)
   // Created here so unlock rules start watching as soon as the game is on screen.
   private unlockService = inject(UnlockService)
   private navigation = inject(GameNavigationService)
   gameTab = this.navigation.tab
 
-  hasDialogueActive = computed(() => this.dialogueManagerService.activeNpc())
-
   readonly GameTab = GameTab
   readonly cheats = environment.cheats
+
+  private preloadedImages = new Set<string>()
+
+  constructor() {
+    // Town and building backgrounds are large; fetch them once a town unlocks so they don't pop in on first visit.
+    effect(() => {
+      const towns = this.playerStore.unlockedContent().towns ?? []
+      const urls = towns.flatMap(id => [TOWNS_DATA[id]?.url, ...(TOWNS_DATA[id]?.buildings.map(b => b.url) ?? [])])
+      for (const url of urls) {
+        if (!url || this.preloadedImages.has(url)) continue
+        this.preloadedImages.add(url)
+        new Image().src = url
+      }
+    })
+  }
 
   changeTab(tab: GameTab) {
     this.navigation.changeTab(tab)

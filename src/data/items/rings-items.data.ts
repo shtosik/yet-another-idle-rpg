@@ -27,4 +27,16 @@ export const RingsItemsData: Partial<Record<ItemID, Item>> = {
       },
     ],
   },
+  [ItemID.manaRing]: {
+    id: ItemID.manaRing,
+    tier: ItemTier.uncommon,
+    url: './assets/img/items/manaRing.png',
+    value: 158,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.ring,
+    stats: [
+      { id: 'maxMana', amount: 2 },
+      { id: 'manaRegenRate', amount: 5000 },
+    ],
+  },
 }

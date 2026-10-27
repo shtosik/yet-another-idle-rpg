@@ -1,11 +1,13 @@
 import { EnemyID } from 'enums/ids/enemy-id.enum'
 import { ZoneID } from 'enums/ids/zone-id.enum'
+import { ItemID } from 'enums/ids/item-id.enum'
 import { Zone } from 'interfaces/zone.interface'
 
 const ZONES_DATA: Record<ZoneID, Zone> = {
   [ZoneID.horseshoeBeach]: {
     id: ZoneID.horseshoeBeach,
     tier: 1,
+    masteryReward: { gold: 50, explorerTokens: 3, items: [{ id: ItemID.crabMeat, amount: 5 }, { id: ItemID.turtleShell, amount: 3 }, { id: ItemID.feather, amount: 5 }] },
     url: './assets/img/backgrounds/horseshoeBeach-vertical.png',
     enemies: [EnemyID.crab, EnemyID.seagull, EnemyID.turtle],
     maxWave: 10,
@@ -16,6 +18,7 @@ const ZONES_DATA: Record<ZoneID, Zone> = {
   [ZoneID.tradersBasement]: {
     id: ZoneID.tradersBasement,
     tier: 1,
+    masteryReward: { gold: 50, explorerTokens: 3, items: [{ id: ItemID.ratTail, amount: 10 }, { id: ItemID.cheese, amount: 3 }] },
     url: './assets/img/backgrounds/tradersBasement.png',
     enemies: [EnemyID.rat],
     maxWave: 6,
@@ -25,6 +28,7 @@ const ZONES_DATA: Record<ZoneID, Zone> = {
   [ZoneID.plains]: {
     id: ZoneID.plains,
     tier: 2,
+    masteryReward: { gold: 200, explorerTokens: 6, items: [{ id: ItemID.slimeResidue, amount: 10 }, { id: ItemID.waterRune, amount: 3 }] },
     url: './assets/img/backgrounds/plains-vertical.png',
     enemies: [EnemyID.blueSlime, EnemyID.redSlime, EnemyID.greenSlime],
     maxWave: 10,
@@ -36,6 +40,7 @@ const ZONES_DATA: Record<ZoneID, Zone> = {
   [ZoneID.theLongPath]: {
     id: ZoneID.theLongPath,
     tier: 3,
+    masteryReward: { gold: 450, explorerTokens: 9, items: [{ id: ItemID.deerPelt, amount: 5 }, { id: ItemID.wolfFangs, amount: 5 }, { id: ItemID.venison, amount: 3 }] },
     url: './assets/img/backgrounds/the-long-path-vertical.png',
     enemies: [EnemyID.deer, EnemyID.wolf, EnemyID.goblinScout],
     maxWave: 20,
@@ -47,6 +52,7 @@ const ZONES_DATA: Record<ZoneID, Zone> = {
   [ZoneID.mountainPass]: {
     id: ZoneID.mountainPass,
     tier: 4,
+    masteryReward: { gold: 800, explorerTokens: 12, items: [{ id: ItemID.deerPelt, amount: 5 }, { id: ItemID.stone, amount: 10 }, { id: ItemID.vialOfWater, amount: 3 }] },
     url: './assets/img/backgrounds/mountain-pass.png',
     enemies: [EnemyID.goat, EnemyID.mountainBat, EnemyID.goblinScavenger],
     maxWave: 15,
@@ -58,6 +64,7 @@ const ZONES_DATA: Record<ZoneID, Zone> = {
   [ZoneID.elderwoodWilds]: {
     id: ZoneID.elderwoodWilds,
     tier: 5,
+    masteryReward: { gold: 1250, explorerTokens: 15, items: [{ id: ItemID.spiderSilk, amount: 5 }, { id: ItemID.apple, amount: 5 }, { id: ItemID.fireRune, amount: 3 }] },
     url: './assets/img/backgrounds/elderwood-wilds.png',
     enemies: [EnemyID.forestSpider, EnemyID.gnollScout, EnemyID.corruptedSapling],
     maxWave: 15,
@@ -68,6 +75,7 @@ const ZONES_DATA: Record<ZoneID, Zone> = {
   [ZoneID.deepwood]: {
     id: ZoneID.deepwood,
     tier: 6,
+    masteryReward: { gold: 1800, explorerTokens: 18, items: [{ id: ItemID.elderSilk, amount: 5 }, { id: ItemID.bearPelt, amount: 3 }, { id: ItemID.ancientWood, amount: 3 }, { id: ItemID.earthRune, amount: 3 }] },
     url: './assets/img/backgrounds/the-deepwood.png',
     enemies: [EnemyID.elderSpider, EnemyID.forestBear, EnemyID.bogSkeleton, EnemyID.treantSprout],
     maxWave: 20,
@@ -77,6 +85,7 @@ const ZONES_DATA: Record<ZoneID, Zone> = {
   [ZoneID.upperCanopy]: {
     id: ZoneID.upperCanopy,
     tier: 7,
+    masteryReward: { gold: 2450, explorerTokens: 21, items: [{ id: ItemID.harpyFeather, amount: 5 }, { id: ItemID.eagleTalon, amount: 3 }, { id: ItemID.airRune, amount: 3 }] },
     url: './assets/img/backgrounds/the-upper-canopy.png',
     enemies: [EnemyID.harpy, EnemyID.giantEagle, EnemyID.canopyBandit],
     maxWave: 15,

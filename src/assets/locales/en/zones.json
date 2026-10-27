@@ -8,5 +8,19 @@
         "elderwoodWilds": "Elderwood Wilds",
         "deepwood": "The Deepwood",
         "upperCanopy": "The Upper Canopy"
+    },
+    "mastery": {
+        "stars": {
+            "conqueror": { "name": "Conqueror", "goal": "Defeat the zone boss {{count}} times." },
+            "hunter": { "name": "Hunter", "goal": "Reach 1 Bestiary star with every enemy in the zone ({{count}})." },
+            "shiny": { "name": "Shiny Hunter", "goal": "Defeat {{count}} shinies in the zone." }
+        },
+        "progress": "Progress: {{current}} / {{target}}",
+        "shinyLocked": "Learn the Shiny Hunter skill to start finding shinies.",
+        "reward": "Chest: {{gold}} gold, {{tokens}} Explorer Tokens,",
+        "claimed": "Claimed",
+        "clickToClaim": "Click to claim the chest.",
+        "inventoryFull": "Free inventory space to claim the chest.",
+        "allStars": "All 3 stars: +2% gold"
     }
 }
