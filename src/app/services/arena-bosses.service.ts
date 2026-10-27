@@ -119,7 +119,7 @@ export class ArenaBossesService {
 
     if (fight.shield !== null) {
       if (damageType !== fight.shield) return 0
-      if (result >= yad.breakDamage) this.fight.set({ ...fight, shield: null, nextShieldAt: now + this.shieldGap(rng) })
+      this.fight.set({ ...fight, shield: null, nextShieldAt: now + this.shieldGap(rng) })
     }
 
     if (isMagic && fight.enemyId === EnemyID.arenaArcanist) {

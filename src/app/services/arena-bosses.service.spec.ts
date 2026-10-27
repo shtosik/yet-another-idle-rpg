@@ -73,17 +73,16 @@ describe('ArenaBossesService', () => {
     expect(bosses.modifyHit(100, DamageElement.physical, false)).toBe(150)
   })
 
-  it("Yad: only the shield's element hurts, and a strong enough hit breaks it", () => {
+  it("Yad: only the shield's element hurts, and its first hit breaks it", () => {
     fightChampion(EnemyID.arenaYad)
     bosses.tick(ARENA_BOSSES.yad.maxGapMs, rng)
     const shield = bosses.shield()!
     const other = ARENA_BOSSES.yad.elements.find(element => element !== shield)!
 
     expect(bosses.modifyHit(500, other, false)).toBe(0)
-    expect(bosses.modifyHit(ARENA_BOSSES.yad.breakDamage - 1, shield, false)).toBe(ARENA_BOSSES.yad.breakDamage - 1)
     expect(bosses.shield()).toBe(shield)
 
-    expect(bosses.modifyHit(ARENA_BOSSES.yad.breakDamage, shield, false)).toBe(ARENA_BOSSES.yad.breakDamage)
+    expect(bosses.modifyHit(5, shield, false)).toBe(5)
     expect(bosses.shield()).toBeNull()
     expect(bosses.modifyHit(500, other, false)).toBe(500)
   })
