@@ -9,4 +9,4 @@ Old man, pale silverwood bark grown up one side of neck/jaw into hairline, patch
 Design doc (`docs/design/mawood-and-elderwood-zones.md`) calls him "Elder Corwin," half-blind. Worth folding in: one eye clouded/milky, faint unfocused gaze — reads as "sees the forest more than the room." Origin per dialogue is a specific failed communion ritual decades ago (not a generic curse) — bark is the ritual's aftermath, not an injury.
 
 ## Setting
-Lives at the Elder Tree building (`main` tab), Mawood's central platform. Twilight-lit by bioluminescent moss/fungi, not sunlight — art should use cool pale-green ambient glow rather than warm daylight.
+Lives at the Elder's Tree building (`main` tab), Mawood's central platform. Twilight-lit by bioluminescent moss/fungi, not sunlight — art should use cool pale-green ambient glow rather than warm daylight.

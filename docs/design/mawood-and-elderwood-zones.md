@@ -157,7 +157,7 @@ The culmination. The Gnarled Treant must be destroyed.
 - Weakness: fire
 - Drops: ancient wood ×1–5 (uncommon), heartwood amulet (rare equipment drop)
 - Types: `plant`, `treant`
-- *An ancient Silverwood Spire that became sentient and turned hostile when the forest's corruption spread. Its roots crack the platform walkways of the Deepwood district.*
+- *An ancient Silverwood Spire consumed by a long-dead druid's failed ritual — the source of the black sap, not its victim (`mawoodCorwin.json` `questTheSap`). Its roots crack the platform walkways of the Deepwood district.*
 
 **Zone stats:** maxWave 20, enemiesPerWave 8  
 **Progression:** no previousZoneId (unlocked from town), nextZoneId = upperCanopy
@@ -269,7 +269,7 @@ Reward types available: `stat` (xp, gold, skillPoints), `item`
 ---
 
 **Quest 7 — "Big Game"** *(multi-step, enemy kills + item fetch)*  
-> *"The bear that took my leg is still out there. Somewhere in the Deepwood. I need its pelt — for closure, not warmth."*
+> *"There's a bear in the Deepwood. Old, missing an ear, mine to leave alone. But the other bears are fair game. I need three pelts."* (A treant took Finn's leg, not a bear: `mawoodFinn.json` `aboutLeg`, `questBigGame`.)
 
 - **Start req:** Quest 6 completed + Deepwood accessible
 - **Step 1:** Kill 5 `forestBear` (enemy req — prove you can handle bears)
