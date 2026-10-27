@@ -6,7 +6,7 @@ Personality summaries and avatar concepts for La Harpar town NPCs, derived from 
 - [Josh](josh.md) — tavern fisherman, sells his attention for beer — avatar done
 - [Bartender](bartender.md) — irritable tavern owner, charges for talk — **avatar needs generating** (still on the generic Mawood-style placeholder)
 - [Trader](trader.md) — general goods shopkeep, town info hub — avatar done
-- [Marvin](marvin.md) — Exploration Guild master, contract broker — avatar done
+- [Marvin](marvin.md) — Exploration Guild master, contract broker — avatar done (stays in La Harpar as a Guild member in the Tavern; the Guild hall moves to Lirold under Varrow, proposed in `docs/ideas/north-lirold-and-exploration-guild.md`)
 
 ## Shared visual thread
 

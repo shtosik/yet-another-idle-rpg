@@ -42,7 +42,7 @@ export class TownBuildingComponent {
     this.dialogueManagerService.startDialogue(id)
   }
 
-  openShop(shopId: ShopID) {
-    this.townsStore.openShop(shopId)
+  openShop(npcId: NpcID, shopId: ShopID) {
+    this.townsStore.openShop(shopId, this.townsStore.npcShopStages()[npcId] ?? 0)
   }
 }

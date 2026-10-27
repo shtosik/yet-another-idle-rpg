@@ -762,6 +762,8 @@ export const PlayerStore = signalStore(
           const waves = store.zonesProgression()[condition.zoneId] ?? {}
           return Object.entries(waves).some(([wave, kills]) => Number(wave) >= condition.wave && kills > 0)
         }
+        case 'questCompleted':
+          return false // UnlockService checks it; the unlocked target itself is saved.
       }
     },
   })),

@@ -14,7 +14,7 @@ Spend `explorerTokens` at the Exploration Guild. Completing tasks raises a Guild
 
 **Task targets** stay a uniform random pick across the pool. Old zones staying in the pool is intended: they keep being useful, and their tasks finish faster. (Weighting toward the newest zone was considered and dropped for now.)
 
-**Token reward** = length reward (short 1, medium 2, long 3) × the zone tier of the task's target zone — the zone the player fights in to finish the task, not how many zones are unlocked. Zone tier (`Zone.tier`) follows progression order: Horseshoe Beach and the Traders' Basement 1, Plains 2, The Long Path 3, Mountain Pass 4, Elderwood Wilds 5, Deepwood 6, Upper Canopy 7. A side zone takes the tier of where it sits in the quest line, not its town's: Deepwood and Upper Canopy come after Elderwood Wilds. Shop prices scale with tier so new upgrades stay something to work towards.
+**Token reward** = length reward (short 1, medium 2, long 3) × the zone tier of the task's target zone — the zone the player fights in to finish the task, not how many zones are unlocked. Zone tier (`Zone.tier`) follows progression order: Horseshoe Beach and the Trader's Basement 1, Plains 2, The Long Path 3, Mountain Pass 4, Elderwood Wilds 5, Deepwood 6, Upper Canopy 7. A side zone takes the tier of where it sits in the quest line, not its town's: Deepwood and Upper Canopy come after Elderwood Wilds. Shop prices scale with tier so new upgrades stay something to work towards.
 
 **Shop tiers**
 - Rank 0 — basics: consumables, skill point books, recipe scrolls.
