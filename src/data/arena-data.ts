@@ -35,7 +35,7 @@ export const ARENA = {
     regular(final), regular(final), regular(final), regular(final), boss(EnemyID.arenaYad),
   ] as ArenaWave[],
   /** Every clear. */
-  clearRewards: [{ id: ItemID.moltenCape, amount: 1 }] as ItemStack[],
+  clearRewards: [{ id: ItemID.moltenCape, amount: 1 }, { id: ItemID.arenaChest, amount: 1 }] as ItemStack[],
   /** The first clear only, on top of `clearRewards`. */
   firstClearRewards: [{ id: ItemID.skillPointBook, amount: 2 }] as ItemStack[],
   /** The battle background (vertical, like the Zones'); the Arena building uses `liroldArena.png`. */

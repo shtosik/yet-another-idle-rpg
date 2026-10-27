@@ -34,6 +34,26 @@ export const RewardsItemsData: Partial<Record<ItemID, Item>> = {
     type: ItemType.spellScroll,
     spellId: SpellID.ambush,
   },
+  // Combat Arena clear reward.
+  [ItemID.arenaChest]: {
+    id: ItemID.arenaChest,
+    tier: ItemTier.epic,
+    url: './assets/img/items/arenaChest.png',
+    value: -1,
+    type: ItemType.chest,
+    rolls: 3,
+    loot: [
+      { weight: 30, gold: [800, 1500] },
+      { weight: 20, itemId: ItemID.elderSilk, amount: [2, 4] },
+      { weight: 20, itemId: ItemID.harpyFeather, amount: [2, 4] },
+      { weight: 15, itemId: ItemID.ancientWood, amount: [1, 3] },
+      { weight: 15, itemId: ItemID.minorManaPotion, amount: [2, 3] },
+      { weight: 3, itemId: ItemID.fireRune, amount: [1, 2] },
+      { weight: 3, itemId: ItemID.airRune, amount: [1, 2] },
+      { weight: 3, itemId: ItemID.earthRune, amount: [1, 2] },
+      { weight: 5, itemId: ItemID.huntersFeastRecipe, amount: [1, 1] },
+    ],
+  },
   // Explorer Token shop upgrades. Icons are placeholders until their art is generated.
   [ItemID.guildSatchel]: {
     id: ItemID.guildSatchel,

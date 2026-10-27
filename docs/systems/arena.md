@@ -1,7 +1,7 @@
 # Combat Arena
 
 ## Purpose
-A timed gauntlet in Lirold: 20 fixed Waves against one clock, for a gold fee. Clearing it pays the Molten Cape every time and 2 Skill Point Books the first time. The fee is 10,000 gold. It doesn't scale with the player. Design and later batches (boss abilities, the Arena Chest): `docs/ideas/combat-arena.md`.
+A timed gauntlet in Lirold: 20 fixed Waves against one clock, for a gold fee. Clearing it pays the Molten Cape and an Arena Chest every time, and 2 Skill Point Books the first time. The fee is 10,000 gold. It doesn't scale with the player. Design and later batches (boss abilities, the Arena Chest): `docs/ideas/combat-arena.md`.
 
 ## Key files
 - `src/data/arena-data.ts:ARENA`: fee, time limit, respawn delay, the 20 waves (enemy pool and kill count each), clear rewards, background.

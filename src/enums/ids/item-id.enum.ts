@@ -182,4 +182,5 @@ export enum ItemID {
     gnollWarbelt = 163,
     ambushScroll = 164,
     moltenCape = 165,
+    arenaChest = 166,
 }

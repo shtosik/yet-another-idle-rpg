@@ -1,6 +1,6 @@
 # Combat Arena
 
-**Scope:** M · **Status:** In progress. Shipped: batch 1 (weapon categories, Melee Damage Multiplier, Molten Cape), batch 2 (the run, Lirold's Arena, the Arena Master; `docs/systems/arena.md`), batch 3 (the champions' abilities; fee and cape rescaled for the later gate). Next: batch 4 (Arena Chest).
+**Scope:** M · **Status:** In progress. Shipped: batch 1 (weapon categories, Melee Damage Multiplier, Molten Cape), batch 2 (the run, Lirold's Arena, the Arena Master; `docs/systems/arena.md`), batch 3 (the champions' abilities; fee and cape rescaled for the later gate), batch 4 (the Arena Chest, `ItemType.chest`). Not built: the rare arena-only recipe scroll in the chest (needs a new recipe).
 
 A timed gauntlet: clear 20 waves before the clock runs out. Fixed difficulty, so it doesn't scale with player power. An overpowered player is meant to stomp it. The main reward is the **Molten Cape** (attack power + melee damage).
 
@@ -17,7 +17,7 @@ The arena is **not a zone**: no stars, no wave navigation, no `zonesProgression`
 - **Clear**: every clear gives a Molten Cape and an Arena Chest. The first clear also gives 2 Skill Point Books. A best-time record is kept. See Rewards below.
 - Respawn delay: 0.5 s in the arena (2 s in Zones).
 - **Away mid-run** (owner decision): the clock is wall time and keeps running; a run that expires while away fails on return with kill rewards kept. No offline Zone kills for that time.
-- Batch 2 rewards: the Molten Cape (every clear) and 2 Skill Point Books (first clear) wait in `arenaRewards` until they fit; the Arena Chest comes in batch 4.
+- Batch 2 rewards: the Molten Cape (every clear) and 2 Skill Point Books (first clear) wait in `arenaRewards` until they fit; batch 4 adds the Arena Chest to every clear.
 
 Sizing: a player at the gate tier with decent gear clears with ~20% to spare when they handle the boss mechanics well and fails when they ignore them. `npm run sim` can model the passive part.
 

@@ -60,6 +60,11 @@ export class InventoryWindow {
     }
 
     const itemData = ITEM_DATA[item.id]
+    if (itemData.type === ItemType.chest) {
+      this.modalService.openChestOpened(this.playerStore.openChest(item))
+      return
+    }
+
     if (itemData.type === ItemType.spellScroll) {
       if (this.playerStore.knownSpellIds().includes(itemData.spellId)) return
       this.playerStore.useItem(item)

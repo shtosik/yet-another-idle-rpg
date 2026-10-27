@@ -493,6 +493,13 @@
     "seed": 1833642526,
     "date": "2026-10-26"
   },
+  "src/assets/img/items/arenaChest.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a small closed treasure chest made of brown wooden planks with dark iron corner bands, a red cloth with gold trim draped over the lid and hanging down one side, a bronze badge of two crossed swords on the front",
+    "seed": 4242,
+    "date": "2026-10-27"
+  },
   "src/assets/img/items/ashwoodBow.png": {
     "family": "item-pixel",
     "tier": null,

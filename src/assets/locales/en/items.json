@@ -165,7 +165,8 @@
         "silkweaveLegs": "Silkweave Legs",
         "gnollWarbelt": "Gnoll Warbelt",
         "ambushScroll": "Ambush Scroll",
-        "moltenCape": "Molten Cape"
+        "moltenCape": "Molten Cape",
+        "arenaChest": "Arena Chest"
     },
     "tiers": {
         "trash": "Trash",
@@ -195,5 +196,9 @@
         "upgrades": "Upgrades {{station}} to Lv {{level}}",
         "needsPrevious": "Needs {{station}} Lv {{level}} first"
     },
-    "teachesSpell": "Teaches the spell {{spell}}"
+    "teachesSpell": "Teaches the spell {{spell}}",
+    "chestRolls": "Holds {{count}} rewards: gold, materials, potions or a recipe",
+    "chestOpened": "Chest opened!",
+    "chestFull": "Not enough inventory space to open the chest. Make room and try again.",
+    "chestOk": "Nice"
 }
