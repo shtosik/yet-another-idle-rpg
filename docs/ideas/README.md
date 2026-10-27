@@ -33,4 +33,5 @@ Owner decisions in force:
 | [Elemental spells & gear expansion](elemental-spells-gear.md) | M | Batch 1 (spells, element branches, weaknesses) done |
 | [Loadouts](loadouts.md) | S | Accepted |
 | [Auto-cast](auto-cast.md) | S-M | Proposed |
+| [Combat Arena](combat-arena.md) | M | Accepted design |
 | [Known issues](known-issues.md) | — | Open bug and tech-debt list |
