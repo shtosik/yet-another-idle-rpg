@@ -79,6 +79,13 @@ describe('ArenaService', () => {
     expect(openResult).toHaveBeenCalledWith(jasmine.objectContaining({ outcome: 'timeout', kills: 4, timeMs: ARENA.timeLimitMs }))
   })
 
+  it('leaving ends the run without the result modal', () => {
+    arena.enter(0)
+    arena.leave(1000)
+    expect(arena.run()).toBeNull()
+    expect(openResult).not.toHaveBeenCalled()
+  })
+
   it('an arena kill pays XP and gold but no zone progress', () => {
     arena.enter(0)
     battleStore.startBattle(0)
@@ -90,6 +97,7 @@ describe('ArenaService', () => {
     expect(arena.run()?.kills).toBe(1)
     expect(playerStore.stats().goldCoins).toBeGreaterThan(goldBefore)
     expect(playerStore.zonesProgression()).toEqual({})
+    expect(Object.values(playerStore.enemyKillCounts())).toEqual([1])
   })
 
   it('a run that ran out while away ends at its end time; the rest is claimed in the zone', async () => {

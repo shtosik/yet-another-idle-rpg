@@ -48,4 +48,15 @@ describe('Ambush and spell scrolls', () => {
     for (let i = 0; i < 5; i++) service.doDamage()
     expect(battleStore.empowered()).toBeNull()
   })
+
+  it('auto-attacks with a bow are not melee, so they keep the crits', () => {
+    playerStore.addItems([{ id: ItemID.woodenBow, amount: 1 }])
+    playerStore.equipItem(playerStore.inventory().find(slot => slot?.id === ItemID.woodenBow)!)
+    battleStore.empower(SpellID.ambush, 5)
+    battleStore.startBattle(0)
+    battleStore.updateEnemyHp(100000)
+
+    service.doDamage()
+    expect(battleStore.empowered()?.hitsLeft).toBe(5)
+  })
 })

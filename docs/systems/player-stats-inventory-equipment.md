@@ -23,7 +23,7 @@
 - **Inventory**: a fixed-length array of slots (`InventoryItem | null`), length = `stats.inventorySlots` (default 40, grows when the stat rises, never shrinks). Items stack per `id + tier`. `removeItems` takes across every stack of an id.
 - **Spell scrolls** (`ItemType.spellScroll`) teach their `spellId` on right-click and are used up; unsellable (`value` -1). See `spells-and-buffs.md`.
 - **Station upgrade items** never enter the inventory: `PlayerStore.addItems` installs them into `stations` instead (see `consumables-camp-crafting.md`).
-- **Equip**: the item leaves the inventory first, the old item goes back in; stats follow from `equipment`. A weapon's `damageType` is the element of auto-attacks and its `weaponCategory` (default melee) whether they are melee hits; an item's `spell` is known while it is equipped (`spells-and-buffs.md`). Item tooltips show both.
+- **Equip**: the item leaves the inventory first, the old item goes back in; stats follow from `equipment`. A weapon's `damageType` is the element of auto-attacks and its `weaponCategory` (default melee) whether they are melee hits; an item's `spell` is known while it is equipped (`spells-and-buffs.md`). Item tooltips show the damage type and the spell, not the weapon category.
 - **Drops** (`calculateEnemyDrops` in `player.store.ts`): each `EnemyDrop` is a 1-in-`chance` roll, amount in `minAmount..maxAmount`; drops with `requiredActiveQuestId` only roll while that quest is active. Shinies roll the normal table 10 times plus `shinyDrops` once.
 
 ## Intended behavior (owner decisions)

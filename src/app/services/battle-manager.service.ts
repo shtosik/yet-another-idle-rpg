@@ -242,9 +242,10 @@ export class BattleManagerService {
   }
 
   private handleEnemyDeath(enemy: Enemy) {
-    // Arena kills pay only XP and gold: no zone progress, kill counts, drops, tasks or offline kill rate.
+    // Arena kills pay XP and gold and count in the bestiary: no zone progress, drops, tasks or offline kill rate.
     if (this.battleStore.arenaRun()) {
       this.battleStore.endBattle()
+      this.playerStore.updateEnemyKillCount(enemy.id, 1)
       this.arenaService.onKill(enemy)
       return
     }

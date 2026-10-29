@@ -180,10 +180,6 @@
         "title": "Time's up!",
         "body": "The sand ran out before the last champion fell. You keep what your kills earned."
       },
-      "left": {
-        "title": "You left the Arena",
-        "body": "You walked out before the end. You keep what your kills earned."
-      },
       "time": "Time: {{time}}",
       "bestTime": "New best time!",
       "inventoryFull": "Not enough inventory space. Make room, then claim your rewards here or from Ludo Crane in Lirold.",
