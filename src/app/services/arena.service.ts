@@ -99,6 +99,7 @@ export class ArenaService {
     if (cleared) this.battleStore.addArenaRewards([...ARENA.clearRewards, ...(isFirstClear ? ARENA.firstClearRewards : [])])
 
     const result: ArenaResult = { outcome, timeMs, kills: run.kills, experience: run.experience, gold: run.gold, isBestTime }
-    this.modalService.openArenaResult(result)
+    // Leaving is the player's own choice, so only a clear or a timeout gets the result modal.
+    if (outcome !== 'left') this.modalService.openArenaResult(result)
   }
 }
