@@ -96,17 +96,20 @@ describe('ArenaService', () => {
   })
 
   it('a run that ran out while away ends at its end time; the rest is claimed in the zone', async () => {
-    const hours = 5 * 60 * 60 * 1000
-    spyOn(window, 'fetch').and.resolveTo(new Response(null, { headers: { Date: new Date(hours).toUTCString() } }))
+    const away = 60 * 60 * 1000
+    spyOn(window, 'fetch').and.resolveTo(new Response(null, { headers: { Date: new Date(away).toUTCString() } }))
     const welcomeBack = spyOn(TestBed.inject(ModalService), 'openWelcomeBack')
     TestBed.inject(OfflineStore).setLastSeen(0)
     arena.enter(0)
 
-    await TestBed.inject(OfflineProgressService).claim()
+    const claiming = TestBed.inject(OfflineProgressService).claim()
+    // The game loop's first tick ends the run before the server time arrives.
+    arena.tick(away)
+    await claiming
 
     expect(arena.run()).toBeNull()
     expect(openResult).toHaveBeenCalledWith(jasmine.objectContaining({ outcome: 'timeout', timeMs: ARENA.timeLimitMs }))
-    expect(welcomeBack).toHaveBeenCalled()
+    expect(welcomeBack).toHaveBeenCalledWith(jasmine.objectContaining({ elapsedMs: away - ARENA.timeLimitMs }))
     expect(playerStore.zonesProgression()[ZoneID.horseshoeBeach]).toBeDefined()
   })
 })

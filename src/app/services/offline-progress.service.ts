@@ -2,7 +2,7 @@ import { ArenaService } from './arena.service'
 import { WeaponCategory } from '../../enums/weapon-category.enum'
 import { inject, Injectable } from '@angular/core'
 import { setTimeout } from 'worker-timers'
-import { BattleStore } from '../store/battle/battle.store'
+import { ArenaRun, BattleStore } from '../store/battle/battle.store'
 import { PlayerStore } from '../store/player/player.store'
 import { QuestsStore } from '../store/quests/quests.store'
 import { OfflineStore } from '../store/offline/offline.store'
@@ -71,6 +71,7 @@ export class OfflineProgressService {
   private anchor: { hostMs: number, perfMs: number } | null = null
   /** `performance.now()` when the pending claim started: time after it is played online, so it isn't claimed. */
   private pendingSincePerf: number | null = null
+  private pendingArenaRun: ArenaRun | null = null
   private isClaiming = false
 
   /** Host time now, or `null` until the host has answered. */
@@ -94,7 +95,11 @@ export class OfflineProgressService {
     if (this.isClaiming) return
     this.isClaiming = true
     // Kept across retries: the claim ends where the wait began, however long the host takes to answer.
-    this.pendingSincePerf ??= performance.now()
+    if (this.pendingSincePerf === null) {
+      this.pendingSincePerf = performance.now()
+      // Read now: the game loop's first tick ends an expired run before the server time arrives.
+      this.pendingArenaRun = this.battleStore.arenaRun()
+    }
     try {
       const hostNow = await fetchServerTime()
       if (hostNow === null) {
@@ -112,7 +117,8 @@ export class OfflineProgressService {
 
       // An arena run that ran out while away ends at its own end time; the rest of the absence is claimed in the
       // zone the player entered it from (kept as `currentZoneId`). A run still going claims nothing.
-      const run = this.battleStore.arenaRun()
+      const run = this.pendingArenaRun
+      this.pendingArenaRun = null
       let arenaMs = 0
       if (run && lastSeen !== null && claimEnd >= run.endsAt) {
         arenaMs = Math.max(0, run.endsAt - lastSeen)
