@@ -114,7 +114,8 @@ describe('ArenaService', () => {
 
     expect(arena.run()).toBeNull()
     expect(openResult).toHaveBeenCalledWith(jasmine.objectContaining({ outcome: 'timeout', timeMs: ARENA.timeLimitMs }))
-    expect(welcomeBack).toHaveBeenCalledWith(jasmine.objectContaining({ elapsedMs: away - ARENA.timeLimitMs }))
+    // The claim ends where the wait began, so a few ms of test time drift off the gap.
+    expect(welcomeBack.calls.mostRecent().args[0].elapsedMs).toBeCloseTo(away - ARENA.timeLimitMs, -2)
     expect(playerStore.zonesProgression()[ZoneID.horseshoeBeach]).toBeDefined()
   })
 })
