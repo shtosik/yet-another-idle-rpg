@@ -21,8 +21,8 @@
 - **Resources** (`PlayerState.resources`: `experience`, `level`, `unspentSkillPoints`, `goldCoins`, `mana`) are earned and spent with `updatePlayerStats([{ stat, amount }])`. The same call with any other stat adds a **permanent bonus** (`PlayerState.permanentBonuses`): used reward items, quest stat rewards, dialogue stat effects. Gear, nodes, buffs and consumables never call it.
 - **XP**: adding `experience` runs `handleExperience`, which levels up (possibly several times) and grants 1 skill point per level. Formula: `src/app/pipes/calculate-xp.pipe.ts`.
 - **Inventory**: a fixed-length array of slots (`InventoryItem | null`), length = `stats.inventorySlots` (default 40, grows when the stat rises, never shrinks). Items stack per `id + tier`. `removeItems` takes across every stack of an id.
-- **Chests** (`ItemType.chest`: `rolls` picks from a weighted `loot` table of gold or item stacks) open on right-click: `PlayerStore.openChest` rolls the loot (`rollChest`, `store/player/chest.ts`), opening needs one empty slot per pick (owner rule: the most new stacks it can give), else nothing changes and the modal says how many. The contents, or "no room", show in a modal. Stackable, unsellable. The Arena Chest is the first.
-- **Spell scrolls** (`ItemType.spellScroll`) teach their `spellId` on right-click and are used up; unsellable (`value` -1). See `spells-and-buffs.md`.
+- **Chests** (`ItemType.chest`: `rolls` picks from a weighted `loot` table of gold or item stacks) open on right-click: `PlayerStore.openChest` rolls the loot (`rollChest`, `store/player/chest.ts`), opening needs one empty slot per pick (owner rule: the most new stacks it can give), else nothing changes and the modal says how many. The contents, or "no room", show in a modal. Stackable, unsellable (open it instead). The Arena Chest is the first.
+- **Spell scrolls** (`ItemType.spellScroll`) teach their `spellId` on right-click and are used up; a scroll for a spell already known can be sold. See `spells-and-buffs.md`.
 - **Station upgrade items** never enter the inventory: `PlayerStore.addItems` installs them into `stations` instead (see `consumables-camp-crafting.md`).
 - **Equip**: the item leaves the inventory first, the old item goes back in; stats follow from `equipment`. A weapon's `damageType` is the element of auto-attacks and its `weaponCategory` (default melee) whether they are melee hits; an item's `spell` is known while it is equipped (`spells-and-buffs.md`). Item tooltips show both.
 - **Drops** (`calculateEnemyDrops` in `player.store.ts`): each `EnemyDrop` is a 1-in-`chance` roll, amount in `minAmount..maxAmount`; drops with `requiredActiveQuestId` only roll while that quest is active. Shinies roll the normal table 10 times plus `shinyDrops` once.
@@ -40,7 +40,7 @@
 - Stat units: multipliers are factors (`critMulti` 1.2 = ×1.2); `critChance` and `shinyChance` are percent; `damageVs*` are additive fractions (0.2 = +20%).
 - Every `PlayerStat` needs an `app:playerStats.<stat>` label (`npm run validate` checks).
 - **Gold per kill** is `ceil(Enemy.gold × goldCoinsMultiplier × 10 if shiny)` (`processBattleEnd`).
-- **Item `value`** is the sell price (`sellItem`, any shop). `value <= 0` is unsellable: books, recipes, station gear, quest items and pets must stay there, and a shop's price must be above the item's `value` (`npm run validate` checks both).
+- **Item `value`** is the sell price (`sellItem`, any shop). `value <= 0` is unsellable: books, station gear, quest items and chests must stay there (recipes, spell scrolls and pets sell, so duplicates aren't dead slots; owner decision), and a shop's price must be above the item's `value` (`npm run validate` checks both).
 - `addItems` silently discards what doesn't fit. Callers that must not lose items check `canFit` first.
 
 ## Known issues

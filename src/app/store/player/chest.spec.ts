@@ -12,7 +12,7 @@ describe('chests', () => {
 
   it('rolls its picks, merging the same item into one stack', () => {
     // rng 0 always picks the first entry (gold) at its minimum.
-    expect(rollChest(chest, () => 0)).toEqual({ gold: chest.rolls * 3000, items: [] })
+    expect(rollChest(chest, () => 0)).toEqual({ gold: chest.rolls * 6000, items: [] })
 
     const silk: ChestItem = { ...chest, loot: [{ weight: 1, itemId: ItemID.elderSilk, amount: [2, 2] }] }
     expect(rollChest(silk, () => 0.5).items).toEqual([{ id: ItemID.elderSilk, amount: 2 * chest.rolls }])
@@ -28,7 +28,7 @@ describe('chests', () => {
     playerStore.addItems([{ id: ItemID.arenaChest, amount: 3 }])
     const gold = playerStore.stats().goldCoins
     expect(open()).not.toBeNull()
-    expect(playerStore.stats().goldCoins).toBe(gold + chest.rolls * 3000)
+    expect(playerStore.stats().goldCoins).toBe(gold + chest.rolls * 6000)
     expect(playerStore.itemCount(ItemID.arenaChest)).toBe(2)
 
     // Fill every other slot with items the loot can't stack onto; the chest stack stays, so no new stack fits.

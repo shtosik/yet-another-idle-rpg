@@ -277,7 +277,7 @@ function buildPetItem(p: PetEntry, shiny: boolean): EquipmentItem {
     id: shiny ? p.shinyId : p.petId,
     tier: shiny ? ItemTier.legendary : ItemTier.rare,
     url: `./assets/img/enemies/${p.asset}${shiny ? '-shiny' : ''}.png`,
-    value: -1,
+    value: shiny ? 2500 : 500,
     type: ItemType.equipment,
     slot: EquipmentSlot.pet,
     stats: shiny ? p.shinyStats : p.stats,
