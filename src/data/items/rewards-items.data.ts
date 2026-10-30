@@ -1,4 +1,5 @@
 import { SpellID } from '../../enums/ids/spell-id.enum'
+import { RecipeID } from '../../enums/ids/recipe-id.enum'
 import { ItemID } from '../../enums/ids/item-id.enum'
 import { Item } from '../../interfaces/item.interface'
 import { ItemTier } from '../../enums/items/item-tier.enum'
@@ -43,6 +44,15 @@ export const RewardsItemsData: Partial<Record<ItemID, Item>> = {
     type: ItemType.spellScroll,
     spellId: SpellID.warCry,
   },
+  // Arena Chest only. Icon: the cooking recipe's art until a workbench scroll is drawn.
+  [ItemID.gladiatorHelmRecipe]: {
+    id: ItemID.gladiatorHelmRecipe,
+    tier: ItemTier.rare,
+    url: './assets/img/items/cookingRecipe.png',
+    value: 150,
+    type: ItemType.recipe,
+    recipeId: RecipeID.gladiatorHelm,
+  },
   // Combat Arena clear reward.
   [ItemID.arenaChest]: {
     id: ItemID.arenaChest,
@@ -60,7 +70,7 @@ export const RewardsItemsData: Partial<Record<ItemID, Item>> = {
       { weight: 60, itemId: ItemID.fireRune, amount: [3, 6] },
       { weight: 60, itemId: ItemID.airRune, amount: [3, 6] },
       { weight: 60, itemId: ItemID.earthRune, amount: [3, 6] },
-      { weight: 50, itemId: ItemID.huntersFeastRecipe, amount: [1, 1] },
+      { weight: 50, itemId: ItemID.gladiatorHelmRecipe, amount: [1, 1] },
       { weight: 30, itemId: ItemID.warCryScroll, amount: [1, 1] },
       { weight: 30, itemId: ItemID.patronGloves, amount: [1, 1] },
       // Champion pets: about 1 in 47 per chest each (never shiny).

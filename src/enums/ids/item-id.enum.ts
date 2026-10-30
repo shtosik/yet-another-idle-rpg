@@ -189,4 +189,6 @@ export enum ItemID {
     petArenaArcanist = 170,
     petArenaBurrower = 171,
     petArenaYad = 172,
+    gladiatorHelm = 173,
+    gladiatorHelmRecipe = 174,
 }

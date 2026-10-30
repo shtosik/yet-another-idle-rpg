@@ -95,4 +95,17 @@ export const HelmetItemsData: Partial<Record<ItemID, Item>> = {
       { id: 'goldCoinsMultiplier', amount: 0.15 },
     ],
   },
+  // Crafted at the workbench (recipe from the Arena Chest): a sidegrade below the Harpy Crown, worth selling.
+  [ItemID.gladiatorHelm]: {
+    id: ItemID.gladiatorHelm,
+    tier: ItemTier.rare,
+    url: './assets/img/items/gladiatorHelm.png',
+    value: 700,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.helmet,
+    stats: [
+      { id: 'attackPower', amount: 4 },
+      { id: 'critChance', amount: 2 },
+    ],
+  },
 }

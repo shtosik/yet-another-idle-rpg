@@ -654,6 +654,13 @@
     "seed": 1230513072,
     "date": "2026-10-26"
   },
+  "src/assets/img/items/gladiatorHelm.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "one open-faced gladiator helmet of polished bronze with an iron brow band and cheek guards, a short crimson horsehair crest running along the top, a single small white feather tucked at one side, a few small dents in the metal, empty inside, no head",
+    "seed": 502902317,
+    "date": "2026-10-30"
+  },
   "src/assets/img/items/gnollCleaver.png": {
     "family": "item-pixel",
     "tier": null,
