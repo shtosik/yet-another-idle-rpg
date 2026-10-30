@@ -9,6 +9,8 @@ import { ARENA } from '../../data/arena-data'
 import ENEMIES_DATA from '../../data/enemies-data'
 import { ItemID } from '../../enums/ids/item-id.enum'
 import { ZoneID } from '../../enums/ids/zone-id.enum'
+import { OfflineProgressService } from './offline-progress.service'
+import { OfflineStore } from '../store/offline/offline.store'
 
 describe('ArenaService', () => {
   let arena: ArenaService
@@ -59,8 +61,11 @@ describe('ArenaService', () => {
     expect(countOf(ItemID.moltenCape)).toBe(1)
     expect(countOf(ItemID.skillPointBook)).toBe(2)
 
-    arena.enter(0)
-    killThrough(totalKills)
+    // The next entry waits out the 30-minute cooldown.
+    arena.enter(ARENA.entryCooldownMs - 1)
+    expect(arena.run()).toBeNull()
+    arena.enter(ARENA.entryCooldownMs)
+    killThrough(totalKills, ARENA.entryCooldownMs + 1000)
     arena.claimRewards()
     expect(countOf(ItemID.moltenCape)).toBe(2)
     expect(countOf(ItemID.skillPointBook)).toBe(2)
@@ -96,5 +101,24 @@ describe('ArenaService', () => {
     expect(playerStore.stats().goldCoins).toBeGreaterThan(goldBefore)
     expect(playerStore.zonesProgression()).toEqual({})
     expect(Object.values(playerStore.enemyKillCounts())).toEqual([1])
+  })
+
+  it('a run that ran out while away ends at its end time; the rest is claimed in the zone', async () => {
+    const away = 60 * 60 * 1000
+    spyOn(window, 'fetch').and.resolveTo(new Response(null, { headers: { Date: new Date(away).toUTCString() } }))
+    const welcomeBack = spyOn(TestBed.inject(ModalService), 'openWelcomeBack')
+    TestBed.inject(OfflineStore).setLastSeen(0)
+    arena.enter(0)
+
+    const claiming = TestBed.inject(OfflineProgressService).claim()
+    // The game loop's first tick ends the run before the server time arrives.
+    arena.tick(away)
+    await claiming
+
+    expect(arena.run()).toBeNull()
+    expect(openResult).toHaveBeenCalledWith(jasmine.objectContaining({ outcome: 'timeout', timeMs: ARENA.timeLimitMs }))
+    // The claim ends where the wait began, so a few ms of test time drift off the gap.
+    expect(welcomeBack.calls.mostRecent().args[0].elapsedMs).toBeCloseTo(away - ARENA.timeLimitMs, -2)
+    expect(playerStore.zonesProgression()[ZoneID.horseshoeBeach]).toBeDefined()
   })
 })

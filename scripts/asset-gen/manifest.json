@@ -493,6 +493,13 @@
     "seed": 1833642526,
     "date": "2026-10-26"
   },
+  "src/assets/img/items/arenaChest.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a small closed treasure chest made of brown wooden planks with dark iron corner bands, a red cloth with gold trim draped over the lid and hanging down one side, a bronze badge of two crossed swords on the front",
+    "seed": 4242,
+    "date": "2026-10-27"
+  },
   "src/assets/img/items/ashwoodBow.png": {
     "family": "item-pixel",
     "tier": null,
@@ -647,6 +654,13 @@
     "seed": 1230513072,
     "date": "2026-10-26"
   },
+  "src/assets/img/items/gladiatorHelm.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "one open-faced gladiator helmet of polished bronze with an iron brow band and cheek guards, a short crimson horsehair crest running along the top, a single small white feather tucked at one side, a few small dents in the metal, empty inside, no head",
+    "seed": 502902317,
+    "date": "2026-10-30"
+  },
   "src/assets/img/items/gnollCleaver.png": {
     "family": "item-pixel",
     "tier": null,
@@ -786,6 +800,13 @@
     "subject": "a single empty deep purple cloth hood with a short cape collar and a thin silver trim, nobody wearing it, single object",
     "seed": 358365248,
     "date": "2026-10-26"
+  },
+  "src/assets/img/items/patronGloves.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a pair of fine crimson leather gloves with round gold coin studs along the cuffs and gold stitching",
+    "seed": 1491485296,
+    "date": "2026-10-27"
   },
   "src/assets/img/items/rootwoodStaff.png": {
     "family": "item-pixel",
@@ -967,6 +988,13 @@
     "subject": "a single long whip of blue and teal seawater lashing through the air in a sweeping curved arc, white foam and spray flying from its tip, on a deep blue background",
     "seed": 1215728485,
     "date": "2026-10-25"
+  },
+  "src/assets/img/skills/warCry.png": {
+    "family": "skill-icon",
+    "tier": null,
+    "subject": "a roaring warrior's wide open mouth shouting a battle cry, with curved red-orange sound waves bursting outward, crimson and gold colours",
+    "seed": 166127394,
+    "date": "2026-10-27"
   },
   "src/assets/img/skills/waterMastery.png": {
     "family": "skill-icon",

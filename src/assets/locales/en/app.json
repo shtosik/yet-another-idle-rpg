@@ -159,6 +159,14 @@
   "arena": {
     "title": "Arena",
     "leave": "Leave",
+    "bosses": {
+      "weakPoint": "Weak point: strike it",
+      "weakPointHit": "Weak point hit! +50% damage",
+      "mound": "Dig at mound {{number}}",
+      "stunned": "Stunned! Takes +50% damage",
+      "shield": "{{element}} shield: only {{element}} hurts",
+      "timeLost": "-{{seconds}}s"
+    },
     "effects": {
       "enter": "Enter the Arena",
       "claim": "Claim arena rewards"

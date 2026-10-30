@@ -185,10 +185,10 @@ for (const shop of shops) {
     }
   }
 }
-const UNSELLABLE_TYPES = new Set([D.ItemType.book, D.ItemType.recipe, D.ItemType.stationUpgrade, D.ItemType.spellScroll, D.ItemType.quest])
+const UNSELLABLE_TYPES = new Set([D.ItemType.book, D.ItemType.stationUpgrade, D.ItemType.quest, D.ItemType.chest])
 for (const item of Object.values(D.ITEM_DATA)) {
   const name = idName(D.ItemID, item.id)
-  if (item.value > 0 && (UNSELLABLE_TYPES.has(item.type) || /^(shiny)?pet[A-Z]/i.test(name))) {
+  if (item.value > 0 && UNSELLABLE_TYPES.has(item.type)) {
     error('src/data/items', `${name} must be unsellable (value <= 0)`)
   }
 }

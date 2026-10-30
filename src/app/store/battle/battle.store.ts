@@ -50,6 +50,8 @@ export interface BattleState {
   arenaRun: ArenaRun | null;
   arenaClears: number;
   arenaBestTimeMs: number | null;
+  /** Wall-clock ms when the Arena takes the player again (`ARENA.entryCooldownMs` after the last entry). */
+  arenaReadyAt: number;
   /** Clear rewards that didn't fit yet; claimed from the result modal or the Arena Master. */
   arenaRewards: ItemStack[];
 }
@@ -71,6 +73,7 @@ export const initialState: BattleState = {
   arenaRun: null,
   arenaClears: 0,
   arenaBestTimeMs: null,
+  arenaReadyAt: 0,
   arenaRewards: [],
 }
 
@@ -344,6 +347,7 @@ export const BattleStore = signalStore(
     startArenaRun(now: number): void {
       patchState(store, {
         arenaRun: { wave: 1, waveKills: 0, startedAt: now, endsAt: now + ARENA.timeLimitMs, kills: 0, experience: 0, gold: 0 },
+        arenaReadyAt: now + ARENA.entryCooldownMs,
         currentEnemyHp: 0,
         enemyId: null,
         isInCombat: false,
@@ -381,6 +385,11 @@ export const BattleStore = signalStore(
         isInCombat: false,
         isShinyEnemy: false,
       }))
+    },
+
+    /** The Arcanist's toll: run time taken off the clock. */
+    shortenArenaRun(ms: number): void {
+      patchState(store, ({ arenaRun: run }) => (run ? { arenaRun: { ...run, endsAt: run.endsAt - ms } } : {}))
     },
 
     addArenaRewards(items: ItemStack[]): void {

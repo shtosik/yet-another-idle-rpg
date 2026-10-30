@@ -311,11 +311,11 @@ export const WeaponsItemsData: Partial<Record<ItemID, Item>> = {
     id: ItemID.moltenCape,
     tier: ItemTier.epic,
     url: './assets/img/items/moltenCape.png',
-    value: 500,
+    value: 5000,
     type: ItemType.equipment,
     slot: EquipmentSlot.cape,
     stats: [
-      { id: 'attackPower', amount: 6 },
+      { id: 'attackPower', amount: 20 },
       { id: 'meleeDamageMultiplier', amount: 0.15 },
     ],
   },
