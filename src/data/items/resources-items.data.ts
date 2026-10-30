@@ -205,7 +205,7 @@ export const ResourcesItemsData: Partial<Record<ItemID, Item>> = {
     id: ItemID.earthRuneRecipe,
     tier: ItemTier.uncommon,
     url: './assets/img/items/earthRuneRecipe.png',
-    value: -1,
+    value: 150,
     type: ItemType.recipe,
     recipeId: RecipeID.earthRune,
   },

@@ -30,6 +30,10 @@
         "harpy": "Harpy",
         "giantEagle": "Giant Eagle",
         "canopyBandit": "Canopy Bandit",
-        "harpyMatriarch": "Harpy Matriarch"
+        "harpyMatriarch": "Harpy Matriarch",
+        "arenaBrute": "The Brute",
+        "arenaArcanist": "The Arcanist",
+        "arenaBurrower": "The Burrower",
+        "arenaYad": "Yad, the Arena Champion"
     }
 }

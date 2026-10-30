@@ -28,6 +28,7 @@ const translations = [
     'dialogues/mawoodFinn',
     'dialogues/mawoodBrenn',
     'dialogues/mawoodMilo',
+    'dialogues/liroldArenaMaster',
     'dialogues/mawoodElarion',
 ]
 

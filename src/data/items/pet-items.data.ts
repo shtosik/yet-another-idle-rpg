@@ -277,19 +277,27 @@ function buildPetItem(p: PetEntry, shiny: boolean): EquipmentItem {
     id: shiny ? p.shinyId : p.petId,
     tier: shiny ? ItemTier.legendary : ItemTier.rare,
     url: `./assets/img/enemies/${p.asset}${shiny ? '-shiny' : ''}.png`,
-    value: -1,
+    value: shiny ? 2500 : 500,
     type: ItemType.equipment,
     slot: EquipmentSlot.pet,
     stats: shiny ? p.shinyStats : p.stats,
   }
 }
 
-export const PetItemsData: Partial<Record<ItemID, Item>> = Object.fromEntries(
-  PETS.flatMap(p => [
+/** Arena champions' pets, from the Arena Chest; no shiny variant, since the arena rolls no shinies. */
+const ARENA_PETS: Omit<PetEntry, 'shinyId' | 'shinyStats'>[] = [
+  { enemyId: EnemyID.arenaBrute, petId: ItemID.petArenaBrute, asset: 'arenaBrute', stats: [{ id: 'damageVsHuman', amount: 0.2 }] },
+  { enemyId: EnemyID.arenaArcanist, petId: ItemID.petArenaArcanist, asset: 'arenaArcanist', stats: [{ id: 'magicDamageMultiplier', amount: 0.1 }] },
+  { enemyId: EnemyID.arenaBurrower, petId: ItemID.petArenaBurrower, asset: 'arenaBurrower', stats: [{ id: 'damageVsMammal', amount: 0.2 }] },
+  { enemyId: EnemyID.arenaYad, petId: ItemID.petArenaYad, asset: 'arenaYad', stats: [{ id: 'meleeDamageMultiplier', amount: 0.1 }] },
+]
+export const PetItemsData: Partial<Record<ItemID, Item>> = Object.fromEntries([
+  ...PETS.flatMap(p => [
     [p.petId, buildPetItem(p, false)],
     [p.shinyId, buildPetItem(p, true)],
   ]),
-)
+  ...ARENA_PETS.map(p => [p.petId, buildPetItem({ ...p, shinyId: p.petId, shinyStats: [] }, false)]),
+])
 
 const PETS_BY_ENEMY: Partial<Record<EnemyID, PetEntry>> = Object.fromEntries(
   PETS.map(p => [p.enemyId, p]),

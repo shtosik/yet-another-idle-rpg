@@ -182,4 +182,13 @@ export enum ItemID {
     gnollWarbelt = 163,
     ambushScroll = 164,
     moltenCape = 165,
+    arenaChest = 166,
+    warCryScroll = 167,
+    patronGloves = 168,
+    petArenaBrute = 169,
+    petArenaArcanist = 170,
+    petArenaBurrower = 171,
+    petArenaYad = 172,
+    gladiatorHelm = 173,
+    gladiatorHelmRecipe = 174,
 }

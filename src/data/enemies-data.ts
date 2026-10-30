@@ -499,6 +499,43 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     url: './assets/img/enemies/harpyMatriarch.png',
     enemyTypes: [EnemyType.harpy, EnemyType.bird],
   },
+  // ── Combat Arena (Lirold): arena-only, no drops; the clear rewards (and the champions' pets, in the Arena Chest) are the arena's ──
+  [EnemyID.arenaBrute]: {
+    id: EnemyID.arenaBrute,
+    maxHp: 900,
+    experience: 540,
+    gold: 270,
+    drops: [],
+    url: './assets/img/enemies/arenaBrute.png',
+    enemyTypes: [EnemyType.human, EnemyType.humanoid],
+  },
+  [EnemyID.arenaArcanist]: {
+    id: EnemyID.arenaArcanist,
+    maxHp: 500,
+    experience: 300,
+    gold: 150,
+    drops: [],
+    url: './assets/img/enemies/arenaArcanist.png',
+    enemyTypes: [EnemyType.human, EnemyType.humanoid],
+  },
+  [EnemyID.arenaBurrower]: {
+    id: EnemyID.arenaBurrower,
+    maxHp: 700,
+    experience: 420,
+    gold: 210,
+    drops: [],
+    url: './assets/img/enemies/arenaBurrower.png',
+    enemyTypes: [EnemyType.mammal],
+  },
+  [EnemyID.arenaYad]: {
+    id: EnemyID.arenaYad,
+    maxHp: 1200,
+    experience: 720,
+    gold: 360,
+    drops: [],
+    url: './assets/img/enemies/arenaYad.png',
+    enemyTypes: [EnemyType.humanoid],
+  },
 }
 
 export default ENEMIES_DATA

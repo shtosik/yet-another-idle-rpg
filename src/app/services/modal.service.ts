@@ -1,3 +1,5 @@
+import { ChestOpenedComponent } from '../components/modals/chest-opened/chest-opened.component'
+import type { ChestContents } from '../store/player/chest'
 import { inject, Injectable } from '@angular/core'
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog'
 import { QuestProps } from '../../data/quests-data'
@@ -8,6 +10,8 @@ import { UnlockNotification } from '../../data/unlock-conditions'
 import { ItemID } from '../../enums/ids/item-id.enum'
 import { WelcomeBackComponent } from '../components/modals/welcome-back/welcome-back.component'
 import type { OfflineSummary } from './offline-progress.service'
+import { ArenaResultComponent } from '../components/modals/arena-result/arena-result.component'
+import type { ArenaResult } from './arena.service'
 
 @Injectable({ providedIn: 'root' })
 export class ModalService {
@@ -53,6 +57,31 @@ export class ModalService {
       hasBackdrop: true,
       disableClose: false,
       data: summary,
+    })
+  }
+
+  openArenaResult(result: ArenaResult) {
+    return this.dialog.open(ArenaResultComponent, {
+      enterAnimationDuration: '300ms',
+      panelClass: 'modal',
+      minWidth: '800px',
+      position: { top: '200px' },
+      hasBackdrop: true,
+      disableClose: false,
+      data: result,
+    })
+  }
+
+  /** The contents of an opened chest, or (null) why it didn't open. */
+  openChestOpened(data: { contents: ChestContents | null, slotsNeeded: number }) {
+    return this.dialog.open(ChestOpenedComponent, {
+      enterAnimationDuration: '300ms',
+      panelClass: 'modal',
+      minWidth: '600px',
+      position: { top: '200px' },
+      hasBackdrop: true,
+      disableClose: false,
+      data,
     })
   }
 

@@ -6,6 +6,12 @@ Versions follow [Semantic Versioning](https://semver.org/). Each note is `- [typ
 New notes go under `[Unreleased]`; `npm run release -- <major|minor|patch>` moves them into a version (docs/deployment.md).
 
 ## [Unreleased]
+- [feature] Recipes, spell scrolls and pets can now be sold, so duplicates no longer take up a slot for good.
+- [feature] Every arena clear also gives an Arena Chest: right-click it in your inventory for four rewards: gold, Elderwood and Canopy materials, runes, mana potions, the Gladiator's Helm recipe (a new workbench helmet), and rarely the War Cry spell scroll (+25% melee damage for 15 s) or Patron's Gloves (+10% gold and XP), or one of the four champions' pets. Opening needs 4 empty inventory slots.
+- [feature] The Arena takes a new challenger 30 minutes after their last entry.
+- [feature] Each arena champion has a trick: click the Brute's weak point for +50% damage, hold your spells against the Arcanist (magic hits cost you time), pick the shaking mound when the Burrower digs in, and hit Yad with a spell or weapon of its shield's element (fire, air or water) to break it.
+- [feature] The Combat Arena opens in Lirold after the Mawood Zones: pay the Arena Master 10,000 gold, then clear 20 waves and four arena champions in 10 minutes to win the Molten Cape (and 2 Skill Point Books the first time). Leaving or running out of time keeps the gold and XP from your kills.
+- [feature] Lirold unlocks once the Harpy Matriarch falls; travel there from the Map's town buttons.
 - [feature] Weapons are now melee, ranged (bows) or magic (staves and wands). A new Melee Damage Multiplier stat boosts melee auto-attacks and Double Attack.
 - [nerf] Ambush's guaranteed crits now apply to melee hits only; bow and staff auto-attacks no longer use them up.
 - [feature] The capital is now called Lirold and the Southback region is now Elderreach, home of Mawood. La Harpar's welcome message now calls it a fishing village.

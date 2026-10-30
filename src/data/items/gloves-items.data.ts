@@ -43,4 +43,17 @@ export const GlovesItemsData: Partial<Record<ItemID, Item>> = {
       { id: 'critChance', amount: 2 },
     ],
   },
+  // Arena Chest only: drops-and-progress gloves, a choice against power gloves.
+  [ItemID.patronGloves]: {
+    id: ItemID.patronGloves,
+    tier: ItemTier.epic,
+    url: './assets/img/items/patronGloves.png',
+    value: 2500,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.gloves,
+    stats: [
+      { id: 'goldCoinsMultiplier', amount: 0.1 },
+      { id: 'xpMultiplier', amount: 0.1 },
+    ],
+  },
 }

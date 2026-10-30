@@ -156,6 +156,37 @@
     "lostDrops_other": "Your inventory was full: {{count}} items were lost.",
     "collect": "Collect"
   },
+  "arena": {
+    "title": "Arena",
+    "leave": "Leave",
+    "bosses": {
+      "weakPoint": "Weak point: strike it",
+      "weakPointHit": "Weak point hit! +50% damage",
+      "mound": "Dig at mound {{number}}",
+      "stunned": "Stunned! Takes +50% damage",
+      "shield": "{{element}} shield: only {{element}} hurts",
+      "timeLost": "-{{seconds}}s"
+    },
+    "effects": {
+      "enter": "Enter the Arena",
+      "claim": "Claim arena rewards"
+    },
+    "result": {
+      "cleared": {
+        "title": "Arena cleared!",
+        "body": "Yad falls and the stands roar your name."
+      },
+      "timeout": {
+        "title": "Time's up!",
+        "body": "The sand ran out before the last champion fell. You keep what your kills earned."
+      },
+      "time": "Time: {{time}}",
+      "bestTime": "New best time!",
+      "inventoryFull": "Not enough inventory space. Make room, then claim your rewards here or from Ludo Crane in Lirold.",
+      "claim": "Claim rewards",
+      "close": "Close"
+    }
+  },
   "settings": {
     "title": "Settings",
     "version": {

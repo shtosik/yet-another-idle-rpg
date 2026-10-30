@@ -34,6 +34,13 @@
     "seed": 507802261,
     "date": "2026-10-17"
   },
+  "src/assets/img/avatars/lirold/liroldArenaMaster.png": {
+    "family": "portrait-pixel",
+    "tier": null,
+    "subject": "a realistic broad heavy-set man in his fifties, bust, very thick neck, clean shaved bald head, a huge bushy grey walrus moustache and a clean-shaven chin, laughing with his mouth wide open in a booming grin, a sleeveless brown leather jerkin, one wide bright crimson red cloth sash with gold edging worn diagonally across the chest from shoulder to hip, bare heavy arms, one consistent natural skin tone on face, neck and arms, fully opaque solid figure, bust with both shoulders fully in frame",
+    "seed": 7511,
+    "date": "2026-10-27"
+  },
   "src/assets/img/avatars/mawood/mawoodBrenn.png": {
     "family": "portrait-pixel",
     "tier": null,
@@ -83,6 +90,27 @@
     "seed": 1334379591,
     "date": "2026-10-21"
   },
+  "src/assets/img/backgrounds/lirold.png": {
+    "family": "town-painterly",
+    "tier": null,
+    "subject": "a large walled capital city on a wide green plain at the foot of high snowy mountains, seen from a hill above: a ring of high grey stone city walls with round towers, a big grey stone castle with tall towers and red and gold banners in the centre of the city, crowded stone and timber houses with red roofs, a large round open-topped stone amphitheatre with arches and tiered seats visible inside, standing inside the walls next to the castle, a tall jagged mountain range filling the horizon behind the city, sunny day, empty streets with no people",
+    "seed": 7604,
+    "date": "2026-10-27"
+  },
+  "src/assets/img/backgrounds/liroldArena-vertical.png": {
+    "family": "zone-pixel",
+    "tier": null,
+    "subject": "the floor of a round stone colosseum seen from ground level inside the pit: a wide empty flat sand floor filling the lower half, a low stone wall around the sand with a heavy iron portcullis gate in the far wall, tiered stone stands rising behind the wall with a distant crowd in the upper rows, long crimson banners hanging from the top rim, blue sky above, nobody on the sand",
+    "seed": 7801,
+    "date": "2026-10-27"
+  },
+  "src/assets/img/backgrounds/liroldArena.png": {
+    "family": "town-painterly",
+    "tier": null,
+    "subject": "inside a large round stone colosseum: an empty flat sand fighting floor in the foreground seen from its edge, a low stone wall around the sand, a heavy iron portcullis gate set in the far stone wall, tiered stone stands rising all around with a small distant crowd only in the high stands, red and gold banners hanging from the top rim, bright daylight, nobody on the sand",
+    "seed": 7702,
+    "date": "2026-10-27"
+  },
   "src/assets/img/backgrounds/mawood.png": {
     "family": "town-painterly",
     "tier": null,
@@ -124,6 +152,34 @@
     "subject": "inside a wooden sorcerer's study built in a giant tree, wood walls crossed by glowing purple and cyan veins of energy, an open glowing spellbook on a tall lectern, floating crystals and carved rune stones, an arcane summoning circle on the floor, floating candle flames, scorch marks on the planks, chaotic heaps of scrolls, a glass crystal ball on a stand, a brass orrery, a glowing magically warded door, empty room",
     "seed": 4444,
     "date": "2026-10-18"
+  },
+  "src/assets/img/enemies/arenaArcanist.png": {
+    "family": "enemy-pixel",
+    "tier": "medium",
+    "subject": "a single human battle mage standing upright, one head with short black hair, two arms and two legs, a long deep dark purple coat with a tall stiff high collar and silver trim, black trousers and black boots, one glowing violet orb floating above the open right palm, the left hand empty, alone",
+    "seed": 7202,
+    "date": "2026-10-27"
+  },
+  "src/assets/img/enemies/arenaBrute.png": {
+    "family": "enemy-pixel",
+    "tier": "large",
+    "subject": "a single hulking heavily muscled bald human pit fighter, one head with a scarred bald scalp, two thick arms and two legs, tan skin, a crude dark iron pauldron on the left shoulder, a leather belt and brown trousers, one huge thick wooden club with a round end studded with iron spikes gripped in the right hand and resting on the right shoulder, nothing in the left hand, alone",
+    "seed": 7103,
+    "date": "2026-10-27"
+  },
+  "src/assets/img/enemies/arenaBurrower.png": {
+    "family": "enemy-pixel",
+    "tier": "large",
+    "subject": "a single giant mole, one head with a pointed hairless pink star-shaped nose and no visible eyes, short dark brown velvet fur, a hunched back covered by overlapping grey stone-like armour plates, two huge pink shovel-like front paws with five long thick white digging claws each, raised in front of its chest, the lower body hidden inside a low round heap of pale sand, alone",
+    "seed": 7302,
+    "date": "2026-10-27"
+  },
+  "src/assets/img/enemies/arenaYad.png": {
+    "family": "enemy-pixel",
+    "tier": "large",
+    "subject": "a single hulking crimson red beast hunched forward like a gorilla leaning on two giant fists, one head, two huge long muscular front arms, two short back legs, rough faceted deep crimson red hide all over the body, a row of curved dark purple horns along its spine and short dark purple spikes on the shoulders and knuckles, small glowing orange eyes under a heavy brow, a wide jaw full of jagged white teeth, a few glowing orange cracks in the hide, small orange, white and blue sparks around its fists, alone",
+    "seed": 7403,
+    "date": "2026-10-27"
   },
   "src/assets/img/enemies/bandit.png": {
     "shinyHue": 88,
@@ -437,6 +493,13 @@
     "seed": 1833642526,
     "date": "2026-10-26"
   },
+  "src/assets/img/items/arenaChest.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a small closed treasure chest made of brown wooden planks with dark iron corner bands, a red cloth with gold trim draped over the lid and hanging down one side, a bronze badge of two crossed swords on the front",
+    "seed": 4242,
+    "date": "2026-10-27"
+  },
   "src/assets/img/items/ashwoodBow.png": {
     "family": "item-pixel",
     "tier": null,
@@ -591,6 +654,13 @@
     "seed": 1230513072,
     "date": "2026-10-26"
   },
+  "src/assets/img/items/gladiatorHelm.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "one open-faced gladiator helmet of polished bronze with an iron brow band and cheek guards, a short crimson horsehair crest running along the top, a single small white feather tucked at one side, a few small dents in the metal, empty inside, no head",
+    "seed": 502902317,
+    "date": "2026-10-30"
+  },
   "src/assets/img/items/gnollCleaver.png": {
     "family": "item-pixel",
     "tier": null,
@@ -730,6 +800,13 @@
     "subject": "a single empty deep purple cloth hood with a short cape collar and a thin silver trim, nobody wearing it, single object",
     "seed": 358365248,
     "date": "2026-10-26"
+  },
+  "src/assets/img/items/patronGloves.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a pair of fine crimson leather gloves with round gold coin studs along the cuffs and gold stitching",
+    "seed": 1491485296,
+    "date": "2026-10-27"
   },
   "src/assets/img/items/rootwoodStaff.png": {
     "family": "item-pixel",
@@ -911,6 +988,13 @@
     "subject": "a single long whip of blue and teal seawater lashing through the air in a sweeping curved arc, white foam and spray flying from its tip, on a deep blue background",
     "seed": 1215728485,
     "date": "2026-10-25"
+  },
+  "src/assets/img/skills/warCry.png": {
+    "family": "skill-icon",
+    "tier": null,
+    "subject": "a roaring warrior's wide open mouth shouting a battle cry, with curved red-orange sound waves bursting outward, crimson and gold colours",
+    "seed": 166127394,
+    "date": "2026-10-27"
   },
   "src/assets/img/skills/waterMastery.png": {
     "family": "skill-icon",

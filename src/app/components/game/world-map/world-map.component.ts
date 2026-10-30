@@ -10,6 +10,7 @@ import { ZoneStarProgress } from 'app/store/player/zone-mastery'
 import { TownMarker, WORLD_MAP_DATA, WorldMapMarker } from 'data/world-map-data'
 import { ZoneID } from 'enums/ids/zone-id.enum'
 import { TownID } from 'enums/map/town-id.enum'
+import TOWNS_DATA from 'data/towns-data'
 
 // CRS units = source pixels. scale(z=maxZoom) = 1 (native), scale(z=0) = 1/2^maxZoom
 // (whole image fits in a single tile). This keeps marker positions authorable in
@@ -46,13 +47,17 @@ export class WorldMapComponent {
 
   protected readonly TownID = TownID
   showTowns = signal(false)
-  /** Unlocked towns that have a map marker, in marker order; stub towns and stale saved IDs have none. */
+  /**
+   * Unlocked towns: map-marker towns in marker order, then towns with Buildings but no marker yet (Lirold, until
+   * the map art grows). Stub towns and stale saved IDs have neither.
+   */
   readonly unlockedTowns = computed(() => {
     const unlocked = this.playerStore.unlockedContent().towns ?? []
-    return WORLD_MAP_DATA.markers
-      .filter((m): m is TownMarker => m.type === 'town')
-      .map(m => m.townId)
-      .filter(townId => unlocked.includes(townId))
+    const markerTowns = WORLD_MAP_DATA.markers.filter((m): m is TownMarker => m.type === 'town').map(m => m.townId)
+    const offMapTowns = Object.values(TOWNS_DATA)
+      .filter(town => town.buildings.length && !markerTowns.includes(town.id))
+      .map(town => town.id)
+    return [...markerTowns, ...offMapTowns].filter(townId => unlocked.includes(townId))
   })
 
   constructor() {

@@ -147,6 +147,20 @@ const RECIPES_DATA: Partial<Record<RecipeID, CraftingRecipe>> = {
         itemsNeeded: [{ id: ItemID.elderSilk, amount: 20 }],
         createsAmount: 1,
     },
+    // Learned from the Arena Chest's recipe scroll; made from the chest's own materials.
+    [RecipeID.gladiatorHelm]: {
+        id: RecipeID.gladiatorHelm,
+        itemId: ItemID.gladiatorHelm,
+        stationId: StationID.workbench,
+        stationLevel: 1,
+        itemsNeeded: [
+            { id: ItemID.ancientWood, amount: 10 },
+            { id: ItemID.harpyFeather, amount: 8 },
+            { id: ItemID.elderSilk, amount: 15 },
+        ],
+        createsAmount: 1,
+        requiresUnlock: true,
+    },
     [RecipeID.fireRune]: {
         id: RecipeID.fireRune,
         itemId: ItemID.fireRune,

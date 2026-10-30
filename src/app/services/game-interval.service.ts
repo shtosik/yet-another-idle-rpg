@@ -5,6 +5,8 @@ import { BattleStore } from '../store/battle/battle.store'
 import { BattleManagerService } from './battle-manager.service'
 import { ShopStore } from '../store/shop/shop.store'
 import { OfflineProgressService } from './offline-progress.service'
+import { ArenaService } from './arena.service'
+import { ARENA } from '../../data/arena-data'
 import { MS_PER_SECOND, RESPAWN_DELAY_IN_MS, TICK_DURATION_IN_MS, timePerAttackMs } from './combat-timing'
 
 /** Longest real-time gap one tick simulates; a longer one is clamped to this. */
@@ -21,6 +23,7 @@ export class GameIntervalService {
     battleManagerService = inject(BattleManagerService)
     shopStore = inject(ShopStore)
     offlineProgress = inject(OfflineProgressService)
+    arenaService = inject(ArenaService)
 
     private timePerAttack = computed(() => timePerAttackMs(this.playerStore.stats()))
 
@@ -53,6 +56,7 @@ export class GameIntervalService {
         }
 
         const deltaMs = Math.min(rawDeltaMs, MAX_TICK_DELTA_IN_MS)
+        this.arenaService.tick(wallNow)
         this.advanceCombat(deltaMs)
         this.playerStore.regenMana(deltaMs)
         this.battleManagerService.tickSpells(deltaMs)
@@ -72,10 +76,11 @@ export class GameIntervalService {
         let remainingMs = deltaMs
 
         if (!this.battleStore.isInCombat()) {
+            const respawnDelay = this.battleStore.arenaRun() ? ARENA.respawnDelayMs : RESPAWN_DELAY_IN_MS
             this.respawnTimer += remainingMs
-            if (this.respawnTimer < RESPAWN_DELAY_IN_MS) return
+            if (this.respawnTimer < respawnDelay) return
 
-            remainingMs = this.respawnTimer - RESPAWN_DELAY_IN_MS
+            remainingMs = this.respawnTimer - respawnDelay
             this.respawnTimer = 0
             this.attackTimer = 0
             this.battleStore.startBattle(this.playerStore.stats().shinyChance)

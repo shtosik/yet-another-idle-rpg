@@ -12,4 +12,6 @@ export enum TownBuildingID {
     mawoodHighPlatform = 10,
     deepwoodEntrance = 11,
     upperCanopyEntrance = 12,
+    // Lirold
+    liroldArena = 13,
 }

@@ -31,6 +31,10 @@
         "ambush": {
             "name": "Ambush",
             "desc": "Your next 5 melee hits, auto-attacks and melee spells alike, are guaranteed critical hits."
+        },
+        "warCry": {
+            "name": "War Cry",
+            "desc": "A roar the stands answer: +25% melee damage for 15 seconds."
         }
     },
     "types": {

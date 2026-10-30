@@ -87,6 +87,15 @@ export const UNLOCK_RULES: UnlockRule[] = [
       bodyKey:  'unlocks:towns.mawood.body',
     },
   },
+  {
+    // After the Mawood Zones: from the Harpy Matriarch's nest the player sees the capital (docs/ideas/north-lirold-and-exploration-guild.md).
+    condition: { type: 'waveReached', zoneId: ZoneID.upperCanopy, wave: 15 },
+    target:    { type: 'town', townId: TownID.lirold },
+    notification: {
+      titleKey: 'unlocks:towns.lirold.title',
+      bodyKey:  'unlocks:towns.lirold.body',
+    },
+  },
 ]
 
 export const ZONE_UNLOCK_NOTIFICATIONS: Partial<Record<ZoneID, UnlockNotification>> = {

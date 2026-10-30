@@ -15,6 +15,7 @@ Current behavior of each game system. Read the doc before changing its system, a
 | offline progress, welcome-back modal | `docs/systems/offline-progress.md` |
 | zones, waves, town/feature unlocks, economy sim | `docs/systems/zones-waves-unlocks.md` |
 | towns, buildings, shops, Exploration Guild | `docs/systems/towns-shops-guild.md` |
+| Combat Arena, arena runs | `docs/systems/arena.md` |
 | enemies, shinies, pets, bestiary | `docs/systems/enemies-shiny-pets-bestiary.md` |
 | world map, map tiles | `docs/systems/world-map.md` |
 | translations | `docs/systems/localization.md` |

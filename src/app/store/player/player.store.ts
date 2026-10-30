@@ -1,3 +1,4 @@
+import { ChestContents, rollChest } from './chest'
 import { WeaponCategory } from '../../../enums/weapon-category.enum'
 import { computed, effect, inject } from '@angular/core'
 import { patchState, signalStore, withComputed, withHooks, withMethods, withState } from '@ngrx/signals'
@@ -629,6 +630,21 @@ export const PlayerStore = signalStore(
       const statsToUpdate = itemData.stats.map(s => ({ stat: s.id, amount: s.amount }))
       store.updatePlayerStats(statsToUpdate)
       store.removeItems([{ id: item.id, tier: item.tier, amount: 1 }])
+    },
+
+    /** Opens one chest: needs one empty slot per pick (the most new stacks it can give); null when there aren't enough. */
+    openChest(item: InventoryItem, rng: () => number = Math.random): ChestContents | null {
+      const itemData = ITEM_DATA[item.id]
+      if (itemData.type !== ItemType.chest) return null
+      const emptySlots = store.stats().inventorySlots - store.inventory().filter(Boolean).length
+      if (emptySlots < itemData.rolls) return null
+      const contents = rollChest(itemData, rng)
+      const chest = { id: item.id, tier: item.tier, amount: 1 }
+
+      store.removeItems([chest])
+      if (contents.gold) store.updatePlayerStats([{ stat: 'goldCoins', amount: contents.gold }])
+      if (contents.items.length) store.addItems(contents.items)
+      return contents
     },
 
     regenMana(deltaMs: number) {

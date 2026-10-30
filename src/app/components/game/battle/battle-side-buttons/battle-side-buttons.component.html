@@ -1,7 +1,7 @@
 <aside>
   <button
     class="wave-button"
-    [class.hidden]="!canMoveToPreviousWave()"
+    [class.hidden]="isInArena() || !canMoveToPreviousWave()"
     (click)="onPreviousWave()"
   ><img
     [ngSrc]="'./assets/img/icons/arrow-prev.png'"
@@ -13,7 +13,7 @@
   </button>
   <button
     class="wave-button"
-    [class.hidden]="!canMoveToNextWave()"
+    [class.hidden]="isInArena() || !canMoveToNextWave()"
     (click)="onNextWave()"
   >
     <img
