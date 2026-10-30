@@ -66,7 +66,7 @@ Options, in hub order (claim first, as a turn-in):
 6. "Another time." → close
 
 ### rules
-> Ten thousand gold opens the gate, and the fee stays with me whatever happens. Twenty waves, one sandglass, ten minutes; every fifth wave is a champion, and the last is Yad. Beat the sand and you walk out in a Molten Cape, with something extra the first time; walk out early or run dry and you keep only what your kills paid.
+> The fee opens the gate, and it stays with me whatever happens. Twenty waves, one sandglass, ten minutes; every fifth wave is a champion, and the last is Yad. Beat the sand and you walk out in a Molten Cape, with something extra the first time; walk out early or run dry and you keep only what your kills paid.
 
 1. "Tell me about your champions." → champions
 2. "Understood." → default

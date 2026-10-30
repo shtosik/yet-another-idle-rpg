@@ -1,7 +1,7 @@
 # Combat Arena
 
 ## Purpose
-A timed gauntlet in Lirold: 20 fixed Waves against one clock, for a gold fee. Clearing it pays the Molten Cape every time and 2 Skill Point Books the first time. The fee is 10,000 gold. It doesn't scale with the player. Design and later batches (boss abilities, the Arena Chest): `docs/ideas/combat-arena.md`.
+A timed gauntlet in Lirold: 20 fixed Waves against one clock, for a gold fee. Clearing it pays the Molten Cape and an Arena Chest every time, and 2 Skill Point Books the first time. The fee is 10,000 gold. It doesn't scale with the player. Design and later batches (boss abilities, the Arena Chest): `docs/ideas/combat-arena.md`.
 
 ## Key files
 - `src/data/arena-data.ts:ARENA`: fee, time limit, respawn delay, the 20 waves (enemy pool and kill count each), clear rewards, background.
@@ -18,6 +18,11 @@ A timed gauntlet in Lirold: 20 fixed Waves against one clock, for a gold fee. Cl
 3. **Kill**: `handleEnemyDeath` hands arena kills to `ArenaService.onKill`: XP and gold (`× xpMultiplier` / `goldCoinsMultiplier`, no wave or shiny multiplier), no drops, Zone progress, kill counts, tasks or offline kill rate. `recordArenaKill` moves to the next wave once the wave's `count` is reached; past wave 20 the run is cleared.
 4. **End**: cleared, `timeout` (`tick` sees `now >= endsAt`) or `left` (Leave). `endArenaRun` clears the run (the zone fight respawns where the player left it); a clear counts in `arenaClears`, may set `arenaBestTimeMs`, and adds the clear rewards (plus the first-clear books) to `arenaRewards`. A clear or a timeout opens the result modal (time, kills, XP, gold and the rewards); a Leave opens none. Arena kills count in `enemyKillCounts`, so the champions show up in the bestiary.
 5. **Claim**: the modal's Claim, or the Arena Master's claim option (`arena` `claim` effect), moves `arenaRewards` into the inventory, only when all of it fits (owner rule). Rewards wait, saved, until then.
+
+## Entry cooldown, drops and the chest
+- **Cooldown**: 30 minutes from one entry to the next (`ARENA.entryCooldownMs`, saved `arenaReadyAt`, owner decision). `ArenaService.isReady` gates `enter`; Ludo's fight option falls back to a "come back later" node.
+- **Champion pets**: in the Arena Chest only (owner decision), about 1 in 47 per chest for each of the four; never shiny, since the arena rolls no shinies.
+- **Arena Chest** (every clear): 4 picks, and opening needs 4 empty slots (one per pick, the most new stacks it can give); gold 6,000–12,000 (about 8k per chest on average), Elder Silk, Harpy Feathers, Ancient Wood, mana potions, runes, the Gladiator's Helm recipe (chest-only; a workbench helmet made from the chest's silk, feathers and wood, worth 700 to sell), and two rare chest-only rewards: the War Cry Scroll (buff spell, +25% melee damage for 15 s) and Patron's Gloves (+10% gold and XP; a drops-and-progress choice against power gloves). Sized so a clear pays more than the 10k fee: the chest's gold alone covers most of it, and the Molten Cape and kill gold the rest.
 
 ## Champions' abilities
 `ArenaService.tick` runs `ArenaBossesService.tick` every game tick; a champion fight starts its timers when the champion is first seen alive. `doDamage` skips a hit on a burrowed champion and passes every other arena hit through `modifyHit` (after `resolveHit`). Numbers live in `ARENA_BOSSES`.

@@ -41,9 +41,14 @@ export class ArenaService {
     return rewards.length > 0 && this.playerStore.canFitItems(rewards)
   })
 
+  /** No run going on and the entry cooldown is over. */
+  isReady(now = Date.now()): boolean {
+    return !this.run() && now >= this.battleStore.arenaReadyAt()
+  }
+
   /** Starts a run and shows the fight. The entry fee is the caller's (the Arena Master's `stat` deduct). */
   enter(now = Date.now()): void {
-    if (this.run()) return
+    if (!this.isReady(now)) return
     this.battleStore.startArenaRun(now)
     this.injector.get(GameNavigationService).changeTab(GameTab.main)
   }

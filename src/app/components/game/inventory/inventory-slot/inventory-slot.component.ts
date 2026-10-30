@@ -50,6 +50,7 @@ export class InventoryItemComponent {
       || this.item.type === ItemType.recipe
       || this.item.type === ItemType.stationUpgrade
       || this.item.type === ItemType.spellScroll
+      || this.item.type === ItemType.chest
   }
 
   handleClick() {

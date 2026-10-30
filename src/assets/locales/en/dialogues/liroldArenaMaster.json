@@ -65,6 +65,10 @@
     "message": "Your winnings, challenger, every last stitch. The stands are still shouting your name.",
     "ok": "Thanks, Ludo."
   },
+  "cooldown": {
+    "message": "Easy, challenger! The sand's still being raked from your last bout. Give it half an hour and the gate's yours again.",
+    "ok": "I'll be back."
+  },
   "running": {
     "message": "You've got a fight going and the sand's still falling! Get back out there, challenger.",
     "ok": "On my way."

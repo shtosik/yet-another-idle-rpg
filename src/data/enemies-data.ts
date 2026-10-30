@@ -499,7 +499,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     url: './assets/img/enemies/harpyMatriarch.png',
     enemyTypes: [EnemyType.harpy, EnemyType.bird],
   },
-  // ── Combat Arena (Lirold): arena-only, no drops; the clear rewards are the arena's ──
+  // ── Combat Arena (Lirold): arena-only, no drops; the clear rewards (and the champions' pets, in the Arena Chest) are the arena's ──
   [EnemyID.arenaBrute]: {
     id: EnemyID.arenaBrute,
     maxHp: 900,
