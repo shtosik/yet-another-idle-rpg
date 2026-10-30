@@ -90,6 +90,7 @@ Regions, Towns, Zones and geography. Source shorthand: `Josh#key` = `src/assets/
 - The capital is first seen from the Harpy Matriarch's nest, the highest point in the game. **(proposed, same doc §2)**
 ### Map placement (proposed, not art)
 `docs/ideas/north-lirold-and-exploration-guild.md` §3a: canvas extended at the bottom to ~2794×1100; Lirold ~(470, 930); coast road from the beach; mine road east then north to the Pass (1250, 550), barred at ~(1245, 610); Slatefall ~(1180, 840); mine mouth ~(1230, 780).
+`docs/design/southern-map-expansion.md` supersedes the canvas size: 2794×1504, with the §3a positions unchanged. The Pass range's southern arm, the Ironspine (owner decision 2026-10-30), runs south-west to the sea, with Lirold inland at its western foot, the mine under it and the mine road between them. Saint Nestroud is the south-east (owner decision). It also adds the Saltmere gulf, the Blackwater Fens, one new Town (Brinewick) and 13 points of interest. **(proposed)** `unlocks.json` `towns.lirold` now reads "a castle under the mountains" (was "by the sea").
 
 ### Design-only setting (not in shipped text)
 `docs/design/mawood-and-elderwood-zones.md`: Spires hundreds of metres high, pale silver-grey; forest floor in twilight lit by bioluminescent moss; lowest platforms ~20 m up. Use for art; not canon until shipped.

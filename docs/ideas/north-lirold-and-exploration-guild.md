@@ -34,7 +34,7 @@ Lirold, the capital of Port Stocksmar, becomes a Town the player reaches **after
 
 The Exploration Guild is chartered by the capital, which pays for its charts and honours its Explorer Tokens. Its only hall stands in the capital, under Guildmaster Odile Varrow. Marvin is La Harpar-born and a Guild member, home in the village after an expedition Varrow sent him on. He drinks in the Tavern, trains anyone who asks, and as a member hands out contracts and a few Guild supplies from his pack. He tells the player what the Guild is and that the hall in Lirold has far more. Once the player has met Varrow, the Guild's business goes through her.
 
-The player climbs the beach, the Plains, the Long Path, the Pass and the Elderwood. From the Harpy Matriarch's nest in the crown of the tallest Spire, the highest point anywhere, they see what the forest hid: south, past the mountains, a road coming down off the Pass, and at its far end grey walls and a castle by the sea.
+The player climbs the beach, the Plains, the Long Path, the Pass and the Elderwood. From the Harpy Matriarch's nest in the crown of the tallest Spire, the highest point anywhere, they see what the forest hid: south, past the mountains, a road coming down off the Pass, and at its far end grey walls and a castle under the mountains.
 
 In the capital, Varrow already knows the player's deeds (§8b) from traders and Marvin's letters. She gives the Guild's one trial:
 - Bring in the outlaws who fled the capital's law into the Spires.
@@ -57,7 +57,7 @@ Passing the trial earns Guild steel and the Guild's writ for the castle's closed
 
 **New popup** (`unlocks.json` `towns.lirold`):
 - title: "Lirold Discovered!"
-- body: "From the Matriarch's nest you can see past the mountains: a road winding south off the Pass, and at its end stone walls and a castle by the sea. Lirold, the capital of Port Stocksmar. Travel there from the Map — the Exploration Guild's hall is there, the one Marvin keeps talking about."
+- body: "From the Matriarch's nest you can see past the mountains: a road winding south off the Pass, and at its end stone walls and a castle under the mountains. Lirold, the capital of Port Stocksmar. Travel there from the Map — the Exploration Guild's hall is there, the one Marvin keeps talking about."
 
 **Guild tasks** keep rolling from unlocked Zones with `tier <= rank + 1`. `ExplorationGuildService` needs no change.
 
