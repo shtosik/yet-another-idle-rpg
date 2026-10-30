@@ -8,6 +8,7 @@ describe('resolveHit', () => {
     stats: { ...statsInitialState, ...stats },
     magicDamage: 0,
     isDoubleAttack: false,
+    isMelee: true,
     damageType: DamageElement.physical,
     enemyWeakness: undefined,
     enemyTypes: [],
@@ -39,6 +40,13 @@ describe('resolveHit', () => {
 
     expect(hit.isCrit).toBeTrue()
     expect(hit.damage).toBe(20)
+  })
+
+  it('applies the melee multiplier to melee hits only', () => {
+    const stats = { attackPower: 10, meleeDamageMultiplier: 1.5 }
+
+    expect(resolveHit(input(stats)).damage).toBe(15)
+    expect(resolveHit({ ...input(stats), isMelee: false }).damage).toBe(10)
   })
 
   it('deals at least 1', () => {

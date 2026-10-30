@@ -22,9 +22,10 @@ Regions, Towns, Zones and geography. Source shorthand: `Josh#key` = `src/assets/
 |---|---|---|
 | La Harpar | Fishing village on Horseshoe Beach; "the most well-known fishing village in the area". Largest fish exporter in Port Stocksmar; fishermen famous across all four Regions; vital trade partner of Lirold "for a long time". Exports fish and seafood; overstocked on turtle shells. | `Josh#placeInfo`, `Elara#fatherIntro`, `Trader#aboutVillage`, `Trader#aboutFishermen`, `Josh#tradeInfo` |
 | | Unlock text: "A fishing village lies nearby." (Owner decision: La Harpar is a fishing village, not a port town.) | `unlocks.json` `towns.laHarpar.body` |
-| Lirold | Capital of the Region (Port Stocksmar); named North Lirold until the 2026-10-27 rename (shipped). Exists in data with no Buildings; its map marker is commented out at (730, 110), a position now wrong (see below). | `Josh#beachName`, `map.json` `towns.lirold`, `towns-data.ts`, `world-map-data.ts` |
-| | Lies **south of Horseshoe Beach**: a large city inside stone walls with a castle at its centre. A road runs from it to the Mountain Pass, with a mine near the Pass. Owner decision (2026-10-27); no shipped text yet. | owner decision, `docs/ideas/north-lirold-and-exploration-guild.md` |
+| Lirold | Capital of the Region (Port Stocksmar); named North Lirold until the 2026-10-27 rename (shipped). Has one Building so far, the Arena (below); it has no map marker yet (the old one at (730, 110) is commented out and in the wrong place, see below), so it is reached from the map's Towns list. | `Josh#beachName`, `map.json` `towns.lirold`, `towns-data.ts`, `world-map-data.ts` |
+| | Lies **south of Horseshoe Beach**: a large city inside stone walls with a castle at its centre. A road runs from it to the Mountain Pass, with a mine near the Pass. Owner decision (2026-10-27); no shipped text yet. It stands inland, not on the water, with a mountain range rising behind it (owner decision, town art). | owner decision, `docs/ideas/north-lirold-and-exploration-guild.md` |
 | | Unlocks after the Elderwood chain (Harpy Matriarch kill): seen from her nest, reached by going back over the Pass and down the coast road. North gate on the coast road, east gate on the castle's mine road (closed except with a Guild writ). Slate roofs from Slatefall. Home of the Exploration Guild's only hall, run by Guildmaster Odile Varrow (Marvin stays in La Harpar). **(proposed, `docs/ideas/north-lirold-and-exploration-guild.md`)** | — |
+| | Its first Building is the Arena (`map.json` `buildings.liroldArena`), the Combat Arena's home; built on the arena branch, not yet released. Unlock popup rewritten to the Matriarch's-nest reveal **(proposed, `docs/ideas/lirold-arena-master.md` §3)**. | `towns-data.ts`, `unlock-conditions.ts` |
 | Slatefall | Miners' village on the castle's mine road between the capital and the Mountain Pass, on the Pass's southern slope. Quarries the capital's slate; the castle's mine, shut two winters ago; the road is barred at the Pass end. Tavern *The Last Lamp*; Hedda Brask, Old Tobin, Pell. Unlocks when *The Guild Trial* completes, after the capital. Port Stocksmar. **(proposed, `docs/ideas/slatefall-and-the-deeper-mines.md`)** | — |
 | Mawood | Elderreach (owner decision). Vertical Town on platforms between the Silverwood Spires, ~300 years old. Built "up, in the light" because the forest floor "belongs to roots and rot". Few travelers; merchants pass through to Sylvie's. | `Corwin#aboutMawood`, `unlocks.json` `towns.mawood.body`, `Milo#intro1` |
 
@@ -37,6 +38,13 @@ Regions, Towns, Zones and geography. Source shorthand: `Josh#key` = `src/assets/
 | Shop (`shop`) | Trader | "The only shop in town". `Trader#intro1` |
 | Basement (`tradersBasement`) | — | Trader's cellar, rat-infested; Zone Trader's Basement. `Trader#questOffer`, `Trader#questCompleted` |
 | Exploration Guild (`explorationGuild`) | Marvin | "Main hub for local adventurers". `Trader#aboutGuild`. Removed; the Guild's only hall is in Lirold, and Marvin (a member, not its head) moves into the Tavern, handling contracts and a few Guild supplies until the player meets Varrow. **(proposed, `docs/ideas/north-lirold-and-exploration-guild.md` §5)** |
+
+### Lirold Buildings
+
+| Building | Who | Notes |
+|---|---|---|
+| Arena (`liroldArena`) | Ludo Crane, Master of the Arena (`NpcID.liroldArenaMaster`) | Sand floor ringed by stone stands; the castle holds its charter, Ludo keeps the sand. Twenty Waves against one sandglass (ten minutes) for a 10,000 gold fee; a new challenger is let in 30 minutes after their last entry. Regular Waves are Elderwood beasts bought from trappers (`arena-data.ts`); champions on Waves 5, 10, 15 and 20 (factions.md, Arena champions). Charter, trappers, Ludo: **(proposed, `docs/ideas/lirold-arena-master.md`)** |
+| Exploration Guild (`explorationGuild`, moved) | Guildmaster Odile Varrow | **(proposed, `docs/ideas/north-lirold-and-exploration-guild.md` §4)** |
 
 ### Mawood Buildings
 

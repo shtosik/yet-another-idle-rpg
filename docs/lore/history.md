@@ -46,6 +46,9 @@ Timeline relative to the present (the player's arrival). Source shorthand as in 
 - Bandits sold a captain's coat in Lirold four years ago. **(proposed, `docs/ideas/la-harpar-quests.md`)**
 - Josh's brother went up the mountain years ago and never returned. **(proposed, `docs/ideas/la-harpar-quests.md`)**
 - Marvin's last expedition was sent by Guildmaster Odile Varrow; he came home to La Harpar (his birthplace) and stays there, in the Tavern, handling contracts and a few Guild supplies until the player meets Varrow, and writing her letters about the player. **(proposed, `docs/ideas/north-lirold-and-exploration-guild.md` §2, §5)**
+- Long ago: the Lirold Arena opens under a castle charter. Later, Ludo Crane holds its sand eleven seasons unbeaten, loses a knee to a cart wheel and becomes its master. **(proposed, `docs/ideas/lirold-arena-master.md`)**
+- Last spring: trappers deliver Yad to the Arena in a crate, origin unsaid; no challenger beats it until the player. **(proposed, same doc; T-28)**
+- Player-driven: the player clears the Arena (Yad killed), any number of times. **(proposed, `docs/ideas/combat-arena.md`)**
 - Unknown, before the mine: someone cuts stone stairs deep under the Slatefall hillside; the Stone Warden stands in them. **(proposed, `docs/ideas/slatefall-and-the-deeper-mines.md`)**
 - Long ago: Slatefall quarries slate for Lirold's roofs and mines iron for its walls; the castle owns the mine. **(proposed, `docs/ideas/slatefall-and-the-deeper-mines.md`)**
 - Two winters ago, the week before the collapse: Tobin hears the stone "sing". **(proposed, same doc)**

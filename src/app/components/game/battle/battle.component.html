@@ -1,6 +1,6 @@
 <div
   class="battle"
-  [style]="{ 'background-image': currentZoneData()?.url | url }"
+  [style]="{ 'background-image': (battleStore.arenaRun() ? arenaUrl : currentZoneData()?.url) | url }"
 >
   <app-battle-nav-bar/>
   <div class="battle-pane">

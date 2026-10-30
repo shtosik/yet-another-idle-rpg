@@ -1,6 +1,8 @@
+import { ArenaService } from './arena.service'
+import { WeaponCategory } from '../../enums/weapon-category.enum'
 import { inject, Injectable } from '@angular/core'
 import { setTimeout } from 'worker-timers'
-import { BattleStore } from '../store/battle/battle.store'
+import { ArenaRun, BattleStore } from '../store/battle/battle.store'
 import { PlayerStore } from '../store/player/player.store'
 import { QuestsStore } from '../store/quests/quests.store'
 import { OfflineStore } from '../store/offline/offline.store'
@@ -63,11 +65,13 @@ export class OfflineProgressService {
   private offlineStore = inject(OfflineStore)
   private battleManager = inject(BattleManagerService)
   private modalService = inject(ModalService)
+  private arenaService = inject(ArenaService)
 
   /** Host time at a `performance.now()` reading; `null` while a claim is pending. */
   private anchor: { hostMs: number, perfMs: number } | null = null
   /** `performance.now()` when the pending claim started: time after it is played online, so it isn't claimed. */
   private pendingSincePerf: number | null = null
+  private pendingArenaRun: ArenaRun | null = null
   private isClaiming = false
 
   /** Host time now, or `null` until the host has answered. */
@@ -91,7 +95,11 @@ export class OfflineProgressService {
     if (this.isClaiming) return
     this.isClaiming = true
     // Kept across retries: the claim ends where the wait began, however long the host takes to answer.
-    this.pendingSincePerf ??= performance.now()
+    if (this.pendingSincePerf === null) {
+      this.pendingSincePerf = performance.now()
+      // Read now: the game loop's first tick ends an expired run before the server time arrives.
+      this.pendingArenaRun = this.battleStore.arenaRun()
+    }
     try {
       const hostNow = await fetchServerTime()
       if (hostNow === null) {
@@ -106,9 +114,20 @@ export class OfflineProgressService {
       this.offlineStore.setLastSeen(hostNow)
       // A clock moved back gives a negative gap: it claims nothing.
       const gapMs = lastSeen === null ? 0 : Math.max(0, claimEnd - lastSeen)
-      const elapsedMs = Math.min(OFFLINE_CAP_IN_MS, gapMs)
 
-      const summary = elapsedMs >= MIN_OFFLINE_CLAIM_IN_MS ? this.applyOffline(elapsedMs, lastSeen!) : null
+      // An arena run that ran out while away ends at its own end time; the rest of the absence is claimed in the
+      // zone the player entered it from (kept as `currentZoneId`). A run still going claims nothing.
+      const run = this.pendingArenaRun
+      this.pendingArenaRun = null
+      let arenaMs = 0
+      if (run && lastSeen !== null && claimEnd >= run.endsAt) {
+        arenaMs = Math.max(0, run.endsAt - lastSeen)
+        this.arenaService.tick(run.endsAt)
+      }
+      const elapsedMs = Math.min(OFFLINE_CAP_IN_MS, gapMs - arenaMs)
+
+      const isClaimable = elapsedMs >= MIN_OFFLINE_CLAIM_IN_MS && !this.battleStore.arenaRun()
+      const summary = isClaimable ? this.applyOffline(elapsedMs, lastSeen!) : null
       // Timers run out in real time even when the gap is too short to claim. After the simulation, which reads them.
       this.tickTimers(gapMs)
       if (!summary) return
@@ -133,6 +152,7 @@ export class OfflineProgressService {
       wave,
       segments: this.segments(elapsedMs),
       damageType: this.playerStore.equippedWeaponDamageType(),
+      isMeleeWeapon: this.playerStore.equippedWeaponCategory() === WeaponCategory.melee,
       hasWeaknessSkill: this.playerStore.hasSkillUnlocked(SkillNodeID.weaknesses),
       activeQuestIds: getActiveQuestIds(this.questsStore.questStepProgression()),
       taskEnemyIds: new Set(this.playerStore.activeTasks().filter(task => !isTaskDone(task)).map(task => task.monsterId)),

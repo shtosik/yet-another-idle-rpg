@@ -10,6 +10,10 @@
     "mawood": {
       "title": "Mawood Discovered!",
       "body": "Smoke and lantern-light flicker between the towering Silverwood Spires — a town built on platforms high above the forest floor. Travel there from the Map. Elder Corwin will want a word, and Sylvie, Finn and Brenna all have work for a capable fighter."
+    },
+    "lirold": {
+      "title": "Lirold Discovered!",
+      "body": "From the Matriarch’s nest you can see past the mountains: a road winding south off the Pass, and at its end stone walls and a castle by the sea. Lirold, the capital of Port Stocksmar. Travel there from the Map; its Arena takes any challenger who can pay the gate."
     }
   },
   "zones": {

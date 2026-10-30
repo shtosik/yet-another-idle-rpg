@@ -23,6 +23,7 @@
       "critMulti": "Damage multiplier of a critical hit.",
       "magicDamage": "Added to every damaging spell's base damage.",
       "magicDamageMultiplier": "Multiplies spell damage, after Magic Damage is added.",
+      "meleeDamageMultiplier": "Multiplies the damage of melee hits: auto-attacks with a melee weapon (or none) and melee spells.",
       "maxMana": "Mana spells cost to cast. Refills one point at a time up to the maximum.",
       "manaRegenRate": "Seconds to regain one mana point. Lower is faster.",
       "spellCooldownReduction": "Seconds taken off every spell's cooldown.",
@@ -50,6 +51,7 @@
     "manaRegenRate": "Mana Regen",
     "magicDamage": "Magic Damage",
     "magicDamageMultiplier": "Magic Damage Multiplier",
+    "meleeDamageMultiplier": "Melee Damage Multiplier",
     "spellCooldownReduction": "Spell Cooldown Reduction",
     "increasedSpellDuration": "Spell Duration",
     "shopRefreshCooldown": "Shop Refresh Cooldown",
@@ -153,6 +155,37 @@
     "lostDrops_one": "Your inventory was full: {{count}} item was lost.",
     "lostDrops_other": "Your inventory was full: {{count}} items were lost.",
     "collect": "Collect"
+  },
+  "arena": {
+    "title": "Arena",
+    "leave": "Leave",
+    "bosses": {
+      "weakPoint": "Weak point: strike it",
+      "weakPointHit": "Weak point hit! +50% damage",
+      "mound": "Dig at mound {{number}}",
+      "stunned": "Stunned! Takes +50% damage",
+      "shield": "{{element}} shield: only {{element}} hurts",
+      "timeLost": "-{{seconds}}s"
+    },
+    "effects": {
+      "enter": "Enter the Arena",
+      "claim": "Claim arena rewards"
+    },
+    "result": {
+      "cleared": {
+        "title": "Arena cleared!",
+        "body": "Yad falls and the stands roar your name."
+      },
+      "timeout": {
+        "title": "Time's up!",
+        "body": "The sand ran out before the last champion fell. You keep what your kills earned."
+      },
+      "time": "Time: {{time}}",
+      "bestTime": "New best time!",
+      "inventoryFull": "Not enough inventory space. Make room, then claim your rewards here or from Ludo Crane in Lirold.",
+      "claim": "Claim rewards",
+      "close": "Close"
+    }
   },
   "settings": {
     "title": "Settings",

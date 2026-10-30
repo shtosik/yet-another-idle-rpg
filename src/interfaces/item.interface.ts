@@ -1,3 +1,4 @@
+import { WeaponCategory } from '../enums/weapon-category.enum'
 import { DamageElement } from 'enums/damage-element.enum'
 import { EquipmentSlot } from 'enums/equipment-slot.enum'
 import { ItemID } from 'enums/ids/item-id.enum'
@@ -29,6 +30,8 @@ export interface EquipmentItem extends ItemData {
     stats: EquipmentItemPossibleStat[]
     slot: EquipmentSlot
     damageType?: DamageElement
+    /** Weapons only; melee when unset. Only melee auto-attacks use `meleeDamageMultiplier`. */
+    weaponCategory?: WeaponCategory
     /** Known while equipped (not in the skill tree); leaves the spell bar when unequipped. */
     spell?: SpellID
 }
@@ -74,6 +77,16 @@ export interface SpellScrollItem extends ItemData {
     spellId: SpellID
 }
 
+/** One pick in a chest's loot table, chosen by `weight`: gold, or an item stack; ranges are inclusive. */
+export type ChestLootEntry = { weight: number } & ({ gold: [number, number] } | { itemId: ItemID; amount: [number, number] })
+
+/** Opened from the inventory: `rolls` picks from `loot`, rolled on open (`rollChest`). */
+export interface ChestItem extends ItemData {
+    type: ItemType.chest
+    rolls: number
+    loot: ChestLootEntry[]
+}
+
 export interface RecipeItem extends ItemData {
     type: ItemType.recipe
     recipeId: RecipeID
@@ -89,7 +102,7 @@ export interface StationUpgradeItem extends ItemData {
 export const isStationUpgradeItem = (item: Item): item is StationUpgradeItem =>
     item.type === ItemType.stationUpgrade
 
-export type Item = EquipmentItem | ResourceItem | RewardsStatsItem | QuestItem | FoodItem | BookItem | PotionItem | RecipeItem | StationUpgradeItem | SpellScrollItem
+export type Item = EquipmentItem | ResourceItem | RewardsStatsItem | QuestItem | FoodItem | BookItem | PotionItem | RecipeItem | StationUpgradeItem | SpellScrollItem | ChestItem
 
 export type UseItemProps = UseItemStatProps
 

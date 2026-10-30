@@ -15,6 +15,7 @@ describe('simulateOfflineKills', () => {
     wave: 1,
     segments: [{ durationMs: HOUR_IN_MS, stats }],
     damageType: DamageElement.physical,
+    isMeleeWeapon: true,
     hasWeaknessSkill: false,
     activeQuestIds: new Set(),
     taskEnemyIds: new Set(),
@@ -22,6 +23,15 @@ describe('simulateOfflineKills', () => {
     rollingKillMs: null,
     rng: seededRng(42),
     ...overrides,
+  })
+
+  it('applies the melee damage multiplier to melee weapons only', () => {
+    const boosted = { ...stats, meleeDamageMultiplier: 2 }
+    const kills = (isMeleeWeapon: boolean, s = stats) =>
+      simulateOfflineKills(input({ isMeleeWeapon, segments: [{ durationMs: HOUR_IN_MS, stats: s }] })).kills
+
+    expect(kills(false, boosted)).toBe(kills(false))
+    expect(kills(true, boosted)).toBeGreaterThan(kills(true))
   })
 
   it('replays the same result for the same seed', () => {

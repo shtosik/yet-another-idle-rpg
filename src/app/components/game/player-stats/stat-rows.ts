@@ -32,6 +32,7 @@ export const STAT_GROUPS: StatGroup[] = [
       { stat: 'attackSpeed', format: 'seconds', always: true },
       { stat: 'critChance', format: 'percent', always: true },
       { stat: 'critMulti', format: 'multiplier', always: true },
+      { stat: 'meleeDamageMultiplier', format: 'multiplier' },
       { stat: 'magicDamage', format: 'number' },
       { stat: 'magicDamageMultiplier', format: 'multiplier' },
     ],

@@ -15,6 +15,7 @@ export const statsInitialState: PlayerStatsType = {
     // attack
     attackPower: 1,
     attackSpeed: 3,
+    meleeDamageMultiplier: 1,
     // magic
     magicDamage: 0,
     magicDamageMultiplier: 1,

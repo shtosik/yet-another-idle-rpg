@@ -1,3 +1,6 @@
+import { ArenaBossesService } from './arena-bosses.service'
+import { ArenaService } from './arena.service'
+import { WeaponCategory } from '../../enums/weapon-category.enum'
 import { computed, inject, Injectable } from '@angular/core'
 import { BattleStore } from '../store/battle/battle.store'
 import { PlayerStore } from '../store/player/player.store'
@@ -26,6 +29,8 @@ const MS_PER_SECOND = 1000
 @Injectable({ providedIn: 'root' })
 export class BattleManagerService {
   private battleStore = inject(BattleStore)
+  private arenaService = inject(ArenaService)
+  private arenaBosses = inject(ArenaBossesService)
   private playerStore = inject(PlayerStore)
   private questsStore = inject(QuestsStore)
   private animations = inject(AnimationsService)
@@ -57,20 +62,29 @@ export class BattleManagerService {
     const enemy = this.battleStore.enemy()
 
     if (!enemy) return
+    const isArena = !!this.battleStore.arenaRun()
+    // A burrowed champion: nothing to hit (a damage-over-time tick is spent).
+    if (isArena && this.arenaBosses.isHidden()) return
 
-    // Ambush: melee hits (auto-attacks and melee spells) use up the guaranteed crits; magic hits don't.
-    const forceCrit = magicDamage === 0 && this.battleStore.useEmpoweredHit()
-    const { damage, isCrit, isWeaknessHit } = resolveHit({
+    // Double Attack is the melee spell, melee whatever the weapon; an auto-attack is melee with a melee weapon.
+    const isMelee = magicDamage === 0 && (isDoubleAttack || this.playerStore.equippedWeaponCategory() === WeaponCategory.melee)
+    // Ambush: melee hits use up the guaranteed crits; ranged and magic hits don't.
+    const forceCrit = isMelee && this.battleStore.useEmpoweredHit()
+    const hitType = damageType ?? this.playerStore.equippedWeaponDamageType()
+    const hit = resolveHit({
       stats: this.playerStore.stats(),
       magicDamage,
+      isMelee,
       forceCrit,
       isDoubleAttack,
-      damageType: damageType ?? this.playerStore.equippedWeaponDamageType(),
+      damageType: hitType,
       enemyWeakness: enemy.weakness,
       enemyTypes: enemy.enemyTypes,
       hasWeaknessSkill: this.playerStore.hasSkillUnlocked(SkillNodeID.weaknesses),
       hasSpellCritSkill: this.playerStore.hasSkillUnlocked(SkillNodeID.spellCrit),
     })
+    const { isCrit, isWeaknessHit } = hit
+    const damage = isArena ? this.arenaBosses.modifyHit(hit.damage, hitType, magicDamage > 0) : hit.damage
 
     const newHp = Math.max(0, enemyHp - damage)
     this.battleStore.updateEnemyHp(newHp)
@@ -228,6 +242,14 @@ export class BattleManagerService {
   }
 
   private handleEnemyDeath(enemy: Enemy) {
+    // Arena kills pay XP and gold and count in the bestiary: no zone progress, drops, tasks or offline kill rate.
+    if (this.battleStore.arenaRun()) {
+      this.battleStore.endBattle()
+      this.playerStore.updateEnemyKillCount(enemy.id, 1)
+      this.arenaService.onKill(enemy)
+      return
+    }
+
     const zoneId = this.battleStore.currentZoneId()
     const wave = this.battleStore.currentWave()
 

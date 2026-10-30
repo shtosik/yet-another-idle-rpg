@@ -141,6 +141,8 @@ export class DialogueComponent {
           case 'claimTask':  return 'Claim reward'
           case 'abandonTask': return 'Cancel task'
         }
+      case 'arena':
+        return i18next.t(`app:arena.effects.${effect.action}`)
       default:
         return ''
     }
