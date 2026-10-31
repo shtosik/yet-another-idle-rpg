@@ -23,3 +23,5 @@ Rules for all coding agents (Claude Code, Codex). Claude-only notes are in `CLAU
 **Scripts are Node** (`scripts/*.mjs`): this machine has no Python.
 
 **Checking UI**: builds with cheats on (`npm start`, `build:testing`) expose `window.dev` a moment after page load, once the cheat bar's deferred chunk arrives. Set game state through it (commands in `src/app/components/game/dev-cheats/dev-cheats.component.ts`), not by editing `localStorage`.
+
+**Before opening a PR that changes player-visible UI or game behavior**, run `.claude/skills/verify-yari` once for the feature files the change touches (Claude: in a subagent on a cheaper model) and put the evidence path in the PR body. Skip for docs, data-only, test, script and art changes.
