@@ -21,7 +21,7 @@ describe('PlayerStore spells from equipment', () => {
 
   const equipStormcaller = () => {
     store.addItems([{ id: ItemID.stormcaller, tier: ItemTier.legendary, amount: 1 }])
-    store.equipItem(store.inventory().find(slot => slot?.id === ItemID.stormcaller)!)
+    store.equipItem(store.inventory().gear.find(slot => slot?.id === ItemID.stormcaller)!)
   }
 
   it('knows the spell only while the item is equipped', () => {

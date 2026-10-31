@@ -28,7 +28,7 @@
       } @else if (canClaim(progress.star)) {
         {{ 'zones:mastery.clickToClaim' | i18next }}
       } @else if (isBlocked(progress)) {
-        {{ 'zones:mastery.inventoryFull' | i18next }}
+        {{ blockedText() }}
       }
     </span>
   }
@@ -56,7 +56,7 @@
       @if (canClaim(progress.star)) {
         <span class="star-tooltip__done">{{ 'zones:mastery.clickToClaim' | i18next }}</span>
       } @else if (isBlocked(progress)) {
-        <span class="star-tooltip__blocked">{{ 'zones:mastery.inventoryFull' | i18next }}</span>
+        <span class="star-tooltip__blocked">{{ blockedText() }}</span>
       }
     }
     <span class="star-tooltip__reward">{{ 'zones:mastery.allStars' | i18next }}</span>

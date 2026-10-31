@@ -32,7 +32,7 @@
       "goldCoinsMultiplier": "Multiplies gold from kills.",
       "offlineProgressRate": "Share of your normal kill rate you keep while away.",
       "shinyChance": "Chance for an enemy to spawn as a shiny.",
-      "inventorySlots": "Slots in your inventory.",
+      "inventorySlots": "Slots in each of your Gear, Consumables and Materials inventory tabs.",
       "maxTaskSlots": "Exploration Guild tasks you can have at once.",
       "taskDoubleKillChance": "Chance for a kill to count twice toward Guild tasks.",
       "shopRefreshCooldown": "Time between shop restocks.",
@@ -135,10 +135,30 @@
   "quest": "Quest",
   "completed": "completed!",
   "inventory": {
-    "slotsNeeded_one": "{{count}} slot needed",
-    "slotsNeeded_other": "{{count}} slots needed",
-    "freeSlots": "Free slots: {{free}} / {{total}}",
+    "slotsNeeded": "{{slots}} needed",
+    "tabSlots_one": "{{count}} {{tab}} slot",
+    "tabSlots_other": "{{count}} {{tab}} slots",
+    "tabsLabel": "Inventory tabs",
+    "tabFull": "{{tab}} tab is full",
+    "tabFullLabel": "{{tab}} {{count}}, full",
+    "empty": "Nothing here yet.",
+    "tabs": {
+      "gear": "Gear",
+      "consumables": "Consumables",
+      "materials": "Materials",
+      "pets": "Pets",
+      "quest": "Quest"
+    },
+    "dropsLost": "{{tab}} full: {{items}} lost",
     "lockedSlot": "Locked slot",
+    "destroy": {
+      "button": "Destroy",
+      "title": "Destroy item",
+      "question": "Destroy {{amount}} x {{item}} ({{tier}})?",
+      "warning": "This can't be undone.",
+      "cancel": "Cancel",
+      "confirm": "Destroy"
+    },
     "page": "Page {{page}}",
     "previousPage": "Previous page",
     "nextPage": "Next page"
@@ -189,6 +209,10 @@
   },
   "settings": {
     "title": "Settings",
+    "items": {
+      "title": "Items",
+      "confirmDestroyFromTier": "Ask before destroying items of this tier or higher"
+    },
     "version": {
       "current": "Version {{version}}",
       "changelog": "What's new"

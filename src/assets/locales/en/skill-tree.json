@@ -135,7 +135,7 @@
         }
     },
     "cost": "{{ amount }} SP",
-    "refundBlockedInventory": "Refund blocked: items occupy the inventory slots this grants",
+    "refundBlockedInventory": "Refund blocked: items occupy the {{tab}} slots this grants",
     "add": "Click to add 1 or Ctrl + Click to add max",
     "respec": {
         "trigger": "Reset Tree",
@@ -144,7 +144,7 @@
         "costLine": "Cost: {{ gold }} gold.",
         "nothingToReset": "Nothing allocated yet.",
         "insufficientGold": "Not enough gold.",
-        "inventoryInUse": "Free up inventory slots first: items sit in slots this tree grants.",
+        "inventoryInUse": "Free up {{tab}} slots first: items sit in slots this tree grants.",
         "confirm": "Reset",
         "cancel": "Cancel"
     }

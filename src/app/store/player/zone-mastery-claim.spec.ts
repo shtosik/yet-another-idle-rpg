@@ -8,6 +8,7 @@ import { ItemType } from '../../../enums/items/item-type.enum'
 import { ItemTier } from '../../../enums/items/item-tier.enum'
 import ITEM_DATA from '../../../data/items-data'
 import ZONES_DATA from '../../../data/zones-data'
+import { tabOf } from './inventory'
 
 describe('PlayerStore zone mastery', () => {
   let store: InstanceType<typeof PlayerStore>
@@ -29,7 +30,7 @@ describe('PlayerStore zone mastery', () => {
     expect(store.claimZoneStar(beach, 'conqueror')).toBeTrue()
     expect(store.resources().goldCoins).toBe(gold + reward.gold)
     expect(store.explorerTokens()).toBe(reward.explorerTokens)
-    expect(store.inventory().find(slot => slot?.id === reward.items[0].id)?.amount).toBe(reward.items[0].amount)
+    expect(store.inventory().materials.find(slot => slot?.id === reward.items[0].id)?.amount).toBe(reward.items[0].amount)
 
     expect(store.claimZoneStar(beach, 'conqueror')).toBeFalse()
     expect(store.resources().goldCoins).toBe(gold + reward.gold)
@@ -46,14 +47,24 @@ describe('PlayerStore zone mastery', () => {
     const resources = (Object.values(ItemID).filter(v => typeof v === 'number') as ItemID[])
       .filter(id => !rewardIds.has(id) && ITEM_DATA[id]?.type === ItemType.resource)
     const tiers = Object.values(ItemTier).filter(v => typeof v === 'number') as ItemTier[]
-    const fillers = resources.flatMap(id => tiers.map(tier => ({ id, tier, amount: 1 }))).slice(0, store.stats().inventorySlots)
+    const fillers = resources.flatMap(id => tiers.map(tier => ({ id, tier, amount: 1 }))).slice(0, store.inventoryCapacity().materials)
     store.addItems(fillers)
-    expect(store.inventory().every(slot => slot !== null)).toBeTrue()
+    expect(store.inventory().materials.every(slot => slot !== null)).toBeTrue()
     store.updateEnemyKillCount(EnemyID.gangsterCrab, 10)
 
     expect(store.canClaimZoneStar(beach, 'conqueror')).toBeFalse()
     expect(store.claimZoneStar(beach, 'conqueror')).toBeFalse()
     expect(store.claimedZoneStars()).toEqual({})
+  })
+
+  it('claims into Materials while the Gear tab is full', () => {
+    const gear = (Object.values(ItemID).filter(v => typeof v === 'number') as ItemID[])
+      .filter(id => tabOf(id) === 'gear').slice(0, store.inventoryCapacity().gear)
+    store.addItems(gear.map(id => ({ id, amount: 1 })))
+    expect(store.inventory().gear.every(slot => slot !== null)).toBeTrue()
+    store.updateEnemyKillCount(EnemyID.gangsterCrab, 10)
+
+    expect(store.claimZoneStar(beach, 'conqueror')).toBeTrue()
   })
 
   it('counts shiny kills per zone online and offline', () => {

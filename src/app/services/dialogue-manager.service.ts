@@ -14,7 +14,7 @@ import { getQuestStatus, getStepItems, matchesQuestState } from './quest-status'
 import { QuestID } from '../../enums/ids/quest-id.enum'
 import { QuestState } from '../../enums/quest-state.enum'
 import { QuestStep } from '../../types/quests/quest-progression.type'
-import { ItemStack } from '../store/player/inventory'
+import { ItemStack, MissingSlots } from '../store/player/inventory'
 import { ExplorationGuildService } from './exploration-guild.service'
 import { TownsStore } from '../store/towns/towns.store'
 import { CurrencyFeedService } from './currency-feed.service'
@@ -65,7 +65,7 @@ export class DialogueManagerService {
 
   /** False when the result's rewards would not fit in the inventory, or its gold fee can't be paid. */
   canApplyResult(result: DialogueResult<any> | undefined): boolean {
-    return this.missingSlots(result) === 0 && this.missingGold(result) === 0
+    return Object.keys(this.missingSlots(result)).length === 0 && this.missingGold(result) === 0
   }
 
   /** Gold still needed to pay the result's `deduct` effects (owner decision: gold never goes negative). */
@@ -77,9 +77,9 @@ export class DialogueManagerService {
     return Math.max(0, fee - this.playerStore.stats().goldCoins)
   }
 
-  /** Slots the player must free before the result's item or quest-completion rewards fit. */
-  missingSlots(result: DialogueResult<any> | undefined): number {
-    if (!result?.effects) return 0
+  /** Slots the player must free, per tab, before the result's item or quest-completion rewards fit. */
+  missingSlots(result: DialogueResult<any> | undefined): MissingSlots {
+    if (!result?.effects) return {}
 
     const adding: ItemStack[] = []
     const removing: ItemStack[] = []
@@ -100,7 +100,7 @@ export class DialogueManagerService {
       }
     }
 
-    return adding.length === 0 ? 0 : this.playerStore.missingSlotsFor(adding, removing)
+    return adding.length === 0 ? {} : this.playerStore.missingSlotsByTab(adding, removing)
   }
 
   private questCompletionRewards(effect: QuestEffect, step: QuestStep): ItemStack[] {

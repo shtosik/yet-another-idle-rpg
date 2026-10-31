@@ -6,6 +6,12 @@ Versions follow [Semantic Versioning](https://semver.org/). Each note is `- [typ
 New notes go under `[Unreleased]`; `npm run release -- <major|minor|patch>` moves them into a version (docs/deployment.md).
 
 ## [Unreleased]
+- [feature] When an enemy drop is lost because its inventory tab is full, the battle view now shows which tab was full and what was lost.
+- [feature] You can destroy items from your inventory: hover an item and click the red x (quest items can't be destroyed). It destroys the whole stack and asks first. In Settings you can choose the lowest item tier that asks for confirmation; by default every tier does.
+- [feature] The inventory is split into tabs: Gear, Consumables, Materials, Pets and Quest. Gear, Consumables and Materials have 20 slots each, Pets has a slot for every pet, and Quest items never run out of room. A full tab only blocks its own items: a full Materials tab no longer loses gear drops. Your items move to their tabs; a tab that holds more than fits keeps them all until you use or sell some. Each tab shows how full it is ("Materials 16/20", in red when full), and the Pets tab lists the pets you own out of all there are.
+- [feature] Messages about missing inventory space now say which tab needs room: crafting, shops, quest turn-ins and other dialogue rewards, chests, zone mastery chests, and skill refunds or respec.
+- [feature] The Guild Satchel now gives +2 slots to each of Gear, Consumables and Materials, and the Guild store has one.
+- [feature] The Arena Chest only needs room for what it actually gives, not 4 empty slots. If the rewards don't fit, the chest stays closed and keeps the same rewards for when you make room.
 - [feature] Recipes, spell scrolls and pets can now be sold, so duplicates no longer take up a slot for good.
 - [feature] Every arena clear also gives an Arena Chest: right-click it in your inventory for four rewards: gold, Elderwood and Canopy materials, runes, mana potions, the Gladiator's Helm recipe (a new workbench helmet), and rarely the War Cry spell scroll (+25% melee damage for 15 s) or Patron's Gloves (+10% gold and XP), or one of the four champions' pets. Opening needs 4 empty inventory slots.
 - [feature] The Arena takes a new challenger 30 minutes after their last entry.

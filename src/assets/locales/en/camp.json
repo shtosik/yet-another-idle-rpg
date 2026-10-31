@@ -47,7 +47,7 @@
         "stationLevel": "Requires {{station}} Lv {{level}} ({{gear}})",
         "stationOrder": "Needs {{station}} Lv {{level}} first",
         "missingItems": "Missing {{items}}",
-        "inventoryFull": "Inventory full · free a slot first",
+        "inventoryFull": "{{tab}} tab full · free a slot first",
         "onlyPossible": "Only {{count}} possible"
     }
 }

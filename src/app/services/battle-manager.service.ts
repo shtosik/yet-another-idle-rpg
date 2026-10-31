@@ -1,7 +1,9 @@
 import { ArenaBossesService } from './arena-bosses.service'
 import { ArenaService } from './arena.service'
 import { WeaponCategory } from '../../enums/weapon-category.enum'
-import { computed, inject, Injectable } from '@angular/core'
+import { computed, inject, Injectable, signal } from '@angular/core'
+import i18next from 'i18next'
+import { InventoryTab, ItemStack, tabOf } from '../store/player/inventory'
 import { BattleStore } from '../store/battle/battle.store'
 import { PlayerStore } from '../store/player/player.store'
 import { QuestsStore } from '../store/quests/quests.store'
@@ -25,6 +27,7 @@ import { OfflineStore } from '../store/offline/offline.store'
 /** Cooldown reduction can't push a spell below this. */
 const MIN_SPELL_COOLDOWN_IN_SECONDS = 1
 const MS_PER_SECOND = 1000
+const DROPS_LOST_TOAST_MS = 3000
 
 @Injectable({ providedIn: 'root' })
 export class BattleManagerService {
@@ -36,6 +39,10 @@ export class BattleManagerService {
   private animations = inject(AnimationsService)
   private modalService = inject(ModalService)
   private offlineStore = inject(OfflineStore)
+
+  /** Drops a full tab lost on the last kill, one line per tab; clears itself after `DROPS_LOST_TOAST_MS`. */
+  dropsLostToast = signal<string | null>(null)
+  private dropsLostTimer?: ReturnType<typeof setTimeout>
 
   currentWaveKillCount = computed(() => {
     const zoneProgression = this.playerStore.zonesProgression()[this.battleStore.currentZoneId()] || {}
@@ -257,7 +264,8 @@ export class BattleManagerService {
     this.battleStore.endBattle()
     this.offlineStore.recordKill(performance.now(), zoneId, wave)
     const activeQuestIds = getActiveQuestIds(this.questsStore.questStepProgression())
-    this.playerStore.processBattleEnd(enemy.id, zoneId, wave, isShiny, activeQuestIds)
+    const lost = this.playerStore.processBattleEnd(enemy.id, zoneId, wave, isShiny, activeQuestIds)
+    if (lost.length) this.showDropsLost(lost)
 
     this.unlockNextZone(wave)
 
@@ -271,6 +279,20 @@ export class BattleManagerService {
     if (isAutoEnabled && isEnoughKillCountToProgress) {
       this.battleStore.changeWave(true)
     }
+  }
+
+  private showDropsLost(lost: ItemStack[]): void {
+    const byTab = new Map<InventoryTab, string[]>()
+    for (const { id, amount } of lost) {
+      const tab = tabOf(id)
+      const name = i18next.t(`items:names.${ItemID[id]}`)
+      byTab.set(tab, [...(byTab.get(tab) ?? []), amount > 1 ? `${name} x${amount}` : name])
+    }
+    const lines = [...byTab].map(([tab, names]) =>
+      i18next.t('app:inventory.dropsLost', { tab: i18next.t(`app:inventory.tabs.${tab}`), items: names.join(', ') }))
+    clearTimeout(this.dropsLostTimer)
+    this.dropsLostToast.set(lines.join('\n'))
+    this.dropsLostTimer = setTimeout(() => this.dropsLostToast.set(null), DROPS_LOST_TOAST_MS)
   }
 
   /**

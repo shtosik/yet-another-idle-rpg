@@ -16,7 +16,7 @@ Data-driven NPC conversations. Each NPC has a graph of nodes; options branch on 
 ## Data flow
 1. `startDialogue(npcId)`: if the `met_<npcId>` flag is not set and the NPC has `firstMeetNodeId`, start there; otherwise at `startNodeId ?? 0`. The first-meet node's options must set that flag themselves with a `flag` effect named `met_` + the `NpcID` value.
 2. For each option, the shown branch is `getActiveResult`: the **first** result whose `visibilityConditions` all pass, skipping results that start a quest which isn't `available`. An option with no matching result is hidden.
-3. `requirementsNeeded` on that result are shown as labels; if any fail, the option is disabled. If the result's item gains (`give` effects, quest item rewards) don't fit after its removals, the option is disabled with an "N slots needed" tag (`DialogueManagerService.missingSlots`). If its `deduct` gold effects cost more than the player has, it is disabled with an "N more gold needed" tag (`missingGold`): gold never goes negative.
+3. `requirementsNeeded` on that result are shown as labels; if any fail, the option is disabled. If the result's item gains (`give` effects, quest item rewards) don't fit after its removals, the option is disabled with a tag naming each short tab, e.g. "1 Materials slot needed" (`DialogueManagerService.missingSlots`, per tab). If its `deduct` gold effects cost more than the player has, it is disabled with an "N more gold needed" tag (`missingGold`): gold never goes negative.
 4. On click, `selectOption` runs the same `getActiveResult` branch: it applies `effects` in order, then closes (`closeDialogue: true`) or moves to `next`.
 
 ## Conditions (quest)

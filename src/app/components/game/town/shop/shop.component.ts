@@ -18,6 +18,8 @@ import { CurrencyFeedService } from '../../../../services/currency-feed.service'
 import { canInstall, isInstalled, stationUpgradeOf } from '../../../../store/player/camp'
 import { isPreferredBy, sellPrice } from '../../../../store/shop/shop-prices'
 import { ShopCurrency } from '../../../../../types/shop/shop.type'
+import { tabOf } from '../../../../store/player/inventory'
+import { tabName } from '../../inventory/tab-text'
 
 /** `currency`: the player has too little of the shop's currency. */
 type BuyBlockReason = 'stock' | 'rank' | 'currency' | 'inventory' | 'station' | null
@@ -76,7 +78,7 @@ export class ShopComponent implements OnInit {
   /** Inventory stacks this shop buys, at its price. */
   sellable = computed(() => {
     const shopId = this.shopId()
-    return this.playerStore.inventory().flatMap(slot => {
+    return Object.values(this.playerStore.inventory()).flat().flatMap(slot => {
       if (!slot) return []
       const price = sellPrice(shopId, slot.id)
       return price > 0 ? [{ slot, itemData: ITEM_DATA[slot.id], price, preferred: isPreferredBy(shopId, slot.id) }] : []
@@ -147,7 +149,7 @@ export class ShopComponent implements OnInit {
       case 'currency':
         return `${name}: ${i18next.t('shop:ui.cantAfford', { price: this.priceLabel(this.currency(), price) })}`
       case 'inventory':
-        return `${name}: ${i18next.t('shop:ui.inventoryFull')}`
+        return `${name}: ${i18next.t('shop:ui.inventoryFull', { tab: tabName(tabOf(itemId)) })}`
       default:
         return `${name}: ${this.priceLabel(this.currency(), price)}`
     }

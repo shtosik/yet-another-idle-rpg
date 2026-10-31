@@ -52,7 +52,7 @@ export class CampComponent {
     if (!active) return []
 
     const inventory = this.playerStore.inventory()
-    const capacity = this.playerStore.stats().inventorySlots
+    const capacity = this.playerStore.inventoryCapacity()
     const stations = this.playerStore.stations()
     const unlockedRecipes = this.playerStore.unlockedRecipes()
 

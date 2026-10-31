@@ -22,6 +22,7 @@ import { BestiaryComponent } from './bestiary/bestiary.component'
 import { ShopStore } from '../../store/shop/shop.store'
 import { CampStore } from '../../store/camp/camp.store'
 import { OfflineStore } from '../../store/offline/offline.store'
+import { SettingsStore } from '../../store/settings/settings.store'
 import { SpellbookComponent } from './spellbook/spellbook.component'
 import { DevCheatsComponent } from './dev-cheats/dev-cheats.component'
 import { SettingsComponent } from './settings/settings.component'
@@ -64,6 +65,8 @@ export class GameComponent {
   shopStore = inject(ShopStore)
   campStore = inject(CampStore)
   offlineStore = inject(OfflineStore)
+  // Created here so its saves are registered for export and import (persistence.md).
+  settingsStore = inject(SettingsStore)
   // Created here so unlock rules start watching as soon as the game is on screen.
   private unlockService = inject(UnlockService)
   private navigation = inject(GameNavigationService)

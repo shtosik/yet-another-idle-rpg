@@ -11,8 +11,8 @@
         <p class="respec__warning">{{ 'skill-tree:respec.nothingToReset' | i18next }}</p>
     } @else if (!preview().canAfford) {
         <p class="respec__warning">{{ 'skill-tree:respec.insufficientGold' | i18next }}</p>
-    } @else if (preview().inventoryBlocked) {
-        <p class="respec__warning">{{ 'skill-tree:respec.inventoryInUse' | i18next }}</p>
+    } @else if (blockedTabName(); as tab) {
+        <p class="respec__warning">{{ 'skill-tree:respec.inventoryInUse' | i18next: { tab: tab } }}</p>
     }
     <div class="respec__actions">
         <button class="respec__btn" (click)="cancel()">

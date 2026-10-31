@@ -207,6 +207,6 @@
     "teachesSpell": "Teaches the spell {{spell}}",
     "chestRolls": "Holds {{count}} rewards: gold, materials, runes, potions, a recipe, a spell, gear or a champion's pet. Needs {{count}} empty slots to open.",
     "chestOpened": "Chest opened!",
-    "chestFull": "You need {{count}} empty inventory slots to open the chest.",
+    "chestFull": "Free {{slots}} to open the chest.",
     "chestOk": "Nice"
 }

@@ -10,6 +10,7 @@ import { SkillTreeService } from 'app/services/skill-tree.service'
 import { ModalService } from 'app/services/modal.service'
 import { isRequirementMet } from 'utils/skill-tree-requirements'
 import { I18nextPipe } from 'app/pipes/i18next.pipe'
+import { tabName } from 'app/components/game/inventory/tab-text'
 
 type NodeState = 'allocated' | 'available' | 'locked' | 'maxed'
 
@@ -191,7 +192,7 @@ export class SkillTreeComponent {
           .join(', ')
         refundLine = `<div class="skill-tooltip__refund skill-tooltip__refund--blocked">Refund blocked by: ${blockerNames}</div>`
       } else if ('reason' in check && check.reason === 'inventory-in-use') {
-        refundLine = `<div class="skill-tooltip__refund skill-tooltip__refund--blocked">${i18next.t('skill-tree:refundBlockedInventory')}</div>`
+        refundLine = `<div class="skill-tooltip__refund skill-tooltip__refund--blocked">${i18next.t('skill-tree:refundBlockedInventory', { tab: tabName(check.tab) })}</div>`
       }
     }
 

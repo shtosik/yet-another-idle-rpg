@@ -50,8 +50,8 @@
               }
 
               @let slotsNeeded = missingSlots(option);
-              @if (slotsNeeded > 0) {
-                <span class="meta-tag requirement">[{{ 'app:inventory.slotsNeeded' | i18next: { count: slotsNeeded } }}]</span>
+              @if (slotsNeeded) {
+                <span class="meta-tag requirement">[{{ 'app:inventory.slotsNeeded' | i18next: { slots: slotsNeeded } }}]</span>
               }
 
               @let goldNeeded = missingGold(option);
