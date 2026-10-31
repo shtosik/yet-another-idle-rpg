@@ -20,6 +20,7 @@ A family (an entry in `styles.mjs`) is a named art recipe: checkpoint, style pro
 | `zone-pixel` | 832×1248 | pixel-art landscape | opaque |
 | `town-painterly` | 1376×768 | inked cartoon illustration (laHarpar look) | opaque |
 | `skill-icon` | 256×256 | inked cartoon tile like `skills/attackPower.png`, full-frame scene | opaque, rounded corners cut by `tile` |
+| `map-painterly` | 1344×752 | top-down inked world map: a 672×376 window at 2×, inpainted (`map-window.mjs`) | opaque |
 
 **Skill and spell icons** (`skill-icon`): the standard for every new skill node and spell icon (owner decision 2026-10-25; the elemental spells and Mastery icons are good examples, `skills/waterMastery.png` the cleanest emblem). Older icons in `skills/` that don't match (`fireStrike.png` 128 px, `magicDamage.png` and `spellCooldown.png` 512 px painterly) are legacy; don't match new art to them. A matching set (one per element) reads best with the same subject wording and seed, changing only the element.
 
@@ -56,7 +57,7 @@ The graph loads the bf16 model with fp8 weights, so it fits a 12 GB card next to
 ## CLI reference
 
 ```
-generate --family <id> --target <path> --subject "<text>" [--count 4] [--seed N] [--no-ref] [--tier tiny|small|medium|large] [--control spider|crabFront|quadruped|bipedLean|bipedBulky|…] [--weapon knife|sword|club|axe|spear|staff] [--control-strength X] [--control-end X] [--source <image> [--denoise 0.45] --no-layer] [--layer]
+generate --family <id> --target <path> --subject "<text>" [--count 4] [--seed N] [--no-ref] [--tier tiny|small|medium|large] [--control spider|crabFront|quadruped|bipedLean|bipedBulky|…] [--weapon knife|sword|club|axe|spear|staff] [--control-strength X] [--control-end X] [--source <image> [--mask <image>] [--denoise 0.45] --no-layer] [--layer]
 generate --make-control <name> --from <image> [--thicken N] [--hand x,y [--grip-angle D] [--weapon-scale S]]
                                              freeze a checked structure image and its silhouette as a control; --hand stores
                                              the weapon anchor (control px) in refs/control/<name>.json
@@ -151,6 +152,29 @@ There is no bow: a bow needs its string and the drawing hand, and should get a p
 What did **not** help: restricting the references to animals only (no sword leakage to remove, and the colours went duller), and drawing the structure with Z-Image then repainting it. Z-Image draws bows and knives correctly, but its goblins are cute and round, the repaint keeps those proportions, and the matte cuts holes in pale bellies and leaves white background inside the loop of a bow. Use the Z-Image source route for crabs, not humanoids.
 
 When reviewing: reject a weapon that changes shape along its length, is doubled, floats away from the hand, passes through the body, or is held in the wrong number of hands. QC cannot see any of this.
+
+## World-map pieces
+
+The map grows one **window** at a time: a 672×376 part of a canvas, drawn at 2× (1344×752) by `map-painterly` as an inpaint of the map's edge, then scaled back and blended in (plan: `docs/design/southern-map-expansion.md`). `scripts/asset-gen/map-window.mjs` does the canvas work:
+
+1. `init --from src/assets/img/world/source.png --size <W>x<H> --canvas .tmp-gen/map/canvas.png`: an RGBA canvas at the new size; transparent = not drawn yet.
+2. `prep --canvas … --left X --top Y --out <dir> [--ramp 40] [--layer name=<png>]…`: writes `<dir>/source.png` and `<dir>/mask.png` at 2×. The mask is white where nothing is drawn and fades into the drawn map over about `--ramp` map px, so the seam falls inside the blend. A window should overlap the drawn map by 100+ px so the model has context to continue. Each `--layer` is a canvas-size image (a region mask, a ControlNet scribble) cropped and scaled the same way. `--blockout <png>` (canvas size) shows that image under the drawn map, so the hole holds rough terrain instead of transparency; the job then needs `"blockout": true`, which keeps those pixels and repaints them at denoise 0.75 by default (must stay below 1, or the blockout is replaced by noise).
+3. A `--batch` job with `source`, `mask` and optional `regions` (below), 4 candidates.
+4. `compose --canvas … --left X --top Y --piece <candidate.png> --mask <dir>/mask.png`: scales the pick to 1× (lanczos), keeps the canvas pixels where the mask is black, blends only in the ramp. No colour matching.
+
+Next windows read the updated canvas, so they continue the new art too.
+
+**Regions** (batch only): `"regions": [{ "mask", "prompt", "control"?, "controlType"?: "lineart", "controlStrength"?, "controlEnd"? }]`, images at the gen size (from `prep --layer`). Inside each mask the subject is the region's prompt and its ControlNet image applies there only; the job's subject covers the rest. Regions must not overlap. A mountain range needs one: a peaks scribble (outline, ridge, hatching, white on black) at 0.5 / 0.5 with a mountain prompt. Without it the model turns a range into plains or a river.
+
+**The inpaint graph** (`lib/workflow.mjs`, any job with `mask`): DifferentialDiffusion (grey mask = partial denoise), the hole filled from its surroundings (Navier-Stokes, then blurred) so no placeholder colour reaches the latent, and the Fooocus inpaint patch (`fooocus_inpaint_head.pth`, `inpaint_v26.fooocus.patch`, from the Krita AI Diffusion server) so the model continues the context instead of painting a new picture. Denoise defaults to 1 with a mask. An inpaint's source, mask and region images must be exactly the gen size (no letterbox).
+
+**Family settings and why** (review 2026-10-30, south-west window):
+- **2× windows.** SDXL's VAE works in 8 px cells; at 1× it smears the map's 2–4 px ink strokes and trees come out as blobs. At 2× the trees and hatching match.
+- **References at map scale.** Three 336² crops (`refs/map/forest`, `mountains`, `mixed`), `style transfer` 0.7. CLIP sees 224 px, so a 336 crop shows it trees at the size the window draws them; 752² crops showed it whole regions. `--ref` swaps them for crops near the window's terrain (swamp, coast).
+- **No Hyper-SDXL LoRA, 25 steps dpmpp_2m karras.** The 8-step LoRA flattened the ink detail.
+- **The camera.** "Seen from directly overhead, orthographic top-down map view" and negatives for horizon, sky and valley views; without them SDXL paints a landscape with mountains on a horizon. Put the ground colour in the subject ("green grassland with dense dark green pine forests").
+- **What failed before:** a latent noise mask at 1× with an 8-step LoRA (style off, visible smudge at the seam), a global colour match while stitching (shifted the whole piece), `cover`/`shave` post steps (moved the piece off the map by a few px), and squeezing the whole 2794×1504 map into one frame (trees 2–3 px).
+- Still open: peaks drawn from the scribble come out a little larger than the map's; the coast, gulf and fen windows are untested.
 
 ## Add or tune a family
 

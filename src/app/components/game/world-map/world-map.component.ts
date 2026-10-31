@@ -48,8 +48,7 @@ export class WorldMapComponent {
   protected readonly TownID = TownID
   showTowns = signal(false)
   /**
-   * Unlocked towns: map-marker towns in marker order, then towns with Buildings but no marker yet (Lirold, until
-   * the map art grows). Stub towns and stale saved IDs have neither.
+   * Unlocked towns: map-marker towns in marker order, then towns with Buildings but no marker yet. Stub towns and stale saved IDs have neither.
    */
   readonly unlockedTowns = computed(() => {
     const unlocked = this.playerStore.unlockedContent().towns ?? []

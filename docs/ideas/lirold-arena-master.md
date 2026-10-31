@@ -30,8 +30,8 @@ The Arena is Lirold's oldest show: a sand floor ringed by stone stands, under a 
 Replaces the current text (which names Varek and says the road comes "past the troll's pass", against the lore: the mine road is barred, and the player arrives by the coast road).
 
 - **title:** "Lirold Discovered!" (unchanged)
-- **body (now, Arena only):** "From the Matriarch's nest you can see past the mountains: a road winding south off the Pass, and at its end stone walls and a castle by the sea. Lirold, the capital of Port Stocksmar. Travel there from the Map; its Arena takes any challenger who can pay the gate."
-- **body (once the Guild hall ships, `north-lirold-and-exploration-guild.md`):** "From the Matriarch's nest you can see past the mountains: a road winding south off the Pass, and at its end stone walls and a castle by the sea. Lirold, the capital of Port Stocksmar. Travel there from the Map: the Exploration Guild's hall is there, and an Arena for anyone who can pay the gate."
+- **body (now, Arena only):** "From the Matriarch's nest you can see past the mountains: a road winding south off the Pass, and at its end stone walls and a castle under the mountains. Lirold, the capital of Port Stocksmar. Travel there from the Map; its Arena takes any challenger who can pay the gate."
+- **body (once the Guild hall ships, `north-lirold-and-exploration-guild.md`):** "From the Matriarch's nest you can see past the mountains: a road winding south off the Pass, and at its end stone walls and a castle under the mountains. Lirold, the capital of Port Stocksmar. Travel there from the Map: the Exploration Guild's hall is there, and an Arena for anyone who can pay the gate."
 
 ## 4. Other text that names the placeholder
 

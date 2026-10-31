@@ -8,7 +8,7 @@ Lirold, the capital of Port Stocksmar, becomes a Town the player reaches **after
 
 **Owner decisions in force (2026-10-27):**
 - The capital lies **south** of Horseshoe Beach: a large city inside stone walls with a castle at its centre. A road runs from it to the Mountain Pass, with a mine near the Pass on that road.
-- It is not on the world map yet; art comes later (§3a is a placement brief only).
+- On the world map: marker at (600, 1180) since the 2026-10-31 redraw (§3a is superseded).
 - It unlocks **after the Mawood Zones** (Elderwood Wilds, the Deepwood, the Upper Canopy).
 - Some capital NPCs acknowledge what the player did in La Harpar and Mawood.
 - Renamed and shipped: North Lirold → **Lirold** (`TownID.lirold`), Southback → **Elderreach** (`RegionID.elderreach`).
@@ -34,7 +34,7 @@ Lirold, the capital of Port Stocksmar, becomes a Town the player reaches **after
 
 The Exploration Guild is chartered by the capital, which pays for its charts and honours its Explorer Tokens. Its only hall stands in the capital, under Guildmaster Odile Varrow. Marvin is La Harpar-born and a Guild member, home in the village after an expedition Varrow sent him on. He drinks in the Tavern, trains anyone who asks, and as a member hands out contracts and a few Guild supplies from his pack. He tells the player what the Guild is and that the hall in Lirold has far more. Once the player has met Varrow, the Guild's business goes through her.
 
-The player climbs the beach, the Plains, the Long Path, the Pass and the Elderwood. From the Harpy Matriarch's nest in the crown of the tallest Spire, the highest point anywhere, they see what the forest hid: south, past the mountains, a road coming down off the Pass, and at its far end grey walls and a castle by the sea.
+The player climbs the beach, the Plains, the Long Path, the Pass and the Elderwood. From the Harpy Matriarch's nest in the crown of the tallest Spire, the highest point anywhere, they see what the forest hid: south, past the mountains, a road coming down off the Pass, and at its far end grey walls and a castle under the mountains.
 
 In the capital, Varrow already knows the player's deeds (§8b) from traders and Marvin's letters. She gives the Guild's one trial:
 - Bring in the outlaws who fled the capital's law into the Spires.
@@ -57,11 +57,13 @@ Passing the trial earns Guild steel and the Guild's writ for the castle's closed
 
 **New popup** (`unlocks.json` `towns.lirold`):
 - title: "Lirold Discovered!"
-- body: "From the Matriarch's nest you can see past the mountains: a road winding south off the Pass, and at its end stone walls and a castle by the sea. Lirold, the capital of Port Stocksmar. Travel there from the Map — the Exploration Guild's hall is there, the one Marvin keeps talking about."
+- body: "From the Matriarch's nest you can see past the mountains: a road winding south off the Pass, and at its end stone walls and a castle under the mountains. Lirold, the capital of Port Stocksmar. Travel there from the Map — the Exploration Guild's hall is there, the one Marvin keeps talking about."
 
 **Guild tasks** keep rolling from unlocked Zones with `tier <= rank + 1`. `ExplorationGuildService` needs no change.
 
 ## 3a. Map placement brief
+
+**Superseded:** the map was redrawn at 3072×2048 (2026-10-31) and Lirold's marker sits at (600, 1180) in `src/data/world-map-data.ts`; the canvas sizes and coordinates below are from the old 2794-wide map (`docs/design/southern-map-expansion.md`).
 
 Placement only, no art plan. The world map source (`src/assets/img/world/source.png`, 2794×752, x right, y down) is extended **at the bottom only**, to about **2794×1100**, so every existing marker keeps its coordinates. The new strip (y 752–1100) continues what touches its top edge: sea on the far left, coast and green land at x ~250–750, the mountain range at x ~780–1400.
 
@@ -424,9 +426,9 @@ Each deed node offers: 1. "What else?" → deeds · 2. "That's enough about me."
 | Quest | `guildTrial` (27) | 60 Canopy Bandits, then the Troll; unlocks Slatefall. |
 | Item | `guildShortsword` (144) | Rare physical weapon, 8 AP, +0.1 attack speed, 4% crit; quest reward. |
 | Dialogue | tips, `aboutHall`, `aboutVarrow` on `laHarparMarvin` | §8a. |
-| Map | Capital marker ~(470, 930) on a 2794×1100 canvas | §3a; art later. |
+| Map | Capital marker at (600, 1180) on the 3072×2048 map | Shipped 2026-10-31. |
 | Art | Capital Town background, Guild hall background (repaint), Varrow portrait, `guildShortsword` icon | `/generate-2d-asset` |
 
-The renames (Lirold, Elderreach) are shipped. The commented-out map marker in `world-map-data.ts` still sits at (730, 110); move it to ~(470, 930) when the canvas grows (§3a).
+The renames (Lirold, Elderreach) are shipped. The map marker is live at (600, 1180).
 
 **Docs to update on implementation:** `docs/systems/towns-shops-guild.md` (Guild hall in Lirold, Marvin in the Tavern, shop stages, `talkToMarvin` switch), `docs/systems/zones-waves-unlocks.md` (new rules), `docs/character/laHarpar/README.md`, `docs/lore/` (proposed → shipped).

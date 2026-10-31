@@ -20,6 +20,8 @@
 //   ... --control biped --weapon knife|sword|club|axe|spear|staff   # code draws a straight weapon into the control at its hand
 //   ... --source scripts/asset-gen/refs/control/crab-source.png --no-layer [--denoise 0.45]   # SDXL repaints a frozen source in the family's style
 //        # enemy-pixel generates with LayerDiffuse (transparent) by default; --no-layer matts instead, which a repaint needs
+//   ... --source <image> --mask <image>   # inpaint (Fooocus patch): white repainted, black kept, grey partly
+//        # map windows: node scripts/asset-gen/map-window.mjs prep ..., then a --batch job with "regions", then map-window.mjs compose
 //
 // Tuning overrides (A/B runs): --steps --cfg --ip-weight --ip-type "<IP-Adapter weight type>" --ip-combine average|concat --sampler --grid --colors --tag <suffix for the slug>
 // --style "<prompt>" replaces the family's style prompt for this job; --negative "<terms>" adds to its negative prompt
@@ -41,7 +43,7 @@ import { loadRefs } from './lib/refs.mjs'
 import { makeSheet } from './lib/sheet.mjs'
 import { makeControl } from './lib/silhouette.mjs'
 import { prepareSource } from './lib/source.mjs'
-import { buildGraph, SOURCE_DENOISE } from './lib/workflow.mjs'
+import { buildGraph, LINEART_TYPE, sourceDenoise } from './lib/workflow.mjs'
 import { generateStructure } from './lib/zimage.mjs'
 import { assertRegistry, DEFAULT_TIER, FAMILIES, getFamily, REPO_ROOT, resolvePost } from './styles.mjs'
 
@@ -97,9 +99,13 @@ async function runQc({ family, raws, candidates, control, weapon }) {
  * Generates `count` candidates for one job into `.tmp-gen/<slug>/` and writes candidate PNGs, sheet and meta.
  * @returns {Promise<object>} the JSON result printed on stdout
  */
-export async function generateJob({ comfy, familyId, target, subject, seed, count = 4, useRef = true, tag, tier, control, weapon, source, keepRaw = true, overrides = {}, tmpDir = TMP_DIR }) {
+export async function generateJob({ comfy, familyId, target, subject, seed, count = 4, useRef = true, tag, tier, control, weapon, source, mask, regions = [], blockout = false, keepRaw = true, overrides = {}, tmpDir = TMP_DIR }) {
     const family = applyOverrides(getFamily(familyId), overrides)
     if (weapon && !control) throw new Error('--weapon needs --control: the weapon is drawn into the control at its hand anchor')
+    if (mask && !source) throw new Error('--mask needs --source: the mask says which part of the source to repaint')
+    if (blockout && !mask) throw new Error('"blockout" needs "source" and "mask": it keeps the hole of an inpaint')
+    if (blockout && overrides.denoise >= 1) throw new Error('"blockout" needs denoise below 1: at 1 the blockout is replaced by noise')
+    if (regions.length && !mask) throw new Error('"regions" need "source" and "mask": a regional prompt is part of the inpaint')
     if (source && family.layer) throw new Error(`${familyId} generates with LayerDiffuse by default, which is untested with "source": pass layer: false (--no-layer) so the family's matte step cuts out the repaint`)
     for (const ref of family.references) {
         if (!existsSync(resolve(REPO_ROOT, ref))) throw new Error(`Reference not found: ${ref}`)
@@ -113,13 +119,20 @@ export async function generateJob({ comfy, familyId, target, subject, seed, coun
     const started = Date.now()
 
     const refs = await loadRefs(family)
+    // an inpaint's images line up pixel for pixel, so they must already be the generation size
+    const load = async (path) => (await prepareSource(path, family.gen, REPO_ROOT, { exact: !!mask })).toString('base64')
     const graph = buildGraph({
         family, subject, seed, count, useRef,
         refsBase64: refs.map((r) => r.base64),
         control: control
             ? { base64: (await controlImage(control, { weapon })).toString('base64'), type: CONTROL_TYPES[control], strength: overrides.controlStrength, end: overrides.controlEnd }
             : undefined,
-        source: source ? { base64: (await prepareSource(source, family.gen, REPO_ROOT)).toString('base64'), denoise: overrides.denoise } : undefined,
+        source: source ? { base64: await load(source), denoise: overrides.denoise, mask: mask ? await load(mask) : undefined, blockout } : undefined,
+        regions: await Promise.all(regions.map(async (r) => ({
+            mask: await load(r.mask),
+            prompt: r.prompt,
+            control: r.control ? { base64: await load(r.control), type: r.controlType === 'lineart' ? LINEART_TYPE : undefined, strength: r.controlStrength, end: r.controlEnd } : undefined,
+        }))),
         prefix: `asset-gen/${slug}`,
     })
     log(`${slug}: ${source ? `repainting ${source},` : 'generating'} ${count} × ${family.gen.join('×')} (${useRef ? `${refs.length} refs` : 'no refs'}, ${family.sampler.steps} steps)`)
@@ -138,7 +151,7 @@ export async function generateJob({ comfy, familyId, target, subject, seed, coun
     writeFileSync(sheet, await makeSheet({ refs: useRef ? refs.map((r) => r.buffer) : [], candidates, target: family.target, pixel: !!family.pixel, flagged: qc.filter((c) => c.flags.length).map((c) => c.n) }))
 
     const seconds = Math.round((Date.now() - started) / 100) / 10
-    const meta = { slug, family: familyId, target, subject, seed, count: files.length, useRef, tag: tag ?? null, tier: usedTier, control: control ?? null, weapon: weapon ?? null, source: source ?? null, denoise: source ? (overrides.denoise ?? SOURCE_DENOISE) : null, layer: !!family.layer, sizeGuessed, seconds, qc }
+    const meta = { slug, family: familyId, target, subject, seed, count: files.length, useRef, tag: tag ?? null, tier: usedTier, control: control ?? null, weapon: weapon ?? null, source: source ?? null, mask: mask ?? null, regions, blockout, denoise: source ? sourceDenoise({ denoise: overrides.denoise, mask, blockout }) : null, layer: !!family.layer, sizeGuessed, seconds, qc }
     writeFileSync(join(dir, 'meta.json'), JSON.stringify(meta, null, 2))
     return { ...meta, candidates: files, sheet, refs: useRef ? refs.map((r) => r.path) : [] }
 }
@@ -224,7 +237,7 @@ const OPTIONS = {
     'list-families': { type: 'boolean' }, stop: { type: 'boolean' }, reprocess: { type: 'boolean' }, control: { type: 'string' },
     steps: { type: 'string' }, cfg: { type: 'string' }, 'ip-weight': { type: 'string' }, 'ip-type': { type: 'string' }, 'ip-combine': { type: 'string' }, sampler: { type: 'string' },
     grid: { type: 'string' }, colors: { type: 'string' }, ref: { type: 'string', multiple: true }, 'control-strength': { type: 'string' }, 'control-end': { type: 'string' }, style: { type: 'string' }, negative: { type: 'string' }, layer: { type: 'boolean' }, 'no-layer': { type: 'boolean' },
-    source: { type: 'string' }, denoise: { type: 'string' }, zimage: { type: 'string' }, name: { type: 'string' },
+    source: { type: 'string' }, mask: { type: 'string' }, denoise: { type: 'string' }, zimage: { type: 'string' }, name: { type: 'string' },
     'make-control': { type: 'string' }, from: { type: 'string' }, erode: { type: 'string' }, 'fill-holes': { type: 'string' }, thicken: { type: 'string' },
     weapon: { type: 'string' }, hand: { type: 'string' }, 'grip-angle': { type: 'string' }, 'weapon-scale': { type: 'string' },
 }
@@ -285,7 +298,7 @@ export async function main(argv = process.argv.slice(2)) {
     const seed = v.seed !== undefined ? Number(v.seed) : Math.floor(Math.random() * 2 ** 31)
     const result = await generateJob({
         comfy, familyId: v.family, target: v.target, subject: v.subject, seed,
-        count: v.count ? Number(v.count) : 4, useRef: !v['no-ref'], tag: v.tag, tier: v.tier, control: v.control, weapon: v.weapon, source: v.source,
+        count: v.count ? Number(v.count) : 4, useRef: !v['no-ref'], tag: v.tag, tier: v.tier, control: v.control, weapon: v.weapon, source: v.source, mask: v.mask,
         overrides: { denoise: v.denoise === undefined ? undefined : Number(v.denoise), steps: v.steps, cfg: v.cfg, ipWeight: v['ip-weight'], ipWeightType: v['ip-type'], ipCombine: v['ip-combine'], sampler: v.sampler, grid: v.grid, colors: v.colors, refs: v.ref, stylePrompt: v.style, negative: v.negative, layer: v['no-layer'] ? false : v.layer, erode: v.erode, fillHoles: v['fill-holes'], controlStrength: v['control-strength'] === undefined ? undefined : Number(v['control-strength']), controlEnd: v['control-end'] === undefined ? undefined : Number(v['control-end']) },
     })
     return { ...result, serverStarted: started, bootSeconds }

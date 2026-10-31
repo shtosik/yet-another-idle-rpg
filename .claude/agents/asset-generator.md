@@ -21,9 +21,10 @@ if unsure.
 | zone background | `zone-pixel` | `src/assets/img/backgrounds/<zone>-vertical.png` |
 | town / building background | `town-painterly` | `towns-data.ts` `url:` path |
 | skill-tree icon | `skill-icon` | `src/assets/img/skills/<SkillNodeID name>.png` |
+| world-map window (map expansion) | `map-painterly` | `.tmp-gen/map/<window>.png`; prep, regions and compose per `docs/systems/asset-pipeline.md` § World-map pieces (blended into the canvas, never written to `world/source.png` directly) |
 
 Confirm the filename by grepping the enum (`ItemID`, `EnemyID`, `NpcID`) or the data file; never invent one. If no family
-fits (for example a world-map tile), report that and skip; do not improvise.
+fits (for example a single map marker icon), report that and skip; do not improvise.
 
 ## 2. Write the subject only
 

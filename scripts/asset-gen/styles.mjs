@@ -31,6 +31,7 @@ export const FAMILY_TARGETS = {
     'town-painterly': [1376, 768],
     'portrait-pixel': [256, 256],
     'skill-icon': [256, 256],
+    'map-painterly': [1344, 752], // a 672×376 map window drawn at 2× (map-window.mjs scales it back)
     'enemy-pixel': [256, 256], // hard cap on the longer side; the real size comes from the Size tier
 }
 
@@ -210,6 +211,32 @@ FAMILIES['skill-icon'] = {
     sampler: { steps: 8, cfg: 5.5, sampler_name: 'euler', scheduler: 'sgm_uniform' },
 }
 
+FAMILIES['map-painterly'] = {
+    description: 'world-map window: a 672×376 part of the map drawn at 2× (1344×752) as an inpaint of its edge (map-window.mjs prep/compose)',
+    checkpoint: 'zavychromaxl_v80.safetensors',
+    // Without "directly overhead" and the horizon negatives SDXL paints a valley landscape with mountains on a horizon.
+    // Ground colour goes in the subject ("lush green grassland", "dark burnt forest"): the style prompt is shared by every region.
+    stylePrompt:
+        'fantasy world map seen from directly overhead, orthographic top-down map view, flat map with no horizon, thick black ink outlines, ' +
+        'large dense forests made of many tiny inked trees packed together, small grey mountains with ink hatching seen from above, ' +
+        'clear blue water with darker ink-lined shores, thin pale dirt roads, soft watercolour shading, no text, no labels',
+    negative: `${NEGATIVE_BASE}, pixel art, lettering, labels, place names, compass rose, map legend, parchment border, parchment edges, torn paper, grid lines, horizon, sky, clouds, distant mountains, landscape painting, panorama, valley view, side view, characters, people, photorealistic, satellite image, neon, sparse scattered trees`,
+    // frozen 336² crops of the map at its own scale (never the live source.png): CLIP sees 224 px, so trees and peaks
+    // reach it at about the size the 2× window draws them. 752² crops showed it a whole region and the trees came out wrong.
+    references: ['forest', 'mountains', 'mixed'].map((n) => `scripts/asset-gen/refs/map/${n}.png`),
+    ipWeightType: 'style transfer',
+    ipWeight: 0.7,
+    // The window is drawn at 2×: at 1× SDXL's VAE (8 px per latent cell) smears the map's 2-4 px ink strokes. The 1344×752
+    // frame is exactly the family target, so no post step moves or rescales a pixel the compositor lines up with the map.
+    gen: [1344, 752],
+    target: [1344, 752],
+    pixel: false,
+    alpha: false,
+    post: [],
+    // no Hyper-SDXL LoRA: the Fooocus inpaint patch and 25 full steps keep the ink detail the 8-step LoRA flattened
+    lora: false,
+    sampler: { steps: 25, cfg: 5.5, sampler_name: 'dpmpp_2m', scheduler: 'karras' },
+}
 
 /** Substitutes the tier tokens in a family's post list. Families without `tiers` pass through unchanged. */
 export function resolvePost(family, tier) {
