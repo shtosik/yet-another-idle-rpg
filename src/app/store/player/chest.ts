@@ -1,5 +1,5 @@
 import { ChestItem } from '../../../interfaces/item.interface'
-import { ItemStack } from './inventory'
+import { InventoryTab, ItemStack, tabOf } from './inventory'
 
 export interface ChestContents {
   gold: number
@@ -7,6 +7,17 @@ export interface ChestContents {
 }
 
 const between = ([min, max]: [number, number], rng: () => number) => min + Math.floor(rng() * (max - min + 1))
+
+/** Per tab, the most new stacks the chest can put there: one per pick, at most one per item in its loot. */
+export function chestSlotsNeeded(chest: ChestItem): Partial<Record<InventoryTab, number>> {
+  const needed: Partial<Record<InventoryTab, number>> = {}
+  const itemIds = new Set(chest.loot.flatMap(entry => 'gold' in entry ? [] : [entry.itemId]))
+  for (const id of itemIds) {
+    const tab = tabOf(id)
+    needed[tab] = Math.min(chest.rolls, (needed[tab] ?? 0) + 1)
+  }
+  return needed
+}
 
 /** `chest.rolls` weighted picks from its loot table; the same item rolled twice lands as one stack. */
 export function rollChest(chest: ChestItem, rng: () => number = Math.random): ChestContents {

@@ -8,7 +8,7 @@ import { PlayerStore } from '../../../store/player/player.store'
 import { ItemType } from '../../../../enums/items/item-type.enum'
 import { BattleManagerService } from '../../../services/battle-manager.service'
 import { ModalService } from '../../../services/modal.service'
-import { countFreeSlots, INVENTORY_PAGE_SIZE, pageCount } from '../../../store/player/inventory'
+import { countFreeSlots, INVENTORY_PAGE_SIZE, INVENTORY_TABS, InventoryTab, pageCount } from '../../../store/player/inventory'
 import { I18nextPipe } from '../../../pipes/i18next.pipe'
 
 @Component({
@@ -23,12 +23,21 @@ export class InventoryWindow {
   playerStore = inject(PlayerStore)
   private battleManagerService = inject(BattleManagerService)
   private modalService = inject(ModalService)
-  inventory = this.playerStore.inventory
+  readonly tabs = INVENTORY_TABS
+  tab = signal<InventoryTab>('gear')
+  inventory = computed(() => this.playerStore.inventory()[this.tab()])
 
   private requestedPage = signal(0)
 
-  capacity = computed(() => this.playerStore.stats().inventorySlots)
-  pages = computed(() => pageCount(this.capacity()))
+  /** Infinity for an unlimited tab (Quest). */
+  capacity = computed(() => this.playerStore.inventoryCapacity()[this.tab()])
+  limited = computed(() => Number.isFinite(this.capacity()))
+  /** Usable slots, plus items kept past capacity (a migrated save); an unlimited tab shows what it holds. */
+  private shownSlots = computed(() => {
+    const lastItem = this.inventory().reduce((last, slot, i) => slot ? i : last, -1)
+    return Math.max(this.limited() ? this.capacity() : 0, lastItem + 1)
+  })
+  pages = computed(() => pageCount(this.shownSlots()))
   page = computed(() => Math.min(this.requestedPage(), this.pages() - 1))
   freeSlots = computed(() => countFreeSlots(this.inventory(), this.capacity()))
 
@@ -39,6 +48,11 @@ export class InventoryWindow {
   })
 
   readonly Items = ITEM_DATA
+
+  selectTab(tab: InventoryTab) {
+    this.tab.set(tab)
+    this.requestedPage.set(0)
+  }
 
   changePage(delta: number) {
     this.requestedPage.set(Math.min(Math.max(this.page() + delta, 0), this.pages() - 1))
@@ -61,7 +75,8 @@ export class InventoryWindow {
 
     const itemData = ITEM_DATA[item.id]
     if (itemData.type === ItemType.chest) {
-      this.modalService.openChestOpened({ contents: this.playerStore.openChest(item), slotsNeeded: itemData.rolls })
+      const slotsNeeded = this.playerStore.missingChestSlots(item)
+      this.modalService.openChestOpened({ contents: this.playerStore.openChest(item), slotsNeeded })
       return
     }
 

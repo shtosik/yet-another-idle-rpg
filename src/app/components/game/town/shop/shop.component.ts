@@ -76,7 +76,7 @@ export class ShopComponent implements OnInit {
   /** Inventory stacks this shop buys, at its price. */
   sellable = computed(() => {
     const shopId = this.shopId()
-    return this.playerStore.inventory().flatMap(slot => {
+    return Object.values(this.playerStore.inventory()).flat().flatMap(slot => {
       if (!slot) return []
       const price = sellPrice(shopId, slot.id)
       return price > 0 ? [{ slot, itemData: ITEM_DATA[slot.id], price, preferred: isPreferredBy(shopId, slot.id) }] : []

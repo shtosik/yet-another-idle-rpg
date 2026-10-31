@@ -6,6 +6,9 @@ Versions follow [Semantic Versioning](https://semver.org/). Each note is `- [typ
 New notes go under `[Unreleased]`; `npm run release -- <major|minor|patch>` moves them into a version (docs/deployment.md).
 
 ## [Unreleased]
+- [feature] The inventory is split into tabs: Gear, Consumables, Materials, Pets and Quest. Gear, Consumables and Materials have 20 slots each, Pets has a slot for every pet, and Quest items never run out of room. A full tab only blocks its own items: a full Materials tab no longer loses gear drops. Your items move to their tabs; a tab that holds more than fits keeps them all until you use or sell some.
+- [feature] The Guild Satchel now gives +2 slots to each of Gear, Consumables and Materials, and the Guild store has one.
+- [feature] The Arena Chest needs room in the tabs its rewards go to, not 4 empty slots anywhere.
 - [feature] Recipes, spell scrolls and pets can now be sold, so duplicates no longer take up a slot for good.
 - [feature] Every arena clear also gives an Arena Chest: right-click it in your inventory for four rewards: gold, Elderwood and Canopy materials, runes, mana potions, the Gladiator's Helm recipe (a new workbench helmet), and rarely the War Cry spell scroll (+25% melee damage for 15 s) or Patron's Gloves (+10% gold and XP), or one of the four champions' pets. Opening needs 4 empty inventory slots.
 - [feature] The Arena takes a new challenger 30 minutes after their last entry.

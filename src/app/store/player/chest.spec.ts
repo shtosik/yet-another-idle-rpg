@@ -1,6 +1,7 @@
 import { provideZonelessChangeDetection } from '@angular/core'
 import { TestBed } from '@angular/core/testing'
-import { rollChest } from './chest'
+import { chestSlotsNeeded, rollChest } from './chest'
+import { tabOf } from './inventory'
 import { PlayerStore } from './player.store'
 import ITEM_DATA from '../../../data/items-data'
 import { ChestItem } from '../../../interfaces/item.interface'
@@ -23,21 +24,31 @@ describe('chests', () => {
     TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] })
     const playerStore = TestBed.inject(PlayerStore)
     // rng 0: gold only, so the later full-inventory check starts with no stacks the loot could join.
-    const open = () => playerStore.openChest({ ...playerStore.inventory().find(s => s?.id === ItemID.arenaChest)!, type: ItemType.chest }, () => 0)
+    const chestSlot = () => ({ ...playerStore.inventory().consumables.find(s => s?.id === ItemID.arenaChest)!, type: ItemType.chest })
 
     playerStore.addItems([{ id: ItemID.arenaChest, amount: 3 }])
     const gold = playerStore.stats().goldCoins
-    expect(open()).not.toBeNull()
+    expect(playerStore.openChest(chestSlot(), () => 0)).not.toBeNull()
     expect(playerStore.stats().goldCoins).toBe(gold + chest.rolls * 6000)
     expect(playerStore.itemCount(ItemID.arenaChest)).toBe(2)
 
-    // Fill every other slot with items the loot can't stack onto; the chest stack stays, so no new stack fits.
+    // A full Materials tab blocks it: every pick could be a new material stack.
     const lootIds = chest.loot.flatMap(entry => ('itemId' in entry ? [entry.itemId] : []))
-    const free = playerStore.stats().inventorySlots - playerStore.inventory().filter(Boolean).length
-    const fillers = Object.values(ITEM_DATA).filter(item => item.id !== ItemID.arenaChest && !lootIds.includes(item.id)).slice(0, free)
-    playerStore.addItems(fillers.map(item => ({ id: item.id, amount: 1 })))
-    expect(playerStore.openChest({ ...playerStore.inventory().find(s => s?.id === ItemID.arenaChest)!, type: ItemType.chest }, () => 0.5)).toBeNull()
+    const fillersIn = (tab: string, count: number) => Object.values(ITEM_DATA)
+      .filter(item => tabOf(item.id) === tab && !lootIds.includes(item.id)).slice(0, count).map(item => ({ id: item.id, amount: 1 }))
+    playerStore.addItems(fillersIn('materials', playerStore.inventoryCapacity().materials))
+    expect(playerStore.missingChestSlots(chestSlot())).toBe(chestSlotsNeeded(chest).materials!)
+    expect(playerStore.openChest(chestSlot(), () => 0.5)).toBeNull()
     expect(playerStore.itemCount(ItemID.arenaChest)).toBe(2)
     localStorage.clear()
+  })
+
+  it('needs, per tab, one slot per pick up to the loot items stored there', () => {
+    const needed = chestSlotsNeeded(chest)
+    expect(needed.materials).toBe(chest.rolls)
+    expect(needed.quest).toBeUndefined()
+
+    const oneGear: ChestItem = { ...chest, loot: [{ weight: 1, itemId: ItemID.patronGloves, amount: [1, 1] }, { weight: 1, gold: [1, 1] }] }
+    expect(chestSlotsNeeded(oneGear)).toEqual({ gear: 1 })
   })
 })

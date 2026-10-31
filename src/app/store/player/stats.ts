@@ -13,6 +13,7 @@ import SPELLS_DATA from '../../../data/spells-data'
 import { statsInitialState } from './player'
 import { SpellID } from '../../../enums/ids/spell-id.enum'
 import { ItemID } from '../../../enums/ids/item-id.enum'
+import type { InventoryTab } from './inventory'
 
 export type PlayerStatsType = Record<PlayerStat, number>
 
@@ -26,6 +27,8 @@ export interface StatModifier {
   amount: number
   /** `amount` is a fraction of the stat after every flat modifier (0.2 = 20% better), not a flat value. */
   percent?: boolean
+  /** `inventorySlots` only: the one tab it grows; without it, every slot tab (`inventoryCapacity`). */
+  tab?: InventoryTab
 }
 
 /** Positive amounts lower these stats: lower is better (seconds per attack, ms per mana, ms per refresh). */
@@ -112,13 +115,14 @@ export const bonusModifiers = (bonuses: Partial<Record<PlayerStat, number>>): St
 export function deriveStats(resources: Resources, modifiers: StatModifier[]): PlayerStatsType {
   const stats: PlayerStatsType = { ...statsInitialState }
 
-  for (const { stat, amount, percent } of modifiers) {
-    if (isResourceStat(stat) || percent) continue
+  // A tab-keyed modifier counts only in that tab's capacity, so `inventorySlots` stays what every slot tab gets.
+  for (const { stat, amount, percent, tab } of modifiers) {
+    if (isResourceStat(stat) || percent || tab) continue
     stats[stat] += INVERTED_STATS.has(stat) ? -amount : amount
   }
   // Percentages apply after flat modifiers, so they keep the same strength as gear improves.
-  for (const { stat, amount, percent } of modifiers) {
-    if (isResourceStat(stat) || !percent) continue
+  for (const { stat, amount, percent, tab } of modifiers) {
+    if (isResourceStat(stat) || !percent || tab) continue
     stats[stat] *= INVERTED_STATS.has(stat) ? 1 - amount : 1 + amount
   }
   for (const stat of Object.keys(stats) as PlayerStat[]) {

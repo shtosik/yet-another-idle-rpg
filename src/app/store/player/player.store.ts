@@ -1,4 +1,4 @@
-import { ChestContents, rollChest } from './chest'
+import { chestSlotsNeeded, ChestContents, rollChest } from './chest'
 import { WeaponCategory } from '../../../enums/weapon-category.enum'
 import { computed, effect, inject } from '@angular/core'
 import { patchState, signalStore, withComputed, withHooks, withMethods, withState } from '@ngrx/signals'
@@ -33,8 +33,28 @@ import { ZoneID } from '../../../enums/ids/zone-id.enum'
 import { TownID } from '../../../enums/map/town-id.enum'
 import { DamageElement } from '../../../enums/damage-element.enum'
 import { withDevtools } from '../helpers/devtools'
-import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
-import { addItems, canFit, countItem, createInventory, fitsCapacity, ItemStack, missingSlots, removeItems, resizeInventory } from './inventory'
+import { SaveMigrations, withGameStateSync } from '../helpers/with-game-state-sync.hook'
+import {
+  addItems,
+  canFit,
+  countFreeSlots,
+  countItem,
+  createInventories,
+  fitsCapacity,
+  Inventories,
+  Inventory,
+  inventoryCapacity,
+  InventoryTab,
+  ItemStack,
+  missingSlots,
+  removeItems,
+  resizeInventory,
+  SlotDeltas,
+  slotDeltas,
+  splitInventory,
+  tabOf,
+  withSlotDeltas,
+} from './inventory'
 import { canInstall, evaluateRecipe, installStations, Stations } from './camp'
 import { StationID } from '../../../enums/ids/station-id.enum'
 import { UNLOCK_RULES, UnlockCondition, UnlockTarget } from '../../../data/unlock-conditions'
@@ -55,6 +75,7 @@ import {
   sameIds,
   skillNodeModifiers,
   SourcedModifiers,
+  StatModifier,
 } from './stats'
 
 export type { PlayerStatsType } from './stats'
@@ -84,7 +105,8 @@ interface PlayerState {
   shinyKillsByZone: Partial<Record<ZoneID, number>>
   /** Mastery stars whose chest was claimed (`zone-mastery.ts`). */
   claimedZoneStars: Partial<Record<ZoneID, ZoneStar[]>>
-  inventory: (InventoryItem | null)[];
+  /** One slot array per tab (`tabOf`). */
+  inventory: Inventories;
   equipment: EquipmentType;
   unlockedNodes: UnlockedNodes;
   unlockedSpells: UnlockedSpellsType;
@@ -108,7 +130,7 @@ export const initialState: PlayerState = {
   permanentBonuses: {},
   manaRegenTimer: 0,
   zonesProgression: {},
-  inventory: createInventory(),
+  inventory: createInventories(),
   equipment: initialEquipmentState,
   unlockedNodes: {},
   unlockedSpells: {},
@@ -147,10 +169,15 @@ const equipmentSpells = (equipment: EquipmentType): SpellID[] =>
 
 const unseen = <T>(ids: T[], seen: T[]): T[] => ids.filter(id => !seen.includes(id))
 
-const equipmentInventorySlots = (itemId: ItemID): number =>
-  (ITEM_DATA[itemId] as EquipmentItem).stats
-    ?.filter(s => s.id === 'inventorySlots')
-    .reduce((sum, s) => sum + s.amount, 0) ?? 0
+/** Stat modifiers one piece of gear grants (none for an empty slot). */
+const gearModifiers = (equipped: { id: ItemID } | null): StatModifier[] =>
+  equipped ? ((ITEM_DATA[equipped.id] as EquipmentItem).stats ?? []).map(s => ({ stat: s.id, amount: s.amount })) : []
+
+/** Version 1 saves held one flat inventory; version 2 splits it into tabs. */
+const SAVE_VERSION = 2
+const SAVE_MIGRATIONS: SaveMigrations = {
+  1: ({ inventory, ...state }) => Array.isArray(inventory) ? { ...state, inventory: splitInventory(inventory as Inventory) } : state,
+}
 
 const handleExperience = (resources: Resources) => {
   const xpForNextLevel = calculateXp(resources.level + 1)
@@ -163,8 +190,8 @@ const handleExperience = (resources: Resources) => {
   handleExperience(resources)
 }
 
-const stackAmount = (inventory: (InventoryItem | null)[], id: ItemID, tier: ItemTier): number =>
-  inventory.reduce((sum, slot) => slot?.id === id && slot.tier === tier ? sum + slot.amount : sum, 0)
+const stackAmount = (inventory: Inventories, id: ItemID, tier: ItemTier): number =>
+  inventory[tabOf(id)].reduce((sum, slot) => slot?.id === id && slot.tier === tier ? sum + slot.amount : sum, 0)
 
 type StatSources = { [K in 'resources' | 'permanentBonuses' | 'equipment' | 'unlockedNodes' | 'claimedZoneStars']: () => PlayerState[K] }
 
@@ -206,7 +233,7 @@ const STORE_KEY = 'playerStore'
 export const PlayerStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
-  withGameStateSync(STORE_KEY, initialState, { transientKeys: ['manaRegenTimer'] }),
+  withGameStateSync(STORE_KEY, initialState, { version: SAVE_VERSION, migrations: SAVE_MIGRATIONS, transientKeys: ['manaRegenTimer'] }),
   withDevtools(STORE_KEY),
   withComputed((store, battleStore = inject(BattleStore)) => {
     // Buff and consumable timers tick constantly; only a change in what's active should recompute stats.
@@ -214,11 +241,14 @@ export const PlayerStore = signalStore(
     const activeConsumables = computed(() => activeConsumableItemIds(battleStore.consumableSlots()), { equal: sameIds })
 
     const sourcedModifiers = computed(() => sourcedModifiersOf(store, activeBuffs(), activeConsumables()))
+    const modifiers = computed(() => Object.values(sourcedModifiers()).flat())
 
     return {
       sourcedModifiers,
       /** Base stats plus every source; never stored (docs/adr/0002-player-stats-derived-from-sources.md). */
-      stats: computed(() => deriveStats(store.resources(), Object.values(sourcedModifiers()).flat())),
+      stats: computed(() => deriveStats(store.resources(), modifiers())),
+      /** Slots per tab: the `inventorySlots` stat keyed by tab, derived like `stats`. */
+      inventoryCapacity: computed(() => inventoryCapacity(modifiers())),
     }
   }),
   withComputed((store, battleStore = inject(BattleStore)) => {
@@ -324,7 +354,7 @@ export const PlayerStore = signalStore(
       const { stations, rest, installed } = installStations(store.stations(), items)
       patchState(store, (state) => ({
         stations,
-        inventory: addItems(state.inventory, store.stats().inventorySlots, rest),
+        inventory: addItems(state.inventory, store.inventoryCapacity(), rest),
       }))
       return installed
     },
@@ -333,22 +363,22 @@ export const PlayerStore = signalStore(
       patchState(store, (state) => ({ inventory: removeItems(state.inventory, items) }))
     },
 
-    /** Whether `adding` fits after `removing` is taken out first. */
+    /** Whether `adding` fits, each item in its tab, after `removing` is taken out first. */
     canFitItems(adding: ItemStack[], removing: ItemStack[] = []): boolean {
-      return canFit(store.inventory(), store.stats().inventorySlots, adding, removing)
+      return canFit(store.inventory(), store.inventoryCapacity(), adding, removing)
     },
 
-    /** Slots still to free before `adding` fits, after `removing` is taken out first. */
+    /** Slots still to free (over all tabs) before `adding` fits, after `removing` is taken out first. */
     missingSlotsFor(adding: ItemStack[], removing: ItemStack[] = []): number {
-      return missingSlots(store.inventory(), store.stats().inventorySlots, adding, removing)
+      return missingSlots(store.inventory(), store.inventoryCapacity(), adding, removing)
     },
 
     /**
-     * Whether `inventorySlots` can change by `delta` (negative shrinks) without stranding items,
+     * Whether each tab's capacity can change by `deltas` (negative shrinks) without stranding items in any tab,
      * with `adding` still fitting afterwards once `removing` is taken out.
      */
-    canChangeInventorySlots(delta: number, adding: ItemStack[] = [], removing: ItemStack[] = []): boolean {
-      const capacity = store.stats().inventorySlots + delta
+    canChangeInventorySlots(deltas: SlotDeltas, adding: ItemStack[] = [], removing: ItemStack[] = []): boolean {
+      const capacity = withSlotDeltas(store.inventoryCapacity(), deltas)
       return fitsCapacity(removeItems(store.inventory(), removing), capacity)
         && canFit(store.inventory(), capacity, adding, removing)
     },
@@ -438,7 +468,7 @@ export const PlayerStore = signalStore(
       const equipped = store.equipment()[slot]
       if (!equipped) return false
       return store.canChangeInventorySlots(
-        -equipmentInventorySlots(equipped.id),
+        slotDeltas([], gearModifiers(equipped)),
         [{ id: equipped.id, tier: equipped.tier, amount: 1 }],
       )
     },
@@ -449,9 +479,19 @@ export const PlayerStore = signalStore(
       if (slot === undefined) return false
       const slotKey = EquipmentSlot[slot] as EquipmentSlotKey
       const equipped = store.equipment()[slotKey]
-      const delta = equipmentInventorySlots(item.id) - (equipped ? equipmentInventorySlots(equipped.id) : 0)
+      const deltas = slotDeltas(gearModifiers(item), gearModifiers(equipped))
       const adding = equipped ? [{ id: equipped.id, tier: equipped.tier, amount: 1 }] : []
-      return store.canChangeInventorySlots(delta, adding, [{ id: item.id, tier: item.tier, amount: 1 }])
+      return store.canChangeInventorySlots(deltas, adding, [{ id: item.id, tier: item.tier, amount: 1 }])
+    },
+
+    /** Empty slots to free before the chest opens: in each tab, one per new stack its picks could put there (owner rule). */
+    missingChestSlots(item: InventoryItem): number {
+      const itemData = ITEM_DATA[item.id]
+      if (itemData.type !== ItemType.chest) return 0
+      const inventory = store.inventory()
+      const capacity = store.inventoryCapacity()
+      return Object.entries(chestSlotsNeeded(itemData)).reduce((sum, [tab, needed]) =>
+        sum + Math.max(0, needed - countFreeSlots(inventory[tab as InventoryTab], capacity[tab as InventoryTab])), 0)
     },
 
     /** Finished, unclaimed, and its chest's items fit in the inventory. */
@@ -494,7 +534,7 @@ export const PlayerStore = signalStore(
      */
     applyKillBatch(batch: KillBatch): KillBatchResult {
       const startLevel = store.resources().level
-      const capacity = store.stats().inventorySlots
+      const capacity = store.inventoryCapacity()
       const { stations, rest, installed } = installStations(store.stations(), batch.items)
       const inventoryBefore = store.inventory()
       const inventory = addItems(inventoryBefore, capacity, rest)
@@ -558,7 +598,7 @@ export const PlayerStore = signalStore(
     /** Sells up to `amount` from one stack at `shopId`'s price (`sellPrice`). No-op when that shop won't buy it. */
     sellItem(item: InventoryItem, shopId: ShopID, amount = 1) {
       const price = sellPrice(shopId, item.id)
-      const owned = store.inventory().find(slot => slot?.id === item.id && slot.tier === item.tier)?.amount ?? 0
+      const owned = store.inventory()[tabOf(item.id)].find(slot => slot?.id === item.id && slot.tier === item.tier)?.amount ?? 0
       const sold = Math.min(amount, owned)
       if (price <= 0 || sold <= 0) return
 
@@ -632,12 +672,10 @@ export const PlayerStore = signalStore(
       store.removeItems([{ id: item.id, tier: item.tier, amount: 1 }])
     },
 
-    /** Opens one chest: needs one empty slot per pick (the most new stacks it can give); null when there aren't enough. */
+    /** Opens one chest when `missingChestSlots` is 0; null otherwise. */
     openChest(item: InventoryItem, rng: () => number = Math.random): ChestContents | null {
       const itemData = ITEM_DATA[item.id]
-      if (itemData.type !== ItemType.chest) return null
-      const emptySlots = store.stats().inventorySlots - store.inventory().filter(Boolean).length
-      if (emptySlots < itemData.rolls) return null
+      if (itemData.type !== ItemType.chest || store.missingChestSlots(item) > 0) return null
       const contents = rollChest(itemData, rng)
       const chest = { id: item.id, tier: item.tier, amount: 1 }
 
@@ -674,7 +712,7 @@ export const PlayerStore = signalStore(
      */
     craftItem(recipeId: RecipeID, times = 1): { crafted: number, installed: ItemID[] } {
       const recipeData = RECIPES_DATA[recipeId]
-      const { maxCraftable, blockReason } = evaluateRecipe(recipeData, store.inventory(), store.stats().inventorySlots, store.stations(), store.unlockedRecipes())
+      const { maxCraftable, blockReason } = evaluateRecipe(recipeData, store.inventory(), store.inventoryCapacity(), store.stations(), store.unlockedRecipes())
       const count = Math.min(times, maxCraftable)
       if (blockReason || count < 1) return { crafted: 0, installed: [] }
 
@@ -777,7 +815,7 @@ export const PlayerStore = signalStore(
     isUnlockConditionMet(condition: UnlockCondition): boolean {
       switch (condition.type) {
         case 'hasItem':
-          return store.inventory().some(i => i?.id === condition.itemId)
+          return countItem(store.inventory(), condition.itemId) > 0
         case 'levelReached':
           return store.stats().level >= condition.level
         case 'waveReached': {
@@ -792,9 +830,9 @@ export const PlayerStore = signalStore(
   withHooks((store) => ({
     // Re-apply unlocks for existing saves silently (no notifications).
     onInit() {
-      // Raising the inventorySlots stat grows the inventory; it never shrinks here.
+      // Raising a tab's capacity grows that tab; it never shrinks here.
       effect(() => {
-        const capacity = store.stats().inventorySlots
+        const capacity = store.inventoryCapacity()
         patchState(store, (state) => ({ inventory: resizeInventory(state.inventory, capacity) }))
       })
 

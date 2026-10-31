@@ -1,8 +1,18 @@
 @let inventoryData = inventory();
 @let usableSlots = capacity();
 
+<div class="inventory-tabs" role="group" [attr.aria-label]="'app:inventory.tabsLabel' | i18next">
+  @for (entry of tabs; track entry) {
+    <button type="button" [class.active]="tab() === entry" [attr.aria-pressed]="tab() === entry" (click)="selectTab(entry)">
+      {{ ('app:inventory.tabs.' + entry) | i18next }}
+    </button>
+  }
+</div>
+
 <div class="inventory-header">
-  <span class="free-slots">{{ 'app:inventory.freeSlots' | i18next: { free: freeSlots(), total: usableSlots } }}</span>
+  @if (limited()) {
+    <span class="free-slots">{{ 'app:inventory.freeSlots' | i18next: { free: freeSlots(), total: usableSlots } }}</span>
+  }
 
   @if (pages() > 1) {
     <div class="pager">
@@ -15,18 +25,19 @@
 
 <div class="inventory">
   @for (index of slots(); track index) {
-    @if (index < usableSlots) {
+    <!-- Items kept past capacity (a migrated save) stay visible and usable until taken out. -->
+    @if (inventoryData[index]; as slotItem) {
       <app-slot>
-        @if (inventoryData[index]; as slotItem) {
-          <app-inventory-slot
-            [amount]="slotItem.amount"
-            [item]="Items[slotItem.id]"
-            [tier]="slotItem.tier"
-            (equipItem)="equipItem(slotItem)"
-            (useItem)="useItem(slotItem)"
-          />
-        }
+        <app-inventory-slot
+          [amount]="slotItem.amount"
+          [item]="Items[slotItem.id]"
+          [tier]="slotItem.tier"
+          (equipItem)="equipItem(slotItem)"
+          (useItem)="useItem(slotItem)"
+        />
       </app-slot>
+    } @else if (index < usableSlots) {
+      <app-slot />
     } @else {
       <app-slot class="locked" [attr.title]="'app:inventory.lockedSlot' | i18next" />
     }
