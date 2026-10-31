@@ -34,6 +34,7 @@
 - **Enemy drops are lost when their inventory tab is full.** This is intended; other tabs are unaffected.
 - **Unequipping, crafting and completing a quest must be blocked when the result has no inventory space**, and the UI must say why.
 - **Spending gold must be blocked when the player can't afford it**, for every gold sink: dialogue fees, shops, respec/refund.
+- **Never lower an `inventorySlots` source** (Guild Satchel, slot gear, skill nodes, base capacity in `statsInitialState`). A lower amount shrinks tabs in existing saves and can push them over capacity: items past capacity are kept, but the tab takes nothing new. If a source must drop, add a player-save migration that makes up the difference, for example by rescaling stored `permanentBonuses` (the version 1 → 2 Satchel rescale in `player.store.ts`).
 
 ## Invariants & gotchas
 - **Stats are derived, not stored.** A new stat source must be added to the `stats` computed in `PlayerStore`, not applied with `updatePlayerStats`. Removing the source (unequip, expiry, refund) removes the stat; there is nothing to mirror.
