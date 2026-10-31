@@ -138,7 +138,7 @@ describe('PlayerStore inventory tabs', () => {
       store.updateUnlockedNodes(SkillNodeID.materialsPouch, 3)
       store.updateUnlockedNodes(SkillNodeID.bottomlessPack, 1)
 
-      expect(store.inventoryCapacity()).toEqual({ ...base, gear: base.gear + 5, consumables: base.consumables + 5, materials: base.materials + 11 })
+      expect(store.inventoryCapacity()).toEqual({ ...base, gear: base.gear + 3, consumables: base.consumables + 3, materials: base.materials + 9 })
     })
 
     it('refuses refunding a slot node that would strand items, naming the tab', () => {

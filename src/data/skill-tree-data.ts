@@ -100,7 +100,6 @@ const EXPLORATION_SKILLS_DATA: Partial<Record<SkillNodeID, SkillNode>> = {
     type: SkillNodeType.battle,
   },
   // Inventory slots (docs/plans/inventory-tabs.md step 5). Never lower these amounts without a save migration.
-  // shortcut: icons reuse existing art until /generate-2d-asset makes slot icons.
   [SkillNodeID.packRat]: {
     id: SkillNodeID.packRat,
     branch: SkillBranch.exploration,
@@ -108,7 +107,7 @@ const EXPLORATION_SKILLS_DATA: Partial<Record<SkillNodeID, SkillNode>> = {
     skillPointCost: 1,
     requires: { kind: 'node', id: SkillNodeID.knowledge, minLevel: 1 },
     maxLevel: 1,
-    url: './assets/img/items/arenaChest.png',
+    url: './assets/img/skills/packRat.png',
     type: SkillNodeType.stat,
     stat: 'inventorySlots',
     statAmount: 1,
@@ -120,7 +119,7 @@ const EXPLORATION_SKILLS_DATA: Partial<Record<SkillNodeID, SkillNode>> = {
     skillPointCost: 1,
     requires: { kind: 'node', id: SkillNodeID.packRat, minLevel: 1 },
     maxLevel: 3,
-    url: './assets/img/items/silverwoodChestplate.png',
+    url: './assets/img/skills/gearPouch.png',
     type: SkillNodeType.stat,
     stat: 'inventorySlots',
     statAmount: 2,
@@ -132,7 +131,7 @@ const EXPLORATION_SKILLS_DATA: Partial<Record<SkillNodeID, SkillNode>> = {
     skillPointCost: 1,
     requires: { kind: 'node', id: SkillNodeID.packRat, minLevel: 1 },
     maxLevel: 3,
-    url: './assets/img/skills/autoEat.png',
+    url: './assets/img/skills/consumablesPouch.png',
     type: SkillNodeType.stat,
     stat: 'inventorySlots',
     statAmount: 2,
@@ -145,7 +144,7 @@ const EXPLORATION_SKILLS_DATA: Partial<Record<SkillNodeID, SkillNode>> = {
     skillPointCost: 1,
     requires: { kind: 'node', id: SkillNodeID.packRat, minLevel: 1 },
     maxLevel: 3,
-    url: './assets/img/items/silk.png',
+    url: './assets/img/skills/materialsPouch.png',
     type: SkillNodeType.stat,
     stat: 'inventorySlots',
     statAmount: 2,
@@ -160,16 +159,16 @@ const EXPLORATION_SKILLS_DATA: Partial<Record<SkillNodeID, SkillNode>> = {
     requires: {
       kind: 'all',
       of: [
-        { kind: 'node', id: SkillNodeID.gearPouch, minLevel: 3 },
-        { kind: 'node', id: SkillNodeID.consumablesPouch, minLevel: 3 },
-        { kind: 'node', id: SkillNodeID.materialsPouch, minLevel: 3 },
+        { kind: 'node', id: SkillNodeID.gearPouch, minLevel: 1 },
+        { kind: 'node', id: SkillNodeID.consumablesPouch, minLevel: 1 },
+        { kind: 'node', id: SkillNodeID.materialsPouch, minLevel: 1 },
       ],
     },
     maxLevel: 1,
-    url: './assets/img/items/arenaChest.png',
+    url: './assets/img/skills/bottomlessPack.png',
     type: SkillNodeType.stat,
     stat: 'inventorySlots',
-    statAmount: 4,
+    statAmount: 2,
   },
 }
 

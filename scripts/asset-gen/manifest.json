@@ -940,6 +940,20 @@
     "seed": 2034600005,
     "date": "2026-10-21"
   },
+  "src/assets/img/skills/bottomlessPack.png": {
+    "family": "skill-icon",
+    "tier": null,
+    "subject": "a single open leather backpack seen from above, its open mouth showing a deep swirling purple starry void spiralling down endlessly",
+    "seed": 2116446245,
+    "date": "2026-10-31"
+  },
+  "src/assets/img/skills/consumablesPouch.png": {
+    "family": "skill-icon",
+    "tier": null,
+    "subject": "a round leather drawstring pouch, with two small red and blue potion bottles and a loaf of bread sticking out of its open top",
+    "seed": 424242,
+    "date": "2026-10-31"
+  },
   "src/assets/img/skills/earthMastery.png": {
     "family": "skill-icon",
     "tier": null,
@@ -961,12 +975,33 @@
     "seed": 155735757,
     "date": "2026-10-25"
   },
+  "src/assets/img/skills/gearPouch.png": {
+    "family": "skill-icon",
+    "tier": null,
+    "subject": "a red cloth drawstring pouch open at the top, with a sword hilt and a steel armoured gauntlet sticking out of it",
+    "seed": 424243,
+    "date": "2026-10-31"
+  },
+  "src/assets/img/skills/materialsPouch.png": {
+    "family": "skill-icon",
+    "tier": null,
+    "subject": "a round leather drawstring pouch, with a rolled bolt of cloth, a chunk of iron ore and a bundle of green herbs sticking out of its open top",
+    "seed": 424242,
+    "date": "2026-10-31"
+  },
   "src/assets/img/skills/origin.png": {
     "family": "skill-icon",
     "tier": null,
     "subject": "a bright cosmic starburst in deep space: a glowing white-gold star core with radiating light rays, surrounded by a swirling purple and blue nebula and tiny scattered stars, the origin of everything",
     "seed": 1941022359,
     "date": "2026-10-21"
+  },
+  "src/assets/img/skills/packRat.png": {
+    "family": "skill-icon",
+    "tier": null,
+    "subject": "a single small brown rat peeking out of the open top of a small leather backpack, its paws resting on the backpack's rim",
+    "seed": 1782365061,
+    "date": "2026-10-31"
   },
   "src/assets/img/skills/stoneSpike.png": {
     "family": "skill-icon",
