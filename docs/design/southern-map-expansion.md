@@ -1,9 +1,11 @@
 # Southern map expansion
 
-Design for growing the world map south. Everything here is **(proposed)** unless it is marked *owner decision* or cites shipped text. Nothing is built.
+Design for growing the world map south. Everything here is **(proposed)** unless it is marked *owner decision* or cites shipped text. The map art is built (2026-10-31); the Towns and Zones in it are not.
+
+**Art landed (owner decision 2026-10-31):** the whole map was redrawn in one style (ChatGPT, from the old map and this doc, upscaled 2× with the NMKD model) at **3072×2048**, north and south together, so every old position moved. `src/data/world-map-data.ts` holds the new marker positions; §4 lists the points of interest on the new art. The art draws the Towns already, which replaces decision 10. The bottom-edge table (§1) and the routes' coordinates (§3) are the 2794-wide plan the art was briefed from.
 
 Owner decisions this doc is built on (2026-10-30):
-1. The map grows south, below the current 752 px, to **2794×1504**.
+1. The map grows south, below the current 752 px, to **2794×1504** (superseded: the art is 3072×2048, above).
 2. The west of the new southern band holds a mountain range, **the Ironspine**, and the capital **Lirold** sits there, **inland** (not on the water), with the range rising behind it.
 3. Lirold is connected to **the mine**, which lies under the Ironspine, by an ordinary road (the mine road). No tunnel.
 4. Only **one new Town** in the south besides Lirold and Slatefall: **Brinewick**. Other Town ideas are parked in §5.
@@ -12,14 +14,14 @@ Owner decisions this doc is built on (2026-10-30):
 7. The Blackwater Fens are where the black sap drains (T-08/T-27), as a hint that never confirms a cause.
 8. Zone tiers continue 10–14 through the south (§4).
 9. The delta river is drawn on the map but links no Zones yet.
-10. Terrain is painted first; each Town is painted in once it is built.
+10. Terrain is painted first; each Town is painted in once it is built (superseded 2026-10-31: the redrawn art shows the Towns).
 
 Companion docs: `docs/ideas/north-lirold-and-exploration-guild.md` §3a (first placement brief, canvas ~1100), `docs/ideas/slatefall-and-the-deeper-mines.md`, `docs/ideas/lirold-arena-master.md`, `docs/lore/world.md`.
 
 ## 1. Summary and canvas
 
-- **New canvas: 2794×1504.** The bottom is extended by exactly one current height (752 px). Width, and every existing marker, stays where it is. Fits three 1344-wide art strips (§6).
-- After the art lands: `WORLD_MAP_DATA.manifest.height` → 1504, `npm run tile`, and `defaultView.center` may move down.
+- **Canvas: 3072×2048** (see Art landed above). The plan was 2794×1504 with every existing marker kept; the redraw moved them.
+- Done: `WORLD_MAP_DATA.manifest` is 3072×2048, tiles regenerated, markers moved, Lirold has a marker.
 - **Shape of the south:** the Mountain Pass range sends a southern arm, the Ironspine, down and west toward the sea. Lirold stands inland at its western foot, on the small river, with the coast a day's ride west. The mine runs under the arm. East of the arm, a wide gulf (the Saltmere) opens to a southern sea. East of the gulf, the Elderreach delta spreads into fens, and a forested rise stands in the far south-east.
 
 ### The current bottom edge (y = 752), west → east
@@ -97,23 +99,23 @@ Read off `src/assets/img/world/source.png`; the x ranges are approximate, so che
 
 ## 4. Points of interest
 
-Positions are on the 2794×1504 canvas (x right, y down). All are **(proposed)** except where noted.
+Positions are on the drawn 3072×2048 map (x right, y down). All are **(proposed)** except where noted.
 
 | # | Name | Position | Hook | Possible game use | Status |
 |---|---|---|---|---|---|
-| 1 | Lirold | (470, 930) | The inland capital on its river, castle on a spur of the Ironspine. | Town (exists in data; marker moves here from the commented-out (730, 110)) | Town shipped (Arena); inland owner decision; position proposed (§3a) |
-| 2 | South Fields | (560, 1090) | The turnip fields where trappers dug up the Burrower, and something still digs. | Guild contract area or event, outside the tier ladder | proposed (field is shipped: `liroldArenaMaster.json`) |
-| 3 | Slatefall | (1180, 840) | Miners' village on the mine road; the mine has been shut two winters. | Town | proposed (`slatefall-and-the-deeper-mines.md`) |
-| 4 | Deeper Mines / Lower Shafts | (1230, 780) | The castle's mine under the Ironspine; the stairs lie below. | Zones, tiers 8–9 | proposed (same doc) |
-| 5 | Stormwatch Light | (260, 1340) | A lighthouse on the range's last cliff whose keeper logs storms that come from nowhere. | Event or small Building (weather hook for T-03, T-28) | proposed |
-| 6 | Lantern Pass | (900, 1180) | The only road over the Ironspine, lamp-posted against fog, goats and trolls. | Zone (tier 10) | proposed |
-| 7 | The Hollow Door | (980, 1300) | A half-buried cut-stone doorway on the range's south face, marked like the Warden. | Sealed dungeon; hint at the stairs' far end (T-25) | proposed |
-| 8 | Brinewick | (1460, 1090) | Salt pans and ferries on the Saltmere's west shore; the south's hub. | Town (ferries, smith, salt trade) | proposed |
-| 9 | Wreck Bar | (1760, 1420) | Sandbars at the gulf mouth where ships break; scavengers and crabs fight over them. | Zone (tier 11) | proposed |
-| 10 | The Drowned Steps | (1720, 1160) | An island whose stone stairs go straight down into the water. | Dungeon Zone (tier 12), water-themed | proposed |
-| 11 | Trappers' Landing | (2150, 880) | The jetty where Elderwood beasts are crated for the Arena. | Building or event (Arena stock, T-28) | proposed |
-| 12 | Blackwater Fens | (2330, 1060) | Where the river's black sap settles and the reeds die. | Zone (tier 13) | proposed |
-| 13 | Sunken Barrows | (2520, 1180) | Grassy mounds sinking into the bog, and the dead who climb out of them. | Dungeon Zone (tier 14) | proposed |
+| 1 | Lirold | (600, 1180) | The inland capital on its river, castle on a spur of the Ironspine. | Town (exists in data; map marker added) | Town shipped (Arena); inland owner decision; position on the art |
+| 2 | South Fields | (560, 1380) | The turnip fields where trappers dug up the Burrower, and something still digs. | Guild contract area or event, outside the tier ladder | proposed (field is shipped: `liroldArenaMaster.json`) |
+| 3 | Slatefall | (1280, 1130) | Miners' village on the mine road; the mine has been shut two winters. | Town | proposed (`slatefall-and-the-deeper-mines.md`) |
+| 4 | Deeper Mines / Lower Shafts | (1330, 1050) | The castle's mine under the Ironspine; the stairs lie below. | Zones, tiers 8–9 | proposed (same doc) |
+| 5 | Stormwatch Light | (170, 1670) | A lighthouse on the range's last cliff whose keeper logs storms that come from nowhere. | Event or small Building (weather hook for T-03, T-28) | proposed |
+| 6 | Lantern Pass | (980, 1480) | The only road over the Ironspine, lamp-posted against fog, goats and trolls. | Zone (tier 10) | proposed |
+| 7 | The Hollow Door | (1050, 1700) | A half-buried cut-stone doorway on the range's south face, marked like the Warden. | Sealed dungeon; hint at the stairs' far end (T-25) | proposed |
+| 8 | Brinewick | (1640, 1450) | Salt pans and ferries on the Saltmere's west shore; the south's hub. | Town (ferries, smith, salt trade) | proposed |
+| 9 | Wreck Bar | (2000, 1870) | Sandbars at the gulf mouth where ships break; scavengers and crabs fight over them. | Zone (tier 11) | proposed |
+| 10 | The Drowned Steps | (1920, 1540) | An island whose stone stairs go straight down into the water. | Dungeon Zone (tier 12), water-themed | proposed |
+| 11 | Trappers' Landing | (2220, 1160) | The jetty where Elderwood beasts are crated for the Arena. | Building or event (Arena stock, T-28) | proposed |
+| 12 | Blackwater Fens | (2520, 1540) | Where the river's black sap settles and the reeds die. | Zone (tier 13) | proposed |
+| 13 | Sunken Barrows | (2860, 1640) | Grassy mounds sinking into the bog, and the dead who climb out of them. | Dungeon Zone (tier 14) | proposed |
 
 **Progression (owner decision 8):** Lower Shafts (9) → Lantern Pass (10) → Brinewick → Wreck Bar (11) → Drowned Steps (12) → Trappers' Landing → Blackwater Fens (13) → Sunken Barrows (14). The South Fields and Stormwatch Light are side content off the main line.
 
@@ -134,7 +136,9 @@ Dropped from the map for now (owner decision 4). Their positions stay free in th
 
 ## 7. Art brief (map-painterly subjects)
 
-The new band is y 752–1504. Paint it as three 1344-wide strips that overlap for blending: **West** x 0–1344, **Centre** x 725–2069, **East** x 1450–2794. Give each strip a slight overlap with the existing art at its top edge so the seam can be blended, and match §1's bottom-edge table. Terrain only: settlements are left as clear ground and placed later.
+Done differently: the art was redrawn whole (see Art landed at the top). This brief stays as the reference for extending the map later with `map-window.mjs`.
+
+The new band is y 752–1504. It is painted in 672×376 windows (`docs/systems/asset-pipeline.md` § World-map pieces), row by row from the existing edge down, each overlapping the drawn map by 100+ px; mountain ranges get a peaks-scribble region. The three areas below are the subjects for the windows inside them: **West** x 0–1344, **Centre** x 725–2069, **East** x 1450–2794. Match §1's bottom-edge table. Terrain only: settlements are left as clear ground and placed later.
 
 - **West (x 0–1344):** Seen from above, a narrow strip of sea and rocky coast along the left edge; a small river flowing down from the top edge and winding right, away from the coast, through green fields, with a dirt road beside it; a flat rocky spur left clear on the river's right bank in the upper centre, with patchwork farm fields south of it; a large grey mountain range coming down from the top edge across the centre and right and sweeping toward the lower left, ending in tall sea cliffs in the bottom-left corner; a winding pass crossing the range in the lower centre; a terraced mountainside with spoil heaps and a quarry cut near the top right; green foothills along the bottom right with a river running toward the right edge.
 - **Centre (x 725–2069):** Seen from above, the eastern slopes of a grey mountain range on the left coming down from the top edge; a narrow water inlet at the top centre widening into a broad calm gulf that fills the centre and right and opens to the sea along the bottom; white salt pans and pale beaches along the gulf's left shore; a small rocky island in the middle of the gulf with stone steps going down into the water; long sandbars with broken ship hulls near the bottom; reed marsh along the right shore.

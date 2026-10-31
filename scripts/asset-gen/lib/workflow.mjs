@@ -2,6 +2,7 @@
 //
 // checkpoint -> Hyper-SDXL 8-step LoRA -> [IP-Adapter style transfer from reference images] -> sampler -> decode -> save
 // `useRef: false` (or an empty reference list) drops the IP-Adapter branch entirely.
+// A source with a mask is an inpaint: DifferentialDiffusion + filled hole + Fooocus inpaint patch (map windows).
 
 export const LORA_NAME = 'Hyper-SDXL-8steps-CFG-lora.safetensors'
 export const IPADAPTER_NAME = 'ip-adapter_sdxl_vit-h.safetensors'
@@ -10,8 +11,14 @@ export const CONTROLNET_NAME = 'xinsir-controlnet-union-sdxl-1.0-promax.safetens
 export const SCRIBBLE_TYPE = 'hed/pidi/scribble/ted'
 export const LINEART_TYPE = 'canny/lineart/anime_lineart/mlsd'
 export const LAYER_CONFIG = 'SDXL, Attention Injection'
+export const FOOOCUS_HEAD = 'fooocus_inpaint_head.pth'
+export const FOOOCUS_PATCH = 'inpaint_v26.fooocus.patch'
 /** How far img2img repaints a frozen source: lower keeps its shapes, above ~0.6 the model starts redrawing anatomy. */
 export const SOURCE_DENOISE = 0.45
+/** A blockout in the hole is kept as layout and colour at this denoise; at 1 it is noise and ignored. */
+export const BLOCKOUT_DENOISE = 0.75
+/** Denoise for a source job: its own, else the blockout, inpaint (1) or repaint default. */
+export const sourceDenoise = ({ denoise, mask, blockout }) => denoise ?? (blockout ? BLOCKOUT_DENOISE : mask ? 1 : SOURCE_DENOISE)
 /**
  * IP-Adapter defaults. 'style transfer' injects the references into the SDXL style block only; 'style transfer
  * precise' and 'strong style transfer' are the other style-only modes. 'average' blends all references into one
@@ -33,11 +40,16 @@ const DEFAULT_SAMPLER = { steps: 8, cfg: 5.5, sampler_name: 'euler', scheduler: 
  * @param {boolean} [p.useRef]
  * @param {{base64: string, strength?: number, end?: number, type?: string}} [p.control] union ControlNet image that
  *        fixes the layout, e.g. limb count (scribble by default, `type` picks another mode); `end` is the fraction of sampling it applies to
- * @param {{base64: string, denoise?: number}} [p.source] frozen image repainted in the family's style (img2img) instead
- *        of sampling from noise; the image must already be the family's gen size
+ * @param {{base64: string, denoise?: number, mask?: string, blockout?: boolean}} [p.source] frozen image repainted in the family's style (img2img) instead
+ *        of sampling from noise; the image must already be the family's gen size. `mask` (base64, same size, white =
+ *        repaint, black = keep, grey = partly) turns it into an inpaint. `blockout`: the hole already holds a
+ *        blockout to repaint (denoise BLOCKOUT_DENOISE by default, must stay below 1), so it is not filled from the surroundings
+ * @param {{mask: string, prompt: string, control?: {base64: string, strength?: number, end?: number, type?: string}}[]} [p.regions]
+ *        regional prompts: inside each mask (base64, white = region) the subject is `prompt` and its own ControlNet
+ *        image applies there only, e.g. a mountain range drawn as peaks scribble while the rest stays grassland
  * @param {string} [p.prefix]     SaveImage filename prefix
  */
-export function buildGraph({ family, subject, seed, refsBase64 = [], count = 1, useRef = true, control, source, prefix = 'asset-gen' }) {
+export function buildGraph({ family, subject, seed, refsBase64 = [], count = 1, useRef = true, control, source, regions = [], prefix = 'asset-gen' }) {
     const sampler = { ...DEFAULT_SAMPLER, ...family.sampler }
     const withRefs = useRef && refsBase64.length > 0
 
@@ -71,6 +83,11 @@ export function buildGraph({ family, subject, seed, refsBase64 = [], count = 1, 
         }
         modelRef = ['layer', 0]
     }
+    if (source?.mask) {
+        // grey mask values become per-pixel denoise strength, so the mask ramp blends into the kept map instead of a hard cut
+        graph.differentialDiffusion = { class_type: 'DifferentialDiffusion', inputs: { model: modelRef } }
+        modelRef = ['differentialDiffusion', 0]
+    }
     if (withRefs) {
         let batchRef = ['ref0', 0]
         refsBase64.forEach((image, i) => {
@@ -99,27 +116,60 @@ export function buildGraph({ family, subject, seed, refsBase64 = [], count = 1, 
         modelRef = ['ipadapter', 0]
     }
 
-    let positiveRef = ['positive', 0]
-    let negativeRef = ['negative', 0]
-    if (control) {
-        graph.controlImage = { class_type: 'ETN_LoadImageBase64', inputs: { image: control.base64 } }
-        graph.controlLoader = { class_type: 'ControlNetLoader', inputs: { control_net_name: CONTROLNET_NAME } }
-        graph.controlType = { class_type: 'SetUnionControlNetType', inputs: { control_net: ['controlLoader', 0], type: control.type ?? SCRIBBLE_TYPE } }
-        graph.controlApply = {
+    /** Adds `<key>Image`, `<key>Type` and `<key>Apply` nodes (one shared loader) and returns the controlled [positive, negative]. */
+    const applyControl = (key, ctl, positive, negative) => {
+        graph[`${key}Image`] = { class_type: 'ETN_LoadImageBase64', inputs: { image: ctl.base64 } }
+        graph.controlLoader ??= { class_type: 'ControlNetLoader', inputs: { control_net_name: CONTROLNET_NAME } }
+        graph[`${key}Type`] = { class_type: 'SetUnionControlNetType', inputs: { control_net: ['controlLoader', 0], type: ctl.type ?? SCRIBBLE_TYPE } }
+        graph[`${key}Apply`] = {
             class_type: 'ControlNetApplyAdvanced',
             inputs: {
-                positive: positiveRef,
-                negative: negativeRef,
-                control_net: ['controlType', 0],
-                image: ['controlImage', 0],
+                positive,
+                negative,
+                control_net: [`${key}Type`, 0],
+                image: [`${key}Image`, 0],
                 vae: ['checkpoint', 2],
-                strength: control.strength ?? 0.5,
+                strength: ctl.strength ?? 0.5,
                 start_percent: 0,
-                end_percent: control.end ?? 0.5,
+                end_percent: ctl.end ?? 0.5,
             },
         }
-        positiveRef = ['controlApply', 0]
-        negativeRef = ['controlApply', 1]
+        return [[`${key}Apply`, 0], [`${key}Apply`, 1]]
+    }
+
+    let positiveRef = ['positive', 0]
+    let negativeRef = ['negative', 0]
+    if (control) [positiveRef, negativeRef] = applyControl('control', control, positiveRef, negativeRef)
+    if (regions.length) {
+        // each region's conditioning applies inside its mask, the main subject everywhere else (regions must not overlap)
+        const parts = regions.map((region, i) => {
+            graph[`region${i}MaskImage`] = { class_type: 'ETN_LoadImageBase64', inputs: { image: region.mask } }
+            graph[`region${i}Mask`] = { class_type: 'ImageToMask', inputs: { image: [`region${i}MaskImage`, 0], channel: 'red' } }
+            graph[`region${i}Prompt`] = { class_type: 'CLIPTextEncode', inputs: { text: `${region.prompt}, ${family.stylePrompt}`, clip: graph.positive.inputs.clip } }
+            const conds = region.control
+                ? applyControl(`region${i}Control`, region.control, [`region${i}Prompt`, 0], negativeRef)
+                : [[`region${i}Prompt`, 0], negativeRef]
+            return { conds, mask: [`region${i}Mask`, 0] }
+        })
+        let unionRef = parts[0].mask
+        parts.slice(1).forEach(({ mask }, i) => {
+            graph[`regionUnion${i + 1}`] = { class_type: 'MaskComposite', inputs: { destination: unionRef, source: mask, x: 0, y: 0, operation: 'add' } }
+            unionRef = [`regionUnion${i + 1}`, 0]
+        })
+        graph.regionRest = { class_type: 'InvertMask', inputs: { mask: unionRef } }
+        const masked = (key, conditioning, mask) => {
+            graph[key] = { class_type: 'ConditioningSetMask', inputs: { conditioning, mask, strength: 1, set_cond_area: 'default' } }
+            return [key, 0]
+        }
+        ;[positiveRef, negativeRef] = ['Positive', 'Negative'].map((side, s) => {
+            let combined = masked(`rest${side}`, s ? negativeRef : positiveRef, ['regionRest', 0])
+            parts.forEach(({ conds, mask }, i) => {
+                const part = masked(`region${i}${side}`, conds[s], mask)
+                graph[`combine${i}${side}`] = { class_type: 'ConditioningCombine', inputs: { conditioning_1: combined, conditioning_2: part } }
+                combined = [`combine${i}${side}`, 0]
+            })
+            return combined
+        })
     }
 
     graph.sampler = {
@@ -139,15 +189,39 @@ export function buildGraph({ family, subject, seed, refsBase64 = [], count = 1, 
     }
     if (source) {
         graph.sourceImage = { class_type: 'ETN_LoadImageBase64', inputs: { image: source.base64 } }
-        graph.sourceLatent = { class_type: 'VAEEncode', inputs: { pixels: ['sourceImage', 0], vae: ['checkpoint', 2] } }
-        let latentRef = ['sourceLatent', 0]
+        let latentRef
+        if (source.mask) {
+            // Inpaint the way Krita AI Diffusion does: the hole is filled from its surroundings (Navier-Stokes, then
+            // blurred) so no placeholder colour or edge reaches the latent, and the Fooocus inpaint patch makes the model
+            // continue the kept context instead of drawing a new picture over it.
+            graph.maskImage = { class_type: 'ETN_LoadImageBase64', inputs: { image: source.mask } }
+            graph.mask = { class_type: 'ImageToMask', inputs: { image: ['maskImage', 0], channel: 'red' } }
+            let pixelsRef = ['sourceImage', 0]
+            if (!source.blockout) {
+                graph.holeMask = { class_type: 'ThresholdMask', inputs: { mask: ['mask', 0], value: 0.5 } }
+                graph.holeFill = { class_type: 'INPAINT_MaskedFill', inputs: { image: pixelsRef, mask: ['holeMask', 0], fill: 'navier-stokes', falloff: 0 } }
+                graph.holeBlur = { class_type: 'INPAINT_MaskedBlur', inputs: { image: ['holeFill', 0], mask: ['holeMask', 0], blur: 65, falloff: 0 } }
+                pixelsRef = ['holeBlur', 0]
+            }
+            graph.inpaintEncode = {
+                class_type: 'INPAINT_VAEEncodeInpaintConditioning',
+                inputs: { positive: positiveRef, negative: negativeRef, vae: ['checkpoint', 2], pixels: pixelsRef, mask: ['mask', 0] },
+            }
+            graph.inpaintPatch = { class_type: 'INPAINT_LoadFooocusInpaint', inputs: { head: FOOOCUS_HEAD, patch: FOOOCUS_PATCH } }
+            graph.inpaintModel = { class_type: 'INPAINT_ApplyFooocusInpaint', inputs: { model: modelRef, patch: ['inpaintPatch', 0], latent: ['inpaintEncode', 2] } }
+            Object.assign(graph.sampler.inputs, { model: ['inpaintModel', 0], positive: ['inpaintEncode', 0], negative: ['inpaintEncode', 1] })
+            latentRef = ['inpaintEncode', 3]
+        } else {
+            graph.sourceLatent = { class_type: 'VAEEncode', inputs: { pixels: ['sourceImage', 0], vae: ['checkpoint', 2] } }
+            latentRef = ['sourceLatent', 0]
+        }
         if (count > 1) {
             // each candidate repaints the same source with its own noise
             graph.sourceBatch = { class_type: 'RepeatLatentBatch', inputs: { samples: latentRef, amount: count } }
             latentRef = ['sourceBatch', 0]
         }
         graph.sampler.inputs.latent_image = latentRef
-        graph.sampler.inputs.denoise = source.denoise ?? SOURCE_DENOISE
+        graph.sampler.inputs.denoise = sourceDenoise(source)
         delete graph.latent
     }
     graph.decode = { class_type: 'VAEDecode', inputs: { samples: ['sampler', 0], vae: ['checkpoint', 2] } }

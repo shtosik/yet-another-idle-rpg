@@ -8,7 +8,7 @@ import { FAMILIES, REPO_ROOT } from '../styles.mjs'
 
 /**
  * Validates a parsed jobs file and returns normalised jobs. Throws one error listing every problem.
- * Accepted job fields: family, target, subject (required); count, seed, tier, tag, control, weapon (drawn into the control at its hand anchor), source (repo path of a frozen image that SDXL repaints instead of starting from noise) with denoise (0-1) and "layer": false (enemy-pixel uses LayerDiffuse by default; a repaint is matted instead), noRef, refs (repo paths replacing the family references), ipWeight, ipWeightType and ipCombine (IP-Adapter mode), style (replaces the family style prompt), negative (added to the family negative prompt), controlStrength, controlEnd, layer (LayerDiffuse transparent generation), lora (false = no Hyper-SDXL LoRA), erode and fillHoles (cutout cleanup: trim a pale halo, fill see-through body patches), steps, cfg, sampler (optional).
+ * Accepted job fields: family, target, subject (required); count, seed, tier, tag, control, weapon (drawn into the control at its hand anchor), source (repo path of a frozen image that SDXL repaints instead of starting from noise) with denoise (0-1), mask (repo path; white = repaint, black = keep: an inpaint) with regions ([{mask, prompt, control?, controlType?: "lineart", controlStrength?, controlEnd?}], repo paths at gen size: a regional prompt and ControlNet inside each mask) and blockout (true: the hole holds a blockout to repaint, not filled; denoise 0.75 by default, must stay below 1) and "layer": false (enemy-pixel uses LayerDiffuse by default; a repaint is matted instead), noRef, refs (repo paths replacing the family references), ipWeight, ipWeightType and ipCombine (IP-Adapter mode), style (replaces the family style prompt), negative (added to the family negative prompt), controlStrength, controlEnd, layer (LayerDiffuse transparent generation), lora (false = no Hyper-SDXL LoRA), erode and fillHoles (cutout cleanup: trim a pale halo, fill see-through body patches), steps, cfg, sampler (optional).
  */
 export function parseJobs(json) {
     if (!Array.isArray(json) || json.length === 0) throw new Error('Batch file must be a non-empty JSON array of jobs')
@@ -25,6 +25,19 @@ export function parseJobs(json) {
         if (job?.weapon && CONTROLS[job.control] && !controlMeta(job.control).hand) problems.push(`job ${i}: weapon needs a control with a hand anchor ("${job.control ?? ''}" has none)`)
         if (job?.source && !existsSync(resolve(REPO_ROOT, job.source))) problems.push(`job ${i}: source image not found "${job.source}"`)
         if (job?.source && (job.layer ?? FAMILIES[job.family]?.layer)) problems.push(`job ${i}: "source" needs "layer": false (LayerDiffuse with a source image is untested)`)
+        if (job?.mask && !job.source) problems.push(`job ${i}: "mask" needs "source"`)
+        if (job?.mask && !existsSync(resolve(REPO_ROOT, job.mask))) problems.push(`job ${i}: mask image not found "${job.mask}"`)
+        if (job?.blockout && !job.mask) problems.push(`job ${i}: "blockout" needs "source" and "mask"`)
+        if (job?.blockout && job.denoise >= 1) problems.push(`job ${i}: "blockout" needs denoise below 1 (default 0.75)`)
+        if (job?.regions !== undefined && !job.mask) problems.push(`job ${i}: "regions" need "source" and "mask"`)
+        if (job?.regions !== undefined && !Array.isArray(job.regions)) problems.push(`job ${i}: "regions" must be an array`)
+        for (const [r, region] of (Array.isArray(job?.regions) ? job.regions : []).entries()) {
+            if (typeof region?.prompt !== 'string' || !region.prompt) problems.push(`job ${i}: region ${r} needs a "prompt"`)
+            if (!region?.mask) problems.push(`job ${i}: region ${r} needs a "mask"`)
+            for (const key of ['mask', 'control']) {
+                if (region?.[key] && !existsSync(resolve(REPO_ROOT, region[key]))) problems.push(`job ${i}: region ${r} ${key} image not found "${region[key]}"`)
+            }
+        }
         if (job?.denoise !== undefined && !(job.denoise > 0 && job.denoise <= 1)) problems.push(`job ${i}: denoise must be in (0, 1]`)
         if (job?.family && job?.target) {
             const slug = slugFor(job.family, job.target, job.tag)
@@ -52,7 +65,7 @@ export async function runBatch({ comfy, jobs, generate, nextSeed = () => Math.fl
                 await comfy.assertCheckpoint(checkpoint)
                 checked.add(checkpoint)
             }
-            results.push(await generate({ comfy, familyId: job.family, target: job.target, subject: job.subject, seed: job.seed ?? nextSeed(), count: job.count, useRef: !job.noRef, tag: job.tag, tier: job.tier, control: job.control, weapon: job.weapon, source: job.source, overrides: { denoise: job.denoise, refs: job.refs, ipWeight: job.ipWeight, ipWeightType: job.ipWeightType, ipCombine: job.ipCombine, stylePrompt: job.style, negative: job.negative, layer: job.layer, lora: job.lora, erode: job.erode, fillHoles: job.fillHoles, steps: job.steps, cfg: job.cfg, sampler: job.sampler, controlStrength: job.controlStrength, controlEnd: job.controlEnd } }))
+            results.push(await generate({ comfy, familyId: job.family, target: job.target, subject: job.subject, seed: job.seed ?? nextSeed(), count: job.count, useRef: !job.noRef, tag: job.tag, tier: job.tier, control: job.control, weapon: job.weapon, source: job.source, mask: job.mask, regions: job.regions, blockout: job.blockout, overrides: { denoise: job.denoise, refs: job.refs, ipWeight: job.ipWeight, ipWeightType: job.ipWeightType, ipCombine: job.ipCombine, stylePrompt: job.style, negative: job.negative, layer: job.layer, lora: job.lora, erode: job.erode, fillHoles: job.fillHoles, steps: job.steps, cfg: job.cfg, sampler: job.sampler, controlStrength: job.controlStrength, controlEnd: job.controlEnd } }))
         } catch (err) {
             failures.push({ index, target: job.target, error: err.message })
         }

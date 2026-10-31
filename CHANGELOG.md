@@ -6,6 +6,7 @@ Versions follow [Semantic Versioning](https://semver.org/). Each note is `- [typ
 New notes go under `[Unreleased]`; `npm run release -- <major|minor|patch>` moves them into a version (docs/deployment.md).
 
 ## [Unreleased]
+- [feature] The world map is redrawn and now reaches south, with Lirold's castle under the Ironspine mountains, the Saltmere gulf and the Blackwater Fens. Lirold and the Trader's Basement have their own map markers.
 - [feature] Recipes, spell scrolls and pets can now be sold, so duplicates no longer take up a slot for good.
 - [feature] Every arena clear also gives an Arena Chest: right-click it in your inventory for four rewards: gold, Elderwood and Canopy materials, runes, mana potions, the Gladiator's Helm recipe (a new workbench helmet), and rarely the War Cry spell scroll (+25% melee damage for 15 s) or Patron's Gloves (+10% gold and XP), or one of the four champions' pets. Opening needs 4 empty inventory slots.
 - [feature] The Arena takes a new challenger 30 minutes after their last entry.
