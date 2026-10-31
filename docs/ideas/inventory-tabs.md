@@ -10,18 +10,19 @@ Owner rejected a separate Pet Stable: equipping some items from the inventory an
 
 Each tab has its own slot count. Tabs that only filter one shared grid don't solve filling.
 
-| Tab | Holds (by `ItemType` / slot) | Start capacity (first guess) |
+| Tab | Holds (by `ItemType` / slot) | Start capacity |
 |---|---|---|
-| Gear | `equipment` except `slot: pet` | 30 |
+| Gear | `equipment` except `slot: pet` | 20 |
 | Consumables | `food`, `potion`, `recipe`, `spellScroll`, `book`, `rewardsStats`, `chest` | 20 |
-| Materials | `resource` | 40 |
+| Materials | `resource` | 20 |
 | Pets | `equipment` with `slot: pet` | one per pet species (never fills) |
 | Quest | `quest` | unlimited |
 
 - No "All" view.
 - `stationUpgrade` still never enters the inventory (installed on pickup).
-- Guild Satchel: +5 Materials (or pick the tab it grows; decide when wiring).
-- Start capacities need a check with `npm run sim` for when each tab fills.
+- Capacity is one `inventorySlots` stat keyed by tab, not a stat per tab.
+- Guild Satchel: +2 slots to Gear, Consumables and Materials each; Guild store stock 1.
+- Implementation steps: `docs/plans/inventory-tabs.md`.
 
 ### Owner rules, now per tab
 - Drops are lost when **their** tab is full (intended). Other tabs are unaffected.
@@ -33,11 +34,9 @@ Each tab has its own slot count. Tabs that only filter one shared grid don't sol
 
 ## 2. Inventory slots in the skill tree
 
-One path: a hub node branches to **5 tab nodes** (+N slots each for Gear, Consumables, Materials, Pets*, Quest*), which converge on a **capstone** that gives +N slots to all tabs.
+One path: a hub node branches to **3 tab nodes** (+N slots each for Gear, Consumables, Materials), which converge on a **capstone** that gives +N slots to all three. No nodes for Pets or Quest, since those tabs never fill.
 
-\* Pets and Quest never fill, so their nodes are wasted as written. Options: make the branch 3 tab nodes (Gear, Consumables, Materials), or give the Pets/Quest nodes another effect. Decide when placing nodes.
-
-**Respec guard (critical).** Respec and node refunds must be blocked when removing the slots would strand items. A guard already exists for the single stat: `PlayerStore.canChangeInventorySlots` (`player.store.ts:350` on staging), used by `skill-tree.service.ts:65` (single refund) and `:129-145` (full respec). It must become per tab: shrinking any tab below its used slots blocks the refund, and the block reason names the tab. The capstone shrinks all tabs at once, so its refund checks every tab. The same per-tab check covers unequipping gear that grants slots (`player.store.ts:368-379`).
+**Respec guard (critical).** Respec and node refunds must be blocked when removing the slots would strand items. A guard already exists for the single stat: `PlayerStore.canChangeInventorySlots` (`player.store.ts:350` on staging), used by `skill-tree.service.ts:65` (single refund) and `:129-145` (full respec). It must become per tab: shrinking any tab below its used slots blocks the refund, and the block reason names the tab. The capstone shrinks all tabs at once, so its refund checks every tab. The same per-tab check covers equipping and unequipping gear that grants slots (`canEquip` / `canUnequip` in `player.store.ts`).
 
 ## 3. Save migration (first migration step)
 
