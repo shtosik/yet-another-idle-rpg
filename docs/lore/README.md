@@ -11,4 +11,4 @@ Files (the agent creates each one from shipped text the first time it is needed)
 
 NPC characters live in `docs/character/`, zone and town designs in `docs/design/`, quest proposals in `docs/ideas/`.
 
-Proposed facts citing `la-harpar-quests.md` (the Tidecaller questline) come from a draft that is not in `docs/ideas/` yet; treat them as unconfirmed until it lands.
+Proposed facts citing `la-harpar-quests.md` (the Tidecaller questline) come from a proposed draft; treat them as unconfirmed until it ships.

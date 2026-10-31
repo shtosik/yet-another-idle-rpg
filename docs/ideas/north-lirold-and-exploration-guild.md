@@ -2,7 +2,7 @@
 
 **Scope:** M · **Status:** Proposed (revision 5, 2026-10-27). File name kept from before the rename.
 
-> `la-harpar-quests.md` (the Tidecaller questline and La Harpar side quests) is a separate draft, not in `docs/ideas/` yet. Everything below that cites it is conditional on it shipping, including the ID numbers it reserves.
+> `la-harpar-quests.md` (the Tidecaller questline and La Harpar side quests) is a proposed draft in `docs/ideas/`. Its ItemID reservation (134–143) is void: shipped items took those ids. Everything below that cites it is conditional on it shipping, including the ID numbers it reserves.
 
 Lirold, the capital of Port Stocksmar, becomes a Town the player reaches **after the Elderwood chain**. The Exploration Guild's hall is there, run by a new Guildmaster, **Odile Varrow**. She gives *The Guild Trial*, knows the player's deeds, and has the full Guild store and contracts. **Marvin stays in La Harpar for good**: a Guild member back from an expedition, now in the Tavern. Until the player meets Varrow he sells a few Guild items and handles contracts; after that he sends them to her. He also teaches combat. The road from the capital to the Mountain Pass and the mining village on it are in [`slatefall-and-the-deeper-mines.md`](slatefall-and-the-deeper-mines.md).
 

@@ -38,4 +38,11 @@ Owner decisions in force:
 | [Lirold & the Exploration Guild](north-lirold-and-exploration-guild.md) | M | Proposed |
 | [Slatefall & the Deeper Mines](slatefall-and-the-deeper-mines.md) | M-L | Proposed |
 | [Inventory tabs & destroy](inventory-tabs.md) | M-L | In progress (PRs 82, 83) |
+| [La Harpar quests & Tidecaller questline](la-harpar-quests.md) | M | Proposed |
+| [Town reputation](town-reputation.md) | M | Proposed |
+| [Achievements](achievements.md) | M | Proposed |
+| [Gear upgrading](gear-upgrading.md) | M | Proposed |
+| [Item sets](item-sets.md) | S-M | Proposed |
+| [Gathering skills (professions)](gathering-skills.md) | M-L | Proposed |
+| [Enemy affixes](enemy-affixes.md) | S-M | Noted (owner not keen) |
 | [Known issues](known-issues.md) | — | Open bug and tech-debt list |
