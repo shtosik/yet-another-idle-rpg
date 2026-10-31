@@ -444,6 +444,7 @@ for (const f of [...walkFiles(join(SRC, 'app'), '.ts'), ...walkFiles(join(SRC, '
 // 6. Doc references: backticked paths in agent-facing docs must exist.
 
 const DOC_FILES = [
+  join(ROOT, 'AGENTS.md'),
   join(ROOT, 'CLAUDE.md'),
   join(ROOT, 'CODING_STANDARDS.md'),
   join(ROOT, 'docs', 'git-workflow.md'),
