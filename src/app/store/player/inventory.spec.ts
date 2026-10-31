@@ -1,12 +1,13 @@
 import {
   addItems,
+  blockedTab,
   canFit,
   countItem,
   createInventories,
-  fitsCapacity,
   Inventories,
   inventoryCapacity,
   missingSlots,
+  missingSlotsByTab,
   removeItems,
   resizeInventory,
   slotDeltas,
@@ -124,13 +125,28 @@ describe('inventory', () => {
       const full = { ...fullMaterials(), gear: idsIn('gear').slice(1, 21).map(id => stack(id)) }
       expect(missingSlots(full, capacity(), [{ id: newMaterial, amount: 1 }, { id: idsIn('gear')[0], amount: 1 }])).toBe(2)
     })
+
+    it('names each tab that is short, so messages can say which', () => {
+      const full = { ...fullMaterials(), gear: idsIn('gear').slice(1, 21).map(id => stack(id)) }
+      const adding = [{ id: newMaterial, amount: 1 }, { id: idsIn('materials')[21], amount: 1 }, { id: ItemID.ambushScroll, amount: 1 }]
+      expect(missingSlotsByTab(full, capacity(), adding)).toEqual({ materials: 2 })
+      expect(missingSlotsByTab(full, capacity(), [{ id: idsIn('gear')[0], amount: 1 }])).toEqual({ gear: 1 })
+      expect(missingSlotsByTab(fullMaterials(), capacity(), [{ id: ItemID.woodenBow, amount: 1 }])).toEqual({})
+    })
   })
 
-  describe('fitsCapacity / resizeInventory', () => {
-    it('checks every tab against its own capacity', () => {
+  describe('blockedTab / resizeInventory', () => {
+    it('checks every tab against its own capacity and names the one that strands items', () => {
       const inventory = { ...createInventories(), consumables: [null, stack(ItemID.ambushScroll)] }
-      expect(fitsCapacity(inventory, capacity({ consumables: 2 }))).toBeTrue()
-      expect(fitsCapacity(inventory, capacity({ consumables: 1 }))).toBeFalse()
+      expect(blockedTab(inventory, capacity({ consumables: 2 }))).toBeNull()
+      expect(blockedTab(inventory, capacity({ consumables: 1 }))).toBe('consumables')
+      // Taking the stranded item out first lifts the block.
+      expect(blockedTab(inventory, capacity({ consumables: 1 }), [], [{ id: ItemID.ambushScroll, amount: 1 }])).toBeNull()
+    })
+
+    it('names the tab with no room for what is added', () => {
+      const fullGear = { ...createInventories(), gear: idsIn('gear').slice(1, 21).map(id => stack(id)) }
+      expect(blockedTab(fullGear, capacity(), [{ id: idsIn('gear')[0], amount: 1 }])).toBe('gear')
     })
 
     it('grows a tab to its capacity, never shrinks, and keeps the same object when nothing grew', () => {
@@ -158,7 +174,7 @@ describe('inventory', () => {
       const result = splitInventory(flat)
 
       expect(result.materials.length).toBe(25)
-      expect(fitsCapacity(result, capacity())).toBeFalse()
+      expect(blockedTab(result, capacity())).toBe('materials')
       // The resize after loading never shrinks it.
       expect(resizeInventory(result, capacity()).materials.length).toBe(25)
     })

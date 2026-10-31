@@ -17,8 +17,8 @@ import ITEM_DATA from '../../../../data/items-data'
 })
 export class ChestOpenedComponent {
   private modalRef = inject(MatDialogRef)
-  private readonly data = inject<{ contents: ChestContents | null, slotsNeeded: number }>(MAT_DIALOG_DATA)
-  /** null: the chest didn't open (not enough empty slots). */
+  private readonly data = inject<{ contents: ChestContents | null, slotsNeeded: string }>(MAT_DIALOG_DATA)
+  /** null: the chest didn't open (not enough empty slots); `slotsNeeded` then names what each tab must free. */
   readonly contents = this.data.contents
   readonly slotsNeeded = this.data.slotsNeeded
 

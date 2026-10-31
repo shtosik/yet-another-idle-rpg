@@ -7,7 +7,8 @@ import { I18nextPipe } from '../../../../pipes/i18next.pipe'
 import { StatToPercentagePipe } from '../../../../pipes/stat-to-percentage.pipe'
 import { DurationPipe } from '../../../../pipes/duration.pipe'
 import { ConsumableEffectComponent } from '../../../shared/consumable-effect/consumable-effect.component'
-import { countItem } from '../../../../store/player/inventory'
+import { countItem, tabOf } from '../../../../store/player/inventory'
+import { tabName } from '../../inventory/tab-text'
 import { stationUpgradeOf } from '../../../../store/player/camp'
 import { isConsumableItem } from '../../../../../interfaces/item.interface'
 import ITEM_DATA from '../../../../../data/items-data'
@@ -114,7 +115,7 @@ export class RecipeDetailComponent {
         return { blocked: true, text: i18next.t('camp:reasons.missingItems', { items }) }
       }
       case 'inventoryFull':
-        return { blocked: true, text: i18next.t('camp:reasons.inventoryFull') }
+        return { blocked: true, text: i18next.t('camp:reasons.inventoryFull', { tab: tabName(tabOf(recipe.itemId)) }) }
     }
 
     const size = this.batchSize()

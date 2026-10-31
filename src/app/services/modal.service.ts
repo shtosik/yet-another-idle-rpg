@@ -75,7 +75,7 @@ export class ModalService {
   }
 
   /** The contents of an opened chest, or (null) why it didn't open. */
-  openChestOpened(data: { contents: ChestContents | null, slotsNeeded: number }) {
+  openChestOpened(data: { contents: ChestContents | null, slotsNeeded: string }) {
     return this.dialog.open(ChestOpenedComponent, {
       enterAnimationDuration: '300ms',
       panelClass: 'modal',

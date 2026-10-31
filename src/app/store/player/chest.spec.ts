@@ -37,7 +37,7 @@ describe('chests', () => {
     const fillersIn = (tab: string, count: number) => Object.values(ITEM_DATA)
       .filter(item => tabOf(item.id) === tab && !lootIds.includes(item.id)).slice(0, count).map(item => ({ id: item.id, amount: 1 }))
     playerStore.addItems(fillersIn('materials', playerStore.inventoryCapacity().materials))
-    expect(playerStore.missingChestSlots(chestSlot())).toBe(chestSlotsNeeded(chest).materials!)
+    expect(playerStore.missingChestSlots(chestSlot())).toEqual({ materials: chestSlotsNeeded(chest).materials! })
     expect(playerStore.openChest(chestSlot(), () => 0.5)).toBeNull()
     expect(playerStore.itemCount(ItemID.arenaChest)).toBe(2)
     localStorage.clear()

@@ -63,7 +63,7 @@ describe('PlayerStore inventory tabs', () => {
 
       expect(store.canFitItems([{ id: ItemID.woodenBow, amount: 1 }])).toBeTrue()
       expect(store.canFitItems([{ id: ItemID.stone, amount: 1 }])).toBeFalse()
-      expect(store.missingSlotsFor([{ id: ItemID.stone, amount: 1 }, { id: ItemID.woodenBow, amount: 1 }])).toBe(1)
+      expect(store.missingSlotsByTab([{ id: ItemID.stone, amount: 1 }, { id: ItemID.woodenBow, amount: 1 }])).toEqual({ materials: 1 })
     })
 
     it('the Guild Satchel adds 2 slots to each slot tab', () => {
@@ -126,6 +126,8 @@ describe('PlayerStore inventory tabs', () => {
 
       expect(store.canChangeInventorySlots({ gear: -5, consumables: -5 })).toBeTrue()
       expect(store.canChangeInventorySlots({ materials: -1 })).toBeFalse()
+      expect(store.slotChangeBlockedTab({ gear: -1, materials: -1 })).toBe('materials')
+      expect(store.slotChangeBlockedTab({ gear: -1 })).toBeNull()
     })
   })
 

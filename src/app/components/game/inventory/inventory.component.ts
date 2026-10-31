@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common'
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, ElementRef, inject, signal, viewChildren } from '@angular/core'
 import { SlotComponent } from 'app/components/shared/slot/slot.component'
 import ITEM_DATA from 'data/items-data'
 import { InventoryItem, isConsumableItem } from 'interfaces/item.interface'
@@ -8,10 +8,13 @@ import { PlayerStore } from '../../../store/player/player.store'
 import { ItemType } from '../../../../enums/items/item-type.enum'
 import { BattleManagerService } from '../../../services/battle-manager.service'
 import { ModalService } from '../../../services/modal.service'
-import { countFreeSlots, INVENTORY_PAGE_SIZE, INVENTORY_TABS, InventoryTab, pageCount } from '../../../store/player/inventory'
+import { countFreeSlots, INVENTORY_PAGE_SIZE, INVENTORY_TABS, InventoryTab, pageCount, SLOT_TABS } from '../../../store/player/inventory'
+import { missingSlotsText } from './tab-text'
 import { firstValueFrom } from 'rxjs'
 import { needsDestroyConfirm, SettingsStore } from '../../../store/settings/settings.store'
 import { I18nextPipe } from '../../../pipes/i18next.pipe'
+
+const isSlotTab = (tab: InventoryTab): boolean => (SLOT_TABS as readonly InventoryTab[]).includes(tab)
 
 @Component({
   selector: 'app-inventory',
@@ -26,29 +29,44 @@ export class InventoryWindow {
   private battleManagerService = inject(BattleManagerService)
   private modalService = inject(ModalService)
   private settingsStore = inject(SettingsStore)
-  readonly tabs = INVENTORY_TABS
   tab = signal<InventoryTab>('gear')
   inventory = computed(() => this.playerStore.inventory()[this.tab()])
+  private tabButtons = viewChildren<ElementRef<HTMLButtonElement>>('tabButton')
+
+  /** Each tab's button text ("Materials 16/20", "Quest 3") and whether a slot tab has no free slot left. */
+  tabs = computed(() => {
+    const inventories = this.playerStore.inventory()
+    const capacities = this.playerStore.inventoryCapacity()
+    return INVENTORY_TABS.map(tab => {
+      const used = inventories[tab].filter(Boolean).length
+      const capacity = capacities[tab]
+      const count = Number.isFinite(capacity) ? `${used}/${capacity}` : `${used}`
+      // Pets and Quest never fill, so only slot tabs get the full cue.
+      const full = isSlotTab(tab) && countFreeSlots(inventories[tab], capacity) === 0
+      return { tab, count, full }
+    })
+  })
 
   private requestedPage = signal(0)
 
   /** Infinity for an unlimited tab (Quest). */
   capacity = computed(() => this.playerStore.inventoryCapacity()[this.tab()])
-  limited = computed(() => Number.isFinite(this.capacity()))
-  /** Usable slots, plus items kept past capacity (a migrated save); an unlimited tab shows what it holds. */
-  private shownSlots = computed(() => {
-    const lastItem = this.inventory().reduce((last, slot, i) => slot ? i : last, -1)
-    return Math.max(this.limited() ? this.capacity() : 0, lastItem + 1)
+  /** Pets and Quest list what they hold; slot tabs show every slot, empty and locked ones too. */
+  listsItemsOnly = computed(() => !isSlotTab(this.tab()))
+  /** Inventory indices to show: usable slots plus items kept past capacity (a migrated save), padded to full pages. */
+  private shownIndices = computed(() => {
+    const inventory = this.inventory()
+    if (this.listsItemsOnly()) return inventory.flatMap((slot, i) => slot ? [i] : [])
+    const lastItem = inventory.reduce((last, slot, i) => slot ? i : last, -1)
+    const length = pageCount(Math.max(this.capacity(), lastItem + 1)) * INVENTORY_PAGE_SIZE
+    return Array.from({ length }, (_, i) => i)
   })
-  pages = computed(() => pageCount(this.shownSlots()))
+  pages = computed(() => pageCount(this.shownIndices().length))
   page = computed(() => Math.min(this.requestedPage(), this.pages() - 1))
   freeSlots = computed(() => countFreeSlots(this.inventory(), this.capacity()))
 
   /** Absolute inventory indices shown on the current page. */
-  slots = computed(() => {
-    const start = this.page() * INVENTORY_PAGE_SIZE
-    return Array.from({ length: INVENTORY_PAGE_SIZE }, (_, i) => start + i)
-  })
+  slots = computed(() => this.shownIndices().slice(this.page() * INVENTORY_PAGE_SIZE, (this.page() + 1) * INVENTORY_PAGE_SIZE))
 
   readonly Items = ITEM_DATA
   protected readonly ItemType = ItemType
@@ -56,6 +74,31 @@ export class InventoryWindow {
   selectTab(tab: InventoryTab) {
     this.tab.set(tab)
     this.requestedPage.set(0)
+  }
+
+  /** Arrow keys, Home and End move between tabs (roving tabindex), as in the quests panel. */
+  onTabKeydown(event: KeyboardEvent): void {
+    const index = INVENTORY_TABS.indexOf(this.tab())
+    let next: number
+    switch (event.key) {
+      case 'ArrowRight':
+        next = (index + 1) % INVENTORY_TABS.length
+        break
+      case 'ArrowLeft':
+        next = (index - 1 + INVENTORY_TABS.length) % INVENTORY_TABS.length
+        break
+      case 'Home':
+        next = 0
+        break
+      case 'End':
+        next = INVENTORY_TABS.length - 1
+        break
+      default:
+        return
+    }
+    event.preventDefault()
+    this.selectTab(INVENTORY_TABS[next])
+    this.tabButtons()[next]?.nativeElement.focus()
   }
 
   changePage(delta: number) {
@@ -89,7 +132,7 @@ export class InventoryWindow {
 
     const itemData = ITEM_DATA[item.id]
     if (itemData.type === ItemType.chest) {
-      const slotsNeeded = this.playerStore.missingChestSlots(item)
+      const slotsNeeded = missingSlotsText(this.playerStore.missingChestSlots(item))
       this.modalService.openChestOpened({ contents: this.playerStore.openChest(item), slotsNeeded })
       return
     }

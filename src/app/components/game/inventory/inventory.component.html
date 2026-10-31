@@ -1,47 +1,67 @@
 @let inventoryData = inventory();
 @let usableSlots = capacity();
 
-<div class="inventory-tabs" role="group" [attr.aria-label]="'app:inventory.tabsLabel' | i18next">
-  @for (entry of tabs; track entry) {
-    <button type="button" [class.active]="tab() === entry" [attr.aria-pressed]="tab() === entry" (click)="selectTab(entry)">
-      {{ ('app:inventory.tabs.' + entry) | i18next }}
-    </button>
+<div class="inventory-tabs" role="tablist" [attr.aria-label]="'app:inventory.tabsLabel' | i18next">
+  @for (entry of tabs(); track entry.tab) {
+    @let selected = tab() === entry.tab;
+    @let name = ('app:inventory.tabs.' + entry.tab) | i18next;
+    <button
+      #tabButton
+      aria-controls="inventory-panel"
+      role="tab"
+      type="button"
+      [attr.aria-label]="entry.full ? ('app:inventory.tabFullLabel' | i18next: { tab: name, count: entry.count }) : null"
+      [attr.aria-selected]="selected"
+      [attr.id]="'inventory-tab-' + entry.tab"
+      [attr.tabindex]="selected ? 0 : -1"
+      [attr.title]="entry.full ? ('app:inventory.tabFull' | i18next: { tab: name }) : null"
+      [class.active]="selected"
+      [class.full]="entry.full"
+      (click)="selectTab(entry.tab)"
+      (keydown)="onTabKeydown($event)"
+    >{{ name }} <span class="count">{{ entry.count }}</span></button>
   }
 </div>
 
-<div class="inventory-header">
-  @if (limited()) {
-    <span class="free-slots">{{ 'app:inventory.freeSlots' | i18next: { free: freeSlots(), total: usableSlots } }}</span>
-  }
+<div class="inventory-panel" id="inventory-panel" role="tabpanel" [attr.aria-labelledby]="'inventory-tab-' + tab()">
+  @if (!listsItemsOnly() || pages() > 1) {
+    <div class="inventory-header">
+      @if (!listsItemsOnly()) {
+        <span class="free-slots">{{ 'app:inventory.freeSlots' | i18next: { free: freeSlots(), total: usableSlots } }}</span>
+      }
 
-  @if (pages() > 1) {
-    <div class="pager">
-      <button type="button" [disabled]="page() === 0" [attr.aria-label]="'app:inventory.previousPage' | i18next" (click)="changePage(-1)">&lsaquo;</button>
-      <span>{{ 'app:inventory.page' | i18next: { page: page() + 1 } }} / {{ pages() }}</span>
-      <button type="button" [disabled]="page() === pages() - 1" [attr.aria-label]="'app:inventory.nextPage' | i18next" (click)="changePage(1)">&rsaquo;</button>
+      @if (pages() > 1) {
+        <div class="pager">
+          <button type="button" [disabled]="page() === 0" [attr.aria-label]="'app:inventory.previousPage' | i18next" (click)="changePage(-1)">&lsaquo;</button>
+          <span>{{ 'app:inventory.page' | i18next: { page: page() + 1 } }} / {{ pages() }}</span>
+          <button type="button" [disabled]="page() === pages() - 1" [attr.aria-label]="'app:inventory.nextPage' | i18next" (click)="changePage(1)">&rsaquo;</button>
+        </div>
+      }
     </div>
   }
-</div>
 
-<div class="inventory">
-  @for (index of slots(); track index) {
-    <!-- Items kept past capacity (a migrated save) stay visible and usable until taken out. -->
-    @if (inventoryData[index]; as slotItem) {
-      <app-slot>
-        <app-inventory-slot
-          [amount]="slotItem.amount"
-          [item]="Items[slotItem.id]"
-          [tier]="slotItem.tier"
-          (equipItem)="equipItem(slotItem)"
-          [destroyable]="slotItem.type !== ItemType.quest"
-          (useItem)="useItem(slotItem)"
-          (destroyItem)="destroyItem(slotItem)"
-        />
-      </app-slot>
-    } @else if (index < usableSlots) {
-      <app-slot />
-    } @else {
-      <app-slot class="locked" [attr.title]="'app:inventory.lockedSlot' | i18next" />
+  <div class="inventory">
+    @for (index of slots(); track index) {
+      <!-- Items kept past capacity (a migrated save) stay visible and usable until taken out. -->
+      @if (inventoryData[index]; as slotItem) {
+        <app-slot>
+          <app-inventory-slot
+            [amount]="slotItem.amount"
+            [item]="Items[slotItem.id]"
+            [tier]="slotItem.tier"
+            (equipItem)="equipItem(slotItem)"
+            [destroyable]="slotItem.type !== ItemType.quest"
+            (useItem)="useItem(slotItem)"
+            (destroyItem)="destroyItem(slotItem)"
+          />
+        </app-slot>
+      } @else if (index < usableSlots) {
+        <app-slot />
+      } @else {
+        <app-slot class="locked" [attr.title]="'app:inventory.lockedSlot' | i18next" />
+      }
+    } @empty {
+      <p class="empty">{{ 'app:inventory.empty' | i18next }}</p>
     }
-  }
+  </div>
 </div>

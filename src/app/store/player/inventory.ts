@@ -205,10 +205,13 @@ export const countFreeSlots = (inventory: Inventory, capacity: number): number =
     ? inventory.slice(0, capacity).filter(slot => slot === null).length + Math.max(0, capacity - inventory.length)
     : Infinity
 
-/** Per tab: slots still to free before `adding` fits, once `removing` has been taken out first. Tabs that fit are left out. */
-function missingSlotsByTab(inventories: Inventories, capacity: TabCapacity, adding: ItemStack[], removing: ItemStack[] = []): Partial<Record<InventoryTab, number>> {
+/** Slots still to free per tab; a tab with room is left out, so `{}` means everything fits. */
+export type MissingSlots = Partial<Record<InventoryTab, number>>
+
+/** Per tab: slots still to free before `adding` fits, once `removing` has been taken out first. */
+export function missingSlotsByTab(inventories: Inventories, capacity: TabCapacity, adding: ItemStack[], removing: ItemStack[] = []): MissingSlots {
   const after = removeItems(inventories, removing)
-  const missing: Partial<Record<InventoryTab, number>> = {}
+  const missing: MissingSlots = {}
 
   for (const [tab, stacks] of tabEntries(byTab(adding))) {
     const usable = after[tab].slice(0, capacity[tab])
@@ -232,9 +235,15 @@ export const missingSlots = (inventories: Inventories, capacity: TabCapacity, ad
 export const canFit = (inventories: Inventories, capacity: TabCapacity, adding: ItemStack[], removing: ItemStack[] = []): boolean =>
   missingSlots(inventories, capacity, adding, removing) === 0
 
-/** True when no tab has an item at or beyond its capacity. */
-export const fitsCapacity = (inventories: Inventories, capacity: TabCapacity): boolean =>
-  INVENTORY_TABS.every(tab => inventories[tab].every((slot, i) => slot === null || i < capacity[tab]))
+/**
+ * At a new `capacity`, the first tab that would strand an item past its capacity (once `removing` is taken out)
+ * or has no room for `adding`; null when the change is fine.
+ */
+export function blockedTab(inventories: Inventories, capacity: TabCapacity, adding: ItemStack[] = [], removing: ItemStack[] = []): InventoryTab | null {
+  const after = removeItems(inventories, removing)
+  const stranded = INVENTORY_TABS.find(tab => after[tab].some((slot, i) => slot !== null && i >= capacity[tab]))
+  return stranded ?? (Object.keys(missingSlotsByTab(inventories, capacity, adding, removing)) as InventoryTab[])[0] ?? null
+}
 
 /** A Page is a 40-slot view of one tab. */
 export const INVENTORY_PAGE_SIZE = 40

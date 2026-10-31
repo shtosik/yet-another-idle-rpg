@@ -41,18 +41,19 @@ import {
   countFreeSlots,
   countItem,
   createInventories,
-  fitsCapacity,
   Inventories,
   Inventory,
   inventoryCapacity,
   InventoryTab,
   ItemStack,
-  missingSlots,
+  MissingSlots,
+  missingSlotsByTab,
   removeItems,
   resizeInventory,
   SlotDeltas,
   slotDeltas,
   splitInventory,
+  blockedTab,
   tabOf,
   withSlotDeltas,
 } from './inventory'
@@ -388,9 +389,9 @@ export const PlayerStore = signalStore(
       return canFit(store.inventory(), store.inventoryCapacity(), adding, removing)
     },
 
-    /** Slots still to free (over all tabs) before `adding` fits, after `removing` is taken out first. */
-    missingSlotsFor(adding: ItemStack[], removing: ItemStack[] = []): number {
-      return missingSlots(store.inventory(), store.inventoryCapacity(), adding, removing)
+    /** Slots still to free in each tab before `adding` fits, after `removing` is taken out first. */
+    missingSlotsByTab(adding: ItemStack[], removing: ItemStack[] = []): MissingSlots {
+      return missingSlotsByTab(store.inventory(), store.inventoryCapacity(), adding, removing)
     },
 
     /**
@@ -398,9 +399,12 @@ export const PlayerStore = signalStore(
      * with `adding` still fitting afterwards once `removing` is taken out.
      */
     canChangeInventorySlots(deltas: SlotDeltas, adding: ItemStack[] = [], removing: ItemStack[] = []): boolean {
-      const capacity = withSlotDeltas(store.inventoryCapacity(), deltas)
-      return fitsCapacity(removeItems(store.inventory(), removing), capacity)
-        && canFit(store.inventory(), capacity, adding, removing)
+      return blockedTab(store.inventory(), withSlotDeltas(store.inventoryCapacity(), deltas), adding, removing) === null
+    },
+
+    /** The tab that stops `canChangeInventorySlots`, so a message can name it; null when none does. */
+    slotChangeBlockedTab(deltas: SlotDeltas, adding: ItemStack[] = [], removing: ItemStack[] = []): InventoryTab | null {
+      return blockedTab(store.inventory(), withSlotDeltas(store.inventoryCapacity(), deltas), adding, removing)
     },
 
     updateUnlockedNodes(id: SkillNodeID, amount: number) {
@@ -505,13 +509,17 @@ export const PlayerStore = signalStore(
     },
 
     /** Empty slots to free before the chest opens: in each tab, one per new stack its picks could put there (owner rule). */
-    missingChestSlots(item: InventoryItem): number {
+    missingChestSlots(item: InventoryItem): MissingSlots {
       const itemData = ITEM_DATA[item.id]
-      if (itemData.type !== ItemType.chest) return 0
+      const missing: MissingSlots = {}
+      if (itemData.type !== ItemType.chest) return missing
       const inventory = store.inventory()
       const capacity = store.inventoryCapacity()
-      return Object.entries(chestSlotsNeeded(itemData)).reduce((sum, [tab, needed]) =>
-        sum + Math.max(0, needed - countFreeSlots(inventory[tab as InventoryTab], capacity[tab as InventoryTab])), 0)
+      for (const [tab, needed] of Object.entries(chestSlotsNeeded(itemData)) as [InventoryTab, number][]) {
+        const short = needed - countFreeSlots(inventory[tab], capacity[tab])
+        if (short > 0) missing[tab] = short
+      }
+      return missing
     },
 
     /** Finished, unclaimed, and its chest's items fit in the inventory. */
@@ -695,10 +703,10 @@ export const PlayerStore = signalStore(
       store.removeItems([{ id: item.id, tier: item.tier, amount: 1 }])
     },
 
-    /** Opens one chest when `missingChestSlots` is 0; null otherwise. */
+    /** Opens one chest when `missingChestSlots` is empty; null otherwise. */
     openChest(item: InventoryItem, rng: () => number = Math.random): ChestContents | null {
       const itemData = ITEM_DATA[item.id]
-      if (itemData.type !== ItemType.chest || store.missingChestSlots(item) > 0) return null
+      if (itemData.type !== ItemType.chest || Object.keys(store.missingChestSlots(item)).length > 0) return null
       const contents = rollChest(itemData, rng)
       const chest = { id: item.id, tier: item.tier, amount: 1 }
 
