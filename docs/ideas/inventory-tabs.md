@@ -1,4 +1,4 @@
-# Inventory tabs, zone pet collections & destroy
+# Inventory tabs & destroy
 
 **Scope:** M-L · **Status:** Accepted design (owner, 2026-10-31)
 
@@ -48,15 +48,7 @@ Game is in production with no players yet. Do a real migration anyway, as a test
 
 ## 4. Zone pet collections
 
-A zone's set = the pets of every enemy in its `enemies` list **plus its boss**. Every zone with monsters counts (Traders' Basement too: rat + Giant Rat). Today no zone repeats an enemy; if a later zone reuses one, its pet counts toward both sets.
-
-- Arena champion pets belong to no zone set (could be their own Arena set later).
-- Separate from zone mastery (`masteryReward`, a one-time claim); the collection bonus is permanent.
-- Completing a zone's normal set gives a **global permanent bonus**: gold find or XP (alternate per zone, small, e.g. +2%).
-- Shiny sets: parked until shiny pet rates are fixed (currently ~1 shiny pet per 200,000 kills at 1% shiny chance).
-- Owned pets are read from the Pets tab plus the equipped pet; no new state.
-- Progress shown in the bestiary per zone (owned / total).
-- Bonus is a new source in the `stats` computed (ADR 0002), not stored.
+Deferred (owner, 2026-10-31): the design moved to `pet-leveling-collection.md` → Zone collections.
 
 ## 5. Destroy items
 
@@ -75,4 +67,4 @@ A zone's set = the pets of every enemy in its `enemies` list **plus its boss**. 
 - Sort / compact button (small QoL, can ride along with tabs).
 
 ## Touch-points
-`src/app/store/player/inventory.ts` (`addItems`, `canFit`, `missingSlots` per tab), `player.store.ts` (state, `addItems`, `applyKillBatch`, equip/unequip guards, `canChangeInventorySlots`, `sellItem`), `player.ts` (initial state, capacity stats per tab), `skill-tree.service.ts` (refund guards), `skill-tree-data.ts` (nodes), `camp.ts` (`evaluateRecipe`), shop component (full badge), inventory component (tabs, destroy), bestiary component (zone sets), `stats.ts` (collection bonus), new settings store, persistence (save version + migration), i18n. Docs: `docs/systems/player-stats-inventory-equipment.md`, `persistence.md`, `skill-tree.md`, `enemies-shiny-pets-bestiary.md`.
+`src/app/store/player/inventory.ts` (`addItems`, `canFit`, `missingSlots` per tab), `player.store.ts` (state, `addItems`, `applyKillBatch`, equip/unequip guards, `canChangeInventorySlots`, `sellItem`), `player.ts` (initial state, capacity stats per tab), `skill-tree.service.ts` (refund guards), `skill-tree-data.ts` (nodes), `camp.ts` (`evaluateRecipe`), shop component (full badge), inventory component (tabs, destroy), new settings store, persistence (save version + migration), i18n. Docs: `docs/systems/player-stats-inventory-equipment.md`, `persistence.md`, `skill-tree.md`.

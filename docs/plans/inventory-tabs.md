@@ -14,7 +14,8 @@ Implementation plan for `docs/ideas/inventory-tabs.md` (the design and its reaso
 | Respec | Blocked when a tab would shrink below its used slots; the reason names the tab. |
 | Migration | Real migration from the flat inventory, through a migration table (test of the mechanism). Never deletes items. |
 | Destroy | Confirm popup from tier X up (default: every tier). Quest items can't be destroyed. Setting lives in a new settings store. |
-| Zone collections | Zone roster + boss, every zone with monsters. Gold or XP bonus. Arena pets in no zone set. Shiny sets parked. |
+| Zone collections | Deferred; design kept in `docs/ideas/pet-leveling-collection.md`. |
+| Chests | Roll first; only the rolled items need room. A roll that doesn't fit is kept and saved at once until it does. |
 | Parked | Extra pet copies, loot rules, shiny sets. |
 
 ## Tab mapping (`tabOf(item)`)
@@ -30,7 +31,9 @@ Implementation plan for `docs/ideas/inventory-tabs.md` (the design and its reaso
 
 ## Steps
 
-Steps 1–3 don't depend on each other. Step 4 waits for 1–3. Steps 5 and 6 need 4 and don't depend on each other.
+Status (2026-10-31): steps 1–4b and the chest rule are in PR #82 (step 3 was built inside 4a); step 5 is PR #83, stacked on #82; step 6 is deferred.
+
+Steps 1–3 don't depend on each other. Step 4 waits for 1–3. Step 5 needs 4.
 
 ### 1. Online "drop lost" toast (S, Sonnet)
 - `PlayerStore.addItems` (`player.store.ts:323`) returns what didn't fit; online kill drops (`player.store.ts:483`) show a toast "Inventory full: X lost". Offline already counts `lostDrops` (`:497-541`).
@@ -92,11 +95,8 @@ Steps 1–3 don't depend on each other. Step 4 waits for 1–3. Steps 5 and 6 ne
 - `skill-tree.service.ts:65-145`: refund and respec guards check every tab the node grows; the reason names the tab.
 - Docs: `skill-tree.md`.
 
-### 6. Zone pet collections (M, Opus)
-- Set = pets of a zone's `enemies` + `bossEnemyId` (`zones-data.ts`). Owned = Pets tab + equipped pet.
-- Bonus per completed set (gold find or XP) as a modifier source in `stats.ts` (ADR 0002).
-- Bestiary: owned / total per zone (`bestiary.component.*`).
-- Docs: `enemies-shiny-pets-bestiary.md`, changelog.
+### 6. Zone pet collections — deferred
+Dropped from this plan (owner, 2026-10-31). The design is in `docs/ideas/pet-leveling-collection.md` → Zone collections.
 
 ## Checks per step
 Done checks (`npm run validate`, `npm run lint`, `npm run test:ci`, `npx ng build`) plus a spec for new logic. `/code-review` on step 4 only.
