@@ -24,8 +24,12 @@
   margin-bottom: 0.6rem
   border-bottom: vars.$panelBorder
 
+  // Equal-width tabs, so a count growing from 9 to 10 doesn't shift its neighbours.
   button
-    padding: 0.25rem 0.6rem
+    flex: 1 1 0
+    min-width: 0
+    padding: 0.25rem 0.4rem
+    text-align: center
     border: 0
     border-radius: vars.$panelBorderRadius vars.$panelBorderRadius 0 0
     background: transparent
@@ -57,7 +61,7 @@
 
 .inventory-header
   display: flex
-  justify-content: space-between
+  justify-content: flex-end
   align-items: center
   gap: 0.8rem
   margin-bottom: 0.8rem

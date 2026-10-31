@@ -236,13 +236,14 @@ export const canFit = (inventories: Inventories, capacity: TabCapacity, adding: 
   missingSlots(inventories, capacity, adding, removing) === 0
 
 /**
- * At a new `capacity`, the first tab that would strand an item past its capacity (once `removing` is taken out)
- * or has no room for `adding`; null when the change is fine.
+ * Going from capacity `from` to `to`, the first tab that would strand an item (once `removing` is taken out)
+ * or has no room for `adding`; null when the change is fine. Items already past `from` (a migrated save) don't
+ * block: slots never move, so only a shrink strands, and only items in the slots it locks.
  */
-export function blockedTab(inventories: Inventories, capacity: TabCapacity, adding: ItemStack[] = [], removing: ItemStack[] = []): InventoryTab | null {
+export function blockedTab(inventories: Inventories, from: TabCapacity, to: TabCapacity, adding: ItemStack[] = [], removing: ItemStack[] = []): InventoryTab | null {
   const after = removeItems(inventories, removing)
-  const stranded = INVENTORY_TABS.find(tab => after[tab].some((slot, i) => slot !== null && i >= capacity[tab]))
-  return stranded ?? (Object.keys(missingSlotsByTab(inventories, capacity, adding, removing)) as InventoryTab[])[0] ?? null
+  const stranded = INVENTORY_TABS.find(tab => after[tab].some((slot, i) => slot !== null && i >= to[tab] && i < from[tab]))
+  return stranded ?? (Object.keys(missingSlotsByTab(inventories, to, adding, removing)) as InventoryTab[])[0] ?? null
 }
 
 /** A Page is a 40-slot view of one tab. */

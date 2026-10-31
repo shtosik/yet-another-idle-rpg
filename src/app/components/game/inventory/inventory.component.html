@@ -24,19 +24,13 @@
 </div>
 
 <div class="inventory-panel" id="inventory-panel" role="tabpanel" [attr.aria-labelledby]="'inventory-tab-' + tab()">
-  @if (!listsItemsOnly() || pages() > 1) {
+  @if (pages() > 1) {
     <div class="inventory-header">
-      @if (!listsItemsOnly()) {
-        <span class="free-slots">{{ 'app:inventory.freeSlots' | i18next: { free: freeSlots(), total: usableSlots } }}</span>
-      }
-
-      @if (pages() > 1) {
-        <div class="pager">
-          <button type="button" [disabled]="page() === 0" [attr.aria-label]="'app:inventory.previousPage' | i18next" (click)="changePage(-1)">&lsaquo;</button>
-          <span>{{ 'app:inventory.page' | i18next: { page: page() + 1 } }} / {{ pages() }}</span>
-          <button type="button" [disabled]="page() === pages() - 1" [attr.aria-label]="'app:inventory.nextPage' | i18next" (click)="changePage(1)">&rsaquo;</button>
-        </div>
-      }
+      <div class="pager">
+        <button type="button" [disabled]="page() === 0" [attr.aria-label]="'app:inventory.previousPage' | i18next" (click)="changePage(-1)">&lsaquo;</button>
+        <span>{{ 'app:inventory.page' | i18next: { page: page() + 1 } }} / {{ pages() }}</span>
+        <button type="button" [disabled]="page() === pages() - 1" [attr.aria-label]="'app:inventory.nextPage' | i18next" (click)="changePage(1)">&rsaquo;</button>
+      </div>
     </div>
   }
 

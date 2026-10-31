@@ -138,7 +138,6 @@
     "slotsNeeded": "{{slots}} needed",
     "tabSlots_one": "{{count}} {{tab}} slot",
     "tabSlots_other": "{{count}} {{tab}} slots",
-    "freeSlots": "Free slots: {{free}} / {{total}}",
     "tabsLabel": "Inventory tabs",
     "tabFull": "{{tab}} tab is full",
     "tabFullLabel": "{{tab}} {{count}}, full",

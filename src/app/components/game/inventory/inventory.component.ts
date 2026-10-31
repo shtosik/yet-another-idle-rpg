@@ -63,7 +63,6 @@ export class InventoryWindow {
   })
   pages = computed(() => pageCount(this.shownIndices().length))
   page = computed(() => Math.min(this.requestedPage(), this.pages() - 1))
-  freeSlots = computed(() => countFreeSlots(this.inventory(), this.capacity()))
 
   /** Absolute inventory indices shown on the current page. */
   slots = computed(() => this.shownIndices().slice(this.page() * INVENTORY_PAGE_SIZE, (this.page() + 1) * INVENTORY_PAGE_SIZE))
