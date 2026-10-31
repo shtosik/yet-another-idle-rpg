@@ -3,7 +3,8 @@
 Several Claude sessions often run in parallel on this repo, sharing the main checkout.
 
 - **Keep the main checkout on its current branch.** `git checkout` / `git switch` there moves every other session onto your branch and mixes uncommitted work.
-- **New work starts from `origin/staging`**; local `main` lags behind. Create a worktree: `git fetch origin && git worktree add ../yari-<name> -b feat/<name> origin/staging` (or start the session with `claude --worktree <name>`), and work only inside it.
+- **`origin/staging` is the default for everything**: new work, and also reading code or researching ideas. `main` is the released state, explored only for a hotfix or when asked; local `main` lags further behind.
+- **New work starts from `origin/staging`**. Create a worktree: `git fetch origin && git worktree add ../yari-<name> -b feat/<name> origin/staging` (or start the session with `claude --worktree <name>`), and work only inside it.
 - A sub-feature branches from its parent feature branch; a hotfix branches from `origin/main` (`docs/deployment.md` → Releases).
 - **PRs go back to where the branch came from**: feature PRs into `staging`. `main` takes only `release/*` and `hotfix/*` PRs, and CI fails on anything else. CI runs only on PRs into `main` and `staging`, so before merging a sub-feature into its parent, run the Done checks yourself.
 - Right after `git worktree add`, switch the session into the worktree with the `EnterWorktree` tool (`path: ../yari-<name>`). The desktop app's diff pane only shows the session's own folder, so edits made in a worktree the session never entered don't show up there.
