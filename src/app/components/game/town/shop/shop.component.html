@@ -65,6 +65,7 @@
               [class.shop__item--full]="reason === 'inventory'"
               [class.shop__item--locked]="reason === 'rank' || reason === 'station'"
               [attr.aria-label]="buyLabel(i, reason)"
+              [attr.title]="reason === 'inventory' ? buyLabel(i, reason) : null"
               (click)="buyItem(i, $event)"
             >
               <app-slot>

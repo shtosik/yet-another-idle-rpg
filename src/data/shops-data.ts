@@ -91,7 +91,7 @@ const SHOPS_DATA: Record<ShopID, Shop> = {
       { itemId: ItemID.cheesePlatterRecipe, tier: ItemTier.uncommon,  price: 6,  maxStock: 1,  refreshable: false },
       { itemId: ItemID.skillPointBook,      tier: ItemTier.legendary, price: 15, maxStock: 1,  refreshable: true },
       // Rank 1: more space and recipes
-      { itemId: ItemID.guildSatchel,        tier: ItemTier.rare,      price: 20, maxStock: 3,  refreshable: false, minRank: 1 },
+      { itemId: ItemID.guildSatchel,        tier: ItemTier.rare,      price: 20, maxStock: 1,  refreshable: false, minRank: 1 },
       { itemId: ItemID.huntersFeastRecipe,  tier: ItemTier.uncommon,  price: 12, maxStock: 1,  refreshable: false, minRank: 1 },
       { itemId: ItemID.ambushScroll,        tier: ItemTier.rare,      price: 25, maxStock: 1,  refreshable: false, minRank: 1 },
       // Rank 2: combat-changers, bought once

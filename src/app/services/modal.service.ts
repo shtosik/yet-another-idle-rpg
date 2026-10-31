@@ -7,6 +7,8 @@ import { QuestCompletedComponent } from '../components/modals/quest-completed/qu
 import { RespecConfirmComponent } from '../components/modals/respec-confirm/respec-confirm.component'
 import { UnlockNotificationComponent } from '../components/modals/unlock-notification/unlock-notification.component'
 import { UnlockNotification } from '../../data/unlock-conditions'
+import { DestroyConfirmComponent } from '../components/modals/destroy-confirm/destroy-confirm.component'
+import { InventoryItem } from '../../interfaces/item.interface'
 import { ItemID } from '../../enums/ids/item-id.enum'
 import { WelcomeBackComponent } from '../components/modals/welcome-back/welcome-back.component'
 import type { OfflineSummary } from './offline-progress.service'
@@ -73,7 +75,7 @@ export class ModalService {
   }
 
   /** The contents of an opened chest, or (null) why it didn't open. */
-  openChestOpened(data: { contents: ChestContents | null, slotsNeeded: number }) {
+  openChestOpened(data: { contents: ChestContents | null, slotsNeeded: string }) {
     return this.dialog.open(ChestOpenedComponent, {
       enterAnimationDuration: '300ms',
       panelClass: 'modal',
@@ -95,6 +97,18 @@ export class ModalService {
     }
 
     return this.dialog.open(RespecConfirmComponent, config)
+  }
+
+  /** Closes with true when the player confirms. */
+  openDestroyConfirm(item: InventoryItem) {
+    return this.dialog.open<DestroyConfirmComponent, InventoryItem, boolean>(DestroyConfirmComponent, {
+      panelClass: 'modal',
+      minWidth: '500px',
+      position: { top: '200px' },
+      hasBackdrop: true,
+      disableClose: false,
+      data: item,
+    })
   }
 
   /** Loaded on demand: the component carries the whole CHANGELOG.md text. */

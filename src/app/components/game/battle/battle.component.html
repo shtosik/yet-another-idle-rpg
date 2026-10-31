@@ -16,6 +16,9 @@
       [y]="enemyPositionVal.y"
     />
     <app-battle-side-buttons/>
+    @if (dropsLostToast(); as message) {
+      <div class="battle-pane__toast" role="status">{{ message }}</div>
+    }
   </div>
   <app-battle-footer/>
 </div>

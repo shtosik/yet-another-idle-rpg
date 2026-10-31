@@ -6,6 +6,8 @@ import { PlayerStore } from 'app/store/player/player.store'
 import { ZoneStar, ZoneStarProgress } from 'app/store/player/zone-mastery'
 import { ItemID } from 'enums/ids/item-id.enum'
 import ZONES_DATA from 'data/zones-data'
+import i18next from 'i18next'
+import { missingSlotsText } from 'app/components/game/inventory/tab-text'
 
 /** The current zone's three mastery stars; a finished star is clicked to claim its chest. */
 @Component({
@@ -23,6 +25,9 @@ export class ZoneMasteryComponent {
 
   stars = computed<ZoneStarProgress[]>(() => this.playerStore.zoneMastery()[this.battleStore.currentZoneId()])
   reward = computed(() => ZONES_DATA[this.battleStore.currentZoneId()].masteryReward)
+  /** Why a finished star can't be claimed, naming each tab that needs room. */
+  blockedText = computed(() =>
+    i18next.t('zones:mastery.inventoryFull', { slots: missingSlotsText(this.playerStore.missingSlotsByTab(this.reward().items)) }))
   /** Shinies only spawn once something raises `shinyChance` (the Shiny Hunter skill), as in the bestiary. */
   shiniesUnlocked = computed(() => this.playerStore.stats().shinyChance > 0)
 

@@ -1,6 +1,7 @@
 import { provideZonelessChangeDetection } from '@angular/core'
 import { TestBed } from '@angular/core/testing'
 import { rollChest } from './chest'
+import { tabOf } from './inventory'
 import { PlayerStore } from './player.store'
 import ITEM_DATA from '../../../data/items-data'
 import { ChestItem } from '../../../interfaces/item.interface'
@@ -18,26 +19,66 @@ describe('chests', () => {
     expect(rollChest(silk, () => 0.5).items).toEqual([{ id: ItemID.elderSilk, amount: 2 * chest.rolls }])
   })
 
-  it("opens from the inventory, or not at all when the loot doesn't fit", () => {
-    localStorage.clear()
-    TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] })
-    const playerStore = TestBed.inject(PlayerStore)
-    // rng 0: gold only, so the later full-inventory check starts with no stacks the loot could join.
-    const open = () => playerStore.openChest({ ...playerStore.inventory().find(s => s?.id === ItemID.arenaChest)!, type: ItemType.chest }, () => 0)
-
-    playerStore.addItems([{ id: ItemID.arenaChest, amount: 3 }])
-    const gold = playerStore.stats().goldCoins
-    expect(open()).not.toBeNull()
-    expect(playerStore.stats().goldCoins).toBe(gold + chest.rolls * 6000)
-    expect(playerStore.itemCount(ItemID.arenaChest)).toBe(2)
-
-    // Fill every other slot with items the loot can't stack onto; the chest stack stays, so no new stack fits.
+  describe('opening from the inventory', () => {
+    let playerStore: InstanceType<typeof PlayerStore>
+    const chestSlot = () => ({ ...playerStore.inventory().consumables.find(s => s?.id === ItemID.arenaChest)!, type: ItemType.chest })
     const lootIds = chest.loot.flatMap(entry => ('itemId' in entry ? [entry.itemId] : []))
-    const free = playerStore.stats().inventorySlots - playerStore.inventory().filter(Boolean).length
-    const fillers = Object.values(ITEM_DATA).filter(item => item.id !== ItemID.arenaChest && !lootIds.includes(item.id)).slice(0, free)
-    playerStore.addItems(fillers.map(item => ({ id: item.id, amount: 1 })))
-    expect(playerStore.openChest({ ...playerStore.inventory().find(s => s?.id === ItemID.arenaChest)!, type: ItemType.chest }, () => 0.5)).toBeNull()
-    expect(playerStore.itemCount(ItemID.arenaChest)).toBe(2)
-    localStorage.clear()
+    const fill = (tab: string) => playerStore.addItems(Object.values(ITEM_DATA)
+      .filter(item => tabOf(item.id) === tab && !lootIds.includes(item.id))
+      .slice(0, playerStore.inventoryCapacity()[tab as 'materials'])
+      .map(item => ({ id: item.id, amount: 1 })))
+    // rng 0 picks gold only; rng 0.5 lands on a material pick in the Arena Chest's loot.
+    const materialRoll = rollChest(chest, () => 0.5)
+
+    beforeEach(() => {
+      localStorage.clear()
+      TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] })
+      playerStore = TestBed.inject(PlayerStore)
+      playerStore.addItems([{ id: ItemID.arenaChest, amount: 3 }])
+    })
+    afterEach(() => localStorage.clear())
+
+    it('opens when the roll fits, even with other tabs full', () => {
+      fill('materials')
+      const gold = playerStore.stats().goldCoins
+      const { contents, missing } = playerStore.openChest(chestSlot(), () => 0)
+      expect(contents).toEqual({ gold: chest.rolls * 6000, items: [] })
+      expect(missing).toEqual({})
+      expect(playerStore.stats().goldCoins).toBe(gold + chest.rolls * 6000)
+      expect(playerStore.itemCount(ItemID.arenaChest)).toBe(2)
+    })
+
+    it("keeps and saves the roll when it doesn't fit, so a retry or reload can't re-roll it", () => {
+      expect(materialRoll.items.length).toBeGreaterThan(0)
+      fill('materials')
+      const blocked = playerStore.openChest(chestSlot(), () => 0.5)
+      expect(blocked.contents).toBeNull()
+      expect(blocked.missing.materials).toBeGreaterThan(0)
+      expect(playerStore.itemCount(ItemID.arenaChest)).toBe(3)
+      expect(playerStore.rolledChests()[ItemID.arenaChest]).toEqual(materialRoll)
+
+      // A different rng on retry still gets the kept roll.
+      expect(playerStore.openChest(chestSlot(), () => 0).contents).toBeNull()
+
+      // Saved at once: a fresh store (page reload) still holds the roll.
+      TestBed.resetTestingModule()
+      TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] })
+      playerStore = TestBed.inject(PlayerStore)
+      expect(playerStore.rolledChests()[ItemID.arenaChest]).toEqual(materialRoll)
+
+      // Once there is room, the kept roll opens and is cleared.
+      playerStore.removeItems(playerStore.inventory().materials.filter(s => s !== null).map(s => ({ id: s!.id, amount: s!.amount })))
+      expect(playerStore.openChest(chestSlot(), () => 0).contents).toEqual(materialRoll)
+      expect(playerStore.rolledChests()[ItemID.arenaChest]).toBeUndefined()
+    })
+
+    it('drops a kept roll once the last chest of its id is gone, so a later one rolls fresh', () => {
+      fill('materials')
+      playerStore.openChest(chestSlot(), () => 0.5)
+      playerStore.removeItems([{ id: ItemID.arenaChest, amount: 2 }])
+      expect(playerStore.rolledChests()[ItemID.arenaChest]).toEqual(materialRoll)
+      playerStore.destroyItem(chestSlot())
+      expect(playerStore.rolledChests()[ItemID.arenaChest]).toBeUndefined()
+    })
   })
 })

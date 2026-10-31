@@ -87,7 +87,7 @@ export const RewardsItemsData: Partial<Record<ItemID, Item>> = {
     url: './assets/img/items/silk.png',
     value: -1,
     type: ItemType.rewardsStats,
-    stats: [{ id: 'inventorySlots', amount: 5 }],
+    stats: [{ id: 'inventorySlots', amount: 2 }],
   },
   [ItemID.secondContract]: {
     id: ItemID.secondContract,

@@ -8,9 +8,25 @@
     justify-content: space-between
     height: 100%
     cursor: pointer
+    position: relative
 
     img
         object-fit: contain
+
+    &__destroy
+        position: absolute
+        top: 0
+        right: 0
+        display: none
+        padding: 0 0.25rem
+        line-height: 1
+        background: rgba(0, 0, 0, 0.7)
+        border: 1px solid #d36e6e
+        color: #d36e6e
+        cursor: pointer
+
+    &:hover #{$self}__destroy, #{$self}__destroy:focus-visible
+        display: block
 
     &__tooltip
         display: flex

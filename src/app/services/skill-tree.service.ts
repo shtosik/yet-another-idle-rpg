@@ -9,6 +9,8 @@ import { canBuyNode } from '../../utils/skill-tree-requirements'
 import { canRefundNode, CanRefundResult } from '../../utils/skill-tree-refund'
 import { SKILL_TREE_GRAPH } from '../../data/skill-tree-graph'
 import { SpellID } from '../../enums/ids/spell-id.enum'
+import { InventoryTab, slotDeltas } from '../store/player/inventory'
+import { skillNodeModifiers } from '../store/player/stats'
 
 @Injectable({ providedIn: 'root' })
 export class SkillTreeService {
@@ -61,13 +63,8 @@ export class SkillTreeService {
     const check = canRefundNode(id, levels, this.playerStore.unlockedNodes(), SKILL_TREE_GRAPH)
     if (!check.ok) return check
 
-    const node = ALL_SKILLS[id]
-    const slotsLost = node.type === SkillNodeType.stat && node.stat === 'inventorySlots'
-      ? node.statAmount * check.levelsRefunded
-      : 0
-    if (!this.playerStore.canChangeInventorySlots(-slotsLost)) {
-      return { ok: false, reason: 'inventory-in-use', blockers: [] }
-    }
+    const tab = this.playerStore.slotChangeBlockedTab(slotDeltas([], skillNodeModifiers({ [id]: check.levelsRefunded })))
+    if (tab) return { ok: false, reason: 'inventory-in-use', blockers: [], tab }
 
     return check
   }
@@ -112,7 +109,8 @@ export class SkillTreeService {
     skillPointsToReturn: number
     goldCost: number
     canAfford: boolean
-    inventoryBlocked: boolean
+    /** The tab that would strand items without the tree's slots; null when respec is fine. */
+    inventoryBlockedTab: InventoryTab | null
   } {
     const unlocked = this.playerStore.unlockedNodes()
     let allocatedLevels = 0
@@ -126,23 +124,17 @@ export class SkillTreeService {
     }
     const goldCost = SKILL_TREE_DATA.respec.fullResetGoldCost({ allocatedLevels: allocatedLevels })
     const canAfford = this.playerStore.stats().goldCoins >= goldCost
-    const inventoryBlocked = !this.playerStore.canChangeInventorySlots(-this.inventorySlotsGranted())
-    return { allocatedLevels, skillPointsToReturn, goldCost, canAfford, inventoryBlocked }
+    const inventoryBlockedTab = this.allSlotNodesBlockedTab()
+    return { allocatedLevels, skillPointsToReturn, goldCost, canAfford, inventoryBlockedTab }
   }
 
-  private inventorySlotsGranted(): number {
-    let slots = 0
-    for (const [idStr, level] of Object.entries(this.playerStore.unlockedNodes())) {
-      const node = ALL_SKILLS[Number(idStr) as SkillNodeID]
-      if (level && node?.type === SkillNodeType.stat && node.stat === 'inventorySlots') {
-        slots += node.statAmount * level
-      }
-    }
-    return slots
+  /** The first tab that can't hold its items without the slots the skill tree grants; null when every tab can. */
+  private allSlotNodesBlockedTab(): InventoryTab | null {
+    return this.playerStore.slotChangeBlockedTab(slotDeltas([], skillNodeModifiers(this.playerStore.unlockedNodes())))
   }
 
   respecEntireTree(): boolean {
-    if (!this.playerStore.canChangeInventorySlots(-this.inventorySlotsGranted())) return false
+    if (this.allSlotNodesBlockedTab()) return false
 
     const unlocked = this.playerStore.unlockedNodes()
     let allocatedLevels = 0

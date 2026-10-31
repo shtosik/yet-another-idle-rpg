@@ -1,6 +1,17 @@
 <h2 class="settings__title">{{ 'app:settings.title' | i18next }}</h2>
 
 <section class="settings__group">
+    <h3 class="settings__heading">{{ 'app:settings.items.title' | i18next }}</h3>
+    <label class="settings__hint" for="destroy-tier">{{ 'app:settings.items.confirmDestroyFromTier' | i18next }}</label>
+    <select id="destroy-tier" class="settings__select" (change)="setDestroyTier($any($event.target).value)">
+        @for (tier of tiers; track tier) {
+            <option [value]="tier" [selected]="tier === settingsStore.confirmDestroyFromTier()">
+                {{ ('items:tiers.' + ItemTier[tier]) | i18next }}
+            </option>
+        }
+    </select>
+</section>
+<section class="settings__group">
     <h3 class="settings__heading">{{ 'app:settings.saves.title' | i18next }}</h3>
     <p class="settings__hint">{{ 'app:settings.saves.hint' | i18next }}</p>
     <div class="settings__actions">

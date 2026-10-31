@@ -10,7 +10,7 @@
     "nextRefresh": "Next refresh in {{time}}",
     "soldOut": "Sold Out",
     "restocking": "Restocking…",
-    "inventoryFull": "Inventory Full",
+    "inventoryFull": "{{tab}} tab full",
     "cantAfford": "Can't afford ({{price}})",
     "price": "{{amount}} gold",
     "buy": "Buy",

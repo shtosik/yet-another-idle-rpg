@@ -24,17 +24,17 @@ describe('Ambush and spell scrolls', () => {
 
   const useScroll = () => {
     playerStore.addItems([{ id: ItemID.ambushScroll, tier: ItemTier.rare, amount: 1 }])
-    playerStore.useItem(playerStore.inventory().find(slot => slot?.id === ItemID.ambushScroll)!)
+    playerStore.useItem(playerStore.inventory().consumables.find(slot => slot?.id === ItemID.ambushScroll)!)
   }
 
   it('the scroll teaches Ambush once and is used up', () => {
     useScroll()
     expect(playerStore.knownSpellIds()).toContain(SpellID.ambush)
-    expect(playerStore.inventory().some(slot => slot?.id === ItemID.ambushScroll)).toBeFalse()
+    expect(playerStore.inventory().consumables.some(slot => slot?.id === ItemID.ambushScroll)).toBeFalse()
 
     // A second scroll isn't wasted on a spell already known.
     useScroll()
-    expect(playerStore.inventory().some(slot => slot?.id === ItemID.ambushScroll)).toBeTrue()
+    expect(playerStore.inventory().consumables.some(slot => slot?.id === ItemID.ambushScroll)).toBeTrue()
   })
 
   it('melee hits use up the 5 guaranteed crits; magic hits do not', () => {
@@ -51,7 +51,7 @@ describe('Ambush and spell scrolls', () => {
 
   it('auto-attacks with a bow are not melee, so they keep the crits', () => {
     playerStore.addItems([{ id: ItemID.woodenBow, amount: 1 }])
-    playerStore.equipItem(playerStore.inventory().find(slot => slot?.id === ItemID.woodenBow)!)
+    playerStore.equipItem(playerStore.inventory().gear.find(slot => slot?.id === ItemID.woodenBow)!)
     battleStore.empower(SpellID.ambush, 5)
     battleStore.startBattle(0)
     battleStore.updateEnemyHp(100000)

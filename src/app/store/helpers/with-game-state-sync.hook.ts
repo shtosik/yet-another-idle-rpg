@@ -25,8 +25,8 @@ function decodeSave(saved: string): string {
 /** Each returns false when its write failed (storage full or blocked). */
 const immediateSavers = new Set<() => boolean>()
 
-/** Save version of every synced store by `localStorage` key; all of them are created with `GameComponent`. */
-const syncedVersions = new Map<string, number>()
+/** Save version and migrations of every synced store by `localStorage` key; all of them are created with `GameComponent`. */
+const syncedVersions = new Map<string, { version: number, migrations: SaveMigrations }>()
 
 /** Set once saves are replaced by an import: no store may write its old state back before the reload. */
 let savesSuspended = false
@@ -69,10 +69,10 @@ export function exportGameSaves(): Record<string, string> | null {
  * How a raw save would load into a store of save version `version`: `load`, `outdated` (the store would start
  * fresh), `newer` (written by a newer build; the store would start fresh and not save) or `unreadable`.
  */
-export function classifySave(raw: unknown, version: number): SaveReadResult['kind'] | 'unreadable' {
+export function classifySave(raw: unknown, version: number, migrations: SaveMigrations = {}): SaveReadResult['kind'] | 'unreadable' {
     if (typeof raw !== 'string') return 'unreadable'
     try {
-        return readSave(raw, version).kind
+        return readSave(raw, version, migrations).kind
     } catch {
         return 'unreadable'
     }
@@ -80,8 +80,8 @@ export function classifySave(raw: unknown, version: number): SaveReadResult['kin
 
 /** `classifySave` against the store saved under `key` in this build; `unknown` when no store uses that key. */
 export function checkImportedSave(key: string, raw: unknown): ReturnType<typeof classifySave> | 'unknown' {
-    const version = syncedVersions.get(key)
-    return version === undefined ? 'unknown' : classifySave(raw, version)
+    const synced = syncedVersions.get(key)
+    return synced === undefined ? 'unknown' : classifySave(raw, synced.version, synced.migrations)
 }
 
 const writeGameSaves = (saves: Record<string, string>) =>
@@ -134,9 +134,15 @@ const isPlainObject = (value: unknown): value is object =>
     typeof value === 'object' && value !== null && !Array.isArray(value)
 
 /**
+ * Save migrations of one store: the entry at version N turns a version N state into a version N + 1 state.
+ * A migration must never delete player progress; one that throws makes the save unreadable (it is then never overwritten).
+ */
+export type SaveMigrations = Record<number, (state: Record<string, unknown>) => object>
+
+/**
  * What loading a save should do:
- * - `load`: same version, patch `state` in.
- * - `outdated`: an older version; start from `initialState`, and the next save replaces it.
+ * - `load`: same version, or an older one migrated up to it; patch `state` in.
+ * - `outdated`: an older version with no migration path; start from `initialState`, and the next save replaces it.
  * - `newer`: written by a newer build (another worktree on the same origin); start from `initialState`
  *   but never save over it.
  */
@@ -146,7 +152,7 @@ export type SaveReadResult =
     | { kind: 'newer', savedVersion: number }
 
 /** Parses a raw `localStorage` value. Throws when it can't be read at all (the caller then never saves over it). */
-export function readSave(raw: string, version: number): SaveReadResult {
+export function readSave(raw: string, version: number, migrations: SaveMigrations = {}): SaveReadResult {
     const data: unknown = JSON.parse(decodeSave(raw))
     if (!isPlainObject(data)) throw new Error('save is not an object')
 
@@ -160,17 +166,23 @@ export function readSave(raw: string, version: number): SaveReadResult {
         state = envelope.state
     }
 
-    if (savedVersion === version) return { kind: 'load', state }
-    return savedVersion < version ? { kind: 'outdated', savedVersion } : { kind: 'newer', savedVersion }
+    if (savedVersion > version) return { kind: 'newer', savedVersion }
+    for (let v = savedVersion; v < version; v++) {
+        if (!migrations[v]) return { kind: 'outdated', savedVersion }
+    }
+    for (let v = savedVersion; v < version; v++) state = migrations[v](state as Record<string, unknown>)
+    return { kind: 'load', state }
 }
 
 export interface GameStateSyncOptions<T> {
     /**
-     * Bump when a change to the saved state shape would break loading an older save. An older save is ignored
-     * and replaced (the store starts from `initialState`); a newer one is left alone. Pre-release; a migration
-     * table comes later.
+     * Bump when a change to the saved state shape would break loading an older save. An older save is migrated
+     * up through `migrations`; without a path it is ignored and replaced (the store starts from `initialState`).
+     * A newer one is left alone.
      */
     version?: number
+    /** Version N to N + 1 transforms of the saved state (`SaveMigrations`). */
+    migrations?: SaveMigrations
     /** Never saved; always start from `initialState` (timers that change every tick). Changing them doesn't trigger a save. */
     transientKeys?: (keyof T & string)[]
 }
@@ -180,7 +192,7 @@ export interface GameStateSyncOptions<T> {
  * Saved keys missing from `initialState` are dropped, so removed state doesn't linger in saves.
  */
 export function withGameStateSync<T extends object>(key: string, initialState: T, options: GameStateSyncOptions<T> = {}) {
-    const { version = LEGACY_SAVE_VERSION, transientKeys = [] } = options
+    const { version = LEGACY_SAVE_VERSION, migrations = {}, transientKeys = [] } = options
     const savedKeys = Object.keys(initialState).filter(k => !(transientKeys as string[]).includes(k))
 
     return signalStoreFeature(
@@ -192,7 +204,7 @@ export function withGameStateSync<T extends object>(key: string, initialState: T
                 const saved = localStorage.getItem(key)
                 if (saved) {
                     try {
-                        const result = readSave(saved, version)
+                        const result = readSave(saved, version, migrations)
                         switch (result.kind) {
                             case 'load':
                                 patchState(store, merge({}, initialState, pick(result.state, savedKeys)))
@@ -211,7 +223,7 @@ export function withGameStateSync<T extends object>(key: string, initialState: T
                     }
                 }
 
-                syncedVersions.set(key, version)
+                syncedVersions.set(key, { version, migrations })
                 let isDirty = false
                 // False only when a write failed; a store that doesn't save this session has nothing to lose.
                 const save = (force = false): boolean => {

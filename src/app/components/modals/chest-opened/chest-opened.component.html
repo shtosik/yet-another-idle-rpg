@@ -18,7 +18,7 @@
       }
     </div>
   } @else {
-    <p class="chest-opened__gold">{{ 'items:chestFull' | i18next: { count: slotsNeeded } }}</p>
+    <p class="chest-opened__gold">{{ 'items:chestFull' | i18next: { slots: slotsNeeded } }}</p>
   }
   <button class="chest-opened__cta" (click)="close()">{{ 'items:chestOk' | i18next }}</button>
 </div>

@@ -9,7 +9,7 @@ The idle core: a 100 ms tick that advances the game by the real time elapsed, au
 - `src/app/services/battle-manager.service.ts:BattleManagerService` — `doDamage`, `castSpell`, `useConsumable`, `tickSpells`, `tickConsumables`, enemy death, zone and feature unlock checks.
 - `src/app/services/hit-resolution.ts:resolveHit` — pure damage formula (crit, double attack, weakness, damage-vs-type). Takes an `rng` for testing.
 - `src/app/store/battle/battle.store.ts:BattleStore` — current zone, wave, enemy, HP, spells, buffs, consumable slots.
-- `src/app/store/player/player.store.ts:processBattleEnd` — XP, gold, drops, kill counters, task progress.
+- `src/app/store/player/player.store.ts:processBattleEnd` — XP, gold, drops, kill counters, task progress; drops lost to a full inventory tab raise a toast (see `player-stats-inventory-equipment.md`).
 
 ## Data flow
 Every tick (`TICK_DURATION_IN_MS` = 100) measures the real time since the last tick with `performance.now()`, capped at `MAX_TICK_DELTA_IN_MS` (1 s), and advances everything by that delta. A gap over `SLEEP_GAP_IN_MS` (60 s, on `performance.now()` or `Date.now()`) is a sleeping device: the tick skips it and starts an offline claim instead (`offline-progress.md`).

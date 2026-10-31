@@ -20,7 +20,7 @@ Owner decisions in force:
 | [Wave variety, wave scaling & boss waves](wave-variety.md) | M | Scaling done; variety proposed |
 | [Rune rifts (challenge dungeons)](rune-rifts.md) | M | Proposed |
 | [Prestige / rebirth](prestige.md) | M-L | Proposed |
-| [Pet leveling & collection bonuses](pet-leveling-collection.md) | S-M | Proposed |
+| [Pet leveling & collection bonuses](pet-leveling-collection.md) | S-M | Proposed (zone collections designed) |
 | [Overkill & spell mastery](overkill-spell-mastery.md) | S-M | Proposed |
 | [Automation & loot rules](automation-loot-rules.md) | S | Proposed |
 | [Town building upgrades](town-building-upgrades.md) | M | Proposed |
@@ -37,4 +37,5 @@ Owner decisions in force:
 | [Lirold Arena Master (Ludo Crane)](lirold-arena-master.md) | S | Proposed |
 | [Lirold & the Exploration Guild](north-lirold-and-exploration-guild.md) | M | Proposed |
 | [Slatefall & the Deeper Mines](slatefall-and-the-deeper-mines.md) | M-L | Proposed |
+| [Inventory tabs & destroy](inventory-tabs.md) | M-L | In progress (PRs 82, 83) |
 | [Known issues](known-issues.md) | — | Open bug and tech-debt list |

@@ -16,6 +16,15 @@
     width="32"
   >
   <span>{{ amount }}</span>
+  @if (destroyable) {
+    <button
+      type="button"
+      class="item__destroy"
+      [attr.aria-label]="'app:inventory.destroy.button' | i18next"
+      [attr.title]="'app:inventory.destroy.button' | i18next"
+      (click)="handleDestroy($event)"
+    >&times;</button>
+  }
 </div>
 
 <ng-template

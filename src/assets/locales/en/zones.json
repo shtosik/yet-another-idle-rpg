@@ -20,7 +20,7 @@
         "reward": "Chest: {{gold}} gold, {{tokens}} Explorer Tokens,",
         "claimed": "Claimed",
         "clickToClaim": "Click to claim the chest.",
-        "inventoryFull": "Free inventory space to claim the chest.",
+        "inventoryFull": "Free {{slots}} to claim the chest.",
         "allStars": "All 3 stars: +2% gold"
     }
 }
