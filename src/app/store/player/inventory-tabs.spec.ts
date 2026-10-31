@@ -10,6 +10,8 @@ import { ZoneID } from '../../../enums/ids/zone-id.enum'
 import { EquipmentItem, InventoryItem } from '../../../interfaces/item.interface'
 import { EquipmentSlot } from '../../../enums/equipment-slot.enum'
 import { sellPrice } from '../shop/shop-prices'
+import { SkillNodeID } from '../../../enums/ids/skill-node-id.enum'
+import { SkillTreeService } from '../../services/skill-tree.service'
 
 const allIds = Object.keys(ITEM_DATA).map(Number) as ItemID[]
 const idsIn = (tab: InventoryTab) => allIds.filter(id => tabOf(id) === tab)
@@ -128,6 +130,32 @@ describe('PlayerStore inventory tabs', () => {
       expect(store.canChangeInventorySlots({ materials: -1 })).toBeFalse()
       expect(store.slotChangeBlockedTab({ gear: -1, materials: -1 })).toBe('materials')
       expect(store.slotChangeBlockedTab({ gear: -1 })).toBeNull()
+    })
+
+    it('slot nodes grow their own tab, the hub and capstone every slot tab', () => {
+      const base = store.inventoryCapacity()
+      store.updateUnlockedNodes(SkillNodeID.packRat, 1)
+      store.updateUnlockedNodes(SkillNodeID.materialsPouch, 3)
+      store.updateUnlockedNodes(SkillNodeID.bottomlessPack, 1)
+
+      expect(store.inventoryCapacity()).toEqual({ ...base, gear: base.gear + 5, consumables: base.consumables + 5, materials: base.materials + 11 })
+    })
+
+    it('refuses refunding a slot node that would strand items, naming the tab', () => {
+      const skillTree = TestBed.inject(SkillTreeService)
+      store.updateUnlockedNodes(SkillNodeID.packRat, 1)
+      store.updateUnlockedNodes(SkillNodeID.materialsPouch, 3)
+      fill('materials')
+
+      expect(skillTree.previewRefund(SkillNodeID.materialsPouch, 1)).toEqual(jasmine.objectContaining({ ok: false, reason: 'inventory-in-use', tab: 'materials' }))
+      expect(skillTree.respecPreview().inventoryBlockedTab).toBe('materials')
+
+      // Slots don't compact: only freeing the two slots the refund takes away (the last two) allows it.
+      const materials = store.inventory().materials
+      store.removeItems([{ id: materials[0]!.id, amount: 1 }])
+      expect(skillTree.previewRefund(SkillNodeID.materialsPouch, 1).ok).toBeFalse()
+      store.removeItems(materials.slice(-2).map(s => ({ id: s!.id, amount: 1 })))
+      expect(skillTree.previewRefund(SkillNodeID.materialsPouch, 1).ok).toBeTrue()
     })
   })
 

@@ -10,6 +10,11 @@ export enum SkillNodeID {
     weaknesses = 4,
     shinyHunter = 5,
     autoEat = 6,
+    packRat = 7,
+    gearPouch = 8,
+    consumablesPouch = 9,
+    materialsPouch = 10,
+    bottomlessPack = 11,
 
     // Damage Skill Tree
     attackPower = 205,

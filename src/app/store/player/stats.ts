@@ -83,7 +83,7 @@ export const skillNodeModifiers = (unlockedNodes: UnlockedNodes): StatModifier[]
   Object.entries(unlockedNodes).flatMap(([id, level]) => {
     const node = ALL_SKILLS[Number(id) as SkillNodeID]
     return level && node?.type === SkillNodeType.stat
-      ? [{ stat: node.stat, amount: node.statAmount * level, percent: node.statPercent }]
+      ? [{ stat: node.stat, amount: node.statAmount * level, percent: node.statPercent, tab: node.tab }]
       : []
   })
 

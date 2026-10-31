@@ -3,6 +3,7 @@ import { SkillBranch } from 'enums/ids/skill-branch.enum'
 import { SpellID } from 'enums/ids/spell-id.enum'
 import { SkillNodeType } from 'enums/skill-node-type.enum'
 import { PlayerStat } from 'types/player/player-stat.type'
+import type { SlotTab } from 'app/store/player/inventory'
 
 export interface SkillNodePosition {
     x: number
@@ -40,6 +41,8 @@ export interface SkillNode {
     statAmount?: number
     /** `statAmount` per level is a fraction of the stat (0.1 = 10% better), applied after flat modifiers. */
     statPercent?: boolean
+    /** `inventorySlots` nodes only: the tab it grows; none grows every slot tab. */
+    tab?: SlotTab
     special?: boolean
     spellId?: SpellID
 }

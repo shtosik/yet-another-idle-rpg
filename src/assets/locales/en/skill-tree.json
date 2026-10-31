@@ -37,6 +37,26 @@
             "name": "Bookworm",
             "desc": "Increases xp gain by 10%."
         },
+        "packRat": {
+            "name": "Pack Rat",
+            "desc": "+1 slot to your Gear, Consumables and Materials tabs."
+        },
+        "gearPouch": {
+            "name": "Gear Pouch",
+            "desc": "+2 Gear tab slots per level."
+        },
+        "consumablesPouch": {
+            "name": "Consumables Pouch",
+            "desc": "+2 Consumables tab slots per level."
+        },
+        "materialsPouch": {
+            "name": "Materials Pouch",
+            "desc": "+2 Materials tab slots per level."
+        },
+        "bottomlessPack": {
+            "name": "Bottomless Pack",
+            "desc": "+4 slots to your Gear, Consumables and Materials tabs."
+        },
         "weaknesses": {
             "name": "Weaknesses",
             "desc": "Allows you to take advantage of enemy weaknesses."
