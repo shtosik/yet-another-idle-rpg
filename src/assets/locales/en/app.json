@@ -146,6 +146,7 @@
       "pets": "Pets",
       "quest": "Quest"
     },
+    "dropsLost": "{{tab}} full: {{items}} lost",
     "lockedSlot": "Locked slot",
     "page": "Page {{page}}",
     "previousPage": "Previous page",

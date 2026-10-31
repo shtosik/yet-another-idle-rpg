@@ -36,6 +36,7 @@ import { withDevtools } from '../helpers/devtools'
 import { SaveMigrations, withGameStateSync } from '../helpers/with-game-state-sync.hook'
 import {
   addItems,
+  lostItems,
   canFit,
   countFreeSlots,
   countItem,
@@ -514,7 +515,7 @@ export const PlayerStore = signalStore(
     },
   })),
   withMethods((store) => ({
-    processBattleEnd(enemyId: EnemyID, zoneId: ZoneID, currentWave: number, isShiny: boolean, activeQuestIds?: Set<QuestID>) {
+    processBattleEnd(enemyId: EnemyID, zoneId: ZoneID, currentWave: number, isShiny: boolean, activeQuestIds?: Set<QuestID>): ItemStack[] {
       const enemy = ENEMIES_DATA[enemyId]
       const { experience, gold, dropRolls } = killReward(enemy, ZONES_DATA[zoneId], currentWave, isShiny, store.stats())
       const drops = new Map<string, InventoryItem>()
@@ -532,7 +533,10 @@ export const PlayerStore = signalStore(
       store.updateTaskProgress(enemyId)
       if (isShiny) patchState(store, (state) => ({ shinyKillsByZone: addShinyKills(state.shinyKillsByZone, zoneId, 1) }))
 
+      // Station upgrades install instead of being stored, so they never count as lost.
+      const lost = lostItems(store.inventory(), store.inventoryCapacity(), installStations(store.stations(), itemsToUpdate).rest)
       if (itemsToUpdate.length) store.addItems(itemsToUpdate)
+      return lost
     },
 
     /** `stats` as it would be with only these buffs and consumable effects running (offline buff segments). */

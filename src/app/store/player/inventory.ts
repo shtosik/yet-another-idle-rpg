@@ -240,3 +240,14 @@ export const fitsCapacity = (inventories: Inventories, capacity: TabCapacity): b
 export const INVENTORY_PAGE_SIZE = 40
 
 export const pageCount = (slots: number): number => Math.max(1, Math.ceil(slots / INVENTORY_PAGE_SIZE))
+
+/** What of `items` would not fit when added, per id + tier (one entry each, as rolled drops are). Tab per `tabOf`. */
+export function lostItems(inventories: Inventories, capacity: TabCapacity, items: ItemStack[]): ItemStack[] {
+  const after = addItems(inventories, capacity, items)
+  const owned = (inventory: Inventories, id: ItemID, tier: ItemTier) =>
+    inventory[tabOf(id)].reduce((sum, slot) => slot?.id === id && slot.tier === tier ? sum + slot.amount : sum, 0)
+  return items.flatMap(({ id, amount, tier = ITEM_DATA[id].tier }) => {
+    const lost = amount - (owned(after, id, tier) - owned(inventories, id, tier))
+    return lost > 0 ? [{ id, tier, amount: lost }] : []
+  })
+}

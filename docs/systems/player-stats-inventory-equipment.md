@@ -31,7 +31,7 @@
 - **Drops** (`calculateEnemyDrops` in `player.store.ts`): each `EnemyDrop` is a 1-in-`chance` roll, amount in `minAmount..maxAmount`; drops with `requiredActiveQuestId` only roll while that quest is active. Shinies roll the normal table 10 times plus `shinyDrops` once.
 
 ## Intended behavior (owner decisions)
-- **Enemy drops are lost when their inventory tab is full.** This is intended; other tabs are unaffected.
+- **Enemy drops are lost when their inventory tab is full.** This is intended; other tabs are unaffected. Online, `processBattleEnd` returns the lost drops (`lostItems` in `inventory.ts`: what would not fit per id + tier; station upgrades never count) and `BattleManagerService.dropsLostToast` shows one toast per kill, a line per tab ("Materials full: Wolf Pelt lost"), in the battle view for 3 s. Offline counts them in `lostDrops` instead.
 - **Unequipping, crafting and completing a quest must be blocked when the result has no inventory space**, and the UI must say why.
 - **Spending gold must be blocked when the player can't afford it**, for every gold sink: dialogue fees, shops, respec/refund.
 - **Never lower an `inventorySlots` source** (Guild Satchel, slot gear, skill nodes, base capacity in `statsInitialState`). A lower amount shrinks tabs in existing saves and can push them over capacity: items past capacity are kept, but the tab takes nothing new. If a source must drop, add a player-save migration that makes up the difference, for example by rescaling stored `permanentBonuses` (the version 1 → 2 Satchel rescale in `player.store.ts`).

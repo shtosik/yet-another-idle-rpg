@@ -1,7 +1,7 @@
 import { provideZonelessChangeDetection } from '@angular/core'
 import { TestBed } from '@angular/core/testing'
 import { PlayerStore } from './player.store'
-import { InventoryTab, tabOf } from './inventory'
+import { InventoryTab, lostItems, tabOf } from './inventory'
 import ITEM_DATA from '../../../data/items-data'
 import { ItemID } from '../../../enums/ids/item-id.enum'
 import { ItemTier } from '../../../enums/items/item-tier.enum'
@@ -99,6 +99,22 @@ describe('PlayerStore inventory tabs', () => {
       expect(result.lostDrops).toBe(4)
       expect(result.receivedItems).toEqual([slot(ItemID.woodenBow)])
       expect(store.itemCount(ItemID.woodenBow)).toBe(1)
+    })
+
+    it('reports as lost only the drops whose own tab is full, online', () => {
+      fill('materials', [ItemID.stone])
+      const lost = lostItems(store.inventory(), store.inventoryCapacity(), [
+        { id: ItemID.stone, amount: 4 }, { id: ItemID.woodenBow, amount: 1 },
+      ])
+
+      expect(lost).toEqual([{ id: ItemID.stone, tier: ITEM_DATA[ItemID.stone].tier, amount: 4 }])
+    })
+
+    it('does not report a drop that stacks onto an existing stack in a full tab', () => {
+      fill('materials')
+      const stacked = idsIn('materials')[0]
+
+      expect(lostItems(store.inventory(), store.inventoryCapacity(), [{ id: stacked, amount: 3 }])).toEqual([])
     })
   })
 
