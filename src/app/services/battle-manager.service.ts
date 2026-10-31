@@ -281,10 +281,6 @@ export class BattleManagerService {
     }
   }
 
-  /**
-   * A kill on `wave` of the current zone: the boss opens the next zone (online kills and offline claims).
-   * Town and feature unlocks (`UNLOCK_RULES`) are `UnlockService`'s job.
-   */
   private showDropsLost(lost: ItemStack[]): void {
     const byTab = new Map<InventoryTab, string[]>()
     for (const { id, amount } of lost) {
@@ -299,6 +295,10 @@ export class BattleManagerService {
     this.dropsLostTimer = setTimeout(() => this.dropsLostToast.set(null), DROPS_LOST_TOAST_MS)
   }
 
+  /**
+   * A kill on `wave` of the current zone: the boss opens the next zone (online kills and offline claims).
+   * Town and feature unlocks (`UNLOCK_RULES`) are `UnlockService`'s job.
+   */
   unlockNextZone(wave: number): void {
     const zoneData = this.battleStore.currentZoneData()
     const isBossWave = wave === zoneData.maxWave

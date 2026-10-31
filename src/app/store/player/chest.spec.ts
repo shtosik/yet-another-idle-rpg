@@ -71,5 +71,14 @@ describe('chests', () => {
       expect(playerStore.openChest(chestSlot(), () => 0).contents).toEqual(materialRoll)
       expect(playerStore.rolledChests()[ItemID.arenaChest]).toBeUndefined()
     })
+
+    it('drops a kept roll once the last chest of its id is gone, so a later one rolls fresh', () => {
+      fill('materials')
+      playerStore.openChest(chestSlot(), () => 0.5)
+      playerStore.removeItems([{ id: ItemID.arenaChest, amount: 2 }])
+      expect(playerStore.rolledChests()[ItemID.arenaChest]).toEqual(materialRoll)
+      playerStore.destroyItem(chestSlot())
+      expect(playerStore.rolledChests()[ItemID.arenaChest]).toBeUndefined()
+    })
   })
 })

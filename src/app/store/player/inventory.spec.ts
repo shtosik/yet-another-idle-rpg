@@ -138,15 +138,16 @@ describe('inventory', () => {
   describe('blockedTab / resizeInventory', () => {
     it('checks every tab against its own capacity and names the one that strands items', () => {
       const inventory = { ...createInventories(), consumables: [null, stack(ItemID.ambushScroll)] }
-      expect(blockedTab(inventory, capacity({ consumables: 2 }))).toBeNull()
-      expect(blockedTab(inventory, capacity({ consumables: 1 }))).toBe('consumables')
+      const two = capacity({ consumables: 2 })
+      expect(blockedTab(inventory, two, two)).toBeNull()
+      expect(blockedTab(inventory, two, capacity({ consumables: 1 }))).toBe('consumables')
       // Taking the stranded item out first lifts the block.
-      expect(blockedTab(inventory, capacity({ consumables: 1 }), [], [{ id: ItemID.ambushScroll, amount: 1 }])).toBeNull()
+      expect(blockedTab(inventory, two, capacity({ consumables: 1 }), [], [{ id: ItemID.ambushScroll, amount: 1 }])).toBeNull()
     })
 
     it('names the tab with no room for what is added', () => {
       const fullGear = { ...createInventories(), gear: idsIn('gear').slice(1, 21).map(id => stack(id)) }
-      expect(blockedTab(fullGear, capacity(), [{ id: idsIn('gear')[0], amount: 1 }])).toBe('gear')
+      expect(blockedTab(fullGear, capacity(), capacity(), [{ id: idsIn('gear')[0], amount: 1 }])).toBe('gear')
     })
 
     it('grows a tab to its capacity, never shrinks, and keeps the same object when nothing grew', () => {
@@ -174,7 +175,9 @@ describe('inventory', () => {
       const result = splitInventory(flat)
 
       expect(result.materials.length).toBe(25)
-      expect(blockedTab(result, capacity())).toBe('materials')
+      // Items already past capacity don't block unrelated changes; shrinking the tab further still does.
+      expect(blockedTab(result, capacity(), capacity({ gear: 18 }))).toBeNull()
+      expect(blockedTab(result, capacity(), capacity({ materials: 19 }))).toBe('materials')
       // The resize after loading never shrinks it.
       expect(resizeInventory(result, capacity()).materials.length).toBe(25)
     })

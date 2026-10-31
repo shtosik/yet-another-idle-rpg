@@ -210,6 +210,14 @@ const handleExperience = (resources: Resources) => {
 const stackAmount = (inventory: Inventories, id: ItemID, tier: ItemTier): number =>
   inventory[tabOf(id)].reduce((sum, slot) => slot?.id === id && slot.tier === tier ? sum + slot.amount : sum, 0)
 
+/** Takes `items` out; a kept chest roll goes with the last chest of its id (sold, destroyed), so a later one rolls fresh. */
+const withoutItems = (state: PlayerState, items: ItemStack[]): Pick<PlayerState, 'inventory' | 'rolledChests'> => {
+  const inventory = removeItems(state.inventory, items)
+  const rolledChests = Object.fromEntries(
+    Object.entries(state.rolledChests).filter(([id]) => countItem(inventory, Number(id) as ItemID) > 0))
+  return { inventory, rolledChests }
+}
+
 type StatSources = { [K in 'resources' | 'permanentBonuses' | 'equipment' | 'unlockedNodes' | 'claimedZoneStars']: () => PlayerState[K] }
 
 /** Every stat modifier, grouped by where it comes from (the stats panel's breakdown order). */
@@ -377,13 +385,13 @@ export const PlayerStore = signalStore(
     },
 
     removeItems(items: ItemStack[]) {
-      patchState(store, (state) => ({ inventory: removeItems(state.inventory, items) }))
+      patchState(store, (state) => withoutItems(state, items))
     },
 
     /** Throws away the whole stack (same id and tier). Quest items can't be destroyed; returns whether anything was. */
     destroyItem(item: InventoryItem): boolean {
       if (item.type === ItemType.quest) return false
-      patchState(store, (state) => ({ inventory: removeItems(state.inventory, [{ id: item.id, amount: item.amount, tier: item.tier }]) }))
+      patchState(store, (state) => withoutItems(state, [{ id: item.id, amount: item.amount, tier: item.tier }]))
       return true
     },
 
@@ -402,12 +410,14 @@ export const PlayerStore = signalStore(
      * with `adding` still fitting afterwards once `removing` is taken out.
      */
     canChangeInventorySlots(deltas: SlotDeltas, adding: ItemStack[] = [], removing: ItemStack[] = []): boolean {
-      return blockedTab(store.inventory(), withSlotDeltas(store.inventoryCapacity(), deltas), adding, removing) === null
+      const capacity = store.inventoryCapacity()
+      return blockedTab(store.inventory(), capacity, withSlotDeltas(capacity, deltas), adding, removing) === null
     },
 
     /** The tab that stops `canChangeInventorySlots`, so a message can name it; null when none does. */
     slotChangeBlockedTab(deltas: SlotDeltas, adding: ItemStack[] = [], removing: ItemStack[] = []): InventoryTab | null {
-      return blockedTab(store.inventory(), withSlotDeltas(store.inventoryCapacity(), deltas), adding, removing)
+      const capacity = store.inventoryCapacity()
+      return blockedTab(store.inventory(), capacity, withSlotDeltas(capacity, deltas), adding, removing)
     },
 
     updateUnlockedNodes(id: SkillNodeID, amount: number) {
@@ -704,8 +714,9 @@ export const PlayerStore = signalStore(
       const contents = store.rolledChests()[item.id] ?? rollChest(itemData, rng)
       const missing = store.missingSlotsByTab(contents.items, [chest])
       const rolledChests = { ...store.rolledChests() }
+      const blocked = Object.keys(missing).length > 0
 
-      if (Object.keys(missing).length > 0) {
+      if (blocked) {
         rolledChests[item.id] = contents
         patchState(store, { rolledChests })
       } else {
@@ -716,7 +727,7 @@ export const PlayerStore = signalStore(
         if (contents.items.length) store.addItems(contents.items)
       }
       saveGameStateNow()
-      return { contents: Object.keys(missing).length > 0 ? null : contents, missing }
+      return { contents: blocked ? null : contents, missing }
     },
 
     regenMana(deltaMs: number) {
