@@ -1,6 +1,6 @@
 # Git workflow
 
-Several Claude sessions often run in parallel on this repo, sharing the main checkout.
+Several agent sessions (Claude, Codex) often run in parallel on this repo, sharing the main checkout.
 
 - **Keep the main checkout on its current branch.** `git checkout` / `git switch` there moves every other session onto your branch and mixes uncommitted work.
 - **`origin/staging` is the default for everything**: new work, and also reading code or researching ideas. `main` is the released state, explored only for a hotfix or when asked; local `main` lags further behind. To read staging without a worktree, run `git fetch origin staging` first, since `git show origin/staging:<path>` reads the local remote-tracking ref, which is stale until fetched.

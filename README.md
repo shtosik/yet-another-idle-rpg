@@ -21,7 +21,7 @@ npm start          # http://localhost:4200
 
 ## Docs
 
-- [CLAUDE.md](CLAUDE.md) — working rules and gotchas (for people and coding agents).
+- [AGENTS.md](AGENTS.md) — working rules and gotchas (for people and coding agents); [CLAUDE.md](CLAUDE.md) imports it.
 - [GLOSSARY.md](GLOSSARY.md) — game terms.
 - [docs/systems/](docs/systems/) — how each game system works today.
 - [docs/ideas/](docs/ideas/) — design backlog.
