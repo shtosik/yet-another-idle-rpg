@@ -12,7 +12,7 @@ Upgrade equipment from +1 to +5 (cap rises later) by spending gold and zone reso
 - Stats stay derived: equipped gear stats in `stats()` read `upgradeLevel`.
 
 ## Where
-Workbench at the Camp, or a smith NPC. Max level gated by Workbench level and/or town reputation (`town-reputation.md`).
+Workbench at the Camp, or a smith NPC. Max level gated by Workbench level; town reputation does not affect it (`town-reputation.md`).
 
 ## Selling
 Sell price rises with upgrade level (partial refund of the cost).

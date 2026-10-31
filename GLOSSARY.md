@@ -35,7 +35,7 @@ A rare variant of an enemy with a recolored sprite and better drops.
 _Avoid_: Rare, elite, variant
 
 **Pet**:
-An equippable companion item; both normal and shiny enemies can drop one.
+An equippable companion item, dropped by normal and shiny enemies or given by a town at the Exalted reputation tier.
 _Avoid_: Companion, familiar
 
 ## Combat
@@ -114,6 +114,22 @@ _Avoid_: Guild token, exploration token
 **Task**:
 A repeatable Exploration Guild contract to kill a set number of one monster, separate from quests.
 _Avoid_: Quest, bounty, mission
+
+**Guild rank**:
+The player's Exploration Guild level, earned by completing tasks; separate from reputation.
+_Avoid_: Rank (alone), guild level
+
+**Reputation**:
+The points a player has earned with one town; never spent and never lost.
+_Avoid_: Rep, standing, fame, town rank
+
+**Reputation tier**:
+A named step of reputation reached at a threshold, the same five for every town: Neutral, Friendly, Honored, Revered, Exalted.
+_Avoid_: Rank, level, reputation level
+
+**Title**:
+A display-only name the player earns from content such as reputation tiers and picks to show in the stats panel; it gives no stats.
+_Avoid_: Badge, honorific, rank
 
 **Zone unlock**:
 A zone opens when the boss of the zone before it is defeated, or, for a zone entered from a town building, when that building's quest has started.
