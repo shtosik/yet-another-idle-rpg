@@ -3,6 +3,8 @@ import { NpcID } from '../../../enums/map/npc-id.enum'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
 import { ShopID } from '../../../enums/ids/shop-id.enum'
+import { TownID } from '../../../enums/map/town-id.enum'
+import { ReputationTier } from '../../../enums/reputation-tier.enum'
 
 export enum SylvieDialogue {
   default = 0,
@@ -125,6 +127,12 @@ const MAWOOD_SYLVIE: MawoodSylvieDialogueType = {
           {
             // She only trusts her tools to someone who has helped her once.
             visibilityConditions: [{ type: 'quest', questId: QuestID.silkAndWater, questState: QuestState.completed }],
+            next: SylvieDialogue.default,
+            effects: [{ type: 'shop', shopId: ShopID.mawoodApothecary }],
+          },
+          // ...or to anyone Mawood already calls a friend.
+          {
+            visibilityConditions: [{ type: 'reputation', townId: TownID.mawood, tier: ReputationTier.friendly, hidden: true }],
             next: SylvieDialogue.default,
             effects: [{ type: 'shop', shopId: ShopID.mawoodApothecary }],
           },

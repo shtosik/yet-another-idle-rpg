@@ -1,4 +1,12 @@
 {
+  "titles": {
+    "label": "Title",
+    "none": "None",
+    "laHarparFriendly": "Friend of La Harpar",
+    "laHarparExalted": "Toast of La Harpar",
+    "mawoodFriendly": "Friend of Mawood",
+    "mawoodExalted": "Keeper of Mawood"
+  },
   "statsPanel": {
     "groups": {
       "combat": "Combat",

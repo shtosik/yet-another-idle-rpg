@@ -40,6 +40,7 @@ Owner decisions in force:
 | [Inventory tabs & destroy](inventory-tabs.md) | M-L | In progress (PRs 82, 83) |
 | [La Harpar quests & Tidecaller questline](la-harpar-quests.md) | M | Proposed |
 | [Town reputation](town-reputation.md) | M | Steps 1–2 done (state, quest rewards, Reputation tab, turn-ins) |
+| [Town reputation: tier rewards and titles](town-reputation-tier-rewards.md) | M | Built, except the Revered quests (later PR) |
 | [Achievements](achievements.md) | M | Proposed |
 | [Gear upgrading](gear-upgrading.md) | M | Proposed |
 | [Item sets](item-sets.md) | S-M | Proposed |

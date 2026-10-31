@@ -13,7 +13,8 @@
     "aboutForest": "Tell me about the Elderwood.",
     "corruption": "What is happening to the trees?",
     "work": "Do you have any work for me?",
-    "goodbye": "Goodbye, Elder."
+    "goodbye": "Goodbye, Elder.",
+    "recovery": "How is the forest?"
   },
   "aboutMawood": {
     "message": "Mawood has stood for three hundred years. Not on the ground — that would have been foolish. The forest floor belongs to roots and rot and things older than memory. So we built up, in the light. It has always worked. Until two years ago, when the black sap first appeared.",
@@ -75,5 +76,9 @@
   "waitingForFinn": {
     "message": "The resin told me what it could. The gnolls are the next thread to pull, and Finn knows their camps better than anyone. Find him. I'll be here when you have answers.",
     "opt1": "I'll find Finn."
+  },
+  "reveredFirstShoot": {
+    "message": "One silver shoot in the outer Wilds. One, the first in two years. The rest will take years, perhaps more than I have left. But it is one more than last spring.",
+    "opt1": "One is a start."
   }
 }

@@ -14,7 +14,7 @@ import { ZoneID } from '../../../enums/ids/zone-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
 import { getQuestStatus, getStepItems } from '../../services/quest-status'
 import { ReputationService } from '../../services/reputation.service'
-import { ReputationGain } from '../player/reputation'
+import { REPUTATION_THRESHOLDS, ReputationGain } from '../player/reputation'
 
 /** Lifetime kill counters at the moment the quest reached its current step. */
 export interface KillBaseline {
@@ -137,6 +137,8 @@ export const QuestsStore = signalStore(
             const met = !!step && (req.step === undefined || step === req.step)
             return { current: met ? 1 : 0, target: 1 }
           }
+          case 'reputation':
+            return { current: playerStore.reputation()[req.townId] ?? 0, target: REPUTATION_THRESHOLDS[req.tier] }
           default:
             return { current: 0, target: 1 }
         }

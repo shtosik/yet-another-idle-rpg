@@ -2,6 +2,9 @@ import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { DialogueNode } from '../../../interfaces/dialogues/dialogue-node.interface'
 import { NpcID } from '../../../enums/map/npc-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
+import { DialogueCondition } from '../../../types/dialogues/dialogue-condition.type'
+import { TownID } from '../../../enums/map/town-id.enum'
+import { ReputationTier } from '../../../enums/reputation-tier.enum'
 
 export enum BartenderDialogue {
   default = 0, // Explicitly set to 0 for returning players
@@ -12,6 +15,8 @@ export enum BartenderDialogue {
   anyoneWhoCanTrainMe1,
   anyoneWhoCanTrainMe2,
   anyWorkForMe2,
+  whatIsThisPlaceFree,
+  onTheHouse,
 }
 
 export type LaHarparBartenderDialogueType = Record<BartenderDialogue, DialogueNode<BartenderDialogue>>
@@ -20,6 +25,9 @@ const NS = 'dialogues/laHarparBartender'
 const PAID_FOR_WORK_FLAG = 'bartender_paid_for_work'
 const PAID_FOR_PLACE_FLAG = 'bartender_paid_for_place'
 const PAID_FOR_TRAINER_FLAG = 'bartender_paid_for_trainer'
+/** At La Harpar Friendly he answers for free. */
+const LA_HARPAR_FRIENDLY: DialogueCondition = { type: 'reputation', townId: TownID.laHarpar, tier: ReputationTier.friendly, hidden: true }
+const LA_HARPAR_REVERED: DialogueCondition = { type: 'reputation', townId: TownID.laHarpar, tier: ReputationTier.revered, hidden: true }
 
 const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
   [BartenderDialogue.introduction1]: {
@@ -69,6 +77,7 @@ const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
         responseKey: `${NS}:default.whatIsThisPlace`,
         // Each paid answer costs gold once; asking again is free.
         results: [
+          { visibilityConditions: [LA_HARPAR_FRIENDLY], next: BartenderDialogue.whatIsThisPlaceFree },
           {
             visibilityConditions: [{ type: 'flag', name: PAID_FOR_PLACE_FLAG, isSet: false }],
             next: BartenderDialogue.whatIsThisPlace1,
@@ -84,6 +93,13 @@ const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
         responseKey: `${NS}:default.anyWork`,
         results: [
           // The 40-gold tip is paid once; after that he repeats the offer for free.
+          {
+            visibilityConditions: [
+              { type: 'quest', questId: QuestID.meatShortage, questState: QuestState.available },
+              LA_HARPAR_FRIENDLY,
+            ],
+            next: BartenderDialogue.anyWorkForMe1,
+          },
           {
             visibilityConditions: [
               { type: 'quest', questId: QuestID.meatShortage, questState: QuestState.available },
@@ -108,6 +124,7 @@ const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
       {
         responseKey: `${NS}:default.anyTrainer`,
         results: [
+          { visibilityConditions: [LA_HARPAR_FRIENDLY], next: BartenderDialogue.anyoneWhoCanTrainMe1 },
           {
             visibilityConditions: [{ type: 'flag', name: PAID_FOR_TRAINER_FLAG, isSet: false }],
             next: BartenderDialogue.anyoneWhoCanTrainMe1,
@@ -118,6 +135,10 @@ const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
           },
           { next: BartenderDialogue.anyoneWhoCanTrainMe1 },
         ],
+      },
+      {
+        responseKey: `${NS}:default.onTheHouse`,
+        results: [{ visibilityConditions: [LA_HARPAR_REVERED], next: BartenderDialogue.onTheHouse }],
       },
       {
         responseKey: 'quests:reputation.turnInOne',
@@ -179,6 +200,26 @@ const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
     options: [
       {
         responseKey: `${NS}:whatIsThisPlace1.opt1`,
+        results: [{ next: BartenderDialogue.default }],
+      },
+    ],
+  },
+  [BartenderDialogue.whatIsThisPlaceFree]: {
+    id: BartenderDialogue.whatIsThisPlaceFree,
+    messageKey: `${NS}:whatIsThisPlaceFree.message`,
+    options: [
+      {
+        responseKey: `${NS}:whatIsThisPlace1.opt1`,
+        results: [{ next: BartenderDialogue.default }],
+      },
+    ],
+  },
+  [BartenderDialogue.onTheHouse]: {
+    id: BartenderDialogue.onTheHouse,
+    messageKey: `${NS}:onTheHouse.message`,
+    options: [
+      {
+        responseKey: `${NS}:onTheHouse.opt1`,
         results: [{ next: BartenderDialogue.default }],
       },
     ],

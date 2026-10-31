@@ -9,7 +9,8 @@
     "aboutBrenn": "Tell me about your craft.",
     "aboutCorruption": "What do you make of the corruption?",
     "work": "Do you have any work for me?",
-    "goodbye": "Right, I'm getting back to it."
+    "goodbye": "Right, I'm getting back to it.",
+    "commissions": "Taking commissions again?"
   },
   "aboutBrenn": {
     "message": "I carve armor from Silverwood bark. Sounds flimsy — it isn't. The bark calcifies as the tree ages, layer by layer. The oldest sections are harder than iron and lighter than leather, and they smell like rain for years after cutting. I've been trying to figure out if the corruption changes the mechanical properties. So far: yes, and badly.",
@@ -54,5 +55,9 @@
   "questWarTrophiesComplete": {
     "message": "Three times. I'd say they'll think twice now, but gnolls don't really do thinking, do they? Here — take this. I was saving it for someone worth giving it to. That's you, apparently.",
     "opt1": "Cheers, Brenna."
+  },
+  "reveredCommissions": {
+    "message": "Slowly. Clean bark is coming in again, a few pieces a week. The craft isn't dying with the forest after all. Don't make me say thank you.",
+    "opt1": "Wouldn't dream of it."
   }
 }

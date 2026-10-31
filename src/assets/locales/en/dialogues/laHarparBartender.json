@@ -14,7 +14,8 @@
     "whatIsThisPlace": "What is this place exactly?",
     "anyWork": "Do you have any work for me?",
     "anyTrainer": "Do you know anyone who could train me?",
-    "goodbye": "That's all for now. Have a good day."
+    "goodbye": "That's all for now. Have a good day.",
+    "onTheHouse": "The usual, please."
   },
   "whatIsThisPlace1": {
     "message": "A tavern. Are you blind? That'll be 20 coins for the enlightenment. Money well spent, I'd say.",
@@ -36,6 +37,13 @@
   },
   "anyWorkForMe2": {
     "message": "Nothing new at the moment. Check back with me later.",
+    "opt1": "Cheers."
+  },
+  "whatIsThisPlaceFree": {
+    "message": "A tavern. Are you blind? Don't reach for your purse, this one's on the house. You've been good for business."
+  },
+  "onTheHouse": {
+    "message": "One ale, on the house. Don't get used to it. ...Fine. Get a little used to it.",
     "opt1": "Cheers."
   }
 }

@@ -5,6 +5,7 @@ import { ZoneID } from '../enums/ids/zone-id.enum'
 import { EnemyID } from '../enums/ids/enemy-id.enum'
 import { NpcID } from '../enums/map/npc-id.enum'
 import { TownID } from '../enums/map/town-id.enum'
+import { ReputationTier } from '../enums/reputation-tier.enum'
 
 export const QUEST_STEP_AFTER_COMPLETED = 9999
 
@@ -27,7 +28,15 @@ export type RequirementProps =
   | WaveKillCountRequirement
   | EnemyKillCountRequirement
   | QuestRequirement
-  | StatRequirement;
+  | StatRequirement
+  | ReputationRequirement;
+
+/** At least `tier` with `townId`. Also a dialogue condition and a shop item's `minReputation`. */
+export interface ReputationRequirement {
+  type: 'reputation'
+  townId: TownID
+  tier: ReputationTier
+}
 
 export interface StatRequirement {
   type: 'stat'

@@ -28,6 +28,9 @@ Data-driven NPC conversations. Each NPC has a graph of nodes; options branch on 
 
 Kill-count requirements inside quest conditions count kills since the quest reached its current step (see `quests.md`). Quest requirements are checked by `QuestsStore.requirementProgress`, the same check the quest panel uses for its progress and Ready tag.
 
+## Conditions (reputation)
+`{ type: 'reputation', townId, tier }` passes when `PlayerStore.townTier(townId) >= tier`. Gate a free or extra branch with it, before the paid one; with `hidden: true` it stays a silent gate. A shown lock label is `reputationLockText` ("Requires Mawood Honored — 140/200"). See `towns-shops-guild.md`.
+
 ## Conditions and effects (arena)
 `{ type: 'arena', state: 'ready' | 'running' | 'rewardsWaiting' }`: ready to enter (no run, entry cooldown over) / a run going on / clear rewards waiting to be claimed. The `arena` effect's `action` is `enter` (start a run; pair it with the fee's `stat` deduct) or `claim` (move the waiting rewards into the inventory; counted by `missingSlots`). See `arena.md`.
 

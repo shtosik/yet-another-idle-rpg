@@ -20,7 +20,7 @@ Mysteries and setups the game plants but does not answer. Source shorthand as in
 | T-13 | Why do harpies go quiet for the Matriarch, and why were they "more aggressive than usual" lately? | `Milo#aboutCanopy` | — |
 | T-14 | Finn's old one-eared bear: "Personal reasons. Don't ask." | `Finn#questBigGame` | — |
 | T-15 | Milo's parents, traders who left without him. | `Milo#aboutMilo` | — |
-| T-16 | Josh's Heirloom: why does Josh give away a family heirloom? | `items.json` `joshsHeirloom`, `quests-data.ts` `clearingOutTheBeach` | — |
+| T-16 | Josh's Heirloom: why does Josh give away a family heirloom? | `items.json` `joshsHeirloom`, `quests-data.ts` `clearingOutTheBeach` | He kept the ring for someone who went up the mountain and never came back for it (T-05); who is left unsaid. **(proposed, `docs/ideas/town-reputation-tier-rewards.md` `aboutHeirloom`)** |
 | T-17 | Marvin's expedition (returned "a few days ago"): where to? | `Elara#marvinInfo`, `Trader#aboutPeople` | Kept open: Varrow sent him; she says "the charts aren't finished, so neither is the answer". **(proposed, `docs/ideas/north-lirold-and-exploration-guild.md`)** |
 | T-18 | Drenhollow: where is it, and why did Elarion leave? | `Elarion#aboutElarion` | — |
 | T-19 | Corrupted heartwood "conducts arcane energy"; corruption made earth magic volatile. Does this outlast the Treant? | `Elarion#aboutElarion`, `Elarion#aboutMagic` | — |

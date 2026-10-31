@@ -5,6 +5,7 @@ import { reputationProgress, reputationTier } from './reputation'
 import { TownID } from '../../../enums/map/town-id.enum'
 import { ReputationTier } from '../../../enums/reputation-tier.enum'
 import { NpcID } from '../../../enums/map/npc-id.enum'
+import { TitleID } from '../../../enums/ids/title-id.enum'
 import { turnInBundles, turnInFor } from '../../../data/reputation-turn-ins'
 
 describe('town reputation', () => {
@@ -49,6 +50,16 @@ describe('town reputation', () => {
       expect(tierUps).toEqual([{ townId: TownID.mawood, tier: ReputationTier.honored }])
       expect(store.reputation()).toEqual({ [TownID.mawood]: 250, [TownID.laHarpar]: 10 })
       expect(store.addReputation([{ townId: TownID.mawood, amount: 1 }])).toEqual([])
+    })
+
+    it('earns titles from tiers and only lets an earned one be shown', () => {
+      store.selectTitle(TitleID.mawoodFriendly)
+      expect(store.selectedTitle()).toBeNull()
+
+      store.addReputation([{ townId: TownID.mawood, amount: 50 }])
+      expect(store.earnedTitles()).toEqual([TitleID.mawoodFriendly])
+      store.selectTitle(TitleID.mawoodFriendly)
+      expect(store.selectedTitle()).toBe(TitleID.mawoodFriendly)
     })
   })
 })

@@ -689,6 +689,20 @@
     "seed": 200018096,
     "date": "2026-10-26"
   },
+  "src/assets/img/items/greaterManaPotion.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "one large round glass flask with a cork stopper, filled with deep-blue liquid with faint silver sparkles",
+    "seed": 2256485,
+    "date": "2026-10-31"
+  },
+  "src/assets/img/items/greaterManaPotionRecipe.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "one flat open parchment sheet with rolled-up top and bottom edges, a small blue round potion flask symbol drawn in the middle, a few lines of scribbles below it",
+    "seed": 77123,
+    "date": "2026-10-31"
+  },
   "src/assets/img/items/grilledFish.png": {
     "family": "item-pixel",
     "tier": null,
@@ -808,6 +822,13 @@
     "seed": 1491485296,
     "date": "2026-10-27"
   },
+  "src/assets/img/items/rootwalkerBoots.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single pair of soft dark-green leather boots wrapped with thin brown root tendrils, small glowing silver-green runes on the shafts",
+    "seed": 1636038567,
+    "date": "2026-10-31"
+  },
   "src/assets/img/items/rootwoodStaff.png": {
     "family": "item-pixel",
     "tier": null,
@@ -918,6 +939,13 @@
     "subject": "one browned roast meat joint with a short white bone sticking out of one end, one red apple beside it, nothing underneath",
     "seed": 1268499607,
     "date": "2026-10-21"
+  },
+  "src/assets/img/items/wharfRunnersBoots.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single pair of sturdy brown leather sea boots with white salt stains, brass buckles, rope lacing at the shin and sea-blue trim at the cuffs",
+    "seed": 1399112550,
+    "date": "2026-10-31"
   },
   "src/assets/img/skills/airMastery.png": {
     "family": "skill-icon",

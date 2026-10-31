@@ -2,6 +2,8 @@ import { DialogueNode } from '../../../interfaces/dialogues/dialogue-node.interf
 import { NpcID } from '../../../enums/map/npc-id.enum'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
+import { TownID } from '../../../enums/map/town-id.enum'
+import { ReputationTier } from '../../../enums/reputation-tier.enum'
 
 export enum BrennDialogue {
   default = 0,
@@ -16,6 +18,7 @@ export enum BrennDialogue {
   questWarTrophies,
   questWarTrophiesProgress,
   questWarTrophiesComplete,
+  reveredCommissions,
 }
 
 export type MawoodBrennDialogueType = Record<BrennDialogue, DialogueNode<BrennDialogue>>
@@ -100,6 +103,18 @@ const MAWOOD_BRENN: MawoodBrennDialogueType = {
         ],
       },
       {
+        responseKey: `${NS}:default.commissions`,
+        results: [
+          {
+            visibilityConditions: [
+              { type: 'reputation', townId: TownID.mawood, tier: ReputationTier.revered, hidden: true },
+              { type: 'quest', questId: QuestID.rawMaterials, questState: QuestState.completed },
+            ],
+            next: BrennDialogue.reveredCommissions,
+          },
+        ],
+      },
+      {
         responseKey: 'quests:reputation.turnInOne',
         results: [{ next: BrennDialogue.default, effects: [{ type: 'reputationTurnIn', npcId: NpcID.mawoodBrenn, bundles: 'one' }] }],
       },
@@ -110,6 +125,17 @@ const MAWOOD_BRENN: MawoodBrennDialogueType = {
       {
         responseKey: `${NS}:default.goodbye`,
         results: [{ next: BrennDialogue.default, closeDialogue: true }],
+      },
+    ],
+  },
+
+  [BrennDialogue.reveredCommissions]: {
+    id: BrennDialogue.reveredCommissions,
+    messageKey: `${NS}:reveredCommissions.message`,
+    options: [
+      {
+        responseKey: `${NS}:reveredCommissions.opt1`,
+        results: [{ next: BrennDialogue.default }],
       },
     ],
   },

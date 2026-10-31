@@ -2,6 +2,8 @@ import { DialogueNode } from '../../../interfaces/dialogues/dialogue-node.interf
 import { NpcID } from '../../../enums/map/npc-id.enum'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
+import { TownID } from '../../../enums/map/town-id.enum'
+import { ReputationTier } from '../../../enums/reputation-tier.enum'
 
 export enum CorwinDialogue {
   default = 0,
@@ -21,6 +23,7 @@ export enum CorwinDialogue {
   questBlightedHeartComplete,
   postQuestLore,
   waitingForFinn,
+  reveredFirstShoot,
 }
 
 export type MawoodCorwinDialogueType = Record<CorwinDialogue, DialogueNode<CorwinDialogue>>
@@ -136,8 +139,31 @@ const MAWOOD_CORWIN: MawoodCorwinDialogueType = {
         ],
       },
       {
+        responseKey: `${NS}:default.recovery`,
+        results: [
+          {
+            visibilityConditions: [
+              { type: 'reputation', townId: TownID.mawood, tier: ReputationTier.revered, hidden: true },
+              { type: 'quest', questId: QuestID.theBlightedHeart, questState: QuestState.completed },
+            ],
+            next: CorwinDialogue.reveredFirstShoot,
+          },
+        ],
+      },
+      {
         responseKey: `${NS}:default.goodbye`,
         results: [{ next: CorwinDialogue.default, closeDialogue: true }],
+      },
+    ],
+  },
+
+  [CorwinDialogue.reveredFirstShoot]: {
+    id: CorwinDialogue.reveredFirstShoot,
+    messageKey: `${NS}:reveredFirstShoot.message`,
+    options: [
+      {
+        responseKey: `${NS}:reveredFirstShoot.opt1`,
+        results: [{ next: CorwinDialogue.default }],
       },
     ],
   },

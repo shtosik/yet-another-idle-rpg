@@ -254,6 +254,8 @@ export class DialogueManagerService {
           }
         }
         return false
+      case 'reputation':
+        return this.playerStore.townTier(c.townId) >= c.tier
       case 'arena':
         switch (c.state) {
           case 'ready': return this.arenaService.isReady()
