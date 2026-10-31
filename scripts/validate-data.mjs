@@ -56,6 +56,7 @@ export { UNLOCK_RULES, ZONE_UNLOCK_NOTIFICATIONS } from 'data/unlock-conditions'
 export { WORLD_MAP_DATA } from 'data/world-map-data'
 export { sellPrice } from 'app/store/shop/shop-prices'
 export { REPUTATION_TOWNS } from 'app/store/player/reputation'
+export { REPUTATION_TURN_INS } from 'data/reputation-turn-ins'
 export { CHANGELOG_NOTE_TYPES } from 'app/components/modals/changelog/changelog'
 `
 
@@ -241,6 +242,26 @@ for (const quest of Object.values(D.QUEST_DATA)) {
   for (const reward of quest.rewards.filter(r => r.type === 'reputation')) {
     if (!D.REPUTATION_TOWNS.includes(reward.townId)) error('src/data/quests-data.ts', `${idName(D.QuestID, quest.questId)} gives reputation in ${idName(D.TownID, reward.townId)}, which isn't in REPUTATION_TOWNS`)
     if (!(reward.amount > 0)) error('src/data/quests-data.ts', `${idName(D.QuestID, quest.questId)} gives ${reward.amount} reputation; it must be positive`)
+  }
+}
+
+// A reputation turn-in giver stands in the town they credit, and their dialogue uses the turn-in.
+const townOfNpc = npcId => Object.values(D.TOWNS_DATA).find(t => t.buildings.some(b => b.npcs.some(n => n.id === npcId)))?.id
+const effectsOf = npcId => Object.values(D.NPC_DATA[npcId]?.dialogue ?? {})
+  .flatMap(node => node.options ?? []).flatMap(option => option.results ?? []).flatMap(result => result.effects ?? [])
+for (const turnIn of D.REPUTATION_TURN_INS) {
+  const npc = idName(D.NpcID, turnIn.npcId)
+  const file = 'src/data/reputation-turn-ins.ts'
+  if (!D.REPUTATION_TOWNS.includes(turnIn.townId)) error(file, `${npc}'s turn-in credits ${idName(D.TownID, turnIn.townId)}, which isn't in REPUTATION_TOWNS`)
+  if (townOfNpc(turnIn.npcId) !== turnIn.townId) error(file, `${npc}'s turn-in credits ${idName(D.TownID, turnIn.townId)}, but ${npc} doesn't stand there`)
+  if (!has(D.ITEM_DATA, turnIn.itemId)) error(file, `${npc}'s turn-in has unknown ItemID ${turnIn.itemId}`)
+  if (!(turnIn.bundleSize > 0 && turnIn.reputation > 0)) error(file, `${npc}'s turn-in needs a positive bundleSize and reputation`)
+  if (!effectsOf(turnIn.npcId).some(e => e.type === 'reputationTurnIn')) error(file, `${npc}'s dialogue never uses their turn-in`)
+}
+for (const npc of Object.values(D.NPC_DATA)) {
+  for (const effect of effectsOf(npc.id).filter(e => e.type === 'reputationTurnIn')) {
+    if (effect.npcId !== npc.id) error(`src/data/dialogues (${idName(D.NpcID, npc.id)})`, `turn-in effect names ${idName(D.NpcID, effect.npcId)}, not this NPC`)
+    if (!D.REPUTATION_TURN_INS.some(t => t.npcId === effect.npcId)) error(`src/data/dialogues (${idName(D.NpcID, npc.id)})`, 'turn-in effect has no REPUTATION_TURN_INS entry')
   }
 }
 for (const skill of Object.values(D.ALL_SKILLS)) {

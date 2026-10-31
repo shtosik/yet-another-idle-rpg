@@ -39,7 +39,7 @@ Owner decisions in force:
 | [Slatefall & the Deeper Mines](slatefall-and-the-deeper-mines.md) | M-L | Proposed |
 | [Inventory tabs & destroy](inventory-tabs.md) | M-L | In progress (PRs 82, 83) |
 | [La Harpar quests & Tidecaller questline](la-harpar-quests.md) | M | Proposed |
-| [Town reputation](town-reputation.md) | M | Step 1 done (state, quest rewards, Reputation tab) |
+| [Town reputation](town-reputation.md) | M | Steps 1–2 done (state, quest rewards, Reputation tab, turn-ins) |
 | [Achievements](achievements.md) | M | Proposed |
 | [Gear upgrading](gear-upgrading.md) | M | Proposed |
 | [Item sets](item-sets.md) | S-M | Proposed |

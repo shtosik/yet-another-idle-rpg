@@ -123,6 +123,10 @@ _Avoid_: Rank (alone), guild level
 The points a player has earned with one town; never spent and never lost.
 _Avoid_: Rep, standing, fame, town rank
 
+**Reputation turn-in**:
+Handing a town NPC full **bundles** (a fixed amount, e.g. 20 Crab Meat) of one drop for that town's reputation, repeatable until the town is Exalted. The NPC is its **giver**. Not a quest turn-in, which hands in a quest step.
+_Avoid_: Donation, trade-in, delivery
+
 **Reputation tier**:
 A named step of reputation reached at a threshold, the same five for every town: Neutral, Friendly, Honored, Revered, Exalted.
 _Avoid_: Rank, level, reputation level

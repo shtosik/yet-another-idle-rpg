@@ -1,3 +1,4 @@
+import { NpcID } from '../../../enums/map/npc-id.enum'
 import { DialogueNode } from '../../../interfaces/dialogues/dialogue-node.interface'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
@@ -97,6 +98,14 @@ const LA_HARPAR_JOSH: LaHarparJoshDialogueType = {
           },
           { next: JoshDialogue.workInfo },
         ],
+      },
+      {
+        responseKey: 'quests:reputation.turnInOne',
+        results: [{ next: JoshDialogue.talkReady, effects: [{ type: 'reputationTurnIn', npcId: NpcID.laHarparJosh, bundles: 'one' }] }],
+      },
+      {
+        responseKey: 'quests:reputation.turnInAll',
+        results: [{ next: JoshDialogue.talkReady, effects: [{ type: 'reputationTurnIn', npcId: NpcID.laHarparJosh, bundles: 'all' }] }],
       },
       { responseKey: `${NS}:talkReady.opt5`, results: [{ next: JoshDialogue.talkReady, closeDialogue: true }] },
     ],

@@ -31,6 +31,9 @@ Kill-count requirements inside quest conditions count kills since the quest reac
 ## Conditions and effects (arena)
 `{ type: 'arena', state: 'ready' | 'running' | 'rewardsWaiting' }`: ready to enter (no run, entry cooldown over) / a run going on / clear rewards waiting to be claimed. The `arena` effect's `action` is `enter` (start a run; pair it with the fee's `stat` deduct) or `claim` (move the waiting rewards into the inventory; counted by `missingSlots`). See `arena.md`.
 
+## Effects (reputation turn-in)
+`{ type: 'reputationTurnIn', npcId, bundles: 'one' | 'all' }` hands `npcId`'s `REPUTATION_TURN_INS` item over: one full bundle, or every full bundle held, for town reputation through `ReputationService.gain`. `DialogueManagerService.turnIn` keeps back what the current steps of active quests need; `canApplyResult` disables the option without a full bundle beyond that, and `getActiveResult` skips it (hiding the option) once the town is Exalted. The shared response keys `quests:reputation.turnInOne`/`turnInAll` get `amount`, `item`, `held` and `kept` from `getResponseParams` (the `_kept` variant when quests keep some back); the effect tag shows "+10 La Harpar reputation". See `towns-shops-guild.md`.
+
 ## Invariants & gotchas
 - **Order results from most specific to least.** Quest hubs go: turn-in (`readyToAdvance`) → in progress (`active`) → offer (`available`) → fallback. An NPC with several questlines (Finn) lists every turn-in, then every in-progress, then every offer.
 - A turn-in result is just `readyToAdvance` + `advance`/`end`. The store takes the step's items; don't restate them as `requirementsNeeded` or `take`. The turn-in NPC must match the step's `turnInNpc` in `QUEST_DATA` (`npm run validate` checks that their dialogue handles the quest).

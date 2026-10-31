@@ -131,6 +131,14 @@ const MAWOOD_SYLVIE: MawoodSylvieDialogueType = {
         ],
       },
       {
+        responseKey: 'quests:reputation.turnInOne',
+        results: [{ next: SylvieDialogue.default, effects: [{ type: 'reputationTurnIn', npcId: NpcID.mawoodSylvie, bundles: 'one' }] }],
+      },
+      {
+        responseKey: 'quests:reputation.turnInAll',
+        results: [{ next: SylvieDialogue.default, effects: [{ type: 'reputationTurnIn', npcId: NpcID.mawoodSylvie, bundles: 'all' }] }],
+      },
+      {
         responseKey: `${NS}:default.goodbye`,
         results: [{ next: SylvieDialogue.default, closeDialogue: true }],
       },

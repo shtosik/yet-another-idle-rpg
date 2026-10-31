@@ -4,6 +4,8 @@ import { PlayerStore } from './player.store'
 import { reputationProgress, reputationTier } from './reputation'
 import { TownID } from '../../../enums/map/town-id.enum'
 import { ReputationTier } from '../../../enums/reputation-tier.enum'
+import { NpcID } from '../../../enums/map/npc-id.enum'
+import { turnInBundles, turnInFor } from '../../../data/reputation-turn-ins'
 
 describe('town reputation', () => {
   it('derives the tier from cumulative points', () => {
@@ -17,6 +19,13 @@ describe('town reputation', () => {
   it('measures progress from the current tier to the next', () => {
     expect(reputationProgress(140)).toEqual({ tier: ReputationTier.friendly, current: 90, needed: 150, nextThreshold: 200 })
     expect(reputationProgress(1500).nextThreshold).toBeNull()
+  })
+
+  it('hands over one full bundle or all of them, never a partial one', () => {
+    const turnIn = turnInFor(NpcID.laHarparBartender)!
+    expect(turnInBundles(turnIn, 19, 'one')).toBe(0)
+    expect(turnInBundles(turnIn, 59, 'one')).toBe(1)
+    expect(turnInBundles(turnIn, 59, 'all')).toBe(2)
   })
 
   describe('PlayerStore.addReputation', () => {

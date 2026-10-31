@@ -100,6 +100,14 @@ const MAWOOD_BRENN: MawoodBrennDialogueType = {
         ],
       },
       {
+        responseKey: 'quests:reputation.turnInOne',
+        results: [{ next: BrennDialogue.default, effects: [{ type: 'reputationTurnIn', npcId: NpcID.mawoodBrenn, bundles: 'one' }] }],
+      },
+      {
+        responseKey: 'quests:reputation.turnInAll',
+        results: [{ next: BrennDialogue.default, effects: [{ type: 'reputationTurnIn', npcId: NpcID.mawoodBrenn, bundles: 'all' }] }],
+      },
+      {
         responseKey: `${NS}:default.goodbye`,
         results: [{ next: BrennDialogue.default, closeDialogue: true }],
       },

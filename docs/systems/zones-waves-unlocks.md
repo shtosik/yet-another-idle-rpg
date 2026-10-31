@@ -20,7 +20,7 @@ Zones are the combat areas; each has waves of regular enemies ending in a boss. 
 
 **Wave scaling** (`waveMultipliers`): with `t = (wave - 1) / (lastRegularWave - 1)`, HP is `× (1 + WAVE_HP_SCALING·t)` and XP/gold `× (1 + WAVE_REWARD_SCALING·t)` (1.0 and 1.2: the last regular wave has ×2 HP and ×2.2 rewards, so pushing waves pays per second). `startBattle` saves the scaled `maxHp` on the enemy; `processBattleEnd` applies the reward multiplier. Not scaled: the boss wave, drop chances, the shiny chance and shiny rewards (a shiny pays ×5 XP / ×10 gold of the unscaled base), so low waves are where materials and shinies come from. The multipliers aren't shown in the UI (owner decision: too much info for the nav bar).
 
-**Zone chain**: each tier's mean regular-enemy HP, XP and gold is ×1, ×3, ×6, ×12, ×24, ×48, ×96 of Horseshoe Beach's (4 HP, 6 XP, 3 gold); a boss has 25× its zone's mean HP and 10× its rewards. No enemy is shared between zones. Tune with `npm run sim` (`docs/ideas/progression-pacing.md`).
+**Zone chain**: each tier's mean regular-enemy HP, XP and gold is ×1, ×3, ×6, ×12, ×24, ×48, ×96 of Horseshoe Beach's (4 HP, 6 XP, 3 gold); a boss has 25× its zone's mean HP and 10× its rewards. No enemy is shared between zones. Tune with `npm run sim` (`docs/ideas/progression-pacing.md`; `-- --reputation` adds town reputation pacing).
 
 **Zone unlocks**, two paths:
 1. **Chain**: killing the boss of a zone adds its `nextZoneId` to `unlockedContent.zones` and shows `ZONE_UNLOCK_NOTIFICATIONS[next]`. Chain: Horseshoe Beach → Plains → The Long Path → Mountain Pass → Elderwood Wilds.

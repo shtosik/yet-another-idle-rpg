@@ -30,6 +30,12 @@ await build({
       export { statsInitialState } from 'app/store/player/player'
       export { waveMultipliers } from 'app/store/battle/wave-scaling'
       export { calculateXp } from 'app/store/player/experience'
+      export { default as QUEST_DATA } from 'data/quests-data'
+      export { REPUTATION_TURN_INS } from 'data/reputation-turn-ins'
+      export { REPUTATION_THRESHOLDS, REPUTATION_TOWNS } from 'app/store/player/reputation'
+      export { ReputationTier } from 'enums/reputation-tier.enum'
+      export { NpcID } from 'enums/map/npc-id.enum'
+      export { TownID } from 'enums/map/town-id.enum'
     `,
     resolveDir: SRC,
     loader: 'ts',
@@ -234,5 +240,48 @@ if (process.argv.includes('--weaknesses')) {
       ...strikeSpells.map(spell => secondsPerKill(zone, r.arrival, { weaknesses: true, spell })),
     ]
     console.log(`  ${r.key.padEnd(16)} ${weakTo.padEnd(28)} ${cells.map(c => c.toFixed(1).padStart(5)).join('  ')}`)
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Town reputation pacing (--reputation)
+
+if (process.argv.includes('--reputation')) {
+  const endBuild = build_()
+  const questTotal = townId => Object.values(D.QUEST_DATA)
+    .flatMap(q => q.rewards).filter(r => r.type === 'reputation' && r.townId === townId).reduce((s, r) => s + r.amount, 0)
+
+  /** Turn-in reputation per hour farming wave 1 of `zone` at `build`: expected drops (1/chance, no bestiary bonus) per kill. */
+  const repPerHour = (turnIn, zone, build) => {
+    const kills = zone.enemies.map(id => {
+      const drop = D.ENEMIES_DATA[id].drops.find(d => d.id === turnIn.itemId)
+      return { items: drop ? (drop.minAmount + drop.maxAmount) / 2 / drop.chance : 0, seconds: killStats(zone, 1, id, build).seconds }
+    })
+    const items = kills.reduce((s, k) => s + k.items, 0) / kills.length
+    const seconds = kills.reduce((s, k) => s + k.seconds, 0) / kills.length
+    return items / turnIn.bundleSize * turnIn.reputation / seconds * 3600
+  }
+
+  console.log('\nReputation turn-ins (best route zone, wave 1; reputation/h at that zone\'s arrival build and at the end-of-route build)')
+  const bestByTown = {}
+  for (const turnIn of D.REPUTATION_TURN_INS) {
+    const best = zoneRows.map(r => {
+      const zone = D.ZONES_DATA[D.ZoneID[r.key]]
+      return { key: r.key, arrival: repPerHour(turnIn, zone, r.arrival), late: repPerHour(turnIn, zone, endBuild) }
+    }).filter(r => r.late > 0).sort((a, b) => b.late - a.late)[0]
+    if (!best) {
+      console.log(`  ${D.NpcID[turnIn.npcId].padEnd(18)} no route zone drops ${turnIn.itemId}`)
+      continue
+    }
+    bestByTown[turnIn.townId] = Math.max(bestByTown[turnIn.townId] ?? 0, best.late)
+    console.log(`  ${D.NpcID[turnIn.npcId].padEnd(18)} ${best.key.padEnd(16)} ${String(Math.round(best.arrival)).padStart(5)} reputation/h   ${String(Math.round(best.late)).padStart(5)} reputation/h late`)
+  }
+
+  const tiers = Object.entries(D.REPUTATION_THRESHOLDS).filter(([, points]) => points > 0)
+  console.log(`\n  town       quests   hours of the best late turn-in, after all quests, to ${tiers.map(([t]) => D.ReputationTier[t]).join(' / ')}`)
+  for (const townId of D.REPUTATION_TOWNS) {
+    const quests = questTotal(townId)
+    const hours = tiers.map(([, points]) => Math.max(0, points - quests) / (bestByTown[townId] ?? Infinity))
+    console.log(`  ${D.TownID[townId].padEnd(10)} ${String(quests).padStart(6)}   ${hours.map(h => h.toFixed(1).padStart(5)).join('  ')}`)
   }
 }

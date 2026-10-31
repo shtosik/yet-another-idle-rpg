@@ -3,14 +3,18 @@ import { ArenaService } from './arena.service'
 import { DialogueNode } from '../../interfaces/dialogues/dialogue-node.interface'
 import { computed, inject, Injectable, signal } from '@angular/core'
 import { isTaskDone, PlayerStore } from '../store/player/player.store'
-import { DialogueEffect, QuestEffect } from '../../types/dialogues/dialogue-effect.type'
+import { DialogueEffect, QuestEffect, ReputationTurnInEffect } from '../../types/dialogues/dialogue-effect.type'
+import { ReputationTurnIn, turnInBundles, turnInFor } from '../../data/reputation-turn-ins'
+import { ReputationService } from './reputation.service'
 import { QuestsStore } from '../store/quests/quests.store'
 import { DialogueOption, DialogueResult } from '../../interfaces/dialogues/dialogue-option.type'
 import { DialogueCondition } from '../../types/dialogues/dialogue-condition.type'
 import { NpcID } from '../../enums/map/npc-id.enum'
 import npcData, { NPCProps } from '../../data/npc-data'
 import QUEST_DATA, { RequirementProps } from '../../data/quests-data'
-import { getQuestStatus, getStepItems, matchesQuestState } from './quest-status'
+import { getActiveQuestIds, getQuestStatus, getStepItems, matchesQuestState } from './quest-status'
+import { reputationTier } from '../store/player/reputation'
+import { ReputationTier } from '../../enums/reputation-tier.enum'
 import { QuestID } from '../../enums/ids/quest-id.enum'
 import { QuestState } from '../../enums/quest-state.enum'
 import { QuestStep } from '../../types/quests/quest-progression.type'
@@ -28,6 +32,7 @@ export class DialogueManagerService {
   private currencyFeed = inject(CurrencyFeedService)
   private battleStore = inject(BattleStore)
   private arenaService = inject(ArenaService)
+  private reputationService = inject(ReputationService)
 
   private currentConversation = signal<Record<any, DialogueNode<any>> | null>(null)
   private currentNodeId = signal<any>(null)
@@ -40,7 +45,10 @@ export class DialogueManagerService {
 
   activeNpc = signal<NPCProps | null>(null)
 
-  /** The shown and executed branch: the first result whose conditions pass, skipping quest starts that aren't available. */
+  /**
+   * The shown and executed branch: the first result whose conditions pass, skipping quest starts that aren't available
+   * and turn-ins whose town is Exalted.
+   */
   getActiveResult<T>(option: DialogueOption<T>): DialogueResult<T> | undefined {
     if (!option.results || option.results.length === 0) return undefined
 
@@ -49,6 +57,8 @@ export class DialogueManagerService {
         (e): e is QuestEffect => e.type === 'quest' && e.action === 'start',
       )
       if (questStart && !this.isQuestAvailable(questStart.questId)) return false
+      const turnIn = result.effects?.find((e): e is ReputationTurnInEffect => e.type === 'reputationTurnIn')
+      if (turnIn && this.isTurnInClosed(turnIn)) return false
 
       return this.checkConditions(result.visibilityConditions)
     })
@@ -63,9 +73,32 @@ export class DialogueManagerService {
     )
   }
 
-  /** False when the result's rewards would not fit in the inventory, or its gold fee can't be paid. */
+  /** False when the result's rewards would not fit in the inventory, its gold fee can't be paid, or a turn-in has no full bundle. */
   canApplyResult(result: DialogueResult<any> | undefined): boolean {
     return Object.keys(this.missingSlots(result)).length === 0 && this.missingGold(result) === 0
+      && (result?.effects ?? []).every(effect => effect.type !== 'reputationTurnIn' || this.turnIn(effect).bundles > 0)
+  }
+
+  /**
+   * What a turn-in hands over right now: the NPC's turn-in, how many of its item the player holds, how many the
+   * current steps of active quests keep back, and the full bundles taken from the rest.
+   */
+  turnIn(effect: ReputationTurnInEffect): { turnIn: ReputationTurnIn, held: number, kept: number, bundles: number } {
+    const turnIn = turnInFor(effect.npcId)
+    if (!turnIn) throw new Error(`No reputation turn-in for NPC ${effect.npcId}`)
+    const progression = this.questStore.questStepProgression()
+    const kept = [...getActiveQuestIds(progression)]
+      .flatMap(questId => getStepItems(questId, progression[questId] as QuestStep))
+      .filter(stack => stack.id === turnIn.itemId)
+      .reduce((sum, stack) => sum + stack.amount, 0)
+    const held = this.playerStore.itemCount(turnIn.itemId)
+    return { turnIn, held, kept, bundles: turnInBundles(turnIn, Math.max(0, held - kept), effect.bundles) }
+  }
+
+  /** Turn-ins stop once their town is Exalted: more reputation would count for nothing. */
+  private isTurnInClosed(effect: ReputationTurnInEffect): boolean {
+    const townId = turnInFor(effect.npcId)?.townId
+    return townId === undefined || reputationTier(this.playerStore.reputation()[townId] ?? 0) === ReputationTier.exalted
   }
 
   /** Gold still needed to pay the result's `deduct` effects (owner decision: gold never goes negative). */
@@ -295,6 +328,13 @@ export class DialogueManagerService {
           if (effect.action === 'enter') this.arenaService.enter()
           else this.arenaService.claimRewards()
           break
+        case 'reputationTurnIn': {
+          const { turnIn, bundles } = this.turnIn(effect)
+          if (bundles === 0) break
+          this.playerStore.removeItems([{ id: turnIn.itemId, amount: bundles * turnIn.bundleSize }])
+          this.reputationService.gain([{ townId: turnIn.townId, amount: bundles * turnIn.reputation }])
+          break
+        }
       }
     })
   }

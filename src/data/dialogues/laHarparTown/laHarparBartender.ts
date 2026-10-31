@@ -120,6 +120,14 @@ const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
         ],
       },
       {
+        responseKey: 'quests:reputation.turnInOne',
+        results: [{ next: BartenderDialogue.default, effects: [{ type: 'reputationTurnIn', npcId: NpcID.laHarparBartender, bundles: 'one' }] }],
+      },
+      {
+        responseKey: 'quests:reputation.turnInAll',
+        results: [{ next: BartenderDialogue.default, effects: [{ type: 'reputationTurnIn', npcId: NpcID.laHarparBartender, bundles: 'all' }] }],
+      },
+      {
         responseKey: `${NS}:default.goodbye`,
         results: [
           {
