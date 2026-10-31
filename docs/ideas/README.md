@@ -37,4 +37,5 @@ Owner decisions in force:
 | [Lirold Arena Master (Ludo Crane)](lirold-arena-master.md) | S | Proposed |
 | [Lirold & the Exploration Guild](north-lirold-and-exploration-guild.md) | M | Proposed |
 | [Slatefall & the Deeper Mines](slatefall-and-the-deeper-mines.md) | M-L | Proposed |
+| [Inventory tabs, zone pet collections & destroy](inventory-tabs.md) | M-L | Accepted design |
 | [Known issues](known-issues.md) | — | Open bug and tech-debt list |
