@@ -157,7 +157,7 @@ The culmination. The Gnarled Treant must be destroyed.
 - Weakness: fire
 - Drops: ancient wood ×1–5 (uncommon), heartwood amulet (rare equipment drop)
 - Types: `plant`, `treant`
-- *An ancient Silverwood Spire that became sentient and turned hostile when the forest's corruption spread. Its roots crack the platform walkways of the Deepwood district.*
+- *An ancient Silverwood Spire consumed by a long-dead druid's failed ritual — the source of the black sap, not its victim (`mawoodCorwin.json` `questTheSap`). Its roots crack the platform walkways of the Deepwood district.*
 
 **Zone stats:** maxWave 20, enemiesPerWave 8  
 **Progression:** no previousZoneId (unlocked from town), nextZoneId = upperCanopy
@@ -177,7 +177,7 @@ The culmination. The Gnarled Treant must be destroyed.
 |---------|------|----|----------|-------|-------|
 | 27 | `harpy` | 45 | physical | harpy feather (resource, high value) | New type: `harpy`, `bird` (reuse) |
 | 28 | `giantEagle` | 60 | physical | eagle talon (resource) | New type: `bird` (reuse). Rare; territorial |
-| 29 | `canopyBandit` | 70 | air | vial of water, machete (low chance) | Reuse `bandit`, `human`. Outlaws who fled up here |
+| 29 | `canopyBandit` | 70 | air | vial of water (the machete drop was removed for the tier 7 Talon Blade on Giant Eagle) | Reuse `bandit`, `human`. Outlaws who fled up here |
 | 1 | `seagull` | 3 | physical | *(reuse)* | Lost stragglers, weak filler |
 
 **Boss (EnemyID 30): `harpyMatriarch`**
@@ -269,7 +269,7 @@ Reward types available: `stat` (xp, gold, skillPoints), `item`
 ---
 
 **Quest 7 — "Big Game"** *(multi-step, enemy kills + item fetch)*  
-> *"The bear that took my leg is still out there. Somewhere in the Deepwood. I need its pelt — for closure, not warmth."*
+> *"There's a bear in the Deepwood. Old, missing an ear, mine to leave alone. But the other bears are fair game. I need three pelts."* (A treant took Finn's leg, not a bear: `mawoodFinn.json` `aboutLeg`, `questBigGame`.)
 
 - **Start req:** Quest 6 completed + Deepwood accessible
 - **Step 1:** Kill 5 `forestBear` (enemy req — prove you can handle bears)

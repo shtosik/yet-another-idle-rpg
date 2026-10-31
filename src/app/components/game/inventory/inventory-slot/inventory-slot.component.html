@@ -16,6 +16,15 @@
     width="32"
   >
   <span>{{ amount }}</span>
+  @if (destroyable) {
+    <button
+      type="button"
+      class="item__destroy"
+      [attr.aria-label]="'app:inventory.destroy.button' | i18next"
+      [attr.title]="'app:inventory.destroy.button' | i18next"
+      (click)="handleDestroy($event)"
+    >&times;</button>
+  }
 </div>
 
 <ng-template
@@ -25,21 +34,38 @@
 >
   <div class="item__tooltip">
     <span>{{ ('items:names.' + ItemID[item.id]) | i18next }}</span>
-    <span
-      [attr.data-tier]="ItemTier[tier]"
-      class="tier"
-    >{{ ('items:tiers.' + ItemTier[tier]) | i18next }}</span>
+    <span class="tier-line">
+      <span
+        [attr.data-tier]="ItemTier[tier]"
+        class="tier"
+      >{{ ('items:tiers.' + ItemTier[tier]) | i18next }}</span>
+      @if (item.slot === EquipmentSlot.weapon) {
+        @let element = DamageElement[item.damageType ?? DamageElement.physical];
+        <span aria-hidden="true">·</span>
+        <span
+          [attr.data-element]="element"
+          class="element"
+        >{{ ('bestiary:elements.' + element) | i18next }}</span>
+      }
+    </span>
     @if (item.type === ItemType.equipment) {
       @for (stat of $any(item.stats); track stat.id) {
         <span class="stat">{{ stat.id | statToPercentage:stat.amount }} {{ ('app:playerStats.' + stat.id) | i18next }}</span>
       }
-      <span class="click">{{ 'items:clickToEquip' | i18next }}</span>
+      @if (item.spell !== undefined) {
+        <span class="stat">{{ 'items:grantsSpell' | i18next:{ spell: ('spells:names.' + SpellID[item.spell] + '.name') | i18next } }}</span>
+      }
+      @if (clickable) {
+        <span class="click">{{ 'items:clickToEquip' | i18next }}</span>
+      }
     }
     @if (item.type === ItemType.rewardsStats) {
       @for (stat of $any(item.stats); track stat.id) {
-        <span class="stat">+{{ stat.id | statToPercentage:stat.amount }} {{ ('app:playerStats.' + stat.id) | i18next }}</span>
+        <span class="stat">{{ stat.id | statToPercentage:stat.amount }} {{ ('app:playerStats.' + stat.id) | i18next }}</span>
       }
-      <span class="click">{{ 'items:rightClickToUse' | i18next }}</span>
+      @if (clickable) {
+        <span class="click">{{ 'items:rightClickToUse' | i18next }}</span>
+      }
     }
     @if (item.type === ItemType.food || item.type === ItemType.potion) {
       <app-consumable-effect [effect]="item.effect"/>
@@ -51,7 +77,14 @@
         <span class="stat">{{ 'items:station.needsPrevious' | i18next:{ station, level: item.level - 1 } }}</span>
       }
     }
-    @if (item.type === ItemType.food || item.type === ItemType.potion || item.type === ItemType.book || item.type === ItemType.stationUpgrade) {
+    @if (item.type === ItemType.chest) {
+      <span class="stat">{{ 'items:chestRolls' | i18next:{ count: item.rolls } }}</span>
+    }
+    @if (item.type === ItemType.spellScroll) {
+      <span class="stat">{{ 'items:teachesSpell' | i18next:{ spell: ('spells:names.' + SpellID[item.spellId] + '.name') | i18next } }}</span>
+    }
+    <!-- Shop and modal slots ignore clicks, so they show no click hints. -->
+    @if (clickable && (item.type === ItemType.food || item.type === ItemType.potion || item.type === ItemType.book || item.type === ItemType.stationUpgrade || item.type === ItemType.spellScroll || item.type === ItemType.chest)) {
       <span class="click">{{ 'items:rightClickToUse' | i18next }}</span>
     }
   </div>

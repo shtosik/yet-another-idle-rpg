@@ -8,6 +8,7 @@ $selectedBackground: #1a1a1a
 $muted: #a3a3a3
 $ready: #4ade80
 $locked: #fb923c
+$slotSize: 2.75rem
 
 :host
   @include mixins.panel
@@ -20,7 +21,7 @@ $locked: #fb923c
   flex-direction: column
   width: 100%
   height: 100%
-  font-size: 0.75rem
+  font-size: 0.8125rem
 
   &__tabs
     display: flex
@@ -39,7 +40,7 @@ $locked: #fb923c
     border-radius: vars.$panelBorderRadius vars.$panelBorderRadius 0 0
     background: transparent
     color: inherit
-    font-size: 0.75rem
+    font-size: 0.8125rem
     cursor: pointer
 
     &:hover
@@ -58,7 +59,7 @@ $locked: #fb923c
     border-radius: 3px
     background: #333
     color: #dddada
-    font-size: 0.7rem
+    font-size: 0.7625rem
 
   &__body
     display: flex
@@ -69,7 +70,7 @@ $locked: #fb923c
 
   &__recipes
     display: flex
-    flex: 0 0 27.5rem
+    flex: 0 0 20rem
     flex-direction: column
     gap: 0.375rem
     min-height: 0
@@ -85,15 +86,48 @@ $locked: #fb923c
 
   &__station-level
     color: $muted
-    font-size: 0.7rem
+    font-size: 0.7625rem
 
-  &__list
+  &__filters
     display: flex
-    flex: 1 1 auto
-    flex-direction: column
+    flex-wrap: wrap
+    align-items: center
     gap: 3px
+
+  &__filter
+    height: 1.375rem
+    padding: 0 0.5rem
+    border: vars.$panelBorder
+    border-radius: 3px
+    background: $rowBackground
+    color: #dddada
+    font-size: 0.7625rem
+    cursor: pointer
+
+    &:hover
+      background: vars.$hoverBackground
+
+    &--active,
+    &--active:hover
+      border-color: palette.$yellow
+      background: #422006
+      color: #fef9c3
+
+  // Slots pack from the top-left; the list scrolls once it outgrows the panel.
+  &__grid
+    display: grid
+    grid-template-columns: repeat(auto-fill, $slotSize)
+    grid-auto-rows: $slotSize
+    align-content: start
+    gap: 4px
+    flex: 1 1 auto
     min-height: 0
     overflow-y: auto
+    padding: 2px
+
+  &__empty
+    grid-column: 1 / -1
+    color: $muted
 
   &__detail
     flex: 1 1 auto
@@ -112,115 +146,56 @@ $locked: #fb923c
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6)
     pointer-events: none
 
-.row
+.slot
+  position: relative
   display: flex
   align-items: center
+  justify-content: center
+  width: 100%
+  height: 100%
+  padding: 0
+  border: 1px solid map.get(palette.$itemPalette, normal)
   border-radius: 4px
   background: $rowBackground
+  cursor: pointer
 
-  &--selected
+  @each $tier, $color in palette.$itemPalette
+    &[data-tier="#{$tier}"]
+      border-color: $color
+
+  &:hover
+    background: vars.$hoverBackground
+
+  &--selected,
+  &--selected:hover
     background: $selectedBackground
-    box-shadow: inset 0 0 0 1px palette.$yellow
+    box-shadow: 0 0 0 2px palette.$yellow
 
-  &__select
-    display: flex
-    flex: 1 1 auto
-    align-items: center
-    gap: 0.5rem
-    min-width: 0
-    height: 2.375rem
-    padding: 0 0.375rem
-    border: 0
-    background: none
-    color: inherit
-    font-size: 0.75rem
-    text-align: left
-    cursor: pointer
+  &__img
+    image-rendering: pixelated
+    object-fit: contain
 
-  &__icon
-    display: flex
-    flex: none
-    align-items: center
-    justify-content: center
-    width: 1.875rem
-    height: 1.875rem
-    border: 1px solid map.get(palette.$itemPalette, normal)
-    border-radius: 4px
-    background: $selectedBackground
+  // Missing ingredients: still selectable, just quieter.
+  &--dim &__img
+    opacity: 0.4
 
-    @each $tier, $color in palette.$itemPalette
-      &[data-tier="#{$tier}"]
-        border-color: $color
+  &--locked &__img
+    opacity: 0.25
+    filter: grayscale(1)
 
-    img
-      image-rendering: pixelated
-      object-fit: contain
-
-    &--locked img
-      opacity: 0.45
-
-  &__name
-    flex: 1 1 auto
-    min-width: 0
-    overflow: hidden
-    color: #f5f5f5
-    text-overflow: ellipsis
-    white-space: nowrap
-
-    &--muted
-      color: $muted
-
-  &__ingredients
-    display: flex
-    flex: none
-    gap: 0.375rem
-
-  &__ingredient
+  &__lock
+    position: absolute
+    right: 1px
+    bottom: 0
     display: flex
     align-items: center
     gap: 1px
-    color: $muted
-    font-size: 0.7rem
-
-    img
-      image-rendering: pixelated
-
-  &__badge
-    display: flex
-    flex: none
-    align-items: center
-    justify-content: flex-end
-    gap: 3px
-    width: 2.5rem
-    color: $muted
-
-    &--ready
-      color: $ready
-
-    &--locked
-      color: $locked
-
-  &__quick
-    display: flex
-    flex: none
-    align-items: center
-    justify-content: center
-    width: 2rem
-    height: 2rem
-    margin-right: 3px
-    border: 0
+    padding: 0 2px
     border-radius: 3px
-    background: #422006
-    color: #fde047
-    cursor: pointer
-
-    &:hover:not(:disabled)
-      background: #5c2d0a
-
-    &:disabled
-      background: transparent
-      color: #555
-      cursor: default
+    background: rgba(0, 0, 0, 0.75)
+    color: $locked
+    font-size: 0.7125rem
+    line-height: 0.9rem
 
 button:focus-visible
   outline: 2px solid palette.$yellow

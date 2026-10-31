@@ -13,6 +13,7 @@ import { DialogueCondition } from '../../../../types/dialogues/dialogue-conditio
 import { ZoneID } from '../../../../enums/ids/zone-id.enum'
 import { CloseButtonComponent } from '../../shared/close-button/close-button.component'
 import { PlayerStore } from '../../../store/player/player.store'
+import { missingSlotsText } from '../inventory/tab-text'
 
 @Component({
   selector: 'app-dialogue',
@@ -141,6 +142,8 @@ export class DialogueComponent {
           case 'claimTask':  return 'Claim reward'
           case 'abandonTask': return 'Cancel task'
         }
+      case 'arena':
+        return i18next.t(`app:arena.effects.${effect.action}`)
       default:
         return ''
     }
@@ -158,8 +161,9 @@ export class DialogueComponent {
     return !result.requirementsNeeded.every(req => this.dialogueService.checkCondition(req))
   }
 
-  missingSlots(option: DialogueOption<any>): number {
-    return this.dialogueService.missingSlots(this.dialogueService.getActiveResult(option))
+  /** "1 Materials slot" etc.; empty when the rewards fit. */
+  missingSlots(option: DialogueOption<any>): string {
+    return missingSlotsText(this.dialogueService.missingSlots(this.dialogueService.getActiveResult(option)))
   }
 
   missingGold(option: DialogueOption<any>): number {

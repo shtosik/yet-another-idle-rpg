@@ -10,6 +10,11 @@ export enum SkillNodeID {
     weaknesses = 4,
     shinyHunter = 5,
     autoEat = 6,
+    packRat = 7,
+    gearPouch = 8,
+    consumablesPouch = 9,
+    materialsPouch = 10,
+    bottomlessPack = 11,
 
     // Damage Skill Tree
     attackPower = 205,
@@ -26,4 +31,15 @@ export enum SkillNodeID {
     magicDamage = 403,
     spellCrit = 404,
     spellCooldown = 405,
+    tidalLash = 406,
+    galeCut = 407,
+    stoneSpike = 408,
+    fireMastery = 409,
+    waterMastery = 410,
+    airMastery = 411,
+    earthMastery = 412,
+    fireStrikeCooldown = 413,
+    tidalLashCooldown = 414,
+    galeCutCooldown = 415,
+    stoneSpikeMana = 416,
 }

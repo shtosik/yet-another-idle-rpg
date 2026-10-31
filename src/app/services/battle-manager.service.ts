@@ -1,4 +1,9 @@
-import { computed, inject, Injectable } from '@angular/core'
+import { ArenaBossesService } from './arena-bosses.service'
+import { ArenaService } from './arena.service'
+import { WeaponCategory } from '../../enums/weapon-category.enum'
+import { computed, inject, Injectable, signal } from '@angular/core'
+import i18next from 'i18next'
+import { InventoryTab, ItemStack, tabOf } from '../store/player/inventory'
 import { BattleStore } from '../store/battle/battle.store'
 import { PlayerStore } from '../store/player/player.store'
 import { QuestsStore } from '../store/quests/quests.store'
@@ -7,6 +12,7 @@ import { SkillNodeID } from '../../enums/ids/skill-node-id.enum'
 import { SpellID } from '../../enums/ids/spell-id.enum'
 import SPELLS_DATA from '../../data/spells-data'
 import { SpellType } from '../../enums/spell-type.enum'
+import { SpellDamageOverTimeEffectProps } from '../../interfaces/spell.interface'
 import { Enemy } from '../../interfaces/enemy.interface'
 import { ZONE_UNLOCK_NOTIFICATIONS } from '../../data/unlock-conditions'
 import { ModalService } from './modal.service'
@@ -21,15 +27,22 @@ import { OfflineStore } from '../store/offline/offline.store'
 /** Cooldown reduction can't push a spell below this. */
 const MIN_SPELL_COOLDOWN_IN_SECONDS = 1
 const MS_PER_SECOND = 1000
+const DROPS_LOST_TOAST_MS = 3000
 
 @Injectable({ providedIn: 'root' })
 export class BattleManagerService {
   private battleStore = inject(BattleStore)
+  private arenaService = inject(ArenaService)
+  private arenaBosses = inject(ArenaBossesService)
   private playerStore = inject(PlayerStore)
   private questsStore = inject(QuestsStore)
   private animations = inject(AnimationsService)
   private modalService = inject(ModalService)
   private offlineStore = inject(OfflineStore)
+
+  /** Drops a full tab lost on the last kill, one line per tab; clears itself after `DROPS_LOST_TOAST_MS`. */
+  dropsLostToast = signal<string | null>(null)
+  private dropsLostTimer?: ReturnType<typeof setTimeout>
 
   currentWaveKillCount = computed(() => {
     const zoneProgression = this.playerStore.zonesProgression()[this.battleStore.currentZoneId()] || {}
@@ -56,17 +69,29 @@ export class BattleManagerService {
     const enemy = this.battleStore.enemy()
 
     if (!enemy) return
+    const isArena = !!this.battleStore.arenaRun()
+    // A burrowed champion: nothing to hit (a damage-over-time tick is spent).
+    if (isArena && this.arenaBosses.isHidden()) return
 
-    const { damage, isCrit, isWeaknessHit } = resolveHit({
+    // Double Attack is the melee spell, melee whatever the weapon; an auto-attack is melee with a melee weapon.
+    const isMelee = magicDamage === 0 && (isDoubleAttack || this.playerStore.equippedWeaponCategory() === WeaponCategory.melee)
+    // Ambush: melee hits use up the guaranteed crits; ranged and magic hits don't.
+    const forceCrit = isMelee && this.battleStore.useEmpoweredHit()
+    const hitType = damageType ?? this.playerStore.equippedWeaponDamageType()
+    const hit = resolveHit({
       stats: this.playerStore.stats(),
       magicDamage,
+      isMelee,
+      forceCrit,
       isDoubleAttack,
-      damageType: damageType ?? this.playerStore.equippedWeaponDamageType(),
+      damageType: hitType,
       enemyWeakness: enemy.weakness,
       enemyTypes: enemy.enemyTypes,
       hasWeaknessSkill: this.playerStore.hasSkillUnlocked(SkillNodeID.weaknesses),
       hasSpellCritSkill: this.playerStore.hasSkillUnlocked(SkillNodeID.spellCrit),
     })
+    const { isCrit, isWeaknessHit } = hit
+    const damage = isArena ? this.arenaBosses.modifyHit(hit.damage, hitType, magicDamage > 0) : hit.damage
 
     const newHp = Math.max(0, enemyHp - damage)
     this.battleStore.updateEnemyHp(newHp)
@@ -78,27 +103,46 @@ export class BattleManagerService {
   }
 
   canAffordSpell(spellId: SpellID): boolean {
-    const spellData = SPELLS_DATA[spellId]
-    return this.playerStore.stats().mana >= spellData.baseManaCost
+    return this.playerStore.stats().mana >= this.manaCost(spellId)
   }
 
-  /** Seconds, after `spellCooldownReduction`, never below `MIN_SPELL_COOLDOWN_IN_SECONDS`. */
+  /** Levels of the spell's perk node (`SpellProps.perk`); 0 without one. */
+  private perkLevel(spellId: SpellID): number {
+    const perk = SPELLS_DATA[spellId].perk
+    return perk ? this.playerStore.unlockedNodes()[perk.nodeId] ?? 0 : 0
+  }
+
+  /** `baseManaCost` minus the perk's mana per level, never below 1. */
+  manaCost(spellId: SpellID): number {
+    const { baseManaCost, perk } = SPELLS_DATA[spellId]
+    return Math.max(1, baseManaCost - (perk?.manaPerLevel ?? 0) * this.perkLevel(spellId))
+  }
+
+  /** Seconds, after `spellCooldownReduction` and the spell's perk, never below `MIN_SPELL_COOLDOWN_IN_SECONDS`. */
   spellCooldown(spellId: SpellID): number {
-    const reduced = SPELLS_DATA[spellId].baseCooldown - this.playerStore.stats().spellCooldownReduction
+    const { baseCooldown, perk } = SPELLS_DATA[spellId]
+    const perkReduction = (perk?.cooldownPerLevel ?? 0) * this.perkLevel(spellId)
+    const reduced = baseCooldown - this.playerStore.stats().spellCooldownReduction - perkReduction
     return Math.max(MIN_SPELL_COOLDOWN_IN_SECONDS, reduced)
   }
 
   /**
-   * Equipped, off cooldown and affordable. Damage spells need a living enemy; buffs can be cast between fights
-   * but not while already active.
+   * Equipped, off cooldown, known (a gear spell: its gear is on) and affordable. Damage spells need a living enemy; buffs and
+   * empower spells (Ambush) can be cast between fights but not while already active.
    */
   canCast(spellId: SpellID): boolean {
     const slot = this.battleStore.equippedSpells().find(s => s?.spellId === spellId)
     if (!slot || slot.cooldownRemainingMs > 0 || !this.canAffordSpell(spellId)) return false
+    // A gear spell waiting out its cooldown after the gear came off.
+    if (!this.playerStore.knownSpellIds().includes(spellId)) return false
 
     if (SPELLS_DATA[spellId].effect.type === SpellType.buff) {
       return !this.battleStore.activeBuffs().some(b => b.spellId === spellId)
     }
+    if (SPELLS_DATA[spellId].effect.type === SpellType.damageOverTime
+      && this.battleStore.activeDamageOverTime().some(d => d.spellId === spellId)) return false
+    // Like a buff: castable between fights, not again while its crits are left.
+    if (SPELLS_DATA[spellId].effect.type === SpellType.empower) return this.battleStore.empowered()?.spellId !== spellId
     return this.battleStore.isInCombat()
   }
 
@@ -106,7 +150,7 @@ export class BattleManagerService {
     if (!this.canCast(spellId)) return
 
     const spellData = SPELLS_DATA[spellId]
-    this.playerStore.updatePlayerStats([{ stat: 'mana', amount: -spellData.baseManaCost }])
+    this.playerStore.updatePlayerStats([{ stat: 'mana', amount: -this.manaCost(spellId) }])
     this.battleStore.setSpellCooldown(spellId, this.spellCooldown(spellId) * MS_PER_SECOND)
 
     switch (spellData.effect.type) {
@@ -115,6 +159,12 @@ export class BattleManagerService {
         break
       case SpellType.magic:
         this.doDamage(spellData.effect.baseDamage, false, spellData.effect.damageType)
+        break
+      case SpellType.damageOverTime:
+        this.battleStore.addDamageOverTime(spellId)
+        break
+      case SpellType.empower:
+        this.battleStore.empower(spellId, spellData.effect.hits)
         break
       case SpellType.buff: {
         // The stat change itself is derived from activeBuffs (PlayerStore.stats).
@@ -144,6 +194,19 @@ export class BattleManagerService {
 
   tickSpells(deltaMs: number): void {
     this.battleStore.tickSpellTimers(deltaMs)
+  }
+
+  /** Damage over time only runs while an enemy is alive, so a respawn doesn't use it up; it goes on to the next enemy. */
+  tickDamageOverTime(deltaMs: number): void {
+    let remainingMs = deltaMs
+    // Hit by hit, so a kill stops the clock right there: the time and hits left wait for the next enemy.
+    while (remainingMs > 0 && this.battleStore.isInCombat()) {
+      const { spellId, usedMs } = this.battleStore.advanceDamageOverTime(remainingMs)
+      remainingMs -= usedMs
+      if (spellId === null) return
+      const { damagePerHit, damageType } = SPELLS_DATA[spellId].effect as SpellDamageOverTimeEffectProps
+      this.doDamage(damagePerHit, false, damageType)
+    }
   }
 
   /** Once per second: consumable effects and locks, then auto-eat. */
@@ -186,6 +249,14 @@ export class BattleManagerService {
   }
 
   private handleEnemyDeath(enemy: Enemy) {
+    // Arena kills pay XP and gold and count in the bestiary: no zone progress, drops, tasks or offline kill rate.
+    if (this.battleStore.arenaRun()) {
+      this.battleStore.endBattle()
+      this.playerStore.updateEnemyKillCount(enemy.id, 1)
+      this.arenaService.onKill(enemy)
+      return
+    }
+
     const zoneId = this.battleStore.currentZoneId()
     const wave = this.battleStore.currentWave()
 
@@ -193,7 +264,8 @@ export class BattleManagerService {
     this.battleStore.endBattle()
     this.offlineStore.recordKill(performance.now(), zoneId, wave)
     const activeQuestIds = getActiveQuestIds(this.questsStore.questStepProgression())
-    this.playerStore.processBattleEnd(enemy.id, zoneId, wave, isShiny, activeQuestIds)
+    const lost = this.playerStore.processBattleEnd(enemy.id, zoneId, wave, isShiny, activeQuestIds)
+    if (lost.length) this.showDropsLost(lost)
 
     this.unlockNextZone(wave)
 
@@ -207,6 +279,20 @@ export class BattleManagerService {
     if (isAutoEnabled && isEnoughKillCountToProgress) {
       this.battleStore.changeWave(true)
     }
+  }
+
+  private showDropsLost(lost: ItemStack[]): void {
+    const byTab = new Map<InventoryTab, string[]>()
+    for (const { id, amount } of lost) {
+      const tab = tabOf(id)
+      const name = i18next.t(`items:names.${ItemID[id]}`)
+      byTab.set(tab, [...(byTab.get(tab) ?? []), amount > 1 ? `${name} x${amount}` : name])
+    }
+    const lines = [...byTab].map(([tab, names]) =>
+      i18next.t('app:inventory.dropsLost', { tab: i18next.t(`app:inventory.tabs.${tab}`), items: names.join(', ') }))
+    clearTimeout(this.dropsLostTimer)
+    this.dropsLostToast.set(lines.join('\n'))
+    this.dropsLostTimer = setTimeout(() => this.dropsLostToast.set(null), DROPS_LOST_TOAST_MS)
   }
 
   /**

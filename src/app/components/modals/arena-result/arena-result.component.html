@@ -1,0 +1,36 @@
+<app-close-button (onClose)="close()"/>
+<div class="arena-result">
+  <h2 class="arena-result__title">{{ 'app:arena.result.' + result.outcome + '.title' | i18next }}</h2>
+  <p class="arena-result__body">{{ 'app:arena.result.' + result.outcome + '.body' | i18next }}</p>
+
+  <ul class="arena-result__stats">
+    <li>{{ 'app:arena.result.time' | i18next: { time: (timeSeconds | duration) } }}</li>
+    @if (result.isBestTime) {
+      <li class="arena-result__best">{{ 'app:arena.result.bestTime' | i18next }}</li>
+    }
+    <li>{{ 'app:offline.kills' | i18next: { count: result.kills } }}</li>
+    <li>+{{ result.experience | number }} {{ 'app:playerStats.experience' | i18next }}</li>
+    <li>+{{ result.gold | number }} {{ 'app:playerStats.goldCoins' | i18next }}</li>
+  </ul>
+
+  @if (rewards().length) {
+    <div class="arena-result__items">
+      @for (item of rewards(); track $index) {
+        <app-slot>
+          <app-inventory-slot
+            [item]="ITEM_DATA[item.id]"
+            [tier]="item.tier ?? ITEM_DATA[item.id].tier"
+            [amount]="item.amount"
+            [clickable]="false"
+          />
+        </app-slot>
+      }
+    </div>
+    @if (!canClaim()) {
+      <p class="arena-result__full">{{ 'app:arena.result.inventoryFull' | i18next }}</p>
+    }
+    <button class="arena-result__cta" [disabled]="!canClaim()" (click)="claim()">{{ 'app:arena.result.claim' | i18next }}</button>
+  } @else {
+    <button class="arena-result__cta" (click)="close()">{{ 'app:arena.result.close' | i18next }}</button>
+  }
+</div>

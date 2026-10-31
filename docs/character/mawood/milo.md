@@ -1,7 +1,7 @@
 # Milo — Orphan Kid, Canopy Scout
 
 ## Personality
-~8-10 years old, reckless, fast-talking, overconfident bravado hiding real competence (tracks harpy patrols Finn dismisses). Craves being taken seriously ("Probably. But you've handled worse.").
+8 years old ("Eight years, which is my whole life"), reckless, fast-talking, overconfident bravado hiding real competence (tracks harpy patrols Finn dismisses). Craves being taken seriously ("But you've handled worse. Probably.").
 
 ## Avatar concept
 Small kid, wind-tousled hair, oversized hand-me-down jacket, rope/climbing harness. Freckles, wide grin, feather tied to belt. Lean-forward posture like mid-climb. Bright eager eyes.

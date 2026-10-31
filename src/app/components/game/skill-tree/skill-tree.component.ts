@@ -10,6 +10,7 @@ import { SkillTreeService } from 'app/services/skill-tree.service'
 import { ModalService } from 'app/services/modal.service'
 import { isRequirementMet } from 'utils/skill-tree-requirements'
 import { I18nextPipe } from 'app/pipes/i18next.pipe'
+import { tabName } from 'app/components/game/inventory/tab-text'
 
 type NodeState = 'allocated' | 'available' | 'locked' | 'maxed'
 
@@ -42,7 +43,7 @@ export class SkillTreeComponent {
     attributionControl: false,
     zoomControl: true,
     center: L.latLng(-400, 700),
-    zoom: -1,
+    zoom: 0,
     doubleClickZoom: false,
     zoomAnimation: true,
   }
@@ -94,7 +95,7 @@ export class SkillTreeComponent {
 
   private placeEdges(): void {
     const edgeGroup = L.layerGroup().addTo(this.map)
-    for (const [fromId, dependents] of SKILL_TREE_GRAPH.forwardEdges) {
+    for (const [fromId, dependents] of SKILL_TREE_GRAPH.drawnEdges) {
       const fromPos = SKILL_TREE_GRAPH.positions.get(fromId)
       if (!fromPos) continue
       for (const toId of dependents) {
@@ -133,12 +134,20 @@ export class SkillTreeComponent {
     }
 
     for (const edge of this.edges) {
-      const toState = stateById.get(edge.to)
-      const styleKey: 'locked' | 'available' | 'allocated' =
-        (toState === 'allocated' || toState === 'maxed') ? 'allocated'
-          : (toState === 'available') ? 'available'
-            : 'locked'
-      edge.polyline.setStyle(EDGE_STYLE[styleKey])
+      edge.polyline.setStyle(EDGE_STYLE[this.edgeStyle(stateById.get(edge.to))])
+    }
+  }
+
+  /** An edge is styled by the node it leads to. */
+  private edgeStyle(toState: NodeState | undefined): keyof typeof EDGE_STYLE {
+    switch (toState) {
+      case 'allocated':
+      case 'maxed':
+        return 'allocated'
+      case 'available':
+        return 'available'
+      default:
+        return 'locked'
     }
   }
 
@@ -183,7 +192,7 @@ export class SkillTreeComponent {
           .join(', ')
         refundLine = `<div class="skill-tooltip__refund skill-tooltip__refund--blocked">Refund blocked by: ${blockerNames}</div>`
       } else if ('reason' in check && check.reason === 'inventory-in-use') {
-        refundLine = `<div class="skill-tooltip__refund skill-tooltip__refund--blocked">${i18next.t('skill-tree:refundBlockedInventory')}</div>`
+        refundLine = `<div class="skill-tooltip__refund skill-tooltip__refund--blocked">${i18next.t('skill-tree:refundBlockedInventory', { tab: tabName(check.tab) })}</div>`
       }
     }
 

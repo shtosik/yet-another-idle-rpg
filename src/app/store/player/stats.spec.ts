@@ -1,4 +1,4 @@
-import { buffModifiers, deriveStats, equipmentModifiers, initialResources } from './stats'
+import { buffModifiers, deriveStats, equipmentModifiers, initialResources, statContributions } from './stats'
 import { initialEquipmentState, statsInitialState } from './player'
 import { ItemID } from '../../../enums/ids/item-id.enum'
 import { ItemTier } from '../../../enums/items/item-tier.enum'
@@ -38,5 +38,31 @@ describe('deriveStats', () => {
     const stats = deriveStats(initialResources(), [{ stat: 'goldCoins', amount: 10 }])
 
     expect(stats.goldCoins).toBe(0)
+  })
+})
+
+describe('statContributions', () => {
+  const none = { equipment: [], skills: [], buffs: [], consumables: [], bonuses: [], mastery: [] }
+
+  it('sums flat and percent amounts per source and skips sources without the stat', () => {
+    const contributions = statContributions('attackPower', {
+      ...none,
+      equipment: [{ stat: 'attackPower', amount: 2 }, { stat: 'attackPower', amount: 1 }, { stat: 'critChance', amount: 5 }],
+      skills: [{ stat: 'attackPower', amount: 0.1, percent: true }],
+    })
+
+    expect(contributions).toEqual([
+      { source: 'equipment', flat: 3, percent: 0 },
+      { source: 'skills', flat: 0, percent: 0.1 },
+    ])
+  })
+
+  it('keeps the data sign for inverted stats and rounds float drift', () => {
+    const contributions = statContributions('attackSpeed', {
+      ...none,
+      buffs: [{ stat: 'attackSpeed', amount: 0.1 }, { stat: 'attackSpeed', amount: 0.2 }],
+    })
+
+    expect(contributions).toEqual([{ source: 'buffs', flat: 0.3, percent: 0 }])
   })
 })

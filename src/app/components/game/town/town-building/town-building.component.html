@@ -8,7 +8,9 @@
   @for (npc of buildingData.npcs; track npc.id) {
     <app-npc-frame
       [npc]="npc"
+      [shopId]="npcShops()[npc.id]"
       (openDialogue)="openDialogue($event)"
+      (openShop)="openShop(npc.id, $event)"
     />
   }
 </section>

@@ -1,0 +1,16 @@
+<app-close-button (onClose)="cancel()"/>
+<div class="destroy">
+    <h2 class="destroy__title">{{ 'app:inventory.destroy.title' | i18next }}</h2>
+    <p>
+        {{ 'app:inventory.destroy.question' | i18next: {
+            amount: item.amount,
+            item: ('items:names.' + ItemID[item.id]) | i18next,
+            tier: ('items:tiers.' + ItemTier[item.tier]) | i18next
+        } }}
+    </p>
+    <p class="destroy__warning">{{ 'app:inventory.destroy.warning' | i18next }}</p>
+    <div class="destroy__actions">
+        <button class="destroy__btn" (click)="cancel()">{{ 'app:inventory.destroy.cancel' | i18next }}</button>
+        <button class="destroy__btn destroy__btn--confirm" (click)="confirm()">{{ 'app:inventory.destroy.confirm' | i18next }}</button>
+    </div>
+</div>

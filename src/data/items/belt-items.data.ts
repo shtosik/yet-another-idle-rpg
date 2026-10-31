@@ -27,4 +27,16 @@ export const BeltItemsData: Partial<Record<ItemID, Item>> = {
       },
     ],
   },
+  [ItemID.gnollWarbelt]: {
+    id: ItemID.gnollWarbelt,
+    tier: ItemTier.uncommon,
+    url: './assets/img/items/gnollWarbelt.png',
+    value: 2500,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.belt,
+    stats: [
+      { id: 'attackPower', amount: 3 },
+      { id: 'damageVsGnoll', amount: 0.2 },
+    ],
+  },
 }

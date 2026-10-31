@@ -108,3 +108,26 @@ test('--pick copies the candidate and creates/updates the manifest entry; scratc
     assert.equal(Object.keys(readManifest(manifestPath)).length, 1)
     assert.throws(() => pickCandidate({ slug: 'enemy-pixel-wolf', n: 9, tmpDir, root, manifestPath }), /--pick must be 1\.\.2/)
 })
+
+test('parseJobs checks regions: they need a mask job, a prompt and existing images', () => {
+    const map = { family: 'map-painterly', target: '.tmp-gen/map/w.png', subject: 's' }
+    const ref = 'scripts/asset-gen/refs/map/forest.png'
+    assert.throws(
+        () => parseJobs([
+            { ...map, regions: [{ mask: ref, prompt: 'p' }] },
+            { ...map, tag: 'b', source: ref, mask: ref, regions: [{ mask: 'nope.png' }] },
+        ]),
+        (err) => /job 0: "regions" need "source" and "mask"/.test(err.message) && /region 0 needs a "prompt"/.test(err.message) && /region 0 mask image not found "nope.png"/.test(err.message),
+    )
+    assert.equal(parseJobs([{ ...map, source: ref, mask: ref, regions: [{ mask: ref, prompt: 'mountains', control: ref }] }]).length, 1)
+})
+
+test('parseJobs checks blockout: it needs a mask job and a denoise below 1', () => {
+    const map = { family: 'map-painterly', target: '.tmp-gen/map/w.png', subject: 's' }
+    const ref = 'scripts/asset-gen/refs/map/forest.png'
+    assert.throws(
+        () => parseJobs([{ ...map, blockout: true }, { ...map, tag: 'b', source: ref, mask: ref, blockout: true, denoise: 1 }]),
+        (err) => /job 0: "blockout" needs "source" and "mask"/.test(err.message) && /job 1: "blockout" needs denoise below 1/.test(err.message),
+    )
+    assert.equal(parseJobs([{ ...map, source: ref, mask: ref, blockout: true }]).length, 1)
+})

@@ -1,7 +1,7 @@
 import { patchState, signalStore, withComputed, withHooks, withMethods, withState } from '@ngrx/signals'
 import { ZoneID } from 'enums/ids/zone-id.enum'
 import { Enemy } from 'interfaces/enemy.interface'
-import { ActiveBuff, EquippedSpell } from '../../../interfaces/spells/equipped-spell.interface'
+import { ActiveBuff, ActiveDamageOverTime, EquippedSpell } from '../../../interfaces/spells/equipped-spell.interface'
 import ZONES_DATA from 'data/zones-data'
 import ENEMIES_DATA from 'data/enemies-data'
 import { SpellID } from '../../../enums/ids/spell-id.enum'
@@ -11,6 +11,24 @@ import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
 import { toShinyUrl } from 'utils/shiny-url'
 import { waveMultipliers } from './wave-scaling'
 import { ActiveConsumable, CONSUMABLE_SLOTS, ConsumableSlot } from '../../../interfaces/consumable.interface'
+import SPELLS_DATA from '../../../data/spells-data'
+import { SpellDamageOverTimeEffectProps } from '../../../interfaces/spell.interface'
+import { ARENA } from '../../../data/arena-data'
+import { ItemStack } from '../player/inventory'
+
+const MS_PER_SECOND = 1000
+
+/** A Combat Arena run in progress (`ArenaService`). Times are wall-clock ms, so the clock runs while the game is closed. */
+export interface ArenaRun {
+  /** 1-based index into `ARENA.waves`; one past the last wave means cleared. */
+  wave: number
+  waveKills: number
+  startedAt: number
+  endsAt: number
+  kills: number
+  experience: number
+  gold: number
+}
 
 export interface BattleState {
   isInCombat: boolean;
@@ -22,9 +40,20 @@ export interface BattleState {
   autoWaveProgressionEnabled: boolean;
   equippedSpells: (EquippedSpell | null)[];
   activeBuffs: ActiveBuff[];
+  activeDamageOverTime: ActiveDamageOverTime[];
+  /** An empower spell's guaranteed crits left (Ambush); saved, and not time-based, so it waits across reloads and offline. */
+  empowered: { spellId: SpellID, hitsLeft: number } | null;
   isShinyEnemy: boolean;
   consumableSlots: Record<ConsumableSlot, ActiveConsumable | null>;
   autoEatEnabled: boolean;
+  /** While set, the fight is the arena's: zone and wave moves are blocked, `currentZoneId` is where the player returns. */
+  arenaRun: ArenaRun | null;
+  arenaClears: number;
+  arenaBestTimeMs: number | null;
+  /** Wall-clock ms when the Arena takes the player again (`ARENA.entryCooldownMs` after the last entry). */
+  arenaReadyAt: number;
+  /** Clear rewards that didn't fit yet; claimed from the result modal or the Arena Master. */
+  arenaRewards: ItemStack[];
 }
 
 export const initialState: BattleState = {
@@ -36,9 +65,16 @@ export const initialState: BattleState = {
   autoWaveProgressionEnabled: false,
   equippedSpells: [null, null, null, null, null],
   activeBuffs: [],
+  activeDamageOverTime: [],
+  empowered: null,
   isShinyEnemy: false,
   consumableSlots: { food: null, potion: null },
   autoEatEnabled: false,
+  arenaRun: null,
+  arenaClears: 0,
+  arenaBestTimeMs: null,
+  arenaReadyAt: 0,
+  arenaRewards: [],
 }
 
 const STORE_KEY = 'battleStore'
@@ -61,7 +97,9 @@ export const BattleStore = signalStore(
       // An id the data no longer has (enemy removed or renumbered): no enemy; the fight is ended on load.
       const enemy = ENEMIES_DATA[enemyId]
       if (!enemy) return null
-      const maxHp = Math.round(enemy.maxHp * waveMultipliers(store.currentZoneData(), store.currentWave()).hp)
+      // Arena enemies are never wave-scaled.
+      const hpScale = store.arenaRun() ? 1 : waveMultipliers(store.currentZoneData(), store.currentWave()).hp
+      const maxHp = Math.round(enemy.maxHp * hpScale)
       return { ...enemy, maxHp, url: store.isShinyEnemy() ? toShinyUrl(enemy.url) : enemy.url }
     },
     requiredKillCountOnCurrentWave: () => store.currentWave() === store.currentZoneData().maxWave ? 1 : store.currentZoneData().enemiesPerWave,
@@ -69,6 +107,14 @@ export const BattleStore = signalStore(
   withMethods((store) => ({
     /** `shinyChance` is the player's stat in percent (passed in: PlayerStore derives its stats from this store). */
     startBattle(shinyChance: number): void {
+      const run = store.arenaRun()
+      if (run) {
+        const { enemies } = ARENA.waves[run.wave - 1]
+        const enemy = ENEMIES_DATA[enemies[Math.floor(Math.random() * enemies.length)]]
+        patchState(store, { isInCombat: true, enemyId: enemy.id, currentEnemyHp: enemy.maxHp, isShinyEnemy: false })
+        return
+      }
+
       patchState(store, (state) => {
         const zoneData = store.currentZoneData()
         let enemy: Enemy
@@ -95,6 +141,7 @@ export const BattleStore = signalStore(
     },
 
     changeWave(next: boolean): void {
+      if (store.arenaRun()) return
       patchState(store, (state) => {
         const zoneData = store.currentZoneData()
 
@@ -103,7 +150,8 @@ export const BattleStore = signalStore(
           const isMaxWave = state.currentWave === zoneData.maxWave
           const shouldGoNextZone = nextZone && isMaxWave
 
-          const wave = shouldGoNextZone ? 1 : (isMaxWave ? zoneData.maxWave : state.currentWave + 1)
+          // Past the last wave: the next zone's first wave, or stay on the last one when there's no next zone.
+          const wave = shouldGoNextZone ? 1 : Math.min(state.currentWave + 1, zoneData.maxWave)
           const zone = shouldGoNextZone ? nextZone : state.currentZoneId
 
           return {
@@ -120,7 +168,8 @@ export const BattleStore = signalStore(
           const isFirstWave = state.currentWave === 1
           const shouldGoPreviousZone = !!(previousZoneId && isFirstWave)
 
-          const wave = shouldGoPreviousZone ? previousZoneData.maxWave : (isFirstWave ? state.currentWave : state.currentWave - 1)
+          // Before wave 1: the previous zone's last wave, or stay on wave 1 when there's no previous zone.
+          const wave = shouldGoPreviousZone ? previousZoneData.maxWave : Math.max(state.currentWave - 1, 1)
           const zone = shouldGoPreviousZone ? previousZoneId : state.currentZoneId
 
           return {
@@ -181,6 +230,57 @@ export const BattleStore = signalStore(
       }))
     },
 
+    addDamageOverTime(spellId: SpellID): void {
+      patchState(store, (state) => ({
+        activeDamageOverTime: [...state.activeDamageOverTime.filter(d => d.spellId !== spellId), { spellId, msElapsed: 0, hits: 0 }],
+      }))
+    },
+
+    /**
+     * Advances running damage-over-time spells up to the next hit, at most `maxMs` of combat. Returns the spell that
+     * hits there (null when none is due within `maxMs`) and the time used, so the caller can stop at a kill and the
+     * rest waits for the next enemy. A spell ends after its last hit (`duration` / `interval` hits).
+     */
+    advanceDamageOverTime(maxMs: number): { spellId: SpellID | null, usedMs: number } {
+      const running = store.activeDamageOverTime()
+      if (!running.length) return { spellId: null, usedMs: maxMs }
+
+      const timing = (spellId: SpellID) => {
+        const { duration, interval } = SPELLS_DATA[spellId].effect as SpellDamageOverTimeEffectProps
+        return { intervalMs: interval * MS_PER_SECOND, totalHits: Math.round(duration / interval) }
+      }
+      const usedMs = Math.min(maxMs, ...running.map(a => Math.max(0, (a.hits + 1) * timing(a.spellId).intervalMs - a.msElapsed)))
+
+      let spellId: SpellID | null = null
+      const next = running.flatMap(active => {
+        const { intervalMs, totalHits } = timing(active.spellId)
+        const advanced = { ...active, msElapsed: active.msElapsed + usedMs }
+        if (spellId === null && advanced.msElapsed >= (advanced.hits + 1) * intervalMs) {
+          spellId = active.spellId
+          advanced.hits++
+        }
+        return advanced.hits < totalHits ? [advanced] : []
+      })
+      patchState(store, { activeDamageOverTime: next })
+      return { spellId, usedMs }
+    },
+
+    empower(spellId: SpellID, hits: number): void {
+      patchState(store, { empowered: { spellId, hitsLeft: hits } })
+    },
+
+    /** Uses one guaranteed crit; returns whether there was one. */
+    useEmpoweredHit(): boolean {
+      const empowered = store.empowered()
+      if (!empowered) return false
+      patchState(store, { empowered: empowered.hitsLeft > 1 ? { ...empowered, hitsLeft: empowered.hitsLeft - 1 } : null })
+      return true
+    },
+
+    clearDamageOverTime(): void {
+      patchState(store, { activeDamageOverTime: [] })
+    },
+
     /** Advances spell cooldowns and buffs by `deltaMs`. Writes only when something is running. */
     tickSpellTimers(deltaMs: number): void {
       const isCooling = store.equippedSpells().some(s => s && s.cooldownRemainingMs > 0)
@@ -232,6 +332,7 @@ export const BattleStore = signalStore(
     },
 
     setZone(zoneId: ZoneID): void {
+      if (store.arenaRun()) return
       patchState(store, {
         currentZoneId: zoneId,
         currentWave: 1,
@@ -240,6 +341,63 @@ export const BattleStore = signalStore(
         isInCombat: false,
         isShinyEnemy: false,
       })
+    },
+
+    /** Starts a run at wave 1; the zone fight in progress is dropped. */
+    startArenaRun(now: number): void {
+      patchState(store, {
+        arenaRun: { wave: 1, waveKills: 0, startedAt: now, endsAt: now + ARENA.timeLimitMs, kills: 0, experience: 0, gold: 0 },
+        arenaReadyAt: now + ARENA.entryCooldownMs,
+        currentEnemyHp: 0,
+        enemyId: null,
+        isInCombat: false,
+        isShinyEnemy: false,
+      })
+    },
+
+    /** One arena kill: counts it and its rewards, and moves to the next wave once this one has its kills. */
+    recordArenaKill(experience: number, gold: number): void {
+      patchState(store, ({ arenaRun: run }) => {
+        if (!run) return {}
+        const waveKills = run.waveKills + 1
+        const isWaveDone = waveKills >= ARENA.waves[run.wave - 1].count
+        return {
+          arenaRun: {
+            ...run,
+            wave: isWaveDone ? run.wave + 1 : run.wave,
+            waveKills: isWaveDone ? 0 : waveKills,
+            kills: run.kills + 1,
+            experience: run.experience + experience,
+            gold: run.gold + gold,
+          },
+        }
+      })
+    },
+
+    /** Ends the run; a clear counts and may set the best time. The zone fight respawns. */
+    endArenaRun(cleared: boolean, timeMs: number): void {
+      patchState(store, (state) => ({
+        arenaRun: null,
+        arenaClears: state.arenaClears + (cleared ? 1 : 0),
+        arenaBestTimeMs: cleared && (state.arenaBestTimeMs === null || timeMs < state.arenaBestTimeMs) ? timeMs : state.arenaBestTimeMs,
+        currentEnemyHp: 0,
+        enemyId: null,
+        isInCombat: false,
+        isShinyEnemy: false,
+      }))
+    },
+
+    /** The Arcanist's toll: run time taken off the clock. */
+    shortenArenaRun(ms: number): void {
+      patchState(store, ({ arenaRun: run }) => (run ? { arenaRun: { ...run, endsAt: run.endsAt - ms } } : {}))
+    },
+
+    addArenaRewards(items: ItemStack[]): void {
+      patchState(store, (state) => ({ arenaRewards: [...state.arenaRewards, ...items] }))
+    },
+
+    clearArenaRewards(): void {
+      patchState(store, { arenaRewards: [] })
     },
 
     resetState(): void {

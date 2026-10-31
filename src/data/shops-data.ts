@@ -15,6 +15,7 @@ const SHOPS_DATA: Record<ShopID, Shop> = {
       { itemId: ItemID.waterRune,       tier: ItemTier.normal,    price: 25,   maxStock: 99, refreshable: true  },
       { itemId: ItemID.earthRuneRecipe, tier: ItemTier.uncommon,  price: 500,  maxStock: 1,  refreshable: false },
       { itemId: ItemID.magicStaff,      tier: ItemTier.uncommon,  price: 3000, maxStock: 1,  refreshable: false },
+      { itemId: ItemID.mysticHood,      tier: ItemTier.uncommon,  price: 4000, maxStock: 1,  refreshable: false },
     ],
     // A collector of the arcane: runes, gear and rare monster parts, nothing else.
     buys: [ItemType.resource, ItemType.equipment],
@@ -39,6 +40,7 @@ const SHOPS_DATA: Record<ShopID, Shop> = {
       { itemId: ItemID.apple,          tier: ItemTier.normal,    price: 25,   maxStock: 99, refreshable: true  },
       { itemId: ItemID.cookingPot,     tier: ItemTier.uncommon,  price: 400,  maxStock: 1,  refreshable: false },
       { itemId: ItemID.woodenBow,      tier: ItemTier.uncommon,  price: 2500, maxStock: 1,  refreshable: true  },
+      { itemId: ItemID.apprenticeRobe, tier: ItemTier.uncommon,  price: 1500, maxStock: 1,  refreshable: false },
       { itemId: ItemID.fireRune,       tier: ItemTier.normal,    price: 20,   maxStock: 99, refreshable: true  },
       { itemId: ItemID.airRune,        tier: ItemTier.normal,    price: 20,   maxStock: 99, refreshable: true  },
       { itemId: ItemID.earthRune,      tier: ItemTier.normal,    price: 20,   maxStock: 99, refreshable: true  },
@@ -89,8 +91,9 @@ const SHOPS_DATA: Record<ShopID, Shop> = {
       { itemId: ItemID.cheesePlatterRecipe, tier: ItemTier.uncommon,  price: 6,  maxStock: 1,  refreshable: false },
       { itemId: ItemID.skillPointBook,      tier: ItemTier.legendary, price: 15, maxStock: 1,  refreshable: true },
       // Rank 1: more space and recipes
-      { itemId: ItemID.guildSatchel,        tier: ItemTier.rare,      price: 20, maxStock: 3,  refreshable: false, minRank: 1 },
+      { itemId: ItemID.guildSatchel,        tier: ItemTier.rare,      price: 20, maxStock: 1,  refreshable: false, minRank: 1 },
       { itemId: ItemID.huntersFeastRecipe,  tier: ItemTier.uncommon,  price: 12, maxStock: 1,  refreshable: false, minRank: 1 },
+      { itemId: ItemID.ambushScroll,        tier: ItemTier.rare,      price: 25, maxStock: 1,  refreshable: false, minRank: 1 },
       // Rank 2: combat-changers, bought once
       { itemId: ItemID.secondContract,      tier: ItemTier.legendary, price: 40, maxStock: 1,  refreshable: false, minRank: 2 },
       { itemId: ItemID.bountyMark,          tier: ItemTier.legendary, price: 40, maxStock: 1,  refreshable: false, minRank: 2 },

@@ -19,4 +19,41 @@ export const GlovesItemsData: Partial<Record<ItemID, Item>> = {
       },
     ],
   },
+  [ItemID.leatherGloves]: {
+    id: ItemID.leatherGloves,
+    tier: ItemTier.normal,
+    url: './assets/img/items/leatherGloves.png',
+    value: 12,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.gloves,
+    stats: [
+      { id: 'attackPower', amount: 1 },
+      { id: 'critChance', amount: 1 },
+    ],
+  },
+  [ItemID.bearhideGloves]: {
+    id: ItemID.bearhideGloves,
+    tier: ItemTier.uncommon,
+    url: './assets/img/items/bearhideGloves.png',
+    value: 338,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.gloves,
+    stats: [
+      { id: 'attackPower', amount: 3 },
+      { id: 'critChance', amount: 2 },
+    ],
+  },
+  // Arena Chest only: drops-and-progress gloves, a choice against power gloves.
+  [ItemID.patronGloves]: {
+    id: ItemID.patronGloves,
+    tier: ItemTier.epic,
+    url: './assets/img/items/patronGloves.png',
+    value: 2500,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.gloves,
+    stats: [
+      { id: 'goldCoinsMultiplier', amount: 0.1 },
+      { id: 'xpMultiplier', amount: 0.1 },
+    ],
+  },
 }

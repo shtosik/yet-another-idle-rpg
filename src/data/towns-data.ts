@@ -105,14 +105,24 @@ export const TOWNS_DATA: Record<TownID, Town> = {
       },
     ],
   },
-  [TownID.northLirold]: {
-    id: TownID.northLirold,
+  [TownID.lirold]: {
+    id: TownID.lirold,
     regionId: RegionID.portStocksmar,
-    buildings: [],
+    url: './assets/img/backgrounds/lirold.png',
+    buildings: [
+      {
+        buildingId: TownBuildingID.liroldArena,
+        position: { x: 50, y: 55 },
+        npcs: [
+          { id: NpcID.liroldArenaMaster, position: { x: 50, y: 50 } },
+        ],
+        url: './assets/img/backgrounds/liroldArena.png',
+      },
+    ],
   },
   [TownID.mawood]: {
     id: TownID.mawood,
-    regionId: RegionID.portStocksmar,
+    regionId: RegionID.elderreach,
     url: './assets/img/backgrounds/mawood.png',
     buildings: [
       {

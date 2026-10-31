@@ -47,86 +47,96 @@ const portStocksmarMarkers: WorldMapMarker[] = [
     type: 'town',
     townId: TownID.laHarpar,
     label: 'La Harpar',
-    position: { x: 410, y: 180 },
+    position: { x: 550, y: 280 },
   },
-  // {
-  //   type: 'town',
-  //   townId: TownID.northLirold,
-  //   label: 'North Lirold',
-  //   position: { x: 730, y: 110 },
-  // },
+  {
+    type: 'town',
+    townId: TownID.lirold,
+    label: 'Lirold',
+    position: { x: 600, y: 1180 },
+  },
   {
     type: 'zone',
     zoneId: ZoneID.horseshoeBeach,
     label: 'Horseshoe Beach',
-    position: { x: 200, y: 430 },
+    position: { x: 370, y: 650 },
+    minZoom: 2,
+  },
+  {
+    type: 'zone',
+    zoneId: ZoneID.tradersBasement,
+    label: "Trader's Basement",
+    position: { x: 550, y: 190 },
     minZoom: 2,
   },
   {
     type: 'zone',
     zoneId: ZoneID.plains,
     label: 'Plains',
-    position: { x: 750, y: 80 },
+    position: { x: 960, y: 120 },
     minZoom: 2,
   },
   {
     type: 'zone',
     zoneId: ZoneID.theLongPath,
     label: 'The Long Path',
-    position: { x: 670, y: 260 },
+    position: { x: 940, y: 480 },
     minZoom: 2,
   },
-  // Zones beyond the pass, positioned on the expanded (2794-wide) map art.
   {
     type: 'zone',
     zoneId: ZoneID.mountainPass,
     label: 'Mountain Pass',
-    position: { x: 1250, y: 550 },
+    position: { x: 1400, y: 600 },
     minZoom: 2,
   },
+]
+
+const elderreachMarkers: WorldMapMarker[] = [
   {
     type: 'zone',
     zoneId: ZoneID.elderwoodWilds,
     label: 'Elderwood Wilds',
-    position: { x: 1765, y: 310 },
+    position: { x: 2080, y: 620 },
     minZoom: 2,
   },
   {
     type: 'zone',
     zoneId: ZoneID.deepwood,
     label: 'Deepwood',
-    position: { x: 2030, y: 125 },
+    position: { x: 2000, y: 430 },
     minZoom: 2,
   },
   {
     type: 'zone',
     zoneId: ZoneID.upperCanopy,
     label: 'Upper Canopy',
-    position: { x: 2500, y: 75 },
+    position: { x: 2690, y: 100 },
     minZoom: 2,
   },
   {
     type: 'town',
     townId: TownID.mawood,
     label: 'Mawood',
-    position: { x: 2305, y: 150 },
+    position: { x: 2580, y: 280 },
   },
 ]
 
 export const WORLD_MAP_DATA: WorldMap = {
   tilesPath: 'assets/maps/world/tiles',
   manifest: {
-    width: 2794,
-    height: 752,
+    width: 3072,
+    height: 2048,
     tileSize: 256,
     minZoom: 1,
     maxZoom: 4,
   },
   defaultView: {
-    center: { x: 698, y: 376 },
+    center: { x: 1000, y: 600 },
     zoom: 2,
   },
   markers: [
     ...portStocksmarMarkers,
+    ...elderreachMarkers,
   ],
 }

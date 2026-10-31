@@ -1,4 +1,4 @@
-# Elder Tree — Town Center (`TownBuildingID.main`)
+# Elder's Tree — Town Center (`TownBuildingID.main`)
 
 ## Purpose
 Mawood's central platform, home to [Corwin](../mawood/corwin.md). Quest hub for the whole "Roots of Rot" corruption questline.

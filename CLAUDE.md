@@ -1,91 +1,23 @@
 # CLAUDE.md
 
-Guidance for Claude Code in this repository: a browser idle RPG (auto-battle in zones, skill tree, gear, quests, towns, crafting).
+**Done** = `npm run validate`, `npm run lint`, `npm run test:ci` and `npx ng build` all pass (CI runs the same).
 
-## Commands
+**Ask me** a clarifying question when a requirement or the architecture is unclear from the existing files.
 
-```bash
-npm start            # dev server (ng serve)
-npm run build        # production build (also staging)
-npm run build:testing # production build with the cheat bar (testing environment)
-npm run validate     # data, i18n, asset and doc-reference checks (scripts/validate-data.mjs)
-npm run sim          # economy simulation: zone times, first-hour ladder, reward flags (scripts/sim-economy.mjs)
-npm run tile         # regenerate world map tiles (node scripts/tile-map.mjs)
-npm run test:assets  # asset-gen pipeline tests (node:test, no GPU needed)
-npm run release -- minor  # on a release/* branch: bump version, date the changelog (docs/deployment.md)
-```
+**Before changing game behavior** (combat, saves, stats, inventory, drops, gold, dialogue, quests, skill tree, spells, crafting, offline progress, zones, towns, shops, enemies, pets, world map, translations, art), find its system doc in `docs/systems/README.md`; update that doc in the same commit.
 
-**Done** = `npm run validate` and `npx ng build` both pass.
+**Player-facing change** → add a note under `## [Unreleased]` in `CHANGELOG.md`: `- [feature|bug|buff|nerf] text`, plain English for players. Releases own the `package.json` `version`; release, deploy and environment steps are in `docs/deployment.md`.
 
-## Role
+**Before writing or reviewing code**, read `CODING_STANDARDS.md`.
 
-You're Senior Game Programmer. Prioritize good game design, user experience and optimization for web application. Write code that is readable with modern Angular standards, use signals. Ask questions if needed.
+**Before creating a branch, switching branches, committing or opening a PR**, read `docs/git-workflow.md`: parallel sessions share this checkout.
 
-## Communication Guidelines
+**Explore and develop on `origin/staging`**, also when only reading code or researching ideas in a new session. `main` is the released state: look at it only for a hotfix or when asked. The main checkout may sit on `main`, so check `git branch --show-current` before reading code there; otherwise run `git fetch origin staging` first, then read from a staging worktree or `git show origin/staging:<path>`.
 
-- Always think through the problem before executing code.
-- If a requirement is ambiguous or if you need more information to provide the best solution, **ask me a clarifying question** before proceeding.
-- Do not make assumptions about my project architecture if the answer isn't clear from the existing files.
+**Never lower inventory slot bonuses** (`inventorySlots` on items, skill nodes or the base) without a save migration: see owner decisions in `docs/systems/player-stats-inventory-equipment.md`.
 
-## Git workflow
+**Language**: use the terms in `GLOSSARY.md` in code, docs and commits.
 
-Several Claude sessions often run in parallel on this repo, sharing the main checkout.
+**Scripts are Node** (`scripts/*.mjs`): this machine has no Python.
 
-- **Never switch branches (`git checkout` / `git switch`) in the main checkout.** It moves every other session onto your branch and mixes uncommitted work.
-- For a new feature branch, create a worktree instead: `git worktree add ../yari-<name> -b feat/<name>` (or start the session with `claude --worktree <name>`), and work only inside it.
-- Right after `git worktree add`, switch the session into the worktree with the `EnterWorktree` tool (`path: ../yari-<name>`). The desktop app's diff pane only shows the session's own folder, so edits made in a worktree the session never entered don't show up there.
-- Run `npm install` in the new worktree. **Do not** junction/symlink `node_modules` from the main checkout — removing the worktree has deleted the real `node_modules` before.
-- Only stage files you changed yourself; other sessions' uncommitted work may be in the tree.
-
-## Stack
-
-Angular 20 standalone components, zoneless change detection, `OnPush` on every component (a few older ones still lack it), `inject()` for DI, signal `input()`/`output()` in new code (some older components still use decorators). State in NgRx Signal Stores (`src/app/store/`), persisted to `localStorage`. Angular Material dialogs, SASS, i18next, Leaflet. Static game content is typed TS data in `src/data/`, keyed by numeric enums in `src/enums/`.
-
-## Gotchas
-
-- **Pre-release: save compatibility is not required.** Rename and renumber freely; after a breaking change to a store's saved shape, bump its save `version` (`withGameStateSync(KEY, initialState, { version })`) instead of clearing `localStorage` (`docs/systems/persistence.md`).
-- **Stats are derived, not stored.** `PlayerStore.stats()` is computed from base + equipment + skill nodes + buffs + consumables + permanent bonuses. `updatePlayerStats` only earns/spends resources or adds a permanent bonus; a new stat source goes into the `stats` computed (ADR 0002).
-- **New i18n namespace → register it** in the `translations` list in `src/app/app.config.ts`. Template pipe is `| i18next`.
-- **Item data lives in `src/data/items/<category>-items.data.ts`**; `src/data/items-data.ts` only merges them.
-- **Quest conditions**: `QuestState.active` = started; `QuestState.readyToAdvance` = started and current step's requirements met (turn-ins).
-- **Owner decisions**: block gold spending the player can't afford; block unequip, craft and quest turn-in when the result has no inventory space (enemy drops lost on a full inventory is intended). Details in `docs/systems/player-stats-inventory-equipment.md`.
-- **Language**: use the terms in `GLOSSARY.md` in code, docs and commits.
-- **`docs/archive/` is history.** Current behavior is in `docs/systems/`.
-- **Change a system → update its `docs/systems/` doc in the same commit.**
-- **Player-facing change → add a note under `## [Unreleased]` in `CHANGELOG.md`**: `- [feature|bug|buff|nerf] text`, plain English for players. Never edit `version` in `package.json` by hand; releases bump it (`docs/deployment.md`).
-
-## Systems — read before touching
-
-| Touching | Read |
-|---|---|
-| tick, auto-attack, damage, enemy death | `docs/systems/game-loop-and-combat.md` |
-| saves, stores, `localStorage` | `docs/systems/persistence.md` |
-| stats, XP, inventory, equipment, drops | `docs/systems/player-stats-inventory-equipment.md` |
-| NPC dialogue, conditions, effects | `docs/systems/dialogue.md` |
-| quests | `docs/systems/quests.md` |
-| skill tree, respec | `docs/systems/skill-tree.md` |
-| spells, buffs, mana | `docs/systems/spells-and-buffs.md` |
-| Camp, stations, recipes, food, potions | `docs/systems/consumables-camp-crafting.md` |
-| offline progress, welcome-back modal | `docs/systems/offline-progress.md` |
-| zones, waves, town/feature unlocks | `docs/systems/zones-waves-unlocks.md` |
-| towns, buildings, shops, Exploration Guild | `docs/systems/towns-shops-guild.md` |
-| enemies, shinies, pets, bestiary | `docs/systems/enemies-shiny-pets-bestiary.md` |
-| world map, map tiles | `docs/systems/world-map.md` |
-| translations | `docs/systems/localization.md` |
-| generated art | `docs/systems/asset-pipeline.md` |
-
-## Skills and agents
-
-Adding content: `/add-enemy-and-zone`, `/add-quest`, `/add-recipe-or-consumable`, `/add-equipment-item`, `/add-shiny-variant`, `/add-monster-weakness`, `/add-npc-dialogue`, `/add-shop`, `/add-town-building`, `/add-dialogue-effect`. Checking a dialogue tree: `/audit-dialogue`.
-
-Art (icons, sprites, portraits, backgrounds): `/generate-2d-asset`, which briefs the `asset-generator` agent.
-
-## Other docs
-
-- `GLOSSARY.md` — domain language.
-- `docs/deployment.md` — environments (production, staging, testing), branch flow, CI/CD.
-- `docs/ideas/` — design backlog with status per idea.
-- `docs/ideas/known-issues.md` — open bugs and tech debt across systems.
-- `docs/adr/` — architecture decisions.
-- `docs/plans/` — forward plans.
-- `docs/design/`, `docs/character/` — lore and portrait briefs.
+**Checking UI**: builds with cheats on (`npm start`, `build:testing`) expose `window.dev` a moment after page load, once the cheat bar's deferred chunk arrives. Set game state through it (commands in `src/app/components/game/dev-cheats/dev-cheats.component.ts`), not by editing `localStorage`.

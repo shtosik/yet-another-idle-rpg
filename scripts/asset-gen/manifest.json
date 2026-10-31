@@ -34,6 +34,13 @@
     "seed": 507802261,
     "date": "2026-10-17"
   },
+  "src/assets/img/avatars/lirold/liroldArenaMaster.png": {
+    "family": "portrait-pixel",
+    "tier": null,
+    "subject": "a realistic broad heavy-set man in his fifties, bust, very thick neck, clean shaved bald head, a huge bushy grey walrus moustache and a clean-shaven chin, laughing with his mouth wide open in a booming grin, a sleeveless brown leather jerkin, one wide bright crimson red cloth sash with gold edging worn diagonally across the chest from shoulder to hip, bare heavy arms, one consistent natural skin tone on face, neck and arms, fully opaque solid figure, bust with both shoulders fully in frame",
+    "seed": 7511,
+    "date": "2026-10-27"
+  },
   "src/assets/img/avatars/mawood/mawoodBrenn.png": {
     "family": "portrait-pixel",
     "tier": null,
@@ -83,6 +90,27 @@
     "seed": 1334379591,
     "date": "2026-10-21"
   },
+  "src/assets/img/backgrounds/lirold.png": {
+    "family": "town-painterly",
+    "tier": null,
+    "subject": "a large walled capital city on a wide green plain at the foot of high snowy mountains, seen from a hill above: a ring of high grey stone city walls with round towers, a big grey stone castle with tall towers and red and gold banners in the centre of the city, crowded stone and timber houses with red roofs, a large round open-topped stone amphitheatre with arches and tiered seats visible inside, standing inside the walls next to the castle, a tall jagged mountain range filling the horizon behind the city, sunny day, empty streets with no people",
+    "seed": 7604,
+    "date": "2026-10-27"
+  },
+  "src/assets/img/backgrounds/liroldArena-vertical.png": {
+    "family": "zone-pixel",
+    "tier": null,
+    "subject": "the floor of a round stone colosseum seen from ground level inside the pit: a wide empty flat sand floor filling the lower half, a low stone wall around the sand with a heavy iron portcullis gate in the far wall, tiered stone stands rising behind the wall with a distant crowd in the upper rows, long crimson banners hanging from the top rim, blue sky above, nobody on the sand",
+    "seed": 7801,
+    "date": "2026-10-27"
+  },
+  "src/assets/img/backgrounds/liroldArena.png": {
+    "family": "town-painterly",
+    "tier": null,
+    "subject": "inside a large round stone colosseum: an empty flat sand fighting floor in the foreground seen from its edge, a low stone wall around the sand, a heavy iron portcullis gate set in the far stone wall, tiered stone stands rising all around with a small distant crowd only in the high stands, red and gold banners hanging from the top rim, bright daylight, nobody on the sand",
+    "seed": 7702,
+    "date": "2026-10-27"
+  },
   "src/assets/img/backgrounds/mawood.png": {
     "family": "town-painterly",
     "tier": null,
@@ -124,6 +152,34 @@
     "subject": "inside a wooden sorcerer's study built in a giant tree, wood walls crossed by glowing purple and cyan veins of energy, an open glowing spellbook on a tall lectern, floating crystals and carved rune stones, an arcane summoning circle on the floor, floating candle flames, scorch marks on the planks, chaotic heaps of scrolls, a glass crystal ball on a stand, a brass orrery, a glowing magically warded door, empty room",
     "seed": 4444,
     "date": "2026-10-18"
+  },
+  "src/assets/img/enemies/arenaArcanist.png": {
+    "family": "enemy-pixel",
+    "tier": "medium",
+    "subject": "a single human battle mage standing upright, one head with short black hair, two arms and two legs, a long deep dark purple coat with a tall stiff high collar and silver trim, black trousers and black boots, one glowing violet orb floating above the open right palm, the left hand empty, alone",
+    "seed": 7202,
+    "date": "2026-10-27"
+  },
+  "src/assets/img/enemies/arenaBrute.png": {
+    "family": "enemy-pixel",
+    "tier": "large",
+    "subject": "a single hulking heavily muscled bald human pit fighter, one head with a scarred bald scalp, two thick arms and two legs, tan skin, a crude dark iron pauldron on the left shoulder, a leather belt and brown trousers, one huge thick wooden club with a round end studded with iron spikes gripped in the right hand and resting on the right shoulder, nothing in the left hand, alone",
+    "seed": 7103,
+    "date": "2026-10-27"
+  },
+  "src/assets/img/enemies/arenaBurrower.png": {
+    "family": "enemy-pixel",
+    "tier": "large",
+    "subject": "a single giant mole, one head with a pointed hairless pink star-shaped nose and no visible eyes, short dark brown velvet fur, a hunched back covered by overlapping grey stone-like armour plates, two huge pink shovel-like front paws with five long thick white digging claws each, raised in front of its chest, the lower body hidden inside a low round heap of pale sand, alone",
+    "seed": 7302,
+    "date": "2026-10-27"
+  },
+  "src/assets/img/enemies/arenaYad.png": {
+    "family": "enemy-pixel",
+    "tier": "large",
+    "subject": "a single hulking crimson red beast hunched forward like a gorilla leaning on two giant fists, one head, two huge long muscular front arms, two short back legs, rough faceted deep crimson red hide all over the body, a row of curved dark purple horns along its spine and short dark purple spikes on the shoulders and knuckles, small glowing orange eyes under a heavy brow, a wide jaw full of jagged white teeth, a few glowing orange cracks in the hide, small orange, white and blue sparks around its fists, alone",
+    "seed": 7403,
+    "date": "2026-10-27"
   },
   "src/assets/img/enemies/bandit.png": {
     "shinyHue": 88,
@@ -416,12 +472,33 @@
     "shinySaturation": 4,
     "shinyBrightness": 1.2
   },
+  "src/assets/img/items/ambushScroll.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single rolled pale parchment spell scroll lying diagonally, rolled up at both ends, wrapped with a dark purple ribbon and closed with one round dark red wax seal stamped with a small dagger shape",
+    "seed": 400079890,
+    "date": "2026-10-26"
+  },
   "src/assets/img/items/ancientWood.png": {
     "family": "item-pixel",
     "tier": null,
     "subject": "a thick gnarled chunk of old pale wood log with deep bark ridges and rings, single object",
     "seed": 535645451,
     "date": "2026-10-17"
+  },
+  "src/assets/img/items/apprenticeRobe.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a simple plain brown cloth robe with long sleeves and a rope belt, no decoration, nobody wearing it, single object",
+    "seed": 1833642526,
+    "date": "2026-10-26"
+  },
+  "src/assets/img/items/arenaChest.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a small closed treasure chest made of brown wooden planks with dark iron corner bands, a red cloth with gold trim draped over the lid and hanging down one side, a bronze badge of two crossed swords on the front",
+    "seed": 4242,
+    "date": "2026-10-27"
   },
   "src/assets/img/items/ashwoodBow.png": {
     "family": "item-pixel",
@@ -437,12 +514,26 @@
     "seed": 4242,
     "date": "2026-10-21"
   },
+  "src/assets/img/items/banditBandana.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a solid red cloth headscarf folded into a band and tied in a knot at the back with two short loose ends",
+    "seed": 790,
+    "date": "2026-10-26"
+  },
   "src/assets/img/items/bearPelt.png": {
     "family": "item-pixel",
     "tier": null,
     "subject": "a folded brown bear fur hide pelt, thick fur, single object, no animal",
     "seed": 1606794755,
     "date": "2026-10-17"
+  },
+  "src/assets/img/items/bearhideGloves.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a pair of thick gloves covered in shaggy dark brown bear fur",
+    "seed": 791,
+    "date": "2026-10-26"
   },
   "src/assets/img/items/blightedFetish.png": {
     "family": "item-pixel",
@@ -457,6 +548,13 @@
     "subject": "a chunk of dark rotten heartwood timber with black tar veins and sickly green cracks, single object",
     "seed": 1869639304,
     "date": "2026-10-17"
+  },
+  "src/assets/img/items/bogHammer.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single heavy war hammer with a grey stone head wrapped in thin dark brown roots and patches of green moss, on a long wooden handle, nothing below the handle",
+    "seed": 786,
+    "date": "2026-10-26"
   },
   "src/assets/img/items/boneFragment.png": {
     "family": "item-pixel",
@@ -521,6 +619,20 @@
     "seed": 1451607053,
     "date": "2026-10-17"
   },
+  "src/assets/img/items/emberWand.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a short straight dark wooden wand with a small glowing orange-red ember stone set in a metal claw on its tip, no flame, single object",
+    "seed": 1476461554,
+    "date": "2026-10-26"
+  },
+  "src/assets/img/items/fangSpear.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a diagonal wooden spear with a long brown shaft whose point is one big curved ivory-white animal fang tied on with leather cord",
+    "seed": 786,
+    "date": "2026-10-26"
+  },
   "src/assets/img/items/firePit.png": {
     "family": "item-pixel",
     "tier": null,
@@ -535,12 +647,47 @@
     "seed": 4242,
     "date": "2026-10-21"
   },
+  "src/assets/img/items/galeStaff.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a long straight pale wooden staff whose head is a swirl of pale green wind with two white feathers tied to it, single object",
+    "seed": 1230513072,
+    "date": "2026-10-26"
+  },
+  "src/assets/img/items/gladiatorHelm.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "one open-faced gladiator helmet of polished bronze with an iron brow band and cheek guards, a short crimson horsehair crest running along the top, a single small white feather tucked at one side, a few small dents in the metal, empty inside, no head",
+    "seed": 502902317,
+    "date": "2026-10-30"
+  },
+  "src/assets/img/items/gnollCleaver.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a broad notched iron cleaver with a wide rectangular blade with chipped edges and a short wrapped handle",
+    "seed": 2005107212,
+    "date": "2026-10-26"
+  },
   "src/assets/img/items/gnollTrophy.png": {
     "family": "item-pixel",
     "tier": null,
     "subject": "a hunting trophy: a wooden plaque with a mounted bone-and-fang necklace and fur tuft, single object, no creature, no face",
     "seed": 1610306603,
     "date": "2026-10-17"
+  },
+  "src/assets/img/items/gnollWarbelt.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a brown leather belt with a metal buckle and animal teeth and small bones hanging from it on cords",
+    "seed": 332133338,
+    "date": "2026-10-26"
+  },
+  "src/assets/img/items/goblinFirebrand.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a crude jagged short sword with a notched iron blade glowing orange-red with fire and small flames along the edge, a short wrapped hilt",
+    "seed": 200018096,
+    "date": "2026-10-26"
   },
   "src/assets/img/items/grilledFish.png": {
     "family": "item-pixel",
@@ -577,6 +724,48 @@
     "seed": 1674236555,
     "date": "2026-10-21"
   },
+  "src/assets/img/items/leatherBoots.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a pair of simple plain brown leather boots with stitched seams",
+    "seed": 974326351,
+    "date": "2026-10-26"
+  },
+  "src/assets/img/items/leatherCap.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a simple rounded brown leather helmet with no brim, stitched panels and a chin strap",
+    "seed": 787,
+    "date": "2026-10-26"
+  },
+  "src/assets/img/items/leatherGloves.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a pair of simple plain brown leather gloves with stitched seams",
+    "seed": 688688305,
+    "date": "2026-10-26"
+  },
+  "src/assets/img/items/leatherPants.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a pair of simple plain brown leather trousers with stitched seams",
+    "seed": 1269848897,
+    "date": "2026-10-26"
+  },
+  "src/assets/img/items/leatherVest.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a simple plain brown leather vest with stitched seams and laces at the front",
+    "seed": 1446249975,
+    "date": "2026-10-26"
+  },
+  "src/assets/img/items/manaRing.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single silver ring with one large glowing blue gem set on top, single object",
+    "seed": 1834476597,
+    "date": "2026-10-26"
+  },
   "src/assets/img/items/matriarchPlume.png": {
     "family": "item-pixel",
     "tier": null,
@@ -591,12 +780,40 @@
     "seed": 777,
     "date": "2026-10-21"
   },
+  "src/assets/img/items/moltenCape.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single empty black cape lying diagonally, a small dark iron clasp on the collar at the top right, jagged pointed hem at the bottom left, the cloth a honeycomb of dark hexagon cells separated by glowing orange and yellow lava borders",
+    "seed": 424242,
+    "date": "2026-10-27"
+  },
   "src/assets/img/items/mortarAndPestle.png": {
     "family": "item-pixel",
     "tier": null,
     "subject": "one grey stone mortar bowl with a single stone pestle resting inside it, leaning against the rim",
     "seed": 1581558275,
     "date": "2026-10-21"
+  },
+  "src/assets/img/items/mysticHood.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single empty deep purple cloth hood with a short cape collar and a thin silver trim, nobody wearing it, single object",
+    "seed": 358365248,
+    "date": "2026-10-26"
+  },
+  "src/assets/img/items/patronGloves.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a pair of fine crimson leather gloves with round gold coin studs along the cuffs and gold stitching",
+    "seed": 1491485296,
+    "date": "2026-10-27"
+  },
+  "src/assets/img/items/rootwoodStaff.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a long staff made of twisted brown roots, the roots at the top clutching a round green-brown stone, single object",
+    "seed": 1660006269,
+    "date": "2026-10-26"
   },
   "src/assets/img/items/runeAltar.png": {
     "family": "item-pixel",
@@ -605,12 +822,40 @@
     "seed": 1702929459,
     "date": "2026-10-21"
   },
+  "src/assets/img/items/sageRobe.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "an ornate deep blue robe with long wide sleeves, gold trim along the edges, gold star embroidery and a gold sash, nobody wearing it, single object",
+    "seed": 655647313,
+    "date": "2026-10-26"
+  },
+  "src/assets/img/items/silkweaveLegs.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a pair of pale white silk leggings laid flat, empty, with a drawstring waist",
+    "seed": 790,
+    "date": "2026-10-26"
+  },
   "src/assets/img/items/silverwoodChestplate.png": {
     "family": "item-pixel",
     "tier": null,
     "subject": "a chestplate armor made of pale silvery bark plates with leather straps, single object",
     "seed": 1032867683,
     "date": "2026-10-17"
+  },
+  "src/assets/img/items/slimeWand.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a short straight wooden wand with a round translucent blue slime blob stuck on its tip, single object",
+    "seed": 385478130,
+    "date": "2026-10-26"
+  },
+  "src/assets/img/items/spellweaverAmulet.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a round silver amulet pendant on a chain with glowing violet arcane runes and woven threads of light in its centre, single object",
+    "seed": 1375803952,
+    "date": "2026-10-26"
   },
   "src/assets/img/items/spiderFang.png": {
     "family": "item-pixel",
@@ -624,6 +869,41 @@
     "tier": null,
     "subject": "spider web drawn in code (spokes and sagging rings, 48px, hard pixels); SDXL could not draw a web with transparent gaps",
     "date": "2026-10-18"
+  },
+  "src/assets/img/items/stoneAxe.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a crude stone axe: a chipped grey stone head lashed with cord to a short wooden stick handle",
+    "seed": 164251808,
+    "date": "2026-10-26"
+  },
+  "src/assets/img/items/stormcaller.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a long ornate dark staff whose head is a crackling storm orb with bright yellow lightning and swirling grey wind, two teal and brown harpy feathers hanging from the head, single object",
+    "seed": 125528548,
+    "date": "2026-10-26"
+  },
+  "src/assets/img/items/talonBlade.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a curved sword whose blade is one giant pale eagle talon, with a hilt wrapped in leather and white feathers tied to the pommel",
+    "seed": 279261417,
+    "date": "2026-10-26"
+  },
+  "src/assets/img/items/trollClub.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a huge heavy wooden club made from a tree branch, a thick knobbly rounded head tapering to a thin handle, with grey stones pressed into the wood",
+    "seed": 786,
+    "date": "2026-10-26"
+  },
+  "src/assets/img/items/trollHideVest.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a rough sleeveless tunic made of one thick grey-green warty hide with ragged edges and coarse stitching, no pockets and no buttons",
+    "seed": 790,
+    "date": "2026-10-26"
   },
   "src/assets/img/items/venison.png": {
     "family": "item-pixel",
@@ -639,6 +919,20 @@
     "seed": 1268499607,
     "date": "2026-10-21"
   },
+  "src/assets/img/skills/airMastery.png": {
+    "family": "skill-icon",
+    "tier": null,
+    "subject": "a round bronze medallion seen straight on, with a glowing pale green and white spiral wind swirl symbol embossed in its centre, on a dark green background",
+    "seed": 424242,
+    "date": "2026-10-25"
+  },
+  "src/assets/img/skills/ambush.png": {
+    "family": "skill-icon",
+    "tier": null,
+    "subject": "a single plain straight steel dagger with a short leather-wrapped hilt thrusting diagonally out of a swirl of black smoky shadow, one dark hooded arm holding it and nothing else, the blade lit with a thin white edge highlight, on a dark purple-black background",
+    "seed": 1334613516,
+    "date": "2026-10-26"
+  },
   "src/assets/img/skills/autoEat.png": {
     "family": "skill-icon",
     "tier": null,
@@ -646,11 +940,102 @@
     "seed": 2034600005,
     "date": "2026-10-21"
   },
+  "src/assets/img/skills/bottomlessPack.png": {
+    "family": "skill-icon",
+    "tier": null,
+    "subject": "a single open leather backpack seen from above, its open mouth showing a deep swirling purple starry void spiralling down endlessly",
+    "seed": 2116446245,
+    "date": "2026-10-31"
+  },
+  "src/assets/img/skills/consumablesPouch.png": {
+    "family": "skill-icon",
+    "tier": null,
+    "subject": "a round leather drawstring pouch, with two small red and blue potion bottles and a loaf of bread sticking out of its open top",
+    "seed": 424242,
+    "date": "2026-10-31"
+  },
+  "src/assets/img/skills/earthMastery.png": {
+    "family": "skill-icon",
+    "tier": null,
+    "subject": "a round bronze medallion seen straight on, with a glowing brown and ochre mountain peak symbol embossed in its centre, on a dark brown background",
+    "seed": 424242,
+    "date": "2026-10-25"
+  },
+  "src/assets/img/skills/fireMastery.png": {
+    "family": "skill-icon",
+    "tier": null,
+    "subject": "a round bronze medallion seen straight on, with a glowing red and orange flame symbol embossed in its centre, on a dark red background",
+    "seed": 424242,
+    "date": "2026-10-25"
+  },
+  "src/assets/img/skills/galeCut.png": {
+    "family": "skill-icon",
+    "tier": null,
+    "subject": "a single sharp crescent-shaped blade of pale green and white wind slicing diagonally across the frame, thin streaks of air and a few torn leaves trailing behind it, on a dark green background",
+    "seed": 155735757,
+    "date": "2026-10-25"
+  },
+  "src/assets/img/skills/gearPouch.png": {
+    "family": "skill-icon",
+    "tier": null,
+    "subject": "a red cloth drawstring pouch open at the top, with a sword hilt and a steel armoured gauntlet sticking out of it",
+    "seed": 424243,
+    "date": "2026-10-31"
+  },
+  "src/assets/img/skills/materialsPouch.png": {
+    "family": "skill-icon",
+    "tier": null,
+    "subject": "a round leather drawstring pouch, with a rolled bolt of cloth, a chunk of iron ore and a bundle of green herbs sticking out of its open top",
+    "seed": 424242,
+    "date": "2026-10-31"
+  },
   "src/assets/img/skills/origin.png": {
     "family": "skill-icon",
     "tier": null,
     "subject": "a bright cosmic starburst in deep space: a glowing white-gold star core with radiating light rays, surrounded by a swirling purple and blue nebula and tiny scattered stars, the origin of everything",
     "seed": 1941022359,
     "date": "2026-10-21"
+  },
+  "src/assets/img/skills/packRat.png": {
+    "family": "skill-icon",
+    "tier": null,
+    "subject": "a single small brown rat peeking out of the open top of a small leather backpack, its paws resting on the backpack's rim",
+    "seed": 1782365061,
+    "date": "2026-10-31"
+  },
+  "src/assets/img/skills/stoneSpike.png": {
+    "family": "skill-icon",
+    "tier": null,
+    "subject": "a single jagged brown and ochre stone spike bursting upward out of cracked earth, rock shards and dust flying outward from its base, on a dark brown background",
+    "seed": 41095558,
+    "date": "2026-10-25"
+  },
+  "src/assets/img/skills/thunderstorm.png": {
+    "family": "skill-icon",
+    "tier": null,
+    "subject": "a jagged bright yellow-white lightning bolt striking down through the centre, with curved white gusts of wind blasting outward on both sides and small sparks, on a dark storm-grey sky background",
+    "seed": 1215728485,
+    "date": "2026-10-26"
+  },
+  "src/assets/img/skills/tidalLash.png": {
+    "family": "skill-icon",
+    "tier": null,
+    "subject": "a single long whip of blue and teal seawater lashing through the air in a sweeping curved arc, white foam and spray flying from its tip, on a deep blue background",
+    "seed": 1215728485,
+    "date": "2026-10-25"
+  },
+  "src/assets/img/skills/warCry.png": {
+    "family": "skill-icon",
+    "tier": null,
+    "subject": "a roaring warrior's wide open mouth shouting a battle cry, with curved red-orange sound waves bursting outward, crimson and gold colours",
+    "seed": 166127394,
+    "date": "2026-10-27"
+  },
+  "src/assets/img/skills/waterMastery.png": {
+    "family": "skill-icon",
+    "tier": null,
+    "subject": "a round bronze medallion seen straight on, with a glowing blue water droplet symbol embossed in its centre, on a dark blue background",
+    "seed": 424242,
+    "date": "2026-10-25"
   }
 }

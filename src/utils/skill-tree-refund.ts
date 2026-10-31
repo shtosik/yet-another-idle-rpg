@@ -1,10 +1,13 @@
 import { SkillNodeID } from 'enums/ids/skill-node-id.enum'
 import { SkillTreeGraph } from 'data/skill-tree-graph'
 import { isRequirementMet } from 'utils/skill-tree-requirements'
+import type { InventoryTab } from 'app/store/player/inventory'
 
 export type CanRefundResult =
     | { ok: true; levelsRefunded: number }
-    | { ok: false; reason: 'not-allocated' | 'blocked-by' | 'inventory-in-use'; blockers: SkillNodeID[] }
+    | { ok: false; reason: 'not-allocated' | 'blocked-by'; blockers: SkillNodeID[] }
+    /** `tab`: the inventory tab that would strand items without the refunded slots. */
+    | { ok: false; reason: 'inventory-in-use'; blockers: SkillNodeID[]; tab: InventoryTab }
 
 export function canRefundNode(
     targetId: SkillNodeID,

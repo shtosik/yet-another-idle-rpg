@@ -11,6 +11,7 @@ export type DialogueEffect =
   | ShopEffect
   | DialogueFlagEffect
   | GuildEffect
+  | ArenaEffect
 
 export interface QuestEffect {
   type: 'quest'
@@ -33,6 +34,8 @@ export interface ItemEffect {
 export interface ShopEffect {
   type: 'shop'
   shopId: number
+  /** Stock stage to open at (default 0): items with a higher `minStage` stay hidden. */
+  stage?: number
 }
 
 export interface DialogueFlagEffect {
@@ -46,4 +49,10 @@ export interface GuildEffect {
   taskLength?: TaskLength
   /** `abandonTask`: index into `activeTasks` of the task to cancel. */
   taskIndex?: number
+}
+
+/** Start a Combat Arena run (pair it with the entry fee's `stat` deduct), or claim the rewards waiting from clears. */
+export interface ArenaEffect {
+  type: 'arena'
+  action: 'enter' | 'claim'
 }

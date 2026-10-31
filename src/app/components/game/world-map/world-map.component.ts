@@ -1,13 +1,16 @@
-import { ChangeDetectionStrategy, Component, effect, EventEmitter, inject, Output } from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, effect, EventEmitter, inject, Output, signal } from '@angular/core'
 import { LeafletModule } from '@bluehalo/ngx-leaflet'
+import { I18nextPipe } from 'app/pipes/i18next.pipe'
 import * as L from 'leaflet'
 import { GameTab } from 'enums/ids/game-tab.enum'
 import { TownsStore } from 'app/store/towns/towns.store'
 import { BattleStore } from 'app/store/battle/battle.store'
 import { PlayerStore } from 'app/store/player/player.store'
-import { WORLD_MAP_DATA, WorldMapMarker } from 'data/world-map-data'
+import { ZoneStarProgress } from 'app/store/player/zone-mastery'
+import { TownMarker, WORLD_MAP_DATA, WorldMapMarker } from 'data/world-map-data'
 import { ZoneID } from 'enums/ids/zone-id.enum'
 import { TownID } from 'enums/map/town-id.enum'
+import TOWNS_DATA from 'data/towns-data'
 
 // CRS units = source pixels. scale(z=maxZoom) = 1 (native), scale(z=0) = 1/2^maxZoom
 // (whole image fits in a single tile). This keeps marker positions authorable in
@@ -17,11 +20,17 @@ const PIXEL_CRS: L.CRS = L.Util.extend({}, L.CRS.Simple, {
   zoom: (scale: number) => Math.log2(scale) + WORLD_MAP_DATA.manifest.maxZoom,
 })
 
+/** Modifier for a map marker's mastery star (claimed stars use the base style). */
+function starModifier(progress: ZoneStarProgress): string {
+  if (progress.claimed) return ''
+  return progress.done ? 'map-marker__star--ready' : 'map-marker__star--empty'
+}
+
 @Component({
   selector: 'app-world-map',
   templateUrl: './world-map.component.html',
   styleUrl: './world-map.component.sass',
-  imports: [LeafletModule],
+  imports: [LeafletModule, I18nextPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class WorldMapComponent {
@@ -36,6 +45,20 @@ export class WorldMapComponent {
   private zoneMarkerMap = new Map<ZoneID, L.Marker>()
   private townMarkerMap = new Map<TownID, L.Marker>()
 
+  protected readonly TownID = TownID
+  showTowns = signal(false)
+  /**
+   * Unlocked towns: map-marker towns in marker order, then towns with Buildings but no marker yet. Stub towns and stale saved IDs have neither.
+   */
+  readonly unlockedTowns = computed(() => {
+    const unlocked = this.playerStore.unlockedContent().towns ?? []
+    const markerTowns = WORLD_MAP_DATA.markers.filter((m): m is TownMarker => m.type === 'town').map(m => m.townId)
+    const offMapTowns = Object.values(TOWNS_DATA)
+      .filter(town => town.buildings.length && !markerTowns.includes(town.id))
+      .map(town => town.id)
+    return [...markerTowns, ...offMapTowns].filter(townId => unlocked.includes(townId))
+  })
+
   constructor() {
     effect(() => {
       const unlockedZones = this.playerStore.unlockedContent().zones
@@ -46,6 +69,16 @@ export class WorldMapComponent {
       const unlockedTowns = this.playerStore.unlockedContent().towns
       if (!this.map) return
       this.syncTownMarkers(unlockedTowns)
+    })
+    effect(() => {
+      const currentZoneId = this.battleStore.currentZoneId()
+      if (!this.map) return
+      this.highlightZone(currentZoneId)
+    })
+    effect(() => {
+      this.playerStore.zoneMastery()
+      if (!this.map) return
+      this.showZoneStars()
     })
   }
 
@@ -85,11 +118,31 @@ export class WorldMapComponent {
         noWrap: true,
       }).addTo(map)
 
-      map.setMaxBounds(bounds.pad(0.05))
+      // Exactly the image: padding would let an edge zone's centering show the background past the image.
+      map.setMaxBounds(bounds)
+      // Open at the zoom where the image fills the panel; the default view's zoom only fits its width.
+      map.setView(this.openingCenter(), map.getBoundsZoom(bounds, true), { animate: false })
 
       this.placeMarkers()
       this.syncMarkerVisibility()
     })
+  }
+
+  toggleTowns(): void {
+    this.showTowns.update(show => !show)
+  }
+
+  openTown(townId: TownID): void {
+    this.townsStore.selectTown(townId)
+    this.changeTab.emit(GameTab.towns)
+  }
+
+  /** The current zone's marker, or the default view's center for a zone without one. */
+  private openingCenter(): L.LatLng {
+    const zoneId = this.battleStore.currentZoneId()
+    const marker = WORLD_MAP_DATA.markers.find(m => m.type === 'zone' && m.zoneId === zoneId)
+    const { x, y } = marker?.position ?? WORLD_MAP_DATA.defaultView.center
+    return L.latLng(-y, x)
   }
 
   private placeMarkers(): void {
@@ -102,6 +155,22 @@ export class WorldMapComponent {
     }
     this.syncZoneMarkers(this.playerStore.unlockedContent().zones)
     this.syncTownMarkers(this.playerStore.unlockedContent().towns)
+  }
+
+  /** Marks the zone the player is fighting in; a marker's element exists only once it's on the map. */
+  private highlightZone(currentZoneId: ZoneID): void {
+    for (const [zoneId, marker] of this.zoneMarkerMap) {
+      marker.getElement()?.querySelector('.map-marker')?.classList.toggle('map-marker--current', zoneId === currentZoneId)
+    }
+  }
+
+  /** Each zone marker's mastery stars: claimed, ready to claim (glowing), or not yet earned. */
+  private showZoneStars(): void {
+    const mastery = this.playerStore.zoneMastery()
+    for (const [zoneId, marker] of this.zoneMarkerMap) {
+      const stars = marker.getElement()?.querySelector('.map-marker__stars')
+      if (stars) stars.innerHTML = mastery[zoneId].map(p => `<span class="map-marker__star ${starModifier(p)}">★</span>`).join('')
+    }
   }
 
   private syncZoneMarkers(unlockedZones: ZoneID[]): void {
@@ -122,6 +191,8 @@ export class WorldMapComponent {
       }
     }
     this.syncMarkerVisibility()
+    this.highlightZone(this.battleStore.currentZoneId())
+    this.showZoneStars()
   }
 
   private syncTownMarkers(unlockedTowns: TownID[]): void {
@@ -147,7 +218,9 @@ export class WorldMapComponent {
   private buildMarker(data: WorldMapMarker): L.Marker {
     const latLng = L.latLng(-data.position.y, data.position.x)
     const icon = L.divIcon({
-      html: `<div class="map-marker map-marker--${data.type}">${data.label}</div>`,
+      html: data.type === 'zone'
+        ? `<div class="map-marker map-marker--zone">${data.label}<span class="map-marker__stars"></span></div>`
+        : `<div class="map-marker map-marker--${data.type}">${data.label}</div>`,
       className: '',
       iconSize: [0, 0],
       iconAnchor: [0, 0],
@@ -155,10 +228,7 @@ export class WorldMapComponent {
     const marker = L.marker(latLng, { icon })
 
     if (data.type === 'town') {
-      marker.on('click', () => {
-        this.townsStore.selectTown(data.townId)
-        this.changeTab.emit(GameTab.towns)
-      })
+      marker.on('click', () => this.openTown(data.townId))
     } else if (data.type === 'zone') {
       marker.on('click', () => {
         this.battleStore.setZone(data.zoneId)

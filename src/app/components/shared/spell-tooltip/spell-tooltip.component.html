@@ -1,0 +1,18 @@
+@let spellData = spell();
+<div class="spell-tooltip">
+  <div class="spell-tooltip__header">
+    <span>{{ ('spells:names.' + SpellID[spellData.id] + '.name') | i18next }}</span>
+    <span [class]="SpellType[spellData.effect.type]">{{ ('spells:types.' + SpellType[spellData.effect.type]) | i18next }}</span>
+  </div>
+  <div class="spell-tooltip__info">
+    <span class="mana">{{ 'spells:manaCost' | i18next: { cost: manaCost() } }}</span>
+    <span class="cooldown">{{ 'spells:cooldown' | i18next: { cooldown: cooldown() } }}</span>
+    @if (spellData.effect.type === SpellType.buff) {
+      <span class="duration">{{ 'spells:duration' | i18next: { duration: spellData.effect.duration + increasedSpellDuration() } }}</span>
+    }
+    @if (spellData.effect.type === SpellType.damageOverTime) {
+      <span class="duration">{{ 'spells:duration' | i18next: { duration: spellData.effect.duration } }}</span>
+    }
+  </div>
+  <span class="spell-tooltip__desc">{{ ('spells:names.' + SpellID[spellData.id] + '.desc') | i18next }}</span>
+</div>

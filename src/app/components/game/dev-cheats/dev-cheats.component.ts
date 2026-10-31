@@ -1,15 +1,31 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core'
+import { ChangeDetectionStrategy, Component, DestroyRef, inject } from '@angular/core'
+import { SkillTreeService } from '../../../services/skill-tree.service'
+import { GameNavigationService } from '../../../services/game-navigation.service'
+import { GameTab } from 'enums/ids/game-tab.enum'
+import { SkillNodeID } from 'enums/ids/skill-node-id.enum'
+import { ShopID } from 'enums/ids/shop-id.enum'
+import { TownID } from 'enums/map/town-id.enum'
+import { EquipmentSlotKey } from 'enums/equipment-slot.enum'
+import { ALL_SKILLS } from '../../../../data/skill-tree-data'
+import { NodeRequirement } from '../../../../interfaces/skill-tree/skill-node.interface'
+import ITEM_DATA from '../../../../data/items-data'
+import TOWNS_DATA from '../../../../data/towns-data'
 import { PlayerStore } from '../../../store/player/player.store'
 import { BattleStore } from '../../../store/battle/battle.store'
 import { QuestsStore } from '../../../store/quests/quests.store'
 import { TownsStore } from '../../../store/towns/towns.store'
 import { ShopStore } from '../../../store/shop/shop.store'
+import { SettingsStore } from '../../../store/settings/settings.store'
 import { CampStore } from '../../../store/camp/camp.store'
 import { OfflineStore } from '../../../store/offline/offline.store'
 import { PlayerStat } from '../../../../types/player/player-stat.type'
 import { ZoneID } from 'enums/ids/zone-id.enum'
 import { ItemID } from 'enums/ids/item-id.enum'
 import { ItemTier } from 'enums/items/item-tier.enum'
+import { EnemyID } from 'enums/ids/enemy-id.enum'
+
+/** Features `window.dev.unlock` can open. */
+type DevFeature = 'camp' | 'skillTree' | 'map' | 'spellbook' | 'towns'
 
 // Cheat buttons for dev and testing builds. GameComponent renders it only when environment.cheats is on.
 @Component({
@@ -30,7 +46,105 @@ export class DevCheatsComponent {
   private townsStore = inject(TownsStore)
   private shopStore = inject(ShopStore)
   private campStore = inject(CampStore)
+  private settingsStore = inject(SettingsStore)
   private offlineStore = inject(OfflineStore)
+  private skillTree = inject(SkillTreeService)
+  private navigation = inject(GameNavigationService)
+
+  /**
+   * `window.dev` in the browser console: puts the game into a state in one call when checking UI.
+   * IDs are the enum numbers (`ShopID`, `ZoneID`, `SkillNodeID`, `ItemID`, `EnemyID`, `GameTab`).
+   */
+  private readonly devTools = {
+    tab: (tab: GameTab) => this.navigation.changeTab(tab),
+    setZone: (zoneId: ZoneID) => {
+      this.playerStore.unlockZone(zoneId)
+      this.battleStore.setZone(zoneId)
+    },
+    grantStat: (stat: PlayerStat, amount: number) => this.playerStore.updatePlayerStats([{ stat, amount }]),
+    /** Learns the node and, first, whatever it requires (the first option of an `any`), granting the points. */
+    learnSkill: (nodeId: SkillNodeID): boolean => this.learnSkill(nodeId, 1),
+    giveItem: (itemId: ItemID, amount = 1, tier = ITEM_DATA[itemId].tier) =>
+      this.playerStore.addItems([{ id: itemId, tier, amount }]),
+    /** Gives the item and equips it; false (with a console warning) when there's no room or it can't be equipped. */
+    equip: (itemId: ItemID, tier = ITEM_DATA[itemId].tier): boolean => {
+      const stack = { id: itemId, tier, amount: 1 }
+      if (!this.playerStore.canFitItems([stack])) {
+        console.warn('dev.equip: no inventory space for the item')
+        return false
+      }
+      this.playerStore.addItems([stack])
+      const item = { ...stack, type: ITEM_DATA[itemId].type }
+      if (!this.playerStore.canEquip(item)) {
+        this.playerStore.removeItems([stack])
+        console.warn('dev.equip: the item can\'t be equipped (not equipment, or no room to swap out the current one)')
+        return false
+      }
+      this.playerStore.equipItem(item)
+      return true
+    },
+    unequip: (slot: EquipmentSlotKey) => this.playerStore.unequipItem(slot),
+    /** Opens the shop over La Harpar's first building, whatever town or building was open. */
+    openShop: (shopId: ShopID) => {
+      this.navigation.changeTab(GameTab.towns)
+      this.townsStore.selectTown(TownID.laHarpar)
+      this.townsStore.selectTownBuilding(TOWNS_DATA[TownID.laHarpar].buildings[0])
+      this.townsStore.openShop(shopId)
+    },
+    /** Sets an enemy's lifetime kill count (bestiary ranks, zone mastery, quest kill steps). */
+    setKills: (enemyId: EnemyID, count: number) =>
+      this.playerStore.updateEnemyKillCount(enemyId, count - (this.playerStore.enemyKillCounts()[enemyId] ?? 0)),
+    /** Adds shiny kills in a zone (zone mastery's Shiny Hunter star). */
+    addShinyKills: (zoneId: ZoneID, count: number) => this.playerStore.applyKillBatch({
+      zoneId, wave: 1, kills: 0, shinies: count, killsByEnemy: {}, taskCountsByEnemy: {}, experience: 0, gold: 0, items: [],
+    }),
+    unlock: (feature: DevFeature) => this.unlockFeature(feature),
+  }
+
+  private unlockFeature(feature: DevFeature): void {
+    switch (feature) {
+      case 'camp': return this.playerStore.unlockCamp()
+      case 'skillTree': return this.playerStore.unlockSkillTree()
+      case 'map': return this.playerStore.unlockMap()
+      case 'spellbook': return this.playerStore.unlockSpellbook()
+      case 'towns': return Object.keys(TOWNS_DATA).forEach(id => this.playerStore.unlockTown(Number(id) as TownID))
+    }
+  }
+
+  private learnSkill(nodeId: SkillNodeID, level: number): boolean {
+    const node = ALL_SKILLS[nodeId]
+    if (node.requires) this.meetRequirement(node.requires)
+    while ((this.playerStore.unlockedNodes()[nodeId] ?? 0) < Math.min(level, node.maxLevel)) {
+      this.playerStore.updatePlayerStats([{ stat: 'unspentSkillPoints', amount: node.skillPointCost }])
+      const before = this.playerStore.unlockedNodes()[nodeId] ?? 0
+      this.skillTree.buyNode(nodeId, false)
+      if ((this.playerStore.unlockedNodes()[nodeId] ?? 0) === before) {
+        // Refused (a prerequisite didn't take): take back the points granted for it.
+        this.playerStore.updatePlayerStats([{ stat: 'unspentSkillPoints', amount: -node.skillPointCost }])
+        return false
+      }
+    }
+    return true
+  }
+
+  private meetRequirement(requirement: NodeRequirement): void {
+    switch (requirement.kind) {
+      case 'node':
+        this.learnSkill(requirement.id, requirement.minLevel)
+        return
+      case 'all':
+        requirement.of.forEach(r => this.meetRequirement(r))
+        return
+      case 'any':
+        this.meetRequirement(requirement.of[0])
+        return
+    }
+  }
+
+  constructor() {
+    Object.assign(window, { dev: this.devTools })
+    inject(DestroyRef).onDestroy(() => delete (window as { dev?: unknown }).dev)
+  }
 
   resetState() {
     this.playerStore.resetState()
@@ -40,6 +154,7 @@ export class DevCheatsComponent {
     this.shopStore.resetState()
     this.campStore.resetState()
     this.offlineStore.resetState()
+    this.settingsStore.resetState()
   }
 
   resetQuests() {

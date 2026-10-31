@@ -59,4 +59,53 @@ export const HelmetItemsData: Partial<Record<ItemID, Item>> = {
       },
     ],
   },
+  [ItemID.mysticHood]: {
+    id: ItemID.mysticHood,
+    tier: ItemTier.uncommon,
+    url: './assets/img/items/mysticHood.png',
+    value: 1300,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.helmet,
+    stats: [
+      { id: 'magicDamage', amount: 3 },
+      { id: 'manaRegenRate', amount: 3000 },
+    ],
+  },
+  [ItemID.leatherCap]: {
+    id: ItemID.leatherCap,
+    tier: ItemTier.normal,
+    url: './assets/img/items/leatherCap.png',
+    value: 12,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.helmet,
+    stats: [
+      { id: 'attackPower', amount: 1 },
+      { id: 'critChance', amount: 1 },
+    ],
+  },
+  [ItemID.banditBandana]: {
+    id: ItemID.banditBandana,
+    tier: ItemTier.uncommon,
+    url: './assets/img/items/banditBandana.png',
+    value: 600,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.helmet,
+    stats: [
+      { id: 'attackPower', amount: 2 },
+      { id: 'goldCoinsMultiplier', amount: 0.15 },
+    ],
+  },
+  // Crafted at the workbench (recipe from the Arena Chest): a sidegrade below the Harpy Crown, worth selling.
+  [ItemID.gladiatorHelm]: {
+    id: ItemID.gladiatorHelm,
+    tier: ItemTier.rare,
+    url: './assets/img/items/gladiatorHelm.png',
+    value: 700,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.helmet,
+    stats: [
+      { id: 'attackPower', amount: 4 },
+      { id: 'critChance', amount: 2 },
+    ],
+  },
 }

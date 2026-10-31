@@ -17,10 +17,10 @@ Pays for time the game wasn't running (tab closed, device asleep) as kills on th
 3. **Claim.** The claim ends where it started waiting for the host (`pendingSincePerf`), not when the host answers: the game plays online while it waits, so that time isn't paid twice. `elapsed = min(24 h, claimEnd − lastSeenAt)`; a negative gap claims nothing; under 60 s isn't simulated. `lastSeenAt` moves to `hostNow`.
 4. **Segments.** The claim is split where a spell buff or consumable effect runs out; each segment gets `PlayerStore.statsFor(active buffs, active consumables)`.
 5. **Simulation** (`simulateOfflineKills`), on the current zone and wave only (auto wave progression is off offline), with an RNG seeded from the old `lastSeenAt`:
-   - Per kill: random enemy from the wave pool (boss on the boss wave), shiny roll, auto-attack hits rolled with `resolveHit` (no spells, no mana) until it dies, XP / gold / drops rolled as online, task counts (Bounty Mark double included) for enemies with an unfinished task.
+   - Per kill: random enemy from the wave pool (boss on the boss wave), shiny roll, auto-attack hits rolled with `resolveHit` (no spells, no mana) until it dies, XP / gold / drops rolled as online (bestiary rank drop bonus at the ranks from the claim start, `enemyKillCounts` input), task counts (Bounty Mark double included) for enemies with an unfinished task.
    - Kill time = (respawn delay + hits × attack time) × slowdown ÷ `offlineProgressRate`. A segment with a rate of 0 is skipped.
    - Slowdown = `max(1, rolling online ms per kill ÷ theoretical ms per kill)`: the offline rate is never faster than what the player actually achieved recently. With fewer than 5 samples the theoretical rate is used alone.
-6. **Apply.** After the simulation, spell timers and consumable effects / slot locks tick down by the whole gap, even one under 60 s (auto-eat doesn't run). `applyKillBatch` adds XP (with level-ups), gold, wave and enemy kill counts (which drive quest kill steps and the bestiary), task progress and drops; drops that don't fit are lost and counted; the modal shows only the drops that landed. A boss kill unlocks the next zone (`BattleManagerService.unlockNextZone`); town and feature unlocks follow from the new state through `UnlockService`.
+6. **Apply.** After the simulation, spell timers and consumable effects / slot locks tick down by the whole gap, even one under 60 s (auto-eat doesn't run). A claimed gap (60 s or more) also ends a running damage-over-time spell; a shorter one (a reload) leaves it paused. `applyKillBatch` adds XP (with level-ups), gold, wave and enemy kill counts (which drive quest kill steps and the bestiary), task progress and drops; drops that don't fit are lost and counted; the modal shows only the drops that landed. A boss kill unlocks the next zone (`BattleManagerService.unlockNextZone`); town and feature unlocks follow from the new state through `UnlockService`.
 7. **Save, then modal.** `saveGameStateNow` writes every store immediately, then the modal opens (only if anything was killed).
 
 Sleeping device: a tick whose `performance.now()` or `Date.now()` gap exceeds 60 s isn't simulated by the tick; it calls `onSleepGap`, which drops the host anchor and runs a claim.
@@ -33,6 +33,7 @@ Rolling rate: every online kill calls `OfflineStore.recordKill(performance.now()
 - Stats are read per segment at claim start; level-ups during the claim don't change the rate.
 - The enemy alive when the page closed is untouched; the simulation starts from fresh spawns.
 - Shop refresh timers and mana regen don't advance offline.
+- **Arena runs**: a run that ran out while away is ended at its `endsAt` first, and only the time after it is simulated, in the Zone the player entered the arena from; a claim during a run still going simulates nothing (`arena.md`).
 - Testing (dev build, plain JSON saves): subtract time from `state.lastSeenAt` in `localStorage.offlineStore` (saves are `{ v, state }`) and reload in the same script (the 1 s save would overwrite it otherwise). A plain JSON save also loads in a prod build.
 
 ## Known issues

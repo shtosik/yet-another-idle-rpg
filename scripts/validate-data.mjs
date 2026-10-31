@@ -34,6 +34,7 @@ export { SpellID } from 'enums/ids/spell-id.enum'
 export { StationID } from 'enums/ids/station-id.enum'
 export { SkillNodeID } from 'enums/ids/skill-node-id.enum'
 export { SkillBranch } from 'enums/ids/skill-branch.enum'
+export { SkillNodeType } from 'enums/skill-node-type.enum'
 export { NpcID } from 'enums/map/npc-id.enum'
 export { TownID } from 'enums/map/town-id.enum'
 export { TownBuildingID } from 'enums/map/town-building-id.enum'
@@ -184,10 +185,10 @@ for (const shop of shops) {
     }
   }
 }
-const UNSELLABLE_TYPES = new Set([D.ItemType.book, D.ItemType.recipe, D.ItemType.stationUpgrade, D.ItemType.quest])
+const UNSELLABLE_TYPES = new Set([D.ItemType.book, D.ItemType.stationUpgrade, D.ItemType.quest, D.ItemType.chest])
 for (const item of Object.values(D.ITEM_DATA)) {
   const name = idName(D.ItemID, item.id)
-  if (item.value > 0 && (UNSELLABLE_TYPES.has(item.type) || /^(shiny)?pet[A-Z]/i.test(name))) {
+  if (item.value > 0 && UNSELLABLE_TYPES.has(item.type)) {
     error('src/data/items', `${name} must be unsellable (value <= 0)`)
   }
 }
@@ -195,6 +196,12 @@ for (const item of Object.values(D.ITEM_DATA)) {
 for (const recipe of Object.values(D.RECIPES_DATA)) {
   for (const cost of recipe.itemsNeeded) {
     if (!has(D.ITEM_DATA, cost.id)) error('src/data/recipes-data.ts', `${idName(D.RecipeID, recipe.id)} needs unknown ItemID ${cost.id}`)
+  }
+  // Crafted gear must not sell for much more than its materials, or crafting turns drops and shop runes into gold.
+  const item = D.ITEM_DATA[recipe.itemId]
+  const materials = recipe.itemsNeeded.reduce((sum, cost) => sum + Math.max(0, D.ITEM_DATA[cost.id]?.value ?? 0) * cost.amount, 0)
+  if (item?.type === D.ItemType.equipment && item.value * recipe.createsAmount > 2 * materials) {
+    error('src/data/items', `${idName(D.ItemID, item.id)} sells for ${item.value * recipe.createsAmount}g per craft but its recipe's materials are worth ${materials}g (max 2×)`)
   }
   const station = D.STATIONS_DATA[recipe.stationId]
   if (station && recipe.stationLevel > station.maxLevel) {
@@ -213,6 +220,24 @@ for (const town of Object.values(D.TOWNS_DATA)) {
     }
   }
 }
+// A step's turnInNpc backs the quest panel's "Talk to" link: the NPC must stand in a town
+// and their dialogue must start, advance or end that quest.
+const placedNpcs = new Set(Object.values(D.TOWNS_DATA).flatMap(t => t.buildings.flatMap(b => b.npcs.map(n => n.id))))
+const questsInDialogue = npcId => new Set(Object.values(D.NPC_DATA[npcId]?.dialogue ?? {})
+  .flatMap(node => node.options ?? [])
+  .flatMap(option => option.results ?? [])
+  .flatMap(result => result.effects ?? [])
+  .filter(effect => effect.type === 'quest')
+  .map(effect => effect.questId))
+for (const quest of Object.values(D.QUEST_DATA)) {
+  quest.steps.forEach((step, i) => {
+    const where = `${idName(D.QuestID, quest.questId)} step ${i + 1}`
+    const npc = idName(D.NpcID, step.turnInNpc)
+    if (!has(D.NPC_DATA, step.turnInNpc)) error('src/data/quests-data.ts', `${where} has unknown turnInNpc ${step.turnInNpc}`)
+    else if (!placedNpcs.has(step.turnInNpc)) error('src/data/quests-data.ts', `${where}: turnInNpc ${npc} isn't in any town building`)
+    else if (!questsInDialogue(step.turnInNpc).has(quest.questId)) error('src/data/quests-data.ts', `${where}: turnInNpc ${npc}'s dialogue never starts, advances or ends this quest`)
+  })
+}
 for (const skill of Object.values(D.ALL_SKILLS)) {
   const reqs = []
   const collect = r => { if (!r) return; if (r.kind === 'node') reqs.push(r.id); else r.of.forEach(collect) }
@@ -220,6 +245,33 @@ for (const skill of Object.values(D.ALL_SKILLS)) {
   for (const id of reqs) {
     if (!has(D.ALL_SKILLS, id)) error('src/data/skill-tree-data.ts', `${idName(D.SkillNodeID, skill.id)} requires unknown node ${id}`)
   }
+  if (skill.anchor !== undefined && (!has(D.ALL_SKILLS, skill.anchor) || skill.anchor === skill.id)) {
+    error('src/data/skill-tree-data.ts', `${idName(D.SkillNodeID, skill.id)} has anchor ${skill.anchor}, which isn't another node`)
+  }
+}
+// Owner rule: a spell comes from exactly one source (a skill node, a spell scroll or a piece of gear), so a respec,
+// a refund or taking gear off never has to guess which source a known spell came from.
+const spellSources = new Map()
+const addSpellSource = (spellId, source) => spellSources.set(spellId, [...(spellSources.get(spellId) ?? []), source])
+for (const skill of Object.values(D.ALL_SKILLS)) {
+  if (skill.type === D.SkillNodeType.spell) addSpellSource(skill.spellId, `skill node ${idName(D.SkillNodeID, skill.id)}`)
+}
+for (const item of Object.values(D.ITEM_DATA)) {
+  if (item.type === D.ItemType.spellScroll) addSpellSource(item.spellId, `spell scroll ${idName(D.ItemID, item.id)}`)
+  if (item.type === D.ItemType.equipment && item.spell !== undefined) addSpellSource(item.spell, `gear ${idName(D.ItemID, item.id)}`)
+}
+for (const [spellId, sources] of spellSources) {
+  if (sources.length > 1) error('src/data/spells-data.ts', `${idName(D.SpellID, spellId)} has more than one source (${sources.join(', ')}); a spell may come from only one`)
+}
+
+// A spell perk is a battle node read only through SpellProps.perk; a stat or spell node would also apply its own effect.
+for (const spell of Object.values(D.SPELLS_DATA)) {
+  if (!spell.perk) continue
+  const where = `${idName(D.SpellID, spell.id)} perk`
+  const node = D.ALL_SKILLS[spell.perk.nodeId]
+  if (!node) error('src/data/spells-data.ts', `${where} points at unknown node ${spell.perk.nodeId}`)
+  else if (node.type !== D.SkillNodeType.battle) error('src/data/spells-data.ts', `${where}: node ${idName(D.SkillNodeID, node.id)} must be a battle node`)
+  if (!spell.perk.cooldownPerLevel && !spell.perk.manaPerLevel) error('src/data/spells-data.ts', `${where} has neither cooldownPerLevel nor manaPerLevel`)
 }
 
 // ---------------------------------------------------------------------------
@@ -393,6 +445,8 @@ for (const f of [...walkFiles(join(SRC, 'app'), '.ts'), ...walkFiles(join(SRC, '
 
 const DOC_FILES = [
   join(ROOT, 'CLAUDE.md'),
+  join(ROOT, 'CODING_STANDARDS.md'),
+  join(ROOT, 'docs', 'git-workflow.md'),
   ...(existsSync(join(ROOT, 'docs', 'systems')) ? walkFiles(join(ROOT, 'docs', 'systems'), '.md') : []),
   // angular-developer is a vendored generic skill; its paths describe other projects.
   ...walkFiles(join(ROOT, '.claude', 'skills'), '.md').filter(f => !/[\\/]angular-developer[\\/]/.test(f)),
@@ -475,6 +529,49 @@ for (const doc of DOC_FILES) {
       const note = NOTE_RE.exec(line)
       if (!note) error('CHANGELOG.md', `[${s.version}] '${line}' is not '- [type] text'`)
       else if (!Object.hasOwn(NOTE_TYPES, note[1])) error('CHANGELOG.md', `[${s.version}] unknown note type '${note[1]}' (${Object.keys(NOTE_TYPES).join(', ')})`)
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 8. Component styles and templates: icons are files, not inline <svg>; every BEM class
+//    (block__element, block--modifier) a component's styles define is used by its template or code.
+
+const repoPath = f => relative(ROOT, f).replace(/\\/g, '/')
+const escapeRegExp = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+const APP = join(SRC, 'app')
+
+for (const f of walkFiles(APP, '.html')) {
+  if (/<svg[\s>]/i.test(readFileSync(f, 'utf8'))) error(repoPath(f), 'inline <svg>: use an icon file under src/assets/img/icons/ with <img ngSrc>')
+}
+for (const f of walkFiles(APP, '.ts')) {
+  // Inline templates in any quote style: template: `…`, '…' or "…".
+  if (/template:\s*(['"`])(?:(?!\1)[\s\S])*?<svg[\s>]/i.test(readFileSync(f, 'utf8'))) error(repoPath(f), 'inline <svg> in the template: use an icon file under src/assets/img/icons/ with <img ngSrc>')
+}
+
+{
+  const sass = await import('sass')
+  const BEM_CLASS = /\.(-?[a-z][\w-]*?(?:__|--)[\w-]+)/gi
+  const styleFiles = [...walkFiles(APP, '.component.sass'), ...walkFiles(APP, '.component.scss')]
+  for (const styleFile of styleFiles) {
+    const base = styleFile.replace(/\.s[ac]ss$/, '')
+    const source = ['.html', '.ts'].map(ext => base + ext).filter(existsSync).map(f => readFileSync(f, 'utf8')).join('\n')
+    let css
+    try {
+      css = sass.compile(styleFile, { loadPaths: [join(SRC, 'styles')], style: 'expanded' }).css
+    } catch (e) {
+      error(repoPath(styleFile), `doesn't compile: ${e.message.split('\n')[0]}`)
+      continue
+    }
+    for (const name of new Set([...css.matchAll(BEM_CLASS)].map(m => m[1]))) {
+      // Whole names only: `.btn--a` isn't used by `btn--ab`.
+      if (new RegExp(`(^|[^\\w-])${escapeRegExp(name)}(?![\\w-])`).test(source)) continue
+      // A modifier built at runtime ('hud__currency--' + x, `map-marker--${x}`, badge--{{ x }}) leaves its prefix
+      // right before a quote, `${` or `{{`.
+      const modifierAt = name.lastIndexOf('--')
+      const prefix = escapeRegExp(name.slice(0, modifierAt + 2))
+      if (modifierAt > 0 && new RegExp(`(^|[^\\w-])${prefix}(?=['"\`]|\\$\\{|\\{\\{)`).test(source)) continue
+      error(repoPath(styleFile), `.${name} is styled but neither the template nor the component code uses it`)
     }
   }
 }

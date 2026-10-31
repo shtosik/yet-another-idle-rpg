@@ -1,4 +1,48 @@
 {
+  "statsPanel": {
+    "groups": {
+      "combat": "Combat",
+      "magic": "Magic",
+      "progress": "Progress",
+      "weaknesses": "Weakness damage",
+      "vsEnemies": "Damage vs enemy types"
+    },
+    "sources": {
+      "base": "Base",
+      "equipment": "Gear",
+      "skills": "Skills",
+      "buffs": "Buffs",
+      "consumables": "Food & potions",
+      "bonuses": "Permanent bonuses",
+      "mastery": "Zone mastery"
+    },
+    "descriptions": {
+      "attackPower": "Damage of each auto-attack, before crits and bonuses.",
+      "attackSpeed": "Seconds between auto-attacks. Lower is faster.",
+      "critChance": "Chance for a hit to be a critical hit. Spells crit only with the Spell Crit skill.",
+      "critMulti": "Damage multiplier of a critical hit.",
+      "magicDamage": "Added to every damaging spell's base damage.",
+      "magicDamageMultiplier": "Multiplies spell damage, after Magic Damage is added.",
+      "meleeDamageMultiplier": "Multiplies the damage of melee hits: auto-attacks with a melee weapon (or none) and melee spells.",
+      "maxMana": "Mana spells cost to cast. Refills one point at a time up to the maximum.",
+      "manaRegenRate": "Seconds to regain one mana point. Lower is faster.",
+      "spellCooldownReduction": "Seconds taken off every spell's cooldown.",
+      "increasedSpellDuration": "Seconds added to every buff spell's duration.",
+      "xpMultiplier": "Multiplies XP from kills.",
+      "goldCoinsMultiplier": "Multiplies gold from kills.",
+      "offlineProgressRate": "Share of your normal kill rate you keep while away.",
+      "shinyChance": "Chance for an enemy to spawn as a shiny.",
+      "inventorySlots": "Slots in each of your Gear, Consumables and Materials inventory tabs.",
+      "maxTaskSlots": "Exploration Guild tasks you can have at once.",
+      "taskDoubleKillChance": "Chance for a kill to count twice toward Guild tasks.",
+      "shopRefreshCooldown": "Time between shop restocks.",
+      "weakness": "Damage multiplier when you hit an enemy's elemental weakness with this element. Needs the Weaknesses skill.",
+      "damageVs": "Extra damage against enemies of this type, added on top of everything else."
+    },
+    "total": "Total",
+    "showAll": "Show all stats",
+    "showChanged": "Show changed stats"
+  },
   "playerStats": {
     "attackSpeed": "Attack Speed",
     "attackPower": "Attack Power",
@@ -7,6 +51,7 @@
     "manaRegenRate": "Mana Regen",
     "magicDamage": "Magic Damage",
     "magicDamageMultiplier": "Magic Damage Multiplier",
+    "meleeDamageMultiplier": "Melee Damage Multiplier",
     "spellCooldownReduction": "Spell Cooldown Reduction",
     "increasedSpellDuration": "Spell Duration",
     "shopRefreshCooldown": "Shop Refresh Cooldown",
@@ -75,7 +120,12 @@
     "towns": "Towns",
     "bestiary": "Bestiary",
     "spellbook": "Spellbook",
-    "settings": "Settings"
+    "settings": "Settings",
+    "locked": "Locked"
+  },
+  "hud": {
+    "level": "Lv {{level}}",
+    "explorerTokens": "Explorer Tokens"
   },
   "starts": "Starts",
   "requires": "Requires",
@@ -85,10 +135,30 @@
   "quest": "Quest",
   "completed": "completed!",
   "inventory": {
-    "slotsNeeded_one": "{{count}} slot needed",
-    "slotsNeeded_other": "{{count}} slots needed",
-    "freeSlots": "Free slots: {{free}} / {{total}}",
+    "slotsNeeded": "{{slots}} needed",
+    "tabSlots_one": "{{count}} {{tab}} slot",
+    "tabSlots_other": "{{count}} {{tab}} slots",
+    "tabsLabel": "Inventory tabs",
+    "tabFull": "{{tab}} tab is full",
+    "tabFullLabel": "{{tab}} {{count}}, full",
+    "empty": "Nothing here yet.",
+    "tabs": {
+      "gear": "Gear",
+      "consumables": "Consumables",
+      "materials": "Materials",
+      "pets": "Pets",
+      "quest": "Quest"
+    },
+    "dropsLost": "{{tab}} full: {{items}} lost",
     "lockedSlot": "Locked slot",
+    "destroy": {
+      "button": "Destroy",
+      "title": "Destroy item",
+      "question": "Destroy {{amount}} x {{item}} ({{tier}})?",
+      "warning": "This can't be undone.",
+      "cancel": "Cancel",
+      "confirm": "Destroy"
+    },
     "page": "Page {{page}}",
     "previousPage": "Previous page",
     "nextPage": "Next page"
@@ -106,8 +176,43 @@
     "lostDrops_other": "Your inventory was full: {{count}} items were lost.",
     "collect": "Collect"
   },
+  "arena": {
+    "title": "Arena",
+    "leave": "Leave",
+    "bosses": {
+      "weakPoint": "Weak point: strike it",
+      "weakPointHit": "Weak point hit! +50% damage",
+      "mound": "Dig at mound {{number}}",
+      "stunned": "Stunned! Takes +50% damage",
+      "shield": "{{element}} shield: only {{element}} hurts",
+      "timeLost": "-{{seconds}}s"
+    },
+    "effects": {
+      "enter": "Enter the Arena",
+      "claim": "Claim arena rewards"
+    },
+    "result": {
+      "cleared": {
+        "title": "Arena cleared!",
+        "body": "Yad falls and the stands roar your name."
+      },
+      "timeout": {
+        "title": "Time's up!",
+        "body": "The sand ran out before the last champion fell. You keep what your kills earned."
+      },
+      "time": "Time: {{time}}",
+      "bestTime": "New best time!",
+      "inventoryFull": "Not enough inventory space. Make room, then claim your rewards here or from Ludo Crane in Lirold.",
+      "claim": "Claim rewards",
+      "close": "Close"
+    }
+  },
   "settings": {
     "title": "Settings",
+    "items": {
+      "title": "Items",
+      "confirmDestroyFromTier": "Ask before destroying items of this tier or higher"
+    },
     "version": {
       "current": "Version {{version}}",
       "changelog": "What's new"

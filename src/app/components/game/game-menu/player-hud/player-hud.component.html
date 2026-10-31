@@ -1,0 +1,44 @@
+<div class="hud">
+  <div class="hud__progress">
+    <span class="hud__level">{{ 'hud.level' | i18next: { level: level() } }}</span>
+
+    <div
+      class="hud__xp"
+      role="progressbar"
+      [attr.aria-label]="'playerStats.experience' | i18next"
+      [attr.aria-valuenow]="experience()"
+      [attr.aria-valuemax]="xpForNextLevel()"
+      aria-valuemin="0"
+    >
+      <div class="hud__xp-fill" [style.width.%]="xpPercent()"></div>
+      <span class="hud__xp-text">{{ experience() | number: '1.0-0' }} / {{ xpForNextLevel() | number: '1.0-0' }}</span>
+    </div>
+  </div>
+
+  <ul class="hud__currencies">
+    @for (entry of currencies(); track entry.currency) {
+      <li
+        class="hud__currency"
+        [class]="'hud__currency--' + entry.currency"
+        [attr.aria-label]="entry.labelKey | i18next"
+        [attr.title]="entry.labelKey | i18next"
+      >
+        @if (entry.currency === 'explorerTokens') {
+          <img class="hud__icon" src="./assets/img/icons/explorationToken.png" alt="" aria-hidden="true" width="14" height="14">
+        } @else {
+          <span class="hud__coin" aria-hidden="true"></span>
+        }
+        <span class="hud__currency-value" aria-live="polite">{{ entry.amount | abbr }}</span>
+
+        @for (change of entry.changes; track change.id) {
+          <span
+            class="hud__float"
+            aria-hidden="true"
+            [class.hud__float--gain]="change.amount > 0"
+            [class.hud__float--loss]="change.amount < 0"
+          >{{ change.amount > 0 ? '+' : '−' }}{{ (change.amount < 0 ? -change.amount : change.amount) | abbr }}</span>
+        }
+      </li>
+    }
+  </ul>
+</div>

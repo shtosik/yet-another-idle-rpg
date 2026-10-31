@@ -61,6 +61,10 @@ _Avoid_: Buff slot
 Automatically refilling an empty consumable slot from the inventory.
 _Avoid_: Auto-use, auto-consume
 
+**Inventory tab**:
+One of the inventory's five sections (Gear, Consumables, Materials, Pets, Quest), each with its own slots; an item's tab follows from its type.
+_Avoid_: Bag, category
+
 ## Skill tree
 
 **Branch**:
@@ -140,3 +144,7 @@ _Avoid_: Blueprint, formula
 **Recipe scroll**:
 An item that, when used, permanently unlocks a recipe.
 _Avoid_: Recipe item, blueprint
+
+**Spell scroll**:
+An item that, when used, permanently teaches a spell (Ambush Scroll).
+_Avoid_: Spell book, tome

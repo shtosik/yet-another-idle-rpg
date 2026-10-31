@@ -1,3 +1,5 @@
+import { BattleStore } from '../store/battle/battle.store'
+import { ArenaService } from './arena.service'
 import { DialogueNode } from '../../interfaces/dialogues/dialogue-node.interface'
 import { computed, inject, Injectable, signal } from '@angular/core'
 import { isTaskDone, PlayerStore } from '../store/player/player.store'
@@ -12,9 +14,10 @@ import { getQuestStatus, getStepItems, matchesQuestState } from './quest-status'
 import { QuestID } from '../../enums/ids/quest-id.enum'
 import { QuestState } from '../../enums/quest-state.enum'
 import { QuestStep } from '../../types/quests/quest-progression.type'
-import { ItemStack } from '../store/player/inventory'
+import { ItemStack, MissingSlots } from '../store/player/inventory'
 import { ExplorationGuildService } from './exploration-guild.service'
 import { TownsStore } from '../store/towns/towns.store'
+import { CurrencyFeedService } from './currency-feed.service'
 
 @Injectable({ providedIn: 'root' })
 export class DialogueManagerService {
@@ -22,6 +25,9 @@ export class DialogueManagerService {
   private questStore = inject(QuestsStore)
   private guildService = inject(ExplorationGuildService)
   private townsStore = inject(TownsStore)
+  private currencyFeed = inject(CurrencyFeedService)
+  private battleStore = inject(BattleStore)
+  private arenaService = inject(ArenaService)
 
   private currentConversation = signal<Record<any, DialogueNode<any>> | null>(null)
   private currentNodeId = signal<any>(null)
@@ -59,7 +65,7 @@ export class DialogueManagerService {
 
   /** False when the result's rewards would not fit in the inventory, or its gold fee can't be paid. */
   canApplyResult(result: DialogueResult<any> | undefined): boolean {
-    return this.missingSlots(result) === 0 && this.missingGold(result) === 0
+    return Object.keys(this.missingSlots(result)).length === 0 && this.missingGold(result) === 0
   }
 
   /** Gold still needed to pay the result's `deduct` effects (owner decision: gold never goes negative). */
@@ -71,9 +77,9 @@ export class DialogueManagerService {
     return Math.max(0, fee - this.playerStore.stats().goldCoins)
   }
 
-  /** Slots the player must free before the result's item or quest-completion rewards fit. */
-  missingSlots(result: DialogueResult<any> | undefined): number {
-    if (!result?.effects) return 0
+  /** Slots the player must free, per tab, before the result's item or quest-completion rewards fit. */
+  missingSlots(result: DialogueResult<any> | undefined): MissingSlots {
+    if (!result?.effects) return {}
 
     const adding: ItemStack[] = []
     const removing: ItemStack[] = []
@@ -83,6 +89,8 @@ export class DialogueManagerService {
         const stacks = effect.items.map(i => ({ id: i.itemId, amount: i.amount }))
         if (effect.action === 'give') adding.push(...stacks)
         else removing.push(...stacks)
+      } else if (effect.type === 'arena' && effect.action === 'claim') {
+        adding.push(...this.battleStore.arenaRewards())
       } else if (effect.type === 'quest' && effect.action !== 'start') {
         const status = getQuestStatus(this.questStore.questStepProgression(), effect.questId)
         if (status.state !== QuestState.active) continue
@@ -92,7 +100,7 @@ export class DialogueManagerService {
       }
     }
 
-    return adding.length === 0 ? 0 : this.playerStore.missingSlotsFor(adding, removing)
+    return adding.length === 0 ? {} : this.playerStore.missingSlotsByTab(adding, removing)
   }
 
   private questCompletionRewards(effect: QuestEffect, step: QuestStep): ItemStack[] {
@@ -213,6 +221,13 @@ export class DialogueManagerService {
           }
         }
         return false
+      case 'arena':
+        switch (c.state) {
+          case 'ready': return this.arenaService.isReady()
+          case 'running': return !!this.battleStore.arenaRun()
+          case 'rewardsWaiting': return this.battleStore.arenaRewards().length > 0
+        }
+        return false
       default:
         return false
     }
@@ -220,26 +235,8 @@ export class DialogueManagerService {
 
   /** Kill requirements of `questId` count kills since its current step started. */
   private checkRequirement(req: RequirementProps, questId: QuestID): boolean {
-    switch (req.type) {
-      case 'stat':
-        const stats = this.playerStore.stats()
-
-        return (stats[req.key] as number) >= req.amount
-      case 'item':
-        return this.playerStore.itemCount(req.itemId) >= req.amount
-      case 'enemy':
-        return this.questStore.questEnemyKills(questId, req.enemyId) >= req.amount
-      case 'quest':
-        const currentProgress = this.questStore.getQuestStep(req.questId)
-
-        if (!currentProgress) return false
-
-        return req.step !== undefined ? currentProgress === req.step : true
-      case 'wave':
-        return this.questStore.questWaveKills(questId, req.zoneId, req.wave) >= req.amount
-      default:
-        return false
-    }
+    const { current, target } = this.questStore.requirementProgress(questId, req)
+    return current >= target
   }
 
   private applyEffects(effects: DialogueEffect[]) {
@@ -266,7 +263,7 @@ export class DialogueManagerService {
           }
           break
         case 'shop':
-          this.openShop(effect.shopId)
+          this.openShop(effect.shopId, effect.stage)
           break
         case 'flag':
           this.questStore.setDialogueFlag(effect.name)
@@ -286,16 +283,25 @@ export class DialogueManagerService {
             case 'abandonTask':
               this.playerStore.abandonTask(effect.taskIndex ?? 0)
               break
-            case 'claimTask':
+            case 'claimTask': {
+              const tokensBefore = this.playerStore.explorerTokens()
               this.playerStore.claimCompletedTasks()
+              this.currencyFeed.show('explorerTokens', this.playerStore.explorerTokens() - tokensBefore)
               break
+            }
           }
+          break
+        case 'arena':
+          if (effect.action === 'enter') this.arenaService.enter()
+          else this.arenaService.claimRewards()
           break
       }
     })
   }
 
-  private openShop(shopId: number) {
-    this.townsStore.openShop(shopId)
+  private openShop(shopId: number, stage = 0) {
+    const npc = this.activeNpc()
+    if (npc) this.townsStore.rememberNpcShop(npc.id, shopId, stage)
+    this.townsStore.openShop(shopId, stage)
   }
 }

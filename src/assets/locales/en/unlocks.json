@@ -5,11 +5,15 @@
   "towns": {
     "laHarpar": {
       "title": "La Harpar Discovered!",
-      "body": "A bustling port town lies nearby. The Map tab is now available — use it to travel there. Once inside, visit the Tavern for rumors, browse the Market for supplies, and seek out the Exploration Guild for bounty tasks."
+      "body": "A fishing village lies nearby. The Map tab is now available — use it to travel there. Once inside, visit the Tavern for rumors, browse the Market for supplies, and seek out the Exploration Guild for bounty tasks."
     },
     "mawood": {
       "title": "Mawood Discovered!",
       "body": "Smoke and lantern-light flicker between the towering Silverwood Spires — a town built on platforms high above the forest floor. Travel there from the Map. Elder Corwin will want a word, and Sylvie, Finn and Brenna all have work for a capable fighter."
+    },
+    "lirold": {
+      "title": "Lirold Discovered!",
+      "body": "From the Matriarch’s nest you can see past the mountains: a road winding south off the Pass, and at its end stone walls and a castle under the mountains. Lirold, the capital of Port Stocksmar. Travel there from the Map; its Arena takes any challenger who can pay the gate."
     }
   },
   "zones": {

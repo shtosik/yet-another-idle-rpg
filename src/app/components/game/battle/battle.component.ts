@@ -8,6 +8,8 @@ import { EnemyComponent } from './enemy/enemy.component'
 import { DamagePopupComponent } from '../damage-popup/damage-popup.component'
 import { BattleFooterComponent } from './battle-footer/battle-footer.component'
 import { BattleSideButtonsComponent } from './battle-side-buttons/battle-side-buttons.component'
+import { BattleManagerService } from '../../../services/battle-manager.service'
+import { ARENA } from '../../../../data/arena-data'
 
 @Component({
   selector: 'app-battle',
@@ -24,8 +26,11 @@ export class BattleComponent {
   battleStore = inject(BattleStore)
   enemyContainerContainer = viewChild<EnemyComponent>('enemyElement')
 
+  dropsLostToast = inject(BattleManagerService).dropsLostToast
   isInCombat = this.battleStore.isInCombat
   currentZoneData = this.battleStore.currentZoneData
+
+  readonly arenaUrl = ARENA.url
 
   enemyPosition = signal({ x: 0, y: 0 })
 

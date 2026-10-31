@@ -38,6 +38,38 @@ describe('readSave', () => {
   })
 })
 
+describe('readSave migrations', () => {
+  const migrations = {
+    1: (s: Record<string, unknown>) => ({ ...s, coins: s['gold'] }),
+    2: (s: Record<string, unknown>) => ({ ...s, step: 3 }),
+  }
+
+  it('migrates an older save up to the current version, one step at a time', () => {
+    expect(readSave(JSON.stringify({ v: 1, state: { gold: 5 } }), 3, migrations))
+      .toEqual({ kind: 'load', state: { gold: 5, coins: 5, step: 3 } })
+    expect(readSave(JSON.stringify({ v: 2, state: { gold: 5 } }), 3, migrations))
+      .toEqual({ kind: 'load', state: { gold: 5, step: 3 } })
+  })
+
+  it('migrates a bare pre-versioning save as version 1', () => {
+    expect(readSave(JSON.stringify({ gold: 5 }), 2, migrations)).toEqual({ kind: 'load', state: { gold: 5, coins: 5 } })
+  })
+
+  it('reports a save as outdated when a step of its path is missing', () => {
+    expect(readSave(JSON.stringify({ v: 1, state: {} }), 3, { 2: migrations[2] })).toEqual({ kind: 'outdated', savedVersion: 1 })
+  })
+
+  it('throws when a migration fails, so the save is never overwritten', () => {
+    const broken = { 1: () => { throw new Error('bad') } }
+    expect(() => readSave(JSON.stringify({ v: 1, state: {} }), 2, broken)).toThrow()
+    expect(classifySave(JSON.stringify({ v: 1, state: {} }), 2, broken)).toBe('unreadable')
+  })
+
+  it('lets an import load a migratable save instead of counting it as outdated', () => {
+    expect(classifySave(JSON.stringify({ v: 1, state: { gold: 5 } }), 2, migrations)).toBe('load')
+  })
+})
+
 describe('classifySave (save import check)', () => {
   const envelope = (v: number) => JSON.stringify({ v, state: { gold: 5 } })
 

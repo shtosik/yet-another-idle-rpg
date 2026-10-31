@@ -94,3 +94,12 @@ test('skill-icon is a 256×256 inked tile cut by the tile step, with frozen refe
     assert.equal(f.post.at(-1)[0], 'tile')
     for (const ref of f.references) assert.match(ref, /^scripts\/asset-gen\/refs\/skill\//)
 })
+
+test('map-painterly draws exactly its target size with no post step, so a window lines up with the map pixel for pixel', () => {
+    const f = FAMILIES['map-painterly']
+    assert.deepEqual(f.gen, f.target)
+    assert.ok(f.gen.every((n) => n % 16 === 0), 'gen/2 must stay a whole latent multiple')
+    assert.deepEqual(f.post, [])
+    assert.equal(f.alpha, false)
+    for (const ref of f.references) assert.match(ref, /^scripts\/asset-gen\/refs\/map\//)
+})

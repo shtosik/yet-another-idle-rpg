@@ -1,53 +1,31 @@
 <nav class="game-menu">
   <ul class="game-menu__tabs">
-    <li
-      (click)="changeTab.emit(GameTab.main)"
-      class="game-menu__tab"
-    >{{ ('gameTabs.' + GameTab[GameTab.main]) | i18next }}
-    </li>
-    @if (playerStore.mapUnlocked()) {
-      <li
-        class="game-menu__tab"
-        (click)="changeTab.emit(GameTab.map)"
-      >{{ ('gameTabs.' + GameTab[GameTab.map]) | i18next }}
+    @for (entry of tabs(); track entry.tab) {
+      @let active = entry.tab === activeTab();
+      <li>
+        <button
+          class="game-menu__tab"
+          type="button"
+          [class.game-menu__tab--active]="active"
+          [class.game-menu__tab--locked]="!entry.unlocked"
+          [attr.aria-disabled]="entry.unlocked ? null : 'true'"
+          [attr.aria-current]="active ? 'page' : null"
+          [attr.title]="entry.unlocked ? null : ('gameTabs.locked' | i18next)"
+          (click)="select(entry)"
+        >
+          @if (!entry.unlocked) {
+            <img alt="" height="12" ngSrc="./assets/img/icons/lock.svg" width="12">
+          }
+          {{ ('gameTabs.' + GameTab[entry.tab]) | i18next }}
+          @if (!entry.unlocked) {
+            <span class="game-menu__sr-only">({{ 'gameTabs.locked' | i18next }})</span>
+          }
+          @if (entry.unlocked && entry.badge) {
+            <span class="game-menu__badge">{{ entry.badge }}</span>
+          }
+        </button>
       </li>
     }
-    @if (level() > 1) {
-      <li
-        class="game-menu__tab"
-        (click)="changeTab.emit(GameTab.skillTree)"
-      >{{ ('gameTabs.' + GameTab[GameTab.skillTree]) | i18next }}
-        @if (skillPoints()) {
-          <span
-            class="skill-point"
-          >({{ skillPoints() }})</span>
-        }
-      </li>
-    }
-    @if (playerStore.campUnlocked()) {
-      <li
-        class="game-menu__tab"
-        (click)="changeTab.emit(GameTab.camp)"
-      >
-        {{ ('gameTabs.' + GameTab[GameTab.camp]) | i18next }}
-      </li>
-    }
-    <li
-      class="game-menu__tab"
-      (click)="changeTab.emit(GameTab.bestiary)"
-    >{{ ('gameTabs.' + GameTab[GameTab.bestiary]) | i18next }}
-    </li>
-    @if (playerStore.spellbookUnlocked()) {
-      <li
-        class="game-menu__tab"
-        (click)="changeTab.emit(GameTab.spellbook)"
-      >{{ ('gameTabs.' + GameTab[GameTab.spellbook]) | i18next }}
-      </li>
-    }
-    <li
-      class="game-menu__tab game-menu__tab--end"
-      (click)="changeTab.emit(GameTab.settings)"
-    >{{ ('gameTabs.' + GameTab[GameTab.settings]) | i18next }}
-    </li>
   </ul>
 </nav>
+<app-player-hud class="game-menu__hud"/>

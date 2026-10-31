@@ -4,6 +4,7 @@ import { SpellID } from 'enums/ids/spell-id.enum'
 import { SkillNodeType } from 'enums/skill-node-type.enum'
 import { SkillNode } from 'interfaces/skill-tree/skill-node.interface'
 import { SkillTree } from 'interfaces/skill-tree/skill-tree.interface'
+import { PlayerStat } from 'types/player/player-stat.type'
 
 // Positions are resolved at module load by skill-tree-graph.ts.
 // Only the origin (and any unconnected special node) carries an explicit
@@ -72,7 +73,7 @@ const EXPLORATION_SKILLS_DATA: Partial<Record<SkillNodeID, SkillNode>> = {
     id: SkillNodeID.weaknesses,
     branch: SkillBranch.exploration,
     skillPointCost: 2,
-    requires: { kind: 'node', id: SkillNodeID.goldGain, minLevel: 5 },
+    requires: { kind: 'node', id: SkillNodeID.goldGain, minLevel: 1 },
     maxLevel: 1,
     url: './assets/img/skills/weaknesses.png',
     type: SkillNodeType.battle,
@@ -97,6 +98,77 @@ const EXPLORATION_SKILLS_DATA: Partial<Record<SkillNodeID, SkillNode>> = {
     maxLevel: 1,
     url: './assets/img/skills/autoEat.png',
     type: SkillNodeType.battle,
+  },
+  // Inventory slots (docs/plans/inventory-tabs.md step 5). Never lower these amounts without a save migration.
+  [SkillNodeID.packRat]: {
+    id: SkillNodeID.packRat,
+    branch: SkillBranch.exploration,
+    turn: 45,
+    skillPointCost: 1,
+    requires: { kind: 'node', id: SkillNodeID.knowledge, minLevel: 1 },
+    maxLevel: 1,
+    url: './assets/img/skills/packRat.png',
+    type: SkillNodeType.stat,
+    stat: 'inventorySlots',
+    statAmount: 1,
+  },
+  [SkillNodeID.gearPouch]: {
+    id: SkillNodeID.gearPouch,
+    branch: SkillBranch.exploration,
+    turn: -40,
+    skillPointCost: 1,
+    requires: { kind: 'node', id: SkillNodeID.packRat, minLevel: 1 },
+    maxLevel: 3,
+    url: './assets/img/skills/gearPouch.png',
+    type: SkillNodeType.stat,
+    stat: 'inventorySlots',
+    statAmount: 2,
+    tab: 'gear',
+  },
+  [SkillNodeID.consumablesPouch]: {
+    id: SkillNodeID.consumablesPouch,
+    branch: SkillBranch.exploration,
+    skillPointCost: 1,
+    requires: { kind: 'node', id: SkillNodeID.packRat, minLevel: 1 },
+    maxLevel: 3,
+    url: './assets/img/skills/consumablesPouch.png',
+    type: SkillNodeType.stat,
+    stat: 'inventorySlots',
+    statAmount: 2,
+    tab: 'consumables',
+  },
+  [SkillNodeID.materialsPouch]: {
+    id: SkillNodeID.materialsPouch,
+    branch: SkillBranch.exploration,
+    turn: 40,
+    skillPointCost: 1,
+    requires: { kind: 'node', id: SkillNodeID.packRat, minLevel: 1 },
+    maxLevel: 3,
+    url: './assets/img/skills/materialsPouch.png',
+    type: SkillNodeType.stat,
+    stat: 'inventorySlots',
+    statAmount: 2,
+    tab: 'materials',
+  },
+  [SkillNodeID.bottomlessPack]: {
+    id: SkillNodeID.bottomlessPack,
+    branch: SkillBranch.exploration,
+    anchor: SkillNodeID.consumablesPouch,
+    skillPointCost: 3,
+    special: true,
+    requires: {
+      kind: 'all',
+      of: [
+        { kind: 'node', id: SkillNodeID.gearPouch, minLevel: 1 },
+        { kind: 'node', id: SkillNodeID.consumablesPouch, minLevel: 1 },
+        { kind: 'node', id: SkillNodeID.materialsPouch, minLevel: 1 },
+      ],
+    },
+    maxLevel: 1,
+    url: './assets/img/skills/bottomlessPack.png',
+    type: SkillNodeType.stat,
+    stat: 'inventorySlots',
+    statAmount: 2,
   },
 }
 
@@ -169,24 +241,78 @@ const DAMAGE_SKILLS_DATA: Partial<Record<SkillNodeID, SkillNode>> = {
   },
 }
 
+/** A strike spell starting its element branch. Spells sit 2.5 steps out so the four don't overlap around the origin. */
+const strikeSpell = (id: SkillNodeID, branch: SkillBranch, spellId: SpellID, icon: string): SkillNode => ({
+  id,
+  branch,
+  distance: 2.5,
+  skillPointCost: 2,
+  requires: { kind: 'node', id: SkillNodeID.origin, minLevel: 1 },
+  special: true,
+  maxLevel: 1,
+  url: `./assets/img/skills/${icon}.png`,
+  type: SkillNodeType.spell,
+  spellId,
+})
+
+/** +0.1 to the element's weakness multiplier per level. */
+const elementMastery = (id: SkillNodeID, branch: SkillBranch, spell: SkillNodeID, stat: PlayerStat, icon: string): SkillNode => ({
+  id,
+  branch,
+  skillPointCost: 1,
+  requires: { kind: 'node', id: spell, minLevel: 1 },
+  maxLevel: 5,
+  url: `./assets/img/skills/${icon}.png`,
+  type: SkillNodeType.stat,
+  stat,
+  statAmount: 0.1,
+})
+
+/** Read through the spell's `perk` (`SPELLS_DATA`), so it has no stat of its own. */
+const spellPerk = (id: SkillNodeID, branch: SkillBranch, mastery: SkillNodeID, maxLevel: number, icon: string): SkillNode => ({
+  id,
+  branch,
+  skillPointCost: 1,
+  requires: { kind: 'node', id: mastery, minLevel: 1 },
+  maxLevel,
+  url: `./assets/img/skills/${icon}.png`,
+  type: SkillNodeType.battle,
+})
+
+const ELEMENT_SKILLS_DATA: Partial<Record<SkillNodeID, SkillNode>> = {
+  [SkillNodeID.fireStrike]: strikeSpell(SkillNodeID.fireStrike, SkillBranch.fire, SpellID.fireStrike, 'fireStrike'),
+  [SkillNodeID.fireMastery]: elementMastery(SkillNodeID.fireMastery, SkillBranch.fire, SkillNodeID.fireStrike, 'extraFireDamageMultiplier', 'fireMastery'),
+  [SkillNodeID.fireStrikeCooldown]: spellPerk(SkillNodeID.fireStrikeCooldown, SkillBranch.fire, SkillNodeID.fireMastery, 3, 'spellCooldown'),
+
+  [SkillNodeID.tidalLash]: strikeSpell(SkillNodeID.tidalLash, SkillBranch.water, SpellID.tidalLash, 'tidalLash'),
+  [SkillNodeID.waterMastery]: elementMastery(SkillNodeID.waterMastery, SkillBranch.water, SkillNodeID.tidalLash, 'extraWaterDamageMultiplier', 'waterMastery'),
+  [SkillNodeID.tidalLashCooldown]: spellPerk(SkillNodeID.tidalLashCooldown, SkillBranch.water, SkillNodeID.waterMastery, 3, 'spellCooldown'),
+
+  [SkillNodeID.galeCut]: strikeSpell(SkillNodeID.galeCut, SkillBranch.air, SpellID.galeCut, 'galeCut'),
+  [SkillNodeID.airMastery]: elementMastery(SkillNodeID.airMastery, SkillBranch.air, SkillNodeID.galeCut, 'extraAirDamageMultiplier', 'airMastery'),
+  [SkillNodeID.galeCutCooldown]: spellPerk(SkillNodeID.galeCutCooldown, SkillBranch.air, SkillNodeID.airMastery, 3, 'spellCooldown'),
+
+  [SkillNodeID.stoneSpike]: strikeSpell(SkillNodeID.stoneSpike, SkillBranch.earth, SpellID.stoneSpike, 'stoneSpike'),
+  [SkillNodeID.earthMastery]: elementMastery(SkillNodeID.earthMastery, SkillBranch.earth, SkillNodeID.stoneSpike, 'extraEarthDamageMultiplier', 'earthMastery'),
+  [SkillNodeID.stoneSpikeMana]: spellPerk(SkillNodeID.stoneSpikeMana, SkillBranch.earth, SkillNodeID.earthMastery, 2, 'maxMana'),
+}
+
+/** The spell node that starts each element branch. */
+const STRIKE_SPELL_NODES = Object.values(ELEMENT_SKILLS_DATA)
+  .flatMap(node => node?.type === SkillNodeType.spell ? [node.id] : [])
+
+/**
+ * The shared magic core opens with any strike spell. It is anchored to the origin, in the lane between the water and
+ * air branches, so the tree draws one line to it instead of one from every spell.
+ */
 const MAGIC_SKILLS_DATA: Partial<Record<SkillNodeID, SkillNode>> = {
-  [SkillNodeID.fireStrike]: {
-    id: SkillNodeID.fireStrike,
-    branch: SkillBranch.magic,
-    skillPointCost: 2,
-    requires: { kind: 'node', id: SkillNodeID.origin, minLevel: 1 },
-    special: true,
-    maxLevel: 1,
-    url: './assets/img/skills/fireStrike.png',
-    type: SkillNodeType.spell,
-    spellId: SpellID.fireStrike,
-  },
   [SkillNodeID.maxMana]: {
     id: SkillNodeID.maxMana,
     branch: SkillBranch.magic,
-    turn: -45,
+    anchor: SkillNodeID.origin,
+    distance: 2,
     skillPointCost: 1,
-    requires: { kind: 'node', id: SkillNodeID.fireStrike, minLevel: 1 },
+    requires: { kind: 'any', of: STRIKE_SPELL_NODES.map(id => ({ kind: 'node', id, minLevel: 1 })) },
     maxLevel: 5,
     url: './assets/img/skills/maxMana.png',
     type: SkillNodeType.stat,
@@ -196,8 +322,9 @@ const MAGIC_SKILLS_DATA: Partial<Record<SkillNodeID, SkillNode>> = {
   [SkillNodeID.manaRegen]: {
     id: SkillNodeID.manaRegen,
     branch: SkillBranch.magic,
+    turn: -20,
     skillPointCost: 1,
-    requires: { kind: 'node', id: SkillNodeID.fireStrike, minLevel: 1 },
+    requires: { kind: 'node', id: SkillNodeID.maxMana, minLevel: 1 },
     maxLevel: 5,
     url: './assets/img/skills/manaRegen.png',
     type: SkillNodeType.stat,
@@ -208,9 +335,9 @@ const MAGIC_SKILLS_DATA: Partial<Record<SkillNodeID, SkillNode>> = {
   [SkillNodeID.magicDamage]: {
     id: SkillNodeID.magicDamage,
     branch: SkillBranch.magic,
-    turn: 45,
+    turn: 20,
     skillPointCost: 1,
-    requires: { kind: 'node', id: SkillNodeID.fireStrike, minLevel: 1 },
+    requires: { kind: 'node', id: SkillNodeID.maxMana, minLevel: 1 },
     maxLevel: 10,
     url: './assets/img/skills/magicDamage.png',
     type: SkillNodeType.stat,
@@ -244,6 +371,7 @@ export const ALL_SKILLS: Partial<Record<SkillNodeID, SkillNode>> = {
   [SkillNodeID.origin]: HUB_SKILL,
   ...EXPLORATION_SKILLS_DATA,
   ...DAMAGE_SKILLS_DATA,
+  ...ELEMENT_SKILLS_DATA,
   ...MAGIC_SKILLS_DATA,
 }
 

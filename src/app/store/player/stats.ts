@@ -13,6 +13,7 @@ import SPELLS_DATA from '../../../data/spells-data'
 import { statsInitialState } from './player'
 import { SpellID } from '../../../enums/ids/spell-id.enum'
 import { ItemID } from '../../../enums/ids/item-id.enum'
+import type { InventoryTab } from './inventory'
 
 export type PlayerStatsType = Record<PlayerStat, number>
 
@@ -26,10 +27,43 @@ export interface StatModifier {
   amount: number
   /** `amount` is a fraction of the stat after every flat modifier (0.2 = 20% better), not a flat value. */
   percent?: boolean
+  /** `inventorySlots` only: the one tab it grows; without it, every slot tab (`inventoryCapacity`). */
+  tab?: InventoryTab
 }
 
 /** Positive amounts lower these stats: lower is better (seconds per attack, ms per mana, ms per refresh). */
 const INVERTED_STATS = new Set<PlayerStat>(['attackSpeed', 'manaRegenRate', 'shopRefreshCooldown'])
+
+export const isInvertedStat = (stat: PlayerStat): boolean => INVERTED_STATS.has(stat)
+
+/** Where a stat modifier comes from; the stats panel breaks each stat down by these. */
+export type StatSource = 'equipment' | 'skills' | 'buffs' | 'consumables' | 'bonuses' | 'mastery'
+export type SourcedModifiers = Record<StatSource, StatModifier[]>
+
+export interface StatContribution {
+  source: StatSource
+  /** Sum of the source's flat amounts, as written in data (positive = better, also for inverted stats). */
+  flat: number
+  /** Sum of the source's percent amounts (0.1 = 10% better). */
+  percent: number
+}
+
+/** What each source adds to `stat`, in `SourcedModifiers` key order; sources adding nothing are left out. */
+export function statContributions(stat: PlayerStat, sources: SourcedModifiers): StatContribution[] {
+  return (Object.entries(sources) as [StatSource, StatModifier[]][]).flatMap(([source, modifiers]) => {
+    let flat = 0
+    let percent = 0
+    for (const modifier of modifiers) {
+      if (modifier.stat !== stat) continue
+      if (modifier.percent) percent += modifier.amount
+      else flat += modifier.amount
+    }
+    if (!flat && !percent) return []
+    return [{ source, flat: round(flat), percent: round(percent) }]
+  })
+}
+
+const round = (value: number): number => Math.round(value * STAT_PRECISION) / STAT_PRECISION
 
 /** Rounds away float drift from summing fractional modifiers (2.7000000000000006 -> 2.7). */
 const STAT_PRECISION = 1e6
@@ -49,7 +83,7 @@ export const skillNodeModifiers = (unlockedNodes: UnlockedNodes): StatModifier[]
   Object.entries(unlockedNodes).flatMap(([id, level]) => {
     const node = ALL_SKILLS[Number(id) as SkillNodeID]
     return level && node?.type === SkillNodeType.stat
-      ? [{ stat: node.stat, amount: node.statAmount * level, percent: node.statPercent }]
+      ? [{ stat: node.stat, amount: node.statAmount * level, percent: node.statPercent, tab: node.tab }]
       : []
   })
 
@@ -81,17 +115,18 @@ export const bonusModifiers = (bonuses: Partial<Record<PlayerStat, number>>): St
 export function deriveStats(resources: Resources, modifiers: StatModifier[]): PlayerStatsType {
   const stats: PlayerStatsType = { ...statsInitialState }
 
-  for (const { stat, amount, percent } of modifiers) {
-    if (isResourceStat(stat) || percent) continue
+  // A tab-keyed modifier counts only in that tab's capacity, so `inventorySlots` stays what every slot tab gets.
+  for (const { stat, amount, percent, tab } of modifiers) {
+    if (isResourceStat(stat) || percent || tab) continue
     stats[stat] += INVERTED_STATS.has(stat) ? -amount : amount
   }
   // Percentages apply after flat modifiers, so they keep the same strength as gear improves.
-  for (const { stat, amount, percent } of modifiers) {
-    if (isResourceStat(stat) || !percent) continue
+  for (const { stat, amount, percent, tab } of modifiers) {
+    if (isResourceStat(stat) || !percent || tab) continue
     stats[stat] *= INVERTED_STATS.has(stat) ? 1 - amount : 1 + amount
   }
   for (const stat of Object.keys(stats) as PlayerStat[]) {
-    stats[stat] = Math.round(stats[stat] * STAT_PRECISION) / STAT_PRECISION
+    stats[stat] = round(stats[stat])
   }
 
   Object.assign(stats, resources)

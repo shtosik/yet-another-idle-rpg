@@ -31,8 +31,20 @@ $itemPalette: (
   "quest": rgb(147, 12, 51),
 );
 
+$elementPalette: (
+  "fire": rgb(255, 122, 61),
+  "water": rgb(79, 179, 255),
+  "air": rgb(155, 224, 180),
+  "earth": rgb(196, 154, 90),
+  "light": rgb(255, 241, 168),
+  "dark": rgb(179, 140, 255),
+  "physical": rgb(200, 200, 200),
+);
+
 $spellTypePalette: (
   "melee": rgb(147, 12, 51),
   "magic": rgb(0, 118, 255),
-  "buff": rgb(60, 179, 113)
+  "buff": rgb(60, 179, 113),
+  "damageOverTime": rgb(155, 224, 180),
+  "empower": rgb(234, 179, 8)
 )

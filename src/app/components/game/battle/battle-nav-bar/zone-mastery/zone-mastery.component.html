@@ -1,0 +1,64 @@
+<div class="zone-mastery">
+  @for (progress of stars(); track progress.star) {
+    <button
+      type="button"
+      class="zone-mastery__star"
+      [class.zone-mastery__star--claimed]="progress.claimed"
+      [class.zone-mastery__star--ready]="canClaim(progress.star)"
+      [class.zone-mastery__star--locked]="isLocked(progress)"
+      [attr.aria-disabled]="!canClaim(progress.star)"
+      [attr.aria-label]="'zones:mastery.stars.' + progress.star + '.name' | i18next"
+      [attr.aria-describedby]="'zone-star-desc-' + progress.star"
+      placement="bottom"
+      tooltipClass="tooltip-override"
+      [tooltipContext]="{ progress }"
+      [tooltipTemplate]="starTooltip"
+      (click)="claim(progress.star)"
+    >★</button>
+    <!-- Screen readers hear the goal, progress and state; the tooltip only shows on hover and focus. -->
+    <span class="zone-mastery__sr-only" [id]="'zone-star-desc-' + progress.star">
+      {{ 'zones:mastery.stars.' + progress.star + '.goal' | i18next: { count: progress.target } }}
+      @if (isLocked(progress)) {
+        {{ 'zones:mastery.shinyLocked' | i18next }}
+      } @else {
+        {{ 'zones:mastery.progress' | i18next: { current: progress.current, target: progress.target } }}
+      }
+      @if (progress.claimed) {
+        {{ 'zones:mastery.claimed' | i18next }}
+      } @else if (canClaim(progress.star)) {
+        {{ 'zones:mastery.clickToClaim' | i18next }}
+      } @else if (isBlocked(progress)) {
+        {{ blockedText() }}
+      }
+    </span>
+  }
+</div>
+
+<ng-template #starTooltip let-progress="progress">
+  <div class="star-tooltip">
+    <span class="star-tooltip__title">{{ 'zones:mastery.stars.' + progress.star + '.name' | i18next }}</span>
+    <span>{{ 'zones:mastery.stars.' + progress.star + '.goal' | i18next: { count: progress.target } }}</span>
+    @if (isLocked(progress)) {
+      <span class="star-tooltip__blocked">{{ 'zones:mastery.shinyLocked' | i18next }}</span>
+    } @else {
+      <span>{{ 'zones:mastery.progress' | i18next: { current: progress.current, target: progress.target } }}</span>
+    }
+    @if (progress.claimed) {
+      <span class="star-tooltip__done">{{ 'zones:mastery.claimed' | i18next }}</span>
+    } @else {
+      @let chest = reward();
+      <span class="star-tooltip__reward">
+        {{ 'zones:mastery.reward' | i18next: { gold: chest.gold, tokens: chest.explorerTokens } }}
+        @for (item of chest.items; track item.id; let last = $last) {
+          {{ item.amount }}× {{ 'items:names.' + ItemID[item.id] | i18next }}{{ last ? '' : ', ' }}
+        }
+      </span>
+      @if (canClaim(progress.star)) {
+        <span class="star-tooltip__done">{{ 'zones:mastery.clickToClaim' | i18next }}</span>
+      } @else if (isBlocked(progress)) {
+        <span class="star-tooltip__blocked">{{ blockedText() }}</span>
+      }
+    }
+    <span class="star-tooltip__reward">{{ 'zones:mastery.allStars' | i18next }}</span>
+  </div>
+</ng-template>

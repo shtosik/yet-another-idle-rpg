@@ -3,6 +3,7 @@ import { PlayerStat } from '../types/player/player-stat.type'
 import { ItemID } from '../enums/ids/item-id.enum'
 import { ZoneID } from '../enums/ids/zone-id.enum'
 import { EnemyID } from '../enums/ids/enemy-id.enum'
+import { NpcID } from '../enums/map/npc-id.enum'
 
 export const QUEST_STEP_AFTER_COMPLETED = 9999
 
@@ -15,6 +16,8 @@ export interface QuestProps {
 
 export type QuestStepProps = {
   description: string;
+  /** Who the player talks to about this step; the quest panel's "Talk to" link. Their dialogue must handle the quest. */
+  turnInNpc: NpcID;
   requirements: RequirementProps[];
 };
 
@@ -82,6 +85,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
     steps: [
       {
         description: 'Bartender in La Harpar tavern asked me to bring her 30 crab meat.',
+        turnInNpc: NpcID.laHarparBartender,
         requirements: [{ type: 'item', itemId: ItemID.crabMeat, amount: 30 }],
       },
     ],
@@ -97,6 +101,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
     steps: [
       {
         description: 'I\'m supposed to kill 50 enemies on wave 7 on Horseshoe Beach.',
+        turnInNpc: NpcID.laHarparJosh,
         requirements: [{ type: 'wave', zoneId: 1, wave: 7, amount: 50 }],
       },
     ],
@@ -112,6 +117,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
     steps: [
       {
         description: 'La Harpar\'s trader asked me to get rid of pests in his basement. 50 should be enough.',
+        turnInNpc: NpcID.laHarparTrader,
         requirements: [{ type: 'enemy', enemyId: EnemyID.rat, amount: 50 }],
       },
     ],
@@ -127,6 +133,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
     steps: [
       {
         description: 'Elara is looking for her father, Captain Theron Tidecaller. I need to find some clues',
+        turnInNpc: NpcID.laHarparElara,
         requirements: [{ type: 'item', itemId: ItemID.captainsLetter, amount: 1 }],
       },
     ],
@@ -139,6 +146,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
     steps: [
       {
         description: 'Elder Corwin asked me to kill 20 corrupted saplings and bring back 3 resin samples.',
+        turnInNpc: NpcID.mawoodCorwin,
         requirements: [
           { type: 'enemy', enemyId: EnemyID.corruptedSapling, amount: 20 },
           { type: 'item', itemId: ItemID.corruptedResin, amount: 3 },
@@ -156,6 +164,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
     steps: [
       {
         description: 'Finn wants me to find the Gnoll Warchief — Corwin needs his fetish to trace the blight.',
+        turnInNpc: NpcID.mawoodFinn,
         requirements: [
           { type: 'item', itemId: ItemID.blightedFetish, amount: 1 },
         ],
@@ -172,6 +181,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
     steps: [
       {
         description: 'Corwin needs cursed sap from 15 treant sprouts to brew a purifying flame.',
+        turnInNpc: NpcID.mawoodCorwin,
         requirements: [
           { type: 'enemy', enemyId: EnemyID.treantSprout, amount: 15 },
           { type: 'item', itemId: ItemID.cursedSap, amount: 5 },
@@ -189,6 +199,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
     steps: [
       {
         description: 'The Gnarled Treant must fall. Corwin wants its heartwood.',
+        turnInNpc: NpcID.mawoodCorwin,
         requirements: [
           { type: 'item', itemId: ItemID.blightedHeartwood, amount: 1 },
         ],
@@ -208,6 +219,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
     steps: [
       {
         description: 'Sylvie needs 15 spider silk and 10 vials of water for her apothecary.',
+        turnInNpc: NpcID.mawoodSylvie,
         requirements: [
           { type: 'item', itemId: ItemID.spiderSilk, amount: 15 },
           { type: 'item', itemId: ItemID.vialOfWater, amount: 10 },
@@ -226,6 +238,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
     steps: [
       {
         description: 'Push back the spider infestation: kill 40 forest spiders and clear 60 on wave 10 of Elderwood Wilds.',
+        turnInNpc: NpcID.mawoodSylvie,
         requirements: [
           { type: 'enemy', enemyId: EnemyID.forestSpider, amount: 40 },
           { type: 'wave', zoneId: ZoneID.elderwoodWilds, wave: 10, amount: 60 },
@@ -244,6 +257,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
     steps: [
       {
         description: 'Finn wants me to prove my aim — kill 10 gnoll scouts.',
+        turnInNpc: NpcID.mawoodFinn,
         requirements: [
           { type: 'enemy', enemyId: EnemyID.gnollScout, amount: 10 },
         ],
@@ -260,6 +274,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
     steps: [
       {
         description: 'Finn wants closure: kill 5 forest bears in the Deepwood and bring back 3 pelts.',
+        turnInNpc: NpcID.mawoodFinn,
         requirements: [
           { type: 'enemy', enemyId: EnemyID.forestBear, amount: 5 },
           { type: 'item', itemId: ItemID.bearPelt, amount: 3 },
@@ -280,6 +295,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
     steps: [
       {
         description: 'Brenna needs 20 ancient wood and 5 bear pelts for a custom chestplate.',
+        turnInNpc: NpcID.mawoodBrenn,
         requirements: [
           { type: 'item', itemId: ItemID.ancientWood, amount: 20 },
           { type: 'item', itemId: ItemID.bearPelt, amount: 5 },
@@ -298,6 +314,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
     steps: [
       {
         description: 'Brenna wants the gnoll war-bands broken — kill the Warchief three times.',
+        turnInNpc: NpcID.mawoodBrenn,
         requirements: [
           { type: 'enemy', enemyId: EnemyID.gnollWarchief, amount: 3 },
         ],
@@ -316,6 +333,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
     steps: [
       {
         description: 'Milo wants 5 harpy feathers for his kite.',
+        turnInNpc: NpcID.mawoodMilo,
         requirements: [
           { type: 'item', itemId: ItemID.harpyFeather, amount: 5 },
         ],
@@ -333,6 +351,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
     steps: [
       {
         description: 'Milo heard something bigger than the harpies — clear 50 on wave 8 of the Upper Canopy and kill the Matriarch.',
+        turnInNpc: NpcID.mawoodMilo,
         requirements: [
           { type: 'wave', zoneId: ZoneID.upperCanopy, wave: 8, amount: 50 },
           { type: 'enemy', enemyId: EnemyID.harpyMatriarch, amount: 1 },

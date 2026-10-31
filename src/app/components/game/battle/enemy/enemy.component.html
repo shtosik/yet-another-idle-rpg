@@ -14,13 +14,55 @@
     <span>{{ currentEnemyHp() }} / {{ currentEnemy().maxHp }}</span>
   </div>
   <app-monster-debuff-bar />
+  @let shield = bosses.shield();
+  @if (shield !== null) {
+    <p class="enemy__status enemy__status--shield">
+      <img [ngSrc]="WEAKNESS_ICONS[shield]" alt="" width="16" height="16" disableOptimizedSrcset>
+      {{ 'app:arena.bosses.shield' | i18next: { element: ('bestiary:elements.' + DamageElement[shield] | i18next) } }}
+    </p>
+  }
+  @if (bosses.isDamageBoosted()) {
+    <p class="enemy__status">{{ 'app:arena.bosses.weakPointHit' | i18next }}</p>
+  }
+  @if (bosses.isStunned()) {
+    <p class="enemy__status">{{ 'app:arena.bosses.stunned' | i18next }}</p>
+  }
   <div class="enemy__sprite-box">
-    <img
-      appHalfSizeSprite
-      [src]="currentEnemy().url"
-      [class.enemy__sprite--shiny]="battleStore.isShinyEnemy()"
-      class="enemy__sprite"
-      alt=""
-    >
+    @let burrow = bosses.burrow();
+    @if (burrow) {
+      <div class="mounds">
+        @for (index of mounds; track index) {
+          <button
+            type="button"
+            class="mound"
+            [class.mound--shaking]="index === burrow.correct"
+            [attr.aria-label]="'app:arena.bosses.mound' | i18next: { number: index + 1 }"
+            (click)="bosses.pickMound(index)"
+          ></button>
+        }
+      </div>
+    } @else {
+      <img
+        appHalfSizeSprite
+        [src]="currentEnemy().url"
+        [class.enemy__sprite--shiny]="battleStore.isShinyEnemy()"
+        [class.enemy__sprite--shield-fire]="shield === DamageElement.fire"
+        [class.enemy__sprite--shield-air]="shield === DamageElement.air"
+        [class.enemy__sprite--shield-water]="shield === DamageElement.water"
+        class="enemy__sprite"
+        alt=""
+      >
+    }
+    @let weakPoint = bosses.weakPoint();
+    @if (weakPoint) {
+      <button
+        type="button"
+        class="weak-point"
+        [style.left.%]="weakPoint.x"
+        [style.top.%]="weakPoint.y"
+        [attr.aria-label]="'app:arena.bosses.weakPoint' | i18next"
+        (click)="bosses.hitWeakPoint()"
+      ></button>
+    }
   </div>
 </div>

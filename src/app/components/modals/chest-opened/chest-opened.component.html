@@ -1,0 +1,24 @@
+<app-close-button (onClose)="close()"/>
+<div class="chest-opened">
+  @if (contents) {
+    <h2 class="chest-opened__title">{{ 'items:chestOpened' | i18next }}</h2>
+    @if (contents.gold) {
+      <p class="chest-opened__gold">+{{ contents.gold | number }} {{ 'app:playerStats.goldCoins' | i18next }}</p>
+    }
+    <div class="chest-opened__items">
+      @for (item of contents.items; track item.id) {
+        <app-slot>
+          <app-inventory-slot
+            [item]="ITEM_DATA[item.id]"
+            [tier]="ITEM_DATA[item.id].tier"
+            [amount]="item.amount"
+            [clickable]="false"
+          />
+        </app-slot>
+      }
+    </div>
+  } @else {
+    <p class="chest-opened__gold">{{ 'items:chestFull' | i18next: { slots: slotsNeeded } }}</p>
+  }
+  <button class="chest-opened__cta" (click)="close()">{{ 'items:chestOk' | i18next }}</button>
+</div>

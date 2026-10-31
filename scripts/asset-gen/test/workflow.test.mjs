@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { buildGraph, CLIP_VISION_NAME, IPADAPTER_NAME, LORA_NAME, SOURCE_DENOISE } from '../lib/workflow.mjs'
+import { BLOCKOUT_DENOISE, buildGraph, CLIP_VISION_NAME, IPADAPTER_NAME, LORA_NAME, SOURCE_DENOISE } from '../lib/workflow.mjs'
 
 const family = (overrides = {}) => ({
     checkpoint: 'zavychromaxl_v80.safetensors',
@@ -113,6 +113,61 @@ test('source graph: the frozen image is VAE-encoded as the start latent at the c
     assert.ok(!classes(g).includes('RepeatLatentBatch'))
     assert.equal(buildGraph({ family: family(), subject: 's', seed: 1, source: { base64: 'SRC' } }).sampler.inputs.denoise, SOURCE_DENOISE)
     assert.equal(buildGraph({ family: family(), subject: 's', seed: 1 }).sampler.inputs.denoise, 1)
+})
+
+const assertLinks = (g) => {
+    for (const [id, node] of Object.entries(g)) {
+        for (const value of Object.values(node.inputs)) {
+            if (Array.isArray(value)) assert.ok(g[value[0]], `${id} links to missing ${value[0]}`)
+        }
+    }
+}
+
+test('a source with a mask inpaints with the Fooocus patch on a filled hole, under DifferentialDiffusion', () => {
+    const g = buildGraph({ family: family({ lora: false }), subject: 's', seed: 1, count: 3, refsBase64: ['A'], source: { base64: 'SRC', mask: 'MASK' } })
+    assert.equal(g.maskImage.inputs.image, 'MASK')
+    assert.deepEqual(g.differentialDiffusion.inputs.model, ['checkpoint', 0])
+    assert.deepEqual(g.ipadapter.inputs.model, ['differentialDiffusion', 0])
+    assert.equal(g.holeFill.inputs.fill, 'navier-stokes')
+    assert.deepEqual(g.inpaintEncode.inputs.pixels, ['holeBlur', 0])
+    assert.deepEqual(g.inpaintModel.inputs.model, ['ipadapter', 0])
+    assert.deepEqual(g.sampler.inputs.model, ['inpaintModel', 0])
+    assert.deepEqual(g.sampler.inputs.positive, ['inpaintEncode', 0])
+    assert.deepEqual(g.sourceBatch.inputs.samples, ['inpaintEncode', 3])
+    assert.equal(g.sampler.inputs.denoise, 1)
+    assert.equal(g.sourceLatent, undefined)
+    assertLinks(g)
+    const plain = buildGraph({ family: family(), subject: 's', seed: 1, source: { base64: 'SRC' } })
+    assert.equal(plain.inpaintEncode, undefined)
+    assert.equal(plain.differentialDiffusion, undefined)
+})
+
+test('a blockout inpaint keeps the source pixels in the hole and repaints them below denoise 1', () => {
+    const g = buildGraph({ family: family(), subject: 's', seed: 1, source: { base64: 'SRC', mask: 'MASK', blockout: true } })
+    assert.equal(g.holeFill, undefined)
+    assert.deepEqual(g.inpaintEncode.inputs.pixels, ['sourceImage', 0])
+    assert.equal(g.sampler.inputs.denoise, BLOCKOUT_DENOISE)
+    assert.ok(BLOCKOUT_DENOISE < 1)
+    assertLinks(g)
+})
+
+test('regions condition their own prompt and ControlNet inside their mask and the subject everywhere else', () => {
+    const regions = [
+        { mask: 'M0', prompt: 'mountains', control: { base64: 'PEAKS', strength: 0.5, end: 0.5 } },
+        { mask: 'M1', prompt: 'a lake' },
+    ]
+    const g = buildGraph({ family: family(), subject: 'grassland', seed: 1, source: { base64: 'SRC', mask: 'MASK' }, regions })
+    assert.match(g.region0Prompt.inputs.text, /^mountains, /)
+    assert.deepEqual(g.region0ControlApply.inputs.positive, ['region0Prompt', 0])
+    assert.equal(g.region0ControlImage.inputs.image, 'PEAKS')
+    assert.equal(g.region1ControlApply, undefined)
+    assert.deepEqual(g.regionUnion1.inputs, { destination: ['region0Mask', 0], source: ['region1Mask', 0], x: 0, y: 0, operation: 'add' })
+    assert.deepEqual(g.restPositive.inputs.conditioning, ['positive', 0])
+    assert.deepEqual(g.restPositive.inputs.mask, ['regionRest', 0])
+    assert.deepEqual(g.region0Positive.inputs.conditioning, ['region0ControlApply', 0])
+    assert.deepEqual(g.inpaintEncode.inputs.positive, ['combine1Positive', 0])
+    assert.deepEqual(g.inpaintEncode.inputs.negative, ['combine1Negative', 0])
+    assertLinks(g)
 })
 
 test('source graph repeats the encoded latent once per candidate and keeps every link valid', () => {

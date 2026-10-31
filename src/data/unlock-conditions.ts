@@ -1,4 +1,5 @@
 import { ItemID } from 'enums/ids/item-id.enum'
+import { QuestID } from 'enums/ids/quest-id.enum'
 import { ZoneID } from 'enums/ids/zone-id.enum'
 import { TownID } from 'enums/map/town-id.enum'
 
@@ -18,7 +19,13 @@ export interface LevelReachedCondition {
   level: number
 }
 
-export type UnlockCondition = WaveReachedCondition | HasItemCondition | LevelReachedCondition
+/** Checked by `UnlockService` only: quest progress lives in `QuestsStore`, which `PlayerStore` can't read. */
+export interface QuestCompletedCondition {
+  type: 'questCompleted'
+  questId: QuestID
+}
+
+export type UnlockCondition = WaveReachedCondition | HasItemCondition | LevelReachedCondition | QuestCompletedCondition
 
 export interface TownUnlockTarget {
   type: 'town'
@@ -78,6 +85,15 @@ export const UNLOCK_RULES: UnlockRule[] = [
     notification: {
       titleKey: 'unlocks:towns.mawood.title',
       bodyKey:  'unlocks:towns.mawood.body',
+    },
+  },
+  {
+    // After the Mawood Zones: from the Harpy Matriarch's nest the player sees the capital (docs/ideas/north-lirold-and-exploration-guild.md).
+    condition: { type: 'waveReached', zoneId: ZoneID.upperCanopy, wave: 15 },
+    target:    { type: 'town', townId: TownID.lirold },
+    notification: {
+      titleKey: 'unlocks:towns.lirold.title',
+      bodyKey:  'unlocks:towns.lirold.body',
     },
   },
 ]

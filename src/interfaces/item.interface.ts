@@ -1,3 +1,4 @@
+import { WeaponCategory } from '../enums/weapon-category.enum'
 import { DamageElement } from 'enums/damage-element.enum'
 import { EquipmentSlot } from 'enums/equipment-slot.enum'
 import { ItemID } from 'enums/ids/item-id.enum'
@@ -8,6 +9,7 @@ import { PlayerStat } from 'types/player/player-stat.type'
 import { RecipeID } from 'enums/ids/recipe-id.enum'
 import { ConsumableEffect } from './consumable.interface'
 import { StationID } from 'enums/ids/station-id.enum'
+import { SpellID } from 'enums/ids/spell-id.enum'
 
 export interface ItemData {
     id: ItemID
@@ -28,6 +30,10 @@ export interface EquipmentItem extends ItemData {
     stats: EquipmentItemPossibleStat[]
     slot: EquipmentSlot
     damageType?: DamageElement
+    /** Weapons only; melee when unset. Only melee auto-attacks use `meleeDamageMultiplier`. */
+    weaponCategory?: WeaponCategory
+    /** Known while equipped (not in the skill tree); leaves the spell bar when unequipped. */
+    spell?: SpellID
 }
 
 export interface ResourceItem extends ItemData {
@@ -65,6 +71,22 @@ export type ConsumableItem = FoodItem | PotionItem
 export const isConsumableItem = (item: Item): item is ConsumableItem =>
     item.type === ItemType.food || item.type === ItemType.potion
 
+/** Teaches `spellId` for good when used (right-click); a respec doesn't take it away. */
+export interface SpellScrollItem extends ItemData {
+    type: ItemType.spellScroll
+    spellId: SpellID
+}
+
+/** One pick in a chest's loot table, chosen by `weight`: gold, or an item stack; ranges are inclusive. */
+export type ChestLootEntry = { weight: number } & ({ gold: [number, number] } | { itemId: ItemID; amount: [number, number] })
+
+/** Opened from the inventory: `rolls` picks from `loot`, rolled on open (`rollChest`). */
+export interface ChestItem extends ItemData {
+    type: ItemType.chest
+    rolls: number
+    loot: ChestLootEntry[]
+}
+
 export interface RecipeItem extends ItemData {
     type: ItemType.recipe
     recipeId: RecipeID
@@ -80,7 +102,7 @@ export interface StationUpgradeItem extends ItemData {
 export const isStationUpgradeItem = (item: Item): item is StationUpgradeItem =>
     item.type === ItemType.stationUpgrade
 
-export type Item = EquipmentItem | ResourceItem | RewardsStatsItem | QuestItem | FoodItem | BookItem | PotionItem | RecipeItem | StationUpgradeItem
+export type Item = EquipmentItem | ResourceItem | RewardsStatsItem | QuestItem | FoodItem | BookItem | PotionItem | RecipeItem | StationUpgradeItem | SpellScrollItem | ChestItem
 
 export type UseItemProps = UseItemStatProps
 

@@ -1,13 +1,12 @@
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core'
 import { TooltipTemplateDirective } from 'ngx-tooltip-directives'
-import { I18nextPipe } from '../../../../../pipes/i18next.pipe'
 import { UrlPipe } from '../../../../../pipes/url.pipe'
 import { EquippedSpell } from '../../../../../../interfaces/spells/equipped-spell.interface'
-import { PlayerStore } from '../../../../../store/player/player.store'
-import { SpellID } from '../../../../../../enums/ids/spell-id.enum'
 import SPELLS_DATA from '../../../../../../data/spells-data'
-import { SpellType } from '../../../../../../enums/spell-type.enum'
 import { BattleManagerService } from '../../../../../services/battle-manager.service'
+import { BattleStore } from '../../../../../store/battle/battle.store'
+import { PlayerStore } from '../../../../../store/player/player.store'
+import { SpellTooltipComponent } from '../../../../shared/spell-tooltip/spell-tooltip.component'
 
 const MS_PER_SECOND = 1000
 
@@ -17,28 +16,33 @@ const MS_PER_SECOND = 1000
   styleUrls: ['spell-slot.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    I18nextPipe,
     UrlPipe,
     TooltipTemplateDirective,
+    SpellTooltipComponent,
   ],
 })
 export class SpellSlotComponent {
-  playerStore = inject(PlayerStore)
   battleManagerService = inject(BattleManagerService)
+  private battleStore = inject(BattleStore)
+  private playerStore = inject(PlayerStore)
 
   equippedSpell = input.required<EquippedSpell>()
 
-  playerStats = this.playerStore.stats
-
   spellData = computed(() => SPELLS_DATA[this.equippedSpell().spellId])
+  /** A buff, damage-over-time or empower spell from this slot is running. */
+  isActive = computed(() => {
+    const spellId = this.equippedSpell().spellId
+    return this.battleStore.activeBuffs().some(b => b.spellId === spellId)
+      || this.battleStore.activeDamageOverTime().some(d => d.spellId === spellId)
+      || this.battleStore.empowered()?.spellId === spellId
+  })
+  /** False for a gear spell whose gear came off; it stays until its cooldown ends. */
+  isKnown = computed(() => this.playerStore.knownSpellIds().includes(this.equippedSpell().spellId))
   canAfford = computed(() => this.battleManagerService.canAffordSpell(this.equippedSpell().spellId))
   /** Seconds, after cooldown reduction. */
   cooldown = computed(() => this.battleManagerService.spellCooldown(this.equippedSpell().spellId))
   secondsUntilReady = computed(() => Math.ceil(this.equippedSpell().cooldownRemainingMs / MS_PER_SECOND))
   cooldownSweepDeg = computed(() => this.equippedSpell().cooldownRemainingMs / (this.cooldown() * MS_PER_SECOND) * 360)
-
-  protected readonly SpellID = SpellID
-  protected readonly SpellType = SpellType
 
   handleCastSpell() {
     this.battleManagerService.castSpell(this.equippedSpell().spellId)

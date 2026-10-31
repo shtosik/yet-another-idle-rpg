@@ -19,4 +19,16 @@ export const BootsItemsData: Partial<Record<ItemID, Item>> = {
       },
     ],
   },
+  [ItemID.leatherBoots]: {
+    id: ItemID.leatherBoots,
+    tier: ItemTier.normal,
+    url: './assets/img/items/leatherBoots.png',
+    value: 12,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.boots,
+    stats: [
+      { id: 'attackPower', amount: 1 },
+      { id: 'critChance', amount: 1 },
+    ],
+  },
 }

@@ -1,0 +1,25 @@
+@use '../../../../styles/mixins' as mixins
+
+:host
+  display: block
+  position: relative
+
+app-close-button
+  position: absolute
+  right: 1rem
+  top: 1rem
+
+.chest-opened
+  padding: 3rem
+
+  &__title, &__gold
+    margin-bottom: 1rem
+
+  &__items
+    display: flex
+    flex-wrap: wrap
+    gap: 1rem
+    margin-bottom: 1.5rem
+
+  &__cta
+    @include mixins.button
