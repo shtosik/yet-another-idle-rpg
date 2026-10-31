@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject } from '@angular/core'
 import { SkillTreeService } from '../../../services/skill-tree.service'
 import { GameNavigationService } from '../../../services/game-navigation.service'
+import { ReputationService } from '../../../services/reputation.service'
 import { GameTab } from 'enums/ids/game-tab.enum'
 import { SkillNodeID } from 'enums/ids/skill-node-id.enum'
 import { ShopID } from 'enums/ids/shop-id.enum'
@@ -50,6 +51,7 @@ export class DevCheatsComponent {
   private offlineStore = inject(OfflineStore)
   private skillTree = inject(SkillTreeService)
   private navigation = inject(GameNavigationService)
+  private reputationService = inject(ReputationService)
 
   /**
    * `window.dev` in the browser console: puts the game into a state in one call when checking UI.
@@ -99,6 +101,8 @@ export class DevCheatsComponent {
       zoneId, wave: 1, kills: 0, shinies: count, killsByEnemy: {}, taskCountsByEnemy: {}, experience: 0, gold: 0, items: [],
     }),
     unlock: (feature: DevFeature) => this.unlockFeature(feature),
+    /** Adds town reputation the way a quest reward does, tier-up toast included. */
+    addReputation: (townId: TownID, amount: number) => this.reputationService.gain([{ townId, amount }]),
   }
 
   private unlockFeature(feature: DevFeature): void {

@@ -6,6 +6,7 @@ Versions follow [Semantic Versioning](https://semver.org/). Each note is `- [typ
 New notes go under `[Unreleased]`; `npm run release -- <major|minor|patch>` moves them into a version (docs/deployment.md).
 
 ## [Unreleased]
+- [feature] Town reputation: La Harpar and Mawood quests now also give reputation with their town. Reach Friendly, Honored, Revered and Exalted; a message shows when you reach a new tier. The quest panel's Reputation tab shows your tier and progress in each town you've found, and the town view shows your tier next to the town's name. Tier rewards come in a later update.
 
 ## [0.2.0] - 2026-10-31
 - [feature] The world map is redrawn and now reaches south, with Lirold's castle under the Ironspine mountains, the Saltmere gulf and the Blackwater Fens. Lirold and the Trader's Basement have their own map markers.

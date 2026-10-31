@@ -1,6 +1,6 @@
 # Town reputation
 
-**Scope:** M · **Status:** Accepted (design settled with the owner, 2026-10-31; numbers to tune)
+**Scope:** M · **Status:** In progress: step 1 done (design settled with the owner, 2026-10-31; numbers to tune)
 
 Each town keeps the player's **reputation**: points earned by helping it, never spent and never lost. Reaching a **reputation tier** unlocks stock, recipes, optional quests, dialogue, **titles** and, at the top, a town **pet**. It gives a reason to go back to older towns and zones without daily content. Terms are in `GLOSSARY.md`.
 

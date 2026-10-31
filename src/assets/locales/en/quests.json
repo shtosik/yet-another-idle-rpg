@@ -36,5 +36,17 @@
     "showCompleted": "Completed ({{count}})",
     "hideCompleted": "Hide completed ({{count}})",
     "reputationEmpty": "No reputation yet."
+  },
+  "reputation": {
+    "tiers": {
+      "neutral": "Neutral",
+      "friendly": "Friendly",
+      "honored": "Honored",
+      "revered": "Revered",
+      "exalted": "Exalted"
+    },
+    "reward": "+{{ amount }} {{ town }} reputation",
+    "tierUp": "{{ town }} now sees you as {{ tier }}",
+    "progressLabel": "{{ town }} reputation"
   }
 }

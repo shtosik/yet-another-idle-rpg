@@ -55,6 +55,7 @@ export { ALL_SKILLS } from 'data/skill-tree-data'
 export { UNLOCK_RULES, ZONE_UNLOCK_NOTIFICATIONS } from 'data/unlock-conditions'
 export { WORLD_MAP_DATA } from 'data/world-map-data'
 export { sellPrice } from 'app/store/shop/shop-prices'
+export { REPUTATION_TOWNS } from 'app/store/player/reputation'
 export { CHANGELOG_NOTE_TYPES } from 'app/components/modals/changelog/changelog'
 `
 
@@ -237,6 +238,10 @@ for (const quest of Object.values(D.QUEST_DATA)) {
     else if (!placedNpcs.has(step.turnInNpc)) error('src/data/quests-data.ts', `${where}: turnInNpc ${npc} isn't in any town building`)
     else if (!questsInDialogue(step.turnInNpc).has(quest.questId)) error('src/data/quests-data.ts', `${where}: turnInNpc ${npc}'s dialogue never starts, advances or ends this quest`)
   })
+  for (const reward of quest.rewards.filter(r => r.type === 'reputation')) {
+    if (!D.REPUTATION_TOWNS.includes(reward.townId)) error('src/data/quests-data.ts', `${idName(D.QuestID, quest.questId)} gives reputation in ${idName(D.TownID, reward.townId)}, which isn't in REPUTATION_TOWNS`)
+    if (!(reward.amount > 0)) error('src/data/quests-data.ts', `${idName(D.QuestID, quest.questId)} gives ${reward.amount} reputation; it must be positive`)
+  }
 }
 for (const skill of Object.values(D.ALL_SKILLS)) {
   const reqs = []

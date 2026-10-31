@@ -58,6 +58,7 @@ import {
   withSlotDeltas,
 } from './inventory'
 import { canInstall, evaluateRecipe, installStations, Stations } from './camp'
+import { ReputationGain, reputationTier, TierUp } from './reputation'
 import { StationID } from '../../../enums/ids/station-id.enum'
 import { UNLOCK_RULES, UnlockCondition, UnlockTarget } from '../../../data/unlock-conditions'
 import { BattleStore } from '../battle/battle.store'
@@ -117,6 +118,8 @@ interface PlayerState {
   activeTasks: Task[];
   totalTasksCompleted: number;
   explorerTokens: number;
+  /** Points per town, never spent or lost; the tier is derived (`reputation.ts`). */
+  reputation: Partial<Record<TownID, number>>;
   unlockedContent: UnlockedContent;
   campUnlocked: boolean;
   stations: Stations;
@@ -145,6 +148,7 @@ export const initialState: PlayerState = {
   activeTasks: [],
   totalTasksCompleted: 0,
   explorerTokens: 0,
+  reputation: {},
   unlockedContent: {
     zones: [ZoneID.horseshoeBeach],
     towns: [],
@@ -797,6 +801,17 @@ export const PlayerStore = signalStore(
         if (towns.includes(id)) return {}
         return { unlockedContent: { ...state.unlockedContent, towns: [...towns, id] } }
       })
+    },
+
+    /** Adds points per town; returns each town whose tier went up, once, with its new tier. */
+    addReputation(gains: ReputationGain[]): TierUp[] {
+      const before = store.reputation()
+      const after = { ...before }
+      gains.forEach(({ townId, amount }) => after[townId] = (after[townId] ?? 0) + amount)
+      patchState(store, { reputation: after })
+      return [...new Set(gains.map(gain => gain.townId))]
+        .map(townId => ({ townId, tier: reputationTier(after[townId] ?? 0) }))
+        .filter(({ townId, tier }) => tier > reputationTier(before[townId] ?? 0))
     },
 
     isTownUnlocked(id: TownID): boolean {

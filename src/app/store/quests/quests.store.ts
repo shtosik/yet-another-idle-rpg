@@ -13,6 +13,8 @@ import { EnemyID } from '../../../enums/ids/enemy-id.enum'
 import { ZoneID } from '../../../enums/ids/zone-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
 import { getQuestStatus, getStepItems } from '../../services/quest-status'
+import { ReputationService } from '../../services/reputation.service'
+import { ReputationGain } from '../player/reputation'
 
 /** Lifetime kill counters at the moment the quest reached its current step. */
 export interface KillBaseline {
@@ -48,10 +50,12 @@ export const QuestsStore = signalStore(
     store,
     modalService = inject(ModalService),
     playerStore = inject(PlayerStore),
+    reputationService = inject(ReputationService),
   ) => ({
     handleQuestCompleted(data: QuestProps) {
       const statsToUpdate = []
       const itemsToUpdate: ItemStack[] = []
+      const reputationGains: ReputationGain[] = []
 
       data.rewards.forEach((reward) => {
         switch (reward.type) {
@@ -59,8 +63,10 @@ export const QuestsStore = signalStore(
             statsToUpdate.push({ stat: reward.key, amount: reward.amount })
             break
           case 'item':
-
             itemsToUpdate.push({ id: reward.itemId, amount: reward.amount })
+            break
+          case 'reputation':
+            reputationGains.push({ townId: reward.townId, amount: reward.amount })
             break
         }
       })
@@ -69,6 +75,7 @@ export const QuestsStore = signalStore(
       modalService.openQuestCompleted(data)
       playerStore.updatePlayerStats(statsToUpdate)
       playerStore.addItems(itemsToUpdate)
+      reputationService.gain(reputationGains)
     },
 
     /** Zones entered from a town building open when that building's quest starts. */

@@ -4,12 +4,13 @@ import { ItemID } from '../enums/ids/item-id.enum'
 import { ZoneID } from '../enums/ids/zone-id.enum'
 import { EnemyID } from '../enums/ids/enemy-id.enum'
 import { NpcID } from '../enums/map/npc-id.enum'
+import { TownID } from '../enums/map/town-id.enum'
 
 export const QUEST_STEP_AFTER_COMPLETED = 9999
 
 export interface QuestProps {
   questId: QuestID
-  rewards: Array<StatReward | ItemReward>
+  rewards: QuestReward[]
   startRequirements: RequirementProps[]
   steps: QuestStepProps[]
 }
@@ -71,6 +72,15 @@ interface ItemReward {
   amount: number
 }
 
+/** Credits a town that keeps reputation (`REPUTATION_TOWNS`), not always the giver's. */
+interface ReputationReward {
+  type: 'reputation'
+  townId: TownID
+  amount: number
+}
+
+export type QuestReward = StatReward | ItemReward | ReputationReward
+
 // interface SkillReward {
 //     type: 'skill'
 //     name: SkillNames
@@ -90,6 +100,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', townId: TownID.laHarpar, amount: 20 },
       { type: 'stat', key: 'unspentSkillPoints', amount: 1 },
       { type: 'stat', key: 'experience', amount: 1000 },
       { type: 'stat', key: 'goldCoins', amount: 200 },
@@ -106,6 +117,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', townId: TownID.laHarpar, amount: 20 },
       { type: 'stat', key: 'experience', amount: 1500 },
       { type: 'stat', key: 'goldCoins', amount: 250 },
       { type: 'item', itemId: ItemID.joshsHeirloom, amount: 1 },
@@ -122,6 +134,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', townId: TownID.laHarpar, amount: 20 },
       { type: 'stat', key: 'unspentSkillPoints', amount: 1 },
       { type: 'stat', key: 'experience', amount: 1500 },
       { type: 'stat', key: 'goldCoins', amount: 300 },
@@ -154,6 +167,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', townId: TownID.mawood, amount: 25 },
       { type: 'stat', key: 'experience', amount: 1000 },
       { type: 'stat', key: 'goldCoins', amount: 200 },
     ],
@@ -171,6 +185,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', townId: TownID.mawood, amount: 20 },
       { type: 'stat', key: 'experience', amount: 2500 },
       { type: 'stat', key: 'goldCoins', amount: 500 },
     ],
@@ -189,6 +204,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', townId: TownID.mawood, amount: 35 },
       { type: 'stat', key: 'experience', amount: 3000 },
       { type: 'stat', key: 'goldCoins', amount: 600 },
     ],
@@ -206,6 +222,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', townId: TownID.mawood, amount: 100 },
       { type: 'stat', key: 'experience', amount: 5000 },
       { type: 'stat', key: 'goldCoins', amount: 1000 },
       { type: 'stat', key: 'unspentSkillPoints', amount: 1 },
@@ -227,6 +244,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', townId: TownID.mawood, amount: 25 },
       { type: 'stat', key: 'experience', amount: 800 },
       { type: 'stat', key: 'goldCoins', amount: 150 },
       { type: 'item', itemId: ItemID.skillPointBook, amount: 1 },
@@ -246,6 +264,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', townId: TownID.mawood, amount: 35 },
       { type: 'stat', key: 'experience', amount: 2000 },
       { type: 'stat', key: 'goldCoins', amount: 400 },
     ],
@@ -264,6 +283,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', townId: TownID.mawood, amount: 45 },
       { type: 'stat', key: 'experience', amount: 1200 },
       { type: 'stat', key: 'goldCoins', amount: 300 },
     ],
@@ -282,6 +302,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', townId: TownID.mawood, amount: 45 },
       { type: 'stat', key: 'experience', amount: 3500 },
       { type: 'stat', key: 'goldCoins', amount: 700 },
       { type: 'stat', key: 'unspentSkillPoints', amount: 1 },
@@ -303,6 +324,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', townId: TownID.mawood, amount: 45 },
       { type: 'stat', key: 'experience', amount: 2500 },
       { type: 'stat', key: 'goldCoins', amount: 500 },
       { type: 'item', itemId: ItemID.silverwoodChestplate, amount: 1 },
@@ -321,6 +343,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', townId: TownID.mawood, amount: 50 },
       { type: 'stat', key: 'experience', amount: 4000 },
       { type: 'stat', key: 'goldCoins', amount: 800 },
       { type: 'item', itemId: ItemID.skillPointBook, amount: 1 },
@@ -340,6 +363,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', townId: TownID.mawood, amount: 25 },
       { type: 'stat', key: 'experience', amount: 1000 },
       { type: 'stat', key: 'goldCoins', amount: 200 },
       { type: 'item', itemId: ItemID.eagleTalon, amount: 1 },
@@ -359,6 +383,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', townId: TownID.mawood, amount: 75 },
       { type: 'stat', key: 'experience', amount: 5000 },
       { type: 'stat', key: 'goldCoins', amount: 1000 },
       { type: 'stat', key: 'unspentSkillPoints', amount: 1 },

@@ -8,7 +8,12 @@
     class="town-view"
     [style.backgroundImage]="'url(' + town.url + ')'"
   >
-    <h2 class="town-view__name">{{ 'map:towns.' + TownID[town.id] | i18next }}</h2>
+    <h2 class="town-view__name">
+      {{ 'map:towns.' + TownID[town.id] | i18next }}
+      @if (townTier(); as tier) {
+        <span class="town-view__tier">{{ 'quests:reputation.tiers.' + ReputationTier[tier.value] | i18next }}</span>
+      }
+    </h2>
     <app-close-button (onClose)="goToMap()"/>
     @for (building of town.buildings; track building.buildingId) {
       @if (isBuildingAvailable(building)) {

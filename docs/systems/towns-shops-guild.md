@@ -17,7 +17,9 @@ Towns are non-combat hubs. Each town has **buildings**; a building holds NPCs (d
 ## Data flow
 **Navigation**: the world map's town marker calls `TownsStore.selectTown` and switches to the town tab. Clicking a building either enters its zone (`zoneId` → `BattleStore.setZone`, back to battle) or opens the building view with its NPC frames. A building with `questRequirement` is hidden until that quest has started. Leaving the tab clears the selection.
 
-**Town view**: the town name sits top left; building buttons highlight on hover and focus. `GameComponent` preloads every unlocked town's background and building backgrounds, so they don't pop in on first visit.
+**Town view**: the town name sits top left, followed by the player's reputation tier in towns that keep reputation; building buttons highlight on hover and focus. `GameComponent` preloads every unlocked town's background and building backgrounds, so they don't pop in on first visit.
+
+**Reputation** (`src/app/store/player/reputation.ts`, design in `docs/ideas/town-reputation.md`): `PlayerStore.reputation` saves points per `TownID`; they are never spent or lost. Only `REPUTATION_TOWNS` (La Harpar, Mawood) keep it. The tier (`ReputationTier`: Neutral 0, Friendly 50, Honored 200, Revered 600, Exalted 1500, cumulative `REPUTATION_THRESHOLDS`) is derived, never saved. Today only quest rewards give reputation (`quests.md`). Every gain goes through `ReputationService.gain`, which calls `PlayerStore.addReputation` and shows a tier-up toast with one line per town that went up, however many tiers it crossed; `GameComponent` renders it above dialogs. The quest panel's Reputation tab lists each unlocked reputation town with its tier and a bar to the next threshold (full at Exalted), with no reward lists. Guild rank is separate: tasks never give reputation. Cheat: `dev.addReputation(townId, amount)`.
 
 **Dialogue**: clicking an NPC portrait starts their dialogue, shown as an overlay over the building inside the town panel, so the inventory below stays visible during turn-ins. Leaving the building (or opening a shop) closes it.
 
