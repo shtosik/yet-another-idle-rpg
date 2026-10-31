@@ -130,7 +130,7 @@ Dropped from the map for now (owner decision 4). Their positions stay free in th
 
 ## 6. Changes to existing docs
 
-- `north-lirold-and-exploration-guild.md` §3a: the canvas becomes **2794×1504**, not ~1100. Every §3a position (Lirold, the coast road, the mine road, Slatefall, the mine mouth, the barrier) stays the same. The range in §3a's strip is the Ironspine and keeps going south and west.
+- `north-lirold-and-exploration-guild.md` §3a: superseded by the 3072×2048 redraw (Art landed, above) and marked so; the plan here was **2794×1504**, not ~1100. Every §3a position (Lirold, the coast road, the mine road, Slatefall, the mine mouth, the barrier) stays the same. The range in §3a's strip is the Ironspine and keeps going south and west.
 - `slatefall-and-the-deeper-mines.md`: no position change. "Under the Pass" still holds; the mine is now also "under the Ironspine". T-25 gains a hinted far end (the Hollow Door).
 - `unlocks.json` `towns.lirold`: "a castle by the sea" rewritten to "a castle under the mountains" to match the inland decision. `docs/character/lirold/lirold-coastal-concept.png` shows a harbour and is superseded.
 
