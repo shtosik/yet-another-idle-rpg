@@ -173,10 +173,22 @@ const unseen = <T>(ids: T[], seen: T[]): T[] => ids.filter(id => !seen.includes(
 const gearModifiers = (equipped: { id: ItemID } | null): StatModifier[] =>
   equipped ? ((ITEM_DATA[equipped.id] as EquipmentItem).stats ?? []).map(s => ({ stat: s.id, amount: s.amount })) : []
 
+/** Version 1 Guild Satchels gave +5 slots; version 2 gives +2 to each slot tab. They were the only permanent slot source. */
+const V1_SATCHEL_SLOTS = 5
+const V2_SATCHEL_SLOTS = 2
+
 /** Version 1 saves held one flat inventory; version 2 splits it into tabs. */
 const SAVE_VERSION = 2
 const SAVE_MIGRATIONS: SaveMigrations = {
-  1: ({ inventory, ...state }) => Array.isArray(inventory) ? { ...state, inventory: splitInventory(inventory as Inventory) } : state,
+  1: ({ inventory, ...state }) => {
+    const bonuses = state['permanentBonuses'] as PlayerState['permanentBonuses'] | undefined
+    const slots = bonuses?.inventorySlots
+    return {
+      ...state,
+      ...(Array.isArray(inventory) && { inventory: splitInventory(inventory as Inventory) }),
+      ...(slots && { permanentBonuses: { ...bonuses, inventorySlots: Math.round(slots / V1_SATCHEL_SLOTS) * V2_SATCHEL_SLOTS } }),
+    }
+  },
 }
 
 const handleExperience = (resources: Resources) => {

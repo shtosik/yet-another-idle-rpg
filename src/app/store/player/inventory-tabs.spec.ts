@@ -45,6 +45,14 @@ describe('PlayerStore inventory tabs', () => {
       expect(store.inventory().materials.filter(Boolean).length).toBe(25)
       expect(store.inventory().gear.length).toBe(store.inventoryCapacity().gear)
     })
+
+    it('turns used version 1 Guild Satchels (+5 slots each) into +2 slots per tab', () => {
+      localStorage.setItem('playerStore', JSON.stringify({ inventory: [], permanentBonuses: { inventorySlots: 5, maxMana: 10 } }))
+      create()
+
+      expect(store.permanentBonuses()).toEqual({ inventorySlots: 2, maxMana: 10 })
+      expect(store.inventoryCapacity().materials).toBe(22)
+    })
   })
 
   describe('add / fit / missing', () => {
