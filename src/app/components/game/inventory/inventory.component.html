@@ -33,7 +33,9 @@
           [item]="Items[slotItem.id]"
           [tier]="slotItem.tier"
           (equipItem)="equipItem(slotItem)"
+          [destroyable]="slotItem.type !== ItemType.quest"
           (useItem)="useItem(slotItem)"
+          (destroyItem)="destroyItem(slotItem)"
         />
       </app-slot>
     } @else if (index < usableSlots) {

@@ -9,6 +9,8 @@ import { ItemType } from '../../../../enums/items/item-type.enum'
 import { BattleManagerService } from '../../../services/battle-manager.service'
 import { ModalService } from '../../../services/modal.service'
 import { countFreeSlots, INVENTORY_PAGE_SIZE, INVENTORY_TABS, InventoryTab, pageCount } from '../../../store/player/inventory'
+import { firstValueFrom } from 'rxjs'
+import { needsDestroyConfirm, SettingsStore } from '../../../store/settings/settings.store'
 import { I18nextPipe } from '../../../pipes/i18next.pipe'
 
 @Component({
@@ -23,6 +25,7 @@ export class InventoryWindow {
   playerStore = inject(PlayerStore)
   private battleManagerService = inject(BattleManagerService)
   private modalService = inject(ModalService)
+  private settingsStore = inject(SettingsStore)
   readonly tabs = INVENTORY_TABS
   tab = signal<InventoryTab>('gear')
   inventory = computed(() => this.playerStore.inventory()[this.tab()])
@@ -48,6 +51,7 @@ export class InventoryWindow {
   })
 
   readonly Items = ITEM_DATA
+  protected readonly ItemType = ItemType
 
   selectTab(tab: InventoryTab) {
     this.tab.set(tab)
@@ -60,6 +64,16 @@ export class InventoryWindow {
 
   equipItem(item: InventoryItem) {
     if (item.type === ItemType.equipment) this.playerStore.equipItem(item)
+  }
+
+  /** Asks first when the item's tier is at or above the setting; quest items are never destroyed. */
+  async destroyItem(item: InventoryItem) {
+    if (item.type === ItemType.quest) return
+    if (needsDestroyConfirm(item.tier, this.settingsStore.confirmDestroyFromTier())) {
+      const confirmed = await firstValueFrom(this.modalService.openDestroyConfirm(item).afterClosed())
+      if (!confirmed) return
+    }
+    this.playerStore.destroyItem(item)
   }
 
   useItem(item: InventoryItem) {

@@ -7,6 +7,7 @@ New notes go under `[Unreleased]`; `npm run release -- <major|minor|patch>` move
 
 ## [Unreleased]
 - [feature] When an enemy drop is lost because its inventory tab is full, the battle view now shows which tab was full and what was lost.
+- [feature] You can destroy items from your inventory: hover an item and click the red x (quest items can't be destroyed). It destroys the whole stack and asks first. In Settings you can choose the lowest item tier that asks for confirmation; by default every tier does.
 - [feature] The inventory is split into tabs: Gear, Consumables, Materials, Pets and Quest. Gear, Consumables and Materials have 20 slots each, Pets has a slot for every pet, and Quest items never run out of room. A full tab only blocks its own items: a full Materials tab no longer loses gear drops. Your items move to their tabs; a tab that holds more than fits keeps them all until you use or sell some.
 - [feature] The Guild Satchel now gives +2 slots to each of Gear, Consumables and Materials, and the Guild store has one.
 - [feature] The Arena Chest needs room in the tabs its rewards go to, not 4 empty slots anywhere.

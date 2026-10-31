@@ -15,6 +15,7 @@ Saves game state to `localStorage` (at most once a second per store) and restore
 | `townsStore` (v2) | `src/app/store/towns/towns.store.ts:TownsStore` | selected town and building id, `npcShops` (NPC → shop opened through their dialogue; the open shop isn't saved) |
 | `shopStore` | `src/app/store/shop/shop.store.ts:ShopStore` | stock and refresh timers |
 | `campStore` | `src/app/store/camp/camp.store.ts:CampStore` | Camp tab UI selection |
+| `settingsStore` | `src/app/store/settings/settings.store.ts:SettingsStore` | player options: `confirmDestroyFromTier` (lowest item tier that asks before destroying; default trash) |
 | `offlineStore` | `src/app/store/offline/offline.store.ts:OfflineStore` | `lastSeenAt` (host time, high-water mark), the kill window (recent online kill intervals on one zone and wave, `offline-progress.md`) |
 
 ## Data flow

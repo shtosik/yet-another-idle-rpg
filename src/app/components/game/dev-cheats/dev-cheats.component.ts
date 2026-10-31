@@ -15,6 +15,7 @@ import { BattleStore } from '../../../store/battle/battle.store'
 import { QuestsStore } from '../../../store/quests/quests.store'
 import { TownsStore } from '../../../store/towns/towns.store'
 import { ShopStore } from '../../../store/shop/shop.store'
+import { SettingsStore } from '../../../store/settings/settings.store'
 import { CampStore } from '../../../store/camp/camp.store'
 import { OfflineStore } from '../../../store/offline/offline.store'
 import { PlayerStat } from '../../../../types/player/player-stat.type'
@@ -45,6 +46,7 @@ export class DevCheatsComponent {
   private townsStore = inject(TownsStore)
   private shopStore = inject(ShopStore)
   private campStore = inject(CampStore)
+  private settingsStore = inject(SettingsStore)
   private offlineStore = inject(OfflineStore)
   private skillTree = inject(SkillTreeService)
   private navigation = inject(GameNavigationService)
@@ -152,6 +154,7 @@ export class DevCheatsComponent {
     this.shopStore.resetState()
     this.campStore.resetState()
     this.offlineStore.resetState()
+    this.settingsStore.resetState()
   }
 
   resetQuests() {

@@ -376,6 +376,13 @@ export const PlayerStore = signalStore(
       patchState(store, (state) => ({ inventory: removeItems(state.inventory, items) }))
     },
 
+    /** Throws away the whole stack (same id and tier). Quest items can't be destroyed; returns whether anything was. */
+    destroyItem(item: InventoryItem): boolean {
+      if (item.type === ItemType.quest) return false
+      patchState(store, (state) => ({ inventory: removeItems(state.inventory, [{ id: item.id, amount: item.amount, tier: item.tier }]) }))
+      return true
+    },
+
     /** Whether `adding` fits, each item in its tab, after `removing` is taken out first. */
     canFitItems(adding: ItemStack[], removing: ItemStack[] = []): boolean {
       return canFit(store.inventory(), store.inventoryCapacity(), adding, removing)

@@ -28,9 +28,12 @@ export class InventoryItemComponent {
   @Input() amount: number
   @Input() tier: ItemTier
   @Input() clickable = true
+  /** Shows the destroy button; set by the inventory only. */
+  @Input() destroyable = false
 
   @Output() equipItem = new EventEmitter<void>()
   @Output() useItem = new EventEmitter<void>()
+  @Output() destroyItem = new EventEmitter<void>()
 
   readonly ItemTier = ItemTier
   protected readonly EnemyID = EnemyID
@@ -57,6 +60,11 @@ export class InventoryItemComponent {
     if (!this.clickable) return
 
     this.equipItem.emit()
+  }
+
+  handleDestroy(event: MouseEvent) {
+    event.stopPropagation()
+    this.destroyItem.emit()
   }
 
   handleRightClick(event: MouseEvent) {

@@ -148,6 +148,14 @@
     },
     "dropsLost": "{{tab}} full: {{items}} lost",
     "lockedSlot": "Locked slot",
+    "destroy": {
+      "button": "Destroy",
+      "title": "Destroy item",
+      "question": "Destroy {{amount}} x {{item}} ({{tier}})?",
+      "warning": "This can't be undone.",
+      "cancel": "Cancel",
+      "confirm": "Destroy"
+    },
     "page": "Page {{page}}",
     "previousPage": "Previous page",
     "nextPage": "Next page"
@@ -198,6 +206,10 @@
   },
   "settings": {
     "title": "Settings",
+    "items": {
+      "title": "Items",
+      "confirmDestroyFromTier": "Ask before destroying items of this tier or higher"
+    },
     "version": {
       "current": "Version {{version}}",
       "changelog": "What's new"
