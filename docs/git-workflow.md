@@ -3,7 +3,7 @@
 Several Claude sessions often run in parallel on this repo, sharing the main checkout.
 
 - **Keep the main checkout on its current branch.** `git checkout` / `git switch` there moves every other session onto your branch and mixes uncommitted work.
-- **`origin/staging` is the default for everything**: new work, and also reading code or researching ideas. `main` is the released state, explored only for a hotfix or when asked; local `main` lags further behind.
+- **`origin/staging` is the default for everything**: new work, and also reading code or researching ideas. `main` is the released state, explored only for a hotfix or when asked; local `main` lags further behind. To read staging without a worktree, run `git fetch origin staging` first, since `git show origin/staging:<path>` reads the local remote-tracking ref, which is stale until fetched.
 - **New work starts from `origin/staging`**. Create a worktree: `git fetch origin && git worktree add ../yari-<name> -b feat/<name> origin/staging` (or start the session with `claude --worktree <name>`), and work only inside it.
 - A sub-feature branches from its parent feature branch; a hotfix branches from `origin/main` (`docs/deployment.md` → Releases).
 - **PRs go back to where the branch came from**: feature PRs into `staging`. `main` takes only `release/*` and `hotfix/*` PRs, and CI fails on anything else. CI runs only on PRs into `main` and `staging`, so before merging a sub-feature into its parent, run the Done checks yourself.

@@ -12,7 +12,7 @@
 
 **Before creating a branch, switching branches, committing or opening a PR**, read `docs/git-workflow.md`: parallel sessions share this checkout.
 
-**Explore and develop on `origin/staging`**, also when only reading code or researching ideas in a new session. `main` is the released state: look at it only for a hotfix or when asked. The main checkout may sit on `main`, so check `git branch --show-current` before reading code there; otherwise read from a staging worktree or `git show origin/staging:<path>`.
+**Explore and develop on `origin/staging`**, also when only reading code or researching ideas in a new session. `main` is the released state: look at it only for a hotfix or when asked. The main checkout may sit on `main`, so check `git branch --show-current` before reading code there; otherwise run `git fetch origin staging` first, then read from a staging worktree or `git show origin/staging:<path>`.
 
 **Language**: use the terms in `GLOSSARY.md` in code, docs and commits.
 
