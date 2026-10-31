@@ -87,7 +87,7 @@ Steps 1–3 don't depend on each other. Step 4 waits for 1–3. Steps 5 and 6 ne
 - Tabs in `inventory.component.*`, free slots per tab, shop "full" badge per tab, toast text names the tab.
 - Docs: `player-stats-inventory-equipment.md`, `persistence.md`, `towns-shops-guild.md` (Satchel), changelog.
 
-### 5. Skill tree slot nodes (S-M, Sonnet)
+### 5. Skill tree slot nodes (S-M, Sonnet) — done: hub +1, pouches +2/level × 3, capstone +4 (owner, 2026-10-31)
 - `skill-tree-data.ts`: hub → Gear / Consumables / Materials nodes → capstone. Placement and costs in the tree to be decided in the session.
 - `skill-tree.service.ts:65-145`: refund and respec guards check every tab the node grows; the reason names the tab.
 - Docs: `skill-tree.md`.
