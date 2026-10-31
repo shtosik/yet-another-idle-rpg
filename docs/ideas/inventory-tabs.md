@@ -29,7 +29,7 @@ Each tab has its own slot count. Tabs that only filter one shared grid don't sol
 - Unequip blocked when the Gear (or Pets) tab is full. Pets tab never fills, so in practice only Gear.
 - Craft blocked when the result's tab is full; a craft that frees materials counts the freed slots in the Materials tab only.
 - Quest turn-in blocked when a reward's tab is full.
-- Opening the Arena Chest (needs 4 empty slots today) checks each content's tab. Zone mastery claims (`zone-mastery.ts`) check the Materials tab.
+- Opening a chest rolls first and needs room only for what was rolled; a roll that doesn't fit is kept (and saved) until it does, so it can't be re-rolled (owner, 2026-10-31). Zone mastery claims (`zone-mastery.ts`) check the Materials tab.
 - Shop buy blocked per tab ("full" badge per tab).
 
 ## 2. Inventory slots in the skill tree

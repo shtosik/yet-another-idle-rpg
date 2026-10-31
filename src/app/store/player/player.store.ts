@@ -1,4 +1,4 @@
-import { chestSlotsNeeded, ChestContents, rollChest } from './chest'
+import { ChestContents, rollChest } from './chest'
 import { WeaponCategory } from '../../../enums/weapon-category.enum'
 import { computed, effect, inject } from '@angular/core'
 import { patchState, signalStore, withComputed, withHooks, withMethods, withState } from '@ngrx/signals'
@@ -33,7 +33,7 @@ import { ZoneID } from '../../../enums/ids/zone-id.enum'
 import { TownID } from '../../../enums/map/town-id.enum'
 import { DamageElement } from '../../../enums/damage-element.enum'
 import { withDevtools } from '../helpers/devtools'
-import { SaveMigrations, withGameStateSync } from '../helpers/with-game-state-sync.hook'
+import { saveGameStateNow, SaveMigrations, withGameStateSync } from '../helpers/with-game-state-sync.hook'
 import {
   addItems,
   lostItems,
@@ -109,6 +109,8 @@ interface PlayerState {
   claimedZoneStars: Partial<Record<ZoneID, ZoneStar[]>>
   /** One slot array per tab (`tabOf`). */
   inventory: Inventories;
+  /** A chest's roll that didn't fit yet, kept (and saved at once) until that chest opens, so retrying or reloading can't re-roll it. */
+  rolledChests: Partial<Record<ItemID, ChestContents>>;
   equipment: EquipmentType;
   unlockedNodes: UnlockedNodes;
   unlockedSpells: UnlockedSpellsType;
@@ -133,6 +135,7 @@ export const initialState: PlayerState = {
   manaRegenTimer: 0,
   zonesProgression: {},
   inventory: createInventories(),
+  rolledChests: {},
   equipment: initialEquipmentState,
   unlockedNodes: {},
   unlockedSpells: {},
@@ -508,20 +511,6 @@ export const PlayerStore = signalStore(
       return store.canChangeInventorySlots(deltas, adding, [{ id: item.id, tier: item.tier, amount: 1 }])
     },
 
-    /** Empty slots to free before the chest opens: in each tab, one per new stack its picks could put there (owner rule). */
-    missingChestSlots(item: InventoryItem): MissingSlots {
-      const itemData = ITEM_DATA[item.id]
-      const missing: MissingSlots = {}
-      if (itemData.type !== ItemType.chest) return missing
-      const inventory = store.inventory()
-      const capacity = store.inventoryCapacity()
-      for (const [tab, needed] of Object.entries(chestSlotsNeeded(itemData)) as [InventoryTab, number][]) {
-        const short = needed - countFreeSlots(inventory[tab], capacity[tab])
-        if (short > 0) missing[tab] = short
-      }
-      return missing
-    },
-
     /** Finished, unclaimed, and its chest's items fit in the inventory. */
     canClaimZoneStar(zoneId: ZoneID, star: ZoneStar): boolean {
       const progress = store.zoneMastery()[zoneId].find(p => p.star === star)
@@ -703,17 +692,31 @@ export const PlayerStore = signalStore(
       store.removeItems([{ id: item.id, tier: item.tier, amount: 1 }])
     },
 
-    /** Opens one chest when `missingChestSlots` is empty; null otherwise. */
-    openChest(item: InventoryItem, rng: () => number = Math.random): ChestContents | null {
+    /**
+     * Rolls one chest (or reuses its kept roll) and opens it when the rolled items fit; otherwise keeps the roll and
+     * returns the slots to free per tab (owner rule: only what was actually rolled needs room). Saved at once either
+     * way, so reloading can't undo an opening or re-roll a kept roll.
+     */
+    openChest(item: InventoryItem, rng: () => number = Math.random): { contents: ChestContents | null, missing: MissingSlots } {
       const itemData = ITEM_DATA[item.id]
-      if (itemData.type !== ItemType.chest || Object.keys(store.missingChestSlots(item)).length > 0) return null
-      const contents = rollChest(itemData, rng)
+      if (itemData.type !== ItemType.chest) return { contents: null, missing: {} }
       const chest = { id: item.id, tier: item.tier, amount: 1 }
+      const contents = store.rolledChests()[item.id] ?? rollChest(itemData, rng)
+      const missing = store.missingSlotsByTab(contents.items, [chest])
+      const rolledChests = { ...store.rolledChests() }
 
-      store.removeItems([chest])
-      if (contents.gold) store.updatePlayerStats([{ stat: 'goldCoins', amount: contents.gold }])
-      if (contents.items.length) store.addItems(contents.items)
-      return contents
+      if (Object.keys(missing).length > 0) {
+        rolledChests[item.id] = contents
+        patchState(store, { rolledChests })
+      } else {
+        delete rolledChests[item.id]
+        patchState(store, { rolledChests })
+        store.removeItems([chest])
+        if (contents.gold) store.updatePlayerStats([{ stat: 'goldCoins', amount: contents.gold }])
+        if (contents.items.length) store.addItems(contents.items)
+      }
+      saveGameStateNow()
+      return { contents: Object.keys(missing).length > 0 ? null : contents, missing }
     },
 
     regenMana(deltaMs: number) {

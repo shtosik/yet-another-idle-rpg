@@ -132,8 +132,8 @@ export class InventoryWindow {
 
     const itemData = ITEM_DATA[item.id]
     if (itemData.type === ItemType.chest) {
-      const slotsNeeded = missingSlotsText(this.playerStore.missingChestSlots(item))
-      this.modalService.openChestOpened({ contents: this.playerStore.openChest(item), slotsNeeded })
+      const { contents, missing } = this.playerStore.openChest(item)
+      this.modalService.openChestOpened({ contents, slotsNeeded: missingSlotsText(missing) })
       return
     }
 
