@@ -35,7 +35,7 @@ Tools (load deferred ones with ToolSearch): Bash `run_in_background` for the ser
    sed 's/\x1b\[[0-9;]*m//g' tmp/verify/<run-id>/ng-serve.log | grep -o 'localhost:[0-9]*' | head -1
    ```
 
-   First build takes roughly 10-30 s. A `[vite] Re-optimizing dependencies` line is normal.
+   First build takes roughly 10-30 s. A `[vite] Re-optimizing dependencies` line is normal. The server serves only the files under `src/assets/` that existed when it started: after adding an image there (a new icon gives 404), restart it (Cleanup step 2, then Launch again).
 4. Open it: `mcp__Claude_Browser__preview_start` with `url: http://localhost:<port>/`. Keep the pane's own size (no `resize_window`): emulated sizes are scaled to fit the pane, so screenshot coordinates stop matching page pixels and clicks land on the wrong element. At the default ~1024 px width the page scrolls sideways (equipment panel, NPC portraits are off-screen); see Drive for how to click them.
 5. Ready means usable: `window.dev` exists (it arrives a moment after load, with the deferred cheat chunk) and the battle pane shows an enemy name. Doctor checks both.
 
