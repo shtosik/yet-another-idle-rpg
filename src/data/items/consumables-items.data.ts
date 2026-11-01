@@ -113,6 +113,26 @@ export const ConsumablesItemsData: Partial<Record<ItemID, Item>> = {
       manaRestore: 5,
     },
   },
+  [ItemID.greaterManaPotion]: {
+    id: ItemID.greaterManaPotion,
+    tier: ItemTier.uncommon,
+    url: './assets/img/items/greaterManaPotion.png',
+    value: 80,
+    type: ItemType.potion,
+    effect: {
+      slot: 'potion',
+      cooldown: 2 * MINUTE,
+      manaRestore: 15,
+    },
+  },
+  [ItemID.greaterManaPotionRecipe]: {
+    id: ItemID.greaterManaPotionRecipe,
+    tier: ItemTier.uncommon,
+    url: './assets/img/items/greaterManaPotionRecipe.png',
+    value: 100,
+    type: ItemType.recipe,
+    recipeId: RecipeID.greaterManaPotion,
+  },
   [ItemID.crabStewRecipe]: {
     id: ItemID.crabStewRecipe,
     tier: ItemTier.uncommon,

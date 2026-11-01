@@ -191,4 +191,10 @@ export enum ItemID {
     petArenaYad = 172,
     gladiatorHelm = 173,
     gladiatorHelmRecipe = 174,
+    wharfRunnersBoots = 175,
+    rootwalkerBoots = 176,
+    greaterManaPotion = 177,
+    greaterManaPotionRecipe = 178,
+    petLaHarparCat = 179,
+    petMawoodMoth = 180,
 }

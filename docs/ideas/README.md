@@ -27,7 +27,7 @@ Owner decisions in force:
 | [Bounty board](bounty-board.md) | S-M | Proposed |
 | [Buffs and consumable effects](buffs-and-consumable-effects.md) | S-M | Open question |
 | [UI overhaul: navbar, HUD, shop, Camp, town, map](ui-overhaul.md) | M | Navbar, HUD, Camp grid done; rest accepted |
-| [Quest panel and reputation](quest-panel.md) | M | Quest list done; reputation tab empty |
+| [Quest panel and reputation](quest-panel.md) | M | Quest list and Reputation tab done |
 | [Keybinds](keybinds.md) | S | Proposed |
 | [Responsive layout](responsive-layout.md) | M | Proposed |
 | [Elemental spells & gear expansion](elemental-spells-gear.md) | M | Batch 1 (spells, element branches, weaknesses) done |
@@ -39,7 +39,9 @@ Owner decisions in force:
 | [Slatefall & the Deeper Mines](slatefall-and-the-deeper-mines.md) | M-L | Proposed |
 | [Inventory tabs & destroy](inventory-tabs.md) | M-L | In progress (PRs 82, 83) |
 | [La Harpar quests & Tidecaller questline](la-harpar-quests.md) | M | Proposed |
-| [Town reputation](town-reputation.md) | M | Accepted |
+| [Town reputation](town-reputation.md) | M | Built (steps 1–4: state and quest rewards, turn-ins, tier unlocks and titles, town pets) |
+| [Town reputation: tier rewards and titles](town-reputation-tier-rewards.md) | M | Built |
+| [Town reputation: Exalted town pets](town-reputation-pets.md) | S-M | Built |
 | [Achievements](achievements.md) | M | Proposed |
 | [Gear upgrading](gear-upgrading.md) | M | Proposed |
 | [Item sets](item-sets.md) | S-M | Proposed |

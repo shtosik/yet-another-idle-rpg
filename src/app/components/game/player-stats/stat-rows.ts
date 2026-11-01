@@ -51,6 +51,7 @@ export const STAT_GROUPS: StatGroup[] = [
     rows: [
       { stat: 'xpMultiplier', format: 'multiplier', always: true },
       { stat: 'goldCoinsMultiplier', format: 'multiplier', always: true },
+      { stat: 'foodEffectMultiplier', format: 'multiplier' },
       { stat: 'offlineProgressRate', format: 'fraction', always: true },
       { stat: 'shinyChance', format: 'percent' },
       { stat: 'inventorySlots', format: 'number' },

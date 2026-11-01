@@ -2,6 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core'
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
 import { QuestProps } from '../../../../data/quests-data'
 import { QuestID } from '../../../../enums/ids/quest-id.enum'
+import { TownID } from '../../../../enums/map/town-id.enum'
 import { I18nextPipe } from '../../../pipes/i18next.pipe'
 import { InventoryItemComponent } from '../../game/inventory/inventory-slot/inventory-slot.component'
 import ITEM_DATA from '../../../../data/items-data'
@@ -32,7 +33,12 @@ export class QuestCompletedComponent {
     return this.questData().rewards.filter(i => i.type === 'stat')
   })
 
+  reputationToDisplay = computed(() => {
+    return this.questData().rewards.filter(i => i.type === 'reputation')
+  })
+
   protected readonly QuestID = QuestID
+  protected readonly TownID = TownID
   protected readonly ITEM_DATA = ITEM_DATA
 
   close() {

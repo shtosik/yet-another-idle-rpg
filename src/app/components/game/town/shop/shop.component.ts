@@ -20,9 +20,10 @@ import { isPreferredBy, sellPrice } from '../../../../store/shop/shop-prices'
 import { ShopCurrency } from '../../../../../types/shop/shop.type'
 import { tabOf } from '../../../../store/player/inventory'
 import { tabName } from '../../inventory/tab-text'
+import { reputationLockText, tierName } from '../../quests/reputation/reputation-text'
 
 /** `currency`: the player has too little of the shop's currency. */
-type BuyBlockReason = 'stock' | 'rank' | 'currency' | 'inventory' | 'station' | null
+type BuyBlockReason = 'stock' | 'rank' | 'reputation' | 'currency' | 'inventory' | 'station' | null
 type ShopTab = 'buy' | 'sell'
 
 /** Icon and price text per currency; a new `ShopCurrency` won't compile until it has an entry here. */
@@ -73,6 +74,7 @@ export class ShopComponent implements OnInit {
   /** Shops with rank-gated stock (the guild store) show the player's Guild rank. */
   showsGuildRank = computed(() => SHOPS_DATA[this.shopId()].items.some(item => item.minRank !== undefined))
   guildRank = this.playerStore.guildRank
+  protected readonly tierName = tierName
   balance = computed(() => this.balanceOf(this.currency()))
 
   /** Inventory stacks this shop buys, at its price. */
@@ -102,6 +104,9 @@ export class ShopComponent implements OnInit {
     if (entry.runtime.currentStock <= 0) return 'stock'
 
     if ((entry.staticItem.minRank ?? 0) > this.guildRank()) return 'rank'
+
+    const minReputation = entry.staticItem.minReputation
+    if (minReputation && this.playerStore.townTier(minReputation.townId) < minReputation.tier) return 'reputation'
 
     if (this.balance() < entry.staticItem.price) return 'currency'
 
@@ -144,6 +149,8 @@ export class ShopComponent implements OnInit {
       }
       case 'rank':
         return `${name}: ${i18next.t('shop:ui.needsRank', { rank: minRank })}`
+      case 'reputation':
+        return `${name}: ${this.reputationLock(index)}`
       case 'station':
         return `${name}: ${i18next.t('shop:ui.needsStation', { level: this.requiredStationLevel(index) })}`
       case 'currency':
@@ -153,6 +160,14 @@ export class ShopComponent implements OnInit {
       default:
         return `${name}: ${this.priceLabel(this.currency(), price)}`
     }
+  }
+
+  /** "Requires Mawood Honored — 140/200"; empty for items without a tier lock. */
+  reputationLock(index: number): string {
+    const minReputation = this.items()[index].staticItem.minReputation
+    if (!minReputation) return ''
+    const { townId, tier } = minReputation
+    return reputationLockText(townId, tier, this.playerStore.reputation()[townId] ?? 0)
   }
 
   /** Shops always pay gold for what they buy. */

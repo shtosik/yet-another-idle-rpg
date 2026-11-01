@@ -3,6 +3,8 @@ import { NpcID } from '../../../enums/map/npc-id.enum'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
 import { ShopID } from '../../../enums/ids/shop-id.enum'
+import { TownID } from '../../../enums/map/town-id.enum'
+import { ReputationTier } from '../../../enums/reputation-tier.enum'
 
 export enum SylvieDialogue {
   default = 0,
@@ -21,6 +23,12 @@ export enum SylvieDialogue {
   questInfestation,
   questInfestationProgress,
   questInfestationComplete,
+  safePassageComplete,
+  questCleanCure,
+  questCleanCureProgress1,
+  questCleanCureProgress2,
+  questCleanCureStep1Complete,
+  questCleanCureComplete,
 }
 
 export type MawoodSylvieDialogueType = Record<SylvieDialogue, DialogueNode<SylvieDialogue>>
@@ -81,8 +89,18 @@ const MAWOOD_SYLVIE: MawoodSylvieDialogueType = {
         results: [{ next: SylvieDialogue.aboutCorruption }],
       },
       {
+        responseKey: `${NS}:default.safePassage`,
+        results: [{ visibilityConditions: [{ type: 'quest', questId: QuestID.safePassage, questState: QuestState.readyToAdvance, step: 2 }], next: SylvieDialogue.safePassageComplete }],
+      },
+      {
         responseKey: `${NS}:default.work`,
         results: [
+          // A Clean Cure (Mawood Revered): turn-ins, in progress, offer
+          { visibilityConditions: [{ type: 'quest', questId: QuestID.aCleanCure, questState: QuestState.readyToAdvance, step: 2 }], next: SylvieDialogue.questCleanCureComplete },
+          { visibilityConditions: [{ type: 'quest', questId: QuestID.aCleanCure, questState: QuestState.readyToAdvance, step: 1 }], next: SylvieDialogue.questCleanCureStep1Complete },
+          { visibilityConditions: [{ type: 'quest', questId: QuestID.aCleanCure, questState: QuestState.active, step: 2 }], next: SylvieDialogue.questCleanCureProgress2 },
+          { visibilityConditions: [{ type: 'quest', questId: QuestID.aCleanCure, questState: QuestState.active }], next: SylvieDialogue.questCleanCureProgress1 },
+          { visibilityConditions: [{ type: 'quest', questId: QuestID.aCleanCure, questState: QuestState.available }], next: SylvieDialogue.questCleanCure },
           // Quest 9 — The Infestation: turn-in
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.theInfestation, questState: QuestState.readyToAdvance, step: 1 }],
@@ -128,7 +146,21 @@ const MAWOOD_SYLVIE: MawoodSylvieDialogueType = {
             next: SylvieDialogue.default,
             effects: [{ type: 'shop', shopId: ShopID.mawoodApothecary }],
           },
+          // ...or to anyone Mawood already calls a friend.
+          {
+            visibilityConditions: [{ type: 'reputation', townId: TownID.mawood, tier: ReputationTier.friendly, hidden: true }],
+            next: SylvieDialogue.default,
+            effects: [{ type: 'shop', shopId: ShopID.mawoodApothecary }],
+          },
         ],
+      },
+      {
+        responseKey: 'quests:reputation.turnInOne',
+        results: [{ next: SylvieDialogue.default, effects: [{ type: 'reputationTurnIn', npcId: NpcID.mawoodSylvie, bundles: 'one' }] }],
+      },
+      {
+        responseKey: 'quests:reputation.turnInAll',
+        results: [{ next: SylvieDialogue.default, effects: [{ type: 'reputationTurnIn', npcId: NpcID.mawoodSylvie, bundles: 'all' }] }],
       },
       {
         responseKey: `${NS}:default.goodbye`,
@@ -323,6 +355,49 @@ const MAWOOD_SYLVIE: MawoodSylvieDialogueType = {
           },
         ],
       },
+    ],
+  },
+  [SylvieDialogue.safePassageComplete]: {
+    id: SylvieDialogue.safePassageComplete,
+    messageKey: `${NS}:safePassageComplete.message`,
+    options: [
+      { responseKey: `${NS}:safePassageComplete.opt1`, results: [{ next: SylvieDialogue.default, effects: [{ type: 'quest', action: 'advance', questId: QuestID.safePassage }] }] },
+    ],
+  },
+  [SylvieDialogue.questCleanCure]: {
+    id: SylvieDialogue.questCleanCure,
+    messageKey: `${NS}:questCleanCure.message`,
+    options: [
+      { responseKey: `${NS}:questCleanCure.opt1`, results: [{ next: SylvieDialogue.default, effects: [{ type: 'quest', action: 'start', questId: QuestID.aCleanCure }] }] },
+      { responseKey: `${NS}:questCleanCure.opt2`, results: [{ next: SylvieDialogue.default }] },
+    ],
+  },
+  [SylvieDialogue.questCleanCureProgress1]: {
+    id: SylvieDialogue.questCleanCureProgress1,
+    messageKey: `${NS}:questCleanCureProgress1.message`,
+    options: [
+      { responseKey: `${NS}:questCleanCureProgress1.opt1`, results: [{ next: SylvieDialogue.default }] },
+    ],
+  },
+  [SylvieDialogue.questCleanCureProgress2]: {
+    id: SylvieDialogue.questCleanCureProgress2,
+    messageKey: `${NS}:questCleanCureProgress2.message`,
+    options: [
+      { responseKey: `${NS}:questCleanCureProgress2.opt1`, results: [{ next: SylvieDialogue.default }] },
+    ],
+  },
+  [SylvieDialogue.questCleanCureStep1Complete]: {
+    id: SylvieDialogue.questCleanCureStep1Complete,
+    messageKey: `${NS}:questCleanCureStep1Complete.message`,
+    options: [
+      { responseKey: `${NS}:questCleanCureStep1Complete.opt1`, results: [{ next: SylvieDialogue.default, effects: [{ type: 'quest', action: 'advance', questId: QuestID.aCleanCure }] }] },
+    ],
+  },
+  [SylvieDialogue.questCleanCureComplete]: {
+    id: SylvieDialogue.questCleanCureComplete,
+    messageKey: `${NS}:questCleanCureComplete.message`,
+    options: [
+      { responseKey: `${NS}:questCleanCureComplete.opt1`, results: [{ next: SylvieDialogue.default, effects: [{ type: 'quest', action: 'advance', questId: QuestID.aCleanCure }] }] },
     ],
   },
 }

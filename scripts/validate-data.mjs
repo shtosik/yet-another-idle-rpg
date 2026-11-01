@@ -55,6 +55,9 @@ export { ALL_SKILLS } from 'data/skill-tree-data'
 export { UNLOCK_RULES, ZONE_UNLOCK_NOTIFICATIONS } from 'data/unlock-conditions'
 export { WORLD_MAP_DATA } from 'data/world-map-data'
 export { sellPrice } from 'app/store/shop/shop-prices'
+export { REPUTATION_TOWNS } from 'app/store/player/reputation'
+export { REPUTATION_TURN_INS } from 'data/reputation-turn-ins'
+export { TitleID } from 'enums/ids/title-id.enum'
 export { CHANGELOG_NOTE_TYPES } from 'app/components/modals/changelog/changelog'
 `
 
@@ -237,6 +240,30 @@ for (const quest of Object.values(D.QUEST_DATA)) {
     else if (!placedNpcs.has(step.turnInNpc)) error('src/data/quests-data.ts', `${where}: turnInNpc ${npc} isn't in any town building`)
     else if (!questsInDialogue(step.turnInNpc).has(quest.questId)) error('src/data/quests-data.ts', `${where}: turnInNpc ${npc}'s dialogue never starts, advances or ends this quest`)
   })
+  for (const reward of quest.rewards.filter(r => r.type === 'reputation')) {
+    if (!D.REPUTATION_TOWNS.includes(reward.townId)) error('src/data/quests-data.ts', `${idName(D.QuestID, quest.questId)} gives reputation in ${idName(D.TownID, reward.townId)}, which isn't in REPUTATION_TOWNS`)
+    if (!(reward.amount > 0)) error('src/data/quests-data.ts', `${idName(D.QuestID, quest.questId)} gives ${reward.amount} reputation; it must be positive`)
+  }
+}
+
+// A reputation turn-in giver stands in the town they credit, and their dialogue uses the turn-in.
+const townOfNpc = npcId => Object.values(D.TOWNS_DATA).find(t => t.buildings.some(b => b.npcs.some(n => n.id === npcId)))?.id
+const effectsOf = npcId => Object.values(D.NPC_DATA[npcId]?.dialogue ?? {})
+  .flatMap(node => node.options ?? []).flatMap(option => option.results ?? []).flatMap(result => result.effects ?? [])
+for (const turnIn of D.REPUTATION_TURN_INS) {
+  const npc = idName(D.NpcID, turnIn.npcId)
+  const file = 'src/data/reputation-turn-ins.ts'
+  if (!D.REPUTATION_TOWNS.includes(turnIn.townId)) error(file, `${npc}'s turn-in credits ${idName(D.TownID, turnIn.townId)}, which isn't in REPUTATION_TOWNS`)
+  if (townOfNpc(turnIn.npcId) !== turnIn.townId) error(file, `${npc}'s turn-in credits ${idName(D.TownID, turnIn.townId)}, but ${npc} doesn't stand there`)
+  if (!has(D.ITEM_DATA, turnIn.itemId)) error(file, `${npc}'s turn-in has unknown ItemID ${turnIn.itemId}`)
+  if (!(turnIn.bundleSize > 0 && turnIn.reputation > 0)) error(file, `${npc}'s turn-in needs a positive bundleSize and reputation`)
+  if (!effectsOf(turnIn.npcId).some(e => e.type === 'reputationTurnIn')) error(file, `${npc}'s dialogue never uses their turn-in`)
+}
+for (const npc of Object.values(D.NPC_DATA)) {
+  for (const effect of effectsOf(npc.id).filter(e => e.type === 'reputationTurnIn')) {
+    if (effect.npcId !== npc.id) error(`src/data/dialogues (${idName(D.NpcID, npc.id)})`, `turn-in effect names ${idName(D.NpcID, effect.npcId)}, not this NPC`)
+    if (!D.REPUTATION_TURN_INS.some(t => t.npcId === effect.npcId)) error(`src/data/dialogues (${idName(D.NpcID, npc.id)})`, 'turn-in effect has no REPUTATION_TURN_INS entry')
+  }
 }
 for (const skill of Object.values(D.ALL_SKILLS)) {
   const reqs = []
@@ -378,6 +405,7 @@ const ENTITY_KEYS = [
   [D.SkillNodeID, k => [`skill-tree:nodes.${k}.name`, `skill-tree:nodes.${k}.desc`], 'src/assets/locales/en/skill-tree.json'],
   [D.TownID, k => [`map:towns.${k}`], 'src/assets/locales/en/map.json'],
   [D.TownBuildingID, k => [`map:buildings.${k}`], 'src/assets/locales/en/map.json'],
+  [D.TitleID, k => [`app:titles.${k}`], 'src/assets/locales/en/app.json'],
   [D.DamageElement, k => [`app:elements.${k}`], 'src/assets/locales/en/app.json'],
   [D.ItemTier, k => [`items:tiers.${k}`], 'src/assets/locales/en/items.json'],
 ]
@@ -468,6 +496,8 @@ const allDirs = new Set(allFiles.flatMap(f => f.split('/').slice(0, -1).map((_, 
 
 // A file name with a known extension, or a multi-segment path rooted at a top-level repo dir.
 const PATH_RE = /^[\w.][\w./-]*\.(ts|mjs|js|json|md|html|scss|png)$|^(src|docs|scripts|\.claude|public)(\/[\w.-]+)+\/?$/
+/** Per-machine files docs may name; they are never in git. */
+const LOCAL_ONLY_PATHS = new Set(['.claude/launch.json'])
 function resolveDocPath(p) {
   const clean = p.replace(/\/$/, '')
   if (existsSync(join(ROOT, clean))) return join(ROOT, clean)
@@ -486,7 +516,7 @@ for (const doc of DOC_FILES) {
   for (const [, token] of text.matchAll(/`([^`\s]+)`/g)) {
     if (/[*<>{}$]|^https?:|^\.\.?\/|^\/|^~/.test(token)) continue
     const [path, symbol] = token.split(/:(?=[A-Za-z_])/)
-    if (!PATH_RE.test(path)) continue
+    if (!PATH_RE.test(path) || LOCAL_ONLY_PATHS.has(path)) continue
     const resolved = resolveDocPath(path)
     if (!resolved) { error(rel, `references missing path '${path}'`); continue }
     if (symbol && statSync(resolved).isFile()) {

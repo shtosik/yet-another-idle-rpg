@@ -17,6 +17,7 @@ Judgement rules for writing and review. Mechanical rules are checks instead: `np
 
 - **Ternaries pick between two simple values** (`selected ? 0 : -1`). Choosing what to compute or call, or combining several conditions, goes in `if`/`switch` inside a small named method. (Nested ternaries in `.ts` files are a lint error; lint doesn't read templates, so check those in review.)
 - **Switch over a union or enum with no `default`** when every member needs handling, so a new member (a currency, a stat format) fails to compile until it is handled (`noImplicitReturns` is on). Per-member static values go in a `Record<Union, …>` for the same reason.
+- **A guard covers every path to the same outcome.** When a check is added to one way of doing something (a quest turn-in through `advance` and through `end`), every other way gets it too, or a comment says why it skips it (`dev.completeQuest`). Review greps the outcome's other callers.
 - **An explicit data field beats a derived lookup.** If code has to reverse-engineer a fact from other data (which NPC a quest step turns in to), add the field to the data and have `validate` check it.
 
 ## Structure

@@ -13,6 +13,9 @@ import { BattleStore } from '../../../store/battle/battle.store'
 import { QuestsStore } from '../../../store/quests/quests.store'
 import { GameTab } from '../../../../enums/ids/game-tab.enum'
 import { ShopComponent } from './shop/shop.component'
+import { PlayerStore } from '../../../store/player/player.store'
+import { REPUTATION_TOWNS, reputationTier } from '../../../store/player/reputation'
+import { ReputationTier } from '../../../../enums/reputation-tier.enum'
 
 @Component({
   selector: 'app-towns',
@@ -34,6 +37,7 @@ export class TownsComponent {
   private townsStore = inject(TownsStore)
   private battleStore = inject(BattleStore)
   private questsStore = inject(QuestsStore)
+  private playerStore = inject(PlayerStore)
   private destroyRef = inject(DestroyRef)
   private dialogueManager = inject(DialogueManagerService)
   selectedTownId = this.townsStore.selectedTownId
@@ -41,6 +45,13 @@ export class TownsComponent {
   activeShopId = this.townsStore.activeShopId
   activeShopStage = this.townsStore.activeShopStage
   dialogueActive = computed(() => this.dialogueManager.activeNpc() !== null)
+  /** Wrapped so Neutral (0) still shows; `null` for towns without reputation. */
+  townTier = computed(() => {
+    const townId = this.selectedTownId()
+    if (!REPUTATION_TOWNS.includes(townId)) return null
+    return { value: reputationTier(this.playerStore.reputation()[townId] ?? 0) }
+  })
+  protected readonly ReputationTier = ReputationTier
 
   @Output() changeTab = new EventEmitter<GameTab>()
 

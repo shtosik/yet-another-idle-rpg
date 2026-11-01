@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, effect, inject } from '@angular/cor
 import TOWNS_DATA from '../../../data/towns-data'
 import { GameNavigationService } from '../../services/game-navigation.service'
 import { UnlockService } from '../../services/unlock.service'
+import { ReputationService } from '../../services/reputation.service'
 import { GameTab } from 'enums/ids/game-tab.enum'
 import { AsyncPipe, CommonModule } from '@angular/common'
 import { TownsComponent } from './town/towns.component'
@@ -71,6 +72,7 @@ export class GameComponent {
   private unlockService = inject(UnlockService)
   private navigation = inject(GameNavigationService)
   gameTab = this.navigation.tab
+  tierUpToast = inject(ReputationService).tierUpToast
 
   readonly GameTab = GameTab
   readonly cheats = environment.cheats

@@ -17,6 +17,7 @@
 
 ## Data flow
 - **Stats** (`PlayerStore.stats()`) are a computed `Record<PlayerStat, number>`: `statsInitialState` + equipped gear + stat skill nodes × level + active buffs (`BattleStore.activeBuffs`) + active consumable effects (`BattleStore.consumableSlots`) + `permanentBonuses`, with saved **resources** on top. Nothing stores the total. `PlayerStore.sourcedModifiers()` keeps the modifiers grouped by source (gear, skills, buffs, food and potions, permanent bonuses, zone mastery); `stats` flattens it, and the stats panel's tooltip reads it through `statContributions`.
+- **Title picker** (`player-stats/title-picker/`): above the stats sheet once a title is earned; a select with "None" and the earned titles (`PlayerStore.selectTitle`, see `towns-shops-guild.md`).
 - **Stats panel** (main and Settings tabs, spanning both middle columns): Combat, Magic, Progress, Weakness damage and Damage vs enemy types. A row shows when marked `always` in `STAT_GROUPS` or when its value differs from `statsInitialState`; "Show all stats" lists every row. Level, XP and gold live in the HUD, not here. Hovering or focusing a row shows a one-line description (`app:statsPanel.descriptions.<stat>`, or the row's shared `description` key for weakness and enemy-type rows), Base, each source's flat and percent part, and Total; on inverted stats a positive data amount shows as a minus.
 - **Resources** (`PlayerState.resources`: `experience`, `level`, `unspentSkillPoints`, `goldCoins`, `mana`) are earned and spent with `updatePlayerStats([{ stat, amount }])`. The same call with any other stat adds a **permanent bonus** (`PlayerState.permanentBonuses`): used reward items, quest stat rewards, dialogue stat effects. Gear, nodes, buffs and consumables never call it.
 - **XP**: adding `experience` runs `handleExperience`, which levels up (possibly several times) and grants 1 skill point per level. Formula: `src/app/pipes/calculate-xp.pipe.ts`.
@@ -45,7 +46,7 @@
 - Stat units: multipliers are factors (`critMulti` 1.2 = ×1.2); `critChance` and `shinyChance` are percent; `damageVs*` are additive fractions (0.2 = +20%).
 - Every `PlayerStat` needs an `app:playerStats.<stat>` label (`npm run validate` checks).
 - **Gold per kill** is `ceil(Enemy.gold × goldCoinsMultiplier × 10 if shiny)` (`processBattleEnd`).
-- **Item `value`** is the sell price (`sellItem`, any shop). `value <= 0` is unsellable: books, station gear, quest items and chests must stay there (recipes, spell scrolls and pets sell, so duplicates aren't dead slots; owner decision), and a shop's price must be above the item's `value` (`npm run validate` checks both).
+- **Item `value`** is the sell price (`sellItem`, any shop). `value <= 0` is unsellable: books, station gear, quest items and chests must stay there (recipes, spell scrolls and pets sell, so duplicates aren't dead slots; owner decision; town pets are the exception, `value: -1`, since each is given once), and a shop's price must be above the item's `value` (`npm run validate` checks both).
 - `addItems` silently discards what doesn't fit. Callers that must not lose items check `canFit` first.
 
 ## Known issues

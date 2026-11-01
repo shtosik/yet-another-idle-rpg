@@ -15,6 +15,7 @@ import { ZoneID } from '../../../../../enums/ids/zone-id.enum'
 import { NpcID } from '../../../../../enums/map/npc-id.enum'
 import { getQuestStatus } from '../../../../services/quest-status'
 import { I18nextPipe } from '../../../../pipes/i18next.pipe'
+import { reputationTierLabel } from '../reputation/reputation-text'
 
 interface RequirementRow {
   label: string
@@ -150,6 +151,8 @@ export class QuestListComponent {
         return i18next.t(`app:playerStats.${req.key}`)
       case 'quest':
         return i18next.t(`quests:names.${QuestID[req.questId]}`)
+      case 'reputation':
+        return reputationTierLabel(req.townId, req.tier)
     }
   }
 }

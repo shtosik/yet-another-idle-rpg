@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject } from '@angular/core'
 import { SkillTreeService } from '../../../services/skill-tree.service'
 import { GameNavigationService } from '../../../services/game-navigation.service'
+import { ReputationService } from '../../../services/reputation.service'
 import { GameTab } from 'enums/ids/game-tab.enum'
 import { SkillNodeID } from 'enums/ids/skill-node-id.enum'
 import { ShopID } from 'enums/ids/shop-id.enum'
@@ -23,6 +24,7 @@ import { ZoneID } from 'enums/ids/zone-id.enum'
 import { ItemID } from 'enums/ids/item-id.enum'
 import { ItemTier } from 'enums/items/item-tier.enum'
 import { EnemyID } from 'enums/ids/enemy-id.enum'
+import { QuestID } from 'enums/ids/quest-id.enum'
 
 /** Features `window.dev.unlock` can open. */
 type DevFeature = 'camp' | 'skillTree' | 'map' | 'spellbook' | 'towns'
@@ -50,10 +52,11 @@ export class DevCheatsComponent {
   private offlineStore = inject(OfflineStore)
   private skillTree = inject(SkillTreeService)
   private navigation = inject(GameNavigationService)
+  private reputationService = inject(ReputationService)
 
   /**
    * `window.dev` in the browser console: puts the game into a state in one call when checking UI.
-   * IDs are the enum numbers (`ShopID`, `ZoneID`, `SkillNodeID`, `ItemID`, `EnemyID`, `GameTab`).
+   * IDs are the enum numbers (`ShopID`, `ZoneID`, `SkillNodeID`, `ItemID`, `EnemyID`, `QuestID`, `GameTab`).
    */
   private readonly devTools = {
     tab: (tab: GameTab) => this.navigation.changeTab(tab),
@@ -99,6 +102,13 @@ export class DevCheatsComponent {
       zoneId, wave: 1, kills: 0, shinies: count, killsByEnemy: {}, taskCountsByEnemy: {}, experience: 0, gold: 0, items: [],
     }),
     unlock: (feature: DevFeature) => this.unlockFeature(feature),
+    /** Starts and completes the quest, rewards and completed modal included; a no-op once it's done. */
+    completeQuest: (questId: QuestID) => {
+      this.questsStore.startQuest(questId)
+      this.questsStore.endQuest(questId)
+    },
+    /** Adds town reputation the way a quest reward does, tier-up toast included. */
+    addReputation: (townId: TownID, amount: number) => this.reputationService.gain([{ townId, amount }]),
   }
 
   private unlockFeature(feature: DevFeature): void {

@@ -11,6 +11,8 @@ import { EnemyID } from '../../../../enums/ids/enemy-id.enum'
 import { DialogueEffect } from '../../../../types/dialogues/dialogue-effect.type'
 import { DialogueCondition } from '../../../../types/dialogues/dialogue-condition.type'
 import { ZoneID } from '../../../../enums/ids/zone-id.enum'
+import { TownID } from '../../../../enums/map/town-id.enum'
+import { reputationLockText } from '../quests/reputation/reputation-text'
 import { CloseButtonComponent } from '../../shared/close-button/close-button.component'
 import { PlayerStore } from '../../../store/player/player.store'
 import { missingSlotsText } from '../inventory/tab-text'
@@ -38,10 +40,26 @@ export class DialogueComponent {
     this.dialogueService.selectOption(option)
   }
 
-  /** Interpolation values for a response: a task-cancel option names its monster and the kills left. */
+  /**
+   * Interpolation values for a response: a task-cancel option names its monster and the kills left;
+   * a turn-in names what it hands over and how many the player holds.
+   */
   getResponseParams(option: DialogueOption<any>): Record<string, string | number> | undefined {
-    const effect = this.dialogueService.getActiveResult(option)?.effects
-      ?.find(e => e.type === 'guild' && e.action === 'abandonTask')
+    const effects = this.dialogueService.getActiveResult(option)?.effects
+    const turnInEffect = effects?.find(e => e.type === 'reputationTurnIn')
+    if (turnInEffect?.type === 'reputationTurnIn') {
+      const { turnIn, held, kept, bundles } = this.dialogueService.turnIn(turnInEffect)
+      return {
+        amount: this.shownBundles(bundles) * turnIn.bundleSize,
+        item: i18next.t(`items:names.${ItemID[turnIn.itemId]}`),
+        held,
+        kept,
+        // i18next picks the `_kept` key when quests hold some back.
+        context: kept > 0 ? 'kept' : '',
+      }
+    }
+
+    const effect = effects?.find(e => e.type === 'guild' && e.action === 'abandonTask')
     if (effect?.type !== 'guild') return undefined
 
     const task = this.playerStore.activeTasks()[effect.taskIndex ?? 0]
@@ -78,6 +96,8 @@ export class DialogueComponent {
           zone,
         })
       }
+      case 'reputation':
+        return reputationLockText(condition.townId, condition.tier, this.playerStore.reputation()[condition.townId] ?? 0)
       case 'manyStat':
         return condition.statsRequired
           .map(req => this.getConditionLabel({ type: 'stat', ...req }))
@@ -144,9 +164,21 @@ export class DialogueComponent {
         }
       case 'arena':
         return i18next.t(`app:arena.effects.${effect.action}`)
+      case 'reputationTurnIn': {
+        const { turnIn, bundles } = this.dialogueService.turnIn(effect)
+        return i18next.t('quests:reputation.reward', {
+          amount: this.shownBundles(bundles) * turnIn.reputation,
+          town: i18next.t(`map:towns.${TownID[turnIn.townId]}`),
+        })
+      }
       default:
         return ''
     }
+  }
+
+  /** A disabled turn-in (no full bundle yet) still shows one bundle's worth, so the player sees the rate. */
+  private shownBundles(bundles: number): number {
+    return Math.max(bundles, 1)
   }
 
   isOptionVisible(option: DialogueOption<any>): boolean {

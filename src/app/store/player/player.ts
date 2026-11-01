@@ -12,6 +12,7 @@ export const statsInitialState: PlayerStatsType = {
     // gold
     goldCoins: 0,
     goldCoinsMultiplier: 1,
+    foodEffectMultiplier: 1,
     // attack
     attackPower: 1,
     attackSpeed: 3,
