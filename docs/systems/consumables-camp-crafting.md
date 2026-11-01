@@ -22,7 +22,7 @@ The **Camp** tab is the player's crafting base. It holds **stations** (Workbench
 
 **Crafting** (`craftItem(recipeId, times)`): `evaluateRecipe` decides:
 - visible: station owned, recipe unlocked if `requiresUnlock` (by using its recipe scroll), and gear not already installed;
-- blocked: `stationLevel` too low, `stationOrder` (gear out of sequence), `missingItems`, or `inventoryFull` (checked after paying, since paying can free a slot; the reason names the result's tab, e.g. "Gear tab full").
+- blocked: `stationLevel` too low, `stationOrder` (gear out of sequence), `missingItems` (no reason line: the red ingredient counters show what is short), or `inventoryFull` (checked after paying, since paying can free a slot; the reason names the result's tab, e.g. "Gear tab full").
 Then ingredients are removed and the result added (×`createsAmount` × count). Batch size comes from `CampStore.batchSize` (number or `'max'`).
 
 **Consumables** (`useConsumable(itemId)`):

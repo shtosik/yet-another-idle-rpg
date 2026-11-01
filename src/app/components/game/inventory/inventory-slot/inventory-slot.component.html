@@ -5,17 +5,21 @@
   class="item"
   placement="bottom"
   tooltipClass="tooltip-override"
-  (click)="handleClick()"
   (contextmenu)="handleRightClick($event)"
 >
-  <img
-    [ngSrc]="item.url"
-    alt=""
-    disableOptimizedSrcset
-    height="32"
-    width="32"
-  >
-  <span>{{ amount }}</span>
+  <!-- Shop and modal slots sit inside other controls or take no action, so only clickable slots get a button. -->
+  @if (clickable) {
+    <button
+      type="button"
+      class="item__action"
+      [attr.aria-label]="('items:names.' + ItemID[item.id] | i18next) + ' ×' + amount"
+      (click)="handleActivate($event)"
+    >
+      <ng-container [ngTemplateOutlet]="art" />
+    </button>
+  } @else {
+    <ng-container [ngTemplateOutlet]="art" />
+  }
   @if (destroyable) {
     <button
       type="button"
@@ -27,13 +31,27 @@
   }
 </div>
 
+<ng-template #art>
+  <img
+    [ngSrc]="item.url"
+    alt=""
+    disableOptimizedSrcset
+    height="32"
+    width="32"
+  >
+  <span>{{ amount }}</span>
+</ng-template>
+
 <ng-template
   #tooltip
   let-item="item"
   let-tier="tier"
 >
   <div class="item__tooltip">
-    <span>{{ ('items:names.' + ItemID[item.id]) | i18next }}</span>
+    <span
+      [attr.data-tier]="ItemTier[tier]"
+      class="name"
+    >{{ ('items:names.' + ItemID[item.id]) | i18next }}</span>
     <span class="tier-line">
       <span
         [attr.data-tier]="ItemTier[tier]"
@@ -56,7 +74,7 @@
         <span class="stat">{{ 'items:grantsSpell' | i18next:{ spell: ('spells:names.' + SpellID[item.spell] + '.name') | i18next } }}</span>
       }
       @if (clickable) {
-        <span class="click">{{ 'items:clickToEquip' | i18next }}</span>
+        <span class="click">{{ 'items:rightClickToEquip' | i18next }}</span>
       }
     }
     @if (item.type === ItemType.rewardsStats) {

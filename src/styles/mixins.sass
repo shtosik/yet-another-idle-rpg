@@ -25,6 +25,7 @@
     &[data-tier="quest"]
       box-shadow: rgba(map.get(palette.$itemPalette, quest), 0.6) 0 3px 8px
 
+// Rare, epic and quest use lighter tints than $itemPalette so names reach 4.5:1 contrast on dark panels.
 @mixin textColorByTier
   &[data-tier="trash"]
     color: map.get(palette.$itemPalette, trash)
@@ -36,16 +37,16 @@
     color: map.get(palette.$itemPalette, uncommon)
 
   &[data-tier="rare"]
-    color: map.get(palette.$itemPalette, rare)
+    color: rgb(77, 148, 255)
 
   &[data-tier="epic"]
-    color: map.get(palette.$itemPalette, epic)
+    color: rgb(196, 112, 255)
 
   &[data-tier="legendary"]
     color: map.get(palette.$itemPalette, legendary)
 
   &[data-tier="quest"]
-    color: map.get(palette.$itemPalette, quest)
+    color: rgb(235, 100, 140)
 
 
 @mixin textColorByElement
@@ -78,3 +79,41 @@
 
   &:hover
     background: vars.$hoverBackground
+
+// Panel tab strip: inventory, quest log and camp stations share it so they look the same.
+@mixin tab-bar
+  display: flex
+  flex: none
+  gap: 2px
+  height: 2.25rem
+  padding: 0.25rem 0.375rem 0
+  background: #1f1f1f
+  border-bottom: 1px solid palette.$yellow
+
+@mixin tab
+  padding: 0 0.75rem
+  border: 1px solid transparent
+  border-bottom: 0
+  border-radius: vars.$panelBorderRadius vars.$panelBorderRadius 0 0
+  background: transparent
+  color: inherit
+  font-size: 0.85rem
+  white-space: nowrap
+  cursor: pointer
+
+  &:hover
+    background: vars.$hoverBackground
+
+  &:focus-visible
+    outline: 2px solid palette.$yellow
+    outline-offset: -2px
+
+// Hangs 1px over the strip's yellow line so the active tab opens into the panel.
+@mixin tab-active
+  margin-bottom: -1px
+
+  &,
+  &:hover
+    border-color: palette.$yellow
+    background: vars.$panelBackgroundColor
+    color: palette.$yellow

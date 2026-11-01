@@ -17,39 +17,22 @@
 .empty
   opacity: 0.6
 
+// Strip spans the panel edge to edge like the quest log's: undo the panel padding.
 .inventory-tabs
-  display: flex
-  flex-wrap: wrap
-  gap: 2px
-  margin-bottom: 0.6rem
-  border-bottom: vars.$panelBorder
+  @include mixins.tab-bar
+  margin: calc(-1 * #{vars.$panelPadding}) calc(-1 * #{vars.$panelPadding}) 0.6rem
+  border-radius: vars.$panelBorderRadius vars.$panelBorderRadius 0 0
 
   // Equal-width tabs, so a count growing from 9 to 10 doesn't shift its neighbours.
   button
+    @include mixins.tab
     flex: 1 1 0
     min-width: 0
-    padding: 0.25rem 0.4rem
+    padding: 0 0.4rem
     text-align: center
-    border: 0
-    border-radius: vars.$panelBorderRadius vars.$panelBorderRadius 0 0
-    background: transparent
-    color: inherit
-    font-size: 0.75rem
-    white-space: nowrap
-    cursor: pointer
 
-    &:hover
-      background: vars.$hoverBackground
-
-    &.active,
-    &.active:hover
-      background: vars.$hoverBackground
-      color: palette.$yellow
-      box-shadow: inset 0 -2px 0 palette.$yellow
-
-    &:focus-visible
-      outline: 2px solid palette.$yellow
-      outline-offset: -2px
+    &.active
+      @include mixins.tab-active
 
   .count
     opacity: 0.7

@@ -41,7 +41,7 @@
     @if (selectedMonster(); as m) {
       <h2 class="bestiary__title">
         {{ ('enemies:names.' + EnemyID[m.id]) | i18next }}
-        <span class="bestiary__title-kills">x{{ m.killCount }}</span>
+        <span class="bestiary__kill-count">x{{ m.killCount }}</span>
       </h2>
       <div class="bestiary__detail-sprite-box">
         <img

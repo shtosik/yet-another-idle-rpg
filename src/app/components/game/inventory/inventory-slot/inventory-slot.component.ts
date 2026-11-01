@@ -1,5 +1,5 @@
-import { NgOptimizedImage } from '@angular/common'
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core'
+import { NgOptimizedImage, NgTemplateOutlet } from '@angular/common'
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewChild } from '@angular/core'
 import { ItemTier } from 'enums/items/item-tier.enum'
 import { Item } from 'interfaces/item.interface'
 import { I18nextPipe } from '../../../../pipes/i18next.pipe'
@@ -20,7 +20,7 @@ import { ConsumableEffectComponent } from '../../../shared/consumable-effect/con
   templateUrl: 'inventory-slot.component.html',
   styleUrls: ['./inventory-slot.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgOptimizedImage, I18nextPipe, TooltipTemplateDirective, StatToPercentagePipe, ConsumableEffectComponent],
+  imports: [NgOptimizedImage, NgTemplateOutlet, I18nextPipe, TooltipTemplateDirective, StatToPercentagePipe, ConsumableEffectComponent],
 })
 
 export class InventoryItemComponent {
@@ -34,6 +34,8 @@ export class InventoryItemComponent {
   @Output() equipItem = new EventEmitter<void>()
   @Output() useItem = new EventEmitter<void>()
   @Output() destroyItem = new EventEmitter<void>()
+
+  @ViewChild(TooltipTemplateDirective) private tooltipDirective?: TooltipTemplateDirective
 
   readonly ItemTier = ItemTier
   protected readonly EnemyID = EnemyID
@@ -56,12 +58,6 @@ export class InventoryItemComponent {
       || this.item.type === ItemType.chest
   }
 
-  handleClick() {
-    if (!this.clickable) return
-
-    this.equipItem.emit()
-  }
-
   handleDestroy(event: MouseEvent) {
     event.stopPropagation()
     this.destroyItem.emit()
@@ -69,8 +65,20 @@ export class InventoryItemComponent {
 
   handleRightClick(event: MouseEvent) {
     event.preventDefault()
-    if (!this.clickable || !this.isUsable) return
+    this.act()
+  }
 
-    this.useItem.emit()
+  // detail is 0 for Enter, Space and screen-reader activation; touch taps have no right-click. A mouse left-click stays inert.
+  handleActivate(event: MouseEvent) {
+    if (event.detail === 0 || (event as PointerEvent).pointerType === 'touch') this.act()
+  }
+
+  private act() {
+    if (!this.clickable) return
+
+    // The open tooltip keeps the old item; slots are reused by index, so a swapped item would show stale stats.
+    this.tooltipDirective?.hide()
+    if (this.item.type === ItemType.equipment) this.equipItem.emit()
+    else if (this.isUsable) this.useItem.emit()
   }
 }

@@ -9,7 +9,7 @@
     <span class="detail__icon" [attr.data-tier]="ItemTier[item.tier]">
       <img alt="" disableOptimizedSrcset height="34" width="34" [ngSrc]="item.url">
     </span>
-    <div class="detail__title">
+    <div class="detail__text">
       <h3 class="detail__name" [attr.data-tier]="ItemTier[item.tier]">{{ name }}</h3>
       <span class="detail__type">
         {{ ('camp:itemTypes.' + ItemType[item.type]) | i18next }} · {{ ('items:tiers.' + ItemTier[item.tier]) | i18next }}
