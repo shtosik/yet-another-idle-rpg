@@ -17,7 +17,7 @@ describe('simulateOfflineKills', () => {
     damageType: DamageElement.physical,
     isMeleeWeapon: true,
     hasWeaknessSkill: false,
-    activeQuestIds: new Set(),
+    questDropLimits: new Map(),
     taskEnemyIds: new Set(),
     enemyKillCounts: {},
     rollingKillMs: null,
