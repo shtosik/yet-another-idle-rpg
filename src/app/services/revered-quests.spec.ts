@@ -84,4 +84,13 @@ describe('Revered quests in dialogue', () => {
     expect(questsStore.getQuestStep(QuestID.lastOrders)).toBe(1)
     expect(playerStore.itemCount(ItemID.venisonRoast)).toBe(10)
   })
+
+  it('does not end a quest from dialogue when an item is gone before confirming', () => {
+    questsStore.startQuest(QuestID.silkAndWater)
+    playerStore.addItems([{ id: ItemID.spiderSilk, amount: 14 }, { id: ItemID.vialOfWater, amount: 10 }])
+    dialogue.selectOption(option(MAWOOD_SYLVIE[SylvieDialogue.questSilkWaterComplete], 'questSilkWaterComplete.opt1'))
+
+    expect(questsStore.getQuestStep(QuestID.silkAndWater)).toBe(1)
+    expect(playerStore.itemCount(ItemID.vialOfWater)).toBe(10)
+  })
 })
