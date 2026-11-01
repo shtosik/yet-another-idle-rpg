@@ -18,7 +18,8 @@
       "PowerShell(git worktree list)",
       "PowerShell(git status*)",
       "PowerShell(git diff*)",
-      "PowerShell(git log*)"
+      "PowerShell(git log*)",
+      "EnterWorktree"
     ]
   },
   "hooks": {
