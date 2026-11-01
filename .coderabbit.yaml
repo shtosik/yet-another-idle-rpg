@@ -9,9 +9,11 @@ reviews:
   auto_review:
     enabled: true
     drafts: false
-    # main (default branch) is always reviewed; most PRs target staging.
+    # main (default branch) is always reviewed; most PRs target staging,
+    # and stacked PRs target a parent feature branch.
     base_branches:
       - staging
+      - "feat/.*"
   path_filters:
     - "!package-lock.json"
     - "!dist/**"

@@ -13,7 +13,7 @@ Every serious project needs a scripted way to drive the real app and prove behav
 ## Claude Code tooling
 
 - Long-running processes (dev servers, watchers): start with the Bash tool's `run_in_background`, never a trailing `&`; poll readiness with Monitor or a short check command, not `sleep`.
-- Web and Electron surfaces: prefer the built-in browser (`mcp__Claude_Browser__*`: `preview_start` with a launch.json entry (under .claude/) or a `url`, `read_page`/`find` for ARIA handles, `computer` screenshots). Use Claude in Chrome (`mcp__claude-in-chrome__*`) only when the user asks. A repo's own Playwright/Cypress harness still beats both for scripted proof.
+- Web and Electron surfaces: prefer the built-in browser (`mcp__Claude_Browser__*`: `preview_start` with a `.claude/launch.json` entry or a `url`, `read_page`/`find` for ARIA handles, `computer` screenshots). Use Claude in Chrome (`mcp__claude-in-chrome__*`) only when the user asks. A repo's own Playwright/Cypress harness still beats both for scripted proof.
 - The generated skill names the tools by these names so the next agent can load them (via ToolSearch when deferred).
 - Evidence and scratch state go in a path the generated skill names; one-off files belong in the session scratchpad, proof the user keeps belongs in the repo (gitignored if large).
 

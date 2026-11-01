@@ -14,6 +14,8 @@ Rules for all coding agents (Claude Code, Codex). Claude-only notes are in `CLAU
 
 **Before creating a branch, switching branches, committing or opening a PR**, read `docs/git-workflow.md`: parallel sessions share this checkout.
 
+**PR review comments** (CodeRabbit, inline and nitpicks): `node scripts/pr-comments.mjs <PR>`. State, base and checks of PRs: `node scripts/pr-status.mjs <PR...>`.
+
 **Explore and develop on `origin/staging`**, also when only reading code or researching ideas in a new session. `main` is the released state: look at it only for a hotfix or when asked. The main checkout may sit on `main`, so check `git branch --show-current` before reading code there; otherwise run `git fetch origin staging` first, then read from a staging worktree or `git show origin/staging:<path>`.
 
 **Never lower inventory slot bonuses** (`inventorySlots` on items, skill nodes or the base) without a save migration: see owner decisions in `docs/systems/player-stats-inventory-equipment.md`.
