@@ -497,7 +497,7 @@ const allDirs = new Set(allFiles.flatMap(f => f.split('/').slice(0, -1).map((_, 
 // A file name with a known extension, or a multi-segment path rooted at a top-level repo dir.
 const PATH_RE = /^[\w.][\w./-]*\.(ts|mjs|js|json|md|html|scss|png)$|^(src|docs|scripts|\.claude|public)(\/[\w.-]+)+\/?$/
 /** Per-machine files docs may name; they are never in git. */
-const LOCAL_ONLY_PATHS = new Set(['.claude/launch.json', '.claude/settings.local.json'])
+const LOCAL_ONLY_PATHS = new Set(['.claude/launch.json'])
 function resolveDocPath(p) {
   const clean = p.replace(/\/$/, '')
   if (existsSync(join(ROOT, clean))) return join(ROOT, clean)
