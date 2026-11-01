@@ -26,6 +26,7 @@ import { OfflineStore } from '../../store/offline/offline.store'
 import { SettingsStore } from '../../store/settings/settings.store'
 import { SpellbookComponent } from './spellbook/spellbook.component'
 import { DevCheatsComponent } from './dev-cheats/dev-cheats.component'
+import { installDevStub } from './dev-cheats/dev-stub'
 import { SettingsComponent } from './settings/settings.component'
 import { environment } from '../../../environments/environment'
 
@@ -80,6 +81,7 @@ export class GameComponent {
   private preloadedImages = new Set<string>()
 
   constructor() {
+    if (this.cheats) installDevStub()
     // Town and building backgrounds are large; fetch them once a town unlocks so they don't pop in on first visit.
     effect(() => {
       const towns = this.playerStore.unlockedContent().towns ?? []
