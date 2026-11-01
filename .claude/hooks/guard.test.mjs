@@ -59,3 +59,10 @@ test('allows file restores, worktrees and other git commands', () => {
   assert.equal(run('Bash', { command: `cd "$X" && cd "${WORKTREE}" && git switch staging` }, MAIN), 0)
   assert.equal(run('Bash', { command: 'git switch staging' }, base), 0)
 })
+
+test('blocks EnterWorktree from a worktree into a sibling worktree', () => {
+  assert.equal(run('EnterWorktree', { path: '../yari-other' }), 2)
+  assert.equal(run('EnterWorktree', { path: '../yari-feature' }, MAIN), 0)
+  assert.equal(run('EnterWorktree', { path: '.claude/worktrees/x' }), 0)
+  assert.equal(run('EnterWorktree', { name: 'scratch' }), 0)
+})

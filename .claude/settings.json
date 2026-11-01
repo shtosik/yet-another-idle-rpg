@@ -18,7 +18,8 @@
       "PowerShell(git worktree list)",
       "PowerShell(git status*)",
       "PowerShell(git diff*)",
-      "PowerShell(git log*)"
+      "PowerShell(git log*)",
+      "EnterWorktree"
     ]
   },
   "hooks": {
@@ -36,7 +37,7 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "Bash|PowerShell|.*javascript_tool",
+        "matcher": "Bash|PowerShell|EnterWorktree|.*javascript_tool",
         "hooks": [
           {
             "type": "command",

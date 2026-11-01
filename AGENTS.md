@@ -24,7 +24,7 @@ Rules for all coding agents (Claude Code, Codex). Claude-only notes are in `CLAU
 
 **Scripts are Node** (`scripts/*.mjs`): this machine has no Python.
 
-**Checking UI**: builds with cheats on (`npm start`, `build:testing`) expose `window.dev` a moment after page load, once the cheat bar's deferred chunk arrives. Set game state through it (commands in `src/app/components/game/dev-cheats/dev-cheats.component.ts`) and read it with `dev.state()`.
+**Checking UI**: builds with cheats on (`npm start`, `build:testing`) expose `window.dev`; a call made before the cheat bar's deferred chunk arrives waits for it and returns a Promise, so `await` it. Set game state through it (commands in `src/app/components/game/dev-cheats/dev-cheats.component.ts`) and read it with `dev.state()`.
 
 **Before opening a PR that changes player-visible UI or game behavior**, run `.claude/skills/verify-yari` once for the feature files the change touches (Claude: in a subagent on a cheaper model) and put the evidence path in the PR body. Skip for docs, data-only, test, script and art changes.
 
@@ -37,7 +37,9 @@ A rule here fails a check when broken. When the owner corrects the same mistake 
 | Rule | Enforced by |
 |---|---|
 | Set game state through `window.dev`, not `localStorage` | `.claude/hooks/guard.mjs` (Claude) |
+| `window.dev` calls work right after page load | placeholder in `dev-cheats/dev-stub.ts`, tested in `dev-stub.spec.ts` |
 | Keep the main checkout on its branch; new work in a worktree (`node scripts/worktree.mjs <type/name>`) | `.claude/hooks/guard.mjs` (Claude) |
+| One worktree per session: a session already in a worktree branches inside it, no `EnterWorktree` to a sibling | `.claude/hooks/guard.mjs` (Claude) |
 | Start a session from current `origin/staging` | `.claude/hooks/session-start.mjs` reports how far the checkout lags (Claude) |
 | Codex gets the same project skills | `npm run validate` (`scripts/sync-skills.mjs`) |
 | Data references, i18n keys, assets, doc paths, changelog format | `npm run validate` |
