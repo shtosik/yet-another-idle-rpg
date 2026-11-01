@@ -15,8 +15,8 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const PROJECTS = join(homedir(), '.claude', 'projects')
 // Claude Code names a project folder after its path with every non-alphanumeric character replaced by '-'.
 const encode = path => path.replace(/[^a-zA-Z0-9]/g, '-')
-// The main checkout, also when this runs from a worktree.
-const MAIN = dirname(resolve(ROOT, execFileSync('git', ['rev-parse', '--git-common-dir'], { cwd: ROOT, encoding: 'utf8' }).trim()))
+// The main checkout, also when this runs from a worktree: `git worktree list` names it first.
+const MAIN = resolve(execFileSync('git', ['worktree', 'list', '--porcelain'], { cwd: ROOT, encoding: 'utf8' }).match(/^worktree (.+)$/m)[1])
 const PREFIX = encode(dirname(MAIN)) + '-'
 const CORRECTION = /\b(don'?t|dont|stop|wrong|again|instead|not what|broke|still|forgot|should(n'?t)? have|never|always|why did|revert|undo)\b/i
 

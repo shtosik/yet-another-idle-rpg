@@ -33,14 +33,12 @@ const ARG = String.raw`(?:"[^"]*"|'[^']*'|\S+)`
 const GIT_BRANCH_CMD = new RegExp(String.raw`\bgit((?:\s+(?:-[Cc]\s+${ARG}|--[\w-]+(?:=${ARG})?))*)\s+(switch|checkout)\b([^;&|\n]*)`, 'g')
 const lastDir = options => [...options.matchAll(new RegExp(String.raw`-C\s+(?:"([^"]*)"|'([^']*)'|(\S+))`, 'g'))]
   .map(([, dq, sq, bare]) => dq ?? sq ?? bare).pop() ?? '.'
-// The folder the command is in when git runs: the last `cd` / `Set-Location` / `pushd` before it, or the session's cwd.
-// null when that folder can't be known (a variable, `~`, `-`), so the switch is blocked rather than guessed.
+// The folder the command is in when git runs: the session's cwd moved by each `cd` / `Set-Location` / `pushd` before it,
+// in order. null when a step can't be known (a variable, `~`, `-`), so the switch is blocked rather than guessed.
 const CD = new RegExp(String.raw`(?:^|[;&|\n]\s*|\(\s*)(?:cd|Set-Location|sl|pushd)\s+(?:"([^"]*)"|'([^']*)'|([^\s;&|)]+))`, 'g')
-const dirAt = index => {
-  const target = [...text.slice(0, index).matchAll(CD)].map(([, dq, sq, bare]) => dq ?? sq ?? bare).pop()
-  if (target === undefined) return cwd
-  return /[$~%`]|^-$/.test(target) ? null : resolve(cwd, target)
-}
+const dirAt = index => [...text.slice(0, index).matchAll(CD)]
+  .map(([, dq, sq, bare]) => dq ?? sq ?? bare)
+  .reduce((dir, target) => dir === null || /[$~%`]|^-$/.test(target) ? null : resolve(dir, target), cwd)
 if (/^(Bash|PowerShell)$/.test(tool)) {
   for (const match of text.matchAll(GIT_BRANCH_CMD)) {
     const [, options, verb, rest] = match
