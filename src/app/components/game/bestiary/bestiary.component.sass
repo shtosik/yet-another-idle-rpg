@@ -1,6 +1,8 @@
 @use '../../../../styles/variables' as vars
 @use 'mixins' as mixins
 
+$muted: #b5b0a6
+
 :host
   @include mixins.panel
   width: 100%
@@ -16,6 +18,7 @@
   height: 100%
   padding: 0.8rem
   border-radius: vars.$panelBorderRadius
+  font-size: 0.95rem
 
   &__summary
     grid-column: 1 / -1
@@ -31,7 +34,7 @@
   &__stars
     display: inline-flex
     gap: 1px
-    font-size: 0.7rem
+    font-size: 0.8rem
     line-height: 1
 
   &__star
@@ -57,7 +60,7 @@
     padding: 0.4rem
     overflow-y: auto
     display: grid
-    grid-template-columns: repeat(auto-fill, minmax(4.5rem, 1fr))
+    grid-template-columns: repeat(auto-fill, minmax(5rem, 1fr))
     gap: 0.5rem
     align-content: start
 
@@ -95,17 +98,17 @@
       filter: brightness(0)
 
   &__name
-    font-size: 0.75rem
+    font-size: 0.85rem
     text-align: center
-    line-height: 1
+    line-height: 1.15
 
     &--locked
-      color: #888
+      color: $muted
 
   &__kills
     margin-left: 0.25rem
-    font-size: 0.65rem
-    color: #aaa
+    font-size: 0.8rem
+    color: $muted
     white-space: nowrap
 
   &__details
@@ -125,11 +128,13 @@
     margin: 0
     font-size: 1.2rem
 
-  &__title-kills
+  // Body font inside the Cinzel heading, so the count reads as a number, not capitals.
+  &__kill-count
     margin-left: 0.5rem
-    font-size: 0.9rem
+    font-family: "Alegreya Sans", sans-serif
+    font-size: 0.95rem
     font-weight: normal
-    color: #aaa
+    color: $muted
 
   &__detail-sprite-box
     display: flex
@@ -166,11 +171,11 @@
   &__stats
     display: grid
     grid-template-columns: max-content 1fr
-    gap: 0.3rem 0.8rem
+    gap: 0.4rem 0.8rem
     margin: 0
 
     dt
-      color: #bbb
+      color: $muted
 
     dd
       margin: 0
@@ -187,12 +192,12 @@
     padding: 0
     display: flex
     flex-direction: column
-    gap: 0.2rem
+    gap: 0.25rem
 
   &__drop
     display: flex
     justify-content: space-between
-    padding: 0.2rem 0.4rem
+    padding: 0.3rem 0.5rem
     background: rgba(255, 255, 255, 0.04)
     border-radius: 0.25rem
 
@@ -213,10 +218,10 @@
       image-rendering: pixelated
 
   &__muted
-    opacity: 0.6
+    color: $muted
 
   &__no-drops,
   &__placeholder
     margin: auto
-    color: #888
+    color: $muted
     font-style: italic

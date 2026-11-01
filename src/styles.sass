@@ -12,11 +12,15 @@ html
   min-height: 100vh
   max-height: 100vh
   color: #dddada
-  font-family: "Silkscreen", sans-serif !important
+  font-family: "Alegreya Sans", sans-serif !important
   font-size: 1rem
 
-button
-  font-family: "Silkscreen", sans-serif !important
+// Browsers give form controls their own system font; use the page font instead.
+button, input, select, textarea
+  font-family: inherit
+
+h1, h2, h3, h4, .game-menu__tab, .camp__tab, [role="tab"], [class*="__title"], [class*="__heading"]
+  font-family: "Cinzel", serif !important
 
 ul
   list-style: none
@@ -40,6 +44,8 @@ body
 .modal
   .mat-mdc-dialog-surface
     border: 1px solid palette.$yellow
+    font-size: 1.0625rem
+    line-height: 1.5
 
 // Leaflet's bundled `position: absolute` rule (leaflet.css line 4–16)
 // somehow isn't winning against the host page's cascade for these

@@ -31,13 +31,28 @@
     &__tooltip
         display: flex
         flex-direction: column
-        gap: 0.4rem
+        gap: 0.3rem
+        min-width: 10rem
+        padding: 0.25rem 0.15rem
+        font-size: 0.95rem
+        line-height: 1.35
+        text-align: left
+
+        .name
+            font-size: 1.1rem
+            @include mixins.textColorByTier
 
         .tier-line
             display: flex
-            justify-content: center
             gap: 0.4rem
-            font-size: .8rem
+            padding-bottom: 0.35rem
+            border-bottom: 1px solid rgba(255, 255, 255, 0.12)
+            font-size: 0.85rem
+
+            // Nothing below it (materials): no divider.
+            &:last-child
+                padding-bottom: 0
+                border-bottom: none
 
         .tier
             @include mixins.textColorByTier
@@ -46,11 +61,11 @@
             @include mixins.textColorByElement
 
         .stat
-            font-size: .9rem
+            font-size: 1rem
 
         .click
-            margin-top: 0.4rem
-            text-align: center
-            font-size: 0.8rem
+            margin-top: 0.3rem
+            font-size: 0.85rem
+            color: #a8a294
 
 @include mixins.itemShadowByTier('.item')

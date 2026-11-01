@@ -110,9 +110,9 @@ Settled in the mockup:
 - **Quick-craft button shows the station's tab icon** (hammer, flame, flask, rune), not a play icon. Its tooltip and `aria-label` read "Craft one X" or "Build X".
 - **Rows stay in `RecipeID` order.**
 - **List header** shows the station's current gear plus `Lv N / max`. No hint about the next gear.
-- **Detail pane:** item name in Silkscreen in its tier colour, a type line (`Food · normal · Owned 4`), effects in green, a duration/cooldown line, ingredients as `owned / needed` scaled to the chosen amount, pills for ×1/×5/×10/Max (only ×1 for station items), the Craft button (`Build Fire Pit` for station items), and a reason line.
+- **Detail pane:** item name in its tier colour, a type line (`Food · normal · Owned 4`), effects in green, a duration/cooldown line, ingredients as `owned / needed` scaled to the chosen amount, pills for ×1/×5/×10/Max (only ×1 for station items), the Craft button (`Build Fire Pit` for station items), and a reason line.
 - **Toast** at the top centre: `+5 Grilled Fish`, or `Fire Pit built · Cooking unlocked`.
-- **Fonts:** Silkscreen for tabs, headers and buttons; Roboto 13px for body text.
+- **Fonts:** Cinzel for tabs and headers; Alegreya Sans for body text and buttons.
 
 ```
 ┌───────────────────────────────────────────────────────────────┐

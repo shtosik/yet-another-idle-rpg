@@ -28,7 +28,8 @@
 
   &__npc-message
     margin-top: 0.5rem
-    font-size: 1rem
+    font-size: 1.125rem
+    line-height: 1.4
 
   &__npc-image
     object-fit: contain
@@ -73,15 +74,19 @@ app-close-button
   .option-text
     width: 100%
     text-align: left
-    font-size: 14px
-    text-transform: uppercase
+    font-size: 1rem
+    line-height: 1.35
 
   .option-meta
     display: flex
     flex-wrap: wrap
     gap: 6px
-    font-size: 13px
+    font-size: 0.875rem
     pointer-events: none
+
+    // No tags: drop the row so its gap does not push the text up.
+    &:empty
+      display: none
 
     .meta-tag
       &.requirement
