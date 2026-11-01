@@ -46,7 +46,7 @@
 - Stat units: multipliers are factors (`critMulti` 1.2 = ×1.2); `critChance` and `shinyChance` are percent; `damageVs*` are additive fractions (0.2 = +20%).
 - Every `PlayerStat` needs an `app:playerStats.<stat>` label (`npm run validate` checks).
 - **Gold per kill** is `ceil(Enemy.gold × goldCoinsMultiplier × 10 if shiny)` (`processBattleEnd`).
-- **Item `value`** is the sell price (`sellItem`, any shop). `value <= 0` is unsellable: books, station gear, quest items and chests must stay there (recipes, spell scrolls and pets sell, so duplicates aren't dead slots; owner decision), and a shop's price must be above the item's `value` (`npm run validate` checks both).
+- **Item `value`** is the sell price (`sellItem`, any shop). `value <= 0` is unsellable: books, station gear, quest items and chests must stay there (recipes, spell scrolls and pets sell, so duplicates aren't dead slots; owner decision; town pets are the exception, `value: -1`, since each is given once), and a shop's price must be above the item's `value` (`npm run validate` checks both).
 - `addItems` silently discards what doesn't fit. Callers that must not lose items check `canFit` first.
 
 ## Known issues

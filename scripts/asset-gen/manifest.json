@@ -822,6 +822,20 @@
     "seed": 1491485296,
     "date": "2026-10-27"
   },
+  "src/assets/img/items/petLaHarparCat.png": {
+    "family": "enemy-pixel",
+    "tier": "small",
+    "subject": "a single scruffy ginger tabby cat alone, sitting upright on its haunches, exactly four legs, one head, two eyes, one torn ear, white chest fur, smug half-closed eyes, a small fish bone held in its mouth",
+    "seed": 1343676971,
+    "date": "2026-11-01"
+  },
+  "src/assets/img/items/petMawoodMoth.png": {
+    "family": "enemy-pixel",
+    "tier": "small",
+    "subject": "a single large pale moth alone, exactly four soft silver-white wings veined with bright glowing pale-green lines, a fluffy white body, two feathery antennae",
+    "seed": 4242,
+    "date": "2026-11-01"
+  },
   "src/assets/img/items/rootwalkerBoots.png": {
     "family": "item-pixel",
     "tier": null,

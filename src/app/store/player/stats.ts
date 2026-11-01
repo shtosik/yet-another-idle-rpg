@@ -11,6 +11,7 @@ import { ALL_SKILLS } from '../../../data/skill-tree-data'
 import ITEM_DATA from '../../../data/items-data'
 import SPELLS_DATA from '../../../data/spells-data'
 import { statsInitialState } from './player'
+import { ItemType } from '../../../enums/items/item-type.enum'
 import { SpellID } from '../../../enums/ids/spell-id.enum'
 import { ItemID } from '../../../enums/ids/item-id.enum'
 import type { InventoryTab } from './inventory'
@@ -102,11 +103,20 @@ export const buffModifiers = (spellIds: SpellID[]): StatModifier[] =>
     return { stat, amount, percent }
   })
 
-export const consumableModifiers = (itemIds: ItemID[]): StatModifier[] =>
+/** Food stats count `foodMultiplier` times (`foodEffectMultiplier`); potions are not scaled. */
+export const consumableModifiers = (itemIds: ItemID[], foodMultiplier = 1): StatModifier[] =>
   itemIds.flatMap(itemId => {
     const itemData = ITEM_DATA[itemId]
-    return isConsumableItem(itemData) ? (itemData.effect.stats ?? []) : []
+    if (!isConsumableItem(itemData)) return []
+    const scale = itemData.type === ItemType.food ? foodMultiplier : 1
+    return (itemData.effect.stats ?? []).map(m => ({ ...m, amount: m.amount * scale }))
   })
+
+/** `foodEffectMultiplier` from these modifiers, read before the food it scales (only gear gives it). */
+export const foodMultiplierOf = (modifiers: StatModifier[]): number =>
+  modifiers
+    .filter(m => m.stat === 'foodEffectMultiplier')
+    .reduce((total, m) => total + m.amount, statsInitialState.foodEffectMultiplier)
 
 export const bonusModifiers = (bonuses: Partial<Record<PlayerStat, number>>): StatModifier[] =>
   (Object.entries(bonuses) as [PlayerStat, number][]).map(([stat, amount]) => ({ stat, amount }))

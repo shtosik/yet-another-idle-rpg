@@ -6,6 +6,8 @@ Versions follow [Semantic Versioning](https://semver.org/). Each note is `- [typ
 New notes go under `[Unreleased]`; `npm run release -- <major|minor|patch>` moves them into a version (docs/deployment.md).
 
 ## [Unreleased]
+- [bug] Item tooltips now show the unit on seconds bonuses (e.g. "+5s Spell Cooldown Reduction", not "+5").
+- [feature] Town pets: reach Exalted to get a pet. In La Harpar the Bartender gives the Tavern Cat (food effects ×1.5); in Mawood, Corwin gives the Rootglow Moth (+10 s to buff spells). Each is given once and can't be sold.
 - [bug] A quest turn-in no longer completes if you used up one of its items while the dialogue was open.
 - [feature] Reputation tier rewards. Friendly: the Bartender and Josh answer for free, and Sylvie opens her shop to friends of Mawood. Honored: new stock in the Trader's shop (Cheese, Venison Roast Recipe, Wharf Runner's Boots), Sylvie's apothecary (Minor Mana Potion, Greater Mana Potion Recipe) and Elarion's magic shop (Rootwalker Boots). Revered: four new quests (Safe Passage from the Trader, Last Orders from the Bartender, A Clean Cure from Sylvie, Roots and Rafters from Brenna), and a few townsfolk have something new to say.
 - [feature] Titles: Friendly and Exalted with a town earn a title (Friend of La Harpar, Toast of La Harpar, Friend of Mawood, Keeper of Mawood). Pick the one to show on the stats panel.

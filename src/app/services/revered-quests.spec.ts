@@ -60,6 +60,18 @@ describe('Revered quests in dialogue', () => {
     expect(playerStore.reputation()[TownID.mawood]).toBe(mawood + 25)
   })
 
+  it('gives the town pet once at Exalted', () => {
+    const askCat = option(LA_HARPAR_BARTENDER[BartenderDialogue.default], 'default.tavernCat')
+    expect(dialogue.getActiveResult(askCat)).toBeUndefined()
+
+    playerStore.addReputation([{ townId: TownID.laHarpar, amount: 900 }])
+    expect(dialogue.getActiveResult(askCat)?.next).toBe(BartenderDialogue.tavernCat)
+    dialogue.selectOption(option(LA_HARPAR_BARTENDER[BartenderDialogue.tavernCat], 'tavernCat.opt1'))
+
+    expect(playerStore.itemCount(ItemID.petLaHarparCat)).toBe(1)
+    expect(dialogue.getActiveResult(askCat)).toBeUndefined()
+  })
+
   it('does not complete a hand-in when an item is gone before confirming', () => {
     questsStore.startQuest(QuestID.lastOrders)
     playerStore.addItems([{ id: ItemID.venisonRoast, amount: 10 }, { id: ItemID.fishApplePie, amount: 10 }])
