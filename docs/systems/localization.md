@@ -17,6 +17,7 @@ All player-facing text comes from i18next JSON files, so content can be added an
 ## Key conventions
 | Text | Key |
 |---|---|
+| Equipment panel / slot labels and hints | `app:equipment.*`, `app:equipment.slots.<EquipmentSlot key>` |
 | Item name | `items:names.<ItemID key>` |
 | Enemy name | `enemies:names.<EnemyID key>` |
 | Zone name | `zones:names.<ZoneID key>` |
