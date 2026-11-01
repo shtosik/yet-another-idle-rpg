@@ -191,10 +191,10 @@
         "legendary": "Legendary"
     },
     "grantsSpell": "Grants the spell {{spell}} while equipped",
-    "rightClickToEquip": "Right-click to equip",
+    "rightClickToEquip": "Right-click or Enter to equip",
     "rightClickToUnequip": "Right-click to unequip",
     "unequipBlockedInventory": "Cannot unequip: items occupy the slots this grants",
-    "rightClickToUse": "Right-click to use",
+    "rightClickToUse": "Right-click or Enter to use",
     "consumable": {
         "restoresMana": "Restores {{amount}} mana",
         "duration": "Lasts {{time}}",

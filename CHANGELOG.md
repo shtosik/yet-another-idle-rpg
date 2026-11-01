@@ -7,7 +7,7 @@ New notes go under `[Unreleased]`; `npm run release -- <major|minor|patch>` move
 
 ## [Unreleased]
 - [feature] New fonts: Cinzel for titles and tabs, Alegreya Sans for everything else, so descriptions, numbers and dialogue are much easier to read than the old pixel font.
-- [feature] Equip and unequip items with right-click instead of left-click, the same as using consumables. Left-click no longer swaps gear by accident.
+- [feature] Equip and unequip items with right-click instead of left-click, the same as using consumables. Left-click no longer swaps gear by accident. With a keyboard, Tab to an item and press Enter or Space to equip or use it; on touch screens, tap it.
 - [feature] Item, equipment and zone star tooltips are bigger, left-aligned and easier to scan; item names show in their tier colour.
 - [feature] Dialogue text and answers are bigger, and town building labels no longer grow when you hover them.
 - [feature] The quest log, bestiary, stats panel, crafting panel, popups, top menu, XP and gold bar, and battle bar have bigger, clearer text. Long quest names and requirements wrap instead of being cut off.
