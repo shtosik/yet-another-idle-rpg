@@ -38,6 +38,7 @@ A rule here fails a check when broken. When the owner corrects the same mistake 
 |---|---|
 | Set game state through `window.dev`, not `localStorage` | `.claude/hooks/guard.mjs` (Claude) |
 | Keep the main checkout on its branch; new work in a worktree (`node scripts/worktree.mjs <type/name>`) | `.claude/hooks/guard.mjs` (Claude) |
+| One worktree per session: a session already in a worktree branches inside it, no `EnterWorktree` to a sibling | `.claude/hooks/guard.mjs` (Claude) |
 | Start a session from current `origin/staging` | `.claude/hooks/session-start.mjs` reports how far the checkout lags (Claude) |
 | Codex gets the same project skills | `npm run validate` (`scripts/sync-skills.mjs`) |
 | Data references, i18n keys, assets, doc paths, changelog format | `npm run validate` |
