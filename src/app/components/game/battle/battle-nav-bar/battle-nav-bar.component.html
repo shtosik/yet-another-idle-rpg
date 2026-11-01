@@ -1,61 +1,62 @@
 @let currentZoneData = currentZone();
-
 @let run = arenaRun();
 
 <div class="battle-nav-bar">
+  <div class="zone-header">
+    @if (run) {
+      <h2 class="zone">{{ 'app:arena.title' | i18next }}</h2>
+    } @else {
+      <h2 class="zone">{{ 'zones:names.' + ZoneID[currentZoneData.id] | i18next }}</h2>
+      <app-zone-mastery />
+    }
+  </div>
+  <div class="wave-summary">
+    @if (run) {
+      <span>{{ 'killCount' | i18next }}: {{ run.waveKills }} / {{ arenaWaveKills() }}</span>
+      <span class="wave-count">{{ 'wave' | i18next }} {{ run.wave }}/{{ arenaWaveCount }}</span>
+    } @else {
+      <span>{{ 'killCount' | i18next }}: {{ killCountToShow() }}</span>
+      <span class="wave-count">{{ 'wave' | i18next }} {{ currentWave() }}/{{ currentZoneData.maxWave }}</span>
+    }
+  </div>
+  <div class="wave-progress" role="progressbar"
+    [attr.aria-label]="'app:battle.waveProgress' | i18next"
+    aria-valuemin="0" aria-valuemax="100" [attr.aria-valuenow]="waveProgressPercent()">
+    <div class="wave-progress__fill" [style.transform]="'scaleX(' + waveProgressPercent() / 100 + ')'"></div>
+  </div>
   @if (run) {
-    <div>
-      <div class="zone-header">
-        <h2 class="zone">{{ 'app:arena.title' | i18next }}</h2>
-      </div>
-      <h3 class="killcount"> {{ 'killCount' | i18next }}: {{ run.waveKills }} / {{ arenaWaveKills() }}</h3>
+    <div class="arena-summary">
+      <span class="arena-timer" [class.arena-timer--low]="arenaSeconds() <= 60"
+        [attr.aria-label]="'app:battle.arenaTime' | i18next: { time: (arenaSeconds() | duration) }">
+        {{ arenaSeconds() | duration }}
+      </span>
+      <button type="button" class="arena-leave" (click)="leaveArena()">{{ 'app:arena.leave' | i18next }}</button>
     </div>
-    <div class="right-side">
-      <span>{{ 'wave' | i18next }}: {{ run.wave }}/{{ arenaWaveCount }}</span>
-      <span class="arena-timer" [class.arena-timer--low]="arenaSeconds() <= 60">{{ arenaSeconds() | duration }}</span>
-      @if (timeLost()) {
-        <span class="arena-time-lost">{{ 'app:arena.bosses.timeLost' | i18next: { seconds: timeLost() } }}</span>
-      }
-      <button class="arena-leave" (click)="leaveArena()">{{ 'app:arena.leave' | i18next }}</button>
-    </div>
-  } @else {
-    <div>
-      <div class="zone-header">
-        <h2 class="zone">{{ 'zones:names.' + ZoneID[currentZoneData?.id] | i18next }}</h2>
-        <app-zone-mastery />
-      </div>
-      <h3 class="killcount"> {{ 'killCount' | i18next }}: {{ this.killCountToShow() }}</h3>
-    </div>
-    <div class="right-side">
-      <span>{{ 'wave' | i18next }}: {{ currentWave() }}/{{ currentZoneData.maxWave }}</span>
-    </div>
+    @if (timeLost()) {
+      <span class="arena-time-lost">{{ 'app:arena.bosses.timeLost' | i18next: { seconds: timeLost() } }}</span>
+    }
   }
 </div>
 
-@for (task of taskIndicators(); track task.id) {
-  <div
-    class="task-indicator"
-    [class.task-indicator--complete]="task.complete"
-    [attr.role]="task.complete ? 'button' : null"
-    [attr.tabindex]="task.complete ? 0 : null"
-    [attr.title]="task.complete ? 'Talk to Marvin' : null"
-    (click)="task.complete && claimAtMarvin()"
-    (keydown.enter)="task.complete && claimAtMarvin()"
-  >
-    <img
-      class="task-indicator__icon"
-      [ngSrc]="task.enemyUrl"
-      [alt]="task.enemyName"
-      width="28"
-      height="28"
-    />
-    <div class="task-indicator__info">
-      <span class="task-indicator__label">{{ 'enemies:names.' + task.enemyName | i18next }}</span>
-      @if (task.complete) {
-        <span class="task-indicator__count task-indicator__count--done">Ready to claim!</span>
-      } @else {
-        <span class="task-indicator__count">{{ task.remaining }} remaining</span>
-      }
+<div class="task-list">
+  @for (task of taskIndicators(); track task.id) {
+    <div class="task-indicator" [class.task-indicator--complete]="task.complete"
+      [attr.role]="task.complete ? 'button' : null"
+      [attr.tabindex]="task.complete ? 0 : null"
+      [attr.title]="task.complete ? ('app:battle.talkToMarvin' | i18next) : null"
+      (click)="task.complete && claimAtMarvin()"
+      (keydown.enter)="task.complete && claimAtMarvin()"
+      (keydown.space)="$event.preventDefault(); task.complete && claimAtMarvin()">
+      <img class="task-indicator__icon" [ngSrc]="task.enemyUrl"
+        [alt]="'enemies:names.' + task.enemyName | i18next" width="24" height="24" />
+      <div class="task-indicator__info">
+        <span class="task-indicator__label">{{ 'enemies:names.' + task.enemyName | i18next }}</span>
+        @if (task.complete) {
+          <span class="task-indicator__count task-indicator__count--done">{{ 'app:battle.taskReady' | i18next }}</span>
+        } @else {
+          <span class="task-indicator__count">{{ 'app:battle.taskRemaining' | i18next: { count: task.remaining } }}</span>
+        }
+      </div>
     </div>
-  </div>
-}
+  }
+</div>

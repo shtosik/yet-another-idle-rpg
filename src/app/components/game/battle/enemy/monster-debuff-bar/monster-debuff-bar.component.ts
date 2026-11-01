@@ -27,14 +27,16 @@ export class MonsterDebuffBarComponent {
   private battleStore = inject(BattleStore)
   private playerStore = inject(PlayerStore)
 
-  weakness = computed(() => {
+  readonly elementName = (element: DamageElement): string => DamageElement[element]
+
+  weaknesses = computed(() => {
     const enemy = this.battleStore.enemy()
-    if (!enemy || enemy.weakness === undefined) return null
-    if (!this.playerStore.hasSkillUnlocked(SkillNodeID.weaknesses)) return null
-    return {
+    if (!enemy || enemy.weakness === undefined) return []
+    if (!this.playerStore.hasSkillUnlocked(SkillNodeID.weaknesses)) return []
+    return [{
       element: enemy.weakness,
       icon: WEAKNESS_ICONS[enemy.weakness],
       nameKey: `app:elements.${DamageElement[enemy.weakness]}`,
-    }
+    }]
   })
 }

@@ -1,59 +1,36 @@
-<aside>
-  <button
-    class="wave-button"
-    [class.hidden]="isInArena() || !canMoveToPreviousWave()"
-    (click)="onPreviousWave()"
-  ><img
-    [ngSrc]="'./assets/img/icons/arrow-prev.png'"
-    height="32"
-    width="32"
-    alt=""
-    loading="lazy"
-  >
-  </button>
-  <button
-    class="wave-button"
-    [class.hidden]="isInArena() || !canMoveToNextWave()"
-    (click)="onNextWave()"
-  >
-    <img
-      [ngSrc]="'./assets/img/icons/arrow-next.png'"
-      height="32"
-      width="32"
-      alt=""
-      loading="lazy"
-    >
-  </button>
-
-  @if (hasAutoWaveProgressionUnlocked()) {
-    <button
-      class="auto-button"
-      [class.active]="hasAutoWaveProgressionEnabled()"
-      [class.disabled]="!hasAutoWaveProgressionEnabled()"
-      (click)="enableAutoWaveProgressionAction(!hasAutoWaveProgressionEnabled())"
-    >
-      <img
-        [ngSrc]="'./assets/img/skills/autoWaveProgression.png'"
-        width="26"
-        height="26"
-        alt=""
-        loading="lazy"
-      ></button>
+<aside [attr.aria-label]="'app:battle.controls' | i18next">
+  @if (!isInArena()) {
+    <div class="button-group">
+      <button type="button" class="wave-button" [disabled]="!canMoveToPreviousWave()"
+        [attr.aria-label]="'app:battle.previousWave' | i18next"
+        [title]="'app:battle.previousWave' | i18next" (click)="onPreviousWave()">
+        <span class="wave-arrow" aria-hidden="true"></span>
+      </button>
+      <button type="button" class="wave-button" [disabled]="!canMoveToNextWave()"
+        [attr.aria-label]="'app:battle.nextWave' | i18next"
+        [title]="'app:battle.nextWave' | i18next" (click)="onNextWave()">
+        <span class="wave-arrow wave-arrow--down" aria-hidden="true"></span>
+      </button>
+    </div>
   }
-
-  @if (hasAutoEatUnlocked()) {
-    <button
-      class="auto-button"
-      [class.active]="hasAutoEatEnabled()"
-      [class.disabled]="!hasAutoEatEnabled()"
-      (click)="toggleAutoEat(!hasAutoEatEnabled())"
-    >
-      <img
-        [ngSrc]="'./assets/img/skills/autoEat.png'"
-        width="26"
-        height="26"
-        alt=""
-        loading="lazy"
-      ></button>
+  @if (hasAutoWaveProgressionUnlocked() || hasAutoEatUnlocked()) {
+    <div class="button-group">
+      @if (hasAutoWaveProgressionUnlocked()) {
+        <button type="button" class="auto-button" [attr.aria-pressed]="hasAutoWaveProgressionEnabled()"
+          [attr.aria-label]="'app:battle.autoWave' | i18next"
+          [title]="'app:battle.autoWaveHint' | i18next: { state: (hasAutoWaveProgressionEnabled() ? 'app:battle.on' : 'app:battle.off') | i18next }"
+          (click)="enableAutoWaveProgressionAction(!hasAutoWaveProgressionEnabled())">
+          <img ngSrc="./assets/img/skills/autoWaveProgression.png" width="26" height="26" alt="" />
+        </button>
+      }
+      @if (hasAutoEatUnlocked()) {
+        <button type="button" class="auto-button" [attr.aria-pressed]="hasAutoEatEnabled()"
+          [attr.aria-label]="'app:battle.autoEat' | i18next"
+          [title]="'app:battle.autoEatHint' | i18next: { state: (hasAutoEatEnabled() ? 'app:battle.on' : 'app:battle.off') | i18next }"
+          (click)="toggleAutoEat(!hasAutoEatEnabled())">
+          <img ngSrc="./assets/img/skills/autoEat.png" width="26" height="26" alt="" />
+        </button>
+      }
+    </div>
   }
 </aside>

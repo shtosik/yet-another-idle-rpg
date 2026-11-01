@@ -24,6 +24,12 @@ Active abilities on a 5-slot spell bar under the battle view. Spells cost mana a
 4. **Tick** (every game tick, by the real time elapsed): slot cooldowns and buffs count down in ms; a buff is removed when it reaches 0 and its stat disappears with it. While away, cooldowns and buffs count down by the whole gap, and no spells are cast offline (`offline-progress.md`).
 5. **Mana** regenerates 1 point per `manaRegenRate` ms up to `maxMana`.
 
+## Battle footer presentation
+- Five equal spell slots fit within the battle column; empty dashed slots explain learning and dragging spells from the Spellbook. There are no numbered spell keybinds.
+- A mana total and meter sit above the slots. Each equipped spell shows its current mana cost (after perks), with insufficient mana highlighted. Cooldowns use a dark radial sweep and seconds remaining; gold borders mean `BattleManagerService.canCast`, and green borders mean a running buff, damage-over-time or empower effect.
+- Spell slots are native buttons for Enter/Space casting. `aria-disabled` preserves focus and tooltips while the existing cast guard rejects unavailable casts. Tooltips and accessible labels explain active effects, cooldowns, missing mana, missing gear or the need for an enemy.
+- Player buffs have named icons with remaining seconds. Consumables retain their effect countdown and next-use countdown; this strip scrolls horizontally when crowded. These displays do not change effect durations, costs, cooldowns or drag locks.
+
 ## Invariants & gotchas
 - **Cooldowns belong to the slot.** While a slot is on cooldown its spell can't be dragged off the bar or swapped, and nothing can be dropped onto it (`cdkDragDisabled`, `onSlotDrop`, `unequipSpell`). Refund and respec remove the spell anyway (`unequipSpell(id, true)`).
 - **One source per spell** (owner rule): a skill node, a spell scroll or a piece of gear, never two (`npm run validate` checks). So a refund or respec only touches skill-tree spells, and a scroll spell or gear spell can't be half-removed by one.

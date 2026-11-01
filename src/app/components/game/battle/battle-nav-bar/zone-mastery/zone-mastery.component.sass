@@ -1,20 +1,28 @@
 .zone-mastery
   display: flex
-  gap: 2px
+  gap: 4px
 
   &__star
     padding: 0
-    border: none
-    background: none
+    width: 1.625rem
+    height: 1.625rem
+    border: 1px solid #686052
+    border-radius: 4px
+    background: #262626
     font-size: 1rem
     line-height: 1
-    color: rgba(255, 255, 255, 0.25)
+    color: #928979
+
+    &:hover, &:focus-visible
+      outline: 2px solid #eab308
+      outline-offset: 2px
 
     &[aria-disabled="true"]
       cursor: default
 
     &--claimed
       color: #f0d060
+      border-color: #a18432
 
     // Shiny star before shinies can spawn.
     &--locked
@@ -22,8 +30,8 @@
 
     // Finished and claimable: outlined gold, pulsing until clicked.
     &--ready
-      color: rgba(240, 208, 96, 0.35)
-      text-shadow: 0 0 4px #f0d060
+      color: #f0d060
+      border-color: #f0d060
       cursor: pointer
       animation: star-pulse 1.2s ease-in-out infinite
 
@@ -40,7 +48,7 @@
 
 @keyframes star-pulse
   50%
-    text-shadow: 0 0 9px #f0d060
+    opacity: 0.55
 
 .star-tooltip
   display: flex

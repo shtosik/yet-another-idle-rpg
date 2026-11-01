@@ -1,39 +1,59 @@
-@use 'palette' as palette
 @use 'variables' as vars
+
+:host
+  position: absolute
+  inset: 0
+  z-index: 3
+  pointer-events: none
+  overflow: hidden
 
 .damage-container
   position: absolute
-  top: 50%
-  right: 25%
+  top: 58%
+  left: 50%
 
-@keyframes floatMove
-  0%
-    transform: translateX(-50%) translate(0, 0) scale(1)
-  100%
-    transform: translateX(-50%) translate(20px, -100px) scale(1.2)
+.damage-number
+  position: absolute
+  width: max-content
+  font-size: 1.5rem
+  font-weight: bold
+  color: #fff3c4
+  text-shadow: vars.$textShadow, 0 2px 0 #000
+  animation: damage-hit 1s ease-out forwards
 
-@keyframes fadeOut
+  &.critical
+    color: #ff9797
+    font-size: 1.875rem
+
+.hit-label
+  display: block
+  text-align: center
+  font-size: 0.85rem
+
+.strong .hit-label
+  color: #7dd3fc
+
+@keyframes damage-hit
   0%
     opacity: 1
-  75%
+    transform: translate(-50%, 0) scale(0.75)
+  12%
+    transform: translate(-50%, -10px) scale(1.2)
+  25%
+    transform: translate(-50%, -20px) scale(1)
+  65%
     opacity: 1
   100%
     opacity: 0
+    transform: translate(-50%, -85px) scale(1)
 
-.damage-number
-  font-size: 24px
-  font-weight: bold
-  pointer-events: none
-  animation: floatMove 1s ease-out forwards, fadeOut 1s ease-out forwards
-  color: palette.$yellow
-  text-shadow: vars.$textShadow
+@media (prefers-reduced-motion: reduce)
+  .damage-number
+    animation: damage-fade 1s linear forwards
+    transform: translateX(-50%)
 
-  &.critical
-    font-size: 28px
-    color: #ff4444
-
-  .strong-label
-    font-size: 14px
-    margin-left: 4px
-    color: #66ccff
-    text-shadow: vars.$textShadow
+@keyframes damage-fade
+  70%
+    opacity: 1
+  100%
+    opacity: 0

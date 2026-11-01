@@ -32,6 +32,9 @@ A timed gauntlet in Lirold: 20 fixed Waves against one clock, for a gold fee. Cl
 - **Yad** (wave 20): every 5–10 s after the last shield broke, a shield of fire, air or water (never the same twice running), shown as a coloured aura and a label. While it's up, hits of any other element land 0 (an Ambush crit too, and it uses its charge); the first hit of the shield's element hurts Yad and breaks the shield (owner decision: any one hit, no threshold).
 - Timers aren't saved: a reload mid-fight restarts the champion's timers (and the Arcanist's per-fight cap).
 
+## Battle panel presentation
+The header groups wave kills and wave number above a progress strip, then time remaining and Leave. The clock changes color at 60 seconds; the Arcanist's time loss stays separately visible. Single-enemy arena waves show the Boss badge. Weak-point and mound buttons keep their existing hit targets and mechanics; damage popups do not intercept them, and shield/stun/bonus labels remain visible above the sprite.
+
 ## Invariants & gotchas
 - **The clock is wall time** (`Date.now()`), saved as `startedAt`/`endsAt`, so it runs while the game is closed and a run that expired offline ends on the first tick back (owner decision). A changed system clock moves it too.
 - **Offline**: a run that ran out while away ends as a timeout at its `endsAt`, and the rest of the absence is claimed as normal offline progress in the Zone the player entered from (`currentZoneId`/`currentWave` stay on it during a run; owner decision: no lost progress). A claim while the run is still going earns nothing. Spell and buff timers still run out.

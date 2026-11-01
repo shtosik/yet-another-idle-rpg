@@ -1,16 +1,22 @@
 <div
-  #enemy
   class="enemy"
+  [class.enemy--boss]="isBoss()"
 >
-  @let percentage = (currentEnemyHp() / currentEnemy().maxHp) * 100;
-  @let background = 'linear-gradient(90deg, rgba(255, 0, 0, 1) ' + percentage + '%, rgba(0, 0, 0, 1)' + percentage +
-    '%)';
-
+  <div class="enemy__tags">
+    @if (isBoss()) {
+      <span class="enemy__tag enemy__tag--boss">{{ 'app:battle.boss' | i18next }}</span>
+    }
+  </div>
   <h2>{{ 'enemies:names.' + EnemyID[currentEnemy().id] | i18next }}</h2>
   <div
-    [style]="{ 'background': [[background]] }  "
     class="hp-bar"
+    role="progressbar"
+    [attr.aria-label]="'app:battle.enemyHp' | i18next"
+    aria-valuemin="0"
+    [attr.aria-valuemax]="currentEnemy().maxHp"
+    [attr.aria-valuenow]="currentEnemyHp()"
   >
+    <div class="hp-bar__fill" [style.transform]="'scaleX(' + hpPercent() / 100 + ')' "></div>
     <span>{{ currentEnemyHp() }} / {{ currentEnemy().maxHp }}</span>
   </div>
   <app-monster-debuff-bar />
@@ -43,6 +49,7 @@
       </div>
     } @else {
       <img
+        #sprite
         appHalfSizeSprite
         [src]="currentEnemy().url"
         [class.enemy__sprite--shiny]="battleStore.isShinyEnemy()"

@@ -4,6 +4,9 @@
       @let spellData = SPELLS_DATA[buff.spellId];
       <div
         class="effect-icon"
+        [title]="('spells:names.' + SpellID[buff.spellId] + '.name' | i18next) + ' · ' + buff.secondsLeft + 's'"
+        role="img"
+        [attr.aria-label]="('spells:names.' + SpellID[buff.spellId] + '.name' | i18next) + ' · ' + buff.secondsLeft + 's'"
         [style]="{ 'background-image': spellData.url | url }"
       >
         {{ buff.secondsLeft }}
@@ -29,7 +32,13 @@
       </div>
     }
   </div>
-  <div class="spell-bar">
+  <div class="mana">
+    <span>{{ 'app:playerStats.mana' | i18next }} {{ playerStats().mana }} / {{ playerStats().maxMana }}</span>
+    <div class="mana__track" aria-hidden="true">
+      <div class="mana__fill" [style.transform]="'scaleX(' + manaPercent() / 100 + ')'"></div>
+    </div>
+  </div>
+  <div class="spell-bar" role="group" [attr.aria-label]="'app:battle.spells' | i18next">
     @for (i of slotIndices; track i) {
       @let spell = equippedSpells()[i];
       <div
@@ -40,11 +49,16 @@
         [cdkDropListEnterPredicate]="canEnterSlot"
         (cdkDropListDropped)="onSlotDrop($event)"
         class="spell-bar__slot"
+        [class.spell-bar__slot--empty]="!spell"
       >
         @if (spell) {
           <div class="spell-bar__drag" cdkDrag [cdkDragData]="spell" [cdkDragDisabled]="spell.cooldownRemainingMs > 0">
             <app-spell-slot [equippedSpell]="spell"/>
           </div>
+        } @else {
+          <span class="spell-bar__empty" tabindex="0"
+            [title]="'app:battle.emptySlotHint' | i18next"
+            [attr.aria-label]="'app:battle.emptySlotHint' | i18next">+</span>
         }
       </div>
     }

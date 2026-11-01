@@ -1,8 +1,31 @@
-.monster-debuff-bar
-  display: flex
-  gap: 4px
-  width: 8rem
-  margin-bottom: 1rem
+@use 'mixins'
 
-  .weakness-icon
+:host
+  display: block
+  min-height: 2rem
+  margin: 0.5rem 0
+
+.monster-debuff-bar
+  display: inline-flex
+  flex-wrap: wrap
+  justify-content: center
+  align-items: center
+  max-width: 100%
+  gap: 0.375rem
+  padding: 0.25rem 0.5rem
+  border: 1px solid #686052
+  border-radius: 4px
+  background: #171717e6
+  font-size: 0.9rem
+
+  img
     object-fit: contain
+
+  &__label
+    color: #d6d3d1
+
+  &__element
+    @include mixins.textColorByElement
+    display: inline-flex
+    align-items: center
+    gap: 0.375rem

@@ -40,6 +40,13 @@ Damage (`resolveHit`), in order, kept fractional throughout:
 5. Damage vs type: `× (1 + sum of damageVs<Type>)` over the enemy's `enemyTypes`.
 6. Rounded once: `max(1, round(damage))`.
 
+## Battle panel presentation
+- The panel stays in the left game-grid column across both rows. Its header, flexible fight space and footer fit inside that existing box; effects and task lists scroll within their sections when needed.
+- The enemy name sits above a compact HP meter centered within the panel, with equal side clearance for the right-hand controls, numeric current/max HP and an accessible progress label. Boss waves and shinies have explicit badges. Enemies have no level field and the player has no HP meter.
+- Spawns fade and rise into place; positive-damage events briefly recoil the sprite. Damage popups stack at a fixed point in the fight space, with separate Crit and Strong labels; they never intercept clicks on arena targets or controls. Reduced motion removes recoil and spawn motion and uses a simple popup fade.
+- Between fights, a pulsing gold marker and “Next enemy incoming…” label represent the existing respawn delay. No attack or respawn timing changes.
+- Weaknesses keep their skill gate and show one shared “Weak to” prefix followed by element-colored icon/name chips with hints. Chips wrap within the available width; the combat model still supplies one weakness per enemy. Arena shield, damage-boost and stun messages remain separate from weaknesses; there is no generic enemy debuff collection.
+
 ## Invariants & gotchas
 - **`attackSpeed` is seconds per attack.** Lower is faster. Positive amounts in data lower it (inverted in `deriveStats`), so "+0.3 attack speed" makes attacks faster. Attack time never drops below one tick (100 ms).
 - **Respawn delay is fixed at 2 s** (0.5 s in an arena run, `arena.md`) and independent of `attackSpeed`. The first attack on a new enemy lands one full attack interval after it spawns.

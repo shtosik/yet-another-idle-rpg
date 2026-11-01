@@ -130,18 +130,20 @@
     "damageVsHarpy": "Damage vs Harpies"
   },
   "damage": {
-    "strong": "(strong)"
+    "strong": "Strong!",
+    "strongCritical": "Strong crit!"
   },
   "elements": {
-    "fire": "Weak to Fire",
-    "water": "Weak to Water",
-    "air": "Weak to Air",
-    "earth": "Weak to Earth",
-    "light": "Weak to Light",
-    "dark": "Weak to Dark",
-    "physical": "Weak to Physical"
+    "fire": "Fire",
+    "water": "Water",
+    "air": "Air",
+    "earth": "Earth",
+    "light": "Light",
+    "dark": "Dark",
+    "physical": "Physical"
   },
-  "wave": "Wave",  "killCount": "Kill count",
+  "wave": "Wave",
+  "killCount": "Kill count",
   "gameTabs": {
     "main": "Battle",
     "map": "Map",
@@ -286,5 +288,37 @@
     "newBuild": "A new build of the game is out.",
     "reload": "Reload",
     "saveFailed": "Your progress couldn't be saved, so the game didn't reload. Free some browser storage and try again."
+  },
+  "battle": {
+    "nextEnemy": "Next enemy incoming…",
+    "boss": "Boss",
+    "enemyHp": "Enemy HP",
+    "waveProgress": "Kills toward the next wave",
+    "arenaTime": "Arena time remaining: {{time}}",
+    "talkToMarvin": "Talk to Marvin to claim this task",
+    "taskReady": "Claim task ›",
+    "taskRemaining": "{{count}} left",
+    "controls": "Battle controls",
+    "previousWave": "Previous wave / previous zone",
+    "nextWave": "Next wave / next zone (requires wave completion)",
+    "autoWave": "Auto wave progression",
+    "autoWaveHint": "Auto wave progression: {{state}}. Advance after completing a wave.",
+    "autoEat": "Auto-eat",
+    "autoEatHint": "Auto-eat: {{state}}. Refill the food slot from your inventory when available.",
+    "on": "On",
+    "off": "Off",
+    "weakness": "Weak to",
+    "weaknessHint": "Use {{element}} hits to deal weakness damage.",
+    "spells": "Spells (mana cost on each slot)",
+    "emptySlotHint": "Empty spell slot. Learn spells through skills, spell scrolls or gear; drag known spells here from the Spellbook.",
+    "spellWaiting": "Needs an enemy",
+    "spellUnknown": "Requires its gear to be equipped",
+    "spellActive": "Active",
+    "spellCooldown": "Ready in {{seconds}}s",
+    "spellMana": "Not enough mana",
+    "spellReady": "Ready to cast",
+    "spellLabel": "{{name}}. {{state}}. Costs {{cost}} mana.",
+    "critical": "Crit!",
+    "mastery": "Zone mastery: hover a star for its goal and reward"
   }
 }
