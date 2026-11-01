@@ -10,7 +10,7 @@ Mysteries and setups the game plants but does not answer. Source shorthand as in
 | T-02 | Theron's "rarest jewels" — nobody knows where he keeps them. | `Elara#treasureInfo`, `Elara#hiddenJewelsInfo` | Left open as a later treasure hook. **(proposed, `docs/ideas/la-harpar-quests.md`)** |
 | T-03 | Theron's "uncanny ability to predict weather". | `Elara#captainInfo` | Tied to the mountain's "woven" storms. **(proposed, `docs/ideas/la-harpar-quests.md`)** |
 | T-04 | Is Messatan real, and where? | `Elara#primulaInfo`, `Elara#fairytaleInfo` | Messatan marks on the oldest Deepwood roots; "the Sceptre sleeps where the Spires drink". **(proposed, `docs/ideas/la-harpar-quests.md`)** |
-| T-05 | The uncrossable mountain beyond Greefic Hill: magical force, weather, the lost, chants and howls. | `Josh#unknownRegions`, `Josh#dangerMountain`, `Josh#mountainRumors` | Josh's brother among the lost. **(proposed, `docs/ideas/la-harpar-quests.md`)** |
+| T-05 | The uncrossable mountain beyond Greefic Hill: magical force, weather, the lost, chants and howls. | `Josh#unknownRegions`, `Josh#dangerMountain`, `Josh#mountainRumors` | Josh's brother among the lost, and the one Josh kept his heirloom ring for (`Josh#aboutHeirloom` names nobody). **(proposed, `docs/ideas/la-harpar-quests.md`)** |
 | T-06 | Is the Mountain Pass the same mountain? The Pass is crossable (`Sylvie#intro1`), so probably not, but nothing says. | `Josh#unknownRegions`, `zones.json` `mountainPass` | — |
 | T-08 | 2 years vs centuries: black sap "first appeared" 2 years ago, yet the druid's corruption "has been seeping outward for centuries". What changed 2 years ago? | `Corwin#aboutMawood`, `Corwin#questTheSap` | Whether Theron's arrival (5 years ago) woke it is an open owner call. **(proposed, `docs/ideas/la-harpar-quests.md`)** |
 | T-09 | Corwin's own ritual: he tried to become a Spire's voice and "it became mine". Which Spire? Does his bark change now the Treant is dead? | `Corwin#intro2` | Heartwood purifies his bark curse. (design only, `docs/design/mawood-and-elderwood-zones.md` Quest 4) |
@@ -20,7 +20,6 @@ Mysteries and setups the game plants but does not answer. Source shorthand as in
 | T-13 | Why do harpies go quiet for the Matriarch, and why were they "more aggressive than usual" lately? | `Milo#aboutCanopy` | — |
 | T-14 | Finn's old one-eared bear: "Personal reasons. Don't ask." | `Finn#questBigGame` | — |
 | T-15 | Milo's parents, traders who left without him. | `Milo#aboutMilo` | — |
-| T-16 | Josh's Heirloom: why does Josh give away a family heirloom? | `items.json` `joshsHeirloom`, `quests-data.ts` `clearingOutTheBeach` | — |
 | T-17 | Marvin's expedition (returned "a few days ago"): where to? | `Elara#marvinInfo`, `Trader#aboutPeople` | Kept open: Varrow sent him; she says "the charts aren't finished, so neither is the answer". **(proposed, `docs/ideas/north-lirold-and-exploration-guild.md`)** |
 | T-18 | Drenhollow: where is it, and why did Elarion leave? | `Elarion#aboutElarion` | — |
 | T-19 | Corrupted heartwood "conducts arcane energy"; corruption made earth magic volatile. Does this outlast the Treant? | `Elarion#aboutElarion`, `Elarion#aboutMagic` | — |

@@ -12,6 +12,7 @@ import { DialogueEffect } from '../../../../types/dialogues/dialogue-effect.type
 import { DialogueCondition } from '../../../../types/dialogues/dialogue-condition.type'
 import { ZoneID } from '../../../../enums/ids/zone-id.enum'
 import { TownID } from '../../../../enums/map/town-id.enum'
+import { reputationLockText } from '../quests/reputation/reputation-text'
 import { CloseButtonComponent } from '../../shared/close-button/close-button.component'
 import { PlayerStore } from '../../../store/player/player.store'
 import { missingSlotsText } from '../inventory/tab-text'
@@ -95,6 +96,8 @@ export class DialogueComponent {
           zone,
         })
       }
+      case 'reputation':
+        return reputationLockText(condition.townId, condition.tier, this.playerStore.reputation()[condition.townId] ?? 0)
       case 'manyStat':
         return condition.statsRequired
           .map(req => this.getConditionLabel({ type: 'stat', ...req }))

@@ -31,4 +31,5 @@ export enum RecipeID {
     bearhideGloves = 30,
     silkweaveLegs = 31,
     gladiatorHelm = 32,
+    greaterManaPotion = 33,
 }

@@ -1,6 +1,6 @@
 # Town reputation
 
-**Scope:** M · **Status:** In progress: steps 1–2 done (design settled with the owner, 2026-10-31; numbers to tune)
+**Scope:** M · **Status:** Built: steps 1–4 (design settled with the owner, 2026-10-31; numbers to tune)
 
 Each town keeps the player's **reputation**: points earned by helping it, never spent and never lost. Reaching a **reputation tier** unlocks stock, recipes, optional quests, dialogue, **titles** and, at the top, a town **pet**. It gives a reason to go back to older towns and zones without daily content. Terms are in `GLOSSARY.md`.
 
@@ -91,7 +91,7 @@ At Exalted, a town NPC gives the town's pet once, in dialogue. It is an ordinary
 - **La Harpar:** a new stat that strengthens food effects (+X% to the stats food gives).
 - **Mawood:** `increasedSpellDuration`.
 
-Amounts come from the sim. The giver, animal and dialogue are drafted by `lore-keeper` and checked against canon; sprites come from `/generate-2d-asset`.
+Amounts come from the sim. The giver, animal and dialogue are drafted by `lore-keeper` and checked against canon; sprites come from `/generate-2d-asset`. Draft: [Exalted town pets](town-reputation-pets.md) (the Bartender's tavern cat, Corwin's rootglow moth).
 
 ## UI
 

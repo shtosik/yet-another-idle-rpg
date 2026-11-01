@@ -4,6 +4,7 @@ import { EnemyID } from '../../enums/ids/enemy-id.enum'
 import { ItemID } from '../../enums/ids/item-id.enum'
 import { QuestState } from '../../enums/quest-state.enum'
 import { ZoneID } from '../../enums/ids/zone-id.enum'
+import { ReputationRequirement } from '../../data/quests-data'
 
 export type DialogueCondition = { hidden?: boolean } & (
   | QuestCondition
@@ -19,6 +20,7 @@ export type DialogueCondition = { hidden?: boolean } & (
   | GuildCondition
   | FlagCondition
   | ArenaCondition
+  | ReputationRequirement
   )
 
 /** Ready to enter (no run, cooldown over) / a run going on / clear rewards waiting to be claimed. */

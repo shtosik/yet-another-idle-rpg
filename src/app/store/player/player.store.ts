@@ -59,6 +59,9 @@ import {
 } from './inventory'
 import { canInstall, evaluateRecipe, installStations, Stations } from './camp'
 import { ReputationGain, reputationTier, TierUp } from './reputation'
+import { ReputationTier } from '../../../enums/reputation-tier.enum'
+import { TitleID } from '../../../enums/ids/title-id.enum'
+import TITLES_DATA from '../../../data/titles-data'
 import { StationID } from '../../../enums/ids/station-id.enum'
 import { UNLOCK_RULES, UnlockCondition, UnlockTarget } from '../../../data/unlock-conditions'
 import { BattleStore } from '../battle/battle.store'
@@ -71,6 +74,7 @@ import {
   consumableModifiers,
   deriveStats,
   equipmentModifiers,
+  foodMultiplierOf,
   initialResources,
   isResourceStat,
   PlayerStatsType,
@@ -130,6 +134,8 @@ interface PlayerState {
   /** Bestiary entries and spells the player has looked at; the rest show as a navbar badge. */
   seenEnemies: EnemyID[];
   seenSpells: SpellID[];
+  /** The earned title shown in the stats panel; `null` shows none. Earned titles are derived, not saved. */
+  selectedTitle: TitleID | null;
 }
 
 export const initialState: PlayerState = {
@@ -161,6 +167,7 @@ export const initialState: PlayerState = {
   spellbookUnlocked: false,
   seenEnemies: [],
   seenSpells: [],
+  selectedTitle: null,
 }
 
 const revealedEnemies = (kills: PlayerState['enemyKillCounts']): EnemyID[] =>
@@ -225,14 +232,17 @@ const withoutItems = (state: PlayerState, items: ItemStack[]): Pick<PlayerState,
 type StatSources = { [K in 'resources' | 'permanentBonuses' | 'equipment' | 'unlockedNodes' | 'claimedZoneStars']: () => PlayerState[K] }
 
 /** Every stat modifier, grouped by where it comes from (the stats panel's breakdown order). */
-const sourcedModifiersOf = (store: StatSources, buffSpellIds: SpellID[], consumableItemIds: ItemID[]): SourcedModifiers => ({
-  equipment: equipmentModifiers(store.equipment()),
-  skills: skillNodeModifiers(store.unlockedNodes()),
-  buffs: buffModifiers(buffSpellIds),
-  consumables: consumableModifiers(consumableItemIds),
-  bonuses: bonusModifiers(store.permanentBonuses()),
-  mastery: masteryModifiers(store.claimedZoneStars()),
-})
+const sourcedModifiersOf = (store: StatSources, buffSpellIds: SpellID[], consumableItemIds: ItemID[]): SourcedModifiers => {
+  const equipment = equipmentModifiers(store.equipment())
+  return {
+    equipment,
+    skills: skillNodeModifiers(store.unlockedNodes()),
+    buffs: buffModifiers(buffSpellIds),
+    consumables: consumableModifiers(consumableItemIds, foodMultiplierOf(equipment)),
+    bonuses: bonusModifiers(store.permanentBonuses()),
+    mastery: masteryModifiers(store.claimedZoneStars()),
+  }
+}
 
 /** Totals of a batch of kills (an offline claim), applied in one store update. */
 export interface KillBatch {
@@ -301,6 +311,11 @@ export const PlayerStore = signalStore(
   withComputed((store) => ({
     /** One rank per `TASKS_PER_GUILD_RANK` completed tasks, no cap. Each rank adds a zone tier to the task pool. */
     guildRank: () => Math.floor(store.totalTasksCompleted() / TASKS_PER_GUILD_RANK),
+    /** Titles whose source is met, in `TitleID` order. */
+    earnedTitles: computed(() => (Object.keys(TITLES_DATA).map(Number) as TitleID[]).filter(id => {
+      const source = TITLES_DATA[id]
+      return reputationTier(store.reputation()[source.townId] ?? 0) >= source.tier
+    })),
     hasAvailableTaskSlot: () => store.activeTasks().length < store.stats().maxTaskSlots,
     hasCompletedTask: () => store.activeTasks().some(isTaskDone),
     hasTaskInProgress: () => store.activeTasks().some(task => !isTaskDone(task)),
@@ -801,6 +816,15 @@ export const PlayerStore = signalStore(
         if (towns.includes(id)) return {}
         return { unlockedContent: { ...state.unlockedContent, towns: [...towns, id] } }
       })
+    },
+
+    /** Shows an earned title in the stats panel, or none with `null`; unearned titles are ignored. */
+    selectTitle(id: TitleID | null): void {
+      if (id === null || store.earnedTitles().includes(id)) patchState(store, { selectedTitle: id })
+    },
+
+    townTier(townId: TownID): ReputationTier {
+      return reputationTier(store.reputation()[townId] ?? 0)
     },
 
     /** Adds points per town; returns each town whose tier went up, once, with its new tier. */

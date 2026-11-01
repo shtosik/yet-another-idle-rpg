@@ -3,6 +3,8 @@ import { ItemID } from '../enums/ids/item-id.enum'
 import { ItemTier } from '../enums/items/item-tier.enum'
 import { ItemType } from '../enums/items/item-type.enum'
 import { Shop } from '../types/shop/shop.type'
+import { TownID } from '../enums/map/town-id.enum'
+import { ReputationTier } from '../enums/reputation-tier.enum'
 
 const SHOPS_DATA: Record<ShopID, Shop> = {
   [ShopID.mawoodMagicShop]: {
@@ -16,6 +18,7 @@ const SHOPS_DATA: Record<ShopID, Shop> = {
       { itemId: ItemID.earthRuneRecipe, tier: ItemTier.uncommon,  price: 500,  maxStock: 1,  refreshable: false },
       { itemId: ItemID.magicStaff,      tier: ItemTier.uncommon,  price: 3000, maxStock: 1,  refreshable: false },
       { itemId: ItemID.mysticHood,      tier: ItemTier.uncommon,  price: 4000, maxStock: 1,  refreshable: false },
+      { itemId: ItemID.rootwalkerBoots, tier: ItemTier.rare,      price: 6000, maxStock: 1,  refreshable: false, minReputation: { townId: TownID.mawood, tier: ReputationTier.honored } },
     ],
     // A collector of the arcane: runes, gear and rare monster parts, nothing else.
     buys: [ItemType.resource, ItemType.equipment],
@@ -46,6 +49,9 @@ const SHOPS_DATA: Record<ShopID, Shop> = {
       { itemId: ItemID.earthRune,      tier: ItemTier.normal,    price: 20,   maxStock: 99, refreshable: true  },
       { itemId: ItemID.waterRune,      tier: ItemTier.normal,    price: 20,   maxStock: 99, refreshable: true  },
       { itemId: ItemID.fishApplePieRecipe, tier: ItemTier.uncommon, price: 300, maxStock: 1, refreshable: false },
+      { itemId: ItemID.cheese,             tier: ItemTier.normal,   price: 30,   maxStock: 99, refreshable: true,  minReputation: { townId: TownID.laHarpar, tier: ReputationTier.honored } },
+      { itemId: ItemID.venisonRoastRecipe, tier: ItemTier.uncommon, price: 300,  maxStock: 1,  refreshable: false, minReputation: { townId: TownID.laHarpar, tier: ReputationTier.honored } },
+      { itemId: ItemID.wharfRunnersBoots,  tier: ItemTier.rare,     price: 3000, maxStock: 1,  refreshable: false, minReputation: { townId: TownID.laHarpar, tier: ReputationTier.honored } },
     ],
     // A harbour trader: buys anything, pays best for the sea's catch and cooked food.
     sellMultipliers: {
@@ -64,6 +70,8 @@ const SHOPS_DATA: Record<ShopID, Shop> = {
     items: [
       { itemId: ItemID.mortarAndPestle, tier: ItemTier.uncommon, price: 800, maxStock: 1,  refreshable: false },
       { itemId: ItemID.vialOfWater,     tier: ItemTier.normal,   price: 15,  maxStock: 99, refreshable: true  },
+      { itemId: ItemID.minorManaPotion,         tier: ItemTier.normal,   price: 60,  maxStock: 20, refreshable: true,  minReputation: { townId: TownID.mawood, tier: ReputationTier.honored } },
+      { itemId: ItemID.greaterManaPotionRecipe, tier: ItemTier.uncommon, price: 300, maxStock: 1,  refreshable: false, minReputation: { townId: TownID.mawood, tier: ReputationTier.honored } },
     ],
     // Only ingredients and remedies; reagents and potions pay best.
     buys: [ItemType.resource, ItemType.potion, ItemType.food],

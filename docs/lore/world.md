@@ -33,7 +33,7 @@ Regions, Towns, Zones and geography. Source shorthand: `Josh#key` = `src/assets/
 
 | Building (`map.json` `buildings.*`) | Who | Notes |
 |---|---|---|
-| Tavern (`tavern`) | Bartender, Josh | "A tavern. Duh." `Josh#placeInfo`, `Bartender#whatIsThisPlace1` |
+| Tavern (`tavern`) | Bartender, Josh | "A tavern. Duh." `Josh#placeInfo`, `Bartender#whatIsThisPlace1`. Has a kitchen cat that "sniffs out the best bite of every dish". **(proposed, `docs/ideas/town-reputation-pets.md`)** |
 | Market (`market`) | Trader, Elara | `towns-data.ts` |
 | Shop (`shop`) | Trader | "The only shop in town". `Trader#intro1` |
 | Basement (`tradersBasement`) | — | Trader's cellar, rat-infested; Zone Trader's Basement. `Trader#questOffer`, `Trader#questCompleted` |
@@ -50,7 +50,7 @@ Regions, Towns, Zones and geography. Source shorthand: `Josh#key` = `src/assets/
 
 | Building | Who | Notes |
 |---|---|---|
-| Elder's Tree (`main`) | Elder Corwin | `map.json` |
+| Elder's Tree (`main`) | Elder Corwin | `map.json`. Rootglow moths feed on the light where Spire bark meets living things, and a spell cast near one is slow to fade; one waits on Corwin's shoulder. **(proposed, `docs/ideas/town-reputation-pets.md`)** |
 | Apothecary (`mawoodApothecary`) | Sylvie | Carved into "Spire four, if you count from the east side". `Sylvie#intro1` |
 | Hunter's Lodge (`mawoodHunterLodge`) | Finn Ashwood, Brenna the Carver | `towns-data.ts` |
 | Magic Shop (`mawoodMagicShop`) | Elarion | Glowing runes on the door; wards. `Elarion#intro1`, `Elarion#default` |

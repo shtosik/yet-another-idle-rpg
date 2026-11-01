@@ -31,4 +31,30 @@ export const BootsItemsData: Partial<Record<ItemID, Item>> = {
       { id: 'critChance', amount: 1 },
     ],
   },
+  // Sold at La Harpar Honored
+  [ItemID.wharfRunnersBoots]: {
+    id: ItemID.wharfRunnersBoots,
+    tier: ItemTier.rare,
+    url: './assets/img/items/wharfRunnersBoots.png',
+    value: 1000,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.boots,
+    stats: [
+      { id: 'attackPower', amount: 2 },
+      { id: 'goldCoinsMultiplier', amount: 0.05 },
+    ],
+  },
+  // Sold at Mawood Honored
+  [ItemID.rootwalkerBoots]: {
+    id: ItemID.rootwalkerBoots,
+    tier: ItemTier.rare,
+    url: './assets/img/items/rootwalkerBoots.png',
+    value: 2000,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.boots,
+    stats: [
+      { id: 'magicDamage', amount: 3 },
+      { id: 'maxMana', amount: 3 },
+    ],
+  },
 }

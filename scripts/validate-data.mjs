@@ -57,6 +57,7 @@ export { WORLD_MAP_DATA } from 'data/world-map-data'
 export { sellPrice } from 'app/store/shop/shop-prices'
 export { REPUTATION_TOWNS } from 'app/store/player/reputation'
 export { REPUTATION_TURN_INS } from 'data/reputation-turn-ins'
+export { TitleID } from 'enums/ids/title-id.enum'
 export { CHANGELOG_NOTE_TYPES } from 'app/components/modals/changelog/changelog'
 `
 
@@ -404,6 +405,7 @@ const ENTITY_KEYS = [
   [D.SkillNodeID, k => [`skill-tree:nodes.${k}.name`, `skill-tree:nodes.${k}.desc`], 'src/assets/locales/en/skill-tree.json'],
   [D.TownID, k => [`map:towns.${k}`], 'src/assets/locales/en/map.json'],
   [D.TownBuildingID, k => [`map:buildings.${k}`], 'src/assets/locales/en/map.json'],
+  [D.TitleID, k => [`app:titles.${k}`], 'src/assets/locales/en/app.json'],
   [D.DamageElement, k => [`app:elements.${k}`], 'src/assets/locales/en/app.json'],
   [D.ItemTier, k => [`items:tiers.${k}`], 'src/assets/locales/en/items.json'],
 ]
