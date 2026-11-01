@@ -1,7 +1,7 @@
 // PreToolUse hook: blocks agent actions AGENTS.md and docs/git-workflow.md forbid, with the fix in the message.
 // Exit 2 blocks the call and shows stderr to the agent.
 import { existsSync, readFileSync, statSync } from 'node:fs'
-import { dirname, join, resolve } from 'node:path'
+import { dirname, isAbsolute, join, resolve } from 'node:path'
 
 const input = JSON.parse(readFileSync(0, 'utf8'))
 const tool = input.tool_name ?? ''
@@ -34,11 +34,17 @@ const GIT_BRANCH_CMD = new RegExp(String.raw`\bgit((?:\s+(?:-[Cc]\s+${ARG}|--[\w
 const lastDir = options => [...options.matchAll(new RegExp(String.raw`-C\s+(?:"([^"]*)"|'([^']*)'|(\S+))`, 'g'))]
   .map(([, dq, sq, bare]) => dq ?? sq ?? bare).pop() ?? '.'
 // The folder the command is in when git runs: the session's cwd moved by each `cd` / `Set-Location` / `pushd` before it,
-// in order. null when a step can't be known (a variable, `~`, `-`), so the switch is blocked rather than guessed.
-const CD = new RegExp(String.raw`(?:^|[;&|\n]\s*|\(\s*)(?:cd|Set-Location|sl|pushd)\s+(?:"([^"]*)"|'([^']*)'|([^\s;&|)]+))`, 'g')
+// in order. null when a step can't be known (a variable, `~`, `-`, a `cd` inside a `( … )` subshell), so the switch
+// is blocked rather than guessed; a later absolute path makes it known again.
+// shortcut: a pattern match, not a shell parser; a hook bypass needs deliberate effort, which no agent has shown.
+const CD = new RegExp(String.raw`(^|[;&|\n]\s*|\(\s*)(?:cd|Set-Location|sl|pushd)\s+(?:"([^"]*)"|'([^']*)'|([^\s;&|)]+))`, 'g')
 const dirAt = index => [...text.slice(0, index).matchAll(CD)]
-  .map(([, dq, sq, bare]) => dq ?? sq ?? bare)
-  .reduce((dir, target) => dir === null || /[$~%`]|^-$/.test(target) ? null : resolve(dir, target), cwd)
+  .reduce((dir, [, before, dq, sq, bare]) => {
+    const target = dq ?? sq ?? bare
+    if (before.includes('(') || /[$~%`]|^-$/.test(target)) return null
+    if (isAbsolute(target)) return resolve(target)
+    return dir === null ? null : resolve(dir, target)
+  }, cwd)
 if (/^(Bash|PowerShell)$/.test(tool)) {
   for (const match of text.matchAll(GIT_BRANCH_CMD)) {
     const [, options, verb, rest] = match

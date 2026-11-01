@@ -46,6 +46,7 @@ test('blocks branch switches in the main checkout, from any folder in it or thro
   assert.equal(run('PowerShell', { command: `Set-Location '${MAIN}'; git checkout staging` }), 2)
   assert.equal(run('Bash', { command: 'cd "$MAIN_DIR" && git switch staging' }), 2)
   assert.equal(run('Bash', { command: 'cd .. && cd "main checkout" && git switch staging' }), 2)
+  assert.equal(run('Bash', { command: `(cd "${WORKTREE}"); git switch staging` }, MAIN), 2)
 })
 
 test('allows file restores, worktrees and other git commands', () => {
@@ -55,5 +56,6 @@ test('allows file restores, worktrees and other git commands', () => {
   assert.equal(run('Bash', { command: `git -c core.autocrlf=false -C "${WORKTREE}" switch staging` }, MAIN), 0)
   assert.equal(run('Bash', { command: 'git status' }, MAIN), 0)
   assert.equal(run('Bash', { command: `cd "${WORKTREE}" && git switch staging` }, MAIN), 0)
+  assert.equal(run('Bash', { command: `cd "$X" && cd "${WORKTREE}" && git switch staging` }, MAIN), 0)
   assert.equal(run('Bash', { command: 'git switch staging' }, base), 0)
 })
