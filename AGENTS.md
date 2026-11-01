@@ -2,7 +2,7 @@
 
 Rules for all coding agents (Claude Code, Codex). Claude-only notes are in `CLAUDE.md`.
 
-**Done** = `npm run validate`, `npm run lint`, `npm run test:ci` and `npx ng build` all pass (CI runs the same).
+**Done** = `npm run check` passes: `validate`, `lint`, `test:tools`, `test:ci` and `build`, the same steps as CI.
 
 **Ask me** a clarifying question when a requirement or the architecture is unclear from the existing files.
 
@@ -24,6 +24,21 @@ Rules for all coding agents (Claude Code, Codex). Claude-only notes are in `CLAU
 
 **Scripts are Node** (`scripts/*.mjs`): this machine has no Python.
 
-**Checking UI**: builds with cheats on (`npm start`, `build:testing`) expose `window.dev` a moment after page load, once the cheat bar's deferred chunk arrives. Set game state through it (commands in `src/app/components/game/dev-cheats/dev-cheats.component.ts`), not by editing `localStorage`.
+**Checking UI**: builds with cheats on (`npm start`, `build:testing`) expose `window.dev` a moment after page load, once the cheat bar's deferred chunk arrives. Set game state through it (commands in `src/app/components/game/dev-cheats/dev-cheats.component.ts`) and read it with `dev.state()`.
 
 **Before opening a PR that changes player-visible UI or game behavior**, run `.claude/skills/verify-yari` once for the feature files the change touches (Claude: in a subagent on a cheaper model) and put the evidence path in the PR body. Skip for docs, data-only, test, script and art changes.
+
+**Skills** live in `.claude/skills/`; after adding or editing one, run `npm run sync-skills` to copy it to `.agents/skills/` for Codex. `/generate-2d-asset` is Claude-only; Codex generates art with `node scripts/asset-gen/generate.mjs` (`docs/systems/asset-pipeline.md`).
+
+## Enforced rules
+
+A rule here fails a check when broken. When the owner corrects the same mistake twice, add a check and a row (`.claude/skills/correct`).
+
+| Rule | Enforced by |
+|---|---|
+| Set game state through `window.dev`, not `localStorage` | `.claude/hooks/guard.mjs` (Claude) |
+| Keep the main checkout on its branch; new work in a worktree (`node scripts/worktree.mjs <type/name>`) | `.claude/hooks/guard.mjs` (Claude) |
+| Start a session from current `origin/staging` | `.claude/hooks/session-start.mjs` reports how far the checkout lags (Claude) |
+| Codex gets the same project skills | `npm run validate` (`scripts/sync-skills.mjs`) |
+| Data references, i18n keys, assets, doc paths, changelog format | `npm run validate` |
+| PRs into `main` come from `release/*` or `hotfix/*` with a version bump | CI (`.github/workflows/ci.yml`) |

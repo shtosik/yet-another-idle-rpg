@@ -28,7 +28,20 @@
           {
             "type": "command",
             "shell": "bash",
-            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"SessionStart\",\"additionalContext\":\"Angular repo: before writing or reviewing Angular code (components, templates, signals, stores, routing, forms, tests), load the angular-developer skill with the Skill tool once per session.\"}}'"
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.mjs\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell|.*javascript_tool",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "bash",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard.mjs\""
           }
         ]
       }

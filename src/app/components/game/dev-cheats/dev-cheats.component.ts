@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject } from '@angular/core'
+import { getState } from '@ngrx/signals'
 import { SkillTreeService } from '../../../services/skill-tree.service'
 import { GameNavigationService } from '../../../services/game-navigation.service'
 import { ReputationService } from '../../../services/reputation.service'
@@ -27,7 +28,8 @@ import { EnemyID } from 'enums/ids/enemy-id.enum'
 import { QuestID } from 'enums/ids/quest-id.enum'
 
 /** Features `window.dev.unlock` can open. */
-type DevFeature = 'camp' | 'skillTree' | 'map' | 'spellbook' | 'towns'
+const DEV_FEATURES = ['camp', 'skillTree', 'map', 'spellbook', 'towns'] as const
+type DevFeature = typeof DEV_FEATURES[number]
 
 // Cheat buttons for dev and testing builds. GameComponent renders it only when environment.cheats is on.
 @Component({
@@ -102,6 +104,25 @@ export class DevCheatsComponent {
       zoneId, wave: 1, kills: 0, shinies: count, killsByEnemy: {}, taskCountsByEnemy: {}, experience: 0, gold: 0, items: [],
     }),
     unlock: (feature: DevFeature) => this.unlockFeature(feature),
+    /** Every feature, town and zone. */
+    unlockAll: () => {
+      DEV_FEATURES.forEach(feature => this.unlockFeature(feature))
+      this.unlockAllZones()
+    },
+    /** Live state of every store plus derived `stats`; unlike `localStorage`, current without waiting for the batched save. */
+    state: () => ({
+      stats: this.playerStore.stats(),
+      player: getState(this.playerStore),
+      battle: getState(this.battleStore),
+      quests: getState(this.questsStore),
+      towns: getState(this.townsStore),
+      shop: getState(this.shopStore),
+      camp: getState(this.campStore),
+      offline: getState(this.offlineStore),
+      settings: getState(this.settingsStore),
+    }),
+    /** Every store back to a fresh save, like the `reset state` button. */
+    reset: () => this.resetState(),
     /** Starts and completes the quest, rewards and completed modal included; a no-op once it's done. */
     completeQuest: (questId: QuestID) => {
       this.questsStore.startQuest(questId)
