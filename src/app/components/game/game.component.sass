@@ -1,5 +1,8 @@
 @use 'palette'
 
+// Fits the five-row paper doll; the quests panel takes the rest of the column.
+$equipment-height: 26rem
+
 .game
   display: grid
   gap: 0.5rem
@@ -35,16 +38,16 @@
   .inventory
     grid-row: 2 / 2
 
-  // The paper doll needs five inventory-sized rows; the middle panels keep their sizes.
+  // Column 4 splits by $equipment-height, not the shared rows, so the middle panels keep their sizes.
   .equipment
     grid-row: 1 / span 2
     align-self: start
-    height: 28rem
+    height: $equipment-height
 
   .quests
     grid-row: 1 / span 2
     align-self: end
-    height: calc(100% - 28.5rem)
+    height: calc(100% - #{$equipment-height} - 0.5rem)
 
   .spells
     grid-row: 2 / 2

@@ -16,10 +16,10 @@ import { PlayerStore } from '../../../store/player/player.store'
 })
 export class EquipmentComponent {
     readonly playerStore = inject(PlayerStore)
-    // Reading order follows the body from head to feet, independently of save key order.
+    // Grid order, row by row, left to right: DOM order is the Tab and screen reader order.
     readonly slots = [
-        'helmet', 'cape', 'chest', 'amulet', 'weapon', 'belt',
-        'gloves', 'ring', 'legs', 'boots', 'pet',
+        'helmet', 'amulet', 'chest', 'cape', 'weapon', 'belt',
+        'gloves', 'ring', 'legs', 'pet', 'boots',
     ] satisfies EquipmentSlotKey[]
     readonly equipment = this.playerStore.equipment
     readonly equippedCount = computed(() => this.slots.filter(slot => this.equipment()[slot]).length)

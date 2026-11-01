@@ -6,7 +6,7 @@ Versions follow [Semantic Versioning](https://semver.org/). Each note is `- [typ
 New notes go under `[Unreleased]`; `npm run release -- <major|minor|patch>` moves them into a version (docs/deployment.md).
 
 ## [Unreleased]
-- [feature] The equipment window is now a proper character sheet: every slot sits in its place around your character with a label, empty slots say what goes there, and the header counts what you have on. Hover a slot for details; right-click, Enter or Space unequips.
+- [feature] The equipment window is now a proper character sheet: every slot sits in its place around your character with a label, empty slots say what goes there, and the header counts what you have on. Hover a slot for details; right-click, Enter or Space unequips. The equipment window is taller, so the quest log below it is a little shorter.
 - [feature] New fonts: Cinzel for titles and tabs, Alegreya Sans for everything else, so descriptions, numbers and dialogue are much easier to read than the old pixel font.
 - [feature] Equip and unequip items with right-click instead of left-click, the same as using consumables. Left-click no longer swaps gear by accident.
 - [feature] Item, equipment and zone star tooltips are bigger, left-aligned and easier to scan; item names show in their tier colour.

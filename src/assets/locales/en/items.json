@@ -193,7 +193,6 @@
     "grantsSpell": "Grants the spell {{spell}} while equipped",
     "rightClickToEquip": "Right-click to equip",
     "rightClickToUnequip": "Right-click to unequip",
-    "unequipBlockedInventory": "Cannot unequip: items occupy the slots this grants",
     "rightClickToUse": "Right-click to use",
     "consumable": {
         "restoresMana": "Restores {{amount}} mana",

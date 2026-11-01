@@ -2,7 +2,7 @@
   "equipment": {
     "title": "Equipment",
     "empty": "Empty",
-    "hint": "Right-click equipped gear to unequip",
+    "unequipHint": "Right-click or Enter to unequip",
     "unequipBlocked": "Cannot unequip: free up space in your inventory first.",
     "emptyHint": "Empty slot. Right-click matching gear in your inventory to equip it.",
     "slots": {
