@@ -25,7 +25,7 @@ Regions, Towns, Zones and geography. Source shorthand: `Josh#key` = `src/assets/
 | Lirold | Capital of the Region (Port Stocksmar); named North Lirold until the 2026-10-27 rename (shipped). Has one Building so far, the Arena (below); its world map marker is at (600, 1180) (Map placement, below). | `Josh#beachName`, `map.json` `towns.lirold`, `towns-data.ts`, `world-map-data.ts` |
 | | Lies **south of Horseshoe Beach**: a large city inside stone walls with a castle at its centre. A road runs from it to the Mountain Pass, with a mine near the Pass. Owner decision (2026-10-27); no shipped text yet. It stands inland, not on the water, with a mountain range rising behind it (owner decision, town art). | owner decision, `docs/ideas/north-lirold-and-exploration-guild.md` |
 | | Unlocks after the Elderwood chain (Harpy Matriarch kill): seen from her nest, reached by going back over the Pass and down the coast road. North gate on the coast road, east gate on the castle's mine road (closed except with a Guild writ). Slate roofs from Slatefall. Home of the Exploration Guild's only hall, run by Guildmaster Odile Varrow (Marvin stays in La Harpar). **(proposed, `docs/ideas/north-lirold-and-exploration-guild.md`)** | — |
-| | Its first Building is the Arena (`map.json` `buildings.liroldArena`), the Combat Arena's home; built on the arena branch, not yet released. Unlock popup rewritten to the Matriarch's-nest reveal **(proposed, `docs/ideas/lirold-arena-master.md` §3)**. | `towns-data.ts`, `unlock-conditions.ts` |
+| | Its only shipped Building is the Arena (`map.json` `buildings.liroldArena`), with Ludo Crane. Forge and Exploration Guild hall are separate proposals; neither is required for the existing Arena. | `src/data/towns-data.ts` `TownID.lirold`; `src/assets/locales/en/dialogues/liroldArenaMaster.json` `intro1` |
 | Slatefall | Miners' village on the castle's mine road between the capital and the Mountain Pass, on the Pass's southern slope. Quarries the capital's slate; the castle's mine, shut two winters ago; the road is barred at the Pass end. Tavern *The Last Lamp*; Hedda Brask, Old Tobin, Pell. Unlocks when *The Guild Trial* completes, after the capital. Port Stocksmar. **(proposed, `docs/ideas/slatefall-and-the-deeper-mines.md`)** | — |
 | Mawood | Elderreach (owner decision). Vertical Town on platforms between the Silverwood Spires, ~300 years old. Built "up, in the light" because the forest floor "belongs to roots and rot". Few travelers; merchants pass through to Sylvie's. | `Corwin#aboutMawood`, `unlocks.json` `towns.mawood.body`, `Milo#intro1` |
 
@@ -37,14 +37,15 @@ Regions, Towns, Zones and geography. Source shorthand: `Josh#key` = `src/assets/
 | Market (`market`) | Trader, Elara | `towns-data.ts` |
 | Shop (`shop`) | Trader | "The only shop in town". `Trader#intro1` |
 | Basement (`tradersBasement`) | — | Trader's cellar, rat-infested; Zone Trader's Basement. `Trader#questOffer`, `Trader#questCompleted` |
-| Exploration Guild (`explorationGuild`) | Marvin | "Main hub for local adventurers". `Trader#aboutGuild`. Removed; the Guild's only hall is in Lirold, and Marvin (a member, not its head) moves into the Tavern, handling contracts and a few Guild supplies until the player meets Varrow. **(proposed, `docs/ideas/north-lirold-and-exploration-guild.md` §5)** |
+| Exploration Guild (`explorationGuild`) | Marvin | Shipped Building; Marvin calls himself its head (`Marvin#introduction1`, `src/data/towns-data.ts`). "Main hub for local adventurers" (`Trader#aboutGuild`). Removal of this Building, a single hall in Lirold and Marvin's move to the Tavern as a member are **proposed, `docs/ideas/north-lirold-and-exploration-guild.md` §5**, not the current placement. |
 
 ### Lirold Buildings
 
 | Building | Who | Notes |
 |---|---|---|
-| Arena (`liroldArena`) | Ludo Crane, Master of the Arena (`NpcID.liroldArenaMaster`) | Sand floor ringed by stone stands; the castle holds its charter, Ludo keeps the sand. Twenty Waves against one sandglass (ten minutes) for a 10,000 gold fee; a new challenger is let in 30 minutes after their last entry. Regular Waves are Elderwood beasts bought from trappers (`arena-data.ts`); champions on Waves 5, 10, 15 and 20 (factions.md, Arena champions). Charter, trappers, Ludo: **(proposed, `docs/ideas/lirold-arena-master.md`)** |
+| Arena (`liroldArena`) | Ludo Crane, Master of the Arena (`NpcID.liroldArenaMaster`) | Shipped: sand floor ringed by stands; castle charter, Ludo keeps the sand, trappers supply Elderwood beasts (`src/assets/locales/en/dialogues/liroldArenaMaster.json` `default`, `aboutArena`). Twenty Waves, ten-minute sandglass, 10,000 gold fee and 30-minute entry cooldown (`src/data/arena-data.ts`, `docs/systems/arena.md`); champions on Waves 5, 10, 15 and 20. |
 | Exploration Guild (`explorationGuild`, moved) | Guildmaster Odile Varrow | **(proposed, `docs/ideas/north-lirold-and-exploration-guild.md` §4)** |
+| Forge (proposed `liroldForge`) | Toric, dwarf Blacksmith | Cold repairs since Slatefall's closure two winters ago; *The Cold Forge* recovers his tongs via the Mountain Pass, checks a delivery record with Marvin in La Harpar, brings Toric Fish & Apple Pie and fuel, and restores hot work using matching existing gear. Requires no mine visit or capital Exploration Guild hall. **(proposed, `docs/ideas/gear-upgrading.md`, `docs/ideas/gear-upgrading-cold-forge.md`; character: `docs/character/lirold/toric.md`)** |
 
 ### Mawood Buildings
 
@@ -96,6 +97,12 @@ The design (owner decisions 2026-10-30): the Pass range's southern arm, the Iron
 `docs/design/mawood-and-elderwood-zones.md`: Spires hundreds of metres high, pale silver-grey; forest floor in twilight lit by bioluminescent moss; lowest platforms ~20 m up. Use for art; not canon until shipped.
 
 ## Unknown lands
+
+### Dwarven lands (proposed)
+
+**Keldrath**, the dwarven homeland, lies beneath highlands north beyond Elderreach, outside the drawn map; **Bramhold** is its underground Town where Toric lived. From Port Stocksmar, Toric places home north beyond Elderreach; Saint Nestroud keeps its owner-settled south-eastern position. No bearing relative to Greefic Hill, shared borders, route across its uncrossable mountain, map coordinates or new playable Region is assigned. These names do not amend Josh's four known Regions. **(proposed, [dwarves.md](dwarves.md), sourced to the owner's 2026-11-01 foundation request; dialogue: `docs/ideas/gear-upgrading-cold-forge.md` `aboutHome`)**
+
+### Other lands and mysteries
 
 | Place | Facts | Source |
 |---|---|---|
