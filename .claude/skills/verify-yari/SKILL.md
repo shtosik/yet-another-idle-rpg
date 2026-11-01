@@ -36,7 +36,7 @@ Tools (load deferred ones with ToolSearch): Bash `run_in_background` for the ser
    ```
 
    First build takes roughly 10-30 s. A `[vite] Re-optimizing dependencies` line is normal. The server serves only the files under `src/assets/` that existed when it started: after adding an image there (a new icon gives 404), restart it (Cleanup step 2, then Launch again).
-4. Open it: `mcp__Claude_Browser__preview_start` with `url: http://localhost:<port>/`. Keep the pane's own size (no `resize_window`): emulated sizes are scaled to fit the pane, so screenshot coordinates stop matching page pixels and clicks land on the wrong element. At the default ~1024 px width the page scrolls sideways (equipment panel, NPC portraits are off-screen); see Drive for how to click them.
+4. Open it: `mcp__Claude_Browser__preview_start` with `url: http://localhost:<port>/`. Keep the pane's own size (no `resize_window`): emulated sizes are scaled to fit the pane, the screenshot frame changes between calls, and coordinate clicks land on the wrong element. At the default ~1024 px width the page scrolls sideways and the battle column shrinks to ~2 px (the layout is built for ~1920 px): the battle pane cannot be screenshotted, but its DOM text reads fine. Clicks by `ref` (Drive) are unaffected. If the pane is hidden (`tabs_context` says so), `innerWidth` can read 0 and screenshots lag the DOM; trust `javascript_tool` reads over screenshots.
 5. Ready means usable: `window.dev` exists (it arrives a moment after load, with the deferred cheat chunk) and the battle pane shows an enemy name. Doctor checks both.
 
 ## Doctor
@@ -50,31 +50,27 @@ Run before the first drive and after anything surprising. Read-only.
   await new Promise(r => setTimeout(r, 3000));
   ({ port: location.port, dev: typeof window.dev, saves: Object.keys(localStorage),
      enemy: document.querySelector('app-enemy h2')?.textContent.trim(),
-     kills: document.querySelector('app-battle-nav-bar')?.textContent.match(/Kill count:\s*\d+\s*\/\s*\d+/)?.[0],
-     hud: document.querySelector('app-player-hud')?.innerText.split('\n').join(' | ') })
+     kills: document.querySelector('app-battle-nav-bar')?.textContent.match(/Kill count:\s*\d+(\s*\/\s*\d+)?/)?.[0],
+     hud: ['.hud__level', '.hud__xp-text', '.hud__currency--gold'].map(s => document.querySelector(`app-player-hud ${s}`)?.textContent.trim()).join(' | ') })
   ```
 
-  Healthy: `port` is yours, `dev` is `"object"`, `hud` reads `Lv <level> | <xp> / <xp needed> | <gold>`, `enemy` is a name (fresh save: a Horseshoe Beach enemy such as `Turtle`, `Seagull`, `Crab`), `kills` matches. `dev` `"undefined"` after 3 s means a production build or a crashed bootstrap: check `read_console_messages` with `onlyErrors`.
+  Healthy: `port` is yours, `dev` is `"object"`, `hud` reads `Lv <level> | <xp> / <xp needed> | <gold>`, `enemy` is a name (fresh save: a Horseshoe Beach enemy such as `Turtle`, `Seagull`, `Crab`; `undefined` for a moment between enemies is normal), `kills` matches (`Kill count: N / 10` on a fresh save; the `/ 10` disappears once the wave target is met). `dev` `"undefined"` after 3 s means a production build or a crashed bootstrap: check `read_console_messages` with `onlyErrors`.
 - Fresh save expected but HUD shows level above 1, or kill count above a few: the port was reused and the pane kept that origin's old save. Run `dev.reset()` and re-run doctor.
 
 ## Drive
 
-- Click with `find` (accessible name) then `computer` `left_click` on the returned `ref`. That is a real pointer click. Use `javascript_tool` only to read state or to call `window.dev`.
-- Set up preconditions with `window.dev` (AGENTS.md rule: never edit `localStorage` to set state). Commands, from `src/app/components/game/dev-cheats/dev-cheats.component.ts`, take enum numbers: `dev.tab(GameTab)`, `dev.unlock('camp'|'skillTree'|'map'|'spellbook'|'towns')`, `dev.unlockAll()` (features, towns, zones), `dev.reset()`, `dev.giveItem(ItemID, amount?, tier?)`, `dev.equip(ItemID)`, `dev.unequip(slot)`, `dev.setZone(ZoneID)`, `dev.grantStat(stat, amount)`, `dev.learnSkill(SkillNodeID)`, `dev.openShop(ShopID)`, `dev.setKills(EnemyID, n)`, `dev.addShinyKills(ZoneID, n)`. Look IDs up in `src/enums/ids/*.enum.ts` (e.g. `GameTab.map = 5`, `ItemID.machete = 26`).
+- Click with `find` (accessible name or visible text) then `computer` `left_click` or `right_click` on the returned `ref`. That is a real pointer click, scrolled into view by the tool, so off-screen targets work at any pane width. Use `javascript_tool` only to read state or to call `window.dev`.
+- Set up preconditions with `window.dev` (AGENTS.md rule: never edit `localStorage` to set state). Commands, from `src/app/components/game/dev-cheats/dev-cheats.component.ts`, take enum numbers: `dev.tab(GameTab)`, `dev.unlock('camp'|'skillTree'|'map'|'spellbook'|'towns')`, `dev.unlockAll()` (features, towns, zones), `dev.reset()`, `dev.giveItem(ItemID, amount?, tier?)`, `dev.equip(ItemID, tier?)`, `dev.unequip(slot)`, `dev.setZone(ZoneID)`, `dev.grantStat(stat, amount)`, `dev.learnSkill(SkillNodeID)`, `dev.openShop(ShopID)`, `dev.setKills(EnemyID, n)`, `dev.addShinyKills(ZoneID, n)`, `dev.completeQuest(QuestID)`, `dev.addReputation(TownID, amount)`. Look IDs up in `src/enums/ids/*.enum.ts` (e.g. `GameTab.map = 5`, `ItemID.machete = 26`).
 - Read game state with `dev.state()` (every store plus derived `stats`, live), e.g. `dev.state().battle.currentZoneId`, instead of parsing `localStorage`. Prove what the player sees (kill count, XP, gold) from the DOM, and compare it with `dev.state()`. Read `localStorage` only to prove a change was saved.
 - Never use a `dev` call for the step under test: it sets the state the player's action should produce.
-- Read text with `textContent`, not `innerText`: the UI uppercases labels with CSS, so `innerText` returns `KILL COUNT` and regexes on `Kill count` miss.
-- Handles that exist: game tabs are `button.game-menu__tab` named by label (`Battle`, `Skill tree`, `Camp`, `Spellbook`, `Map`, `Bestiary`, `Settings`; the active one has `aria-current="page"`); NPC portraits are buttons named by NPC; town buildings are buttons named by building; the map's `Towns` toggle and its town buttons. Handles that do not exist: inventory and equipment items are unlabelled `div.item`s, dialogue options are `li.dialogue-modal__option-btn`, and close buttons (`app-close-button button`) have no name. For those, click by coordinate:
-
-  ```js
-  // javascript_tool: scroll the target into view, return its centre in screenshot coordinates
-  const el = document.querySelector('<selector>'); el.scrollIntoView({ block: 'center', inline: 'center' });
-  await new Promise(r => setTimeout(r, 300));
-  const r = el.getBoundingClientRect(), k = 800 / innerWidth;   // 800 = width of the screenshot's "coordinate frame"
-  [Math.round((r.x + r.width / 2) * k), Math.round((r.y + r.height / 2) * k)]
-  ```
-
-  Take a `screenshot` (the click tool refuses coordinates after the page scrolled or resized until you do), check the target is at that spot, then `left_click` the coordinate. If the screenshot reports a frame width other than 800, use that number for `k`.
+- Read text with `textContent` of the specific element, not `innerText`: the UI uppercases some labels (tabs, panel titles) with CSS. Read a container's `textContent` only with a regex that tolerates missing separators: the HUD's reads `Lv 18 / 1004` (level 1, 8 / 100 XP, 4 gold), so read its parts (`.hud__level`, `.hud__xp-text`, `.hud__currency--gold`).
+- Handles (all reachable by `ref`, no coordinate clicks needed):
+  - game tabs: `button "<label>"` (`Battle`, `Skill tree`, `Camp`, `Spellbook`, `Map`, `Bestiary`, `Settings`; the active one has `aria-current="page"`). Locked tabs are all named `Locked`; `find` "Locked" lists them in menu order.
+  - inventory items: `button "<name> ×<amount>"` (e.g. `Machete ×1`); equipment slots: `button "<Slot>: <name|Empty>"` (e.g. `Weapon: Empty`).
+  - NPC portraits: `button "<NPC>"`; town buildings: `button "<building>"`; the map's `button "Towns"` and its town buttons.
+  - dialogue options: `li`s with no role; `find` their text (`find` "Looks quite empty") returns a `generic` ref that clicks fine.
+  - close buttons (`app-close-button button`): no name; `read_page` with `filter: "interactive"` lists them as bare `button [ref_N]` in DOM order (in a building: the building's close comes before the portraits, the dialogue's after).
+- `find` right after a view change can return nothing while the view animates in; wait ~500 ms and retry before calling a handle missing.
 - Saves are batched: each store is written to `localStorage` at most once per second. Poll the store for up to ~2 s after an action before calling a save missing.
 - Per-feature recipes: `features/README.md`.
 
