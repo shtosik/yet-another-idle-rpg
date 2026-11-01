@@ -496,6 +496,8 @@ const allDirs = new Set(allFiles.flatMap(f => f.split('/').slice(0, -1).map((_, 
 
 // A file name with a known extension, or a multi-segment path rooted at a top-level repo dir.
 const PATH_RE = /^[\w.][\w./-]*\.(ts|mjs|js|json|md|html|scss|png)$|^(src|docs|scripts|\.claude|public)(\/[\w.-]+)+\/?$/
+/** Per-machine files docs may name; they are never in git. */
+const LOCAL_ONLY_PATHS = new Set(['.claude/launch.json', '.claude/settings.local.json'])
 function resolveDocPath(p) {
   const clean = p.replace(/\/$/, '')
   if (existsSync(join(ROOT, clean))) return join(ROOT, clean)
@@ -514,7 +516,7 @@ for (const doc of DOC_FILES) {
   for (const [, token] of text.matchAll(/`([^`\s]+)`/g)) {
     if (/[*<>{}$]|^https?:|^\.\.?\/|^\/|^~/.test(token)) continue
     const [path, symbol] = token.split(/:(?=[A-Za-z_])/)
-    if (!PATH_RE.test(path)) continue
+    if (!PATH_RE.test(path) || LOCAL_ONLY_PATHS.has(path)) continue
     const resolved = resolveDocPath(path)
     if (!resolved) { error(rel, `references missing path '${path}'`); continue }
     if (symbol && statSync(resolved).isFile()) {
