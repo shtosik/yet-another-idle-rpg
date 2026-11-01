@@ -10,6 +10,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, statSync } from 'node
 import { dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { changelogSections, compareVersions, NOTE_RE, NOTE_TYPES, parseVersion } from './release.mjs'
+import { staleCodexSkills } from './sync-skills.mjs'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const SRC = join(ROOT, 'src')
@@ -606,6 +607,11 @@ for (const f of walkFiles(APP, '.ts')) {
     }
   }
 }
+
+// ---------------------------------------------------------------------------
+// 9. Codex skills: .agents/skills mirrors the shared skills in .claude/skills.
+
+for (const p of staleCodexSkills()) error(p, 'out of sync with .claude/skills: run `npm run sync-skills`')
 
 // ---------------------------------------------------------------------------
 
