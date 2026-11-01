@@ -22,13 +22,13 @@ Background: `docs/systems/towns-shops-guild.md` (static vs runtime stock, refres
      ],
    },
    ```
-   - `price` is gold and independent of the item's `value`.
+   - `price` is in the shop's `currency`: optional, gold by default, `explorerTokens` for a token shop (`ShopCurrency` in `src/types/shop/shop.type.ts`). It is independent of the item's `value`.
    - `refreshable: true` restocks to `maxStock` every `shopRefreshCooldown` (1 hour base); `false` sells out for good (uniques, station gear, recipe scrolls).
    - Station gear installs on purchase and is blocked until the previous station level is installed.
    - Reordering or inserting items re-syncs saved stock by item id on the next visit.
 
-3. **Open it from dialogue** — in the shopkeeper's dialogue file, add an option whose result is `{ next: <Name>Dialogue.default, effects: [{ type: 'shop', shopId: ShopID.mawoodBlacksmith }] }`, as in `src/data/dialogues/mawoodTown/mawoodElarion.ts` (`browseWares`). The town view swaps to the inline `ShopComponent`. Gate it with `visibilityConditions` (hidden) or `requirementsNeeded` (shown but disabled) if needed. New shopkeeper: use `add-npc-dialogue` first.
+3. **Open it from dialogue** — in the shopkeeper's dialogue file, add an option with one `results` entry `{ next: <Name>Dialogue.default, effects: [{ type: 'shop', shopId: ShopID.mawoodBlacksmith }] }`, as in `src/data/dialogues/mawoodTown/mawoodElarion.ts` (`browseWares`). The town view swaps to the inline `ShopComponent`. Gate it with `visibilityConditions` (hidden) or `requirementsNeeded` (shown but disabled) if needed. New shopkeeper: use `add-npc-dialogue` first.
 
 4. **i18n** — `shop:names.<shopKey>` in `src/assets/locales/en/shop.json`, and the option's `responseKey` in the NPC's dialogue JSON.
 
-Done when `npm run validate` and `npx ng build` pass, and in the dev server the option opens the shop and buying an item takes the gold and adds it to the inventory.
+Done when `npm run check` passes, and in the dev server the option opens the shop and buying an item takes the gold and adds it to the inventory.

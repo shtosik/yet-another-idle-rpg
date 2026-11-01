@@ -21,6 +21,7 @@ Background: `docs/systems/player-stats-inventory-equipment.md` (stat units, deri
      type: ItemType.equipment,
      slot: EquipmentSlot.weapon,
      damageType: DamageElement.fire,   // weapons only; omitted = physical
+     // weaponCategory: WeaponCategory.ranged,  // weapons only: ranged for bows, magic for staves and wands; omitted = melee
      stats: [{ id: 'attackPower', amount: 8 }, { id: 'critChance', amount: 3 }],
    },
    ```
@@ -46,4 +47,4 @@ Background: `docs/systems/player-stats-inventory-equipment.md` (stat units, deri
 
 7. **Rebalancing an existing item**: change `stats` in place. Stats are derived, so saves pick up the new values immediately.
 
-Done when `npm run validate` and `npx ng build` pass, and in the dev server equipping then unequipping the item returns every stat to its previous value.
+Done when `npm run check` passes, and in the dev server equipping then unequipping the item returns every stat to its previous value.

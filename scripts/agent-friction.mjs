@@ -31,7 +31,11 @@ const commands = new Map()
 const bump = (map, key) => map.set(key, (map.get(key) ?? 0) + 1)
 const oneLine = (text, max) => text.replace(/\s+/g, ' ').trim().slice(0, max)
 
-const folders = existsSync(PROJECTS) ? readdirSync(PROJECTS).filter(d => d.startsWith(PREFIX)) : []
+// The main checkout's folder and its `yari-*` worktrees; other projects under the same parent folder are left out.
+const MAIN = 'yet-another-idle-rpg'
+const folders = existsSync(PROJECTS)
+  ? readdirSync(PROJECTS).filter(d => d === PREFIX + MAIN || d.startsWith(PREFIX + 'yari-'))
+  : []
 for (const folder of folders) {
   for (const file of readdirSync(join(PROJECTS, folder)).filter(f => f.endsWith('.jsonl'))) {
     for (const line of readFileSync(join(PROJECTS, folder, file), 'utf8').split('\n')) {

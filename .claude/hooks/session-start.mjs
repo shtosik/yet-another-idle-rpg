@@ -21,6 +21,8 @@ if (counts) {
   const [ahead, behind] = counts.split(/\s+/).map(Number)
   notes.push(`Checkout is on ${branch}: ${ahead} commit(s) not on origin/staging, ${behind} commit(s) of origin/staging missing${fetched ? '' : ' (fetch failed, origin/staging may be stale)'}.`
     + (behind > 0 ? ' Read code from origin/staging or a worktree, not this checkout.' : ''))
+} else {
+  notes.push(`Checkout is on ${branch}; comparing it with origin/staging failed, so check \`git fetch origin staging\` before reading code here.`)
 }
 
 console.log(JSON.stringify({ hookSpecificOutput: { hookEventName: 'SessionStart', additionalContext: notes.join('\n') } }))

@@ -28,7 +28,7 @@ Rules for all coding agents (Claude Code, Codex). Claude-only notes are in `CLAU
 
 **Before opening a PR that changes player-visible UI or game behavior**, run `.claude/skills/verify-yari` once for the feature files the change touches (Claude: in a subagent on a cheaper model) and put the evidence path in the PR body. Skip for docs, data-only, test, script and art changes.
 
-**Skills** live in `.claude/skills/`; after adding or editing one, run `npm run sync-skills` to copy it to `.agents/skills/` for Codex.
+**Skills** live in `.claude/skills/`; after adding or editing one, run `npm run sync-skills` to copy it to `.agents/skills/` for Codex. `/generate-2d-asset` is Claude-only; Codex generates art with `node scripts/asset-gen/generate.mjs` (`docs/systems/asset-pipeline.md`).
 
 ## Enforced rules
 

@@ -34,4 +34,4 @@ For **expanding** an existing NPC, do only steps 2 (new nodes and options), 5 (k
 
 8. **Check** — run the `audit-dialogue` skill on the file.
 
-Done when `npm run validate` and `npx ng build` pass and `audit-dialogue` reports no blockers.
+Done when `npm run check` passes and `audit-dialogue` reports no blockers.

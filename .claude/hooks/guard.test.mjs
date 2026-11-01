@@ -24,7 +24,8 @@ const js = text => run('mcp__Claude_Browser__javascript_tool', { text })
 
 test('blocks localStorage writes in browser JS', () => {
   for (const text of ['localStorage.setItem("playerStore", "{}")', 'localStorage.clear()', 'localStorage.removeItem("x")',
-    'localStorage["battleStore"] = x', 'localStorage.playerStore = "{}"']) assert.equal(js(text), 2, text)
+    'localStorage["battleStore"] = x', 'localStorage.playerStore = "{}"', 'delete localStorage.playerStore',
+    'delete localStorage["playerStore"]']) assert.equal(js(text), 2, text)
 })
 
 test('allows localStorage reads and dev calls', () => {
@@ -38,12 +39,16 @@ test('blocks branch switches in the main checkout, from any folder in it or thro
   assert.equal(run('PowerShell', { command: 'git checkout -b feat/x' }, MAIN), 2)
   assert.equal(run('Bash', { command: 'git switch staging' }, join(MAIN, 'src')), 2)
   assert.equal(run('Bash', { command: `git status && git -C "${MAIN}" switch staging` }), 2)
+  assert.equal(run('Bash', { command: 'git -c core.autocrlf=false switch staging' }, MAIN), 2)
+  assert.equal(run('Bash', { command: 'git --no-pager checkout staging' }, MAIN), 2)
+  assert.equal(run('Bash', { command: 'git checkout staging --' }, MAIN), 2)
 })
 
 test('allows file restores, worktrees and other git commands', () => {
   assert.equal(run('Bash', { command: 'git checkout -- src/app.ts' }, MAIN), 0)
   assert.equal(run('Bash', { command: 'git switch -c feat/x' }, WORKTREE), 0)
   assert.equal(run('Bash', { command: `git -C "${WORKTREE}" checkout staging` }, MAIN), 0)
+  assert.equal(run('Bash', { command: `git -c core.autocrlf=false -C "${WORKTREE}" switch staging` }, MAIN), 0)
   assert.equal(run('Bash', { command: 'git status' }, MAIN), 0)
   assert.equal(run('Bash', { command: 'git switch staging' }, base), 0)
 })

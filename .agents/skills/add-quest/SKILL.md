@@ -44,4 +44,4 @@ Background: `docs/systems/quests.md` (step encoding, flow) and `docs/systems/dia
 
 7. **Check** — run `audit-dialogue` on the giver.
 
-Done when `npm run validate` and `npx ng build` pass and `audit-dialogue` reports no blockers for the giver.
+Done when `npm run check` passes and `audit-dialogue` reports no blockers for the giver.

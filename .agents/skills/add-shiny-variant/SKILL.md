@@ -30,4 +30,4 @@ Background: `docs/systems/enemies-shiny-pets-bestiary.md`. The shiny mechanic it
 
 5. **Shiny sprite** — `src/assets/img/enemies/<asset>-shiny.png` beside the normal sprite. Generate it with `/generate-2d-asset` (the pipeline's `--shiny-of` hue-shifts the base sprite; see `docs/systems/asset-pipeline.md`).
 
-Done when `npm run validate` and `npx ng build` pass (validate checks the `-shiny.png` exists and both names are translated).
+Done when `npm run check` passes (validate checks the `-shiny.png` exists and both names are translated).

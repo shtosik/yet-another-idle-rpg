@@ -22,17 +22,21 @@ const inMainCheckout = dir => {
   }
 }
 
-const STORAGE_WRITE = /localStorage\s*\.\s*(setItem|removeItem|clear)\b|localStorage\s*(\.\s*\w+|\[[^\]]+\])\s*=(?!=)/
+const STORAGE_WRITE = /localStorage\s*\.\s*(setItem|removeItem|clear)\b|localStorage\s*(\.\s*\w+|\[[^\]]+\])\s*=(?!=)|\bdelete\s+localStorage\b/
 if (/javascript_tool$/.test(tool) && STORAGE_WRITE.test(text)) {
   block('Blocked: set game state through window.dev (dev.reset(), dev.unlockAll(), dev.giveItem(...); list in dev-cheats.component.ts), not localStorage. Read state with dev.state().')
 }
 
-// `git [-C <dir>] switch …` always changes branch; `git checkout … -- <paths>` only restores files.
-const GIT_BRANCH_CMD = /\bgit\s+(?:-C\s+(?:"([^"]*)"|'([^']*)'|(\S+))\s+)?(switch|checkout)\b([^;&|\n]*)/g
+// `git [global options] switch …` always changes branch; `git checkout … -- <paths>` only restores files.
+// Global options: `-C <dir>` (the checkout it acts on), `-c <key=value>`, and `--flag` / `--flag=value`.
+const ARG = String.raw`(?:"[^"]*"|'[^']*'|\S+)`
+const GIT_BRANCH_CMD = new RegExp(String.raw`\bgit((?:\s+(?:-[Cc]\s+${ARG}|--[\w-]+(?:=${ARG})?))*)\s+(switch|checkout)\b([^;&|\n]*)`, 'g')
+const lastDir = options => [...options.matchAll(new RegExp(String.raw`-C\s+(?:"([^"]*)"|'([^']*)'|(\S+))`, 'g'))]
+  .map(([, dq, sq, bare]) => dq ?? sq ?? bare).pop() ?? '.'
 if (/^(Bash|PowerShell)$/.test(tool)) {
-  for (const [, dq, sq, bare, verb, rest] of text.matchAll(GIT_BRANCH_CMD)) {
-    if (verb === 'checkout' && /\s--(\s|$)/.test(rest)) continue
-    if (inMainCheckout(resolve(cwd, dq ?? sq ?? bare ?? '.'))) {
+  for (const [, options, verb, rest] of text.matchAll(GIT_BRANCH_CMD)) {
+    if (verb === 'checkout' && /\s--\s+\S/.test(rest)) continue
+    if (inMainCheckout(resolve(cwd, lastDir(options)))) {
       block('Blocked: switching branches in the main checkout moves every parallel session (docs/git-workflow.md). Create a worktree: node scripts/worktree.mjs <type/name>, then EnterWorktree.')
     }
   }

@@ -21,7 +21,7 @@ Background: `docs/systems/towns-shops-guild.md`. Building-specific gameplay goes
      questRequirement: QuestID.someQuest, // optional: hidden until this quest has started
    },
    ```
-   For a **zone entrance**, set `zoneId` and omit `url` and NPCs; clicking it travels to the zone. Give it a `questRequirement`: starting that quest unlocks the zone (see `docs/systems/zones-waves-unlocks.md`).
+   For a **zone entrance**, set `zoneId`, omit `url` and keep `npcs: []` (the field is required); clicking it travels to the zone. Give it a `questRequirement`: starting that quest unlocks the zone (see `docs/systems/zones-waves-unlocks.md`).
 
 3. **Label** — `map:buildings.<buildingKey>` in `src/assets/locales/en/map.json`.
 
@@ -31,4 +31,4 @@ Background: `docs/systems/towns-shops-guild.md`. Building-specific gameplay goes
 
 6. **New mechanic** (optional) — new dialogue effects or conditions via `add-dialogue-effect`.
 
-Done when `npm run validate` and `npx ng build` pass, and in the dev server the building button appears (after its quest, if gated) and opens the building or zone.
+Done when `npm run check` passes, and in the dev server the building button appears (after its quest, if gated) and opens the building or zone.

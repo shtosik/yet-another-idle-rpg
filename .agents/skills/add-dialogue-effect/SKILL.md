@@ -27,4 +27,4 @@ Use the `action` discriminator for related behaviors (one `RecipeEffect` with `a
 - Add the new variant to the conditions or effects description in `docs/systems/dialogue.md`.
 - Use it in one real dialogue and walk that branch in the dev server.
 
-Done when `npm run validate` and `npx ng build` pass and the new branch behaves as intended in the dev server.
+Done when `npm run check` passes and the new branch behaves as intended in the dev server.
