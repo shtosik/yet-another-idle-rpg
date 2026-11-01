@@ -28,7 +28,7 @@ export class EquipmentItemComponent {
 
     readonly hintKey = computed(() => {
         if (!this.item()) return 'app:equipment.emptyHint'
-        if (this.unequipBlocked()) return 'items:unequipBlockedInventory'
+        if (this.unequipBlocked()) return 'app:equipment.unequipBlocked'
         return 'items:rightClickToUnequip'
     })
 

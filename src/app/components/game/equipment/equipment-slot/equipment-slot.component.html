@@ -21,12 +21,13 @@
     (keydown.space)="$event.preventDefault(); handleUnequip(); details.hide()"
     (keydown.escape)="details.hide()"
 >
+    <!-- Filled slots show only the art; the name is in the tooltip and aria-label. -->
     @if (gear) {
         <img height="48" width="48" disableOptimizedSrcset alt="" [ngSrc]="gear.url">
     } @else {
         <span class="empty-mark" aria-hidden="true">&#9671;</span>
+        <span class="slot-name">{{ slotLabel }}</span>
     }
-    <span class="slot-name">{{ slotLabel }}</span>
 </button>
 
 <ng-template
@@ -65,7 +66,7 @@
                     <span class="stat">{{ 'items:grantsSpell' | i18next:{ spell: ('spells:names.' + SpellID[item.spell] + '.name') | i18next } }}</span>
                 }
                 @if (blocked) {
-                    <span class="click click--blocked">{{ 'items:unequipBlockedInventory' | i18next }}</span>
+                    <span class="click click--blocked">{{ 'app:equipment.unequipBlocked' | i18next }}</span>
                 } @else {
                     <span class="click">{{ 'items:rightClickToUnequip' | i18next }}</span>
                 }

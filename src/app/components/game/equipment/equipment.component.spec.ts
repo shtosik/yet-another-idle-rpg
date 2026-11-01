@@ -31,6 +31,7 @@ describe('EquipmentComponent', () => {
     afterEach(() => localStorage.clear())
 
     const weaponButton = () => element.querySelector<HTMLButtonElement>('[style*="weapon"] button')
+    const rightClick = (button: HTMLElement) => button.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true }))
     const equip = (id: ItemID) => {
         const item = ITEM_DATA[id]
         store.addItems([{ id, tier: item.tier, amount: 1 }])
@@ -46,7 +47,7 @@ describe('EquipmentComponent', () => {
         expect(weaponButton().getAttribute('aria-disabled')).toBe('true')
         expect(weaponButton().getAttribute('aria-description')).toContain('matching gear')
         const unequip = spyOn(store, 'unequipItem')
-        weaponButton().click()
+        rightClick(weaponButton())
         expect(unequip).not.toHaveBeenCalled()
     })
 
@@ -66,10 +67,24 @@ describe('EquipmentComponent', () => {
         expect(store.inventory().gear.some(item => item?.id === ItemID.knife)).toBeTrue()
     })
 
-    it('unequips through the button and returns the item to inventory', async () => {
+    it('ignores left-click so a stray click cannot unequip', async () => {
         equip(ItemID.knife)
         await fixture.whenStable()
         weaponButton().click()
+        expect(store.equipment().weapon?.id).toBe(ItemID.knife)
+    })
+
+    it('unequips with Enter from the keyboard', async () => {
+        equip(ItemID.knife)
+        await fixture.whenStable()
+        weaponButton().dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }))
+        expect(store.equipment().weapon).toBeNull()
+    })
+
+    it('unequips on right-click and returns the item to inventory', async () => {
+        equip(ItemID.knife)
+        await fixture.whenStable()
+        rightClick(weaponButton())
         await fixture.whenStable()
         expect(store.equipment().weapon).toBeNull()
         expect(store.inventory().gear.some(item => item?.id === ItemID.knife)).toBeTrue()
@@ -87,8 +102,8 @@ describe('EquipmentComponent', () => {
         expect(store.canUnequip('weapon')).toBeFalse()
         expect(weaponButton().disabled).toBeFalse()
         expect(weaponButton().getAttribute('aria-disabled')).toBe('true')
-        expect(weaponButton().getAttribute('aria-description')).toContain('free space')
-        weaponButton().click()
+        expect(weaponButton().getAttribute('aria-description')).toContain('free up space')
+        rightClick(weaponButton())
         expect(store.equipment().weapon?.id).toBe(ItemID.knife)
     })
 })
