@@ -25,6 +25,7 @@
     &[data-tier="quest"]
       box-shadow: rgba(map.get(palette.$itemPalette, quest), 0.6) 0 3px 8px
 
+// Rare, epic and quest use lighter tints than $itemPalette so names reach 4.5:1 contrast on dark panels.
 @mixin textColorByTier
   &[data-tier="trash"]
     color: map.get(palette.$itemPalette, trash)
@@ -36,16 +37,16 @@
     color: map.get(palette.$itemPalette, uncommon)
 
   &[data-tier="rare"]
-    color: map.get(palette.$itemPalette, rare)
+    color: rgb(77, 148, 255)
 
   &[data-tier="epic"]
-    color: map.get(palette.$itemPalette, epic)
+    color: rgb(196, 112, 255)
 
   &[data-tier="legendary"]
     color: map.get(palette.$itemPalette, legendary)
 
   &[data-tier="quest"]
-    color: map.get(palette.$itemPalette, quest)
+    color: rgb(235, 100, 140)
 
 
 @mixin textColorByElement
