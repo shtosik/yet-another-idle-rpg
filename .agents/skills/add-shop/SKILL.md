@@ -31,4 +31,4 @@ Background: `docs/systems/towns-shops-guild.md` (static vs runtime stock, refres
 
 4. **i18n** — `shop:names.<shopKey>` in `src/assets/locales/en/shop.json`, and the option's `responseKey` in the NPC's dialogue JSON.
 
-Done when `npm run check` passes, and in the dev server the option opens the shop and buying an item takes the gold and adds it to the inventory.
+Done when `npm run check` passes, and in the dev server the option opens the shop and buying an item takes the shop's currency and delivers the item: into the inventory, or installed for station gear.
