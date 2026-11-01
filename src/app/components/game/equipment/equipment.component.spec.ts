@@ -70,14 +70,14 @@ describe('EquipmentComponent', () => {
     it('ignores left-click so a stray click cannot unequip', async () => {
         equip(ItemID.knife)
         await fixture.whenStable()
-        weaponButton().click()
+        weaponButton().dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1 }))
         expect(store.equipment().weapon?.id).toBe(ItemID.knife)
     })
 
-    it('unequips with Enter from the keyboard', async () => {
+    it('unequips on keyboard or assistive-technology activation (click with detail 0)', async () => {
         equip(ItemID.knife)
         await fixture.whenStable()
-        weaponButton().dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }))
+        weaponButton().dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 0 }))
         expect(store.equipment().weapon).toBeNull()
     })
 

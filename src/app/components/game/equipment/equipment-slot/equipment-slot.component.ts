@@ -32,6 +32,11 @@ export class EquipmentItemComponent {
         return 'app:equipment.unequipHint'
     })
 
+    // detail is 0 for Enter, Space and screen-reader activation, 1+ for a mouse click, which stays inert.
+    handleActivate(event: MouseEvent): void {
+        if (event.detail === 0) this.handleUnequip()
+    }
+
     handleUnequip(): void {
         if (this.item() && !this.unequipBlocked()) this.unequipItem.emit(this.slotName())
     }

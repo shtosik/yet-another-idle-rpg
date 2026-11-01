@@ -17,8 +17,7 @@
     [hideDelay]="0"
     tooltipClass="tooltip-override"
     (contextmenu)="$event.preventDefault(); handleUnequip(); details.hide()"
-    (keydown.enter)="$event.preventDefault(); handleUnequip(); details.hide()"
-    (keydown.space)="$event.preventDefault(); handleUnequip(); details.hide()"
+    (click)="handleActivate($event); details.hide()"
     (keydown.escape)="details.hide()"
 >
     <!-- Filled slots show only the art; the name is in the tooltip and aria-label. -->
