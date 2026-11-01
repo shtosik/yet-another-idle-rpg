@@ -1,4 +1,12 @@
 {
+  "titles": {
+    "label": "Title",
+    "none": "None",
+    "laHarparFriendly": "Friend of La Harpar",
+    "laHarparExalted": "Toast of La Harpar",
+    "mawoodFriendly": "Friend of Mawood",
+    "mawoodExalted": "Keeper of Mawood"
+  },
   "statsPanel": {
     "groups": {
       "combat": "Combat",
@@ -30,6 +38,7 @@
       "increasedSpellDuration": "Seconds added to every buff spell's duration.",
       "xpMultiplier": "Multiplies XP from kills.",
       "goldCoinsMultiplier": "Multiplies gold from kills.",
+      "foodEffectMultiplier": "Multiplies the stats your food gives.",
       "offlineProgressRate": "Share of your normal kill rate you keep while away.",
       "shinyChance": "Chance for an enemy to spawn as a shiny.",
       "inventorySlots": "Slots in each of your Gear, Consumables and Materials inventory tabs.",
@@ -67,6 +76,7 @@
     "xpMultiplier": "XP Multiplier",
     "goldCoins": "Gold",
     "goldCoinsMultiplier": "Gold Multiplier",
+    "foodEffectMultiplier": "Food Effect Multiplier",
     "offlineProgressRate": "Offline Progress Rate",
     "unspentSkillPoints": "Skill points",
     "extraFireDamageMultiplier": "Fire Damage",

@@ -13,7 +13,10 @@
     "aboutForest": "Tell me about the Elderwood.",
     "corruption": "What is happening to the trees?",
     "work": "Do you have any work for me?",
-    "goodbye": "Goodbye, Elder."
+    "goodbye": "Goodbye, Elder.",
+    "recovery": "How is the forest?",
+    "rootsAndRafters": "Brenna asks you to bless the new walkway.",
+    "rootglowMoth": "There's a moth on your shoulder, Elder."
   },
   "aboutMawood": {
     "message": "Mawood has stood for three hundred years. Not on the ground — that would have been foolish. The forest floor belongs to roots and rot and things older than memory. So we built up, in the light. It has always worked. Until two years ago, when the black sap first appeared.",
@@ -75,5 +78,22 @@
   "waitingForFinn": {
     "message": "The resin told me what it could. The gnolls are the next thread to pull, and Finn knows their camps better than anyone. Find him. I'll be here when you have answers.",
     "opt1": "I'll find Finn."
+  },
+  "reveredFirstShoot": {
+    "message": "One silver shoot in the outer Wilds. One, the first in two years. The rest will take years, perhaps more than I have left. But it is one more than last spring.",
+    "opt1": "One is a start."
+  },
+  "rootsAndRaftersComplete": {
+    "message": "Clean wood, lashed with silk. Mawood builds up again, as it always has, and I will bless it gladly. Take this, traveler; you have rebuilt more than a walkway.",
+    "opt1": "Thank you, Elder. And the forest?"
+  },
+  "rootglowMoth": {
+    "message": "A rootglow moth. They feed on the light where Spire bark meets living things, and a spell cast near one is slow to fade. This one has been waiting for you, and I would not argue with it.",
+    "opt1": "I'll keep it close.",
+    "opt2": "Not yet, Elder."
+  },
+  "rootglowMothGiven": {
+    "message": "Mawood keeps its friends, traveler. Now a little of it goes with you. Keep it away from Elarion's shop; he sets things on fire.",
+    "opt1": "Thank you, Elder."
   }
 }

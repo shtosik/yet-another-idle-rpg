@@ -20,4 +20,9 @@ export enum QuestID {
     // Mawood — Milo
     feathersForAKite = 14,
     whatLurksAtTheTop = 15,
+    // Revered (town reputation)
+    safePassage = 16,
+    lastOrders = 17,
+    aCleanCure = 18,
+    rootsAndRafters = 19,
 }

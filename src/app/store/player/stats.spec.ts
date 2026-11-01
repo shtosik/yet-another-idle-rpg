@@ -1,6 +1,8 @@
-import { buffModifiers, deriveStats, equipmentModifiers, initialResources, statContributions } from './stats'
+import { buffModifiers, consumableModifiers, deriveStats, equipmentModifiers, foodMultiplierOf, initialResources, statContributions } from './stats'
 import { initialEquipmentState, statsInitialState } from './player'
 import { ItemID } from '../../../enums/ids/item-id.enum'
+import ITEM_DATA from '../../../data/items-data'
+import { ConsumableItem } from '../../../interfaces/item.interface'
 import { ItemTier } from '../../../enums/items/item-tier.enum'
 import { SpellID } from '../../../enums/ids/spell-id.enum'
 
@@ -64,5 +66,21 @@ describe('statContributions', () => {
     })
 
     expect(contributions).toEqual([{ source: 'buffs', flat: 0.3, percent: 0 }])
+  })
+
+  it('scales food stats by the food effect multiplier from gear, not potions', () => {
+    // No potion gives stats yet, so lend one a stat for this test.
+    const potion = ITEM_DATA[ItemID.minorManaPotion] as ConsumableItem
+    const original = potion.effect.stats
+    potion.effect.stats = [{ stat: 'critChance', amount: 4 }]
+    try {
+      const food = foodMultiplierOf([{ stat: 'foodEffectMultiplier', amount: 0.5 }])
+      const stats = deriveStats(initialResources(), consumableModifiers([ItemID.grilledFish, ItemID.minorManaPotion], food))
+      expect(food).toBe(1.5)
+      expect(stats.attackPower).toBe(statsInitialState.attackPower + 3)
+      expect(stats.critChance).toBe(statsInitialState.critChance + 4)
+    } finally {
+      potion.effect.stats = original
+    }
   })
 })

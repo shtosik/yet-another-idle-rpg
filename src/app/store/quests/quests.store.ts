@@ -12,9 +12,9 @@ import { ENTRANCE_ZONES_BY_QUEST } from '../../../data/helpers/entrance-zones'
 import { EnemyID } from '../../../enums/ids/enemy-id.enum'
 import { ZoneID } from '../../../enums/ids/zone-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
-import { getQuestStatus, getStepItems } from '../../services/quest-status'
+import { canAdvanceQuest, getQuestStatus, getStepItems } from '../../services/quest-status'
 import { ReputationService } from '../../services/reputation.service'
-import { ReputationGain } from '../player/reputation'
+import { REPUTATION_THRESHOLDS, ReputationGain } from '../player/reputation'
 
 /** Lifetime kill counters at the moment the quest reached its current step. */
 export interface KillBaseline {
@@ -137,11 +137,25 @@ export const QuestsStore = signalStore(
             const met = !!step && (req.step === undefined || step === req.step)
             return { current: met ? 1 : 0, target: 1 }
           }
+          case 'reputation':
+            return { current: playerStore.reputation()[req.townId] ?? 0, target: REPUTATION_THRESHOLDS[req.tier] }
           default:
             return { current: 0, target: 1 }
         }
       },
-
+    }),
+  ),
+  withMethods((store) => ({
+      /** The quest is active and its current step's requirements are met now. */
+      isStepReady(questId: QuestID): boolean {
+        return canAdvanceQuest(store.questStepProgression(), questId, req => {
+          const { current, target } = store.requirementProgress(questId, req)
+          return current >= target
+        })
+      },
+    }),
+  ),
+  withMethods((store) => ({
       resetState(): void {
         patchState(store, initialState)
       },
@@ -175,8 +189,10 @@ export const QuestsStore = signalStore(
         }))
       },
 
-      /** Takes the current step's items, then moves to the next step or completes. No-op unless active. */
+      /** Takes the current step's items, then moves to the next step or completes. No-op unless the step is still ready. */
       advanceQuest(questId: QuestID) {
+        // Rechecked here: items can be used up between opening a turn-in node and confirming it.
+        if (!store.isStepReady(questId)) return
         const status = getQuestStatus(store.questStepProgression(), questId)
         if (status.state !== QuestState.active) return
 

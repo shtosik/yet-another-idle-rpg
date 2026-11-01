@@ -1,6 +1,7 @@
 import { QuestID } from '../../enums/ids/quest-id.enum'
 import { ItemID } from '../../enums/ids/item-id.enum'
 import { PlayerStat } from '../player/player-stat.type'
+import { NpcID } from '../../enums/map/npc-id.enum'
 
 export type TaskLength = 'short' | 'medium' | 'long'
 
@@ -12,6 +13,7 @@ export type DialogueEffect =
   | DialogueFlagEffect
   | GuildEffect
   | ArenaEffect
+  | ReputationTurnInEffect
 
 export interface QuestEffect {
   type: 'quest'
@@ -49,6 +51,13 @@ export interface GuildEffect {
   taskLength?: TaskLength
   /** `abandonTask`: index into `activeTasks` of the task to cancel. */
   taskIndex?: number
+}
+
+/** Hands `npcId`'s turn-in item (`REPUTATION_TURN_INS`) over for reputation: one full bundle, or all full bundles held. */
+export interface ReputationTurnInEffect {
+  type: 'reputationTurnIn'
+  npcId: NpcID
+  bundles: 'one' | 'all'
 }
 
 /** Start a Combat Arena run (pair it with the entry fee's `stat` deduct), or claim the rewards waiting from clears. */
