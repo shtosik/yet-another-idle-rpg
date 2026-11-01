@@ -146,6 +146,16 @@ export const QuestsStore = signalStore(
     }),
   ),
   withMethods((store) => ({
+      /** The quest is active and its current step's requirements are met now. */
+      isStepReady(questId: QuestID): boolean {
+        return canAdvanceQuest(store.questStepProgression(), questId, req => {
+          const { current, target } = store.requirementProgress(questId, req)
+          return current >= target
+        })
+      },
+    }),
+  ),
+  withMethods((store) => ({
       resetState(): void {
         patchState(store, initialState)
       },
@@ -182,11 +192,7 @@ export const QuestsStore = signalStore(
       /** Takes the current step's items, then moves to the next step or completes. No-op unless the step is still ready. */
       advanceQuest(questId: QuestID) {
         // Rechecked here: items can be used up between opening a turn-in node and confirming it.
-        const isMet = (req: RequirementProps) => {
-          const { current, target } = store.requirementProgress(questId, req)
-          return current >= target
-        }
-        if (!canAdvanceQuest(store.questStepProgression(), questId, isMet)) return
+        if (!store.isStepReady(questId)) return
         const status = getQuestStatus(store.questStepProgression(), questId)
         if (status.state !== QuestState.active) return
 

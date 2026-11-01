@@ -3,8 +3,9 @@
 // Reads enemy, zone and wave-scaling data from src/ (bundled with esbuild), so tuning a number there and
 // re-running this shows the effect. Expected values only: no shinies, no spells, no consumables.
 // --weaknesses adds a separate table: kill time per zone with the Weaknesses skill and one strike spell per element.
+// --food adds a table: each food's stats alone and with the Tavern Cat's food effect multiplier.
 //
-// Usage: npm run sim [-- --waves] [-- --weaknesses]   (--waves also prints every wave of every zone)
+// Usage: npm run sim [-- --waves] [-- --weaknesses] [-- --reputation] [-- --food]   (--waves also prints every wave of every zone)
 
 import { build } from 'esbuild'
 import { mkdirSync, readFileSync } from 'node:fs'
@@ -36,6 +37,10 @@ await build({
       export { ReputationTier } from 'enums/reputation-tier.enum'
       export { NpcID } from 'enums/map/npc-id.enum'
       export { TownID } from 'enums/map/town-id.enum'
+      export { default as ITEM_DATA } from 'data/items-data'
+      export { ItemID } from 'enums/ids/item-id.enum'
+      export { ItemType } from 'enums/items/item-type.enum'
+      export { consumableModifiers, foodMultiplierOf } from 'app/store/player/stats'
     `,
     resolveDir: SRC,
     loader: 'ts',
@@ -283,5 +288,26 @@ if (process.argv.includes('--reputation')) {
     const quests = questTotal(townId)
     const hours = tiers.map(([, points]) => Math.max(0, points - quests) / (bestByTown[townId] ?? Infinity))
     console.log(`  ${D.TownID[townId].padEnd(10)} ${String(quests).padStart(6)}   ${hours.map(h => h.toFixed(1).padStart(5)).join('  ')}`)
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Food and the Tavern Cat (--food)
+
+if (process.argv.includes('--food')) {
+  const cat = D.ITEM_DATA[D.ItemID.petLaHarparCat].stats.map(s => ({ stat: s.id, amount: s.amount }))
+  const catMultiplier = D.foodMultiplierOf(cat)
+  const endPower = build_().attackPower
+  const show = modifiers => modifiers.map(m => `${m.stat} +${Math.round(m.amount * 100) / 100}`).join(', ')
+  const powerShare = modifiers => {
+    const power = modifiers.find(m => m.stat === 'attackPower')?.amount
+    return power ? `  (${Math.round(power / endPower * 100)}% of end-route power ${endPower})` : ''
+  }
+  console.log(`
+Food (stats alone, then with the Tavern Cat ×${catMultiplier})`)
+  for (const item of Object.values(D.ITEM_DATA).filter(i => i.type === D.ItemType.food)) {
+    const alone = D.consumableModifiers([item.id])
+    const withCat = D.consumableModifiers([item.id], catMultiplier)
+    console.log(`  ${D.ItemID[item.id].padEnd(16)} ${show(alone).padEnd(36)} ${show(withCat)}${powerShare(withCat)}`)
   }
 }

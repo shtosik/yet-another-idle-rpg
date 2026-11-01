@@ -92,7 +92,7 @@ Each row gets `minReputation: { townId, tier: ReputationTier.honored }` next to 
 | Item | Tier | Price | Stock | Refreshable | Why |
 |---|---|---|---|---|---|
 | `cheese` | normal | 30 | 99 | yes | Provisions. Today it only drops from rats (Rat 1 in 8, Giant Rat 1 in 2), yet four cooking recipes need it (Baked Apple, Cheese Platter, Fish Apple Pie, Hunter's Feast). Next to Apple at 25. |
-| `machete` | uncommon | 3000 | 1 | no | Safe roads: only the Bandit drops it (1 in 80). Value 1000; between Wooden Bow (2500) and the Skill Point Book (5000). |
+| `wharfRunnersBoots` **(new)** | rare | 3000 | 1 | no | Safe roads: +2 attack power, +5% gold. Replaces the Machete (owner call 3). |
 | `venisonRoastRecipe` (recipe scroll) | uncommon | 300 | 1 | no | Deer and Goats are on La Harpar's road (The Long Path, Mountain Pass). Today it only drops from the Goat (1 in 12). Same price as Fish Apple Pie Recipe (both value 100). Crafted at the Cooking Pot, which this shop sells. |
 
 ### Mawood (`mawoodApothecary`, Sylvie; `mawoodMagicShop`, Elarion)
@@ -101,7 +101,7 @@ Each row gets `minReputation: { townId, tier: ReputationTier.honored }` next to 
 |---|---|---|---|---|---|---|
 | Apothecary | `minorManaPotion` | normal | 60 | 20 | yes | Medicine. Today it is sold only for Explorer Tokens (Guild store) or crafted. Value 30; 60 is above the craft cost (Vial of Water 15 + Apple 25), so crafting stays the cheap way. |
 | Apothecary | `greaterManaPotionRecipe` **(new)** (recipe scroll) | uncommon | 300 | 1 | no | Sylvie's own remedy: spider silk resists the blight (`aboutCorruptionSpreading`). Priced like the other uncommon recipe scrolls. |
-| Magic shop | `spellweaverAmulet` | rare | 12000 | 1 | no | Only the Elder Spider drops it (1 in 60). Value 4000 × 3. |
+| Magic shop | `rootwalkerBoots` **(new)** | rare | 6000 | 1 | no | +3 magic damage, +3 max mana. Replaces the Spellweaver Amulet (owner call 4). |
 
 Note: the apothecary itself opens only after *Silk and Water* or at Friendly (above), so a player who reaches Honored always has access.
 
@@ -333,6 +333,8 @@ Locks name the town and tier and never say "Rank" (the Guild's term, `GLOSSARY.m
 | Item (potion) | `greaterManaPotion` | Greater Mana Potion: restores 15 mana (Minor restores 5), 2 min cooldown, value 80. Icon: recolour of `minorManaPotion`. |
 | Item (recipe scroll) | `greaterManaPotionRecipe` | Teaches `greaterManaPotion` (`requiresUnlock`). Uncommon, value 100, alchemy recipe icon. |
 | Recipe | `greaterManaPotion` | Alchemy (Mortar and Pestle), level 1: 1 `vialOfWater`, 3 `spiderSilk` → 1. |
+| Item (boots) | `wharfRunnersBoots` | Wharf Runner's Boots: rare, +2 attack power, +5% gold. Sold by the Trader at La Harpar Honored, 3000. |
+| Item (boots) | `rootwalkerBoots` | Rootwalker Boots: rare, +3 magic damage, +3 max mana. Sold by Elarion at Mawood Honored, 6000. |
 | Titles | 4 | Friend of La Harpar, Toast of La Harpar, Friend of Mawood, Keeper of Mawood. |
 | Dialogue nodes | see scripts | Every node marked **(new)** above, in the five existing namespaces. No new NPC or namespace. |
 

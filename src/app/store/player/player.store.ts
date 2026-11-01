@@ -74,6 +74,7 @@ import {
   consumableModifiers,
   deriveStats,
   equipmentModifiers,
+  foodMultiplierOf,
   initialResources,
   isResourceStat,
   PlayerStatsType,
@@ -231,14 +232,17 @@ const withoutItems = (state: PlayerState, items: ItemStack[]): Pick<PlayerState,
 type StatSources = { [K in 'resources' | 'permanentBonuses' | 'equipment' | 'unlockedNodes' | 'claimedZoneStars']: () => PlayerState[K] }
 
 /** Every stat modifier, grouped by where it comes from (the stats panel's breakdown order). */
-const sourcedModifiersOf = (store: StatSources, buffSpellIds: SpellID[], consumableItemIds: ItemID[]): SourcedModifiers => ({
-  equipment: equipmentModifiers(store.equipment()),
-  skills: skillNodeModifiers(store.unlockedNodes()),
-  buffs: buffModifiers(buffSpellIds),
-  consumables: consumableModifiers(consumableItemIds),
-  bonuses: bonusModifiers(store.permanentBonuses()),
-  mastery: masteryModifiers(store.claimedZoneStars()),
-})
+const sourcedModifiersOf = (store: StatSources, buffSpellIds: SpellID[], consumableItemIds: ItemID[]): SourcedModifiers => {
+  const equipment = equipmentModifiers(store.equipment())
+  return {
+    equipment,
+    skills: skillNodeModifiers(store.unlockedNodes()),
+    buffs: buffModifiers(buffSpellIds),
+    consumables: consumableModifiers(consumableItemIds, foodMultiplierOf(equipment)),
+    bonuses: bonusModifiers(store.permanentBonuses()),
+    mastery: masteryModifiers(store.claimedZoneStars()),
+  }
+}
 
 /** Totals of a batch of kills (an offline claim), applied in one store update. */
 export interface KillBatch {

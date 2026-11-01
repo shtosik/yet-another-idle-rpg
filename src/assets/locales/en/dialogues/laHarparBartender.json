@@ -15,7 +15,8 @@
     "anyWork": "Do you have any work for me?",
     "anyTrainer": "Do you know anyone who could train me?",
     "goodbye": "That's all for now. Have a good day.",
-    "onTheHouse": "The usual, please."
+    "onTheHouse": "The usual, please.",
+    "tavernCat": "Your cat hasn't taken its eyes off me."
   },
   "whatIsThisPlace1": {
     "message": "A tavern. Are you blind? That'll be 20 coins for the enlightenment. Money well spent, I'd say.",
@@ -58,5 +59,14 @@
   "questLastOrdersComplete": {
     "message": "Smells like a signed contract. Here, you've earned this. And don't tell anyone I paid you.",
     "opt1": "My lips are sealed."
+  },
+  "tavernCat": {
+    "message": "That's the kitchen cat. Useless against the two-legged rats I serve, but it sniffs out the best bite of every dish, and lately it only sniffs after you. Take it, before it eats my profits.",
+    "opt1": "Come here, puss.",
+    "opt2": "Maybe another time."
+  },
+  "tavernCatGiven": {
+    "message": "Scraps, not my good fish. And don't come crying when it sleeps on your face.",
+    "opt1": "Cheers."
   }
 }

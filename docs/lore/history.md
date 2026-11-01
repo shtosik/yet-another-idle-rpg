@@ -29,7 +29,7 @@ Timeline relative to the present (the player's arrival). Source shorthand as in 
 | Quest (`quests.json`) | Outcome | Source |
 |---|---|---|
 | Meat shortage | Bartender gets 30 Crab Meat. | `quests-data.ts`, `Bartender#anyWorkForMe1` |
-| Clearing out the beach | Beach cleared; Josh gives Josh's Heirloom. | `Josh#workInfo`, `Josh#missionCheck`, `quests-data.ts` |
+| Clearing out the beach | Beach cleared; Josh gives Josh's Heirloom. He had kept the ring for someone who went up the mountain and never came back for it (who is unsaid; see T-05). | `Josh#workInfo`, `Josh#missionCheck`, `Josh#aboutHeirloom`, `quests-data.ts` |
 | Rats, We are rats | Trader's Basement cleared. | `Trader#default.opt1`, `Trader#questCompleted` |
 | A tale of a captain | Started; cannot finish (Captain's Letter has no source). | `quests-data.ts`, `docs/systems/quests.md` |
 | Signs of Rot | Resin shows the blight is "more virulent than two years ago"; gnolls implicated. | `Corwin#questSignsOfRotComplete` |
