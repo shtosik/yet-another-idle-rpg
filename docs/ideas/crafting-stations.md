@@ -1,6 +1,6 @@
 # Camp & crafting stations
 
-**Scope:** M · **Status:** Accepted (owner, 2026-10-20)
+**Scope:** M · **Status:** Done (accepted by owner 2026-10-20)
 
 The Crafting tab becomes **Camp**: a set of crafting stations (Workbench, Cooking, Alchemy, Rune Altar) the player acquires and upgrades through crafting, shops, quests and drops. Each station is a tab; each recipe belongs to one station and needs a minimum station level. Adds lore and gives quests/shops something meaningful to unlock.
 

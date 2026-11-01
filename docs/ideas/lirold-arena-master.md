@@ -1,6 +1,6 @@
 # Lirold Arena Master (Ludo Crane)
 
-**Scope:** S · **Status:** Proposed (2026-10-27). Dialogue and lore for the Combat Arena ([`combat-arena.md`](combat-arena.md)).
+**Scope:** S · **Status:** Done (proposed 2026-10-27; Ludo Crane and his dialogue are in the game). Dialogue and lore for the Combat Arena ([`combat-arena.md`](combat-arena.md)).
 
 The Arena Master of Lirold is **Ludo Crane**, the Arena's old champion, now its master and announcer. Character file: [`docs/character/lirold/ludo-crane.md`](../character/lirold/ludo-crane.md). He replaces the placeholder "Varek" everywhere.
 
