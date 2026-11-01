@@ -4,8 +4,8 @@ The player right-clicks (or presses Enter on) a gear item in the inventory to eq
 
 ## Sub-features
 
-- `equip-click` right-click on an inventory gear item equips it; left-click is inert.
-- `equip-unequip` right-click on a filled equipment slot puts the item back in the inventory.
+- `equip-click` right-click (or Enter/Space on its focused button) on an inventory gear item equips it; a mouse left-click is inert.
+- `equip-unequip` right-click (or Enter/Space on the focused slot) on a filled equipment slot puts the item back in the inventory.
 - `equip-persist` equipment survives a reload.
 
 ## How to get to it (user POV)

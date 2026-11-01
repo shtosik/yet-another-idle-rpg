@@ -34,4 +34,4 @@ Each feature file has an H1, one paragraph of player-visible behaviour, then fou
 - [Town NPC dialogue](./town-dialogue.md): Map, town list, building, NPC portrait, dialogue options and close.
 - [Game tabs and unlocks](./game-tabs.md): locked tabs, unlocking, switching panels.
 
-Not mapped yet: skill tree (a Leaflet canvas with no accessible node handles), camp crafting, shops, quests turn-in, town reputation (tier, `Reputation` panel tab), zone mastery stars and wave buttons in the battle nav bar, battle footer spell slots, spellbook, bestiary, arena, offline progress, save export/import in Settings.
+Not mapped yet: skill tree (a Leaflet canvas with no accessible node handles), camp crafting, shops, quests turn-in, the `Reputation` panel tab (the town's tier label is in `town-dialogue.md`), zone mastery stars and wave buttons in the battle nav bar, battle footer spell slots, spellbook, bestiary, arena, offline progress, save export/import in Settings.

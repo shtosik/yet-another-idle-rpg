@@ -5,7 +5,7 @@ The player fights automatically from page load: the current zone's enemies attac
 ## Sub-features
 
 - `battle-auto` combat runs with no input; enemy HP drops and new enemies spawn.
-- `battle-kills` the current wave's kill count rises. The wave itself advances only with the `autoWaveProgression` skill (or the player's next-wave button), so it stays at 1/10 on a fresh save.
+- `battle-kills` the current wave's kill count rises. The wave itself advances only with the `autoWaveProgression` node (or the player's next-wave button), so it stays at 1/10 on a fresh save.
 - `battle-rewards` XP and gold in the HUD increase from kills.
 - `battle-persist` kill count, XP and gold survive a page reload.
 
@@ -35,8 +35,8 @@ Preconditions:
 
   Fresh save: `Kill count: 0 / 10` (or 1-2 if doctor waited), `Wave 1/10`, `Lv 1`, XP `<n> / 100`.
 - **Let it fight.** Wait ~15 s (`await new Promise(r => setTimeout(r, 15000))`), read again. Kill count, XP and gold are higher (a fresh character kills one enemy every ~5-15 s); the enemy name or HP (`<hp> / <max>`) has changed.
-- **Saved.** `JSON.parse(localStorage.getItem('playerStore')).state` has `resources.experience` and `resources.goldCoins` matching the HUD, and `enemyKillCounts` (keyed by `EnemyID`) is non-empty. Keep this reading: it is the lower bound after reload.
-- **Reload.** `navigate` to the same URL, wait 3 s, read again. Level/XP, gold and kill count are at least the saved values from the step before.
+- **Saved.** `JSON.parse(localStorage.getItem('playerStore')).state` has `resources.level`, `resources.experience` and `resources.goldCoins` (at or a little behind the HUD: saves are batched), and `enemyKillCounts` (keyed by `EnemyID`) is non-empty. Keep this reading: it is the lower bound after reload.
+- **Reload.** `navigate` to the same URL, wait 3 s, read again. Level is at least the saved level; XP is at least the saved XP only when the levels match (a level-up resets it). Gold and kill count are at least the saved values.
 - **Proof.** Write before/after/reload readings to `tmp/verify/<run-id>/battle-loop.txt`. A screenshot of the battle pane needs a page wider than the pane's ~1024 px; at that width use the DOM text as proof.
 
 ## Gotchas

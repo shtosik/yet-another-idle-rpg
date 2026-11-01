@@ -51,7 +51,7 @@ Run before the first drive and after anything surprising. Read-only.
   ({ port: location.port, dev: typeof window.dev, saves: Object.keys(localStorage),
      enemy: document.querySelector('app-enemy h2')?.textContent.trim(),
      kills: document.querySelector('app-battle-nav-bar')?.textContent.match(/Kill count:\s*\d+(\s*\/\s*\d+)?/)?.[0],
-     hud: document.querySelector('app-player-hud')?.innerText.split('\n').join(' | ') })
+     hud: ['.hud__level', '.hud__xp-text', '.hud__currency--gold'].map(s => document.querySelector(`app-player-hud ${s}`)?.textContent.trim()).join(' | ') })
   ```
 
   Healthy: `port` is yours, `dev` is `"object"`, `hud` reads `Lv <level> | <xp> / <xp needed> | <gold>`, `enemy` is a name (fresh save: a Horseshoe Beach enemy such as `Turtle`, `Seagull`, `Crab`; `undefined` for a moment between enemies is normal), `kills` matches (`Kill count: N / 10` on a fresh save; the `/ 10` disappears once the wave target is met). `dev` `"undefined"` after 3 s means a production build or a crashed bootstrap: check `read_console_messages` with `onlyErrors`.
