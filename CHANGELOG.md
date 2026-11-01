@@ -6,6 +6,14 @@ Versions follow [Semantic Versioning](https://semver.org/). Each note is `- [typ
 New notes go under `[Unreleased]`; `npm run release -- <major|minor|patch>` moves them into a version (docs/deployment.md).
 
 ## [Unreleased]
+- [bug] Item tooltips now show the unit on seconds bonuses (e.g. "+5s Spell Cooldown Reduction", not "+5").
+- [feature] Town pets: reach Exalted to get a pet. In La Harpar the Bartender gives the Tavern Cat (food effects ×1.5); in Mawood, Corwin gives the Rootglow Moth (+10 s to buff spells). Each is given once and can't be sold.
+- [bug] A quest turn-in no longer completes if you used up one of its items while the dialogue was open.
+- [feature] Reputation tier rewards. Friendly: the Bartender and Josh answer for free, and Sylvie opens her shop to friends of Mawood. Honored: new stock in the Trader's shop (Cheese, Venison Roast Recipe, Wharf Runner's Boots), Sylvie's apothecary (Minor Mana Potion, Greater Mana Potion Recipe) and Elarion's magic shop (Rootwalker Boots). Revered: four new quests (Safe Passage from the Trader, Last Orders from the Bartender, A Clean Cure from Sylvie, Roots and Rafters from Brenna), and a few townsfolk have something new to say.
+- [feature] Titles: Friendly and Exalted with a town earn a title (Friend of La Harpar, Toast of La Harpar, Friend of Mawood, Keeper of Mawood). Pick the one to show on the stats panel.
+- [feature] Greater Mana Potion: restores 15 mana. Learn the recipe from Sylvie's apothecary at Mawood Honored, then brew it with a Vial of Water and 3 Spider Silk.
+- [feature] Reputation turn-ins: four townsfolk take bundles of drops for reputation, as often as you like. In La Harpar, the Bartender takes 20 Crab Meat and Josh (once he'll talk to you: buy him a beer, or be Friendly with La Harpar) 20 Feathers, for 10 reputation each. In Mawood, Sylvie takes 15 Spider Silk for 15 and Brenna 10 Ancient Wood for 25. Hand over one bundle or all your full bundles at once; items your active quests still need are kept back. Once you reach Exalted with a town, its turn-ins close.
+- [feature] Town reputation: La Harpar and Mawood quests now also give reputation with their town. Reach Friendly, Honored, Revered and Exalted; a message shows when you reach a new tier. The quest panel's Reputation tab shows your tier and progress in each town you've found, and the town view shows your tier next to the town's name.
 
 ## [0.2.0] - 2026-10-31
 - [feature] The world map is redrawn and now reaches south, with Lirold's castle under the Ironspine mountains, the Saltmere gulf and the Blackwater Fens. Lirold and the Trader's Basement have their own map markers.

@@ -242,6 +242,15 @@ const RECIPES_DATA: Partial<Record<RecipeID, CraftingRecipe>> = {
         itemsNeeded: [{ id: ItemID.vialOfWater, amount: 1 }, { id: ItemID.apple, amount: 1 }],
         createsAmount: 1,
     },
+    [RecipeID.greaterManaPotion]: {
+        id: RecipeID.greaterManaPotion,
+        itemId: ItemID.greaterManaPotion,
+        stationId: StationID.alchemy,
+        stationLevel: 1,
+        itemsNeeded: [{ id: ItemID.vialOfWater, amount: 1 }, { id: ItemID.spiderSilk, amount: 3 }],
+        createsAmount: 1,
+        requiresUnlock: true,
+    },
     [RecipeID.crabStew]: {
         id: RecipeID.crabStew,
         itemId: ItemID.crabStew,

@@ -15,7 +15,11 @@
     "rawMaterials": "Raw Materials",
     "warTrophies": "War Trophies",
     "feathersForAKite": "Feathers for a Kite",
-    "whatLurksAtTheTop": "What Lurks at the Top"
+    "whatLurksAtTheTop": "What Lurks at the Top",
+    "safePassage": "Safe Passage",
+    "lastOrders": "Last Orders",
+    "aCleanCure": "A Clean Cure",
+    "rootsAndRafters": "Roots and Rafters"
   },
   "requirements": {
     "waveKillCount": "{{ amount }} KC on wave {{ wave }} in {{ zone }}",
@@ -36,5 +40,23 @@
     "showCompleted": "Completed ({{count}})",
     "hideCompleted": "Hide completed ({{count}})",
     "reputationEmpty": "No reputation yet."
+  },
+  "reputation": {
+    "tiers": {
+      "neutral": "Neutral",
+      "friendly": "Friendly",
+      "honored": "Honored",
+      "revered": "Revered",
+      "exalted": "Exalted"
+    },
+    "reward": "+{{ amount }} {{ town }} reputation",
+    "townTier": "{{ town }} {{ tier }}",
+    "requires": "Requires {{ what }} — {{ current }}/{{ target }}",
+    "turnInOne": "Hand over {{ amount }} {{ item }} (have {{ held }})",
+    "turnInOne_kept": "Hand over {{ amount }} {{ item }} (have {{ held }}, {{ kept }} kept for quests)",
+    "turnInAll": "Hand over all full bundles: {{ amount }} {{ item }} (have {{ held }})",
+    "turnInAll_kept": "Hand over all full bundles: {{ amount }} {{ item }} (have {{ held }}, {{ kept }} kept for quests)",
+    "tierUp": "{{ town }} now sees you as {{ tier }}",
+    "progressLabel": "{{ town }} reputation"
   }
 }

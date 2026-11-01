@@ -26,9 +26,9 @@ The **Camp** tab is the player's crafting base. It holds **stations** (Workbench
 Then ingredients are removed and the result added (×`createsAmount` × count). Batch size comes from `CampStore.batchSize` (number or `'max'`).
 
 **Consumables** (`useConsumable(itemId)`):
-1. Refused while the slot is locked, or when it's a pure mana potion at full mana.
+1. Refused while the slot is locked, or when it's a pure mana potion at full mana (Minor restores 5, Greater 15; the Greater Mana Potion is crafted at Alchemy level 1 from 1 Vial of Water and 3 Spider Silk once its recipe scroll, sold by Sylvie at Mawood Honored, is used).
 2. Locks the slot for `cooldown` seconds with an effect lasting `min(duration, cooldown)` seconds, and restores mana.
-3. Each second `tickConsumables` counts down the effect and the lock. While the effect runs, the item's `effect.stats` are part of the derived player stats; they disappear when it ends.
+3. Each second `tickConsumables` counts down the effect and the lock. While the effect runs, the item's `effect.stats` are part of the derived player stats; they disappear when it ends. Food stats (not potions) are multiplied by `foodEffectMultiplier` (base 1; only gear raises it, read from equipment first by `foodMultiplierOf`), e.g. ×1.5 with the Tavern Cat (`npm run sim -- --food` lists every food alone and with it).
 4. **Auto-eat** (needs the `autoEat` node and the toggle): when the food slot's lock ends, eats the same food again if any is left.
 5. **While away**: the effect and the lock count down by the whole gap (`tickConsumables(seconds)`) and auto-eat doesn't run, so food that expires offline stays expired (`offline-progress.md`).
 

@@ -1,0 +1,54 @@
+@use 'palette'
+
+$muted: #a3a3a3
+$rowBackground: #2c2c2c
+$barBackground: #171717
+
+:host
+  display: flex
+  flex-direction: column
+  gap: 4px
+
+.empty
+  color: $muted
+
+.reputation
+  display: grid
+  grid-template-columns: 1fr auto
+  align-items: center
+  gap: 0.25rem 0.5rem
+  padding: 0.375rem 0.5rem
+  border-radius: 4px
+  background: $rowBackground
+
+  &__header
+    display: flex
+    grid-column: 1 / -1
+    justify-content: space-between
+
+  &__tier
+    color: palette.$yellow
+
+  &__bar
+    width: 100%
+    height: 0.5rem
+    border: 0
+    border-radius: 2px
+    background: $barBackground
+    appearance: none
+
+    &::-webkit-progress-bar
+      border-radius: 2px
+      background: $barBackground
+
+    &::-webkit-progress-value
+      border-radius: 2px
+      background: palette.$yellow
+
+    &::-moz-progress-bar
+      border-radius: 2px
+      background: palette.$yellow
+
+  &__points
+    color: $muted
+    font-size: 0.75rem

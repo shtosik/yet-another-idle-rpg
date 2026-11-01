@@ -4,12 +4,14 @@ import { ItemID } from '../enums/ids/item-id.enum'
 import { ZoneID } from '../enums/ids/zone-id.enum'
 import { EnemyID } from '../enums/ids/enemy-id.enum'
 import { NpcID } from '../enums/map/npc-id.enum'
+import { TownID } from '../enums/map/town-id.enum'
+import { ReputationTier } from '../enums/reputation-tier.enum'
 
 export const QUEST_STEP_AFTER_COMPLETED = 9999
 
 export interface QuestProps {
   questId: QuestID
-  rewards: Array<StatReward | ItemReward>
+  rewards: QuestReward[]
   startRequirements: RequirementProps[]
   steps: QuestStepProps[]
 }
@@ -26,7 +28,15 @@ export type RequirementProps =
   | WaveKillCountRequirement
   | EnemyKillCountRequirement
   | QuestRequirement
-  | StatRequirement;
+  | StatRequirement
+  | ReputationRequirement;
+
+/** At least `tier` with `townId`. Also a dialogue condition and a shop item's `minReputation`. */
+export interface ReputationRequirement {
+  type: 'reputation'
+  townId: TownID
+  tier: ReputationTier
+}
 
 export interface StatRequirement {
   type: 'stat'
@@ -71,6 +81,15 @@ interface ItemReward {
   amount: number
 }
 
+/** Credits a town that keeps reputation (`REPUTATION_TOWNS`), not always the giver's. */
+interface ReputationReward {
+  type: 'reputation'
+  townId: TownID
+  amount: number
+}
+
+export type QuestReward = StatReward | ItemReward | ReputationReward
+
 // interface SkillReward {
 //     type: 'skill'
 //     name: SkillNames
@@ -90,6 +109,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', townId: TownID.laHarpar, amount: 20 },
       { type: 'stat', key: 'unspentSkillPoints', amount: 1 },
       { type: 'stat', key: 'experience', amount: 1000 },
       { type: 'stat', key: 'goldCoins', amount: 200 },
@@ -106,6 +126,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', townId: TownID.laHarpar, amount: 20 },
       { type: 'stat', key: 'experience', amount: 1500 },
       { type: 'stat', key: 'goldCoins', amount: 250 },
       { type: 'item', itemId: ItemID.joshsHeirloom, amount: 1 },
@@ -122,6 +143,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', townId: TownID.laHarpar, amount: 20 },
       { type: 'stat', key: 'unspentSkillPoints', amount: 1 },
       { type: 'stat', key: 'experience', amount: 1500 },
       { type: 'stat', key: 'goldCoins', amount: 300 },
@@ -154,6 +176,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', townId: TownID.mawood, amount: 25 },
       { type: 'stat', key: 'experience', amount: 1000 },
       { type: 'stat', key: 'goldCoins', amount: 200 },
     ],
@@ -171,6 +194,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', townId: TownID.mawood, amount: 20 },
       { type: 'stat', key: 'experience', amount: 2500 },
       { type: 'stat', key: 'goldCoins', amount: 500 },
     ],
@@ -189,6 +213,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', townId: TownID.mawood, amount: 35 },
       { type: 'stat', key: 'experience', amount: 3000 },
       { type: 'stat', key: 'goldCoins', amount: 600 },
     ],
@@ -206,6 +231,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', townId: TownID.mawood, amount: 100 },
       { type: 'stat', key: 'experience', amount: 5000 },
       { type: 'stat', key: 'goldCoins', amount: 1000 },
       { type: 'stat', key: 'unspentSkillPoints', amount: 1 },
@@ -227,6 +253,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', townId: TownID.mawood, amount: 25 },
       { type: 'stat', key: 'experience', amount: 800 },
       { type: 'stat', key: 'goldCoins', amount: 150 },
       { type: 'item', itemId: ItemID.skillPointBook, amount: 1 },
@@ -246,6 +273,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', townId: TownID.mawood, amount: 35 },
       { type: 'stat', key: 'experience', amount: 2000 },
       { type: 'stat', key: 'goldCoins', amount: 400 },
     ],
@@ -264,6 +292,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', townId: TownID.mawood, amount: 45 },
       { type: 'stat', key: 'experience', amount: 1200 },
       { type: 'stat', key: 'goldCoins', amount: 300 },
     ],
@@ -282,6 +311,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', townId: TownID.mawood, amount: 45 },
       { type: 'stat', key: 'experience', amount: 3500 },
       { type: 'stat', key: 'goldCoins', amount: 700 },
       { type: 'stat', key: 'unspentSkillPoints', amount: 1 },
@@ -303,6 +333,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', townId: TownID.mawood, amount: 45 },
       { type: 'stat', key: 'experience', amount: 2500 },
       { type: 'stat', key: 'goldCoins', amount: 500 },
       { type: 'item', itemId: ItemID.silverwoodChestplate, amount: 1 },
@@ -321,6 +352,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', townId: TownID.mawood, amount: 50 },
       { type: 'stat', key: 'experience', amount: 4000 },
       { type: 'stat', key: 'goldCoins', amount: 800 },
       { type: 'item', itemId: ItemID.skillPointBook, amount: 1 },
@@ -340,6 +372,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', townId: TownID.mawood, amount: 25 },
       { type: 'stat', key: 'experience', amount: 1000 },
       { type: 'stat', key: 'goldCoins', amount: 200 },
       { type: 'item', itemId: ItemID.eagleTalon, amount: 1 },
@@ -359,11 +392,109 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', townId: TownID.mawood, amount: 75 },
       { type: 'stat', key: 'experience', amount: 5000 },
       { type: 'stat', key: 'goldCoins', amount: 1000 },
       { type: 'stat', key: 'unspentSkillPoints', amount: 1 },
       { type: 'item', itemId: ItemID.skillPointBook, amount: 1 },
       { type: 'item', itemId: ItemID.harpyCrown, amount: 1 },
+    ],
+  },
+  // ── Revered (town reputation) ─────────────────────────────────────────────
+  [QuestID.safePassage]: {
+    questId: QuestID.safePassage,
+    startRequirements: [{ type: 'reputation', townId: TownID.laHarpar, tier: ReputationTier.revered }, { type: 'quest', questId: QuestID.silkAndWater, step: QUEST_STEP_AFTER_COMPLETED }],
+    steps: [
+      {
+        description: 'La Harpar\'s trader wants the Mountain Pass safe for his carts. I need to kill the Troll 3 times and 40 goblin scavengers.',
+        turnInNpc: NpcID.laHarparTrader,
+        requirements: [
+          { type: 'enemy', enemyId: EnemyID.troll, amount: 3 },
+          { type: 'enemy', enemyId: EnemyID.goblinScavenger, amount: 40 },
+        ],
+      },
+      {
+        description: 'The road over the Pass is clear. The trader asked me to tell Sylvie in Mawood that La Harpar is open for business.',
+        turnInNpc: NpcID.mawoodSylvie,
+        requirements: [],
+      },
+    ],
+    rewards: [
+      { type: 'reputation', townId: TownID.laHarpar, amount: 100 },
+      { type: 'reputation', townId: TownID.mawood, amount: 25 },
+      { type: 'stat', key: 'experience', amount: 4000 },
+      { type: 'stat', key: 'goldCoins', amount: 800 },
+    ],
+  },
+  [QuestID.lastOrders]: {
+    questId: QuestID.lastOrders,
+    startRequirements: [{ type: 'reputation', townId: TownID.laHarpar, tier: ReputationTier.revered }],
+    steps: [
+      {
+        description: 'Bartender in La Harpar tavern asked me to bring her 10 venison roasts and 10 fish & apple pies for the buyers from Lirold.',
+        turnInNpc: NpcID.laHarparBartender,
+        requirements: [
+          { type: 'item', itemId: ItemID.venisonRoast, amount: 10 },
+          { type: 'item', itemId: ItemID.fishApplePie, amount: 10 },
+        ],
+      },
+    ],
+    rewards: [
+      { type: 'reputation', townId: TownID.laHarpar, amount: 75 },
+      { type: 'stat', key: 'experience', amount: 4000 },
+      { type: 'stat', key: 'goldCoins', amount: 800 },
+      { type: 'item', itemId: ItemID.skillPointBook, amount: 1 },
+    ],
+  },
+  [QuestID.aCleanCure]: {
+    questId: QuestID.aCleanCure,
+    startRequirements: [{ type: 'reputation', townId: TownID.mawood, tier: ReputationTier.revered }, { type: 'quest', questId: QuestID.theInfestation, step: QUEST_STEP_AFTER_COMPLETED }],
+    steps: [
+      {
+        description: 'Sylvie is close to an antidote. She needs 10 elder silk and 5 spider fangs from the Deepwood.',
+        turnInNpc: NpcID.mawoodSylvie,
+        requirements: [
+          { type: 'item', itemId: ItemID.elderSilk, amount: 10 },
+          { type: 'item', itemId: ItemID.spiderFang, amount: 5 },
+        ],
+      },
+      {
+        description: 'Sylvie gave me a tincture to test. I need to kill 30 corrupted saplings in the Elderwood Wilds.',
+        turnInNpc: NpcID.mawoodSylvie,
+        requirements: [{ type: 'enemy', enemyId: EnemyID.corruptedSapling, amount: 30 }],
+      },
+    ],
+    rewards: [
+      { type: 'reputation', townId: TownID.mawood, amount: 100 },
+      { type: 'stat', key: 'experience', amount: 4000 },
+      { type: 'stat', key: 'goldCoins', amount: 800 },
+      { type: 'item', itemId: ItemID.skillPointBook, amount: 1 },
+    ],
+  },
+  [QuestID.rootsAndRafters]: {
+    questId: QuestID.rootsAndRafters,
+    // The Blighted Heart too: Corwin's turn-in leads into his "first silver shoot" line.
+    startRequirements: [{ type: 'reputation', townId: TownID.mawood, tier: ReputationTier.revered }, { type: 'quest', questId: QuestID.warTrophies, step: QUEST_STEP_AFTER_COMPLETED }, { type: 'quest', questId: QuestID.theBlightedHeart, step: QUEST_STEP_AFTER_COMPLETED }],
+    steps: [
+      {
+        description: 'Brenna is rebuilding Mawood\'s blighted walkways. She needs 30 ancient wood and 20 spider silk.',
+        turnInNpc: NpcID.mawoodBrenn,
+        requirements: [
+          { type: 'item', itemId: ItemID.ancientWood, amount: 30 },
+          { type: 'item', itemId: ItemID.spiderSilk, amount: 20 },
+        ],
+      },
+      {
+        description: 'The first walkway is up. Brenna asked me to fetch Corwin from the Elder\'s Tree to bless it.',
+        turnInNpc: NpcID.mawoodCorwin,
+        requirements: [],
+      },
+    ],
+    rewards: [
+      { type: 'reputation', townId: TownID.mawood, amount: 100 },
+      { type: 'stat', key: 'experience', amount: 5000 },
+      { type: 'stat', key: 'goldCoins', amount: 1000 },
+      { type: 'stat', key: 'unspentSkillPoints', amount: 1 },
     ],
   },
 }
