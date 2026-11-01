@@ -15,7 +15,8 @@
     "aboutCorruption": "What do you know about the corruption?",
     "work": "Do you have any work for me?",
     "goodbye": "Take care of yourself.",
-    "browseWares": "Could I see your remedies and tools?"
+    "browseWares": "Could I see your remedies and tools?",
+    "safePassage": "The La Harpar trader sends his regards. And salt fish."
   },
   "aboutSylvie": {
     "message": "I studied herbal medicine in the coastal settlements — La Harpar, mostly. Apprenticed under an old herbalist who smelled permanently of pine resin and had opinions about everything. When I heard about the Elderwood, I had to come. The plants here are extraordinary. Or they were, before the blight started.",
@@ -73,5 +74,30 @@
   "questInfestationComplete": {
     "message": "I haven't seen a spider in two days. That's the longest stretch in months. You have my eternal gratitude. And this — I've been saving it. Don't ask me where I got it.",
     "opt1": "Thank you, Sylvie."
+  },
+  "safePassageComplete": {
+    "message": "Salt fish from La Harpar! I haven't smelled that since I left the coast. Tell him I'll take vials, coastal herbs, anything he can send over the Pass.",
+    "opt1": "I'll pass it on."
+  },
+  "questCleanCure": {
+    "message": "I think I'm close to the antidote. Truly close, this time! I need the purest samples there are: ten bundles of elder silk and five spider fangs from the Deepwood nests.",
+    "opt1": "Clean samples. I'll get them.",
+    "opt2": "Later, Sylvie."
+  },
+  "questCleanCureProgress1": {
+    "message": "Ten elder silk, five spider fangs. The Deepwood spiders, please, not the ones in my supply cabinet.",
+    "opt1": "Working on it."
+  },
+  "questCleanCureProgress2": {
+    "message": "Thirty corrupted saplings in the Wilds. I'll be here, biting my nails.",
+    "opt1": "Working on it."
+  },
+  "questCleanCureStep1Complete": {
+    "message": "These are perfect. Now the hard part: take this tincture into the Wilds and bring down thirty corrupted saplings. If I'm right, the rot in their roots slows wherever it touches.",
+    "opt1": "Thirty saplings."
+  },
+  "questCleanCureComplete": {
+    "message": "It slows it! It doesn't undo it, and the trees that have fully turned are beyond saving, but it slows it. That's years we didn't have, so take this. I mean it.",
+    "opt1": "Years is a start."
   }
 }

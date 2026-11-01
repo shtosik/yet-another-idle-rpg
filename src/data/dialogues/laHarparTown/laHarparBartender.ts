@@ -1,4 +1,5 @@
 import { QuestID } from '../../../enums/ids/quest-id.enum'
+import { ItemID } from '../../../enums/ids/item-id.enum'
 import { DialogueNode } from '../../../interfaces/dialogues/dialogue-node.interface'
 import { NpcID } from '../../../enums/map/npc-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
@@ -17,6 +18,11 @@ export enum BartenderDialogue {
   anyWorkForMe2,
   whatIsThisPlaceFree,
   onTheHouse,
+  questLastOrders,
+  questLastOrdersProgress,
+  questLastOrdersComplete,
+  tavernCat,
+  tavernCatGiven,
 }
 
 export type LaHarparBartenderDialogueType = Record<BartenderDialogue, DialogueNode<BartenderDialogue>>
@@ -28,6 +34,8 @@ const PAID_FOR_TRAINER_FLAG = 'bartender_paid_for_trainer'
 /** At La Harpar Friendly he answers for free. */
 const LA_HARPAR_FRIENDLY: DialogueCondition = { type: 'reputation', townId: TownID.laHarpar, tier: ReputationTier.friendly, hidden: true }
 const LA_HARPAR_REVERED: DialogueCondition = { type: 'reputation', townId: TownID.laHarpar, tier: ReputationTier.revered, hidden: true }
+/** La Harpar's Exalted pet, given once. */
+const GAVE_PET_FLAG = 'bartender_gave_pet'
 
 const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
   [BartenderDialogue.introduction1]: {
@@ -92,6 +100,10 @@ const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
       {
         responseKey: `${NS}:default.anyWork`,
         results: [
+          // Last Orders (La Harpar Revered): above the paid tip, so it never charges
+          { visibilityConditions: [{ type: 'quest', questId: QuestID.lastOrders, questState: QuestState.readyToAdvance, step: 1 }], next: BartenderDialogue.questLastOrdersComplete },
+          { visibilityConditions: [{ type: 'quest', questId: QuestID.lastOrders, questState: QuestState.active }], next: BartenderDialogue.questLastOrdersProgress },
+          { visibilityConditions: [{ type: 'quest', questId: QuestID.lastOrders, questState: QuestState.available }], next: BartenderDialogue.questLastOrders },
           // The 40-gold tip is paid once; after that he repeats the offer for free.
           {
             visibilityConditions: [
@@ -139,6 +151,16 @@ const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
       {
         responseKey: `${NS}:default.onTheHouse`,
         results: [{ visibilityConditions: [LA_HARPAR_REVERED], next: BartenderDialogue.onTheHouse }],
+      },
+      {
+        responseKey: `${NS}:default.tavernCat`,
+        results: [{
+          visibilityConditions: [
+            { type: 'reputation', townId: TownID.laHarpar, tier: ReputationTier.exalted, hidden: true },
+            { type: 'flag', name: GAVE_PET_FLAG, isSet: false, hidden: true },
+          ],
+          next: BartenderDialogue.tavernCat,
+        }],
       },
       {
         responseKey: 'quests:reputation.turnInOne',
@@ -256,6 +278,52 @@ const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
         responseKey: `${NS}:anyWorkForMe2.opt1`,
         results: [{ next: BartenderDialogue.default, closeDialogue: true }],
       },
+    ],
+  },
+  [BartenderDialogue.questLastOrders]: {
+    id: BartenderDialogue.questLastOrders,
+    messageKey: `${NS}:questLastOrders.message`,
+    options: [
+      { responseKey: `${NS}:questLastOrders.opt1`, results: [{ next: BartenderDialogue.default, effects: [{ type: 'quest', action: 'start', questId: QuestID.lastOrders }] }] },
+      { responseKey: `${NS}:questLastOrders.opt2`, results: [{ next: BartenderDialogue.default }] },
+    ],
+  },
+  [BartenderDialogue.questLastOrdersProgress]: {
+    id: BartenderDialogue.questLastOrdersProgress,
+    messageKey: `${NS}:questLastOrdersProgress.message`,
+    options: [
+      { responseKey: `${NS}:questLastOrdersProgress.opt1`, results: [{ next: BartenderDialogue.default }] },
+    ],
+  },
+  [BartenderDialogue.questLastOrdersComplete]: {
+    id: BartenderDialogue.questLastOrdersComplete,
+    messageKey: `${NS}:questLastOrdersComplete.message`,
+    options: [
+      { responseKey: `${NS}:questLastOrdersComplete.opt1`, results: [{ next: BartenderDialogue.default, effects: [{ type: 'quest', action: 'advance', questId: QuestID.lastOrders }] }] },
+    ],
+  },
+  [BartenderDialogue.tavernCat]: {
+    id: BartenderDialogue.tavernCat,
+    messageKey: `${NS}:tavernCat.message`,
+    options: [
+      {
+        responseKey: `${NS}:tavernCat.opt1`,
+        results: [{
+          next: BartenderDialogue.tavernCatGiven,
+          effects: [
+            { type: 'item', action: 'give', items: [{ itemId: ItemID.petLaHarparCat, amount: 1 }] },
+            { type: 'flag', name: GAVE_PET_FLAG },
+          ],
+        }],
+      },
+      { responseKey: `${NS}:tavernCat.opt2`, results: [{ next: BartenderDialogue.default }] },
+    ],
+  },
+  [BartenderDialogue.tavernCatGiven]: {
+    id: BartenderDialogue.tavernCatGiven,
+    messageKey: `${NS}:tavernCatGiven.message`,
+    options: [
+      { responseKey: `${NS}:tavernCatGiven.opt1`, results: [{ next: BartenderDialogue.default }] },
     ],
   },
 }

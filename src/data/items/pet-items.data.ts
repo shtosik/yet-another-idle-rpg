@@ -291,12 +291,27 @@ const ARENA_PETS: Omit<PetEntry, 'shinyId' | 'shinyStats'>[] = [
   { enemyId: EnemyID.arenaBurrower, petId: ItemID.petArenaBurrower, asset: 'arenaBurrower', stats: [{ id: 'damageVsMammal', amount: 0.2 }] },
   { enemyId: EnemyID.arenaYad, petId: ItemID.petArenaYad, asset: 'arenaYad', stats: [{ id: 'meleeDamageMultiplier', amount: 0.1 }] },
 ]
+/** Town pets: given once at Exalted, legendary, can't be sold, no shiny (icons under items/). */
+const townPet = (id: ItemID, key: string, stats: EquipmentItemPossibleStat[]): EquipmentItem => ({
+  id,
+  tier: ItemTier.legendary,
+  url: `./assets/img/items/${key}.png`,
+  value: -1,
+  type: ItemType.equipment,
+  slot: EquipmentSlot.pet,
+  stats,
+})
+const TOWN_PETS: EquipmentItem[] = [
+  townPet(ItemID.petLaHarparCat, 'petLaHarparCat', [{ id: 'foodEffectMultiplier', amount: 0.5 }]),
+  townPet(ItemID.petMawoodMoth, 'petMawoodMoth', [{ id: 'increasedSpellDuration', amount: 10 }]),
+]
 export const PetItemsData: Partial<Record<ItemID, Item>> = Object.fromEntries([
   ...PETS.flatMap(p => [
     [p.petId, buildPetItem(p, false)],
     [p.shinyId, buildPetItem(p, true)],
   ]),
   ...ARENA_PETS.map(p => [p.petId, buildPetItem({ ...p, shinyId: p.petId, shinyStats: [] }, false)]),
+  ...TOWN_PETS.map(p => [p.id, p]),
 ])
 
 const PETS_BY_ENEMY: Partial<Record<EnemyID, PetEntry>> = Object.fromEntries(

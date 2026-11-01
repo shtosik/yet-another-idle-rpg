@@ -92,7 +92,7 @@ export class DialogueManagerService {
       .filter(stack => stack.id === turnIn.itemId)
       .reduce((sum, stack) => sum + stack.amount, 0)
     const held = this.playerStore.itemCount(turnIn.itemId)
-    return { turnIn, held, kept, bundles: turnInBundles(turnIn, Math.max(0, held - kept), effect.bundles) }
+    return { turnIn, held, kept: Math.min(held, kept), bundles: turnInBundles(turnIn, Math.max(0, held - kept), effect.bundles) }
   }
 
   /** Turn-ins stop once their town is Exalted: more reputation would count for nothing. */
@@ -293,7 +293,8 @@ export class DialogueManagerService {
               this.questStore.advanceQuest(effect.questId)
               break
             case 'end':
-              this.questStore.endQuest(effect.questId)
+              // Dialogue ends are turn-ins, so recheck like `advanceQuest`; `dev.completeQuest` calls `endQuest` directly.
+              if (this.questStore.isStepReady(effect.questId)) this.questStore.endQuest(effect.questId)
               break
           }
           break

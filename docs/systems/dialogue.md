@@ -40,12 +40,13 @@ Kill-count requirements inside quest conditions count kills since the quest reac
 ## Invariants & gotchas
 - **Order results from most specific to least.** Quest hubs go: turn-in (`readyToAdvance`) → in progress (`active`) → offer (`available`) → fallback. An NPC with several questlines (Finn) lists every turn-in, then every in-progress, then every offer.
 - A turn-in result is just `readyToAdvance` + `advance`/`end`. The store takes the step's items; don't restate them as `requirementsNeeded` or `take`. The turn-in NPC must match the step's `turnInNpc` in `QUEST_DATA` (`npm run validate` checks that their dialogue handles the quest).
+- **Talk steps** (`requirements: []`, "go tell Sylvie") are `readyToAdvance` the moment they start. The giver's reminder for that step checks `active` with `step: N` and goes after the previous step's turn-in; the turn-in itself is its own option on the turn-in NPC's `default` node, gated by `readyToAdvance` with `step: N` (e.g. Safe Passage, Roots and Rafters).
 - Lore links into an offer node also need an `available` result, plus a fallback result so the option stays usable.
 - Node ids are the enum values; `default = 0` is the start node for returning players.
 - Every `next` must exist and every node should be reachable. `npm run validate` checks both (unreachable = warning).
 - Dialogue text keys are `dialogues/<npcKey>:<node>.<field>`, and the namespace must be registered in `app.config.ts` (see `localization.md`).
 - Adding a condition or effect variant means extending the union **and** the switch in `checkCondition`/`applyEffects`, plus `getConditionLabel` in the component if it can be a requirement. Use the `add-dialogue-effect` skill.
-- Flags: a `flag` effect sets one; the `flag` condition (`name`, `isSet`) reads it, e.g. to charge a fee only once (the Bartender's three paid answers and Josh's beer: `bartender_paid_for_*`, `josh_paid_beer`). The engine reads `met_<npcId>`.
+- Flags: a `flag` effect sets one; the `flag` condition (`name`, `isSet`) reads it, e.g. to charge a fee only once (the Bartender's three paid answers and Josh's beer: `bartender_paid_for_*`, `josh_paid_beer`), or to give an item once (the Exalted town pets: `bartender_gave_pet`, `corwin_gave_pet`, set by the same result that gives the pet, so a full inventory leaves the offer open). The engine reads `met_<npcId>`.
 
 ## Known issues
 - Gold fees in dialogue (`stat` `deduct` of `goldCoins`, Bartender and Josh) are not gated, so gold can go negative. Owner decision: block spending when the player can't afford it (`player-stats-inventory-equipment.md`).

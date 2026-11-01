@@ -10,6 +10,7 @@ export type PlayerStat =
     | 'level'
     | 'unspentSkillPoints'
     | 'goldCoinsMultiplier'
+    | 'foodEffectMultiplier'
     | 'manaRegenRate'
     | 'magicDamage'
     | 'spellCooldownReduction'
@@ -58,6 +59,7 @@ export const multiplierStats: PlayerStat[] = [
     'critMulti',
     'xpMultiplier',
     'goldCoinsMultiplier',
+    'foodEffectMultiplier',
     'extraFireDamageMultiplier',
     'extraAirDamageMultiplier',
     'extraWaterDamageMultiplier',

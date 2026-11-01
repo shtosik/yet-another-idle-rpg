@@ -195,4 +195,6 @@ export enum ItemID {
     rootwalkerBoots = 176,
     greaterManaPotion = 177,
     greaterManaPotionRecipe = 178,
+    petLaHarparCat = 179,
+    petMawoodMoth = 180,
 }
