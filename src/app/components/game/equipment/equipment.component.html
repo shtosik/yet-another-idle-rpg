@@ -1,12 +1,18 @@
-<section class="equipment">
-    @for (slot of equipmentArray(); track slot.name) {
-        <app-slot>
+<header class="loadout-heading">
+    <h2>{{ 'app:equipment.title' | i18next }}</h2>
+    <span>{{ equippedCount() }} / {{ slots.length }}</span>
+</header>
+<section class="paper-doll" [attr.aria-label]="'app:equipment.title' | i18next">
+    <img class="body-guide" ngSrc="assets/img/icons/equipment-body.svg" width="240" height="352" alt="" aria-hidden="true">
+    @for (name of slots; track name) {
+        @let equipped = equipment()[name];
+        <app-slot class="paper-doll__slot" [style.grid-area]="name">
             <app-equipment-slot
                 (unequipItem)="unequipItem($event)"
-                [item]="Items[slot.item?.id]"
-                [slotName]="slot.name"
-                [tier]="slot.item?.tier"
-                [unequipBlocked]="!!slot.item && !playerStore.canUnequip(slot.name)"
+                [item]="Items[equipped?.id]"
+                [slotName]="name"
+                [tier]="equipped?.tier"
+                [unequipBlocked]="!!equipped && !playerStore.canUnequip(name)"
             />
         </app-slot>
     }
