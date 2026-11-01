@@ -9,6 +9,7 @@ import { NpcID } from '../../enums/map/npc-id.enum'
 import { QuestID } from '../../enums/ids/quest-id.enum'
 import { TownID } from '../../enums/map/town-id.enum'
 import { ReputationTier } from '../../enums/reputation-tier.enum'
+import { QuestState } from '../../enums/quest-state.enum'
 import { DialogueNode } from '../../interfaces/dialogues/dialogue-node.interface'
 import LA_HARPAR_BARTENDER, { BartenderDialogue } from '../../data/dialogues/laHarparTown/laHarparBartender'
 import LA_HARPAR_JOSH, { JoshDialogue } from '../../data/dialogues/laHarparTown/laHarparJosh'
@@ -75,6 +76,14 @@ describe('reputation turn-ins in dialogue', () => {
     dialogue.selectOption(askJosh)
 
     expect(playerStore.stats().goldCoins).toBe(gold)
+  })
+
+  it('offers a Revered quest only at Revered', () => {
+    const available = { type: 'quest', questId: QuestID.lastOrders, questState: QuestState.available } as const
+    playerStore.addReputation([{ townId: TownID.laHarpar, amount: 599 }])
+    expect(dialogue.checkCondition(available)).toBeFalse()
+    playerStore.addReputation([{ townId: TownID.laHarpar, amount: 1 }])
+    expect(dialogue.checkCondition(available)).toBeTrue()
   })
 
   it('closes once the town is Exalted', () => {

@@ -17,6 +17,9 @@ export enum BartenderDialogue {
   anyWorkForMe2,
   whatIsThisPlaceFree,
   onTheHouse,
+  questLastOrders,
+  questLastOrdersProgress,
+  questLastOrdersComplete,
 }
 
 export type LaHarparBartenderDialogueType = Record<BartenderDialogue, DialogueNode<BartenderDialogue>>
@@ -92,6 +95,10 @@ const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
       {
         responseKey: `${NS}:default.anyWork`,
         results: [
+          // Last Orders (La Harpar Revered): above the paid tip, so it never charges
+          { visibilityConditions: [{ type: 'quest', questId: QuestID.lastOrders, questState: QuestState.readyToAdvance, step: 1 }], next: BartenderDialogue.questLastOrdersComplete },
+          { visibilityConditions: [{ type: 'quest', questId: QuestID.lastOrders, questState: QuestState.active }], next: BartenderDialogue.questLastOrdersProgress },
+          { visibilityConditions: [{ type: 'quest', questId: QuestID.lastOrders, questState: QuestState.available }], next: BartenderDialogue.questLastOrders },
           // The 40-gold tip is paid once; after that he repeats the offer for free.
           {
             visibilityConditions: [
@@ -256,6 +263,28 @@ const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
         responseKey: `${NS}:anyWorkForMe2.opt1`,
         results: [{ next: BartenderDialogue.default, closeDialogue: true }],
       },
+    ],
+  },
+  [BartenderDialogue.questLastOrders]: {
+    id: BartenderDialogue.questLastOrders,
+    messageKey: `${NS}:questLastOrders.message`,
+    options: [
+      { responseKey: `${NS}:questLastOrders.opt1`, results: [{ next: BartenderDialogue.default, effects: [{ type: 'quest', action: 'start', questId: QuestID.lastOrders }] }] },
+      { responseKey: `${NS}:questLastOrders.opt2`, results: [{ next: BartenderDialogue.default }] },
+    ],
+  },
+  [BartenderDialogue.questLastOrdersProgress]: {
+    id: BartenderDialogue.questLastOrdersProgress,
+    messageKey: `${NS}:questLastOrdersProgress.message`,
+    options: [
+      { responseKey: `${NS}:questLastOrdersProgress.opt1`, results: [{ next: BartenderDialogue.default }] },
+    ],
+  },
+  [BartenderDialogue.questLastOrdersComplete]: {
+    id: BartenderDialogue.questLastOrdersComplete,
+    messageKey: `${NS}:questLastOrdersComplete.message`,
+    options: [
+      { responseKey: `${NS}:questLastOrdersComplete.opt1`, results: [{ next: BartenderDialogue.default, effects: [{ type: 'quest', action: 'advance', questId: QuestID.lastOrders }] }] },
     ],
   },
 }

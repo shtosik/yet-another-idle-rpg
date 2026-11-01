@@ -59,5 +59,22 @@
   "reveredCommissions": {
     "message": "Slowly. Clean bark is coming in again, a few pieces a week. The craft isn't dying with the forest after all. Don't make me say thank you.",
     "opt1": "Wouldn't dream of it."
+  },
+  "questRootsAndRafters": {
+    "message": "Half the walkways on the lower platforms have gone brittle with the blight. I'm rebuilding them properly: thirty pieces of clean ancient wood and twenty bundles of spider silk for the lashings. I'll know if it's tainted, so don't try.",
+    "opt1": "Thirty ancient wood, twenty silk. Done.",
+    "opt2": "Give me time."
+  },
+  "questRootsAndRaftersProgress": {
+    "message": "Thirty ancient wood, twenty spider silk. Clean, or it goes back.",
+    "opt1": "Understood."
+  },
+  "questRootsAndRaftersStep1Complete": {
+    "message": "Not a black vein in the lot. The first walkway goes up tonight, so fetch Corwin from the Elder's Tree. He'll want to bless it.",
+    "opt1": "I'll get him."
+  },
+  "questRootsAndRaftersStep2": {
+    "message": "Corwin. Elder's Tree. Go on.",
+    "opt1": "Going."
   }
 }

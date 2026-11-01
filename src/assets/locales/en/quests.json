@@ -15,7 +15,11 @@
     "rawMaterials": "Raw Materials",
     "warTrophies": "War Trophies",
     "feathersForAKite": "Feathers for a Kite",
-    "whatLurksAtTheTop": "What Lurks at the Top"
+    "whatLurksAtTheTop": "What Lurks at the Top",
+    "safePassage": "Safe Passage",
+    "lastOrders": "Last Orders",
+    "aCleanCure": "A Clean Cure",
+    "rootsAndRafters": "Roots and Rafters"
   },
   "requirements": {
     "waveKillCount": "{{ amount }} KC on wave {{ wave }} in {{ zone }}",

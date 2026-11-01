@@ -40,6 +40,7 @@ Kill-count requirements inside quest conditions count kills since the quest reac
 ## Invariants & gotchas
 - **Order results from most specific to least.** Quest hubs go: turn-in (`readyToAdvance`) → in progress (`active`) → offer (`available`) → fallback. An NPC with several questlines (Finn) lists every turn-in, then every in-progress, then every offer.
 - A turn-in result is just `readyToAdvance` + `advance`/`end`. The store takes the step's items; don't restate them as `requirementsNeeded` or `take`. The turn-in NPC must match the step's `turnInNpc` in `QUEST_DATA` (`npm run validate` checks that their dialogue handles the quest).
+- **Talk steps** (`requirements: []`, "go tell Sylvie") are `readyToAdvance` the moment they start. The giver's reminder for that step checks `active` with `step: N` and goes after the previous step's turn-in; the turn-in itself is its own option on the turn-in NPC's `default` node, gated by `readyToAdvance` with `step: N` (e.g. Safe Passage, Roots and Rafters).
 - Lore links into an offer node also need an `available` result, plus a fallback result so the option stays usable.
 - Node ids are the enum values; `default = 0` is the start node for returning players.
 - Every `next` must exist and every node should be reachable. `npm run validate` checks both (unreachable = warning).

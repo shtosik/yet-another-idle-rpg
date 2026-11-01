@@ -45,5 +45,18 @@
   "onTheHouse": {
     "message": "One ale, on the house. Don't get used to it. ...Fine. Get a little used to it.",
     "opt1": "Cheers."
+  },
+  "questLastOrders": {
+    "message": "Buyers from Lirold are coming to renew the fish contract, and I want them fed so well they forget to haggle. Ten venison roasts and ten fish and apple pies. You cook, I charm.",
+    "opt1": "Twenty plates, coming up.",
+    "opt2": "I'm no cook."
+  },
+  "questLastOrdersProgress": {
+    "message": "Ten roasts, ten pies. Hot ones. Lirold folk can tell.",
+    "opt1": "Working on it."
+  },
+  "questLastOrdersComplete": {
+    "message": "Smells like a signed contract. Here, you've earned this. And don't tell anyone I paid you.",
+    "opt1": "My lips are sealed."
   }
 }

@@ -14,7 +14,8 @@
     "corruption": "What is happening to the trees?",
     "work": "Do you have any work for me?",
     "goodbye": "Goodbye, Elder.",
-    "recovery": "How is the forest?"
+    "recovery": "How is the forest?",
+    "rootsAndRafters": "Brenna asks you to bless the new walkway."
   },
   "aboutMawood": {
     "message": "Mawood has stood for three hundred years. Not on the ground — that would have been foolish. The forest floor belongs to roots and rot and things older than memory. So we built up, in the light. It has always worked. Until two years ago, when the black sap first appeared.",
@@ -80,5 +81,9 @@
   "reveredFirstShoot": {
     "message": "One silver shoot in the outer Wilds. One, the first in two years. The rest will take years, perhaps more than I have left. But it is one more than last spring.",
     "opt1": "One is a start."
+  },
+  "rootsAndRaftersComplete": {
+    "message": "Clean wood, lashed with silk. Mawood builds up again, as it always has, and I will bless it gladly. Take this, traveler; you have rebuilt more than a walkway.",
+    "opt1": "Thank you, Elder. And the forest?"
   }
 }

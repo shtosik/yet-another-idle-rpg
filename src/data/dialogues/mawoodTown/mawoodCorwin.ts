@@ -24,6 +24,7 @@ export enum CorwinDialogue {
   postQuestLore,
   waitingForFinn,
   reveredFirstShoot,
+  rootsAndRaftersComplete,
 }
 
 export type MawoodCorwinDialogueType = Record<CorwinDialogue, DialogueNode<CorwinDialogue>>
@@ -78,6 +79,10 @@ const MAWOOD_CORWIN: MawoodCorwinDialogueType = {
       {
         responseKey: `${NS}:default.corruption`,
         results: [{ next: CorwinDialogue.corruptionLore }],
+      },
+      {
+        responseKey: `${NS}:default.rootsAndRafters`,
+        results: [{ visibilityConditions: [{ type: 'quest', questId: QuestID.rootsAndRafters, questState: QuestState.readyToAdvance, step: 2 }], next: CorwinDialogue.rootsAndRaftersComplete }],
       },
       {
         responseKey: `${NS}:default.work`,
@@ -386,6 +391,13 @@ const MAWOOD_CORWIN: MawoodCorwinDialogueType = {
         responseKey: `${NS}:waitingForFinn.opt1`,
         results: [{ next: CorwinDialogue.default, closeDialogue: true }],
       },
+    ],
+  },
+  [CorwinDialogue.rootsAndRaftersComplete]: {
+    id: CorwinDialogue.rootsAndRaftersComplete,
+    messageKey: `${NS}:rootsAndRaftersComplete.message`,
+    options: [
+      { responseKey: `${NS}:rootsAndRaftersComplete.opt1`, results: [{ next: CorwinDialogue.reveredFirstShoot, effects: [{ type: 'quest', action: 'advance', questId: QuestID.rootsAndRafters }] }] },
     ],
   },
 }

@@ -12,7 +12,7 @@ import { ENTRANCE_ZONES_BY_QUEST } from '../../../data/helpers/entrance-zones'
 import { EnemyID } from '../../../enums/ids/enemy-id.enum'
 import { ZoneID } from '../../../enums/ids/zone-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
-import { getQuestStatus, getStepItems } from '../../services/quest-status'
+import { canAdvanceQuest, getQuestStatus, getStepItems } from '../../services/quest-status'
 import { ReputationService } from '../../services/reputation.service'
 import { REPUTATION_THRESHOLDS, ReputationGain } from '../player/reputation'
 
@@ -143,7 +143,9 @@ export const QuestsStore = signalStore(
             return { current: 0, target: 1 }
         }
       },
-
+    }),
+  ),
+  withMethods((store) => ({
       resetState(): void {
         patchState(store, initialState)
       },
@@ -177,8 +179,14 @@ export const QuestsStore = signalStore(
         }))
       },
 
-      /** Takes the current step's items, then moves to the next step or completes. No-op unless active. */
+      /** Takes the current step's items, then moves to the next step or completes. No-op unless the step is still ready. */
       advanceQuest(questId: QuestID) {
+        // Rechecked here: items can be used up between opening a turn-in node and confirming it.
+        const isMet = (req: RequirementProps) => {
+          const { current, target } = store.requirementProgress(questId, req)
+          return current >= target
+        }
+        if (!canAdvanceQuest(store.questStepProgression(), questId, isMet)) return
         const status = getQuestStatus(store.questStepProgression(), questId)
         if (status.state !== QuestState.active) return
 
