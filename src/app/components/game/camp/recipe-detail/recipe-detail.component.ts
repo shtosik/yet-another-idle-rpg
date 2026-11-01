@@ -89,7 +89,6 @@ export class RecipeDetailComponent {
   reason = computed(() => {
     const { recipe, evaluation } = this.view()
     const upgrade = this.stationUpgrade()
-    const inventory = this.playerStore.inventory()
 
     switch (evaluation.blockReason) {
       case 'stationLevel':
@@ -106,14 +105,9 @@ export class RecipeDetailComponent {
           blocked: true,
           text: i18next.t('camp:reasons.stationOrder', { station: stationName(upgrade!.stationId), level: upgrade!.level - 1 }),
         }
-      case 'missingItems': {
-        const items = recipe.itemsNeeded
-          .map(({ id, amount }) => ({ id, missing: amount - countItem(inventory, id) }))
-          .filter(({ missing }) => missing > 0)
-          .map(({ id, missing }) => `${missing} ${itemName(id)}`)
-          .join(', ')
-        return { blocked: true, text: i18next.t('camp:reasons.missingItems', { items }) }
-      }
+      // The ingredient counters already show what is short.
+      case 'missingItems':
+        return null
       case 'inventoryFull':
         return { blocked: true, text: i18next.t('camp:reasons.inventoryFull', { tab: tabName(tabOf(recipe.itemId)) }) }
     }

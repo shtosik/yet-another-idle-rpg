@@ -16,11 +16,13 @@
     [appendTooltipToBody]="true"
     [hideDelay]="0"
     tooltipClass="tooltip-override"
-    (click)="handleUnequip(); details.hide()"
+    (contextmenu)="$event.preventDefault(); handleUnequip(); details.hide()"
+    (keydown.enter)="$event.preventDefault(); handleUnequip(); details.hide()"
+    (keydown.space)="$event.preventDefault(); handleUnequip(); details.hide()"
     (keydown.escape)="details.hide()"
 >
     @if (gear) {
-        <img height="40" width="40" disableOptimizedSrcset alt="" [ngSrc]="gear.url">
+        <img height="48" width="48" disableOptimizedSrcset alt="" [ngSrc]="gear.url">
     } @else {
         <span class="empty-mark" aria-hidden="true">&#9671;</span>
     }
@@ -36,7 +38,10 @@
 >
     <div class="item__tooltip">
         @if (item) {
-            <span>{{ ('items:names.' + ItemID[item.id]) | i18next }}</span>
+            <span
+                [attr.data-tier]="ItemTier[tier]"
+                class="name"
+            >{{ ('items:names.' + ItemID[item.id]) | i18next }}</span>
             <span class="tier-line">
                 <span
                     [attr.data-tier]="ItemTier[tier]"
@@ -60,13 +65,13 @@
                     <span class="stat">{{ 'items:grantsSpell' | i18next:{ spell: ('spells:names.' + SpellID[item.spell] + '.name') | i18next } }}</span>
                 }
                 @if (blocked) {
-                    <span class="click">{{ 'app:equipment.unequipBlocked' | i18next }}</span>
+                    <span class="click click--blocked">{{ 'items:unequipBlockedInventory' | i18next }}</span>
                 } @else {
-                    <span class="click">{{ 'items:clickToUnequip' | i18next }}</span>
+                    <span class="click">{{ 'items:rightClickToUnequip' | i18next }}</span>
                 }
             }
         } @else {
-            <span>{{ slotLabel }}</span>
+            <span class="name">{{ slotLabel }}</span>
             <span class="click">{{ 'app:equipment.emptyHint' | i18next }}</span>
         }
     </div>

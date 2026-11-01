@@ -2,9 +2,8 @@
   "equipment": {
     "title": "Equipment",
     "empty": "Empty",
-    "hint": "Click equipped gear to unequip",
-    "unequipBlocked": "Cannot unequip: free space in the inventory first.",
-    "emptyHint": "Empty slot. Click matching gear in your inventory to equip it.",
+    "hint": "Right-click equipped gear to unequip",
+    "emptyHint": "Empty slot. Right-click matching gear in your inventory to equip it.",
     "slots": {
       "helmet": "Head",
       "cape": "Cape",

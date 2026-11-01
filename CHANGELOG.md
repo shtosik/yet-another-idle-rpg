@@ -6,7 +6,14 @@ Versions follow [Semantic Versioning](https://semver.org/). Each note is `- [typ
 New notes go under `[Unreleased]`; `npm run release -- <major|minor|patch>` moves them into a version (docs/deployment.md).
 
 ## [Unreleased]
-- [feature] Equipment now has a paper-doll layout with labeled slots, a character silhouette, and keyboard controls. Hover or focus a slot for details; click equipped gear or press Enter or Space to unequip it.
+- [feature] The equipment window is now a proper character sheet: every slot sits in its place around your character with a label, empty slots say what goes there, and the header counts what you have on. Hover a slot for details; right-click, Enter or Space unequips.
+- [feature] New fonts: Cinzel for titles and tabs, Alegreya Sans for everything else, so descriptions, numbers and dialogue are much easier to read than the old pixel font.
+- [feature] Equip and unequip items with right-click instead of left-click, the same as using consumables. Left-click no longer swaps gear by accident.
+- [feature] Item, equipment and zone star tooltips are bigger, left-aligned and easier to scan; item names show in their tier colour.
+- [feature] Dialogue text and answers are bigger, and town building labels no longer grow when you hover them.
+- [feature] The quest log, bestiary, stats panel, crafting panel, popups, top menu, XP and gold bar, and battle bar have bigger, clearer text. Long quest names and requirements wrap instead of being cut off.
+- [feature] Inventory, quest log and camp tabs share one look: a yellow line runs along the whole tab strip and the active tab opens into the panel.
+- [feature] Recipes no longer show a "Missing" line; the ingredient counters already show what you still need.
 - [bug] Item tooltips now show the unit on seconds bonuses (e.g. "+5s Spell Cooldown Reduction", not "+5").
 - [feature] Town pets: reach Exalted to get a pet. In La Harpar the Bartender gives the Tavern Cat (food effects ×1.5); in Mawood, Corwin gives the Rootglow Moth (+10 s to buff spells). Each is given once and can't be sold.
 - [bug] A quest turn-in no longer completes if you used up one of its items while the dialogue was open.
