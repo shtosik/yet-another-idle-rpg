@@ -1,6 +1,6 @@
 # Inventory tabs & destroy
 
-**Scope:** M-L · **Status:** Accepted design (owner, 2026-10-31)
+**Scope:** M-L · **Status:** Done (design accepted by owner 2026-10-31)
 
 The inventory fills too easily. 40 slots, capped at 55 (3 Guild Satchels). About 70+ non-pet item ids plus 68 pets (32 normal + 32 shiny + 4 Arena champion pets) can each take a slot. Pets sell (500 / shiny 2500) but are rare enough that players keep them, and nothing can be destroyed, so every pet species kept holds a slot. Materials fill the grid early (3–6 new ids per zone), and the next rare pet is then lost silently on a full inventory.
 

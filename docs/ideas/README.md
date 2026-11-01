@@ -9,14 +9,14 @@ Owner decisions in force:
 |---|---|---|
 | [Consumables & buff slots](consumables-buff-slots.md) | M | **v1 implemented** |
 | [Batch crafting](batch-crafting.md) | S | Implemented |
-| [Camp & crafting stations](crafting-stations.md) | M | Accepted |
+| [Camp & crafting stations](crafting-stations.md) | M | Done |
 | [Crafting recipes](crafting-recipes.md) | M | Proposed |
 | [Gold drops & selling](gold-drops-and-selling.md) | S | Done |
 | [Shop preferences](shop-preferences.md) | S | Done |
 | [Progression pacing & economy simulation](progression-pacing.md) | S-M | Simulation done, tuning ongoing |
 | [Offline progress](offline-progress.md) | M | Done (save clamping open) |
 | [Rune socketing](rune-socketing.md) | M | Proposed |
-| [Explorer Token shop & guild ranks](explorer-token-shop.md) | S-M | Done (Ambush, extra consumable slot open) |
+| [Explorer Token shop & guild ranks](explorer-token-shop.md) | S-M | Done (extra consumable slot open) |
 | [Wave variety, wave scaling & boss waves](wave-variety.md) | M | Scaling done; variety proposed |
 | [Rune rifts (challenge dungeons)](rune-rifts.md) | M | Proposed |
 | [Prestige / rebirth](prestige.md) | M-L | Proposed |
@@ -33,11 +33,11 @@ Owner decisions in force:
 | [Elemental spells & gear expansion](elemental-spells-gear.md) | M | Batch 1 (spells, element branches, weaknesses) done |
 | [Loadouts](loadouts.md) | S | Accepted |
 | [Auto-cast](auto-cast.md) | S-M | Proposed |
-| [Combat Arena](combat-arena.md) | M | Accepted design |
-| [Lirold Arena Master (Ludo Crane)](lirold-arena-master.md) | S | Proposed |
-| [Lirold & the Exploration Guild](north-lirold-and-exploration-guild.md) | M | Proposed |
+| [Combat Arena](combat-arena.md) | M | Batches 1–4 done; arena-only recipe scroll open |
+| [Lirold Arena Master (Ludo Crane)](lirold-arena-master.md) | S | Done |
+| [Lirold & the Exploration Guild](north-lirold-and-exploration-guild.md) | M | Lirold and its Arena built; Guild hall, Odile Varrow and The Guild Trial proposed |
 | [Slatefall & the Deeper Mines](slatefall-and-the-deeper-mines.md) | M-L | Proposed |
-| [Inventory tabs & destroy](inventory-tabs.md) | M-L | In progress (PRs 82, 83) |
+| [Inventory tabs & destroy](inventory-tabs.md) | M-L | Done |
 | [La Harpar quests & Tidecaller questline](la-harpar-quests.md) | M | Proposed |
 | [Town reputation](town-reputation.md) | M | Built (steps 1–4: state and quest rewards, turn-ins, tier unlocks and titles, town pets) |
 | [Town reputation: tier rewards and titles](town-reputation-tier-rewards.md) | M | Built |
@@ -47,4 +47,5 @@ Owner decisions in force:
 | [Item sets](item-sets.md) | S-M | Proposed |
 | [Gathering skills (professions)](gathering-skills.md) | M-L | Proposed |
 | [Enemy affixes](enemy-affixes.md) | S-M | Noted (owner not keen) |
+| [Battle UI redesign review](battle-ui-redesign.md) | M | Review findings; fixes proposed |
 | [Known issues](known-issues.md) | — | Open bug and tech-debt list |
