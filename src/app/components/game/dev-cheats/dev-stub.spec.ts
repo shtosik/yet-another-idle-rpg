@@ -18,4 +18,11 @@ describe('installDevStub', () => {
     devWindow.dev = { equip: () => true }
     await expectAsync(result).toBeRejectedWithError(/dev.equp is not a command; commands: equip/)
   })
+
+  it('rejects when the command throws', async () => {
+    installDevStub()
+    const result = (devWindow.dev as { equip: () => Promise<unknown> }).equip()
+    devWindow.dev = { equip: () => { throw new Error('no room') } }
+    await expectAsync(result).toBeRejectedWithError('no room')
+  })
 })
