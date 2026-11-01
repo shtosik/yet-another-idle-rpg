@@ -5,16 +5,15 @@
   <app-battle-nav-bar/>
   <div class="battle-pane">
     @if (!isInCombat()) {
-      <app-spinner/>
+      <div class="battle-pane__waiting" role="status">
+        <span class="battle-pane__waiting-marker" aria-hidden="true"></span>
+        <span>{{ 'app:battle.nextEnemy' | i18next }}</span>
+      </div>
     } @else {
-      <app-enemy #enemyElement/>
+      <app-enemy/>
     }
 
-    @let enemyPositionVal = this.enemyPosition();
-    <app-damage-popup
-      [x]="enemyPositionVal.x"
-      [y]="enemyPositionVal.y"
-    />
+    <app-damage-popup/>
     <app-battle-side-buttons/>
     @if (dropsLostToast(); as message) {
       <div class="battle-pane__toast" role="status">{{ message }}</div>

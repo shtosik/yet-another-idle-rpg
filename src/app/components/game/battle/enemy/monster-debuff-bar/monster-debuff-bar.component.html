@@ -1,14 +1,13 @@
-@let w = weakness();
-@if (w) {
+@let visibleWeaknesses = weaknesses();
+@if (visibleWeaknesses.length) {
   <div class="monster-debuff-bar">
-    <img
-      [ngSrc]="w.icon"
-      [title]="w.nameKey | i18next"
-      [alt]="w.nameKey | i18next"
-      class="weakness-icon"
-      disableOptimizedSrcset
-      height="24"
-      width="24"
-    >
+    <span class="monster-debuff-bar__label">{{ 'app:battle.weakness' | i18next }}</span>
+    @for (w of visibleWeaknesses; track w.element) {
+      <span class="monster-debuff-bar__element" [attr.data-element]="elementName(w.element)"
+        [title]="'app:battle.weaknessHint' | i18next: { element: (w.nameKey | i18next) }">
+        <img [ngSrc]="w.icon" alt="" disableOptimizedSrcset height="24" width="24">
+        <span>{{ w.nameKey | i18next }}</span>
+      </span>
+    }
   </div>
 }

@@ -1,74 +1,123 @@
-@use 'variables' as variables
+@use 'variables' as vars
+@use 'palette'
+
+:host
+  display: block
+  min-width: 0
+  background: #171717f2
+  border-top: vars.$panelBorder
 
 footer
+  padding: 0.625rem
   display: flex
   flex-direction: column
-  padding: 0.5rem 0.5rem
-  width: 100%
+  gap: 0.5rem
+
+.active-effects
+  display: flex
+  align-items: flex-start
+  gap: 0.5rem
+  overflow-x: auto
+  max-width: 100%
+  font-variant-numeric: tabular-nums
+
+  &:empty
+    display: none
+
+.effect-icon
+  width: 2rem
+  height: 2rem
+  flex-shrink: 0
+  border: 1px solid #548059
+  border-radius: 4px
+  background-color: #262626
+  background-size: contain
+  display: flex
+  align-items: flex-end
+  justify-content: center
+  font-size: 0.8rem
+  text-shadow: vars.$textShadow
+
+  &--expired
+    filter: grayscale(1)
+    border-color: #737373
+
+// Left-aligned so the icon stays put while the "Ready in" text changes width.
+.consumable
+  display: flex
+  flex-direction: column
+  align-items: flex-start
+  gap: 0.125rem
+  flex-shrink: 0
+
+  &__ready-in
+    font-size: 0.8rem
+    color: #c5bfb5
+    white-space: nowrap
+
+.mana
+  display: flex
   align-items: center
-  justify-content: flex-end
-  height: 100%
-  gap: 1rem
+  justify-content: space-between
+  gap: 0.5rem
+  font-size: 0.9rem
+  font-variant-numeric: tabular-nums
+  color: #7dd3fc
 
-  .active-effects
-    display: flex
-    gap: 0.5rem
+  &__track
+    flex: 1
+    max-width: 5rem
+    height: 4px
+    background: #ffffff1a
+    overflow: hidden
+
+  &__fill
+    height: 100%
+    transform-origin: left
+    background: #7dd3fc
+
+.spell-bar
+  display: grid
+  grid-template-columns: repeat(5, minmax(0, 1fr))
+  gap: 0.375rem
+
+  &__slot
+    position: relative
+    min-width: 0
+    aspect-ratio: 1
+    border-radius: vars.$panelBorderRadius
+    border: 1px solid #686052
+    background: #262626
+    padding: 2px
+
+    &--empty
+      border-style: dashed
+      border-color: #615b50
+      background: #ffffff04
+
+  &__empty
+    position: absolute
+    inset: 0
+    display: grid
+    place-content: center
+    color: #8f887c
+    font-size: 1.25rem
+    cursor: help
+
+  &__drag
     width: 100%
+    height: 100%
+    cursor: grab
 
-    .effect-icon
-      width: 40px
-      height: 40px
-      background-size: contain
-      display: flex
-      align-items: center
-      justify-content: center
-      text-shadow: variables.$textShadow
+    &:active
+      cursor: grabbing
 
-      &--expired
-        filter: grayscale(1)
-        opacity: 0.6
-
-    // Food / potion: effect countdown on the icon, time until the slot can be used again below it.
-    .consumable
-      display: flex
-      flex-direction: column
-      align-items: center
-      gap: 0.2rem
-
-      &__ready-in
-        font-size: 0.65rem
-        white-space: nowrap
-        text-shadow: variables.$textShadow
-
-  .spell-bar
-    width: 100%
-    display: flex
-    justify-content: space-between
-
-    &__slot
-      height: 4rem
-      width: 4rem
-      border-radius: variables.$panelBorderRadius
-      border: 1px solid #52525b
-      background-color: #27272a
-      padding: 2px
-
-    &__drag
+    app-spell-slot
+      display: block
       height: 100%
-      width: 100%
-      cursor: grab
 
-      &:active
-        cursor: grabbing
+  ::ng-deep .cdk-drag-placeholder
+    display: none
 
-      app-spell-slot
-        display: block
-        height: 100%
-
-    // Hide the CDK placeholder — the static slot frame already shows the empty position
-    ::ng-deep .cdk-drag-placeholder
-      display: none
-
-    // Keep the dragged icon snappy while it follows the cursor
-    ::ng-deep .cdk-drag-animating
-      transition: transform 200ms cubic-bezier(0, 0, 0.2, 1)
+  ::ng-deep .cdk-drag-animating
+    transition: transform 200ms ease

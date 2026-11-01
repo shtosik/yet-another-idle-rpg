@@ -33,6 +33,8 @@ All player-facing text comes from i18next JSON files, so content can be added an
 
 `npm run validate` checks every one of these for every enum value, plus literal `ns:key` strings in data.
 
+Battle panel controls, state labels, weakness hints, spell availability and empty-slot help use `app:battle.*`. `app:elements.*` contains bare element names; the battle panel adds the shared `app:battle.weakness` prefix once. Enemy/zone/spell names continue to use their existing namespaces.
+
 ## Invariants & gotchas
 - **A new namespace must be added to `translations` in `app.config.ts`**, or every key in it renders raw. `npm run validate` catches this.
 - The pipe is `| i18next`, not `| translate`.

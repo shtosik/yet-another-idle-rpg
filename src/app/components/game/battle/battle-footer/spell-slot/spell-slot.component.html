@@ -1,5 +1,9 @@
-<div
+<button
+  type="button"
   class="spell"
+  [class.spell--ready]="canCast()"
+  [attr.aria-disabled]="!canCast()"
+  [attr.aria-label]="accessibleLabel()"
   placement="top"
   tooltipClass="tooltip-override"
   [autoPlacement]="false"
@@ -13,8 +17,10 @@
   @if (secondsUntilReady()) {
     <span class="spell__counter">{{ secondsUntilReady() }}</span>
   }
-</div>
+  <span class="spell__cost" [class.spell__cost--low]="!canAfford()" aria-hidden="true">{{ manaCost() }}</span>
+</button>
 
 <ng-template #tooltip>
+  <p class="spell-status">{{ statusText() }}</p>
   <app-spell-tooltip [spellId]="equippedSpell().spellId"/>
 </ng-template>

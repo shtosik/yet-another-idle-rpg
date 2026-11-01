@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common'
-import { ChangeDetectionStrategy, Component, inject, signal, viewChild } from '@angular/core'
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core'
+import { I18nextPipe } from '../../../pipes/i18next.pipe'
 import { UrlPipe } from 'app/pipes/url.pipe'
-import { SpinnerComponent } from 'app/components/shared/spinner/spinner.component'
 import { BattleStore } from '../../../store/battle/battle.store'
 import { BattleNavBarComponent } from './battle-nav-bar/battle-nav-bar.component'
 import { EnemyComponent } from './enemy/enemy.component'
@@ -16,7 +16,7 @@ import { ARENA } from '../../../../data/arena-data'
   templateUrl: 'battle.component.html',
   styleUrls: ['./battle.component.sass'],
   imports: [
-    CommonModule, UrlPipe, SpinnerComponent,
+    CommonModule, UrlPipe, I18nextPipe,
     BattleNavBarComponent, EnemyComponent, DamagePopupComponent, BattleFooterComponent, BattleSideButtonsComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -24,32 +24,10 @@ import { ARENA } from '../../../../data/arena-data'
 
 export class BattleComponent {
   battleStore = inject(BattleStore)
-  enemyContainerContainer = viewChild<EnemyComponent>('enemyElement')
 
   dropsLostToast = inject(BattleManagerService).dropsLostToast
   isInCombat = this.battleStore.isInCombat
   currentZoneData = this.battleStore.currentZoneData
 
   readonly arenaUrl = ARENA.url
-
-  enemyPosition = signal({ x: 0, y: 0 })
-
-  constructor() {
-    // was used to determine the position of the damage popup, for now not needed
-    // effect(() => {
-    //   const enemy = this.enemyContainerContainer()
-    //   const el = enemy?.getEnemyNativeElement()
-    //
-    //   if (!el) return
-    //
-    //   const rect = el.getBoundingClientRect()
-    //
-    //   console.log(rect)
-    //
-    //   this.enemyPosition.set({
-    //     x: rect.left + 10,
-    //     y: rect.top / 2,
-    //   })
-    // })
-  }
 }
