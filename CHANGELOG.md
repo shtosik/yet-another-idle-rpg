@@ -6,6 +6,7 @@ Versions follow [Semantic Versioning](https://semver.org/). Each note is `- [typ
 New notes go under `[Unreleased]`; `npm run release -- <major|minor|patch>` moves them into a version (docs/deployment.md).
 
 ## [Unreleased]
+- [feature] Equipment now has a paper-doll layout with labeled slots, a character silhouette, and keyboard controls. Hover or focus a slot for details; click equipped gear or press Enter or Space to unequip it.
 - [bug] Item tooltips now show the unit on seconds bonuses (e.g. "+5s Spell Cooldown Reduction", not "+5").
 - [feature] Town pets: reach Exalted to get a pet. In La Harpar the Bartender gives the Tavern Cat (food effects ×1.5); in Mawood, Corwin gives the Rootglow Moth (+10 s to buff spells). Each is given once and can't be sold.
 - [bug] A quest turn-in no longer completes if you used up one of its items while the dialogue was open.

@@ -1,5 +1,5 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common'
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core'
 import { EquipmentSlot, EquipmentSlotKey } from 'enums/equipment-slot.enum'
 import { ItemTier } from 'enums/items/item-tier.enum'
 import { Item } from 'interfaces/item.interface'
@@ -20,14 +20,23 @@ import { StatToPercentagePipe } from '../../../../pipes/stat-to-percentage.pipe'
 })
 
 export class EquipmentItemComponent {
-    @Input() item: Item
-    @Input() tier: ItemTier
-    @Input() slotName: EquipmentSlotKey
-    @Input() unequipBlocked = false
+    readonly item = input<Item | undefined>()
+    readonly tier = input<ItemTier | undefined>()
+    readonly slotName = input.required<EquipmentSlotKey>()
+    readonly unequipBlocked = input(false)
+    readonly unequipItem = output<EquipmentSlotKey>()
 
-    @Output() unequipItem = new EventEmitter<EquipmentSlotKey>()
+    readonly hintKey = computed(() => {
+        if (!this.item()) return 'app:equipment.emptyHint'
+        if (this.unequipBlocked()) return 'app:equipment.unequipBlocked'
+        return 'items:clickToUnequip'
+    })
 
-    ItemTier = ItemTier
+    handleUnequip(): void {
+        if (this.item() && !this.unequipBlocked()) this.unequipItem.emit(this.slotName())
+    }
+
+    readonly ItemTier = ItemTier
     protected readonly ItemID = ItemID
     protected readonly ItemType = ItemType
     protected readonly DamageElement = DamageElement

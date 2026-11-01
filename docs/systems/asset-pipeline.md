@@ -30,6 +30,10 @@ A family (an entry in `styles.mjs`) is a named art recipe: checkpoint, style pro
 
 **Lattice items** (a spider web): the `item-pixel` `matte` step fills enclosed holes, so a web comes out as a slab. SDXL also does not draw one. The web icon was drawn in code (spokes and sagging rings at 48 px, dark outline) and is recorded in the manifest as `procedural`.
 
+## UI diagrams
+
+The equipment paper doll uses `src/assets/img/icons/equipment-body.svg`, a code-drawn decorative silhouette with baked-in panel colors, loaded with `img ngSrc`. It is a layout guide behind the equipment slots rather than generated character art.
+
 ## One-time setup
 
 None of this is in git. The server is the one Krita AI Diffusion manages, in `%APPDATA%\krita\ai_diffusion\server\ComfyUI` (below: `<comfy>`).

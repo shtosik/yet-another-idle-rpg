@@ -1,4 +1,24 @@
 {
+  "equipment": {
+    "title": "Equipment",
+    "empty": "Empty",
+    "hint": "Click equipped gear to unequip",
+    "unequipBlocked": "Cannot unequip: free space in the inventory first.",
+    "emptyHint": "Empty slot. Click matching gear in your inventory to equip it.",
+    "slots": {
+      "helmet": "Head",
+      "cape": "Cape",
+      "chest": "Chest",
+      "amulet": "Amulet",
+      "weapon": "Weapon",
+      "belt": "Belt",
+      "gloves": "Gloves",
+      "ring": "Ring",
+      "legs": "Legs",
+      "boots": "Feet",
+      "pet": "Pet"
+    }
+  },
   "titles": {
     "label": "Title",
     "none": "None",

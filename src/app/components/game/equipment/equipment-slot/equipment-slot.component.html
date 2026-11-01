@@ -1,60 +1,73 @@
-@if (item) {
-    <div
-        class="item"
-        [attr.data-tier]="ItemTier[tier]"
-        [tooltipContext]="{ item, tier, blocked: unequipBlocked }"
-        [tooltipTemplate]="tooltip"
-        placement="bottom"
-        tooltipClass="tooltip-override"
-        (click)="unequipItem.emit(slotName)"
-    >
-        <img
-            height="48"
-            width="48"
-            disableOptimizedSrcset
-            alt=""
-            [ngSrc]="item.url"
-        >
-    </div>
-} @else {
-    <div class="slot-name">{{ slotName }}</div>
-}
+@let gear = item();
+@let slotLabel = ('app:equipment.slots.' + slotName()) | i18next;
+<button
+    type="button"
+    class="item"
+    [class.item--empty]="!gear"
+    [attr.data-tier]="gear ? ItemTier[tier()] : null"
+    [attr.aria-label]="slotLabel + ': ' + (gear ? ('items:names.' + ItemID[gear.id] | i18next) : ('app:equipment.empty' | i18next))"
+    [attr.aria-description]="hintKey() | i18next"
+    [attr.aria-disabled]="!gear || unequipBlocked()"
+    [tooltipContext]="{ item: gear, tier: tier(), blocked: unequipBlocked(), slotLabel }"
+    [tooltipTemplate]="tooltip"
+    #details="tooltipTemplate"
+    placement="left"
+    [autoPlacement]="true"
+    [appendTooltipToBody]="true"
+    [hideDelay]="0"
+    tooltipClass="tooltip-override"
+    (click)="handleUnequip(); details.hide()"
+    (keydown.escape)="details.hide()"
+>
+    @if (gear) {
+        <img height="40" width="40" disableOptimizedSrcset alt="" [ngSrc]="gear.url">
+    } @else {
+        <span class="empty-mark" aria-hidden="true">&#9671;</span>
+    }
+    <span class="slot-name">{{ slotLabel }}</span>
+</button>
 
 <ng-template
     #tooltip
     let-item="item"
     let-tier="tier"
     let-blocked="blocked"
+    let-slotLabel="slotLabel"
 >
     <div class="item__tooltip">
-        <span>{{ ('items:names.' + ItemID[item.id]) | i18next }}</span>
-        <span class="tier-line">
-            <span
-                [attr.data-tier]="ItemTier[tier]"
-                class="tier"
-            >{{ ('items:tiers.' + ItemTier[tier]) | i18next }}</span>
-            @if (item.slot === EquipmentSlot.weapon) {
-                @let element = DamageElement[item.damageType ?? DamageElement.physical];
-                <span aria-hidden="true">·</span>
+        @if (item) {
+            <span>{{ ('items:names.' + ItemID[item.id]) | i18next }}</span>
+            <span class="tier-line">
                 <span
-                    [attr.data-element]="element"
-                    class="element"
-                >{{ ('bestiary:elements.' + element) | i18next }}</span>
-            }
-        </span>
+                    [attr.data-tier]="ItemTier[tier]"
+                    class="tier"
+                >{{ ('items:tiers.' + ItemTier[tier]) | i18next }}</span>
+                @if (item.slot === EquipmentSlot.weapon) {
+                    @let element = DamageElement[item.damageType ?? DamageElement.physical];
+                    <span aria-hidden="true">·</span>
+                    <span
+                        [attr.data-element]="element"
+                        class="element"
+                    >{{ ('bestiary:elements.' + element) | i18next }}</span>
+                }
+            </span>
 
-        @if (item.type === ItemType.equipment) {
-            @for (stat of $any(item.stats); track stat.id) {
-                <span class="stat">{{ stat.id | statToPercentage:stat.amount }} {{ ('app:playerStats.' + stat.id) | i18next }}</span>
+            @if (item.type === ItemType.equipment) {
+                @for (stat of $any(item.stats); track stat.id) {
+                    <span class="stat">{{ stat.id | statToPercentage:stat.amount }} {{ ('app:playerStats.' + stat.id) | i18next }}</span>
+                }
+                @if (item.spell !== undefined) {
+                    <span class="stat">{{ 'items:grantsSpell' | i18next:{ spell: ('spells:names.' + SpellID[item.spell] + '.name') | i18next } }}</span>
+                }
+                @if (blocked) {
+                    <span class="click">{{ 'app:equipment.unequipBlocked' | i18next }}</span>
+                } @else {
+                    <span class="click">{{ 'items:clickToUnequip' | i18next }}</span>
+                }
             }
-            @if (item.spell !== undefined) {
-                <span class="stat">{{ 'items:grantsSpell' | i18next:{ spell: ('spells:names.' + SpellID[item.spell] + '.name') | i18next } }}</span>
-            }
-            @if (blocked) {
-                <span class="click">{{ 'items:unequipBlockedInventory' | i18next }}</span>
-            } @else {
-                <span class="click">{{ 'items:clickToUnequip' | i18next }}</span>
-            }
+        } @else {
+            <span>{{ slotLabel }}</span>
+            <span class="click">{{ 'app:equipment.emptyHint' | i18next }}</span>
         }
     </div>
 </ng-template>

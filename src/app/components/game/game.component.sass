@@ -35,8 +35,16 @@
   .inventory
     grid-row: 2 / 2
 
+  // The paper doll needs five inventory-sized rows; the middle panels keep their sizes.
+  .equipment
+    grid-row: 1 / span 2
+    align-self: start
+    height: 28rem
+
   .quests
-    grid-row: 2 / 2
+    grid-row: 1 / span 2
+    align-self: end
+    height: calc(100% - 28.5rem)
 
   .spells
     grid-row: 2 / 2
