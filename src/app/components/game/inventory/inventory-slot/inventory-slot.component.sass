@@ -1,4 +1,5 @@
 @use 'mixins' as mixins
+@use 'palette'
 
 .item
     $self: &
@@ -12,6 +13,24 @@
 
     img
         object-fit: contain
+
+    &__action
+        display: flex
+        flex-direction: column
+        align-items: center
+        justify-content: space-between
+        width: 100%
+        height: 100%
+        padding: 0
+        border: 0
+        background: transparent
+        color: inherit
+        font: inherit
+        cursor: pointer
+
+        &:focus-visible
+            outline: 2px solid palette.$yellow
+            outline-offset: 3px
 
     &__destroy
         position: absolute

@@ -7,14 +7,19 @@
   tooltipClass="tooltip-override"
   (contextmenu)="handleRightClick($event)"
 >
-  <img
-    [ngSrc]="item.url"
-    alt=""
-    disableOptimizedSrcset
-    height="32"
-    width="32"
-  >
-  <span>{{ amount }}</span>
+  <!-- Shop and modal slots sit inside other controls or take no action, so only clickable slots get a button. -->
+  @if (clickable) {
+    <button
+      type="button"
+      class="item__action"
+      [attr.aria-label]="('items:names.' + ItemID[item.id] | i18next) + ' ×' + amount"
+      (click)="handleActivate($event)"
+    >
+      <ng-container [ngTemplateOutlet]="art" />
+    </button>
+  } @else {
+    <ng-container [ngTemplateOutlet]="art" />
+  }
   @if (destroyable) {
     <button
       type="button"
@@ -25,6 +30,17 @@
     >&times;</button>
   }
 </div>
+
+<ng-template #art>
+  <img
+    [ngSrc]="item.url"
+    alt=""
+    disableOptimizedSrcset
+    height="32"
+    width="32"
+  >
+  <span>{{ amount }}</span>
+</ng-template>
 
 <ng-template
   #tooltip
