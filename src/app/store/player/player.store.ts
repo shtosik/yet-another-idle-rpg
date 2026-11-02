@@ -1,4 +1,5 @@
 import { ChestContents, rollChest } from './chest'
+import { evaluateMerge, MergeResult, MergeSource, rollMerge } from './merge'
 import { WeaponCategory } from '../../../enums/weapon-category.enum'
 import { computed, effect, inject } from '@angular/core'
 import { patchState, signalStore, withComputed, withHooks, withMethods, withState } from '@ngrx/signals'
@@ -647,6 +648,22 @@ export const PlayerStore = signalStore(
 
       store.removeItems([{ id: item.id, tier: item.tier, upgradeLevel: item.upgradeLevel, amount: sold }])
       store.updatePlayerStats([{ stat: 'goldCoins', amount: price * sold }])
+    },
+
+    /** Merges owned copies atomically, so refusals spend nothing and never roll. */
+    mergeItem(base: MergeSource, sacrifice: MergeSource, rng: () => number = Math.random): MergeResult {
+      const plan = evaluateMerge({
+        base, sacrifice, inventory: store.inventory(), equipment: store.equipment(),
+        capacity: store.inventoryCapacity(), goldCoins: store.resources().goldCoins,
+      })
+      if (plan.status === 'refused') return plan
+      const { result, state } = rollMerge(plan, rng)
+      patchState(store, {
+        inventory: state.inventory,
+        equipment: state.equipment,
+        resources: { ...store.resources(), goldCoins: state.goldCoins },
+      })
+      return result
     },
 
     equipItem(item: InventoryItem) {

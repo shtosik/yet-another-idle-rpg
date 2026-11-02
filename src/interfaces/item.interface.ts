@@ -27,6 +27,8 @@ export interface EquipmentItemPossibleStat {
 
 export interface EquipmentItem extends ItemData {
     type: ItemType.equipment
+    /** One-off gear cannot be merged, even when the player owns duplicates. */
+    unique?: true
     stats: EquipmentItemPossibleStat[]
     slot: EquipmentSlot
     damageType?: DamageElement

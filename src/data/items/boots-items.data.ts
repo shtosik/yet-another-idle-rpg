@@ -34,6 +34,7 @@ export const BootsItemsData: Partial<Record<ItemID, Item>> = {
   // Sold at La Harpar Honored
   [ItemID.wharfRunnersBoots]: {
     id: ItemID.wharfRunnersBoots,
+    unique: true,
     tier: ItemTier.rare,
     url: './assets/img/items/wharfRunnersBoots.png',
     value: 1000,
@@ -47,6 +48,7 @@ export const BootsItemsData: Partial<Record<ItemID, Item>> = {
   // Sold at Mawood Honored
   [ItemID.rootwalkerBoots]: {
     id: ItemID.rootwalkerBoots,
+    unique: true,
     tier: ItemTier.rare,
     url: './assets/img/items/rootwalkerBoots.png',
     value: 2000,
