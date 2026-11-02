@@ -49,7 +49,7 @@ describe('Forge panel and gear sources', () => {
     await fixture.whenStable()
     const button = mergeButton()
     expect(button.getAttribute('aria-disabled')).toBe('true')
-    expect(button.textContent.trim()).toBe('Merge')
+    expect(button.textContent.trim()).toBe('Upgrade')
     expect(button.getAttribute('aria-label')).toContain(label)
     const merge = spyOn(player, 'mergeItem').and.callThrough()
     button.click()
@@ -74,7 +74,7 @@ describe('Forge panel and gear sources', () => {
     await expectBlocked('Select gear')
   })
 
-  it('shows a gold refusal in the accessible label while retaining the compact Merge text', async () => {
+  it('shows a gold refusal in the accessible label while retaining the compact Upgrade text', async () => {
     player.addItems([stack()])
     select()
     expect(forge.evaluation()).toEqual({ status: 'refused', reason: 'notEnoughGold' })
@@ -139,7 +139,7 @@ describe('Forge panel and gear sources', () => {
     expect(player.itemCount(id, tier, 4)).toBe(0)
     expect(player.resources.goldCoins()).toBe(100000 - mergeCost(ITEM_DATA[id].value, 4))
     expect(forge.item()?.upgradeLevel).toBe(5)
-    expect(fixture.nativeElement.querySelector('[role="status"]').textContent).toContain('Merge succeeded: Wooden Bow +5')
+    expect(fixture.nativeElement.querySelector('[role="status"]').textContent).toContain('Upgrade succeeded: Wooden Bow +5')
     expect(selection.dragged()).toBeNull()
   })
 
@@ -244,10 +244,10 @@ describe('Forge panel and gear sources', () => {
     const tooltipText = () => [...document.querySelectorAll('.tooltip-override.show')].map(tip => tip.textContent).join()
     const settle = () => new Promise(resolve => setTimeout(resolve, 300))
     await settle()
-    expect(tooltipText()).toContain('A second copy is chosen automatically')
+    expect(tooltipText()).toContain('Not enough gold')
     mergeButton().dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
     await settle()
-    expect(tooltipText()).not.toContain('A second copy is chosen automatically')
+    expect(tooltipText()).not.toContain('Not enough gold')
   })
 
   it('reports a later-level failure without advancing the selected upgrade level', () => {
@@ -256,7 +256,7 @@ describe('Forge panel and gear sources', () => {
     select()
     spyOn(player, 'mergeItem').and.returnValue({ status: 'failure', cost: forge.cost() })
     forge.merge()
-    expect(forge.toast()).toContain('Merge failed: Wooden Bow +0 kept its level')
+    expect(forge.toast()).toContain('Upgrade failed: Wooden Bow +0 kept its level')
     expect(forge.item()?.upgradeLevel).toBe(0)
   })
 

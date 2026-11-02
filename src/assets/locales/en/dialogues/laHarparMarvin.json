@@ -16,7 +16,7 @@
     "taskStatus": "How are my contracts going?",
     "store": "Show me the guild store.",
     "goodbye": "See you around, Marvin.",
-    "coldForge": "Can you check Toric's last Slatefall delivery?",
+    "coldForge": "Can you check Phurgo's last Slatefall delivery?",
     "registerSeal": "Register this Pathfinder's Seal.",
     "sealReminder": "What did the Pathfinder's Seal teach me?"
   },
@@ -42,7 +42,7 @@
     "back": "Actually, not yet."
   },
   "coldForgeRecord": {
-    "message": "Toric's last Slatefall load: worked iron and his own tools, recorded here before the road closed. He can work salvage while the mine stays shut, but get him to stop for a meal first. One Fish & Apple Pie should do it; the recipe is sold here in La Harpar.",
+    "message": "Phurgo's last Slatefall load: worked iron and his own tools, recorded here before the road closed. He can work salvage while the mine stays shut, but get him to stop for a meal first. One Fish & Apple Pie should do it; the recipe is sold here in La Harpar.",
     "opt1": "Is salvage Exploration Guild business?",
     "opt2": "I'll bring him a pie."
   },

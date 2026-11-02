@@ -29,7 +29,7 @@ const translations = [
     'dialogues/mawoodBrenn',
     'dialogues/mawoodMilo',
     'dialogues/liroldArenaMaster',
-    'dialogues/liroldToric',
+    'dialogues/liroldPhurgo',
     'dialogues/mawoodElarion',
 ]
 

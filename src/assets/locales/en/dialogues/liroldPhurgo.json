@@ -1,13 +1,13 @@
 {
   "intro1": {
-    "message": "Toric, blacksmith. Mind the tools; they're cleaner than the floor, and I'd like them to stay that way. If you've come for hot work, the hearth's cold.",
+    "message": "Phurgo, blacksmith. Mind the tools; they're cleaner than the floor, and I'd like them to stay that way. If you've come for hot work, the hearth's cold.",
     "opt1": "Why is the hearth cold?",
     "opt2": "I'll let you work."
   },
   "default": {
     "message": "Come in. What needs seeing to?",
     "opt1": "Here's the wood for your hearth.",
-    "opt2": "One Fish & Apple Pie, Toric.",
+    "opt2": "One Fish & Apple Pie, Phurgo.",
     "opt3": "I've brought your forge tongs.",
     "opt4": "About getting the hearth going...",
     "opt5": "Can I help you get it burning again?",
@@ -15,7 +15,8 @@
     "opt7": "Tell me about the Forge.",
     "opt8": "You really like apple pie?",
     "opt9": "Where did you live before Lirold?",
-    "opt10": "Goodbye, Toric."
+    "opt10": "Goodbye, Phurgo.",
+    "opt11": "How does your Forge work?"
   },
   "aboutForge": {
     "message": "Slatefall sent my iron until the castle shut the mine two winters ago. I've kept busy with cold repairs, but the hearth's been waiting. Then scavengers took my heavy tongs off a stranded cart on the Pass.",
@@ -26,6 +27,20 @@
     "message": "The mine is still shut, but there's useful metal coming through this door again. Two matching pieces give me something to work with. I'll show you the cost before the hammer falls.",
     "opt1": "Can you strengthen my gear?",
     "opt2": "Good to see the fire back."
+  },
+  "forgeWork": {
+    "message": "Bring two of the same piece, alike in quality and worked the same number of times. I fold one into the other; you leave with one stronger piece. If you're wearing one, I strengthen that one; it stays on you, and the spare goes into the fire.",
+    "opt1": "How do we begin, and what will it cost?",
+    "opt2": "Back to business."
+  },
+  "forgeCost": {
+    "message": "Set the piece on my bench, and I'll show you what it'll become before I strike. The work costs gold; finer pieces and those already worked cost more.",
+    "opt1": "How far can you take a piece?",
+    "opt2": "Back to business."
+  },
+  "forgeLimits": {
+    "message": "Five workings is as far as I can take a piece for now; more would need better tools and a steadier hand. Heirlooms and one-of-a-kind gifts stay off my anvil. And keep your animals clear of the hearth; I mend gear, not living creatures.",
+    "opt1": "Back to business."
   },
   "aboutPie": {
     "message": "Apple pie makes a person sit down properly. Coastal traders got me used to La Harpar's fish filling; a proper lunch for a long day at the anvil. Bring it hot, and I'll put the hammer down.",
@@ -62,11 +77,11 @@
     "opt2": "Something else first."
   },
   "coldForgeTongs": {
-    "message": "Jaws still meet, and that's my notch. The old delivery stamp is here too; tell Marvin in La Harpar it was Toric's last Slatefall load. He keeps the Exploration Guild's road records.",
+    "message": "Jaws still meet, and that's my notch. The old delivery stamp is here too; tell Marvin in La Harpar it was Phurgo's last Slatefall load. He keeps the Exploration Guild's road records.",
     "opt1": "I'll ask him to check it."
   },
   "coldForgeProgressThree": {
-    "message": "Marvin, in La Harpar. Tell him the stamp says Toric's last Slatefall load; he won't need the tongs in his lap to find a record.",
+    "message": "Marvin, in La Harpar. Tell him the stamp says Phurgo's last Slatefall load; he won't need the tongs in his lap to find a record.",
     "opt1": "I'll go to La Harpar.",
     "opt2": "Something else first."
   },

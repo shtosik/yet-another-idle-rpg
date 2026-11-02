@@ -1,6 +1,6 @@
 # Plan: gear upgrading
 
-Implementation plan for `docs/ideas/gear-upgrading.md` (rules and owner decisions) and `docs/ideas/gear-upgrading-cold-forge.md` (Toric, *The Cold Forge*, dialogue scripts, Pathfinder's Seal). One PR into `staging` per step, each from its own worktree off `origin/staging`. Code references are from `staging` at `d90cb45` (2026-11-01); re-check line numbers when a step starts.
+Implementation plan for `docs/ideas/gear-upgrading.md` (rules and owner decisions) and `docs/ideas/gear-upgrading-cold-forge.md` (Phurgo, *The Cold Forge*, dialogue scripts, Pathfinder's Seal). One PR into `staging` per step, each from its own worktree off `origin/staging`. Code references are from `staging` at `d90cb45` (2026-11-01); re-check line numbers when a step starts.
 
 ## Order
 
@@ -35,13 +35,13 @@ No way to upgrade yet; a dev cheat makes upgraded items for testing.
 - i18n, keyboard access. Run `verify-yari`.
 - Docs: `towns-shops-guild.md`.
 
-### 5. Toric, the Forge and The Cold Forge (M, Sonnet; skills `/add-town-building`, `/add-npc-dialogue`, `/add-quest`)
-- Forge Building in Lirold (`towns-data.ts:108`), NPC `liroldToric`, background and avatar (asset-generator agent).
-- Toric's dialogue tree from the companion doc's scripts, with the **Upgrade gear** option (the `forge` effect) gated on `theColdForge` completed. Add the Ludo lines (`liroldArenaMaster`) and the Marvin lines.
+### 5. Phurgo, the Forge and The Cold Forge (M, Sonnet; skills `/add-town-building`, `/add-npc-dialogue`, `/add-quest`)
+- Forge Building in Lirold (`towns-data.ts:108`), NPC `liroldPhurgo`, background and avatar (asset-generator agent).
+- Phurgo's dialogue tree from the companion doc's scripts, with the **Upgrade gear** option (the `forge` effect) gated on `theColdForge` completed. Add the Ludo lines (`liroldArenaMaster`) and the Marvin lines.
 - Quest `theColdForge`: 5 steps; rewards 2000 XP and 400 gold unless the owner changes them.
-- Item `toricsForgeTongs` (`ItemType.quest`); Goblin Scavenger drop `{ chance: 50, requiredActiveQuestId: theColdForge }` (`enemies-data.ts:263`). Step 1's cap makes only one ever drop.
+- Item `phurgosForgeTongs` (`ItemType.quest`); Goblin Scavenger drop `{ chance: 50, requiredActiveQuestId: theColdForge }` (`enemies-data.ts:263`). Step 1's cap makes only one ever drop.
 - Step 4 consumes 1 `fishApplePie`; no new content for the pie.
-- Docs: `quests.md`, `towns-shops-guild.md`, `dialogue.md` if the effect list changes. Changelog: `[feature] Toric's Forge in Lirold: upgrade gear up to +5.`
+- Docs: `quests.md`, `towns-shops-guild.md`, `dialogue.md` if the effect list changes. Changelog: `[feature] Phurgo's Forge in Lirold: upgrade gear up to +5.`
 
 ### 6. Pathfinder's Seal (M, Sonnet)
 - Item `pathfindersSeal` (`ItemType.quest`).
@@ -52,4 +52,4 @@ No way to upgrade yet; a dev cheat makes upgraded items for testing.
 
 ### 7. Wrap-up (S)
 - Set `docs/ideas/gear-upgrading.md` to Shipped, move what is now true into the system docs, and leave only the "Later" list in the idea doc.
-- Lore bible: move the facts that shipped from (proposed) to shipped canon (`docs/lore/`, `docs/character/lirold/toric.md`).
+- Lore bible: move the facts that shipped from (proposed) to shipped canon (`docs/lore/`, `docs/character/lirold/phurgo.md`).

@@ -12,7 +12,7 @@ import MAWOOD_BRENN from './dialogues/mawoodTown/mawoodBrenn'
 import MAWOOD_MILO from './dialogues/mawoodTown/mawoodMilo'
 import MAWOOD_ELARION from './dialogues/mawoodTown/mawoodElarion'
 import LIROLD_ARENA_MASTER from './dialogues/liroldTown/liroldArenaMaster'
-import LIROLD_TORIC, { ToricDialogue } from './dialogues/liroldTown/liroldToric'
+import LIROLD_PHURGO, { PhurgoDialogue } from './dialogues/liroldTown/liroldPhurgo'
 
 export interface NPCProps {
   id: NpcID
@@ -23,11 +23,11 @@ export interface NPCProps {
 }
 
 const NPC_Data: Record<number, NPCProps> = {
-  [NpcID.liroldToric]: {
-    id: NpcID.liroldToric,
-    url: './assets/img/avatars/lirold/liroldToric.png',
-    dialogue: LIROLD_TORIC,
-    firstMeetNodeId: ToricDialogue.intro1,
+  [NpcID.liroldPhurgo]: {
+    id: NpcID.liroldPhurgo,
+    url: './assets/img/avatars/lirold/liroldPhurgo.png',
+    dialogue: LIROLD_PHURGO,
+    firstMeetNodeId: PhurgoDialogue.intro1,
   },
   [NpcID.laHarparBartender]: {
     id: NpcID.laHarparBartender,

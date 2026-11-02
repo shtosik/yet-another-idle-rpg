@@ -20,8 +20,6 @@
           <img [ngSrc]="ITEM_DATA[gear.id].url" width="96" height="96" disableOptimizedSrcset draggable="false" alt="">
           <span class="forge__level">+{{ gear.upgradeLevel ?? 0 }}</span>
           @if ((gear.upgradeLevel ?? 0) >= milestoneLevel) { <span class="forge__milestone" aria-hidden="true">&#9670;</span> }
-        } @else {
-          <span class="forge__empty" aria-hidden="true">+</span>
         }
       </button>
       <span class="forge__caption">{{ 'forge:inputHint' | i18next }}</span>
@@ -35,7 +33,7 @@
         <span class="forge__arrow" aria-hidden="true">&#10230;</span>
         @if (item()) {
           <span class="forge__cost" [attr.aria-label]="'forge:cost' | i18next: { amount: cost() }">
-            <img ngSrc="assets/img/items/goldCoins.png" height="16" width="16" alt=""> {{ cost() }}
+            <span class="forge__coin" aria-hidden="true"></span> {{ cost() }}
           </span>
         }
       </div>
@@ -60,7 +58,7 @@
           <img [ngSrc]="ITEM_DATA[result.id].url" width="96" height="96" disableOptimizedSrcset draggable="false" alt="">
           <span class="forge__level">+{{ result.upgradeLevel }}</span>
           @if (result.upgradeLevel >= milestoneLevel) { <span class="forge__milestone" aria-hidden="true">&#9670;</span> }
-        } @else { <span class="forge__empty" aria-hidden="true">&#9671;</span> }
+        }
       </div>
       <span class="forge__caption">{{ 'forge:previewOnly' | i18next }}</span>
     </div>
@@ -88,9 +86,8 @@
         </table>
       }
       <span>{{ mergeLabel() }}</span>
+    } @else {
+      <span>{{ 'forge:chooseHint' | i18next }}</span>
     }
-    <p>{{ 'forge:chooseHint' | i18next }}</p>
-    <p>{{ 'forge:pairHint' | i18next }}</p>
-    <p>{{ 'forge:hint' | i18next: { level: levelCap } }}</p>
   </div>
 </ng-template>

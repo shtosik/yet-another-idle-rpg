@@ -13,8 +13,8 @@ Merge two copies of the same piece of gear into one copy a level higher, at a ne
 - The Arena Chest's rare reward is permanent once handed in to the Exploration Guild. More sources may come later.
 - Equipped gear takes part in merges (see Rules).
 - Gold cost follows the item's value.
-- The Blacksmith is Toric, a dwarf who loves apple pie; one quest Step brings him the shipped Fish & Apple Pie (`ItemID.fishApplePie`).
-- Toric's Forge Tongs are a Quest item (`ItemType.quest`); exactly 1 is required. Goblin Scavengers drop them at **1 in 50**, only while `theColdForge` is active: `drop(ItemID.toricsForgeTongs, 1, 1, 50)` (the last argument means "1 in N").
+- The Blacksmith is Phurgo, a dwarf who loves apple pie; one quest Step brings him the shipped Fish & Apple Pie (`ItemID.fishApplePie`).
+- Phurgo's Forge Tongs are a Quest item (`ItemType.quest`); exactly 1 is required. Goblin Scavengers drop them at **1 in 50**, only while `theColdForge` is active: `drop(ItemID.phurgosForgeTongs, 1, 1, 50)` (the last argument means "1 in N").
 - **No leftover Quest items** (all quest-only drops, not only this Quest): a quest-only drop rolls only while the player still needs it, that is while the active Step that asks for the item isn't met yet, and never for more than the missing amount. Today `kill-rewards.ts` checks only that the Quest is active (`requiredActiveQuestId`), so items keep dropping after the Step is met or delivered.
 - Pathfinder's Seal: **1 in 10 Arena Chests**, until it is registered.
 
@@ -37,20 +37,20 @@ Merge two copies of the same piece of gear into one copy a level higher, at a ne
 A +N item takes `2^N` copies at +0: 32 for +5. For the later cap (failure loses only the sacrifice), one success at +N costs `1 + 1/p` copies of +N on average: about 68 copies of +0 for +6, 152 for +7, 369 for +8, 984 for +9, 2,952 for +10. Gold per attempt is the second brake.
 
 ## The Blacksmith
-New Building **Forge** in Lirold, with **Toric**, a dwarf who loves apple pie. Character and portrait brief: [Toric](../character/lirold/toric.md). He is patient with damaged tools and impatient with people who throw useful things away; apple pie is the one subject that makes him put his hammer down.
+New Building **Forge** in Lirold, with **Phurgo**, a dwarf who loves apple pie. Character and portrait brief: [Phurgo](../character/lirold/phurgo.md). He is patient with damaged tools and impatient with people who throw useful things away; apple pie is the one subject that makes him put his hammer down.
 
 Slatefall's closure cut off his regular iron deliveries two winters ago. He has kept the Forge open for cold repairs, but his hearth is out and his heavy tongs were stolen from a stranded delivery cart on the Mountain Pass. Recovering them and checking an old delivery record gives him a way forward: strengthen matching pieces of existing gear instead of waiting for new iron. This restores one workshop; it neither reopens the mine nor ends Lirold's wider supply problems.
 
-Before *The Cold Forge* is completed, Toric offers conversation and its Quest hub. Afterward his returning-player hub includes **Upgrade gear**, opening the Forge panel: pick a stack (or an equipped item) and merge, with the chance, the gold cost and the stats before and after. The Forge Building is accessible as soon as Lirold opens; the upgrade service is gated by Quest completion. Ludo Crane remains at the Arena; no Lirold Exploration Guild hall is required.
+Before *The Cold Forge* is completed, Phurgo offers conversation and its Quest hub. Afterward his returning-player hub includes **Upgrade gear**, opening the Forge panel: pick a stack (or an equipped item) and merge, with the chance, the gold cost and the stats before and after. The Forge Building is accessible as soon as Lirold opens; the upgrade service is gated by Quest completion. Ludo Crane remains at the Arena; no Lirold Exploration Guild hall is required.
 
 ## Quest: The Cold Forge
-**Proposed Quest `theColdForge`, giver Toric, start gate: Lirold accessible, Quest not started.** Accepting Toric's offer starts Step 1; the introduction is not a separate Step.
+**Proposed Quest `theColdForge`, giver Phurgo, start gate: Lirold accessible, Quest not started.** Accepting Phurgo's offer starts Step 1; the introduction is not a separate Step.
 
-1. **Talk to Ludo Crane at the Arena.** He last saw Toric's stranded delivery cart on the Mountain Pass; Goblin Scavengers took its tools.
-2. **Bring 1 Toric's Forge Tongs to Toric.** New Quest item `ItemID.toricsForgeTongs` (`ItemType.quest`), dropped by Goblin Scavengers in the Mountain Pass at **1 in 50**, only while `theColdForge` is active: `drop(ItemID.toricsForgeTongs, 1, 1, 50)`. Exactly 1 is required; the last drop argument means "1 in N". The old delivery stamp on the tongs gives Toric a record for Marvin to check.
-3. **Talk to Marvin in La Harpar.** At the shipped Exploration Guild Building, he checks a retained delivery record: the tongs belong to Toric, and the cart carried already-worked iron. He recommends salvage while the mine remains closed; he has not charted or visited Slatefall in this story.
-4. **Bring 1 Fish & Apple Pie to Toric.** Existing item `ItemID.fishApplePie`; recipe `RecipeID.fishApplePie` at Cooking station level 2 uses 2 Fish Meat, 2 Apple and 1 Cheese to make 1. It requires learning the Fish & Apple Pie Recipe sold in La Harpar. Toric picked up a taste for the fish filling from coastal traders; he finally sits down for a meal and admits he has been waiting for the old trade to return rather than trying a different kind of work.
-5. **Bring 10 Ancient Wood to Toric.** Existing drops from Treant Sprouts and the Gnarled Treant in the Deepwood. Toric makes charcoal and relights the hearth; completing this Step opens **Upgrade gear**.
+1. **Talk to Ludo Crane at the Arena.** He last saw Phurgo's stranded delivery cart on the Mountain Pass; Goblin Scavengers took its tools.
+2. **Bring 1 Phurgo's Forge Tongs to Phurgo.** New Quest item `ItemID.phurgosForgeTongs` (`ItemType.quest`), dropped by Goblin Scavengers in the Mountain Pass at **1 in 50**, only while `theColdForge` is active: `drop(ItemID.phurgosForgeTongs, 1, 1, 50)`. Exactly 1 is required; the last drop argument means "1 in N". The old delivery stamp on the tongs gives Phurgo a record for Marvin to check.
+3. **Talk to Marvin in La Harpar.** At the shipped Exploration Guild Building, he checks a retained delivery record: the tongs belong to Phurgo, and the cart carried already-worked iron. He recommends salvage while the mine remains closed; he has not charted or visited Slatefall in this story.
+4. **Bring 1 Fish & Apple Pie to Phurgo.** Existing item `ItemID.fishApplePie`; recipe `RecipeID.fishApplePie` at Cooking station level 2 uses 2 Fish Meat, 2 Apple and 1 Cheese to make 1. It requires learning the Fish & Apple Pie Recipe sold in La Harpar. Phurgo picked up a taste for the fish filling from coastal traders; he finally sits down for a meal and admits he has been waiting for the old trade to return rather than trying a different kind of work.
+5. **Bring 10 Ancient Wood to Phurgo.** Existing drops from Treant Sprouts and the Gnarled Treant in the Deepwood. Phurgo makes charcoal and relights the hearth; completing this Step opens **Upgrade gear**.
 
 Reward proposal: the upgrade service, **2000 XP and 400 gold**. This takes two-fifths of the XP/gold of the nearby *What Lurks at the Top* (5000 XP, 1000 gold), with no skill point or gear reward, because it revisits earlier Zones and gives a permanent service. Final balance belongs to the main thread. There is no weapon-pair requirement or free +1 item; the player's first merge uses the normal Forge panel.
 
@@ -73,7 +73,7 @@ The chest rolls it only while the player neither holds an unregistered Seal nor 
 
 ## Open
 - `k` for the gold cost (check with `npm run sim`).
-- Lore pass complete; Step 4 uses shipped Fish & Apple Pie and the tongs are a Quest item, exactly 1 required, with a Quest-active-only 1-in-50 drop by owner decision. The [dwarven foundations](../lore/dwarves.md) are proposed; their names, Keldrath and Bramhold, are owner-approved (2026-11-01). The everyday details, Toric's personal history and the XP/gold rewards still await approval. See the [companion's Owner calls](gear-upgrading-cold-forge.md#owner-calls). Forge art, the Forge-opening dialogue effect and the Seal's permanent registration effect remain implementation work.
+- Lore pass complete; Step 4 uses shipped Fish & Apple Pie and the tongs are a Quest item, exactly 1 required, with a Quest-active-only 1-in-50 drop by owner decision. The [dwarven foundations](../lore/dwarves.md) are proposed; their names, Keldrath and Bramhold, are owner-approved (2026-11-01). The everyday details, Phurgo's personal history and the XP/gold rewards still await approval. See the [companion's Owner calls](gear-upgrading-cold-forge.md#owner-calls). Forge art, the Forge-opening dialogue effect and the Seal's permanent registration effect remain implementation work.
 - Seal name retained: **Pathfinder's Seal**.
 
 ## Touch-points
