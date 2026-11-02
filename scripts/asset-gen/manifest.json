@@ -41,6 +41,13 @@
     "seed": 7511,
     "date": "2026-10-27"
   },
+  "src/assets/img/avatars/lirold/liroldToric.png": {
+    "family": "portrait-pixel",
+    "tier": null,
+    "subject": "A single short, stocky dwarf blacksmith with very broad shoulders and a thick neck, waist-up, square face, a long thick dark beard streaked with grey and tied with a copper ring, hair tied back, heavy brows, calm brown eyes, a small smile; dark leather apron with copper rivets over a slate-blue shirt with rolled sleeves, big muscular forearms with a burn scar on one; one hand resting on an iron anvil in front of him, the other holding a small apple pie on a plate",
+    "seed": 7312,
+    "date": "2026-11-02"
+  },
   "src/assets/img/avatars/mawood/mawoodBrenn.png": {
     "family": "portrait-pixel",
     "tier": null,
@@ -110,6 +117,13 @@
     "subject": "inside a large round stone colosseum: an empty flat sand fighting floor in the foreground seen from its edge, a low stone wall around the sand, a heavy iron portcullis gate set in the far stone wall, tiered stone stands rising all around with a small distant crowd only in the high stands, red and gold banners hanging from the top rim, bright daylight, nobody on the sand",
     "seed": 7702,
     "date": "2026-10-27"
+  },
+  "src/assets/img/backgrounds/liroldForge.png": {
+    "family": "town-painterly",
+    "tier": null,
+    "subject": "Interior of a blacksmith's forge with pale limestone walls and dark timber beams under a slate roof; at the back a big stone forge hearth with a hooded chimney and a large leather bellows, its coals cold and swept clean; in the centre a heavy black iron anvil on a tree stump; a quench barrel of water; racks of neatly hung hammers and tongs on the walls; a workbench with tidy rows of repaired tools; an empty iron hook by the door; empty room",
+    "seed": 7311,
+    "date": "2026-11-02"
   },
   "src/assets/img/backgrounds/mawood.png": {
     "family": "town-painterly",
@@ -925,6 +939,13 @@
     "subject": "a curved sword whose blade is one giant pale eagle talon, with a hilt wrapped in leather and white feathers tied to the pommel",
     "seed": 279261417,
     "date": "2026-10-26"
+  },
+  "src/assets/img/items/toricsForgeTongs.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "One pair of heavy dark iron blacksmith tongs shaped like scissors, two long straight handles crossing at a single round rivet near one end, short thick gripping jaws with a square notch, a small round stamp pressed into one handle",
+    "seed": 7313,
+    "date": "2026-11-02"
   },
   "src/assets/img/items/trollClub.png": {
     "family": "item-pixel",

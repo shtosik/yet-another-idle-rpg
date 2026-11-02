@@ -25,8 +25,7 @@ export interface NPCProps {
 const NPC_Data: Record<number, NPCProps> = {
   [NpcID.liroldToric]: {
     id: NpcID.liroldToric,
-    // Placeholder until Toric's portrait is drawn.
-    url: './assets/img/avatars/mawood/mawoodBrenn.png',
+    url: './assets/img/avatars/lirold/liroldToric.png',
     dialogue: LIROLD_TORIC,
     firstMeetNodeId: ToricDialogue.intro1,
   },

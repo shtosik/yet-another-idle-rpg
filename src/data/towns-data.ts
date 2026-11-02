@@ -122,8 +122,7 @@ export const TOWNS_DATA: Record<TownID, Town> = {
         buildingId: TownBuildingID.liroldForge,
         position: { x: 25, y: 75 },
         npcs: [{ id: NpcID.liroldToric, position: { x: 50, y: 50 } }],
-        // Placeholder until the Forge workshop background is drawn.
-        url: './assets/img/backgrounds/laHarparShop.png',
+        url: './assets/img/backgrounds/liroldForge.png',
       },
     ],
   },
