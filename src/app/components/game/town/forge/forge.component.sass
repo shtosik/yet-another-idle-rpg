@@ -1,0 +1,97 @@
+@use 'palette' as palette
+
+:host
+  display: block
+  width: 100%
+  height: 100%
+  overflow-y: auto
+  position: relative
+
+.forge__close
+  position: absolute
+  right: 1rem
+  top: 1rem
+  padding: 0
+  border: 0
+  background: transparent
+  cursor: pointer
+
+.forge
+  padding: 1.5rem
+
+  h2, h3, caption
+    color: palette.$yellow
+
+  &__hint
+    font-size: 0.8rem
+    opacity: 0.75
+
+  &__grid
+    display: flex
+    flex-wrap: wrap
+    gap: 0.5rem
+    padding: 0
+    list-style: none
+
+  &__item
+    display: block
+    padding: 0
+    border: 0
+    background: transparent
+    cursor: pointer
+
+    &[aria-pressed='true']
+      outline: 2px solid palette.$yellow
+      outline-offset: 2px
+
+  &__choices
+    display: flex
+    flex-wrap: wrap
+    gap: 1rem
+
+    label
+      display: flex
+      flex-direction: column
+      gap: 0.25rem
+
+  select, &__merge
+    padding: 0.4rem 0.6rem
+    border: 1px solid rgba(255, 255, 255, 0.3)
+    border-radius: 4px
+    background: #161616
+    color: inherit
+    font: inherit
+
+  button:focus-visible, select:focus-visible, &__close:focus-visible
+    outline: 2px solid palette.$yellow
+    outline-offset: 3px
+
+  &__merge
+    margin-top: 1rem
+    border-color: palette.$yellow
+    cursor: pointer
+
+    &:disabled
+      opacity: 0.65
+      cursor: not-allowed
+
+  table
+    border-collapse: collapse
+    text-align: left
+
+  th, td
+    padding: 0.25rem 1rem 0.25rem 0
+
+.forge-toast
+  position: sticky
+  bottom: 0.5rem
+  margin: 0 1.5rem
+  padding: 0.375rem 0.875rem
+  border: 1px solid palette.$yellow
+  border-radius: 4px
+  background: #0a0a0a
+  color: palette.$yellow
+  pointer-events: none
+
+  &:empty
+    display: none

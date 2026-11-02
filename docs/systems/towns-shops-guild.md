@@ -4,6 +4,7 @@
 Towns are non-combat hubs. Each town has **buildings**; a building holds NPCs (dialogue) or is a zone entrance. Shops and the Exploration Guild are reached through NPC dialogue.
 
 ## Key files
+- `src/app/components/game/town/forge/forge.component.ts:ForgeComponent` — inline gear merge panel, preview and result toast.
 - `src/data/towns-data.ts:TOWNS_DATA` — per town: `regionId`, background `url`, `buildings[]` (`buildingId`, `position` of the button on the town view, `npcs` with positions, `url` background, optional `zoneId` and `questRequirement`).
 - `src/enums/map/town-id.enum.ts:TownID`, `town-building-id.enum.ts:TownBuildingID`, `npc-id.enum.ts:NpcID`, `region-id.enum.ts:RegionID`.
 - `src/interfaces/town.interface.ts:Town`, `TownBuilding`.
@@ -13,6 +14,13 @@ Towns are non-combat hubs. Each town has **buildings**; a building holds NPCs (d
 - `src/app/store/shop/shop-prices.ts:sellPrice` — what a shop pays for an item.
 - `src/app/store/shop/shop.store.ts:ShopStore` — runtime stock per shop and refresh timer (`ensureShop`, `tickCooldowns`, `buyItem`); `src/types/shop/shop-state.type.ts`.
 - `src/app/services/exploration-guild.service.ts:ExplorationGuildService` — task generation; task state lives in `PlayerStore` (`activeTasks`, `explorerTokens`, `totalTasksCompleted`).
+
+## Forge panel
+The dialogue effect `{ type: 'forge' }` calls `TownsStore.openForge()` and swaps the building view for `ForgeComponent` inline, like a shop. Opening a shop closes the Forge and opening the Forge closes the shop. Closing the panel returns to the building; changing building, town or leaving the town tab closes it. `forgeOpen` is transient and never saved, like `activeShopId`. No NPC or building opens the Forge yet; `await dev.openForge()` opens it over La Harpar's first building for testing.
+
+The panel groups inventory stacks and equipped gear by `stackKey` (id, rarity, upgrade level), shows the combined count with the existing slot, upgrade mark and tooltip, and excludes pets. Unique and capped gear stay visible so players can see why they cannot merge it. Native buttons select groups; labeled native selects choose the base and sacrificed copy from inventory or equipment. An equipped copy is the default base when present; it stays equipped on success. Choosing it as the sacrifice empties its slot. Inventory choices consume one copy each, including two copies from a single stack.
+
+The preview shows gold cost, success chance and stat bonuses before/after using `gearModifiers`, including fractional stats and the +5 milestone. `evaluateMerge` supplies the disabled reason on the Merge button and its accessible label: missing copy, unique, cap, gold or inventory capacity (including the affected tab). `PlayerStore.mergeItem` rechecks and applies the merge. A three-second live status toast reports success or a later-level failure; only gold and the sacrificed copy are lost on failure. The panel follows the resulting group after success. All text uses the `forge` English namespace.
 
 ## Data flow
 **Navigation**: the world map's town marker calls `TownsStore.selectTown` and switches to the town tab. Clicking a building either enters its zone (`zoneId` → `BattleStore.setZone`, back to battle) or opens the building view with its NPC frames. A building with `questRequirement` is hidden until that quest has started. Leaving the tab clears the selection.

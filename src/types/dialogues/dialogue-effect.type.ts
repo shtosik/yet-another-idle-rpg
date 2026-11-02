@@ -10,6 +10,7 @@ export type DialogueEffect =
   | StatEffect
   | ItemEffect
   | ShopEffect
+  | ForgeEffect
   | DialogueFlagEffect
   | GuildEffect
   | ArenaEffect
@@ -38,6 +39,11 @@ export interface ShopEffect {
   shopId: number
   /** Stock stage to open at (default 0): items with a higher `minStage` stay hidden. */
   stage?: number
+}
+
+/** Opens the inline Forge panel in the current town building. */
+export interface ForgeEffect {
+  type: 'forge'
 }
 
 export interface DialogueFlagEffect {

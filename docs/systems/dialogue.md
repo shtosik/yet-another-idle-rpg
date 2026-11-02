@@ -19,6 +19,9 @@ Data-driven NPC conversations. Each NPC has a graph of nodes; options branch on 
 3. `requirementsNeeded` on that result are shown as labels; if any fail, the option is disabled. If the result's item gains (`give` effects, quest item rewards) don't fit after its removals, the option is disabled with a tag naming each short tab, e.g. "1 Materials slot needed" (`DialogueManagerService.missingSlots`, per tab). If its `deduct` gold effects cost more than the player has, it is disabled with an "N more gold needed" tag (`missingGold`): gold never goes negative.
 4. On click, `selectOption` runs the same `getActiveResult` branch: it applies `effects` in order, then closes (`closeDialogue: true`) or moves to `next`.
 
+## Effects (Forge)
+`{ type: 'forge' }` has no payload. `DialogueManagerService.applyEffects` calls `TownsStore.openForge()` to show the Forge panel inline in the current town building, closing any shop. The building view is destroyed, which closes its dialogue just as opening a shop does. The effect tag uses `forge:open` ("Open Forge"). The panel closes on building/town navigation and is not restored after reload. No NPC uses this effect until the Forge content is added; see `towns-shops-guild.md` for the panel and `player-stats-inventory-equipment.md` for merge rules.
+
 ## Conditions (quest)
 `{ type: 'quest', questId, questState, step? }` uses `QuestState`:
 - `notStarted`, `completed` — plain status.

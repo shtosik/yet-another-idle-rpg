@@ -38,6 +38,8 @@ Battle panel controls, state labels, weakness hints, spell availability and empt
 
 Item upgrade labels use `items:upgradedName` (`name`, `level`), `items:upgradeLevel` (`level`), and `items:upgradeMilestone` (`level`), including accessible slot names.
 
+Forge panel labels, pair choices, preview, disabled reasons and merge result toasts use `forge:*` (`forge.json`, registered in `app.config.ts`). Item and stat names retain the shared `items:*` and `app:playerStats.*` keys.
+
 ## Invariants & gotchas
 - **A new namespace must be added to `translations` in `app.config.ts`**, or every key in it renders raw. `npm run validate` catches this.
 - The pipe is `| i18next`, not `| translate`.

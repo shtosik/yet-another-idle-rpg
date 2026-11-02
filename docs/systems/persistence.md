@@ -48,7 +48,7 @@ Settings → Save (`src/app/services/save-transfer.service.ts:SaveTransferServic
 - **New keys pick up defaults.** A key added to `initialState` appears in old saves with its initial value, because of the merge.
 - **Arrays merge by index**, not replace. If `initialState` has a non-empty array and the save has a shorter one, the tail of the initial array survives. Keep initial arrays empty (or accept the effect).
 - **Enum values are what get saved**, never enum names. Renumbering an enum quietly points saved data at different entities.
-- **Transient state**: pass per-tick timers and UI state a reload shouldn't restore as `transientKeys` (`{ transientKeys: ['manaRegenTimer'] }`, `activeShopId`), or keep them outside stores (the attack and respawn timers live on `GameIntervalService`). A transient key changing doesn't trigger a save.
+- **Transient state**: pass per-tick timers and UI state a reload shouldn't restore as `transientKeys` (`{ transientKeys: ['manaRegenTimer'] }`, `activeShopId`, `activeShopStage`, `forgeOpen`), or keep them outside stores (the attack and respawn timers live on `GameIntervalService`). A transient key changing doesn't trigger a save.
 - Clearing `localStorage` by hand: reload within a second, or the next save writes the old state back.
 
 ## Known issues

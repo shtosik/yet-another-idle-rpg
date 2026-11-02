@@ -301,6 +301,9 @@ export class DialogueManagerService {
         case 'shop':
           this.openShop(effect.shopId, effect.stage)
           break
+        case 'forge':
+          this.townsStore.openForge()
+          break
         case 'flag':
           this.questStore.setDialogueFlag(effect.name)
           break

@@ -1,0 +1,77 @@
+<button type="button" class="forge__close" [attr.aria-label]="'forge:close' | i18next" (click)="closed.emit()">
+  <img ngSrc="./assets/img/icons/close.svg" alt="" width="24" height="24">
+</button>
+<div class="forge">
+  <h2>{{ 'forge:title' | i18next }}</h2>
+  <p>{{ 'forge:balance' | i18next: { amount: gold() } }}</p>
+  <p class="forge__hint">{{ 'forge:hint' | i18next: { level: levelCap } }}</p>
+  <ul class="forge__grid" [attr.aria-label]="'forge:gear' | i18next">
+    @for (group of groups(); track group.key) {
+      <li>
+        <button type="button" class="forge__item" [attr.aria-label]="groupLabel(group)"
+                [attr.aria-pressed]="selectedGroup()?.key === group.key" (click)="selectGroup(group); slot.hideTooltip()" (focus)="slot.showTooltip()" (blur)="slot.hideTooltip()" (keydown.escape)="slot.hideTooltip()">
+          <app-slot>
+            <app-inventory-slot #slot [item]="ITEM_DATA[group.item.id]" [tier]="group.item.tier"
+                                [upgradeLevel]="group.item.upgradeLevel ?? 0" [amount]="group.amount" [clickable]="false"/>
+          </app-slot>
+        </button>
+      </li>
+    } @empty {
+      <li>{{ 'forge:empty' | i18next }}</li>
+    }
+  </ul>
+
+  @if (selectedGroup(); as group) {
+    <section class="forge__detail" [attr.aria-label]="'forge:preview' | i18next">
+      <h3>{{ itemName(group.item) }}</h3>
+      <div class="forge__choices">
+        <label>
+          {{ 'forge:base' | i18next }}
+          <select #baseChoice (change)="chooseBase(baseChoice.value)">
+            @for (choice of group.choices; track choice.key) {
+              <option [value]="choice.key" [selected]="base()?.key === choice.key">{{ choiceLabel(choice) }}</option>
+            }
+          </select>
+        </label>
+        <label>
+          {{ 'forge:sacrifice' | i18next }}
+          <select #sacrificeChoice [disabled]="!sacrificeChoices().length"
+                  (change)="chooseSacrifice(sacrificeChoice.value)">
+            @for (choice of sacrificeChoices(); track choice.key) {
+              <option [value]="choice.key" [selected]="sacrifice()?.key === choice.key">{{ choiceLabel(choice) }}</option>
+            } @empty {
+              <option value="">{{ 'forge:missingCopy' | i18next }}</option>
+            }
+          </select>
+        </label>
+      </div>
+      <p class="forge__hint">{{ 'forge:pairHint' | i18next }}</p>
+      <p>{{ 'forge:cost' | i18next: { amount: cost() } }}</p>
+      @if ((group.item.upgradeLevel ?? 0) < levelCap) {
+        <p>{{ 'forge:chance' | i18next: { chance: chance() * 100 } }}</p>
+        <table>
+          <caption>{{ 'forge:levels' | i18next: { before: group.item.upgradeLevel ?? 0, after: (group.item.upgradeLevel ?? 0) + 1 } }}</caption>
+          <thead>
+            <tr>
+              <th scope="col">{{ 'forge:stat' | i18next }}</th>
+              <th scope="col">{{ 'forge:before' | i18next }}</th>
+              <th scope="col">{{ 'forge:after' | i18next }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (stat of statPreview(); track stat.stat) {
+              <tr>
+                <th scope="row">{{ 'app:playerStats.' + stat.stat | i18next }}</th>
+                <td>{{ stat.stat | statToPercentage:stat.amount }}</td>
+                <td>{{ stat.stat | statToPercentage:stat.after }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+      <button type="button" class="forge__merge" [disabled]="evaluation()?.status !== 'ready'"
+              [attr.aria-label]="mergeLabel()" (click)="merge()">{{ mergeLabel() }}</button>
+    </section>
+  }
+</div>
+<div class="forge-toast" role="status" aria-live="polite">{{ toast() }}</div>

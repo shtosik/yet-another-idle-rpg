@@ -42,6 +42,15 @@ export class InventoryItemComponent {
 
   @ViewChild(TooltipTemplateDirective) private tooltipDirective?: TooltipTemplateDirective
 
+  /** Inline panels wrap passive slots in their own button, which owns keyboard focus. */
+  showTooltip(): void {
+    this.tooltipDirective?.show()
+  }
+
+  hideTooltip(): void {
+    this.tooltipDirective?.hide()
+  }
+
   readonly ItemTier = ItemTier
   protected readonly EnemyID = EnemyID
   protected readonly SkillNodeID = SkillNodeID
