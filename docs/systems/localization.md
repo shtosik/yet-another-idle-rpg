@@ -41,7 +41,7 @@ Item upgrade labels use `items:upgradedName` (`name`, `level`), `items:upgradeLe
 
 Forge panel labels, pair choices, preview, disabled reasons and merge result toasts use `forge:*` (`forge.json`, registered in `app.config.ts`). Item and stat names retain the shared `items:*` and `app:playerStats.*` keys.
 
-Pathfinder's Seal uses `items:names.pathfindersSeal`, `app:playerStats.upgradedDropChance`, and the Progress description at `app:statsPanel.descriptions.upgradedDropChance`. Its registration effect label and success/reminder scripts use the existing `dialogues/laHarparMarvin` namespace; Ludo's optional explanation uses `dialogues/liroldArenaMaster`. Keep the scripts' "ten percent" lesson in sync with `PATHFINDERS_SEAL_UPGRADED_DROP_CHANCE` if tuning changes.
+Pathfinder's Seal uses `items:names.pathfindersSeal`, `app:playerStats.upgradedDropChance`, and the Progress description at `app:statsPanel.descriptions.upgradedDropChance`. Its registration effect label and success/reminder scripts use the existing `dialogues/laHarparMarvin` namespace; Ludo's optional explanation uses `dialogues/liroldArenaMaster`. Dialogue describes the salvage lesson and Arena prizes in-world; numeric drop and upgrade mechanics belong in the Progress stat tooltip. Keep that tooltip in sync with `PATHFINDERS_SEAL_UPGRADED_DROP_CHANCE` if tuning changes. The Cold Forge dialogue likewise uses workshop language for cooking preparation and matching gear; journal Steps may give plain instructions. Keep dialogue text aligned with `docs/ideas/gear-upgrading-cold-forge.md`.
 
 ## Invariants & gotchas
 - **A new namespace must be added to `translations` in `app.config.ts`**, or every key in it renders raw. `npm run validate` catches this.

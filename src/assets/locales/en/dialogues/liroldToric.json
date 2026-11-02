@@ -11,7 +11,7 @@
     "opt3": "I've brought your forge tongs.",
     "opt4": "About getting the hearth going...",
     "opt5": "Can I help you get it burning again?",
-    "opt6": "Upgrade gear.",
+    "opt6": "Can you strengthen my gear?",
     "opt7": "Tell me about the Forge.",
     "opt8": "You really like apple pie?",
     "opt9": "Where did you live before Lirold?",
@@ -24,7 +24,7 @@
   },
   "aboutForgeRestored": {
     "message": "The mine is still shut, but there's useful metal coming through this door again. Two matching pieces give me something to work with. I'll show you the cost before the hammer falls.",
-    "opt1": "Upgrade gear.",
+    "opt1": "Can you strengthen my gear?",
     "opt2": "Good to see the fire back."
   },
   "aboutPie": {
@@ -71,7 +71,7 @@
     "opt2": "Something else first."
   },
   "coldForgeProgressFour": {
-    "message": "Marvin's right about one thing: I haven't stopped for a proper meal. Bring me one Fish & Apple Pie, hot enough to make me put the hammer down. La Harpar sells the recipe; you'll need Cooking level two.",
+    "message": "Marvin's right about one thing: I haven't stopped for a proper meal. Bring me one Fish & Apple Pie, hot enough to make me put the hammer down. The recipe is sold in La Harpar; it takes a well-equipped kitchen.",
     "opt1": "One Fish & Apple Pie.",
     "opt2": "Something else first."
   },
@@ -80,13 +80,13 @@
     "opt1": "I'll bring the wood."
   },
   "coldForgeProgressFive": {
-    "message": "Ten Ancient Wood will make the charcoal I need. The Deepwood's treants carry it. Then I can put these tongs back to work.",
+    "message": "Ten Ancient Wood will make the charcoal I need. The old treants of the Deepwood have wood dense enough for the job. Then I can put these tongs back to work.",
     "opt1": "I'll bring it.",
     "opt2": "Something else first."
   },
   "coldForgeComplete": {
-    "message": "There she goes; I'd forgotten how the hearth sounds. Bring two pieces of the same gear, matching rarity and upgrade level, and gold for the work. I'll make you one stronger piece.",
-    "opt1": "Upgrade gear.",
+    "message": "There she goes; I'd forgotten how the hearth sounds. Bring me two matching pieces, alike in quality and workmanship, and gold for the work. I'll make you one stronger piece.",
+    "opt1": "Can you strengthen my gear?",
     "opt2": "I'll come back with gear."
   }
 }
