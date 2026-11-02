@@ -72,8 +72,10 @@
   <div class="forge__tooltip">
     @if (item(); as gear) {
       <strong>{{ itemName(gear) }} · {{ ('items:tiers.' + ItemTier[gear.tier]) | i18next }}</strong>
-      <span>{{ 'forge:base' | i18next }}: {{ copyLabel(base()) }}</span>
-      <span>{{ 'forge:sacrifice' | i18next }}: {{ copyLabel(sacrifice()) }}</span>
+      @if (hasPair()) {
+        <span>{{ 'forge:base' | i18next }}: {{ copyLabel(base()) }}</span>
+        <span>{{ 'forge:sacrifice' | i18next }}: {{ copyLabel(sacrifice()) }}</span>
+      }
       @if (statPreview().length) {
         <table>
           <caption>{{ 'forge:levels' | i18next: { before: gear.upgradeLevel ?? 0, after: preview().upgradeLevel } }}</caption>

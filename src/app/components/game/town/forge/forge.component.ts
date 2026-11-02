@@ -74,6 +74,11 @@ export class ForgeComponent {
       capacity: this.playerStore.inventoryCapacity(), goldCoins: this.playerStore.resources.goldCoins(),
     })
   })
+  /** Base and sacrifice only mean something once a second copy exists. */
+  readonly hasPair = computed(() => {
+    const evaluation = this.evaluation()
+    return !(evaluation?.status === 'refused' && evaluation.reason === 'missingCopy')
+  })
   readonly cost = computed(() => {
     const item = this.item()
     if (!item) return 0
