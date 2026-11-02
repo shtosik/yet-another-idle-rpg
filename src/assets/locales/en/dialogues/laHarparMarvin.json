@@ -48,15 +48,15 @@
   },
   "sealEffect": "Register Pathfinder's Seal",
   "sealRegistered": {
-    "message": "Your name's in the salvage register. Look along the grain, check the seams, and keep the pieces somebody else would pass over. From now on, ten percent of your gear drops will arrive at +1.",
+    "message": "Your name's in the salvage register. Look along the grain, check the seams, and keep the pieces somebody else would pass over. There's sound work out there, if you know where to look.",
     "opt1": "I'll put that to use."
   },
   "sealReminder": {
-    "message": "Ten percent of your gear drops arrive at +1. You learned what to look for; the lesson stays with you. Another seal won't teach it twice.",
+    "message": "Look along the grain and check the seams; sound work is often overlooked. Once you've learned to spot it, the lesson stays with you. Another seal won't teach it twice.",
     "opt1": "Thanks, Marvin."
   },
   "coldForgeSalvage": {
-    "message": "We map the unknown and bring useful things home. A Pathfinder's Seal earns a place in our salvage register and a lesson in spotting sound gear. Find one among Ludo's Arena Chest prizes and bring it here; Toric doesn't need it to light his hearth.",
+    "message": "We map the unknown and bring useful things home. A Pathfinder's Seal earns a place in our salvage register and a lesson in spotting sound gear. Lirold's Arena keeps a few among its prizes; bring me one if you earn it on the sand.",
     "opt1": "Understood."
   }
 }
