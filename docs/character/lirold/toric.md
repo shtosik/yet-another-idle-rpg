@@ -35,7 +35,7 @@ Sample: "A blade can have life left in it after its owner gives up. People, too,
 
 Broad, compact dwarf with large working hands, a square face and a dark beard streaked with iron-grey, tied back clear of the hearth. Calm brown eyes under heavy brows; a small, almost reluctant smile. A smoke-dark leather apron over a rolled-sleeve slate-blue shirt, copper apron rivets, an old burn scar on one forearm. No royal regalia or warrior armour.
 
-Waist-up, readable at NPC portrait size, one hand resting on an anvil and the other holding a small pie plate away from the soot. Hammer and long tongs in the background rather than crossing his face. Pale stone, slate and warm copper connect him to Lirold; a soft ember glow suggests the restored Forge. The pie is a humanising detail, not a giant comic prop. Portrait remains to be generated; no art created in this pass.
+Waist-up, readable at NPC portrait size, one hand resting on an anvil and the other holding a small pie plate away from the soot. Hammer and long tongs in the background rather than crossing his face. Pale stone, slate and warm copper connect him to Lirold; a soft ember glow suggests the restored Forge. The pie is a humanising detail, not a giant comic prop. Portrait: `src/assets/img/avatars/lirold/liroldToric.png` (2026-11-02; reads human-sized, redo for dwarf proportions).
 
 ## Setting and role
 

@@ -15,8 +15,7 @@ export const QuestItemsData: Partial<Record<ItemID, Item>> = {
   [ItemID.toricsForgeTongs]: {
     id: ItemID.toricsForgeTongs,
     tier: ItemTier.normal,
-    // Placeholder until Toric's tongs icon is drawn.
-    url: './assets/img/items/letter.png',
+    url: './assets/img/items/toricsForgeTongs.png',
     value: -1,
     type: ItemType.quest,
   },
