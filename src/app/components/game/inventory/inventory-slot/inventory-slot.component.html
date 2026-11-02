@@ -107,6 +107,9 @@
     }
     @if (item.type === ItemType.chest) {
       <span class="stat">{{ 'items:chestRolls' | i18next:{ count: item.rolls } }}</span>
+      @if (item.bonusRoll; as bonus) {
+        <span class="stat">{{ 'items:chestBonus' | i18next:{ chance: bonus.chance, item: ('items:names.' + ItemID[bonus.itemId]) | i18next } }}</span>
+      }
     }
     @if (item.type === ItemType.spellScroll) {
       <span class="stat">{{ 'items:teachesSpell' | i18next:{ spell: ('spells:names.' + SpellID[item.spellId] + '.name') | i18next } }}</span>

@@ -6,6 +6,7 @@ Versions follow [Semantic Versioning](https://semver.org/). Each note is `- [typ
 New notes go under `[Unreleased]`; `npm run release -- <major|minor|patch>` moves them into a version (docs/deployment.md).
 
 ## [Unreleased]
+- [feature] Pathfinder's Seal: a rare Arena Chest find. Register it with Marvin and some gear drops arrive already upgraded to +1.
 - [feature] Toric's Forge in Lirold: finish The Cold Forge to upgrade gear up to +5 by merging two copies.
 - [feature] The equipment window is now a proper character sheet: every slot sits in its place around your character with a label, empty slots say what goes there, and the header counts what you have on. Hover a slot for details; right-click, Enter or Space unequips. The equipment window is taller, so the quest log below it is a little shorter.
 - [feature] New fonts: Cinzel for titles and tabs, Alegreya Sans for everything else, so descriptions, numbers and dialogue are much easier to read than the old pixel font.

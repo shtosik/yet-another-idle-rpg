@@ -61,6 +61,7 @@ export const RewardsItemsData: Partial<Record<ItemID, Item>> = {
     value: -1,
     type: ItemType.chest,
     rolls: 4,
+    bonusRoll: { itemId: ItemID.pathfindersSeal, chance: 10, registeredStat: 'upgradedDropChance' },
     loot: [
       { weight: 300, gold: [6000, 12000] },
       { weight: 200, itemId: ItemID.elderSilk, amount: [4, 8] },

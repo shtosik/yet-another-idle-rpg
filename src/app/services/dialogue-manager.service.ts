@@ -73,10 +73,14 @@ export class DialogueManagerService {
     )
   }
 
-  /** False when the result's rewards would not fit in the inventory, its gold fee can't be paid, or a turn-in has no full bundle. */
+  /** Rechecks capacity, fees and one-time effects, including Seal registration and reputation bundles. */
   canApplyResult(result: DialogueResult<any> | undefined): boolean {
     return Object.keys(this.missingSlots(result)).length === 0 && this.missingGold(result) === 0
-      && (result?.effects ?? []).every(effect => effect.type !== 'reputationTurnIn' || this.turnIn(effect).bundles > 0)
+      && (result?.effects ?? []).every(effect => {
+        if (effect.type === 'reputationTurnIn') return this.turnIn(effect).bundles > 0
+        if (effect.type === 'registerPathfindersSeal') return this.playerStore.canRegisterPathfindersSeal()
+        return true
+      })
   }
 
   /**
@@ -303,6 +307,9 @@ export class DialogueManagerService {
           break
         case 'forge':
           this.townsStore.openForge()
+          break
+        case 'registerPathfindersSeal':
+          this.playerStore.registerPathfindersSeal()
           break
         case 'flag':
           this.questStore.setDialogueFlag(effect.name)

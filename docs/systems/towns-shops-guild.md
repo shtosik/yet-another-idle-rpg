@@ -48,6 +48,8 @@ The preview shows gold cost, success chance and stat bonuses before/after using 
 
 **Guild store** (`explorersGuildStore`, from Marvin's hub): priced in Explorer Tokens, buys nothing. Rank 0: mana potions, recipe scrolls, Skill Point Book; rank 1: Guild Satchel (+2 slots to each of the Gear, Consumables and Materials tabs, 1 in stock), Hunter's Feast recipe, Ambush Scroll (25 tokens, one); rank 2: Second Contract (+1 `maxTaskSlots`) and Bounty Mark (+10% `taskDoubleKillChance`), one each.
 
+**Pathfinder's Seal registration**: Marvin's hub places "Register this Pathfinder's Seal." after The Cold Forge's talk turn-in and before ordinary Exploration Guild business. It appears only while holding a Seal with no permanent `upgradedDropChance` bonus. The atomic `registerPathfindersSeal` effect takes exactly one Seal and saves the permanent 10% chance for eligible gear drops to arrive at +1; the saved bonus also prevents repeat registration and further Seal rolls. A registered player instead sees "What did the Pathfinder's Seal teach me?" and its permanent-lesson reminder. Registration needs neither The Cold Forge nor a Guild rank. The scripts follow `docs/ideas/gear-upgrading-cold-forge.md`; Ludo's optional Seal lore points to Marvin in La Harpar.
+
 ## Intended behavior (owner decisions)
 - Gold spending is blocked when the player can't afford it (shops already check).
 - Two tasks may roll the same monster; one kill then progresses both. Intended: a lucky roll.

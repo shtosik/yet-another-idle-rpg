@@ -4,7 +4,12 @@
     "opt1": "Tell me.",
     "opt2": "Maybe later."
   },
+  "pathfindersSealInfo": {
+    "message": "The Exploration Guild leaves a few of those among the prizes, challenger. Finding a road out is useful when the last champion wants to keep you! Show it to Marvin in La Harpar; he keeps the register.",
+    "opt1": "I'll ask Marvin."
+  },
   "default": {
+    "pathfindersSeal": "Why was this seal in an Arena Chest?",
     "message": "The sand's raked and the stands are filling. Fight, talk or gawk, challenger?",
     "claim": "I've come for my winnings.",
     "fight": "I'll fight.",
