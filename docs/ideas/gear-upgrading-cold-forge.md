@@ -92,7 +92,7 @@ Quest turn-ins appear before in-progress options, then the offer, then other bus
 3. "I've brought your forge tongs." → coldForgeTongs · only if ready at Step 2; effect: advance `theColdForge`.
 4. "About getting the hearth going..." → coldForgeProgressFive / coldForgeProgressFour / coldForgeProgressThree / coldForgeProgressTwo / coldForgeProgressOne · results in that order, each only if active at its matching Step.
 5. "Can I help you get it burning again?" → coldForgeOffer · only if `theColdForge` available.
-6. "Upgrade gear." → end · only if `theColdForge` completed; effect: open the Forge panel (**new effect needed**, below).
+6. "Can you strengthen my gear?" → end · only if `theColdForge` completed; effect: open the Forge panel (**new effect needed**, below).
 7. "Tell me about the Forge." → aboutForgeRestored if Quest completed; otherwise → aboutForge.
 8. "You really like apple pie?" → aboutPie.
 9. "Where did you live before Lirold?" → aboutHome.
@@ -109,7 +109,7 @@ Quest turn-ins appear before in-progress options, then the offer, then other bus
 **Shown when:** `theColdForge` completed.
 > The mine is still shut, but there's useful metal coming through this door again. Two matching pieces give me something to work with. I'll show you the cost before the hammer falls.
 
-1. "Upgrade gear." → end · effect: open the Forge panel; only if Quest completed.
+1. "Can you strengthen my gear?" → end · effect: open the Forge panel; only if Quest completed.
 2. "Good to see the fire back." → default.
 
 ### aboutPie (new)
@@ -174,7 +174,7 @@ Quest turn-ins appear before in-progress options, then the offer, then other bus
 
 ### coldForgeProgressFour (new)
 **Shown when:** active at Step 4.
-> Marvin's right about one thing: I haven't stopped for a proper meal. Bring me one Fish & Apple Pie, hot enough to make me put the hammer down. La Harpar sells the recipe; you'll need Cooking level two.
+> Marvin's right about one thing: I haven't stopped for a proper meal. Bring me one Fish & Apple Pie, hot enough to make me put the hammer down. The recipe is sold in La Harpar; it takes a well-equipped kitchen.
 
 1. "One Fish & Apple Pie." → end.
 2. "Something else first." → default.
@@ -187,16 +187,16 @@ Quest turn-ins appear before in-progress options, then the offer, then other bus
 
 ### coldForgeProgressFive (new)
 **Shown when:** active at Step 5.
-> Ten Ancient Wood will make the charcoal I need. The Deepwood's treants carry it. Then I can put these tongs back to work.
+> Ten Ancient Wood will make the charcoal I need. The old treants of the Deepwood have wood dense enough for the job. Then I can put these tongs back to work.
 
 1. "I'll bring it." → end.
 2. "Something else first." → default.
 
 ### coldForgeComplete (new)
 **Shown when:** reached after final advancement; Quest completion awards the proposed 2000 XP / 400 gold.
-> There she goes; I'd forgotten how the hearth sounds. Bring two pieces of the same gear, matching rarity and upgrade level, and gold for the work. I'll make you one stronger piece.
+> There she goes; I'd forgotten how the hearth sounds. Bring me two matching pieces, alike in quality and workmanship, and gold for the work. I'll make you one stronger piece.
 
-1. "Upgrade gear." → end · only if Quest completed; effect: open the Forge panel.
+1. "Can you strengthen my gear?" → end · only if Quest completed; effect: open the Forge panel.
 2. "I'll come back with gear." → default.
 
 The relighting is narrative, not a separate timed action. The player need not own matching gear to complete the Quest or select the service; the panel handles whether a merge is possible. Later failure rules remain those in the parent proposal, with the panel showing chance, cost and result before a merge.
@@ -209,7 +209,7 @@ Namespace: `dialogues/liroldArenaMaster`. Read with [Ludo's character](../charac
 **Shown when:** existing returning hub. Insert this Quest turn-in before other business.
 
 1. "What happened to Toric's delivery cart?" → coldForgeLead · only if `theColdForge` ready at Step 1; effect: advance `theColdForge`.
-2. "Why was this seal in an Arena Chest?" → pathfindersSealInfo · optional lore option, only if holding a Pathfinder's Seal and registration flag unset; place after Quest business and existing Arena actions.
+2. "Why give a Pathfinder's Seal as an Arena prize?" → pathfindersSealInfo · optional lore option, only if holding a Pathfinder's Seal and registration flag unset; place after Quest business and existing Arena actions.
 
 ### coldForgeLead (new)
 **Shown when:** reached after Step 1 advancement.
@@ -241,19 +241,19 @@ Namespace: `dialogues/laHarparMarvin`. Use [Marvin's voice](../character/laHarpa
 2. "I'll bring him a pie." → default.
 
 ### coldForgeSalvage (new)
-> We map the unknown and bring useful things home. A Pathfinder's Seal earns a place in our salvage register and a lesson in spotting sound gear. Find one among Ludo's Arena Chest prizes and bring it here; Toric doesn't need it to light his hearth.
+> We map the unknown and bring useful things home. A Pathfinder's Seal earns a place in our salvage register and a lesson in spotting sound gear. Lirold's Arena keeps a few among its prizes; bring me one if you earn it on the sand.
 
 1. "Understood." → default.
 
 ### sealRegistered (new)
 **Shown when:** reached after successful one-time registration; never reachable by a second Seal.
-> Your name's in the salvage register. Look along the grain, check the seams, and keep the pieces somebody else would pass over. From now on, ten percent of your gear drops will arrive at +1.
+> Your name's in the salvage register. Look along the grain, check the seams, and keep the pieces somebody else would pass over. There's sound work out there, if you know where to look.
 
 1. "I'll put that to use." → default.
 
 ### sealReminder (new)
 **Shown when:** `pathfindersSealRegistered` set.
-> Ten percent of your gear drops arrive at +1. You learned what to look for; the lesson stays with you. Another seal won't teach it twice.
+> Look along the grain and check the seams; sound work is often overlooked. Once you've learned to spot it, the lesson stays with you. Another seal won't teach it twice.
 
 1. "Thanks, Marvin." → default.
 
@@ -263,7 +263,7 @@ Retain **Pathfinder's Seal**, proposed `pathfindersSeal`. Quest-type item, rare 
 
 > An Exploration Guild seal for those who find a way home with something worth keeping. Marvin in La Harpar can enter its bearer in the salvage register.
 
-The register and lesson are proposed customs, not a new Building, spendable currency, Guild rank or prerequisite for ordinary Tasks. Registration permanently makes 10% of gear drops arrive at +1, exactly as settled in the parent proposal. Keep the numeric line in sync if the tunable percentage changes. Never promise double loot, a +1 on every item, cheaper merges across all drops, or an upgraded unique Arena reward.
+The register and lesson are proposed customs, not a new Building, spendable currency, Guild rank or prerequisite for ordinary Tasks. Registration permanently makes 10% of gear drops arrive at +1, exactly as settled in the parent proposal. Keep numeric mechanics in the Progress stat tooltip; dialogue describes the salvage lesson in-world. Never promise double loot, a +1 on every item, cheaper merges across all drops, or an upgraded unique Arena reward.
 
 Registration requires no Forge Quest completion. The chest rolls a Seal (1 in 10 chests) only while the player neither holds one nor has registered one, so duplicates never exist. Quest-only drops roll only up to the amount the active Step still needs (owner rule), so no surplus tongs exist either; no disposal mechanic is needed.
 
