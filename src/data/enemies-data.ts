@@ -270,6 +270,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
       drop(ItemID.stick, 1, 1, 4),
       drop(ItemID.stone, 1, 2, 3),
       drop(ItemID.goblinFirebrand, 1, 1, 80),
+      { ...drop(ItemID.toricsForgeTongs, 1, 1, 50), requiredActiveQuestId: QuestID.theColdForge },
       petDrop(EnemyID.goblinScavenger),
     ],
     shinyDrops: shinyPetDrops(EnemyID.goblinScavenger),

@@ -3,6 +3,8 @@
 ## Purpose
 `PlayerStore` holds everything about the player character: stats, level and XP, gold, the inventory grid, equipped gear, and progress flags. Most other systems read from or write to it.
 
+Toric's Forge Tongs (`ItemID.toricsForgeTongs`) use the existing quest item rules: unsellable (`value: -1`), indestructible and consumed by The Cold Forge's step 2. Their temporary icon is the existing letter image; see `quests.md` for their drop source and the quest-drop cap dependency.
+
 ## Key files
 - `src/app/store/player/player.store.ts:PlayerStore` — state, the derived `stats`, `updatePlayerStats`, `addItems`/`removeItems`, `equipItem`/`unequipItem`, `useItem`, `processBattleEnd`, unlock flags.
 - `src/app/store/player/stats.ts` — `deriveStats`, the modifier sources (`equipmentModifiers`, `skillNodeModifiers`, `buffModifiers`, `consumableModifiers`, `bonusModifiers`; zone mastery's `masteryModifiers` lives in `zone-mastery.ts`), `SourcedModifiers` and `statContributions` (per-source breakdown), `RESOURCE_STATS`, inverted stats.

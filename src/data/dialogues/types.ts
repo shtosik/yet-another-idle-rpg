@@ -10,6 +10,7 @@ import { MawoodBrennDialogueType } from './mawoodTown/mawoodBrenn'
 import { MawoodMiloDialogueType } from './mawoodTown/mawoodMilo'
 import { MawoodElarionDialogueType } from './mawoodTown/mawoodElarion'
 import { LiroldArenaMasterDialogueType } from './liroldTown/liroldArenaMaster'
+import { LiroldToricDialogueType } from './liroldTown/liroldToric'
 
 export type DialogueType =
   | LaHarparBartenderDialogueType
@@ -24,3 +25,4 @@ export type DialogueType =
   | MawoodMiloDialogueType
   | MawoodElarionDialogueType
   | LiroldArenaMasterDialogueType
+  | LiroldToricDialogueType

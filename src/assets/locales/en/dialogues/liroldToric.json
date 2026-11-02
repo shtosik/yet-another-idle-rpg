@@ -1,0 +1,92 @@
+{
+  "intro1": {
+    "message": "Toric, blacksmith. Mind the tools; they're cleaner than the floor, and I'd like them to stay that way. If you've come for hot work, the hearth's cold.",
+    "opt1": "Why is the hearth cold?",
+    "opt2": "I'll let you work."
+  },
+  "default": {
+    "message": "Come in. What needs seeing to?",
+    "opt1": "Here's the wood for your hearth.",
+    "opt2": "One Fish & Apple Pie, Toric.",
+    "opt3": "I've brought your forge tongs.",
+    "opt4": "About getting the hearth going...",
+    "opt5": "Can I help you get it burning again?",
+    "opt6": "Upgrade gear.",
+    "opt7": "Tell me about the Forge.",
+    "opt8": "You really like apple pie?",
+    "opt9": "Where did you live before Lirold?",
+    "opt10": "Goodbye, Toric."
+  },
+  "aboutForge": {
+    "message": "Slatefall sent my iron until the castle shut the mine two winters ago. I've kept busy with cold repairs, but the hearth's been waiting. Then scavengers took my heavy tongs off a stranded cart on the Pass.",
+    "opt1": "Can I help?",
+    "opt2": "I'll leave you to it."
+  },
+  "aboutForgeRestored": {
+    "message": "The mine is still shut, but there's useful metal coming through this door again. Two matching pieces give me something to work with. I'll show you the cost before the hammer falls.",
+    "opt1": "Upgrade gear.",
+    "opt2": "Good to see the fire back."
+  },
+  "aboutPie": {
+    "message": "Apple pie makes a person sit down properly. Coastal traders got me used to La Harpar's fish filling; a proper lunch for a long day at the anvil. Bring it hot, and I'll put the hammer down.",
+    "opt1": "I'll remember that."
+  },
+  "aboutHome": {
+    "message": "Bramhold, under the highlands of Keldrath, north beyond Elderreach. Workshops off the halls, trading doors to the surface. I miss the shared table more than the ceiling.",
+    "opt1": "What is life like there?",
+    "opt2": "Why did you leave?",
+    "opt3": "Back to business."
+  },
+  "aboutHomeLife": {
+    "message": "We tally a repaired joint so the next pair of hands knows where to look; a good repair earns its place beside new work. Supper is often mushroom-and-barley stew, dark bread and baked apples. We say surface folk promise faster than metal cools, but keep your word and there's a chair for you.",
+    "opt1": "Why exchange that for Lirold?",
+    "opt2": "Back to business."
+  },
+  "aboutLeaving": {
+    "message": "I wanted a workshop of my own, and work I hadn't learned by heart. Traders spoke of Lirold's repairs and Slatefall iron, so I came here before the mine closed. No one sent me away; I chose this hearth.",
+    "opt1": "I hope it serves you well."
+  },
+  "coldForgeOffer": {
+    "message": "Ludo Crane saw what became of my cart, and he remembers every load that might have fed his Arena. Ask him about the tongs. We'll see what can be saved before we talk about new iron.",
+    "opt1": "I'll ask Ludo at the Arena.",
+    "opt2": "Another time."
+  },
+  "coldForgeProgressOne": {
+    "message": "Ludo Crane, at the Arena. Ask about my stranded cart, not his eleven seasons, unless you've brought a chair.",
+    "opt1": "I'll find him.",
+    "opt2": "Something else first."
+  },
+  "coldForgeProgressTwo": {
+    "message": "Goblin Scavengers, up on the Mountain Pass. My tongs have a square notch by the hinge. Bring them back here.",
+    "opt1": "I'll keep looking.",
+    "opt2": "Something else first."
+  },
+  "coldForgeTongs": {
+    "message": "Jaws still meet, and that's my notch. The old delivery stamp is here too; tell Marvin in La Harpar it was Toric's last Slatefall load. He keeps the Exploration Guild's road records.",
+    "opt1": "I'll ask him to check it."
+  },
+  "coldForgeProgressThree": {
+    "message": "Marvin, in La Harpar. Tell him the stamp says Toric's last Slatefall load; he won't need the tongs in his lap to find a record.",
+    "opt1": "I'll go to La Harpar.",
+    "opt2": "Something else first."
+  },
+  "coldForgeProgressFour": {
+    "message": "Marvin's right about one thing: I haven't stopped for a proper meal. Bring me one Fish & Apple Pie, hot enough to make me put the hammer down. La Harpar sells the recipe; you'll need Cooking level two.",
+    "opt1": "One Fish & Apple Pie.",
+    "opt2": "Something else first."
+  },
+  "coldForgePie": {
+    "message": "You've made room for me to sit down; I suppose I can make room for different work. I've been waiting for that old cart to come home. Bring ten Ancient Wood for charcoal, and we'll try the metal we've got.",
+    "opt1": "I'll bring the wood."
+  },
+  "coldForgeProgressFive": {
+    "message": "Ten Ancient Wood will make the charcoal I need. The Deepwood's treants carry it. Then I can put these tongs back to work.",
+    "opt1": "I'll bring it.",
+    "opt2": "Something else first."
+  },
+  "coldForgeComplete": {
+    "message": "There she goes; I'd forgotten how the hearth sounds. Bring two pieces of the same gear, matching rarity and upgrade level, and gold for the work. I'll make you one stronger piece.",
+    "opt1": "Upgrade gear.",
+    "opt2": "I'll come back with gear."
+  }
+}

@@ -24,6 +24,11 @@ Saved step encoding: `undefined` = not started, `1..n` = on step n, `9999` = com
 - **A Tale of a Captain is unfinished on purpose.** `captainsLetter` has no source and `rewards` is empty (no reputation either); it will be finished later.
 - Completing a quest must be blocked when item rewards don't fit in the inventory (see `player-stats-inventory-equipment.md`).
 
+## The Cold Forge
+Toric at Lirold's Forge offers `QuestID.theColdForge` (20) as soon as the player can reach him; there is no extra quest or reputation gate. Its five steps are: talk to Ludo Crane at the Arena; deliver one Toric's Forge Tongs to Toric; talk to Marvin at La Harpar's Exploration Guild; deliver one existing Fish & Apple Pie to Toric; deliver ten Ancient Wood to Toric. The two talk steps have empty requirements and advance only at their named NPC. The store consumes the three deliveries once. Completion gives 2000 XP and 400 gold and gates Toric's Upgrade gear service, without a separate flag or demonstration merge.
+
+Goblin Scavengers drop `ItemID.toricsForgeTongs` (181), an unsellable, indestructible quest item, at 1 in 50 with `requiredActiveQuestId: QuestID.theColdForge`. The quest-drop cap is the separate step 1 of `docs/plans/gear-upgrading.md`; until it lands, the existing quest-wide drop gate can produce surplus tongs. Fish & Apple Pie keeps its existing recipe, recipe unlock and Cooking level 2 preparation; this quest checks delivery only. Scripts: `docs/ideas/gear-upgrading-cold-forge.md`.
+
 ## Invariants & gotchas
 - Steps are 1-based in saves and 0-based in `steps[]` (`steps[step - 1]`).
 - Turn-in ordering in the NPC's tree matters: see the quest hub order in `dialogue.md`.
@@ -31,7 +36,7 @@ Saved step encoding: `undefined` = not started, `1..n` = on step n, `9999` = com
 - `QUEST_DATA` is the only place requirements live. Turn-ins don't add `requirementsNeeded` or `item` `take` effects for them.
 - A start result only shows while its quest is `available`, so it can't share a result with the `end` that unlocks it. Put the follow-up `start` on the next node.
 - Quests started in a save from before `stepKillBaselines` have no baseline and count lifetime kills.
-- Quest step descriptions are plain English strings, not i18n keys (see `localization.md`).
+- Quest step descriptions retain plain English fallbacks. The quest panel first resolves `quests:steps.<questKey>.<step>` (1-based); The Cold Forge provides all five translations (see `localization.md`).
 
 ## Known issues
 - The inventory space check for item rewards lives in dialogue (`DialogueManagerService.canApplyResult`); `handleQuestCompleted` itself doesn't check.

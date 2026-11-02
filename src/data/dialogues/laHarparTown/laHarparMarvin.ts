@@ -1,3 +1,5 @@
+import { QuestID } from '../../../enums/ids/quest-id.enum'
+import { QuestState } from '../../../enums/quest-state.enum'
 import { DialogueNode } from '../../../interfaces/dialogues/dialogue-node.interface'
 import { NpcID } from '../../../enums/map/npc-id.enum'
 import { ShopID } from '../../../enums/ids/shop-id.enum'
@@ -10,6 +12,8 @@ export enum MarvinDialogue {
   taskIntro,
   taskClaimed,      // kept at id 5 — used as task-complete node
   taskInProgress,   // id 6
+  coldForgeRecord,
+  coldForgeSalvage,
 }
 
 export type LaHarparMarvinDialogueType = Record<MarvinDialogue, DialogueNode<MarvinDialogue>>
@@ -60,6 +64,14 @@ const LA_HARPAR_MARVIN: LaHarparMarvinDialogueType = {
     id: MarvinDialogue.default,
     messageKey: `${NS}:default.message`,
     options: [
+      {
+        responseKey: `${NS}:default.coldForge`,
+        results: [{
+          visibilityConditions: [{ type: 'quest', questId: QuestID.theColdForge, questState: QuestState.readyToAdvance, step: 3 }],
+          next: MarvinDialogue.coldForgeRecord,
+          effects: [{ type: 'quest', questId: QuestID.theColdForge, action: 'advance' }],
+        }],
+      },
       {
         responseKey: `${NS}:default.whatIsThisPlace`,
         results: [{ next: MarvinDialogue.whatIsThisPlace1 }],
@@ -196,6 +208,21 @@ const LA_HARPAR_MARVIN: LaHarparMarvinDialogueType = {
         responseKey: `${NS}:taskInProgress.back`,
         results: [{ next: MarvinDialogue.default }],
       },
+    ],
+  },
+  [MarvinDialogue.coldForgeRecord]: {
+    id: MarvinDialogue.coldForgeRecord,
+    messageKey: `${NS}:coldForgeRecord.message`,
+    options: [
+      { responseKey: `${NS}:coldForgeRecord.opt1`, results: [{ next: MarvinDialogue.coldForgeSalvage }] },
+      { responseKey: `${NS}:coldForgeRecord.opt2`, results: [{ next: MarvinDialogue.default }] },
+    ],
+  },
+  [MarvinDialogue.coldForgeSalvage]: {
+    id: MarvinDialogue.coldForgeSalvage,
+    messageKey: `${NS}:coldForgeSalvage.message`,
+    options: [
+      { responseKey: `${NS}:coldForgeSalvage.opt1`, results: [{ next: MarvinDialogue.default }] },
     ],
   },
 }

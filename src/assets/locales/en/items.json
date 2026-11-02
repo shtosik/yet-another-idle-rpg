@@ -183,7 +183,8 @@
         "petArenaBrute": "Pet Brute",
         "petArenaArcanist": "Pet Arcanist",
         "petArenaBurrower": "Pet Burrower",
-        "petArenaYad": "Pet Yad"
+        "petArenaYad": "Pet Yad",
+        "toricsForgeTongs": "Toric's Forge Tongs"
     },
     "tiers": {
         "trash": "Trash",

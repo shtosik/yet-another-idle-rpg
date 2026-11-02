@@ -22,6 +22,7 @@ All player-facing text comes from i18next JSON files, so content can be added an
 | Enemy name | `enemies:names.<EnemyID key>` |
 | Zone name | `zones:names.<ZoneID key>` |
 | Quest name | `quests:names.<QuestID key>` |
+| Quest step description (optional) | `quests:steps.<QuestID key>.<1-based step>`; falls back to the data's English description |
 | NPC name | `npc:names.<NpcID key>` |
 | Spell | `spells:names.<SpellID key>.name` / `.desc` |
 | Skill node | `skill-tree:nodes.<SkillNodeID key>.name` / `.desc` |
@@ -47,7 +48,7 @@ Forge panel labels, pair choices, preview, disabled reasons and merge result toa
 - i18next is not reactive. Text computed into a signal once won't change if the language changes (not an issue while only `en` exists).
 
 ## Known issues
-- Quest step descriptions are hard-coded English in `src/data/quests-data.ts` (`steps[].description`), shown directly by the quest panel.
+- Older quest step descriptions have only hard-coded English fallbacks in `src/data/quests-data.ts` (`steps[].description`); The Cold Forge provides translated journal lines through `quests:steps.*`.
 - World map labels are hard-coded in `src/data/world-map-data.ts` (`label`).
 - Spell and skill descriptions repeat numbers that live in data (haste amount, fireStrike damage), so they drift when balance changes. Use interpolation params instead.
 - `ItemData.description` exists but is never set; there are no item descriptions.

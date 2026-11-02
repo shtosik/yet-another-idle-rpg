@@ -12,6 +12,7 @@ import MAWOOD_BRENN from './dialogues/mawoodTown/mawoodBrenn'
 import MAWOOD_MILO from './dialogues/mawoodTown/mawoodMilo'
 import MAWOOD_ELARION from './dialogues/mawoodTown/mawoodElarion'
 import LIROLD_ARENA_MASTER from './dialogues/liroldTown/liroldArenaMaster'
+import LIROLD_TORIC, { ToricDialogue } from './dialogues/liroldTown/liroldToric'
 
 export interface NPCProps {
   id: NpcID
@@ -22,6 +23,13 @@ export interface NPCProps {
 }
 
 const NPC_Data: Record<number, NPCProps> = {
+  [NpcID.liroldToric]: {
+    id: NpcID.liroldToric,
+    // Placeholder until Toric's portrait is drawn.
+    url: './assets/img/avatars/mawood/mawoodBrenn.png',
+    dialogue: LIROLD_TORIC,
+    firstMeetNodeId: ToricDialogue.intro1,
+  },
   [NpcID.laHarparBartender]: {
     id: NpcID.laHarparBartender,
     url: './assets/img/avatars/laHarpar/laHarparBartender.png',

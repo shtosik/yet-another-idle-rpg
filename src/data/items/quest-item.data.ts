@@ -4,6 +4,14 @@ import { ItemTier } from '../../enums/items/item-tier.enum'
 import { ItemType } from '../../enums/items/item-type.enum'
 
 export const QuestItemsData: Partial<Record<ItemID, Item>> = {
+  [ItemID.toricsForgeTongs]: {
+    id: ItemID.toricsForgeTongs,
+    tier: ItemTier.normal,
+    // Placeholder until Toric's tongs icon is drawn.
+    url: './assets/img/items/letter.png',
+    value: -1,
+    type: ItemType.quest,
+  },
   [ItemID.captainsLetter]: {
     id: ItemID.captainsLetter,
     tier: ItemTier.normal,
