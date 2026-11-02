@@ -1,6 +1,9 @@
+@let name = ('items:names.' + ItemID[item.id]) | i18next;
+@let displayName = upgradeLevel() > 0 ? ('items:upgradedName' | i18next: { name, level: upgradeLevel() }) : name;
 <div
   [attr.data-tier]="ItemTier[tier]"
-  [tooltipContext]="{ item, tier }"
+  [tooltipContext]="{ item, tier, level: upgradeLevel() }"
+  [class.item--milestone]="upgradeLevel() >= milestoneLevel"
   [tooltipTemplate]="tooltip"
   class="item"
   placement="bottom"
@@ -12,7 +15,7 @@
     <button
       type="button"
       class="item__action"
-      [attr.aria-label]="('items:names.' + ItemID[item.id] | i18next) + ' ×' + amount"
+      [attr.aria-label]="displayName + ' ×' + amount"
       (click)="handleActivate($event)"
     >
       <ng-container [ngTemplateOutlet]="art" />
@@ -39,6 +42,12 @@
     height="32"
     width="32"
   >
+  @if (upgradeLevel() > 0) {
+    <span class="upgrade-level">{{ 'items:upgradeLevel' | i18next: { level: upgradeLevel() } }}</span>
+  }
+  @if (upgradeLevel() >= milestoneLevel) {
+    <span class="milestone-mark" role="img" [attr.aria-label]="'items:upgradeMilestone' | i18next: { level: milestoneLevel }">&#9670;</span>
+  }
   <span>{{ amount }}</span>
 </ng-template>
 
@@ -46,12 +55,13 @@
   #tooltip
   let-item="item"
   let-tier="tier"
+  let-level="level"
 >
   <div class="item__tooltip">
     <span
       [attr.data-tier]="ItemTier[tier]"
       class="name"
-    >{{ ('items:names.' + ItemID[item.id]) | i18next }}</span>
+    >{{ level > 0 ? ('items:upgradedName' | i18next: { name: ('items:names.' + ItemID[item.id] | i18next), level }) : ('items:names.' + ItemID[item.id] | i18next) }}</span>
     <span class="tier-line">
       <span
         [attr.data-tier]="ItemTier[tier]"
@@ -68,7 +78,7 @@
     </span>
     @if (item.type === ItemType.equipment) {
       @for (stat of $any(item.stats); track stat.id) {
-        <span class="stat">{{ stat.id | statToPercentage:stat.amount }} {{ ('app:playerStats.' + stat.id) | i18next }}</span>
+        <span class="stat">{{ stat.id | statToPercentage:upgradedStatAmount(stat.amount, level) }} {{ ('app:playerStats.' + stat.id) | i18next }}</span>
       }
       @if (item.spell !== undefined) {
         <span class="stat">{{ 'items:grantsSpell' | i18next:{ spell: ('spells:names.' + SpellID[item.spell] + '.name') | i18next } }}</span>

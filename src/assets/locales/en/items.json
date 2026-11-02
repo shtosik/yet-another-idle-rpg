@@ -1,4 +1,7 @@
 {
+    "upgradedName": "{{name}} +{{level}}",
+    "upgradeLevel": "+{{level}}",
+    "upgradeMilestone": "Upgrade level +{{level}} milestone",
     "names": {
         "slimeResidue": "Slime Residue",
         "crabMeat": "Crab Meat",

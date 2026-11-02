@@ -117,6 +117,8 @@ export type InventoryItem = {
     type: ItemType
     tier: ItemTier
     amount: number
+    /** Missing in older saves means +0. */
+    upgradeLevel?: number
 }
 
 export type ResourceInventoryItem = {

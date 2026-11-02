@@ -69,11 +69,13 @@ export class DevCheatsComponent {
     grantStat: (stat: PlayerStat, amount: number) => this.playerStore.updatePlayerStats([{ stat, amount }]),
     /** Learns the node and, first, whatever it requires (the first option of an `any`), granting the points. */
     learnSkill: (nodeId: SkillNodeID): boolean => this.learnSkill(nodeId, 1),
-    giveItem: (itemId: ItemID, amount = 1, tier = ITEM_DATA[itemId].tier) =>
-      this.playerStore.addItems([{ id: itemId, tier, amount }]),
+    giveItem: (itemId: ItemID, amount = 1, tier = ITEM_DATA[itemId].tier, upgradeLevel = 0) =>
+      this.playerStore.addItems([{ id: itemId, tier, amount, upgradeLevel }]),
+    addItem: (itemId: ItemID, amount = 1, tier = ITEM_DATA[itemId].tier, upgradeLevel = 0) =>
+      this.playerStore.addItems([{ id: itemId, tier, amount, upgradeLevel }]),
     /** Gives the item and equips it; false (with a console warning) when there's no room or it can't be equipped. */
-    equip: (itemId: ItemID, tier = ITEM_DATA[itemId].tier): boolean => {
-      const stack = { id: itemId, tier, amount: 1 }
+    equip: (itemId: ItemID, tier = ITEM_DATA[itemId].tier, upgradeLevel = 0): boolean => {
+      const stack = { id: itemId, tier, amount: 1, upgradeLevel }
       if (!this.playerStore.canFitItems([stack])) {
         console.warn('dev.equip: no inventory space for the item')
         return false

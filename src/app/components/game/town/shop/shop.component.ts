@@ -82,7 +82,7 @@ export class ShopComponent implements OnInit {
     const shopId = this.shopId()
     return Object.values(this.playerStore.inventory()).flat().flatMap(slot => {
       if (!slot) return []
-      const price = sellPrice(shopId, slot.id)
+      const price = sellPrice(shopId, slot.id, slot.upgradeLevel)
       return price > 0 ? [{ slot, itemData: ITEM_DATA[slot.id], price, preferred: isPreferredBy(shopId, slot.id) }] : []
     })
   })
@@ -171,8 +171,10 @@ export class ShopComponent implements OnInit {
   }
 
   /** Shops always pay gold for what they buy. */
-  sellLabel(itemId: ItemID, price: number, preferred: boolean): string {
-    const label = `${i18next.t(`items:names.${ItemID[itemId]}`)}: ${this.priceLabel('gold', price)}`
+  sellLabel(itemId: ItemID, price: number, preferred: boolean, upgradeLevel = 0): string {
+    let name = i18next.t(`items:names.${ItemID[itemId]}`)
+    if (upgradeLevel > 0) name = i18next.t('items:upgradedName', { name, level: upgradeLevel })
+    const label = `${name}: ${this.priceLabel('gold', price)}`
     if (!preferred) return label
     return `${label}, ${i18next.t('shop:ui.preferred')}`
   }

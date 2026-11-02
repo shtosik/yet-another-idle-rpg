@@ -1,5 +1,5 @@
 import { NgOptimizedImage, NgTemplateOutlet } from '@angular/common'
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewChild } from '@angular/core'
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewChild, input } from '@angular/core'
 import { ItemTier } from 'enums/items/item-tier.enum'
 import { Item } from 'interfaces/item.interface'
 import { I18nextPipe } from '../../../../pipes/i18next.pipe'
@@ -14,6 +14,8 @@ import { DamageElement } from '../../../../../enums/damage-element.enum'
 import { SpellID } from '../../../../../enums/ids/spell-id.enum'
 import { ItemType } from '../../../../../enums/items/item-type.enum'
 import { ConsumableEffectComponent } from '../../../shared/consumable-effect/consumable-effect.component'
+import { UPGRADE_MILESTONE_LEVEL } from '../../../../../data/upgrade-data'
+import { upgradedStatAmount } from '../../../../store/player/stats'
 
 @Component({
   selector: 'app-inventory-slot',
@@ -27,6 +29,9 @@ export class InventoryItemComponent {
   @Input() item: Item
   @Input() amount: number
   @Input() tier: ItemTier
+  readonly upgradeLevel = input(0)
+  protected readonly milestoneLevel = UPGRADE_MILESTONE_LEVEL
+  protected readonly upgradedStatAmount = upgradedStatAmount
   @Input() clickable = true
   /** Shows the destroy button; set by the inventory only. */
   @Input() destroyable = false

@@ -43,6 +43,7 @@
             [amount]="slotItem.amount"
             [item]="Items[slotItem.id]"
             [tier]="slotItem.tier"
+            [upgradeLevel]="slotItem.upgradeLevel ?? 0"
             (equipItem)="equipItem(slotItem)"
             [destroyable]="slotItem.type !== ItemType.quest"
             (useItem)="useItem(slotItem)"

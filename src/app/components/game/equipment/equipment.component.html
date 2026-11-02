@@ -12,6 +12,7 @@
                 [item]="Items[equipped?.id]"
                 [slotName]="name"
                 [tier]="equipped?.tier"
+                [upgradeLevel]="equipped?.upgradeLevel ?? 0"
                 [unequipBlocked]="!!equipped && !playerStore.canUnequip(name)"
             />
         </app-slot>

@@ -1,6 +1,4 @@
-import { EquipmentSlotKey } from 'enums/equipment-slot.enum'
-import { ItemID } from 'enums/ids/item-id.enum'
-import { ItemTier } from 'enums/items/item-tier.enum'
+import { EquipmentType } from 'interfaces/player/equipment.type'
 import type { PlayerStatsType } from './stats'
 
 export const statsInitialState: PlayerStatsType = {
@@ -73,7 +71,7 @@ export const statsInitialState: PlayerStatsType = {
     damageVsHarpy: 0,
 }
 
-export const initialEquipmentState: Record<EquipmentSlotKey, { id: ItemID, tier: ItemTier } | null> = {
+export const initialEquipmentState: EquipmentType = {
     weapon: null,
     cape: null,
     belt: null,

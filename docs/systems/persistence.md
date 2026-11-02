@@ -44,6 +44,7 @@ Settings → Save (`src/app/services/save-transfer.service.ts:SaveTransferServic
 - **Save ids, not data.** Store the id of an enemy, building or item and look the data up in a computed; a saved copy of static data goes stale after a data edit (`BattleStore.enemy`, `TownsStore.selectedTownBuilding`).
 - **A saved id can stop resolving.** Renumbering or removing an enum value leaves old saves pointing at nothing. The lookup computed returns `null` for an unknown id, and the store repairs what depends on it on load: `BattleStore` ends a fight whose `enemyId` no longer exists (combat would otherwise stall) and clamps `currentEnemyHp` to the rebuilt max HP. A new id-based lookup needs the same guard.
 - **Removed top-level keys are dropped on load.** Renamed or removed keys nested deeper (inside an object in state) still linger, because the merge keeps them.
+- **Item upgrade levels are optional.** Inventory and equipment entries without `upgradeLevel` mean +0. This addition keeps player save version 2 and needs no migration; upgraded entries retain their level through saving and loading.
 - **New keys pick up defaults.** A key added to `initialState` appears in old saves with its initial value, because of the merge.
 - **Arrays merge by index**, not replace. If `initialState` has a non-empty array and the save has a shorter one, the tail of the initial array survives. Keep initial arrays empty (or accept the effect).
 - **Enum values are what get saved**, never enum names. Renumbering an enum quietly points saved data at different entities.

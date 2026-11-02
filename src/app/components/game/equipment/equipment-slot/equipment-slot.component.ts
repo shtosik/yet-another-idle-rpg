@@ -10,6 +10,8 @@ import { ItemType } from '../../../../../enums/items/item-type.enum'
 import { DamageElement } from '../../../../../enums/damage-element.enum'
 import { SpellID } from '../../../../../enums/ids/spell-id.enum'
 import { StatToPercentagePipe } from '../../../../pipes/stat-to-percentage.pipe'
+import { UPGRADE_MILESTONE_LEVEL } from '../../../../../data/upgrade-data'
+import { upgradedStatAmount } from '../../../../store/player/stats'
 
 @Component({
     selector: 'app-equipment-slot',
@@ -22,6 +24,9 @@ import { StatToPercentagePipe } from '../../../../pipes/stat-to-percentage.pipe'
 export class EquipmentItemComponent {
     readonly item = input<Item | undefined>()
     readonly tier = input<ItemTier | undefined>()
+    readonly upgradeLevel = input(0)
+    protected readonly milestoneLevel = UPGRADE_MILESTONE_LEVEL
+    protected readonly upgradedStatAmount = upgradedStatAmount
     readonly slotName = input.required<EquipmentSlotKey>()
     readonly unequipBlocked = input(false)
     readonly unequipItem = output<EquipmentSlotKey>()

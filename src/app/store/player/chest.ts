@@ -1,5 +1,5 @@
 import { ChestItem } from '../../../interfaces/item.interface'
-import { ItemStack } from './inventory'
+import { ItemStack, stackKey } from './inventory'
 
 export interface ChestContents {
   gold: number
@@ -21,7 +21,8 @@ export function rollChest(chest: ChestItem, rng: () => number = Math.random): Ch
       continue
     }
     const amount = between(entry.amount, rng)
-    const stack = contents.items.find(item => item.id === entry.itemId)
+    const key = stackKey({ id: entry.itemId })
+    const stack = contents.items.find(item => stackKey(item) === key)
     if (stack) stack.amount += amount
     else contents.items.push({ id: entry.itemId, amount })
   }

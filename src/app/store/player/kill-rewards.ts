@@ -6,11 +6,12 @@ import { Zone } from '../../../interfaces/zone.interface'
 import ITEM_DATA from '../../../data/items-data'
 import { waveMultipliers } from '../battle/wave-scaling'
 import type { PlayerStatsType } from './stats'
+import { stackKey } from './inventory'
 
 /** Returns a value in [0, 1). Online kills use `Math.random`; offline claims use a seeded one. */
 export type Rng = () => number
 
-/** Adds each drop that hits to `accumulator`, keyed by id + tier. */
+/** Adds each drop that hits to `accumulator`, keyed by id + tier + upgradeLevel. */
 export const rollDropList = (
   drops: EnemyDrop[],
   rolls: number,
@@ -28,7 +29,7 @@ export const rollDropList = (
 
       const amount = Math.floor(rng() * (drop.maxAmount - drop.minAmount + 1) + drop.minAmount)
       const { type, tier } = ITEM_DATA[drop.id]
-      const key = `${drop.id}:${tier}`
+      const key = stackKey({ id: drop.id, tier })
       const existing = accumulator.get(key)
       if (existing) existing.amount += amount
       else accumulator.set(key, { id: drop.id, type, tier, amount })
