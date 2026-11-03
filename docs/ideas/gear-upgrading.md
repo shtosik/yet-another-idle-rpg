@@ -25,7 +25,7 @@ Merge two copies of the same piece of gear into one copy a level higher, at a ne
 - **Merge**: two copies with the same `id + tier + upgradeLevel` → one copy at `upgradeLevel + 1`, plus gold. Every new item starts at +0.
 - **Gold cost** follows the item's `value`, so early gear is cheap to upgrade and late gear expensive: +N → +N+1 costs `value × 2^N × k` (`k` tunable, start at 1: the sell price of the copy being sacrificed). Merging one item from +0 to +5 costs `80 × value × k` in all.
 - **Chance**: +1 100%, then 10% less per level: +2 90%, +3 80%, +4 70%, +5 60% (owner change 2026-11-03, was 100% up to +5). Later levels continue the step: +6 50% … +10 10% (not decided).
-- **Failure** (only past +5): the gold and the sacrificed copy are lost; the base copy keeps its level.
+- **Failure** (possible from +2 onward): the gold and the sacrificed copy are lost; the base copy keeps its level.
 - **Stats**: each level adds +10% (tunable) of the item's base stats, rounded. +5 is a milestone: it adds another +25% of base on top, and the item frame gets a mark. +10 gets the same later.
 - **Stacks**: gear stacks per `id + tier + upgradeLevel`, so a stack of five +0 Makeshift Clubs merges straight from the inventory. No per-copy state.
 - **Equipped gear**: an equipped copy can be the base or the sacrifice. As the base, the merged copy replaces it in the slot. As the sacrifice, it disappears and the slot empties.
@@ -34,7 +34,7 @@ Merge two copies of the same piece of gear into one copy a level higher, at a ne
 - **Stats stay derived**: `stats()` reads `upgradeLevel` on equipped items.
 
 ### Cost in copies
-A +N item takes `2^N` copies at +0: 32 for +5. For the later cap (failure loses only the sacrifice), one success at +N costs `1 + 1/p` copies of +N on average: about 68 copies of +0 for +6, 152 for +7, 369 for +8, 984 for +9, 2,952 for +10. Gold per attempt is the second brake.
+A +N item takes at least `2^N` copies at +0 (32 for +5), and more whenever a merge fails. A failure loses only the sacrifice, so one success at +N costs `1 + 1/p` copies of the level below on average, where `p` is that level's chance in the table above; expected costs for the later cap follow from the same chances. Gold per attempt is the second brake.
 
 ## The Blacksmith
 New Building **Forge** in Lirold, with **Phurgo**, a dwarf who loves apple pie. Character and portrait brief: [Phurgo](../character/lirold/phurgo.md). He is patient with damaged tools and impatient with people who throw useful things away; apple pie is the one subject that makes him put his hammer down.
