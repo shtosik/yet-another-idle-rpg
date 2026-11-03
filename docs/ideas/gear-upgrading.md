@@ -19,7 +19,7 @@ Merge two copies of the same piece of gear into one copy a level higher, at a ne
 - Pathfinder's Seal: **1 in 10 Arena Chests**, until it is registered.
 
 ## Naming
-**Upgrade level** (`upgradeLevel`, shown as `+N`). Not "tier": `ItemTier` is already the rarity (Trash to Legendary), and items stack per `id + tier`. Add *Upgrade level* to `GLOSSARY.md` with _Avoid_: tier, rank.
+**Upgrade level** (`upgradeLevel`, shown as `+N`). Not "tier": `ItemTier` is already the rarity (Trash to Legendary), and items stack per `id + tier + upgradeLevel`, so copies at different levels stay separate stacks. Add *Upgrade level* to `GLOSSARY.md` with _Avoid_: tier, rank.
 
 ## Rules
 - **Merge**: two copies with the same `id + tier + upgradeLevel` → one copy at `upgradeLevel + 1`, plus gold. Every new item starts at +0.
@@ -77,4 +77,4 @@ The chest rolls it only while the player neither holds an unregistered Seal nor 
 - Seal name retained: **Pathfinder's Seal**.
 
 ## Touch-points
-`inventory.ts` (stack key `id + tier + upgradeLevel`), `EquipmentItem` (`upgradeLevel`), destroy, drops (`processBattleEnd`, offline; quest-only drops capped at the missing amount in `kill-rewards.ts`, `docs/systems/quests.md`), shop sell price, `player.store.ts` `stats`, item tooltip and slot (`+N`), a new Forge panel, `towns-data.ts` (Forge Building), Blacksmith dialogue and quest, Marvin's Seal option, `arena-data.ts` (chest loot), save migration (missing `upgradeLevel` = 0), `docs/systems/player-stats-inventory-equipment.md`, `GLOSSARY.md`.
+`inventory.ts` (stack key `id + tier + upgradeLevel`), `EquipmentItem` (`upgradeLevel`), destroy, drops (`processBattleEnd`, offline; quest-only drops capped at the missing amount in `kill-rewards.ts`, `docs/systems/quests.md`), shop sell price, `player.store.ts` `stats`, item tooltip and slot (`+N`), a new Forge panel, `towns-data.ts` (Forge Building), Blacksmith dialogue and quest, Marvin's Seal option, `arena-data.ts` (chest loot), save compatibility (missing `upgradeLevel` = +0; no migration or version bump), `docs/systems/player-stats-inventory-equipment.md`, `GLOSSARY.md`.

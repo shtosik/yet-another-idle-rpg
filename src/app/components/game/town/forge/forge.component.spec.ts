@@ -392,7 +392,7 @@ describe('Forge panel and gear sources', () => {
       // Current levels always succeed; simulate the store's later-level failure response.
       spyOn(player, 'mergeItem').and.returnValue({ status: 'failure', cost: forge.cost() })
       forge.merge()
-      expect(forge.toast()).toContain('Upgrade failed: Wooden Bow +0 kept its level')
+      expect(forge.toast()).toContain('Upgrade failed: Wooden Bow kept its level')
       expect(forge.item()?.upgradeLevel ?? 0).toBe(0)
       expect(selection.base()).toBe(base)
       expect(selection.sacrifice()).toBeNull()
