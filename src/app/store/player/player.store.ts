@@ -215,11 +215,13 @@ const handleExperience = (resources: Resources) => {
   handleExperience(resources)
 }
 
-/** Takes `items` out; a kept chest roll goes with the last chest of its id (sold, destroyed), so a later one rolls fresh. */
+/** Takes `items` out; a kept chest roll goes with the last chest of its id at any upgrade level (sold, destroyed), so a later one rolls fresh. */
 const withoutItems = (state: PlayerState, items: ItemStack[]): Pick<PlayerState, 'inventory' | 'rolledChests'> => {
   const inventory = removeItems(state.inventory, items)
-  const rolledChests = Object.fromEntries(
-    Object.entries(state.rolledChests).filter(([id]) => countItem(inventory, Number(id) as ItemID) > 0))
+  const rolledChests = Object.fromEntries(Object.entries(state.rolledChests).filter(([key]) => {
+    const id = Number(key) as ItemID
+    return inventory[tabOf(id)].some(slot => slot?.id === id)
+  }))
   return { inventory, rolledChests }
 }
 
