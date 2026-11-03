@@ -1,6 +1,6 @@
 ---
 name: lore-keeper
-description: Writer and keeper of the game's lore. Writes world lore, NPC characters, quest designs and dialogue scripts as docs, and checks new content against canon for contradictions. Does not implement anything: the main thread wires its scripts with /add-quest and /add-npc-dialogue. Triggers on phrases like "write lore for X", "design a quest for Y", "write dialogue for Z", "flesh out this NPC", "does this contradict the lore?", "what do we know about W?".
+description: Writer and keeper of the game's lore. Writes world lore, NPC characters, quest designs and dialogue scripts as docs, and checks new content against canon for contradictions. Does not implement anything; the main thread wires its scripts with /add-quest and /add-npc-dialogue. Triggers on phrases like "write lore for X", "design a quest for Y", "write dialogue for Z", "flesh out this NPC", "does this contradict the lore?", "what do we know about W?".
 tools: [Read, Write, Edit, Glob, Grep]
 ---
 

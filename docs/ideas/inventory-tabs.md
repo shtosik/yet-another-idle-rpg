@@ -22,7 +22,7 @@ Each tab has its own slot count. Tabs that only filter one shared grid don't sol
 - `stationUpgrade` still never enters the inventory (installed on pickup).
 - Capacity is one `inventorySlots` stat keyed by tab, not a stat per tab.
 - Guild Satchel: +2 slots to Gear, Consumables and Materials each; Guild store stock 1.
-- Implementation steps: `docs/plans/inventory-tabs.md`.
+- Implementation steps (archived, done): `docs/archive/inventory-tabs-plan.md`.
 
 ### Owner rules, now per tab
 - Drops are lost when **their** tab is full (intended). Other tabs are unaffected.
