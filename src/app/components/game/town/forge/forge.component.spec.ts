@@ -163,4 +163,17 @@ describe('ForgeComponent', () => {
     expect(forge.toast()).toContain('Merge failed: Wooden Bow kept its level')
     expect(forge.selectedGroup()?.item.upgradeLevel).toBe(0)
   })
+
+  it('keeps the chosen base when a failed merge rebuilds the groups', () => {
+    player.updatePlayerStats([{ stat: 'goldCoins', amount: 100000 }])
+    player.addItems([stack(4)])
+    player.equipItem(stack(1))
+    forge.chooseBase('inventory')
+    spyOn(player, 'mergeItem').and.callFake(() => {
+      player.removeItems([stack(1)])
+      return { status: 'failure', cost: forge.cost() }
+    })
+    forge.merge()
+    expect(forge.base()?.key).toBe('inventory')
+  })
 })
