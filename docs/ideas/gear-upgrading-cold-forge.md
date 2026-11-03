@@ -263,7 +263,7 @@ Retain **Pathfinder's Seal**, proposed `pathfindersSeal`. Quest-type item, rare 
 
 > An Exploration Guild seal for those who find a way home with something worth keeping. Marvin in La Harpar can enter its bearer in the salvage register.
 
-The register and lesson are proposed customs, not a new Building, spendable currency, Guild rank or prerequisite for ordinary Tasks. Registration permanently makes 10% of gear drops arrive at +1, exactly as settled in the parent proposal. Keep numeric mechanics in the Progress stat tooltip; dialogue describes the salvage lesson in-world. Never promise double loot, a +1 on every item, cheaper merges across all drops, or an upgraded unique Arena reward.
+The register and lesson are proposed customs, not a new Building, spendable currency, Guild rank or prerequisite for ordinary Tasks. Registration permanently makes 10% of eligible gear drops arrive at +1 (never unique gear or pets), exactly as settled in the parent proposal. Keep numeric mechanics in the Progress stat tooltip; dialogue describes the salvage lesson in-world. Never promise double loot, a +1 on every item, cheaper merges across all drops, or an upgraded unique Arena reward.
 
 Registration requires no Forge Quest completion. The chest rolls a Seal (1 in 10 chests) only while the player neither holds one nor has registered one, so duplicates never exist. Quest-only drops roll only up to the amount the active Step still needs (owner rule), so no surplus tongs exist either; no disposal mechanic is needed.
 
@@ -279,7 +279,7 @@ Registration requires no Forge Quest completion. The chest rolls a Seal (1 in 10
 - **Building Forge** (proposed key `liroldForge`): accessible workshop in Lirold; upgrade service after the Quest.
 - **Quest The Cold Forge** (`theColdForge`): five Steps defined above; no numeric IDs reserved.
 - **Toric's Forge Tongs** (`ItemID.toricsForgeTongs`, `ItemType.quest`): unsellable, indestructible Quest item; exactly 1 required. Existing Goblin Scavengers drop one at the owner-decided **1 in 50**, only while `theColdForge` is active: `drop(ItemID.toricsForgeTongs, 1, 1, 50)` (last argument: "1 in N"). Marked by a square notch and old delivery stamp.
-- **Pathfinder's Seal** (`pathfindersSeal`): unsellable, indestructible Quest item; permanent salvage lesson registered once with Marvin.
+- **Pathfinder's Seal** (`pathfindersSeal`): unsellable, indestructible Quest item; permanent salvage lesson registered once with Marvin: 10% of eligible gear drops arrive at +1, never unique gear or pets.
 - **No new enemy, Zone, Region, mining resource or ingredient.** The delivery record, salvage register and Toric's pie plate are narrative props, not inventory items.
 
 ## Owner calls

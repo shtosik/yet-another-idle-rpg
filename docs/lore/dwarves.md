@@ -1,6 +1,6 @@
 # Dwarves
 
-**(proposed)** Small foundations for Toric's conversation, not a history of all dwarves. Source: the owner's 2026-11-01 request to establish a homeland, an underground city, everyday customs and Toric's departure; dialogue proposal: [The Cold Forge](../ideas/gear-upgrading-cold-forge.md). The names and details here are lore-keeper choices, open to owner revision. None is shipped canon.
+**(proposed)** Small foundations for Toric's conversation, not a history of all dwarves. Source: the owner's 2026-11-01 request to establish a homeland, an underground settlement, everyday customs and Toric's departure; dialogue proposal: [The Cold Forge](../ideas/gear-upgrading-cold-forge.md). The names and details here are lore-keeper choices, open to owner revision. None is shipped canon.
 
 ## Canon boundaries
 

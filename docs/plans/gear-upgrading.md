@@ -4,11 +4,11 @@ Implementation plan for `docs/ideas/gear-upgrading.md` (rules and owner decision
 
 ## Order
 
-Step 1 doesn't depend on any other step. Step 2 opens the chain: 2 → 3 → 4 → 5. Step 6 needs 2 and can run beside 3–5. Step 7 comes last.
+Step 1 depends on no other step and lands before Steps 5 and 6: the tongs cap and the Seal's +1 drops build on its drop path. Step 2 opens the chain: 2 → 3 → 4 → 5. Step 6 needs 1 and 2 and can run beside 3–5. Step 7 comes last.
 
 ### 1. Quest-only drops stop at the needed amount (S, Sonnet)
 Owner rule for every quest-only drop, so it ships on its own and fixes existing quests too (Signs of Rot, The Blighted Heart, …).
-- `rollDropList` (`store/player/kill-rewards.ts:14`) skips a `requiredActiveQuestId` drop unless the quest's current step asks for that item and the player holds less than it needs, and caps the amount at the missing count (held plus already rolled in `accumulator`). The function needs the active quests' current-step needs and the held counts, not only `activeQuestIds`; build them once per kill and per offline claim (`battle-manager.service.ts`, `offline-progress.service.ts`).
+- `rollDropList` (`store/player/kill-rewards.ts:14`) skips a `requiredActiveQuestId` drop unless the quest's current step asks for that item and the player holds less than it needs, and caps the amount at the missing count (held plus already rolled in `accumulator`). The function needs the active quests' current-step needs and the held counts, not only `activeQuestIds`; build them once per kill and per offline claim (`battle-manager.service.ts`, `offline-progress.service.ts`) and pass them through `PlayerStore.processBattleEnd` (`player.store.ts`) and `simulateOfflineKills` (`offline-simulation.ts`).
 - Specs: no drop before the step, none after the step is met, a multi-roll kill never overshoots.
 - Docs: `docs/systems/quests.md`, `player-stats-inventory-equipment.md`. Changelog: `[bug] Quest items no longer drop once you have enough.`
 
