@@ -101,14 +101,14 @@ Quest turn-ins appear before in-progress options, then the offer, then other bus
 
 ### forgeWork (new)
 **Shown when:** `theColdForge` completed, from `default.opt11`; read-only explanation beside the Forge-opening option.
-> Bring two of the same piece, alike in quality and worked the same number of times. I fold one into the other; you leave with one stronger piece. If you're wearing one, I strengthen that one; it stays on you, and the spare goes into the fire.
+> Two places on my bench: lay the piece to strengthen in the first, its matching spare in the second. Both must be the same piece, alike in quality and worked the same number of times, or I won't strike. The spare feeds the fire.
 
 1. "How do we begin, and what will it cost?" → forgeCost.
 2. "Back to business." → default.
 
 ### forgeCost (new)
 **Shown when:** reached from forgeWork after Quest completion.
-> Set the piece on my bench, and I'll show you what it'll become before I strike. The work costs gold; finer pieces and those already worked cost more.
+> A worn piece laid first stays on you; laid second, it burns like any spare. I'll show you the stronger piece and price before I strike. Finer pieces and those already worked cost more gold.
 
 1. "How far can you take a piece?" → forgeLimits.
 2. "Back to business." → default.

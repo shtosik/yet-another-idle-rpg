@@ -4,7 +4,7 @@ import i18next from 'i18next'
 import { ForgeComponent } from './forge.component'
 import { InventoryWindow } from '../../inventory/inventory.component'
 import { EquipmentComponent } from '../../equipment/equipment.component'
-import { ForgeSelection } from '../../../../services/forge-selection'
+import { ForgeInput, ForgeSelection } from '../../../../services/forge-selection'
 import { TownsStore } from '../../../../store/towns/towns.store'
 import { PlayerStore } from '../../../../store/player/player.store'
 import { tabOf } from '../../../../store/player/inventory'
@@ -29,8 +29,15 @@ describe('Forge panel and gear sources', () => {
   const stack = (amount = 2, upgradeLevel = 0, itemId = id): InventoryItem => ({
     id: itemId, tier: ITEM_DATA[itemId].tier, type: ITEM_DATA[itemId].type, amount, upgradeLevel,
   })
-  const select = (item = stack()) => selection.select({ from: 'inventory', item })
+  const select = (item = stack()) => selection.select({
+    from: 'inventory', item: { id: item.id, tier: item.tier, upgradeLevel: item.upgradeLevel },
+  })
+  const selectPair = (item = stack()) => {
+    select(item)
+    select(item)
+  }
   const mergeButton = (): HTMLButtonElement => fixture.nativeElement.querySelector('.forge__merge')
+  const inputButton = (slot: ForgeInput): HTMLButtonElement => fixture.nativeElement.querySelector(`[data-input="${slot}"]`)
 
   beforeEach(async () => {
     localStorage.clear()
@@ -56,10 +63,10 @@ describe('Forge panel and gear sources', () => {
     expect(merge).not.toHaveBeenCalled()
   }
 
-  async function drag(source: HTMLElement): Promise<void> {
+  async function drag(source: HTMLElement, slot: ForgeInput): Promise<void> {
     const dataTransfer = new DataTransfer()
     source.dispatchEvent(new DragEvent('dragstart', { bubbles: true, cancelable: true, dataTransfer }))
-    const input: HTMLElement = fixture.nativeElement.querySelector('.forge__input')
+    const input = inputButton(slot)
     const over = new DragEvent('dragover', { bubbles: true, cancelable: true, dataTransfer })
     input.dispatchEvent(over)
     expect(over.defaultPrevented).toBeTrue()
@@ -70,61 +77,89 @@ describe('Forge panel and gear sources', () => {
 
   it('starts empty and explains how to select gear', async () => {
     expect(forge.item()).toBeNull()
+    expect(forge.sacrificeItem()).toBeNull()
     expect(forge.preview()).toBeNull()
     await expectBlocked('Select gear')
   })
 
   it('shows a gold refusal in the accessible label while retaining the compact Upgrade text', async () => {
     player.addItems([stack()])
-    select()
+    selectPair()
     expect(forge.evaluation()).toEqual({ status: 'refused', reason: 'notEnoughGold' })
+    expect(forge.preview()?.upgradeLevel).toBe(1)
     await expectBlocked('Not enough gold')
   })
 
   it('explains unique gear', async () => {
     player.addItems([stack(2, 0, ItemID.joshsHeirloom)])
-    select(stack(2, 0, ItemID.joshsHeirloom))
+    selectPair(stack(2, 0, ItemID.joshsHeirloom))
+    expect(forge.preview()).toBeNull()
     await expectBlocked('Unique gear cannot be upgraded')
   })
 
   it('explains the cap without previewing an unavailable +6', async () => {
     player.addItems([stack(2, 5)])
-    select(stack(2, 5))
+    selectPair(stack(2, 5))
     expect(forge.preview()).toBeNull()
     await expectBlocked('Already at +5 cap')
   })
 
-  it('requires an inventory sacrifice when the sole copy is equipped', async () => {
+  it('ignores a second activation of the same equipped slot', async () => {
     player.addItems([stack(1)])
     player.equipItem(stack(1))
     selection.select({ from: 'equipped', slot: 'weapon' })
-    await expectBlocked('No second matching copy')
+    selection.select({ from: 'equipped', slot: 'weapon' })
+    expect(selection.base()).toEqual({ from: 'equipped', slot: 'weapon' })
+    expect(selection.sacrifice()).toBeNull()
+    expect(forge.preview()).toBeNull()
+    await expectBlocked('Select gear')
   })
 
-  it('does not count another rarity or upgrade level as the matching copy', async () => {
-    player.addItems([stack(1), stack(1, 1), { ...stack(1), tier: ItemTier.legendary }])
-    select(stack(1))
-    await expectBlocked('No second matching copy')
-  })
+  for (const [difference, other] of [
+    ['id', stack(1, 0, ItemID.makeshiftClub)],
+    ['rarity', { ...stack(1), tier: ItemTier.legendary }],
+    ['upgrade level', stack(1, 1)],
+  ] as const) {
+    it(`refuses a different ${difference} and marks both inputs`, async () => {
+      player.addItems([stack(1), other])
+      select(stack(1))
+      select(other)
+      expect(forge.evaluation()).toEqual({ status: 'refused', reason: 'mismatch' })
+      expect(forge.preview()).toBeNull()
+      await expectBlocked('Copies must match')
+      expect(inputButton('base').classList).toContain('forge__slot--mismatch')
+      expect(inputButton('sacrifice').classList).toContain('forge__slot--mismatch')
+      inputButton('sacrifice').click()
+      await fixture.whenStable()
+      expect(inputButton('base').classList).not.toContain('forge__slot--mismatch')
+    })
+  }
 
   it('names the full inventory tab from evaluateMerge', async () => {
     player.updatePlayerStats([{ stat: 'goldCoins', amount: 100000 }])
     player.addItems([stack(3)])
     player.addItems(Object.values(ITEM_DATA).filter(data => tabOf(data.id) === 'gear' && data.id !== id)
       .slice(0, player.inventoryCapacity().gear - 1).map(data => ({ id: data.id, amount: 1 })))
-    select(stack(3))
+    selectPair(stack(3))
     expect(forge.evaluation()).toEqual({ status: 'refused', reason: 'inventoryFull', tab: 'gear' })
+    expect(forge.preview()?.upgradeLevel).toBe(1)
     await expectBlocked('Inventory full: Gear tab')
   })
 
-  it('drops inventory gear, automatically uses a matching equipped base, previews milestone stats and merges in place', async () => {
+  it('drops into explicit inputs, previews milestone stats and upgrades an equipped base in place', async () => {
     player.updatePlayerStats([{ stat: 'goldCoins', amount: 100000 }])
     player.addItems([stack(2, 4)])
     player.equipItem(stack(1, 4))
     const inventory = TestBed.createComponent(InventoryWindow)
+    const equipment = TestBed.createComponent(EquipmentComponent)
     await inventory.whenStable()
+    await equipment.whenStable()
     await fixture.whenStable()
-    await drag(inventory.nativeElement.querySelector('.item__action'))
+    await drag(inventory.nativeElement.querySelector('.item__action'), 'sacrifice')
+    expect(forge.base()).toBeNull()
+    expect(forge.sacrifice()?.from).toBe('inventory')
+    expect(forge.preview()).toBeNull()
+    await drag(equipment.nativeElement.querySelector('[style*="weapon"] button'), 'base')
     expect(forge.base()).toEqual({ from: 'equipped', slot: 'weapon' })
     expect(forge.sacrifice()?.from).toBe('inventory')
     expect(forge.cost()).toBe(mergeCost(ITEM_DATA[id].value, 4))
@@ -139,42 +174,93 @@ describe('Forge panel and gear sources', () => {
     expect(player.itemCount(id, tier, 4)).toBe(0)
     expect(player.resources.goldCoins()).toBe(100000 - mergeCost(ITEM_DATA[id].value, 4))
     expect(forge.item()?.upgradeLevel).toBe(5)
+    expect(selection.base()).toEqual({ from: 'equipped', slot: 'weapon' })
+    expect(selection.sacrifice()).toBeNull()
+    expect(forge.preview()).toBeNull()
     expect(fixture.nativeElement.querySelector('[role="status"]').textContent).toContain('Upgrade succeeded: Wooden Bow +5')
     expect(selection.dragged()).toBeNull()
   })
 
-  it('drops an equipped copy as the base and consumes one matching inventory copy', async () => {
+  it('consumes an equipped copy dropped into the second input and follows the inventory result', async () => {
     player.updatePlayerStats([{ stat: 'goldCoins', amount: 100000 }])
     player.addItems([stack(3)])
     player.equipItem(stack(1))
     const equipment = TestBed.createComponent(EquipmentComponent)
     await equipment.whenStable()
     await fixture.whenStable()
-    await drag(equipment.nativeElement.querySelector('[style*="weapon"] button'))
-    expect(forge.base()).toEqual({ from: 'equipped', slot: 'weapon' })
+    select(stack(2))
+    await drag(equipment.nativeElement.querySelector('[style*="weapon"] button'), 'sacrifice')
+    expect(forge.base()?.from).toBe('inventory')
+    expect(forge.sacrifice()).toEqual({ from: 'equipped', slot: 'weapon' })
     mergeButton().click()
-    expect(player.equipment().weapon?.upgradeLevel).toBe(1)
+    expect(player.equipment().weapon).toBeNull()
     expect(player.itemCount(id, tier, 0)).toBe(1)
+    expect(player.itemCount(id, tier, 1)).toBe(1)
+    expect(selection.base()).toEqual({ from: 'inventory', item: { id, tier, upgradeLevel: 1 } })
+    expect(selection.sacrifice()).toBeNull()
   })
 
-  it('merges two copies from one inventory stack and follows the result', async () => {
+  it('fills both inputs by clicking the same inventory stack twice and follows the upgraded result', async () => {
     player.updatePlayerStats([{ stat: 'goldCoins', amount: 100000 }])
     player.addItems([stack()])
     const inventory = TestBed.createComponent(InventoryWindow)
     await inventory.whenStable()
     await fixture.whenStable()
-    await drag(inventory.nativeElement.querySelector('.item__action'))
+    const button: HTMLButtonElement = inventory.nativeElement.querySelector('.item__action')
+    button.click()
     expect(forge.base()?.from).toBe('inventory')
+    expect(forge.sacrifice()).toBeNull()
+    expect(forge.preview()).toBeNull()
+    button.click()
+    expect(forge.sacrifice()).toEqual(forge.base())
+    expect(forge.evaluation()?.status).toBe('ready')
     forge.merge()
     expect(player.itemCount(id, tier)).toBe(0)
     expect(player.itemCount(id, tier, 1)).toBe(1)
+    expect(forge.item()?.upgradeLevel).toBe(1)
+    expect(selection.sacrifice()).toBeNull()
+    await expectBlocked('Select gear')
+  })
+
+  it('requires two owned copies even if the same stack is selected twice', async () => {
+    player.addItems([stack(1)])
+    selectPair(stack(1))
+    expect(forge.base()).toEqual(forge.sacrifice())
+    expect(forge.preview()).toBeNull()
     await expectBlocked('No second matching copy')
+  })
+
+  it('fills an empty first input before replacing the second when both inputs are full', () => {
+    selectPair()
+    const original = selection.base()
+    select(stack(1, 1))
+    expect(selection.base()).toBe(original)
+    expect(forge.sacrificeItem()?.upgradeLevel).toBe(1)
+    selection.setSlot('base', null)
+    select(stack(1, 2))
+    expect(forge.item()?.upgradeLevel).toBe(2)
+    expect(forge.sacrificeItem()?.upgradeLevel).toBe(1)
+  })
+
+  it('ignores a targeted drop of the same equipped slot into the other input', async () => {
+    player.addItems([stack(1)])
+    player.equipItem(stack(1))
+    const equipment = TestBed.createComponent(EquipmentComponent)
+    await equipment.whenStable()
+    await fixture.whenStable()
+    const source = equipment.nativeElement.querySelector('[style*="weapon"] button')
+    await drag(source, 'sacrifice')
+    await drag(source, 'base')
+    expect(selection.base()).toBeNull()
+    expect(selection.sacrifice()).toEqual({ from: 'equipped', slot: 'weapon' })
+    expect(selection.dragged()).toBeNull()
   })
 
   it('ignores external drops without an in-game source', async () => {
     await fixture.whenStable()
     fixture.nativeElement.querySelector('.forge__input').dispatchEvent(new DragEvent('drop', { dataTransfer: new DataTransfer() }))
     expect(forge.item()).toBeNull()
+    expect(forge.sacrificeItem()).toBeNull()
   })
 
   it('uses click and keyboard activation to select inventory gear instead of equipping it', async () => {
@@ -183,9 +269,11 @@ describe('Forge panel and gear sources', () => {
     await inventory.whenStable()
     const button: HTMLButtonElement = inventory.nativeElement.querySelector('.item__action')
     for (const detail of [1, 0]) {
-      selection.selected.set(null)
+      selection.clear()
       button.dispatchEvent(new MouseEvent('click', { bubbles: true, detail }))
       expect(forge.item()?.id).toBe(id)
+      button.dispatchEvent(new MouseEvent('click', { bubbles: true, detail }))
+      expect(forge.sacrificeItem()?.id).toBe(id)
       expect(player.equipment().weapon).toBeNull()
     }
   })
@@ -197,10 +285,31 @@ describe('Forge panel and gear sources', () => {
     await equipment.whenStable()
     const button: HTMLButtonElement = equipment.nativeElement.querySelector('[style*="weapon"] button')
     for (const detail of [1, 0]) {
-      selection.selected.set(null)
+      selection.clear()
       button.dispatchEvent(new MouseEvent('click', { bubbles: true, detail }))
-      expect(selection.selected()).toEqual({ from: 'equipped', slot: 'weapon' })
+      expect(selection.base()).toEqual({ from: 'equipped', slot: 'weapon' })
+      button.dispatchEvent(new MouseEvent('click', { bubbles: true, detail }))
+      expect(selection.sacrifice()).toBeNull()
       expect(player.equipment().weapon?.id).toBe(id)
+    }
+  })
+
+  it('empties each filled input on mouse or keyboard activation, and focuses Gear from an empty input', async () => {
+    const focusGear = spyOn(forge, 'focusGear')
+    await fixture.whenStable()
+    for (const detail of [1, 0]) {
+      selectPair()
+      const sacrifice = selection.sacrifice()
+      inputButton('base').dispatchEvent(new MouseEvent('click', { bubbles: true, detail }))
+      expect(selection.base()).toBeNull()
+      expect(selection.sacrifice()).toBe(sacrifice)
+      inputButton('sacrifice').dispatchEvent(new MouseEvent('click', { bubbles: true, detail }))
+      expect(selection.sacrifice()).toBeNull()
+      expect(focusGear).not.toHaveBeenCalled()
+      inputButton('base').dispatchEvent(new MouseEvent('click', { bubbles: true, detail }))
+      inputButton('sacrifice').dispatchEvent(new MouseEvent('click', { bubbles: true, detail }))
+      expect(focusGear).toHaveBeenCalledTimes(2)
+      focusGear.calls.reset()
     }
   })
 
@@ -236,7 +345,7 @@ describe('Forge panel and gear sources', () => {
 
   it('keeps the refusal tooltip keyboard-accessible and dismisses it with Escape', async () => {
     player.addItems([stack()])
-    select()
+    selectPair()
     await fixture.whenStable()
     // A headless window never has focus, so `.focus()` fires no focus event; dispatch it directly.
     mergeButton().dispatchEvent(new FocusEvent('focus'))
@@ -250,21 +359,46 @@ describe('Forge panel and gear sources', () => {
     expect(tooltipText()).not.toContain('Not enough gold')
   })
 
-  it('reports a later-level failure without advancing the selected upgrade level', () => {
+  for (const source of ['inventory', 'equipped']) {
+    it(`clears only the sacrifice after a failure with an ${source} base`, () => {
+      player.updatePlayerStats([{ stat: 'goldCoins', amount: 100000 }])
+      player.addItems([stack(3)])
+      if (source === 'equipped') {
+        player.equipItem(stack(1))
+        selection.select({ from: 'equipped', slot: 'weapon' })
+      } else select()
+      select()
+      const base = selection.base()
+      // Current levels always succeed; simulate the store's later-level failure response.
+      spyOn(player, 'mergeItem').and.returnValue({ status: 'failure', cost: forge.cost() })
+      forge.merge()
+      expect(forge.toast()).toContain('Upgrade failed: Wooden Bow +0 kept its level')
+      expect(forge.item()?.upgradeLevel ?? 0).toBe(0)
+      expect(selection.base()).toBe(base)
+      expect(selection.sacrifice()).toBeNull()
+      expect(forge.preview()).toBeNull()
+    })
+  }
+
+  it('keeps both inputs if the store refuses an attempt', () => {
     player.updatePlayerStats([{ stat: 'goldCoins', amount: 100000 }])
     player.addItems([stack()])
-    select()
-    spyOn(player, 'mergeItem').and.returnValue({ status: 'failure', cost: forge.cost() })
+    selectPair()
+    const base = selection.base()
+    const sacrifice = selection.sacrifice()
+    spyOn(player, 'mergeItem').and.returnValue({ status: 'refused', reason: 'missingCopy' })
     forge.merge()
-    expect(forge.toast()).toContain('Upgrade failed: Wooden Bow +0 kept its level')
-    expect(forge.item()?.upgradeLevel).toBe(0)
+    expect(selection.base()).toBe(base)
+    expect(selection.sacrifice()).toBe(sacrifice)
+    expect(forge.toast()).toBeNull()
   })
 
   it('clears the selection and unfinished drag when destroyed', () => {
-    select()
+    selectPair()
     selection.dragged.set({ from: 'inventory', item: stack() })
     fixture.destroy()
-    expect(selection.selected()).toBeNull()
+    expect(selection.base()).toBeNull()
+    expect(selection.sacrifice()).toBeNull()
     expect(selection.dragged()).toBeNull()
   })
 })

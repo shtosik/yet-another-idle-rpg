@@ -4,23 +4,17 @@ import { TooltipTemplateDirective } from 'ngx-tooltip-directives'
 import i18next from 'i18next'
 import ITEM_DATA from '../../../../../data/items-data'
 import { UPGRADE_CHANCES, UPGRADE_LEVEL_CAP, UPGRADE_MILESTONE_LEVEL } from '../../../../../data/upgrade-data'
-import { EquipmentSlot, EquipmentSlotKey } from '../../../../../enums/equipment-slot.enum'
 import { ItemID } from '../../../../../enums/ids/item-id.enum'
-import { ItemType } from '../../../../../enums/items/item-type.enum'
 import { ItemTier } from '../../../../../enums/items/item-tier.enum'
 import { EquipmentItem } from '../../../../../interfaces/player/equipment.type'
 import { I18nextPipe } from '../../../../pipes/i18next.pipe'
 import { StatToPercentagePipe } from '../../../../pipes/stat-to-percentage.pipe'
-import { ForgeSelection } from '../../../../services/forge-selection'
-import { stackKey } from '../../../../store/player/inventory'
+import { ForgeInput, ForgeSelection } from '../../../../services/forge-selection'
 import { evaluateMerge, mergeCost, MergeSource } from '../../../../store/player/merge'
 import { PlayerStore } from '../../../../store/player/player.store'
 import { gearModifiers } from '../../../../store/player/stats'
 import { tabName } from '../../inventory/tab-text'
 
-const EQUIPMENT_SLOTS = [
-  'helmet', 'amulet', 'chest', 'cape', 'weapon', 'belt', 'gloves', 'ring', 'legs', 'pet', 'boots',
-] satisfies EquipmentSlotKey[]
 const TOAST_MS = 3000
 
 @Component({
@@ -39,32 +33,11 @@ export class ForgeComponent {
   protected readonly ItemTier = ItemTier
   protected readonly milestoneLevel = UPGRADE_MILESTONE_LEVEL
   readonly levelCap = UPGRADE_LEVEL_CAP
-
-  readonly item = computed(() => {
-    const source = this.selection.selected()
-    if (!source) return null
-    if (source.from === 'equipped') return this.playerStore.equipment()[source.slot]
-    return source.item
-  })
-  readonly base = computed<MergeSource | null>(() => {
-    const source = this.selection.selected()
-    const item = this.item()
-    if (!source || !item) return null
-    if (source.from === 'equipped') return source
-    const equipment = this.playerStore.equipment()
-    const slot = EQUIPMENT_SLOTS.find(slot => {
-      const equipped = equipment[slot]
-      return equipped && stackKey(equipped) === stackKey(item)
-    })
-    if (slot) return { from: 'equipped', slot }
-    return source
-  })
-  // An equipped copy is always the base. Inventory supplies the sacrifice, including two from one stack.
-  readonly sacrifice = computed<MergeSource | null>(() => {
-    const item = this.item()
-    if (!item) return null
-    return { from: 'inventory', item }
-  })
+  protected readonly inputs: readonly ForgeInput[] = ['base', 'sacrifice']
+  readonly base = this.selection.base
+  readonly sacrifice = this.selection.sacrifice
+  readonly item = computed(() => this.resolve(this.base()))
+  readonly sacrificeItem = computed(() => this.resolve(this.sacrifice()))
   readonly evaluation = computed(() => {
     const base = this.base()
     const sacrifice = this.sacrifice()
@@ -74,10 +47,9 @@ export class ForgeComponent {
       capacity: this.playerStore.inventoryCapacity(), goldCoins: this.playerStore.resources.goldCoins(),
     })
   })
-  /** Base and sacrifice only mean something once a second copy exists. */
-  readonly hasPair = computed(() => {
+  readonly mismatch = computed(() => {
     const evaluation = this.evaluation()
-    return !(evaluation?.status === 'refused' && evaluation.reason === 'missingCopy')
+    return evaluation?.status === 'refused' && evaluation.reason === 'mismatch'
   })
   readonly cost = computed(() => {
     const item = this.item()
@@ -87,9 +59,9 @@ export class ForgeComponent {
   readonly chance = computed(() => UPGRADE_CHANCES[(this.item()?.upgradeLevel ?? 0) + 1] ?? 0)
   readonly preview = computed(() => {
     const item = this.item()
-    if (!item || (item.upgradeLevel ?? 0) >= this.levelCap) return null
-    const data = ITEM_DATA[item.id]
-    if (data.type !== ItemType.equipment || data.slot === EquipmentSlot.pet || data.unique) return null
+    const evaluation = this.evaluation()
+    if (!item || !evaluation) return null
+    if (evaluation.status === 'refused' && evaluation.reason !== 'notEnoughGold' && evaluation.reason !== 'inventoryFull') return null
     return { ...item, upgradeLevel: (item.upgradeLevel ?? 0) + 1 }
   })
   readonly statPreview = computed(() => {
@@ -110,16 +82,27 @@ export class ForgeComponent {
     })
   }
 
+  private resolve(source: MergeSource | null): EquipmentItem | null {
+    if (!source) return null
+    if (source.from === 'equipped') return this.playerStore.equipment()[source.slot]
+    return source.item
+  }
+
+  inputItem(slot: ForgeInput): EquipmentItem | null {
+    if (slot === 'base') return this.item()
+    return this.sacrificeItem()
+  }
+
   dragOver(event: DragEvent): void {
     if (!this.selection.dragged()) return
     event.preventDefault()
     if (event.dataTransfer) event.dataTransfer.dropEffect = 'copy'
   }
 
-  drop(event: DragEvent): void {
+  drop(event: DragEvent, slot: ForgeInput): void {
     event.preventDefault()
     const source = this.selection.dragged()
-    if (source) this.selection.select(source)
+    if (source) this.selection.setSlot(slot, source)
     this.selection.dragged.set(null)
   }
 
@@ -127,19 +110,18 @@ export class ForgeComponent {
     this.document.querySelector<HTMLButtonElement>('app-inventory .item__action')?.focus()
   }
 
+  activateInput(slot: ForgeInput): void {
+    if (this.selection[slot]()) this.selection.setSlot(slot, null)
+    else this.focusGear()
+  }
+
+  itemStats(item: EquipmentItem) {
+    return gearModifiers(item)
+  }
+
   itemName(item: EquipmentItem): string {
     const name = i18next.t(`items:names.${ItemID[item.id]}`)
     return i18next.t('items:upgradedName', { name, level: item.upgradeLevel ?? 0 })
-  }
-
-  copyLabel(source: MergeSource | null): string {
-    if (!source) return i18next.t('forge:selectGear')
-    switch (source.from) {
-      case 'inventory': return i18next.t('forge:inventoryCopy')
-      case 'equipped': return i18next.t('forge:equippedCopy', {
-        slot: i18next.t(`app:equipment.slots.${source.slot}`),
-      })
-    }
   }
 
   mergeLabel(): string {
@@ -166,9 +148,9 @@ export class ForgeComponent {
     const result = this.playerStore.mergeItem(base, sacrifice)
     if (result.status === 'refused') return
     const upgraded = { ...item, upgradeLevel: (item.upgradeLevel ?? 0) + 1 }
-    if (result.status === 'success') {
-      if (base.from === 'equipped') this.selection.select(base)
-      else this.selection.select({ from: 'inventory', item: upgraded })
+    this.selection.setSlot('sacrifice', null)
+    if (result.status === 'success' && base.from === 'inventory') {
+      this.selection.setSlot('base', { from: 'inventory', item: upgraded })
     }
     const name = this.itemName(result.status === 'success' ? upgraded : item)
     clearTimeout(this.toastTimer)

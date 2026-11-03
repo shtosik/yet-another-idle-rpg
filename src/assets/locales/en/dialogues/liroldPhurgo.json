@@ -29,12 +29,12 @@
     "opt2": "Good to see the fire back."
   },
   "forgeWork": {
-    "message": "Bring two of the same piece, alike in quality and worked the same number of times. I fold one into the other; you leave with one stronger piece. If you're wearing one, I strengthen that one; it stays on you, and the spare goes into the fire.",
+    "message": "Two places on my bench: lay the piece to strengthen in the first, its matching spare in the second. Both must be the same piece, alike in quality and worked the same number of times, or I won't strike. The spare feeds the fire.",
     "opt1": "How do we begin, and what will it cost?",
     "opt2": "Back to business."
   },
   "forgeCost": {
-    "message": "Set the piece on my bench, and I'll show you what it'll become before I strike. The work costs gold; finer pieces and those already worked cost more.",
+    "message": "A worn piece laid first stays on you; laid second, it burns like any spare. I'll show you the stronger piece and price before I strike. Finer pieces and those already worked cost more gold.",
     "opt1": "How far can you take a piece?",
     "opt2": "Back to business."
   },
