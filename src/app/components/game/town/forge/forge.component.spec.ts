@@ -83,6 +83,15 @@ describe('Forge panel and gear sources', () => {
     await expectBlocked('Select gear')
   })
 
+  it('hides the chance and cost until the selection can be merged', async () => {
+    player.addItems([stack()])
+    select()
+    await fixture.whenStable()
+    expect(forge.preview()).toBeNull()
+    expect(fixture.nativeElement.querySelector('.forge__chance').textContent.trim()).toBe('—')
+    expect(fixture.nativeElement.querySelector('.forge__cost')).toBeNull()
+  })
+
   it('shows a gold refusal in the accessible label while retaining the compact Upgrade text', async () => {
     player.addItems([stack()])
     selectPair()

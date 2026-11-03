@@ -28,13 +28,17 @@
     <div class="forge__process">
       <img class="forge__emblem" ngSrc="assets/img/icons/forge-anvil.png" width="48" height="48" disableOptimizedSrcset alt="" aria-hidden="true">
       <div class="forge__terms" [attr.title]="mergeLabel()">
-        @if (item()) {
-          <span class="forge__chance" [attr.aria-label]="'forge:chance' | i18next: { chance: chance() * 100 }">{{ chance() * 100 }}%</span>
+        @if (preview()) {
+          <span class="forge__chance">
+            <span aria-hidden="true">{{ chance() * 100 }}%</span>
+            <span class="forge__sr-only">{{ 'forge:chance' | i18next: { chance: chance() * 100 } }}</span>
+          </span>
         } @else { <span class="forge__chance">&mdash;</span> }
         <span class="forge__arrow" aria-hidden="true">&#10230;</span>
-        @if (item()) {
-          <span class="forge__cost" [class.forge__cost--short]="goldShort()" [attr.aria-label]="'forge:cost' | i18next: { amount: cost() }">
-            <span class="forge__coin" aria-hidden="true"></span> {{ cost() }}
+        @if (preview()) {
+          <span class="forge__cost" [class.forge__cost--short]="goldShort()">
+            <span class="forge__coin" aria-hidden="true"></span> <span aria-hidden="true">{{ cost() }}</span>
+            <span class="forge__sr-only">{{ 'forge:cost' | i18next: { amount: cost() } }}</span>
           </span>
         }
       </div>
