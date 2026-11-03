@@ -1,6 +1,6 @@
 # Quest panel and reputation
 
-**Scope:** M · **Status:** Accepted 2026-10-25; quest list and Reputation tab done
+**Scope:** M · **Status:** Done: accepted 2026-10-25; quest list and Reputation tab built
 
 The quest list on the right showed only quest names: no progress, no cue for a turn-in, completed quests mixed in with active ones, no scrolling and no keyboard access.
 

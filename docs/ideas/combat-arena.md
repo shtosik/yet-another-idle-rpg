@@ -1,6 +1,6 @@
 # Combat Arena
 
-**Scope:** M · **Status:** In progress. Shipped: batch 1 (weapon categories, Melee Damage Multiplier, Molten Cape), batch 2 (the run, Lirold's Arena, the Arena Master; `docs/systems/arena.md`), batch 3 (the champions' abilities; fee and cape rescaled for the later gate), batch 4 (the Arena Chest, `ItemType.chest`). Not built: the rare arena-only recipe scroll in the chest (needs a new recipe).
+**Scope:** M · **Status:** Done. Shipped: batch 1 (weapon categories, Melee Damage Multiplier, Molten Cape), batch 2 (the run, Lirold's Arena, the Arena Master; `docs/systems/arena.md`), batch 3 (the champions' abilities; fee and cape rescaled for the later gate), batch 4 (the Arena Chest, `ItemType.chest`, with the rare arena-only recipe scroll `ItemID.gladiatorHelmRecipe`).
 
 A timed gauntlet: clear 20 waves before the clock runs out. Fixed difficulty, so it doesn't scale with player power. An overpowered player is meant to stomp it. The main reward is the **Molten Cape** (attack power + melee damage).
 

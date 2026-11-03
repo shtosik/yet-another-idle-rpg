@@ -1,6 +1,6 @@
 # Town reputation: Exalted town pets
 
-**Scope:** S-M · **Status:** Proposed (draft by `lore-keeper`, 2026-11-01) · Step 4 of [Town reputation](town-reputation.md); steps 1–3 are in [tier rewards and titles](town-reputation-tier-rewards.md).
+**Scope:** S-M · **Status:** Done (draft by `lore-keeper`, 2026-11-01; built in the reputation stack) · Step 4 of [Town reputation](town-reputation.md); steps 1–3 are in [tier rewards and titles](town-reputation-tier-rewards.md).
 
 At **Exalted**, one NPC per town gives the town's pet, once, in dialogue. Each is an ordinary pet item (`EquipmentSlot.pet`, the single pet slot) with a utility stat no enemy pet has, so the player weighs it against a damage pet. Every ID below exists in `src/` unless it is listed under [New content](#new-content). Amounts are first guesses; tune them with `npm run sim`.
 

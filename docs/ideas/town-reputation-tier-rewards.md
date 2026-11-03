@@ -1,6 +1,6 @@
 # Town reputation: tier rewards and titles
 
-**Scope:** M · **Status:** Proposed (draft by `lore-keeper`, 2026-10-31) · Step 3 of [Town reputation](town-reputation.md); the Exalted pet is step 4 and is not designed here.
+**Scope:** M · **Status:** Done (draft by `lore-keeper`, 2026-10-31; built in the reputation stack) · Step 3 of [Town reputation](town-reputation.md); the Exalted pet is step 4 and is not designed here.
 
 The content for each reputation tier at **La Harpar** and **Mawood**: titles, Friendly dialogue, Honored shop stock and recipe scrolls, Revered quests and lines. Every ID below exists in `src/` unless it is listed under [New content](#new-content). Numbers are first guesses; tune them with `npm run sim -- --reputation`.
 

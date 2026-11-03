@@ -1,6 +1,6 @@
 # Elemental spells & gear expansion
 
-**Scope:** M · **Status:** Accepted (2026-10-25), batch 1 implemented (`feat/elemental-spells`), batch 2 implemented (`feat/magic-gear`), batch 3 implemented (`feat/physical-gear`), batch 4 implemented (`feat/spell-scrolls`)
+**Scope:** M · **Status:** Done: accepted 2026-10-25, batch 1 implemented (`feat/elemental-spells`), batch 2 implemented (`feat/magic-gear`), batch 3 implemented (`feat/physical-gear`), batch 4 implemented (`feat/spell-scrolls`)
 
 More spells and more gear, magic and non-magic, for the zones that exist today. Shipped in batches.
 
