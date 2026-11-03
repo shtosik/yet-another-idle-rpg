@@ -646,10 +646,10 @@ for (const f of [...walkFiles(join(ROOT, '.claude', 'agents'), '.md'), ...walkFi
   const IDEAS = join(ROOT, 'docs', 'ideas')
   const STATUSES = ['Proposed', 'Accepted', 'In progress', 'Done', 'Noted', 'Open']
   const readme = 'docs/ideas/README.md'
-  for (const [, file, status] of readFileSync(join(IDEAS, 'README.md'), 'utf8').matchAll(/^\|[^|]*\]\(([\w.-]+\.md)\)[^|]*\|[^|]*\|\s*([^|]*?)\s*\|/gm)) {
+  for (const [, file, status] of readFileSync(join(IDEAS, 'README.md'), 'utf8').matchAll(/^\|[^|]*\]\((?:\.\/)?([\w.-]+\.md)\)[^|]*\|[^|]*\|\s*([^|]*?)\s*\|/gm)) {
     if (!STATUSES.includes(status)) { error(readme, `${file}: status '${status}' is not one of ${STATUSES.join(', ')}`); continue }
     if (!existsSync(join(IDEAS, file))) { error(readme, `links missing file ${file}`); continue }
-    const line = /\*\*Status:\*\*\s*([^\r\n]*)/.exec(readFileSync(join(IDEAS, file), 'utf8'))?.[1]
+    const line = /\*\*Status:\*\*[ \t]*([^\r\n]*)/.exec(readFileSync(join(IDEAS, file), 'utf8'))?.[1]
     if (line === undefined) error(`docs/ideas/${file}`, `no '**Status:** ${status}' line`)
     else if (!line.startsWith(status)) error(`docs/ideas/${file}`, `Status line '${line.slice(0, 40)}…' doesn't start with '${status}', the README status`)
   }

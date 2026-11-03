@@ -70,7 +70,7 @@ export class DevCheatsComponent {
 
   /**
    * `window.dev` in the browser console: puts the game into a state in one call when checking UI.
-   * IDs are enum member names or numbers (`dev.equip('machete')`, `dev.tab(GameTab.map)`); `dev.help()` lists the commands.
+   * IDs are enum member names or numbers (`dev.equip('machete')`, `dev.tab('map')`); `dev.help()` lists the commands.
    */
   readonly commands = {
     tab: (tab: Ref<typeof GameTab>) => this.navigation.changeTab(fromName(GameTab, 'GameTab', tab)),

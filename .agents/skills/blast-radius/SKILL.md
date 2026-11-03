@@ -25,7 +25,7 @@ For each such fact, get it as far down this list as is cheap, and say where it s
 ## Where grep stops in YARI
 
 - **Saves.** Every store persists to `localStorage` as `{ v, state }`; a version bump without a migration resets that store (`docs/systems/persistence.md`). A renamed or retyped state field or a changed enum number breaks existing saves silently unless the store's `version` and `migrations` cover it. Never lower `inventorySlots` without a migration (`AGENTS.md`).
-- **Numeric enums.** Data and saves use enum numbers. Inserting a member mid-enum shifts every later number.
+- **Numeric enums.** Data, saves and numeric `window.dev` arguments (`dev.tab(4)`) use enum numbers. Inserting a member mid-enum shifts every later number.
 - **Derived stats.** `stats` in `PlayerStore` is computed from every source; a new source or changed formula moves every number in the stats panel, combat and offline progress. `npm run sim` models its own build in `scripts/sim-economy.mjs`, so it misses the change until updated by hand.
 - **Data read by other systems.** Quest steps, dialogue conditions, shops, drops and unlock rules reference each other by id. Grep `src/` for the enum member (`ItemID.woodenSword`), including `src/data/dialogues/` and `src/assets/locales/`; `npm run validate` checks the broken references it knows about.
 - **Timing.** Ticks run on wall-clock time through `worker-timers`; saves are throttled to one per second; offline progress replays the same rules in bulk. Check both the live tick and the offline path.
