@@ -35,8 +35,21 @@ Preconditions:
 
   Fresh save: `Kill count: 0 / 10` (or 1-2 if doctor waited), `Wave 1/10`, `Lv 1`, XP `<n> / 100`.
 - **Let it fight.** Wait ~15 s (`await new Promise(r => setTimeout(r, 15000))`), read again. Kill count, XP and gold are higher (a fresh character kills one enemy every ~5-15 s); the enemy name or HP (`<hp> / <max>`) has changed.
-- **Saved.** `JSON.parse(localStorage.getItem('playerStore')).state` has `resources.level`, `resources.experience` and `resources.goldCoins` (at or a little behind the HUD: saves are batched), and `enemyKillCounts` (keyed by `EnemyID`) is non-empty. If the kill count is still 0, poll until a kill lands first (`while (!Object.keys(JSON.parse(localStorage.getItem('playerStore')).state.enemyKillCounts).length) await new Promise(r => setTimeout(r, 1000))`) instead of a fixed wait. Keep this reading: it is the lower bound after reload.
-- **Reload.** `navigate` to the same URL, wait 3 s, read again. Level is at least the saved level; XP is at least the saved XP only when the levels match (a level-up resets it). Gold and kill count are at least the saved values.
+- **Saved.** Read the saved stores once a kill has been saved, polling for up to 30 s (many save intervals). Level, XP and gold are at or a little behind the HUD: saves are batched. `waveKills` is the saved current-wave kill count the nav bar shows; `kills` (`enemyKillCounts`, keyed by `EnemyID`) is the separate bestiary total.
+
+  ```js
+  const saved = () => {
+    const p = JSON.parse(localStorage.getItem('playerStore')).state, b = JSON.parse(localStorage.getItem('battleStore')).state;
+    return { level: p.resources.level, xp: p.resources.experience, gold: p.resources.goldCoins,
+      waveKills: p.zonesProgression[b.currentZoneId]?.[b.currentWave] ?? 0, kills: p.enemyKillCounts };
+  };
+  const deadline = Date.now() + 30000;
+  while (!Object.keys(saved().kills).length && Date.now() < deadline) await new Promise(r => setTimeout(r, 1000));
+  Object.keys(saved().kills).length ? saved() : 'FAIL: no kill saved within 30 s'
+  ```
+
+  A `FAIL` result fails `battle-persist`. Otherwise keep this reading: it is the lower bound after reload.
+- **Reload.** `navigate` to the same URL, wait 3 s, read the DOM again and run `saved()` again. Level is at least the saved level; XP is at least the saved XP only when the levels match (a level-up resets it). Gold is at least the saved gold. The nav bar's kill count and the reloaded `waveKills` are at least the saved `waveKills` (same zone and wave: the wave doesn't advance on a fresh save).
 - **Proof.** Write before/after/reload readings to `tmp/verify/<run-id>/battle-loop.txt`. A screenshot of the battle pane needs a page wider than the pane's ~1024 px; at that width use the DOM text as proof.
 
 ## Gotchas
