@@ -135,7 +135,8 @@ export class ForgeComponent {
 
   itemName(item: EquipmentItem): string {
     const name = i18next.t(`items:names.${ItemID[item.id]}`)
-    return i18next.t('items:upgradedName', { name, level: item.upgradeLevel ?? 0 })
+    const level = item.upgradeLevel ?? 0
+    return level > 0 ? i18next.t('items:upgradedName', { name, level }) : name
   }
 
   groupLabel(group: ForgeGroup): string {

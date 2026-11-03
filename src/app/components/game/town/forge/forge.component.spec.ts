@@ -160,7 +160,7 @@ describe('ForgeComponent', () => {
     // The shipped +5 cap has no failure roll; exercise feedback for the future store result.
     spyOn(player, 'mergeItem').and.returnValue({ status: 'failure', cost: forge.cost() })
     forge.merge()
-    expect(forge.toast()).toContain('Merge failed: Wooden Bow +0 kept its level')
+    expect(forge.toast()).toContain('Merge failed: Wooden Bow kept its level')
     expect(forge.selectedGroup()?.item.upgradeLevel).toBe(0)
   })
 })
