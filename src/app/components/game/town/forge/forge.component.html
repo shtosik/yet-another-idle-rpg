@@ -29,6 +29,7 @@
     }
 
     <div class="forge__process">
+      <img class="forge__emblem" ngSrc="assets/img/icons/forge-anvil.png" width="48" height="48" disableOptimizedSrcset alt="" aria-hidden="true">
       <div class="forge__terms" [attr.title]="mergeLabel()">
         @if (item()) {
           <span class="forge__chance" [attr.aria-label]="'forge:chance' | i18next: { chance: chance() * 100 }">{{ chance() * 100 }}%</span>

@@ -1,5 +1,9 @@
 @use 'palette'
 @use 'mixins'
+@use 'variables' as vars
+@use 'sass:map'
+
+$bronze: map.get(palette.$elementPalette, earth)
 
 :host
   display: block
@@ -8,13 +12,13 @@
   position: relative
 
 .forge
-  padding: 1.25rem 2rem
+  padding: 1rem 1.5rem
 
   h2
-    margin: 0 0 1.25rem
+    // Match the shop/dialogue headings; Cinzel comes from the global h2 rule.
+    margin: 0 0 1rem
     color: palette.$yellow
-    font-size: 1.25rem
-    letter-spacing: 0.12em
+    font-size: 1.4rem
 
   &__close
     position: absolute
@@ -30,6 +34,13 @@
     justify-content: center
     align-items: center
     gap: 2rem
+    padding: 0.5rem 1rem
+    border: 1px solid rgba($bronze, 0.4)
+    border-radius: vars.$panelBorderRadius
+    // The dark wash bounds text contrast; the vignette quietens the tools at the edges.
+    background: radial-gradient(ellipse at center, transparent 20%, #0009 100%), linear-gradient(#000b, #000b), url('/assets/img/ui/forge-workbench.png') center 42% / cover no-repeat
+    box-shadow: vars.$panelShadow
+    color: #dddada
 
   &__station
     display: flex
@@ -38,10 +49,10 @@
     gap: 0.6rem
 
   &__label
+    font-family: 'Cinzel', serif
     font-size: 0.8rem
-    text-transform: uppercase
-    letter-spacing: 0.1em
-    color: #d0b99b
+    letter-spacing: 0.06em
+    color: #e6d5ab
 
   &__slot
     position: relative
@@ -51,19 +62,29 @@
     width: 144px
     height: 144px
     box-sizing: border-box
-    border: 2px solid #79634c
-    border-radius: 6px
-    box-shadow: inset 0 0 24px #0009, 0 6px 16px #0005
-    background: #232024
+    border: 2px solid rgba($bronze, 0.65)
+    border-radius: vars.$panelBorderRadius
+    box-shadow: vars.$panelShadow
+    background: vars.$hoverBackground
     color: inherit
     font: inherit
+
+    // A separate inset frame survives the tier mixin's outer glow.
+    &::before
+      content: ''
+      position: absolute
+      inset: 4px
+      border: 1px solid rgba($bronze, 0.4)
+      border-radius: 2px
+      box-shadow: inset 2px 2px 3px #000, inset -1px -1px 0 rgba($bronze, 0.3), 0 0 0 3px vars.$panelBackgroundColor
+      pointer-events: none
 
     img
       image-rendering: pixelated
 
     &--dragging
       border-color: palette.$yellow
-      background: #3c3025
+      background: vars.$panelBackgroundColor
       outline: 1px dashed palette.$yellow
       outline-offset: 5px
 
@@ -72,14 +93,19 @@
       outline-offset: 3px
 
     &--mismatch
-      border-color: #ed6868
+      border-color: palette.$red
+
+      &::before
+        border-color: palette.$red
 
   &__input
     cursor: pointer
 
+    &:hover:not(.forge__slot--mismatch)
+      border-color: palette.$yellow
+
   &__output
-    border-style: dashed
-    background: #29221b
+    border-color: $bronze
 
     img
       opacity: 0.8
@@ -90,6 +116,7 @@
     top: 0.3rem
     font-size: 1rem
     color: palette.$yellow
+    text-shadow: vars.$textShadow
 
   &__milestone
     position: absolute
@@ -99,28 +126,59 @@
 
   &__caption
     font-size: 0.75rem
-    color: #a99a89
+    line-height: 1.4
 
   &__process
+    position: relative
     display: flex
     flex-direction: column
     align-items: center
     gap: 0.75rem
     min-width: 8rem
+    padding: 0.875rem 0.75rem
+    border: vars.$panelBorder
+    border-top: 2px solid $bronze
+    border-bottom: 3px double $bronze
+    border-radius: vars.$panelBorderRadius
+    background: vars.$hoverBackground
+    box-shadow: vars.$panelShadow
+
+    &::before, &::after
+      content: ''
+      position: absolute
+      top: 0.35rem
+      width: 4px
+      height: 4px
+      border: 1px solid rgba($bronze, 0.7)
+      background: vars.$panelBackgroundColor
+      transform: rotate(45deg)
+
+    &::before
+      left: 0.35rem
+
+    &::after
+      right: 0.35rem
 
   &__terms
     display: flex
     flex-direction: column
     align-items: center
 
+  &__emblem
+    flex: none
+    width: 48px
+    height: 48px
+    image-rendering: pixelated
+
   &__chance
-    color: #e6d5ab
+    font-family: 'Cinzel', serif
     font-size: 1rem
 
   &__arrow
-    color: #9f825c
+    color: $bronze
     font-size: 3rem
     line-height: 1
+    text-shadow: 0 2px 0 #000
 
   &__cost
     display: flex
@@ -133,20 +191,24 @@
     width: 0.85rem
     height: 0.85rem
     border-radius: 50%
-    background: palette.$yellow
-    box-shadow: inset -2px -2px 0 #a16207
+    background: url('/assets/img/icons/coin.svg') center / contain no-repeat
 
   &__merge
-    padding: 0.5rem 1.5rem
-    border: 1px solid #ce9a4c
-    border-radius: 4px
-    background: #63401e
-    color: #fff0d6
-    font: inherit
-    cursor: pointer
+    @include mixins.button
+    padding: 0.4rem 0.875rem
+    font-family: 'Cinzel', serif
+    box-shadow: inset 0 1px 0 rgba($bronze, 0.35), 0 3px 0 #000
+
+    &:active:not([aria-disabled='true'])
+      transform: translateY(1px)
+      box-shadow: inset 0 1px 3px #000
 
     &[aria-disabled='true']
-      opacity: 0.45
+      // Muted metal, rather than opacity, keeps the label readable.
+      color: map.get(palette.$itemPalette, trash)
+      border: vars.$panelBorder
+      background: vars.$hoverBackground
+      box-shadow: none
       cursor: not-allowed
 
   button:focus-visible, &__slot:focus-visible, &__close:focus-visible
@@ -165,7 +227,7 @@
 
     p
       margin: 0.25rem 0
-      color: #c2b8a8
+      color: inherit
 
     table
       border-collapse: collapse

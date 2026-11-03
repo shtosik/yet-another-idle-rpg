@@ -486,6 +486,13 @@
     "shinySaturation": 4,
     "shinyBrightness": 1.2
   },
+  "src/assets/img/icons/forge-anvil.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "One squat forged iron blacksmith anvil with a single horn pointing left, worn bronze highlights along its upper edge",
+    "seed": 531180,
+    "date": "2026-11-03"
+  },
   "src/assets/img/items/ambushScroll.png": {
     "family": "item-pixel",
     "tier": null,
@@ -850,6 +857,13 @@
     "seed": 4242,
     "date": "2026-11-01"
   },
+  "src/assets/img/items/phurgosForgeTongs.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "One pair of heavy dark iron blacksmith tongs shaped like scissors, two long straight handles crossing at a single round rivet near one end, short thick gripping jaws with a square notch, a small round stamp pressed into one handle",
+    "seed": 7313,
+    "date": "2026-11-02"
+  },
   "src/assets/img/items/rootwalkerBoots.png": {
     "family": "item-pixel",
     "tier": null,
@@ -939,13 +953,6 @@
     "subject": "a curved sword whose blade is one giant pale eagle talon, with a hilt wrapped in leather and white feathers tied to the pommel",
     "seed": 279261417,
     "date": "2026-10-26"
-  },
-  "src/assets/img/items/phurgosForgeTongs.png": {
-    "family": "item-pixel",
-    "tier": null,
-    "subject": "One pair of heavy dark iron blacksmith tongs shaped like scissors, two long straight handles crossing at a single round rivet near one end, short thick gripping jaws with a square notch, a small round stamp pressed into one handle",
-    "seed": 7313,
-    "date": "2026-11-02"
   },
   "src/assets/img/items/trollClub.png": {
     "family": "item-pixel",
@@ -1100,5 +1107,21 @@
     "subject": "a round bronze medallion seen straight on, with a glowing blue water droplet symbol embossed in its centre, on a dark blue background",
     "seed": 424242,
     "date": "2026-10-25"
+  },
+  "src/assets/img/ui/forge-workbench.png": {
+    "family": "town-painterly",
+    "tier": null,
+    "subject": "Close overhead view of a blacksmith workbench surface, broad worn dark oak planks filling the entire frame, thick forged iron edging with bronze rivets around the perimeter, small hammer and iron tongs resting along the far upper edge, broad empty central working surface, warm reflected ember light at the edges, no people, no lettering",
+    "seed": 531170,
+    "date": "2026-11-03",
+    "export": {
+      "width": 960,
+      "height": 536,
+      "format": "png",
+      "palette": true,
+      "colours": 256,
+      "dither": 0.6,
+      "effort": 10
+    }
   }
 }
