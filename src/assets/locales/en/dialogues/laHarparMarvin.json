@@ -45,7 +45,7 @@
     "opt2": "I'll bring him a pie."
   },
   "coldForgeSalvage": {
-    "message": "We map the unknown and bring useful things home. A Pathfinder's Seal earns a place in our salvage register and a lesson in spotting sound gear. Find one among Ludo's Arena Chest prizes and bring it here; Toric doesn't need it to light his hearth.",
+    "message": "We map the unknown and bring useful things home. Recovered gear goes into our salvage register, and a trained eye learns to spot the sound pieces. Toric doesn't need our register to light his hearth.",
     "opt1": "Understood."
   }
 }
