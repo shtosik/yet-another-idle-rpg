@@ -89,6 +89,10 @@ describe('Forge panel and gear sources', () => {
     expect(forge.evaluation()).toEqual({ status: 'refused', reason: 'notEnoughGold' })
     expect(forge.preview()?.upgradeLevel).toBe(1)
     await expectBlocked('Not enough gold')
+    expect(fixture.nativeElement.querySelector('.forge__cost').classList).toContain('forge__cost--short')
+    player.updatePlayerStats([{ stat: 'goldCoins', amount: 100000 }])
+    await fixture.whenStable()
+    expect(fixture.nativeElement.querySelector('.forge__cost').classList).not.toContain('forge__cost--short')
   })
 
   it('explains unique gear', async () => {
@@ -164,11 +168,13 @@ describe('Forge panel and gear sources', () => {
     expect(forge.base()).toEqual({ from: 'equipped', slot: 'weapon' })
     expect(forge.sacrifice()?.from).toBe('inventory')
     expect(forge.cost()).toBe(mergeCost(ITEM_DATA[id].value, 4))
-    expect(forge.chance()).toBe(1)
+    expect(forge.chance()).toBe(0.6)
     expect(forge.statPreview()).toContain({ stat: 'attackPower', amount: 4.2, after: 5.25 })
     expect(fixture.nativeElement.querySelector('.forge__output').getAttribute('aria-label')).toContain('Wooden Bow +5')
     expect(player.equipment().weapon?.upgradeLevel).toBe(4)
     expect(player.itemCount(id, tier, 4)).toBe(1)
+    // +5 is no longer certain; pin the roll to a success.
+    spyOn(Math, 'random').and.returnValue(0)
     mergeButton().click()
     await fixture.whenStable()
     expect(player.equipment().weapon?.upgradeLevel).toBe(5)

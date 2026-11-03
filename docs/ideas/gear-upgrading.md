@@ -24,7 +24,7 @@ Merge two copies of the same piece of gear into one copy a level higher, at a ne
 ## Rules
 - **Merge**: two copies with the same `id + tier + upgradeLevel` → one copy at `upgradeLevel + 1`, plus gold. Every new item starts at +0.
 - **Gold cost** follows the item's `value`, so early gear is cheap to upgrade and late gear expensive: +N → +N+1 costs `value × 2^N × k` (`k` tunable, start at 1: the sell price of the copy being sacrificed). Merging one item from +0 to +5 costs `80 × value × k` in all.
-- **Chance**: 100% up to +5. Later, past +5: +6 90%, +7 80%, +8 70%, +9 60%, +10 50%.
+- **Chance**: +1 100%, then 10% less per level: +2 90%, +3 80%, +4 70%, +5 60% (owner change 2026-11-03, was 100% up to +5). Later levels continue the step: +6 50% … +10 10% (not decided).
 - **Failure** (only past +5): the gold and the sacrificed copy are lost; the base copy keeps its level.
 - **Stats**: each level adds +10% (tunable) of the item's base stats, rounded. +5 is a milestone: it adds another +25% of base on top, and the item frame gets a mark. +10 gets the same later.
 - **Stacks**: gear stacks per `id + tier + upgradeLevel`, so a stack of five +0 Makeshift Clubs merges straight from the inventory. No per-copy state.

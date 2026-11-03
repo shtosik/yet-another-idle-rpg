@@ -56,6 +56,7 @@ export class ForgeComponent {
     if (!item) return 0
     return mergeCost(ITEM_DATA[item.id].value, item.upgradeLevel)
   })
+  readonly goldShort = computed(() => !!this.item() && this.playerStore.resources.goldCoins() < this.cost())
   readonly chance = computed(() => UPGRADE_CHANCES[(this.item()?.upgradeLevel ?? 0) + 1] ?? 0)
   readonly preview = computed(() => {
     const item = this.item()

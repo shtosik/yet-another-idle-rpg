@@ -24,7 +24,7 @@ No way to upgrade yet; a dev cheat makes upgraded items for testing.
 
 ### 3. Merge logic and unique gear (M, Opus)
 - `unique?: true` on equipment data: quest rewards, non-refreshable one-in-stock shop items (`shops-data.ts`, for example Magic Staff and Mystic Hood), chest-only gear (Patron's Gloves). `validate` warns about equipment that is a quest reward or chest-only and lacks the flag.
-- `PlayerStore.mergeItem(base, sacrifice)`: same `id + tier + upgradeLevel`, not unique and not a pet, level below the cap, enough gold. The cost is `value × 2^N × k`. Base and sacrifice may each be in the inventory or equipped. When the base is equipped, the merged copy goes into its slot; when the sacrifice is equipped, its slot empties. The chance roll stays in code for later levels, but at a cap of 5 it is always 100%.
+- `PlayerStore.mergeItem(base, sacrifice)`: same `id + tier + upgradeLevel`, not unique and not a pet, level below the cap, enough gold. The cost is `value × 2^N × k`. Base and sacrifice may each be in the inventory or equipped. When the base is equipped, the merged copy goes into its slot; when the sacrifice is equipped, its slot empties. Chance by resulting level: +1 100%, then 10% less per level (+5: 60%); owner change 2026-11-03.
 - Specs for every combination: two from one stack, stack + equipped, equipped as the sacrifice, not enough gold, unique, at the cap.
 - `npm run sim`: print the gold cost to +5 per gear item, to tune `k`.
 - Docs: `player-stats-inventory-equipment.md`.

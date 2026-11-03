@@ -33,7 +33,7 @@
         } @else { <span class="forge__chance">&mdash;</span> }
         <span class="forge__arrow" aria-hidden="true">&#10230;</span>
         @if (item()) {
-          <span class="forge__cost" [attr.aria-label]="'forge:cost' | i18next: { amount: cost() }">
+          <span class="forge__cost" [class.forge__cost--short]="goldShort()" [attr.aria-label]="'forge:cost' | i18next: { amount: cost() }">
             <span class="forge__coin" aria-hidden="true"></span> {{ cost() }}
           </span>
         }
