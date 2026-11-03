@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, linkedSignal, output, signal } from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, output, signal } from '@angular/core'
 import i18next from 'i18next'
 import ITEM_DATA from '../../../../../data/items-data'
 import { UPGRADE_CHANCES, UPGRADE_LEVEL_CAP } from '../../../../../data/upgrade-data'
@@ -77,9 +77,12 @@ export class ForgeComponent {
 
   private selectedKey = signal<string | null>(null)
   selectedGroup = computed(() => this.groups().find(g => g.key === this.selectedKey()) ?? this.groups()[0] ?? null)
-  base = linkedSignal(() => {
+  // Choices are kept by key: a failed merge rebuilds the groups, and the picked copies must survive that.
+  private baseKey = signal<string | null>(null)
+  private sacrificeKey = signal<string | null>(null)
+  base = computed(() => {
     const choices = this.selectedGroup()?.choices ?? []
-    return choices.find(c => c.source.from === 'equipped') ?? choices[0] ?? null
+    return choices.find(c => c.key === this.baseKey()) ?? choices.find(c => c.source.from === 'equipped') ?? choices[0] ?? null
   })
   sacrificeChoices = computed(() => {
     const base = this.base()
@@ -88,7 +91,10 @@ export class ForgeComponent {
       return choice.source.from === 'inventory' && choice.amount >= 2
     })
   })
-  sacrifice = linkedSignal(() => this.sacrificeChoices()[0] ?? null)
+  sacrifice = computed(() => {
+    const choices = this.sacrificeChoices()
+    return choices.find(c => c.key === this.sacrificeKey()) ?? choices[0] ?? null
+  })
 
   evaluation = computed(() => {
     const group = this.selectedGroup()
@@ -123,14 +129,20 @@ export class ForgeComponent {
 
   selectGroup(group: ForgeGroup): void {
     this.selectedKey.set(group.key)
+    this.clearChoices()
   }
 
   chooseBase(key: string): void {
-    this.base.set(this.selectedGroup()?.choices.find(c => c.key === key) ?? null)
+    this.baseKey.set(key)
   }
 
   chooseSacrifice(key: string): void {
-    this.sacrifice.set(this.sacrificeChoices().find(c => c.key === key) ?? null)
+    this.sacrificeKey.set(key)
+  }
+
+  private clearChoices(): void {
+    this.baseKey.set(null)
+    this.sacrificeKey.set(null)
   }
 
   itemName(item: EquipmentItem): string {
@@ -178,7 +190,10 @@ export class ForgeComponent {
     const result = this.playerStore.mergeItem(base.source, sacrifice.source)
     if (result.status === 'refused') return
     const item = { ...group.item, upgradeLevel: (group.item.upgradeLevel ?? 0) + 1 }
-    if (result.status === 'success') this.selectedKey.set(stackKey(item))
+    if (result.status === 'success') {
+      this.selectedKey.set(stackKey(item))
+      this.clearChoices()
+    }
     const name = this.itemName(result.status === 'success' ? item : group.item)
     clearTimeout(this.toastTimer)
     this.toast.set(i18next.t(`forge:${result.status}`, { item: name }))
