@@ -37,6 +37,7 @@ describe('Forge panel and gear sources', () => {
     select(item)
   }
   const mergeButton = (): HTMLButtonElement => fixture.nativeElement.querySelector('.forge__merge')
+  const output = (): HTMLElement => fixture.nativeElement.querySelector('.forge__output')
   const inputButton = (slot: ForgeInput): HTMLButtonElement => fixture.nativeElement.querySelector(`[data-input="${slot}"]`)
 
   beforeEach(async () => {
@@ -343,18 +344,18 @@ describe('Forge panel and gear sources', () => {
     expect(inventory.componentInstance.tab()).toBe('consumables')
   })
 
-  it('keeps the refusal tooltip keyboard-accessible and dismisses it with Escape', async () => {
+  it('shows the refusal in the output tooltip, keyboard-accessible, and dismisses it with Escape', async () => {
     player.addItems([stack()])
     selectPair()
     await fixture.whenStable()
     // A headless window never has focus, so `.focus()` fires no focus event; dispatch it directly.
-    mergeButton().dispatchEvent(new FocusEvent('focus'))
+    output().dispatchEvent(new FocusEvent('focus'))
     // The tooltip library shows and hides after a short transition.
     const tooltipText = () => [...document.querySelectorAll('.tooltip-override.show')].map(tip => tip.textContent).join()
     const settle = () => new Promise(resolve => setTimeout(resolve, 300))
     await settle()
     expect(tooltipText()).toContain('Not enough gold')
-    mergeButton().dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
+    output().dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' }))
     await settle()
     expect(tooltipText()).not.toContain('Not enough gold')
   })

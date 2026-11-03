@@ -13,11 +13,8 @@
           [class.forge__slot--milestone]="inputItem(slot) && (inputItem(slot).upgradeLevel ?? 0) >= milestoneLevel"
           [attr.data-tier]="inputItem(slot) ? ItemTier[inputItem(slot).tier] : null"
           [attr.aria-label]="('forge:' + slot | i18next) + ': ' + (inputItem(slot) ? itemName(inputItem(slot)) : ('forge:chooseHint' | i18next))"
-          [tooltipTemplate]="details" [tooltipContext]="{ gear: inputItem(slot) }" #inputTip="tooltipTemplate"
-          [appendTooltipToBody]="true" [autoPlacement]="true" tooltipClass="tooltip-override"
-          (focus)="inputTip.show(false)" (blur)="inputTip.hide(false)" (keydown.escape)="inputTip.hide(false)"
-          (dragover)="dragOver($event)" (drop)="drop($event, slot); inputTip.hide(false)"
-          (click)="activateInput(slot); inputTip.hide(false)">
+          (dragover)="dragOver($event)" (drop)="drop($event, slot)"
+          (click)="activateInput(slot)">
           @if (inputItem(slot); as gear) {
             <img [ngSrc]="ITEM_DATA[gear.id].url" width="96" height="96" disableOptimizedSrcset draggable="false" alt="">
             <span class="forge__level">+{{ gear.upgradeLevel ?? 0 }}</span>
@@ -41,12 +38,9 @@
           </span>
         }
       </div>
-      <span [tooltipTemplate]="details" [tooltipContext]="{ gear: item() }" #mergeTip="tooltipTemplate" [appendTooltipToBody]="true" [autoPlacement]="true" tooltipClass="tooltip-override">
-        <button type="button" class="forge__merge" [attr.aria-disabled]="evaluation()?.status !== 'ready'"
-          [attr.aria-label]="('forge:merge' | i18next) + ': ' + mergeLabel()"
-          (focus)="mergeTip.show(false)" (blur)="mergeTip.hide(false)" (keydown.escape)="mergeTip.hide(false)"
-          (click)="merge(); mergeTip.hide(false)">{{ 'forge:merge' | i18next }}</button>
-      </span>
+      <button type="button" class="forge__merge" [attr.aria-disabled]="evaluation()?.status !== 'ready'"
+        [attr.aria-label]="('forge:merge' | i18next) + ': ' + mergeLabel()"
+        (click)="merge()">{{ 'forge:merge' | i18next }}</button>
     </div>
 
     <div class="forge__station">
