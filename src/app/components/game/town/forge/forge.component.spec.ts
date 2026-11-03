@@ -223,12 +223,24 @@ describe('Forge panel and gear sources', () => {
     await expectBlocked('Select gear')
   })
 
-  it('requires two owned copies even if the same stack is selected twice', async () => {
+  it('does not put a single owned copy into both inputs', async () => {
     player.addItems([stack(1)])
     selectPair(stack(1))
-    expect(forge.base()).toEqual(forge.sacrifice())
+    expect(forge.base()?.from).toBe('inventory')
+    expect(forge.sacrifice()).toBeNull()
     expect(forge.preview()).toBeNull()
-    await expectBlocked('No second matching copy')
+    await expectBlocked('Select gear')
+  })
+
+  it('does not reuse the only upgraded copy as the sacrifice after an upgrade', () => {
+    player.updatePlayerStats([{ stat: 'goldCoins', amount: 100000 }])
+    player.addItems([stack()])
+    selectPair()
+    forge.merge()
+    expect(player.itemCount(id, tier, 1)).toBe(1)
+    select(stack(1, 1))
+    expect(forge.base()?.from).toBe('inventory')
+    expect(forge.sacrifice()).toBeNull()
   })
 
   it('fills an empty first input before replacing the second when both inputs are full', () => {
@@ -297,6 +309,7 @@ describe('Forge panel and gear sources', () => {
 
   it('empties each filled input on mouse or keyboard activation, and focuses Gear from an empty input', async () => {
     const focusGear = spyOn(forge, 'focusGear')
+    player.addItems([stack()])
     await fixture.whenStable()
     for (const detail of [1, 0]) {
       selectPair()
