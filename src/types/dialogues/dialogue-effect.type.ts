@@ -11,6 +11,7 @@ export type DialogueEffect =
   | ItemEffect
   | ShopEffect
   | ForgeEffect
+  | RegisterPathfindersSealEffect
   | DialogueFlagEffect
   | GuildEffect
   | ArenaEffect
@@ -44,6 +45,11 @@ export interface ShopEffect {
 /** Opens the inline Forge panel in the current town building. */
 export interface ForgeEffect {
   type: 'forge'
+}
+
+/** Consumes one held Seal and permanently grants its lesson, at most once. */
+export interface RegisterPathfindersSealEffect {
+  type: 'registerPathfindersSeal'
 }
 
 export interface DialogueFlagEffect {

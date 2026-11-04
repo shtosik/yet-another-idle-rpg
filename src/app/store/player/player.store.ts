@@ -1,4 +1,5 @@
 import { ChestContents, rollChest } from './chest'
+import { PATHFINDERS_SEAL_UPGRADED_DROP_CHANCE } from '../../../data/upgrade-data'
 import { evaluateMerge, MergeResult, MergeSource, rollMerge } from './merge'
 import { WeaponCategory } from '../../../enums/weapon-category.enum'
 import { computed, effect, inject } from '@angular/core'
@@ -306,6 +307,8 @@ export const PlayerStore = signalStore(
     }
   }),
   withComputed((store) => ({
+    canRegisterPathfindersSeal: computed(() => (store.permanentBonuses().upgradedDropChance ?? 0) === 0
+      && countItem(store.inventory(), ItemID.pathfindersSeal) > 0),
     /** One rank per `TASKS_PER_GUILD_RANK` completed tasks, no cap. Each rank adds a zone tier to the task pool. */
     guildRank: () => Math.floor(store.totalTasksCompleted() / TASKS_PER_GUILD_RANK),
     /** Titles whose source is met, in `TitleID` order. */
@@ -402,6 +405,17 @@ export const PlayerStore = signalStore(
 
     removeItems(items: ItemStack[]) {
       patchState(store, (state) => withoutItems(state, items))
+    },
+
+    /** Consume the Seal and save its one-time lesson together; repeated or stale effects do nothing. */
+    registerPathfindersSeal(): boolean {
+      if (!store.canRegisterPathfindersSeal()) return false
+      patchState(store, state => ({
+        inventory: removeItems(state.inventory, [{ id: ItemID.pathfindersSeal, amount: 1 }]),
+        permanentBonuses: { ...state.permanentBonuses, upgradedDropChance: PATHFINDERS_SEAL_UPGRADED_DROP_CHANCE },
+      }))
+      saveGameStateNow()
+      return true
     },
 
     /** Throws away the whole stack (same id, tier and upgrade level). Quest items can't be destroyed; returns whether anything was. */
@@ -550,7 +564,7 @@ export const PlayerStore = signalStore(
       const { experience, gold, dropRolls } = killReward(enemy, ZONES_DATA[zoneId], currentWave, isShiny, store.stats())
       const drops = new Map<string, InventoryItem>()
       const { dropChance } = rankBonus(enemyId, store.enemyKillCounts()[enemyId] ?? 0)
-      rollEnemyDrops(enemy, dropRolls, isShiny, dropChance, drops, activeQuestIds)
+      rollEnemyDrops(enemy, dropRolls, isShiny, dropChance, drops, activeQuestIds, undefined, store.stats().upgradedDropChance)
       const itemsToUpdate = [...drops.values()]
 
       store.updatePlayerStats([
@@ -743,7 +757,10 @@ export const PlayerStore = signalStore(
       const itemData = ITEM_DATA[item.id]
       if (itemData.type !== ItemType.chest) return { contents: null, missing: {} }
       const chest = { id: item.id, tier: item.tier, upgradeLevel: item.upgradeLevel, amount: 1 }
-      const contents = store.rolledChests()[item.id] ?? rollChest(itemData, rng)
+      const bonus = itemData.bonusRoll
+      const bonusEligible = !!bonus && (store.permanentBonuses()[bonus.registeredStat] ?? 0) === 0
+        && countItem(store.inventory(), bonus.itemId) === 0
+      const contents = store.rolledChests()[item.id] ?? rollChest(itemData, rng, bonusEligible)
       const missing = store.missingSlotsByTab(contents.items, [chest])
       const rolledChests = { ...store.rolledChests() }
       const blocked = Object.keys(missing).length > 0

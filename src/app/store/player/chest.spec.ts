@@ -27,7 +27,11 @@ describe('chests', () => {
       .filter(item => tabOf(item.id) === tab && !lootIds.includes(item.id))
       .slice(0, playerStore.inventoryCapacity()[tab as 'materials'])
       .map(item => ({ id: item.id, amount: 1 })))
-    // rng 0 picks gold only; rng 0.5 lands on a material pick in the Arena Chest's loot.
+    // Weighted picks use 0 (gold); the separate Seal roll uses 0.5 (miss).
+    const goldRoll = () => {
+      let calls = 0
+      return () => ++calls <= chest.rolls * 2 ? 0 : 0.5
+    }
     const materialRoll = rollChest(chest, () => 0.5)
 
     beforeEach(() => {
@@ -41,7 +45,7 @@ describe('chests', () => {
     it('opens when the roll fits, even with other tabs full', () => {
       fill('materials')
       const gold = playerStore.stats().goldCoins
-      const { contents, missing } = playerStore.openChest(chestSlot(), () => 0)
+      const { contents, missing } = playerStore.openChest(chestSlot(), goldRoll())
       expect(contents).toEqual({ gold: chest.rolls * 6000, items: [] })
       expect(missing).toEqual({})
       expect(playerStore.stats().goldCoins).toBe(gold + chest.rolls * 6000)

@@ -12,4 +12,5 @@ export enum NpcID {
     mawoodMilo = 9,
     mawoodElarion = 10,
     liroldArenaMaster = 11,
+    liroldPhurgo = 12,
 }

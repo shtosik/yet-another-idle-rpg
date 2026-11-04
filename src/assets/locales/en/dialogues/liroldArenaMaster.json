@@ -4,14 +4,20 @@
     "opt1": "Tell me.",
     "opt2": "Maybe later."
   },
+  "pathfindersSealInfo": {
+    "message": "The Exploration Guild leaves a few of those among the prizes, challenger. Finding a road out is useful when the last champion wants to keep you! Show it to Marvin in La Harpar; he keeps the register.",
+    "opt1": "I'll ask Marvin."
+  },
   "default": {
+    "pathfindersSeal": "Why give a Pathfinder's Seal as an Arena prize?",
     "message": "The sand's raked and the stands are filling. Fight, talk or gawk, challenger?",
     "claim": "I've come for my winnings.",
     "fight": "I'll fight.",
     "rules": "Remind me of the rules.",
     "champions": "Tell me about your champions.",
     "aboutArena": "Who runs this place?",
-    "goodbye": "Another time."
+    "goodbye": "Another time.",
+    "coldForge": "What happened to Phurgo's delivery cart?"
   },
   "rules": {
     "message": "The fee opens the gate, and it stays with me whatever happens. Twenty waves, one sandglass, ten minutes; every fifth wave is a champion, and the last is Yad. Beat the sand and you walk out in a Molten Cape, with something extra the first time; walk out early or run dry and you keep only what your kills paid.",
@@ -72,5 +78,9 @@
   "running": {
     "message": "You've got a fight going and the sand's still falling! Get back out there, challenger.",
     "ok": "On my way."
+  },
+  "coldForgeLead": {
+    "message": "Ha, a rescue for the tongs, challenger! I saw that cart stranded up on the Mountain Pass; Goblin Scavengers carried off the tools, big tongs and all. Look for Phurgo's square notch by the hinge, then take them straight to him.",
+    "opt1": "I'll find the scavengers."
   }
 }

@@ -25,4 +25,5 @@ export enum QuestID {
     lastOrders = 17,
     aCleanCure = 18,
     rootsAndRafters = 19,
+    theColdForge = 20,
 }

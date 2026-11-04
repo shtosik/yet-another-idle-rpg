@@ -60,7 +60,7 @@ describe('PlayerStore.mergeItem', () => {
   it('upgrades an equipped base in place and derives its stats from the new level', () => {
     store.addItems([item(4, 2)])
     store.equipItem(item(4))
-    expect(store.mergeItem(equippedSource, inventorySource(item(4)), () => 0.999).status).toBe('success')
+    expect(store.mergeItem(equippedSource, inventorySource(item(4)), () => 0).status).toBe('success')
     expect(store.equipment().weapon).toEqual({ id, tier, upgradeLevel: 5 })
     expect(store.itemCount(id, tier, 4)).toBe(0)
     expect(store.stats().attackPower).toBe(statsInitialState.attackPower + 5.25)
@@ -162,14 +162,14 @@ describe('merge preview and later-level rolls', () => {
       const plan = evaluateMerge(input, 10)
       expect(input).toEqual(before)
       if (plan.status !== 'ready') throw new Error('Expected merge preview')
-      expect(plan.chance).toBe(0.9)
+      expect(plan.chance).toBe(0.5)
       const { result, state } = rollMerge(plan, () => 0.95)
       expect(result).toEqual({ status: 'failure', cost: mergeCost(ITEM_DATA[id].value, 5) })
       expect(state.goldCoins).toBe(input.goldCoins - mergeCost(ITEM_DATA[id].value, 5))
       expect(countItem(state.inventory, id, tier, 5)).toBe(equipped === 'sacrifice' ? 3 : 2)
       expect(countItem(state.inventory, id, tier, 6)).toBe(0)
       expect(state.equipment.weapon).toEqual(equipped === 'base' ? input.equipment.weapon : null)
-      expect(rollMerge(plan, () => 0.89).result.status).toBe('success')
+      expect(rollMerge(plan, () => 0.49).result.status).toBe('success')
     }
   })
 

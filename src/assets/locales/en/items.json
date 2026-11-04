@@ -183,7 +183,9 @@
         "petArenaBrute": "Pet Brute",
         "petArenaArcanist": "Pet Arcanist",
         "petArenaBurrower": "Pet Burrower",
-        "petArenaYad": "Pet Yad"
+        "petArenaYad": "Pet Yad",
+        "phurgosForgeTongs": "Phurgo's Forge Tongs",
+        "pathfindersSeal": "Pathfinder's Seal"
     },
     "tiers": {
         "trash": "Trash",
@@ -213,7 +215,8 @@
         "needsPrevious": "Needs {{station}} Lv {{level}} first"
     },
     "teachesSpell": "Teaches the spell {{spell}}",
-    "chestRolls": "Holds {{count}} rewards: gold, materials, runes, potions, a recipe, a spell, gear or a champion's pet. Needs {{count}} empty slots to open.",
+    "chestRolls": "Rolls {{count}} rewards: gold, materials, runes, potions, a recipe, a spell, gear or a champion's pet. Opens when all rolled items fit.",
+    "chestBonus": "Also has a 1-in-{{chance}} chance for {{item}}, until you hold or register one.",
     "chestOpened": "Chest opened!",
     "chestFull": "Free {{slots}} to open the chest.",
     "chestOk": "Nice"

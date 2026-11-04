@@ -4,6 +4,21 @@ import { ItemTier } from '../../enums/items/item-tier.enum'
 import { ItemType } from '../../enums/items/item-type.enum'
 
 export const QuestItemsData: Partial<Record<ItemID, Item>> = {
+  [ItemID.pathfindersSeal]: {
+    id: ItemID.pathfindersSeal,
+    tier: ItemTier.rare,
+    // Placeholder until the brass Exploration Guild seal icon is drawn.
+    url: './assets/img/items/letter.png',
+    value: -1,
+    type: ItemType.quest,
+  },
+  [ItemID.phurgosForgeTongs]: {
+    id: ItemID.phurgosForgeTongs,
+    tier: ItemTier.normal,
+    url: './assets/img/items/phurgosForgeTongs.png',
+    value: -1,
+    type: ItemType.quest,
+  },
   [ItemID.captainsLetter]: {
     id: ItemID.captainsLetter,
     tier: ItemTier.normal,

@@ -5,6 +5,9 @@ import { ZoneID } from '../../enums/ids/zone-id.enum'
 import { DamageElement } from '../../enums/damage-element.enum'
 import { EnemyID } from '../../enums/ids/enemy-id.enum'
 import { ItemID } from '../../enums/ids/item-id.enum'
+import ITEM_DATA from '../../data/items-data'
+import { ItemType } from '../../enums/items/item-type.enum'
+import { EquipmentSlot } from '../../enums/equipment-slot.enum'
 
 const HOUR_IN_MS = 60 * 60 * 1000
 
@@ -36,6 +39,24 @@ describe('simulateOfflineKills', () => {
 
   it('replays the same result for the same seed', () => {
     expect(simulateOfflineKills(input())).toEqual(simulateOfflineKills(input()))
+  })
+
+  it('uses the seeded RNG for +1 gear drops after registration, leaving unique gear and pets at +0', () => {
+    const strong = { ...stats, attackPower: 100_000, upgradedDropChance: 10 }
+    const run = (upgradedDropChance: number) => simulateOfflineKills(input({
+      wave: ZONES_DATA[ZoneID.horseshoeBeach].maxWave,
+      segments: [{ durationMs: HOUR_IN_MS, stats: { ...strong, upgradedDropChance } }],
+    }))
+    spyOn(Math, 'random').and.throwError('Offline rolls must use the seeded RNG')
+    const registered = run(10)
+    expect(registered).toEqual(run(10))
+    expect(registered.items.some(item => item.id === ItemID.knife && item.upgradeLevel === 1)).toBeTrue()
+    expect(registered.items.some(item => item.id === ItemID.knife && !item.upgradeLevel)).toBeTrue()
+    expect(registered.items.filter(item => item.upgradeLevel === 1).every(item => {
+      const data = ITEM_DATA[item.id]
+      return data.type === ItemType.equipment && data.slot !== EquipmentSlot.pet && !data.unique
+    })).toBeTrue()
+    expect(run(0).items.every(item => !item.upgradeLevel)).toBeTrue()
   })
 
   it('kills at offlineProgressRate times the theoretical rate', () => {
