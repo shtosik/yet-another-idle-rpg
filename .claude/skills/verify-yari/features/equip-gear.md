@@ -19,7 +19,7 @@ Preconditions:
 
 - Doctor passes; `Battle` tab active.
 - Nothing equipped in the weapon slot: `JSON.parse(localStorage.getItem('playerStore')).state.equipment.weapon` is `null`.
-- One machete in the inventory: `dev.giveItem(26)` (`ItemID.machete`), or the cheat bar's `give machete` button.
+- One machete in the inventory: `dev.giveItem('machete')`, or the cheat bar's `give machete` button.
 
 - **Before.** `javascript_tool`: `({ inv: document.querySelectorAll('app-inventory .item').length, slots: [...document.querySelectorAll('app-equipment-slot button.item')].map(b => b.getAttribute('aria-label')), ap: dev.state().stats.attackPower })`. `inv` is 1, slot 5 is `Weapon: Empty`.
 - **Left-click is inert.** `find` "Machete", `left_click` the `button "Machete ×1"` ref. Nothing changes.

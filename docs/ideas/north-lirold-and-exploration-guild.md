@@ -1,6 +1,6 @@
 # Lirold & the Exploration Guild
 
-**Scope:** M · **Status:** Proposed (revision 5, 2026-10-27). File name kept from before the rename.
+**Scope:** M · **Status:** In progress: Lirold and its Arena built; Guild hall, Odile Varrow and The Guild Trial proposed (revision 5, 2026-10-27). File name kept from before the rename.
 
 > `la-harpar-quests.md` (the Tidecaller questline and La Harpar side quests) is a proposed draft in `docs/ideas/`. Its ItemID reservation (134–143) is void: shipped items took those ids. Everything below that cites it is conditional on it shipping, including the ID numbers it reserves.
 

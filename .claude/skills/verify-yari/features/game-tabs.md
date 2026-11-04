@@ -29,5 +29,5 @@ Preconditions:
 ## Gotchas
 
 - `find`/`read_page` name locked tabs just `Locked` (the `title` attribute wins), so `find` "Map" finds nothing while Map is locked; pick locked tabs by their order in `find` "Locked".
-- There is no `Towns` tab in the menu; towns open from the Map, and `Map` stays current while a town is open. `dev.tab(4)` forces the towns panel.
+- There is no `Towns` tab in the menu; towns open from the Map, and `Map` stays current while a town is open. `dev.tab('towns')` forces the towns panel.
 - Badges show only on unlocked tabs and are part of the name (`Bestiary 3`); `find` with the label alone still matches. A fresh save shows no badge until the first new enemy.

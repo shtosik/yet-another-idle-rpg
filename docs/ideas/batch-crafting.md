@@ -1,6 +1,6 @@
 # Batch crafting
 
-**Scope:** S · **Status:** Implemented on `feat/consumables` (×1 / ×5 / ×10 / max, blocked when the result doesn't fit)
+**Scope:** S · **Status:** Done: implemented on `feat/consumables` (×1 / ×5 / ×10 / max, blocked when the result doesn't fit)
 
 > **Follow-up:** the crafting UI is being redesigned as the Camp tab. See [Camp & crafting stations](crafting-stations.md).
 

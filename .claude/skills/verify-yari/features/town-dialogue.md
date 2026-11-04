@@ -38,4 +38,4 @@ Preconditions:
 - `app-dialogue` `textContent` starts with whitespace (the empty close button comes first); read `.dialogue-modal__npc-name` instead.
 - Options with unmet requirements have class `disabled` and ignore clicks; pick one without it.
 - Some options start quests or cost gold; check `questsStore`/`playerStore` if the option is the subject of the proof, and reset state afterwards if the run continues.
-- The `dev.tab(4)` (Towns) shortcut skips the map; it is not the player path.
+- The `dev.tab('towns')` shortcut skips the map; it is not the player path.
