@@ -13,6 +13,7 @@ import { BattleStore } from '../../../store/battle/battle.store'
 import { QuestsStore } from '../../../store/quests/quests.store'
 import { GameTab } from '../../../../enums/ids/game-tab.enum'
 import { ShopComponent } from './shop/shop.component'
+import { ForgeComponent } from './forge/forge.component'
 import { PlayerStore } from '../../../store/player/player.store'
 import { REPUTATION_TOWNS, reputationTier } from '../../../store/player/reputation'
 import { ReputationTier } from '../../../../enums/reputation-tier.enum'
@@ -27,6 +28,7 @@ import { ReputationTier } from '../../../../enums/reputation-tier.enum'
     CloseButtonComponent,
     TownBuildingComponent,
     ShopComponent,
+    ForgeComponent,
     DialogueComponent,
   ],
 })
@@ -44,6 +46,7 @@ export class TownsComponent {
   selectedTownBuilding = this.townsStore.selectedTownBuilding
   activeShopId = this.townsStore.activeShopId
   activeShopStage = this.townsStore.activeShopStage
+  forgeOpen = this.townsStore.forgeOpen
   dialogueActive = computed(() => this.dialogueManager.activeNpc() !== null)
   /** Wrapped so Neutral (0) still shows; `null` for towns without reputation. */
   townTier = computed(() => {
@@ -72,6 +75,10 @@ export class TownsComponent {
 
   closeShop() {
     this.townsStore.closeShop()
+  }
+
+  closeForge() {
+    this.townsStore.closeForge()
   }
 
   isBuildingAvailable(building: TownBuilding): boolean {

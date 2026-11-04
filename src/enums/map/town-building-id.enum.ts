@@ -14,4 +14,5 @@ export enum TownBuildingID {
     upperCanopyEntrance = 12,
     // Lirold
     liroldArena = 13,
+    liroldForge = 14,
 }

@@ -197,6 +197,31 @@ for (const item of Object.values(D.ITEM_DATA)) {
   }
 }
 
+// Unique gear: quest rewards and equipment whose only acquisition source is a chest.
+const questGear = new Set(Object.values(D.QUEST_DATA).flatMap(quest => quest.rewards
+  .filter(reward => reward.type === 'item').map(reward => reward.itemId)))
+const outsideChests = new Set([
+  ...questGear,
+  ...shops.flatMap(shop => shop.items.map(item => item.itemId)),
+  ...Object.values(D.ENEMIES_DATA).flatMap(enemy => [...enemy.drops, ...(enemy.shinyDrops ?? [])].map(drop => drop.id)),
+  ...Object.values(D.RECIPES_DATA).map(recipe => recipe.itemId),
+  ...Object.values(D.ZONES_DATA).flatMap(zone => zone.masteryReward.items.map(item => item.id)),
+])
+for (const npc of Object.values(D.NPC_DATA)) {
+  for (const node of Object.values(npc.dialogue)) {
+    const effects = (node.options ?? []).flatMap(option => (option.results ?? []).flatMap(result => result.effects ?? []))
+    for (const effect of effects) if (effect.type === 'item' && effect.action === 'give') for (const item of effect.items) outsideChests.add(item.itemId)
+  }
+}
+const chestOnly = new Set(Object.values(D.ITEM_DATA).filter(item => item.type === D.ItemType.chest)
+  .flatMap(chest => chest.loot.filter(entry => 'itemId' in entry && !outsideChests.has(entry.itemId)).map(entry => entry.itemId)))
+for (const item of Object.values(D.ITEM_DATA)) {
+  if (item.type !== D.ItemType.equipment || item.unique) continue
+  if (questGear.has(item.id) || chestOnly.has(item.id)) {
+    warn('src/data/items', `${idName(D.ItemID, item.id)} is quest-reward or chest-only equipment; add unique: true`)
+  }
+}
+
 for (const recipe of Object.values(D.RECIPES_DATA)) {
   for (const cost of recipe.itemsNeeded) {
     if (!has(D.ITEM_DATA, cost.id)) error('src/data/recipes-data.ts', `${idName(D.RecipeID, recipe.id)} needs unknown ItemID ${cost.id}`)

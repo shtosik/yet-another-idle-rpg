@@ -8,8 +8,8 @@ export interface ChestContents {
 
 const between = ([min, max]: [number, number], rng: () => number) => min + Math.floor(rng() * (max - min + 1))
 
-/** `chest.rolls` weighted picks from its loot table; the same item rolled twice lands as one stack. */
-export function rollChest(chest: ChestItem, rng: () => number = Math.random): ChestContents {
+/** Weighted picks plus an optional guarded bonus; callers keep the entire result when it cannot fit. */
+export function rollChest(chest: ChestItem, rng: () => number = Math.random, bonusEligible = false): ChestContents {
   const totalWeight = chest.loot.reduce((sum, entry) => sum + entry.weight, 0)
   const contents: ChestContents = { gold: 0, items: [] }
 
@@ -25,6 +25,12 @@ export function rollChest(chest: ChestItem, rng: () => number = Math.random): Ch
     const stack = contents.items.find(item => stackKey(item) === key)
     if (stack) stack.amount += amount
     else contents.items.push({ id: entry.itemId, amount })
+  }
+  if (bonusEligible && chest.bonusRoll && rng() < 1 / chest.bonusRoll.chance) {
+    const id = chest.bonusRoll.itemId
+    const stack = contents.items.find(item => item.id === id)
+    if (stack) stack.amount++
+    else contents.items.push({ id, amount: 1 })
   }
   return contents
 }

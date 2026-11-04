@@ -1,6 +1,9 @@
+import { QuestID } from '../../../enums/ids/quest-id.enum'
+import { QuestState } from '../../../enums/quest-state.enum'
 import { DialogueNode } from '../../../interfaces/dialogues/dialogue-node.interface'
 import { NpcID } from '../../../enums/map/npc-id.enum'
 import { ShopID } from '../../../enums/ids/shop-id.enum'
+import { ItemID } from '../../../enums/ids/item-id.enum'
 
 export enum MarvinDialogue {
   default = 0,
@@ -10,6 +13,10 @@ export enum MarvinDialogue {
   taskIntro,
   taskClaimed,      // kept at id 5 — used as task-complete node
   taskInProgress,   // id 6
+  coldForgeRecord,
+  coldForgeSalvage,
+  sealRegistered,
+  sealReminder,
 }
 
 export type LaHarparMarvinDialogueType = Record<MarvinDialogue, DialogueNode<MarvinDialogue>>
@@ -60,6 +67,33 @@ const LA_HARPAR_MARVIN: LaHarparMarvinDialogueType = {
     id: MarvinDialogue.default,
     messageKey: `${NS}:default.message`,
     options: [
+      {
+        responseKey: `${NS}:default.coldForge`,
+        results: [{
+          visibilityConditions: [{ type: 'quest', questId: QuestID.theColdForge, questState: QuestState.readyToAdvance, step: 3 }],
+          next: MarvinDialogue.coldForgeRecord,
+          effects: [{ type: 'quest', questId: QuestID.theColdForge, action: 'advance' }],
+        }],
+      },
+      {
+        responseKey: `${NS}:default.registerSeal`,
+        results: [{
+          visibilityConditions: [
+            { type: 'item', itemId: ItemID.pathfindersSeal, amount: 1 },
+            { type: 'stat', stat: 'upgradedDropChance', comparison: 'lte', amount: 0, hidden: true },
+          ],
+          requirementsNeeded: [{ type: 'item', itemId: ItemID.pathfindersSeal, amount: 1 }],
+          effects: [{ type: 'registerPathfindersSeal' }],
+          next: MarvinDialogue.sealRegistered,
+        }],
+      },
+      {
+        responseKey: `${NS}:default.sealReminder`,
+        results: [{
+          visibilityConditions: [{ type: 'stat', stat: 'upgradedDropChance', comparison: 'gte', amount: 1, hidden: true }],
+          next: MarvinDialogue.sealReminder,
+        }],
+      },
       {
         responseKey: `${NS}:default.whatIsThisPlace`,
         results: [{ next: MarvinDialogue.whatIsThisPlace1 }],
@@ -196,6 +230,35 @@ const LA_HARPAR_MARVIN: LaHarparMarvinDialogueType = {
         responseKey: `${NS}:taskInProgress.back`,
         results: [{ next: MarvinDialogue.default }],
       },
+    ],
+  },
+  [MarvinDialogue.coldForgeRecord]: {
+    id: MarvinDialogue.coldForgeRecord,
+    messageKey: `${NS}:coldForgeRecord.message`,
+    options: [
+      { responseKey: `${NS}:coldForgeRecord.opt1`, results: [{ next: MarvinDialogue.coldForgeSalvage }] },
+      { responseKey: `${NS}:coldForgeRecord.opt2`, results: [{ next: MarvinDialogue.default }] },
+    ],
+  },
+  [MarvinDialogue.coldForgeSalvage]: {
+    id: MarvinDialogue.coldForgeSalvage,
+    messageKey: `${NS}:coldForgeSalvage.message`,
+    options: [
+      { responseKey: `${NS}:coldForgeSalvage.opt1`, results: [{ next: MarvinDialogue.default }] },
+    ],
+  },
+  [MarvinDialogue.sealRegistered]: {
+    id: MarvinDialogue.sealRegistered,
+    messageKey: `${NS}:sealRegistered.message`,
+    options: [
+      { responseKey: `${NS}:sealRegistered.opt1`, results: [{ next: MarvinDialogue.default }] },
+    ],
+  },
+  [MarvinDialogue.sealReminder]: {
+    id: MarvinDialogue.sealReminder,
+    messageKey: `${NS}:sealReminder.message`,
+    options: [
+      { responseKey: `${NS}:sealReminder.opt1`, results: [{ next: MarvinDialogue.default }] },
     ],
   },
 }

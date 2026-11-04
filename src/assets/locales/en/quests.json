@@ -19,7 +19,8 @@
     "safePassage": "Safe Passage",
     "lastOrders": "Last Orders",
     "aCleanCure": "A Clean Cure",
-    "rootsAndRafters": "Roots and Rafters"
+    "rootsAndRafters": "Roots and Rafters",
+    "theColdForge": "The Cold Forge"
   },
   "requirements": {
     "waveKillCount": "{{ amount }} KC on wave {{ wave }} in {{ zone }}",
@@ -58,5 +59,14 @@
     "turnInAll_kept": "Hand over all full bundles: {{ amount }} {{ item }} (have {{ held }}, {{ kept }} kept for quests)",
     "tierUp": "{{ town }} now sees you as {{ tier }}",
     "progressLabel": "{{ town }} reputation"
+  },
+  "steps": {
+    "theColdForge": {
+      "1": "Ask Ludo Crane at Lirold's Arena what happened to Phurgo's delivery cart.",
+      "2": "Recover Phurgo's Forge Tongs from Goblin Scavengers in the Mountain Pass and return them to Phurgo.",
+      "3": "Ask Marvin at the Exploration Guild in La Harpar to check Phurgo's old delivery record.",
+      "4": "Bring Phurgo one Fish & Apple Pie at Lirold's Forge.",
+      "5": "Bring Phurgo 10 Ancient Wood for charcoal at Lirold's Forge."
+    }
   }
 }

@@ -7,6 +7,7 @@ import { EquipmentSlot } from '../../enums/equipment-slot.enum'
 export const RingsItemsData: Partial<Record<ItemID, Item>> = {
   [ItemID.joshsHeirloom]: {
     id: ItemID.joshsHeirloom,
+    unique: true,
     tier: ItemTier.uncommon,
     url: './assets/img/items/joshsHeirloom.png',
     value: -1,

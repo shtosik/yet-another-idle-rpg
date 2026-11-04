@@ -4,8 +4,9 @@
 // re-running this shows the effect. Expected values only: no shinies, no spells, no consumables.
 // --weaknesses adds a separate table: kill time per zone with the Weaknesses skill and one strike spell per element.
 // --food adds a table: each food's stats alone and with the Tavern Cat's food effect multiplier.
+// --upgrades adds merge costs through +5, including all attempts to build both copies at every level.
 //
-// Usage: npm run sim [-- --waves] [-- --weaknesses] [-- --reputation] [-- --food]   (--waves also prints every wave of every zone)
+// Usage: npm run sim [-- --waves] [-- --weaknesses] [-- --reputation] [-- --food] [-- --upgrades]
 
 import { build } from 'esbuild'
 import { mkdirSync, readFileSync } from 'node:fs'
@@ -40,6 +41,9 @@ await build({
       export { default as ITEM_DATA } from 'data/items-data'
       export { ItemID } from 'enums/ids/item-id.enum'
       export { ItemType } from 'enums/items/item-type.enum'
+      export { EquipmentSlot } from 'enums/equipment-slot.enum'
+      export { UPGRADE_COST_FACTOR } from 'data/upgrade-data'
+      export { mergeCost } from 'app/store/player/merge'
       export { consumableModifiers, foodMultiplierOf } from 'app/store/player/stats'
     `,
     resolveDir: SRC,
@@ -54,6 +58,20 @@ await build({
   logLevel: 'error',
 })
 const D = await import(pathToFileURL(outFile).href + `?t=${Date.now()}`)
+
+if (process.argv.includes('--upgrades')) {
+  console.log(`\nGear merge costs (gold), k = ${D.UPGRADE_COST_FACTOR}; 32 +0 copies for one +5`)
+  console.table(Object.values(D.ITEM_DATA)
+    .filter(item => item.type === D.ItemType.equipment && item.slot !== D.EquipmentSlot.pet && !item.unique)
+    .map(item => {
+      const costs = Array.from({ length: 5 }, (_, level) => D.mergeCost(item.value, level))
+      return {
+        item: D.ItemID[item.id],
+        ...Object.fromEntries(costs.map((cost, level) => [`+${level} -> +${level + 1}`, cost])),
+        'Total from +0 copies': costs.reduce((total, cost, level) => total + cost * 2 ** (4 - level), 0),
+      }
+    }))
+}
 
 // ---------------------------------------------------------------------------
 // Assumptions (tune here)
