@@ -3,6 +3,19 @@
 // Bundles the TS data modules with esbuild, imports the bundle, and prints
 // one `file: problem` line per finding. Errors exit 1; warnings only print.
 //
+// Checks, in order (search for `// N.` to jump to one; add a new check as the next number):
+//   1. Enum <-> data coverage: every enum id has data and every data key is an enum id
+//   2. Cross-entity references: ids inside data point at existing entities
+//   3. Dialogue graphs: node links resolve, no unreachable nodes
+//   4. i18n: keys used by data and templates exist in src/assets/locales/en
+//   5. Asset URLs: image paths in data exist
+//   6. Doc references: backticked paths in agent-facing docs exist
+//   7. Version and changelog format
+//   8. Component styles and templates: no inline <svg>, no unused BEM classes
+//   9. Codex skills mirror .claude/skills
+//  10. Agent and skill frontmatter parses (description quoting)
+//  11. docs/ideas/README.md statuses match each idea file's Status line
+//
 // Usage: npm run validate
 
 import { build } from 'esbuild'
@@ -637,6 +650,35 @@ for (const f of walkFiles(APP, '.ts')) {
 // 9. Codex skills: .agents/skills mirrors the shared skills in .claude/skills.
 
 for (const p of staleCodexSkills()) error(p, 'out of sync with .claude/skills: run `npm run sync-skills`')
+
+// ---------------------------------------------------------------------------
+// 10. Agent and skill frontmatter: an unquoted YAML value can't contain ': ' or ' #'. Claude Code drops a file
+//     whose frontmatter doesn't parse without any error, so the agent or skill silently goes missing.
+
+for (const f of [...walkFiles(join(ROOT, '.claude', 'agents'), '.md'), ...walkFiles(join(ROOT, '.claude', 'skills'), 'SKILL.md')]) {
+  const frontmatter = /^---\r?\n([\s\S]*?)\r?\n---/.exec(readFileSync(f, 'utf8'))?.[1] ?? ''
+  // A plain value may wrap onto indented lines; they are part of the same value.
+  for (const [, key, value] of frontmatter.matchAll(/^([\w-]+):[ \t]+(.+(?:\r?\n[ \t]+(?!- ).+)*)/gm)) {
+    if (/^["'[{>|]/.test(value)) continue
+    if (/: | #/.test(value)) error(repoPath(f), `frontmatter '${key}' has ': ' or ' #' unquoted, so it doesn't parse: wrap the value in double quotes`)
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 11. Idea statuses: docs/ideas/README.md lists one status word per idea; the idea file's **Status:** line starts with it.
+
+{
+  const IDEAS = join(ROOT, 'docs', 'ideas')
+  const STATUSES = ['Proposed', 'Accepted', 'In progress', 'Done', 'Noted', 'Open']
+  const readme = 'docs/ideas/README.md'
+  for (const [, file, status] of readFileSync(join(IDEAS, 'README.md'), 'utf8').matchAll(/^\|[^|]*\]\((?:\.\/)?([\w.-]+\.md)\)[^|]*\|[^|]*\|\s*([^|]*?)\s*\|/gm)) {
+    if (!STATUSES.includes(status)) { error(readme, `${file}: status '${status}' is not one of ${STATUSES.join(', ')}`); continue }
+    if (!existsSync(join(IDEAS, file))) { error(readme, `links missing file ${file}`); continue }
+    const line = /\*\*Status:\*\*[ \t]*([^\r\n]*)/.exec(readFileSync(join(IDEAS, file), 'utf8'))?.[1]
+    if (line === undefined) error(`docs/ideas/${file}`, `no '**Status:** ${status}' line`)
+    else if (!line.startsWith(status)) error(`docs/ideas/${file}`, `Status line '${line.slice(0, 40)}…' doesn't start with '${status}', the README status`)
+  }
+}
 
 // ---------------------------------------------------------------------------
 

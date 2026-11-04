@@ -1,5 +1,7 @@
 # Battle UI redesign review
 
+**Scope:** M · **Status:** Proposed: review findings; fixes proposed
+
 ## Visual pass - 31 October 2026
 
 Played the existing server at http://localhost:4310 using Playwright MCP. Verified window.dev, read its implementation and arena instructions, and used its commands plus normal UI interactions; no localStorage edits. Captured viewport screenshots in .codex-shots/ at **1440x900, 1024x768, 390x844 and 360x740**. Files use the state prefixes listed below and a width suffix. These local evidence files are uncommitted.

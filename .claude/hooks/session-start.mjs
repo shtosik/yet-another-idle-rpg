@@ -1,5 +1,7 @@
 // SessionStart hook: session-wide reminders plus where this checkout stands against origin/staging,
 // so a session doesn't read a stale local branch (AGENTS.md: explore and develop on origin/staging).
+// A clean `staging` checkout with no local commits is fast-forwarded, so the docs, skills and agents
+// sessions load from it stay current.
 import { execFileSync } from 'node:child_process'
 
 const git = (...args) => {
@@ -16,7 +18,14 @@ const notes = [
 
 const fetched = git('fetch', 'origin', 'staging', '--quiet') !== null
 const branch = git('branch', '--show-current') || 'detached HEAD'
-const counts = git('rev-list', '--left-right', '--count', 'HEAD...origin/staging')
+let counts = git('rev-list', '--left-right', '--count', 'HEAD...origin/staging')
+const [ahead0, behind0] = counts ? counts.split(/\s+/).map(Number) : []
+// Tracked changes block it; an untracked or ignored file the merge would overwrite makes it abort.
+if (fetched && branch === 'staging' && ahead0 === 0 && behind0 > 0 && git('status', '--porcelain', '--untracked-files=no') === ''
+  && git('merge', '--ff-only', '--no-overwrite-ignore', '--quiet', 'origin/staging') !== null) {
+  notes.push(`Fast-forwarded staging by ${behind0} commit(s) to origin/staging.`)
+  counts = git('rev-list', '--left-right', '--count', 'HEAD...origin/staging')
+}
 if (counts) {
   const [ahead, behind] = counts.split(/\s+/).map(Number)
   notes.push(`Checkout is on ${branch}: ${ahead} commit(s) not on origin/staging, ${behind} commit(s) of origin/staging missing${fetched ? '' : ' (fetch failed, origin/staging may be stale)'}.`

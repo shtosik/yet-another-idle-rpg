@@ -1,6 +1,6 @@
 # Wave variety, wave scaling & boss waves
 
-**Scope:** M · **Status:** Wave scaling done 2026-10-22 (`feat/gold-selling`); variety proposed
+**Scope:** M · **Status:** In progress: wave scaling done 2026-10-22 (`feat/gold-selling`); variety proposed
 
 Later waves in a zone scale enemy HP and rewards; waves can also get a mixed enemy pool, an elite every N waves, and a zone-boss wave with a guaranteed drop.
 

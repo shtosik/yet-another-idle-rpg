@@ -24,7 +24,7 @@ const inMainCheckout = dir => {
 
 const STORAGE_WRITE = /localStorage\s*\.\s*(setItem|removeItem|clear)\b|localStorage\s*(\.\s*\w+|\[[^\]]+\])\s*=(?!=)|\bdelete\s+localStorage\b/
 if (/javascript_tool$/.test(tool) && STORAGE_WRITE.test(text)) {
-  block('Blocked: set game state through window.dev (dev.reset(), dev.unlockAll(), dev.giveItem(...); list in dev-cheats.component.ts), not localStorage. Read state with dev.state().')
+  block('Blocked: set game state through window.dev (dev.reset(), dev.unlockAll(), dev.giveItem(...); await dev.help() lists them), not localStorage. Read state with dev.state().')
 }
 
 // `git [global options] switch …` always changes branch; `git checkout … -- <paths>` only restores files.

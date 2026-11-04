@@ -19,7 +19,7 @@ Preconditions:
 
 - Doctor passes; `Battle` tab active.
 - Nothing equipped in `weapon`: `JSON.parse(localStorage.getItem('playerStore')).state.equipment.weapon` is `null`.
-- One machete in the inventory: `dev.giveItem(26)` (`ItemID.machete`), or the cheat bar's `give machete` button.
+- One machete in the inventory: `dev.giveItem('machete')`, or the cheat bar's `give machete` button.
 
 - **Before.** `javascript_tool`: `({ inv: document.querySelectorAll('app-inventory .item').length, slots: [...document.querySelectorAll('app-equipment-slot')].map(s => s.querySelector('.item') ? 'ITEM' : s.textContent.trim()) })`. `inv` is 1, first slot reads `weapon`.
 - **Equip.** Get the click point for `app-inventory .item` with the scroll-and-scale snippet in SKILL.md (Drive), take a screenshot, then `computer` `left_click` that coordinate. Re-read: `inv` is 0, first slot is `ITEM`; the Combat stats `Attack power` is higher than before.

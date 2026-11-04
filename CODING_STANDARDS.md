@@ -22,6 +22,7 @@ Judgement rules for writing and review. Mechanical rules are checks instead: `np
 
 ## Structure
 
+- **A fix closes its docs.** A PR that fixes an entry in `docs/ideas/known-issues.md` deletes the entry; a PR that ships an idea updates the idea file's `**Status:**` line and the `docs/ideas/README.md` row.
 - **One component per tab or panel section.** A template that switches between several large views splits each view into its own component.
 - **A component's styles cover only its own template.** The game grid in `game.component.html`/`.sass` places panels by host class (`.stats`, `.inventory`, ...); don't reuse those names inside components.
 

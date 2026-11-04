@@ -1,6 +1,6 @@
 # Consumables & buff slots
 
-**Scope:** M · **Status:** v1 implemented on `feat/consumables` (food + potion slots, 6 foods, Minor Mana Potion, auto-eat node, batch crafting)
+**Scope:** M · **Status:** Done: v1 implemented on `feat/consumables` (food + potion slots, 6 foods, Minor Mana Potion, auto-eat node, batch crafting)
 
 > **Follow-up:** recipes move into Camp stations (Cooking, Alchemy). Potions/elixirs unlock in Mawood. See [Camp & crafting stations](crafting-stations.md).
 
