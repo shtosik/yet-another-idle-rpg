@@ -197,5 +197,6 @@ export enum ItemID {
     greaterManaPotionRecipe = 178,
     petLaHarparCat = 179,
     petMawoodMoth = 180,
-    toricsForgeTongs = 181,
+    phurgosForgeTongs = 181,
+    pathfindersSeal = 182,
 }

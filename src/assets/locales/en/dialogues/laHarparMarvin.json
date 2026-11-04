@@ -16,7 +16,9 @@
     "taskStatus": "How are my contracts going?",
     "store": "Show me the guild store.",
     "goodbye": "See you around, Marvin.",
-    "coldForge": "Can you check Toric's last Slatefall delivery?"
+    "coldForge": "Can you check Phurgo's last Slatefall delivery?",
+    "registerSeal": "Register this Pathfinder's Seal.",
+    "sealReminder": "What did the Pathfinder's Seal teach me?"
   },
   "whatIsThisPlace1": {
     "message": "We map the unknown and thin out the dangers. Every monster you hunt under our contract earns you Explorer Tokens. Complete enough tasks and I'll authorize expeditions into deeper, more dangerous territories.",
@@ -40,12 +42,21 @@
     "back": "Actually, not yet."
   },
   "coldForgeRecord": {
-    "message": "Toric's last Slatefall load: worked iron and his own tools, recorded here before the road closed. He can work salvage while the mine stays shut, but get him to stop for a meal first. One Fish & Apple Pie should do it; the recipe is sold here in La Harpar.",
+    "message": "Phurgo's last Slatefall load: worked iron and his own tools, recorded here before the road closed. He can work salvage while the mine stays shut, but get him to stop for a meal first. One Fish & Apple Pie should do it; the recipe is sold here in La Harpar.",
     "opt1": "Is salvage Exploration Guild business?",
     "opt2": "I'll bring him a pie."
   },
+  "sealEffect": "Register Pathfinder's Seal",
+  "sealRegistered": {
+    "message": "Your name's in the salvage register. Look along the grain, check the seams, and keep the pieces somebody else would pass over. There's sound work out there, if you know where to look.",
+    "opt1": "I'll put that to use."
+  },
+  "sealReminder": {
+    "message": "Look along the grain and check the seams; sound work is often overlooked. Once you've learned to spot it, the lesson stays with you. Another seal won't teach it twice.",
+    "opt1": "Thanks, Marvin."
+  },
   "coldForgeSalvage": {
-    "message": "We map the unknown and bring useful things home. Recovered gear goes into our salvage register, and a trained eye learns to spot the sound pieces. Toric doesn't need our register to light his hearth.",
+    "message": "We map the unknown and bring useful things home. A Pathfinder's Seal earns a place in our salvage register and a lesson in spotting sound gear. Lirold's Arena keeps a few among its prizes; bring me one if you earn it on the sand.",
     "opt1": "Understood."
   }
 }

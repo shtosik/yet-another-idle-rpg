@@ -3,7 +3,7 @@ import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
 import { NpcID } from '../../../enums/map/npc-id.enum'
 
-export enum ToricDialogue {
+export enum PhurgoDialogue {
   default = 0,
   intro1,
   aboutForge,
@@ -21,33 +21,36 @@ export enum ToricDialogue {
   coldForgePie,
   coldForgeProgressFive,
   coldForgeComplete,
+  forgeWork,
+  forgeCost,
+  forgeLimits,
 }
 
-export type LiroldToricDialogueType = Record<ToricDialogue, DialogueNode<ToricDialogue>>
+export type LiroldPhurgoDialogueType = Record<PhurgoDialogue, DialogueNode<PhurgoDialogue>>
 
-const NS = 'dialogues/liroldToric'
+const NS = 'dialogues/liroldPhurgo'
 
-const LIROLD_TORIC: LiroldToricDialogueType = {
-  [ToricDialogue.intro1]: {
-    id: ToricDialogue.intro1,
+const LIROLD_PHURGO: LiroldPhurgoDialogueType = {
+  [PhurgoDialogue.intro1]: {
+    id: PhurgoDialogue.intro1,
     messageKey: `${NS}:intro1.message`,
     options: [
       {
         responseKey: `${NS}:intro1.opt1`,
         results: [
-          { next: ToricDialogue.aboutForge, effects: [{ type: 'flag', name: `met_${NpcID.liroldToric}` }] },
+          { next: PhurgoDialogue.aboutForge, effects: [{ type: 'flag', name: `met_${NpcID.liroldPhurgo}` }] },
         ],
       },
       {
         responseKey: `${NS}:intro1.opt2`,
         results: [
-          { closeDialogue: true, effects: [{ type: 'flag', name: `met_${NpcID.liroldToric}` }] },
+          { closeDialogue: true, effects: [{ type: 'flag', name: `met_${NpcID.liroldPhurgo}` }] },
         ],
       },
     ],
   },
-  [ToricDialogue.default]: {
-    id: ToricDialogue.default,
+  [PhurgoDialogue.default]: {
+    id: PhurgoDialogue.default,
     messageKey: `${NS}:default.message`,
     options: [
       {
@@ -55,7 +58,7 @@ const LIROLD_TORIC: LiroldToricDialogueType = {
         results: [
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.theColdForge, questState: QuestState.readyToAdvance, step: 5 }],
-            next: ToricDialogue.coldForgeComplete,
+            next: PhurgoDialogue.coldForgeComplete,
             effects: [{ type: 'quest', questId: QuestID.theColdForge, action: 'advance' }],
           },
         ],
@@ -65,7 +68,7 @@ const LIROLD_TORIC: LiroldToricDialogueType = {
         results: [
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.theColdForge, questState: QuestState.readyToAdvance, step: 4 }],
-            next: ToricDialogue.coldForgePie,
+            next: PhurgoDialogue.coldForgePie,
             effects: [{ type: 'quest', questId: QuestID.theColdForge, action: 'advance' }],
           },
         ],
@@ -75,7 +78,7 @@ const LIROLD_TORIC: LiroldToricDialogueType = {
         results: [
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.theColdForge, questState: QuestState.readyToAdvance, step: 2 }],
-            next: ToricDialogue.coldForgeTongs,
+            next: PhurgoDialogue.coldForgeTongs,
             effects: [{ type: 'quest', questId: QuestID.theColdForge, action: 'advance' }],
           },
         ],
@@ -85,23 +88,23 @@ const LIROLD_TORIC: LiroldToricDialogueType = {
         results: [
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.theColdForge, questState: QuestState.active, step: 5 }],
-            next: ToricDialogue.coldForgeProgressFive,
+            next: PhurgoDialogue.coldForgeProgressFive,
           },
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.theColdForge, questState: QuestState.active, step: 4 }],
-            next: ToricDialogue.coldForgeProgressFour,
+            next: PhurgoDialogue.coldForgeProgressFour,
           },
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.theColdForge, questState: QuestState.active, step: 3 }],
-            next: ToricDialogue.coldForgeProgressThree,
+            next: PhurgoDialogue.coldForgeProgressThree,
           },
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.theColdForge, questState: QuestState.active, step: 2 }],
-            next: ToricDialogue.coldForgeProgressTwo,
+            next: PhurgoDialogue.coldForgeProgressTwo,
           },
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.theColdForge, questState: QuestState.active, step: 1 }],
-            next: ToricDialogue.coldForgeProgressOne,
+            next: PhurgoDialogue.coldForgeProgressOne,
           },
         ],
       },
@@ -110,7 +113,7 @@ const LIROLD_TORIC: LiroldToricDialogueType = {
         results: [
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.theColdForge, questState: QuestState.available }],
-            next: ToricDialogue.coldForgeOffer,
+            next: PhurgoDialogue.coldForgeOffer,
           },
         ],
       },
@@ -125,25 +128,34 @@ const LIROLD_TORIC: LiroldToricDialogueType = {
         ],
       },
       {
+        responseKey: `${NS}:default.opt11`,
+        results: [
+          {
+            visibilityConditions: [{ type: 'quest', questId: QuestID.theColdForge, questState: QuestState.completed }],
+            next: PhurgoDialogue.forgeWork,
+          },
+        ],
+      },
+      {
         responseKey: `${NS}:default.opt7`,
         results: [
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.theColdForge, questState: QuestState.completed }],
-            next: ToricDialogue.aboutForgeRestored,
+            next: PhurgoDialogue.aboutForgeRestored,
           },
-          { next: ToricDialogue.aboutForge },
+          { next: PhurgoDialogue.aboutForge },
         ],
       },
       {
         responseKey: `${NS}:default.opt8`,
         results: [
-          { next: ToricDialogue.aboutPie },
+          { next: PhurgoDialogue.aboutPie },
         ],
       },
       {
         responseKey: `${NS}:default.opt9`,
         results: [
-          { next: ToricDialogue.aboutHome },
+          { next: PhurgoDialogue.aboutHome },
         ],
       },
       {
@@ -154,8 +166,8 @@ const LIROLD_TORIC: LiroldToricDialogueType = {
       },
     ],
   },
-  [ToricDialogue.aboutForge]: {
-    id: ToricDialogue.aboutForge,
+  [PhurgoDialogue.aboutForge]: {
+    id: PhurgoDialogue.aboutForge,
     messageKey: `${NS}:aboutForge.message`,
     options: [
       {
@@ -163,9 +175,9 @@ const LIROLD_TORIC: LiroldToricDialogueType = {
         results: [
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.theColdForge, questState: QuestState.available }],
-            next: ToricDialogue.coldForgeOffer,
+            next: PhurgoDialogue.coldForgeOffer,
           },
-          { next: ToricDialogue.default },
+          { next: PhurgoDialogue.default },
         ],
       },
       {
@@ -176,8 +188,8 @@ const LIROLD_TORIC: LiroldToricDialogueType = {
       },
     ],
   },
-  [ToricDialogue.aboutForgeRestored]: {
-    id: ToricDialogue.aboutForgeRestored,
+  [PhurgoDialogue.aboutForgeRestored]: {
+    id: PhurgoDialogue.aboutForgeRestored,
     messageKey: `${NS}:aboutForgeRestored.message`,
     options: [
       {
@@ -193,97 +205,135 @@ const LIROLD_TORIC: LiroldToricDialogueType = {
       {
         responseKey: `${NS}:aboutForgeRestored.opt2`,
         results: [
-          { next: ToricDialogue.default },
+          { next: PhurgoDialogue.default },
         ],
       },
     ],
   },
-  [ToricDialogue.aboutPie]: {
-    id: ToricDialogue.aboutPie,
+  [PhurgoDialogue.forgeWork]: {
+    id: PhurgoDialogue.forgeWork,
+    messageKey: `${NS}:forgeWork.message`,
+    options: [
+      {
+        responseKey: `${NS}:forgeWork.opt1`,
+        results: [{ next: PhurgoDialogue.forgeCost }],
+      },
+      {
+        responseKey: `${NS}:forgeWork.opt2`,
+        results: [{ next: PhurgoDialogue.default }],
+      },
+    ],
+  },
+  [PhurgoDialogue.forgeCost]: {
+    id: PhurgoDialogue.forgeCost,
+    messageKey: `${NS}:forgeCost.message`,
+    options: [
+      {
+        responseKey: `${NS}:forgeCost.opt1`,
+        results: [{ next: PhurgoDialogue.forgeLimits }],
+      },
+      {
+        responseKey: `${NS}:forgeCost.opt2`,
+        results: [{ next: PhurgoDialogue.default }],
+      },
+    ],
+  },
+  [PhurgoDialogue.forgeLimits]: {
+    id: PhurgoDialogue.forgeLimits,
+    messageKey: `${NS}:forgeLimits.message`,
+    options: [
+      {
+        responseKey: `${NS}:forgeLimits.opt1`,
+        results: [{ next: PhurgoDialogue.default }],
+      },
+    ],
+  },
+  [PhurgoDialogue.aboutPie]: {
+    id: PhurgoDialogue.aboutPie,
     messageKey: `${NS}:aboutPie.message`,
     options: [
       {
         responseKey: `${NS}:aboutPie.opt1`,
         results: [
-          { next: ToricDialogue.default },
+          { next: PhurgoDialogue.default },
         ],
       },
     ],
   },
-  [ToricDialogue.aboutHome]: {
-    id: ToricDialogue.aboutHome,
+  [PhurgoDialogue.aboutHome]: {
+    id: PhurgoDialogue.aboutHome,
     messageKey: `${NS}:aboutHome.message`,
     options: [
       {
         responseKey: `${NS}:aboutHome.opt1`,
         results: [
-          { next: ToricDialogue.aboutHomeLife },
+          { next: PhurgoDialogue.aboutHomeLife },
         ],
       },
       {
         responseKey: `${NS}:aboutHome.opt2`,
         results: [
-          { next: ToricDialogue.aboutLeaving },
+          { next: PhurgoDialogue.aboutLeaving },
         ],
       },
       {
         responseKey: `${NS}:aboutHome.opt3`,
         results: [
-          { next: ToricDialogue.default },
+          { next: PhurgoDialogue.default },
         ],
       },
     ],
   },
-  [ToricDialogue.aboutHomeLife]: {
-    id: ToricDialogue.aboutHomeLife,
+  [PhurgoDialogue.aboutHomeLife]: {
+    id: PhurgoDialogue.aboutHomeLife,
     messageKey: `${NS}:aboutHomeLife.message`,
     options: [
       {
         responseKey: `${NS}:aboutHomeLife.opt1`,
         results: [
-          { next: ToricDialogue.aboutLeaving },
+          { next: PhurgoDialogue.aboutLeaving },
         ],
       },
       {
         responseKey: `${NS}:aboutHomeLife.opt2`,
         results: [
-          { next: ToricDialogue.default },
+          { next: PhurgoDialogue.default },
         ],
       },
     ],
   },
-  [ToricDialogue.aboutLeaving]: {
-    id: ToricDialogue.aboutLeaving,
+  [PhurgoDialogue.aboutLeaving]: {
+    id: PhurgoDialogue.aboutLeaving,
     messageKey: `${NS}:aboutLeaving.message`,
     options: [
       {
         responseKey: `${NS}:aboutLeaving.opt1`,
         results: [
-          { next: ToricDialogue.default },
+          { next: PhurgoDialogue.default },
         ],
       },
     ],
   },
-  [ToricDialogue.coldForgeOffer]: {
-    id: ToricDialogue.coldForgeOffer,
+  [PhurgoDialogue.coldForgeOffer]: {
+    id: PhurgoDialogue.coldForgeOffer,
     messageKey: `${NS}:coldForgeOffer.message`,
     options: [
       {
         responseKey: `${NS}:coldForgeOffer.opt1`,
         results: [
-          { next: ToricDialogue.default, effects: [{ type: 'quest', questId: QuestID.theColdForge, action: 'start' }] },
+          { next: PhurgoDialogue.default, effects: [{ type: 'quest', questId: QuestID.theColdForge, action: 'start' }] },
         ],
       },
       {
         responseKey: `${NS}:coldForgeOffer.opt2`,
         results: [
-          { next: ToricDialogue.default },
+          { next: PhurgoDialogue.default },
         ],
       },
     ],
   },
-  [ToricDialogue.coldForgeProgressOne]: {
-    id: ToricDialogue.coldForgeProgressOne,
+  [PhurgoDialogue.coldForgeProgressOne]: {
+    id: PhurgoDialogue.coldForgeProgressOne,
     messageKey: `${NS}:coldForgeProgressOne.message`,
     options: [
       {
@@ -295,13 +345,13 @@ const LIROLD_TORIC: LiroldToricDialogueType = {
       {
         responseKey: `${NS}:coldForgeProgressOne.opt2`,
         results: [
-          { next: ToricDialogue.default },
+          { next: PhurgoDialogue.default },
         ],
       },
     ],
   },
-  [ToricDialogue.coldForgeProgressTwo]: {
-    id: ToricDialogue.coldForgeProgressTwo,
+  [PhurgoDialogue.coldForgeProgressTwo]: {
+    id: PhurgoDialogue.coldForgeProgressTwo,
     messageKey: `${NS}:coldForgeProgressTwo.message`,
     options: [
       {
@@ -313,25 +363,25 @@ const LIROLD_TORIC: LiroldToricDialogueType = {
       {
         responseKey: `${NS}:coldForgeProgressTwo.opt2`,
         results: [
-          { next: ToricDialogue.default },
+          { next: PhurgoDialogue.default },
         ],
       },
     ],
   },
-  [ToricDialogue.coldForgeTongs]: {
-    id: ToricDialogue.coldForgeTongs,
+  [PhurgoDialogue.coldForgeTongs]: {
+    id: PhurgoDialogue.coldForgeTongs,
     messageKey: `${NS}:coldForgeTongs.message`,
     options: [
       {
         responseKey: `${NS}:coldForgeTongs.opt1`,
         results: [
-          { next: ToricDialogue.default },
+          { next: PhurgoDialogue.default },
         ],
       },
     ],
   },
-  [ToricDialogue.coldForgeProgressThree]: {
-    id: ToricDialogue.coldForgeProgressThree,
+  [PhurgoDialogue.coldForgeProgressThree]: {
+    id: PhurgoDialogue.coldForgeProgressThree,
     messageKey: `${NS}:coldForgeProgressThree.message`,
     options: [
       {
@@ -343,13 +393,13 @@ const LIROLD_TORIC: LiroldToricDialogueType = {
       {
         responseKey: `${NS}:coldForgeProgressThree.opt2`,
         results: [
-          { next: ToricDialogue.default },
+          { next: PhurgoDialogue.default },
         ],
       },
     ],
   },
-  [ToricDialogue.coldForgeProgressFour]: {
-    id: ToricDialogue.coldForgeProgressFour,
+  [PhurgoDialogue.coldForgeProgressFour]: {
+    id: PhurgoDialogue.coldForgeProgressFour,
     messageKey: `${NS}:coldForgeProgressFour.message`,
     options: [
       {
@@ -361,25 +411,25 @@ const LIROLD_TORIC: LiroldToricDialogueType = {
       {
         responseKey: `${NS}:coldForgeProgressFour.opt2`,
         results: [
-          { next: ToricDialogue.default },
+          { next: PhurgoDialogue.default },
         ],
       },
     ],
   },
-  [ToricDialogue.coldForgePie]: {
-    id: ToricDialogue.coldForgePie,
+  [PhurgoDialogue.coldForgePie]: {
+    id: PhurgoDialogue.coldForgePie,
     messageKey: `${NS}:coldForgePie.message`,
     options: [
       {
         responseKey: `${NS}:coldForgePie.opt1`,
         results: [
-          { next: ToricDialogue.default },
+          { next: PhurgoDialogue.default },
         ],
       },
     ],
   },
-  [ToricDialogue.coldForgeProgressFive]: {
-    id: ToricDialogue.coldForgeProgressFive,
+  [PhurgoDialogue.coldForgeProgressFive]: {
+    id: PhurgoDialogue.coldForgeProgressFive,
     messageKey: `${NS}:coldForgeProgressFive.message`,
     options: [
       {
@@ -391,13 +441,13 @@ const LIROLD_TORIC: LiroldToricDialogueType = {
       {
         responseKey: `${NS}:coldForgeProgressFive.opt2`,
         results: [
-          { next: ToricDialogue.default },
+          { next: PhurgoDialogue.default },
         ],
       },
     ],
   },
-  [ToricDialogue.coldForgeComplete]: {
-    id: ToricDialogue.coldForgeComplete,
+  [PhurgoDialogue.coldForgeComplete]: {
+    id: PhurgoDialogue.coldForgeComplete,
     messageKey: `${NS}:coldForgeComplete.message`,
     options: [
       {
@@ -413,11 +463,11 @@ const LIROLD_TORIC: LiroldToricDialogueType = {
       {
         responseKey: `${NS}:coldForgeComplete.opt2`,
         results: [
-          { next: ToricDialogue.default },
+          { next: PhurgoDialogue.default },
         ],
       },
     ],
   },
 }
 
-export default LIROLD_TORIC
+export default LIROLD_PHURGO

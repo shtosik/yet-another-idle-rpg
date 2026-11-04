@@ -87,6 +87,8 @@ export interface ChestItem extends ItemData {
     type: ItemType.chest
     rolls: number
     loot: ChestLootEntry[]
+    /** Separate 1-in-`chance` item roll, suppressed while held or after its permanent benefit is registered. */
+    bonusRoll?: { itemId: ItemID; chance: number; registeredStat: PlayerStat }
 }
 
 export interface RecipeItem extends ItemData {

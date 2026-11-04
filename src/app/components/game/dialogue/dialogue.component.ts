@@ -158,6 +158,8 @@ export class DialogueComponent {
         return 'Open Shop'
       case 'forge':
         return i18next.t('forge:open')
+      case 'registerPathfindersSeal':
+        return i18next.t('dialogues/laHarparMarvin:sealEffect')
       case 'guild':
         switch (effect.action) {
           case 'acceptTask': return `Take task: ${effect.taskLength}`

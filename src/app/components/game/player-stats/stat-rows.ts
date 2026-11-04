@@ -54,6 +54,7 @@ export const STAT_GROUPS: StatGroup[] = [
       { stat: 'foodEffectMultiplier', format: 'multiplier' },
       { stat: 'offlineProgressRate', format: 'fraction', always: true },
       { stat: 'shinyChance', format: 'percent' },
+      { stat: 'upgradedDropChance', format: 'percent' },
       { stat: 'inventorySlots', format: 'number' },
       { stat: 'maxTaskSlots', format: 'number' },
       { stat: 'taskDoubleKillChance', format: 'percent' },

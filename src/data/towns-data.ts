@@ -121,7 +121,7 @@ export const TOWNS_DATA: Record<TownID, Town> = {
       {
         buildingId: TownBuildingID.liroldForge,
         position: { x: 25, y: 75 },
-        npcs: [{ id: NpcID.liroldToric, position: { x: 50, y: 50 } }],
+        npcs: [{ id: NpcID.liroldPhurgo, position: { x: 50, y: 50 } }],
         url: './assets/img/backgrounds/liroldForge.png',
       },
     ],
