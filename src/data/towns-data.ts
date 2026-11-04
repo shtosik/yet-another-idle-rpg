@@ -118,6 +118,12 @@ export const TOWNS_DATA: Record<TownID, Town> = {
         ],
         url: './assets/img/backgrounds/liroldArena.png',
       },
+      {
+        buildingId: TownBuildingID.liroldForge,
+        position: { x: 25, y: 75 },
+        npcs: [{ id: NpcID.liroldPhurgo, position: { x: 50, y: 50 } }],
+        url: './assets/img/backgrounds/liroldForge.png',
+      },
     ],
   },
   [TownID.mawood]: {

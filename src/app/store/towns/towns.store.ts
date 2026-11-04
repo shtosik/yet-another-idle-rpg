@@ -16,6 +16,8 @@ export interface TownsState {
     activeShopId: ShopID | null;
     /** Stock stage `activeShopId` was opened at (`ShopItem.minStage`). Not saved, like the shop. */
     activeShopStage: number;
+    /** Not saved: a reload never reopens the Forge. */
+    forgeOpen: boolean;
     /** Shops the player has opened through an NPC's dialogue; that NPC's frame then offers a direct Shop button. */
     npcShops: Partial<Record<NpcID, ShopID>>;
     /** Stage each of those NPCs opened their shop at, so the Shop button reopens it the same way. */
@@ -27,6 +29,7 @@ const initialState: TownsState = {
     selectedTownBuildingId: null,
     activeShopId: null,
     activeShopStage: 0,
+    forgeOpen: false,
     npcShops: {},
     npcShopStages: {},
 }
@@ -38,7 +41,7 @@ const SAVE_VERSION = 2
 export const TownsStore = signalStore(
     { providedIn: 'root' },
     withState(initialState),
-    withGameStateSync(STORE_KEY, initialState, { version: SAVE_VERSION, transientKeys: ['activeShopId', 'activeShopStage'] }),
+    withGameStateSync(STORE_KEY, initialState, { version: SAVE_VERSION, transientKeys: ['activeShopId', 'activeShopStage', 'forgeOpen'] }),
     withDevtools(STORE_KEY),
     withComputed((store) => ({
         selectedTownBuilding: (): TownBuilding | null => {
@@ -52,15 +55,21 @@ export const TownsStore = signalStore(
         resetState(): void {
             patchState(store, initialState)
         },
-        // Moving to another town or building closes any open shop; another town also leaves the building.
+        // Moving to another town or building closes the shop or Forge; another town also leaves the building.
         selectTown(townId: TownID): void {
-            patchState(store, { selectedTownId: townId, selectedTownBuildingId: null, activeShopId: null })
+            patchState(store, { selectedTownId: townId, selectedTownBuildingId: null, activeShopId: null, forgeOpen: false })
         },
         selectTownBuilding(townBuilding: TownBuilding | null): void {
-            patchState(store, { selectedTownBuildingId: townBuilding?.buildingId ?? null, activeShopId: null })
+            patchState(store, { selectedTownBuildingId: townBuilding?.buildingId ?? null, activeShopId: null, forgeOpen: false })
         },
         openShop(shopId: ShopID, stage = 0): void {
-            patchState(store, { activeShopId: shopId, activeShopStage: stage })
+            patchState(store, { activeShopId: shopId, activeShopStage: stage, forgeOpen: false })
+        },
+        openForge(): void {
+            patchState(store, { forgeOpen: true, activeShopId: null })
+        },
+        closeForge(): void {
+            patchState(store, { forgeOpen: false })
         },
         rememberNpcShop(npcId: NpcID, shopId: ShopID, stage = 0): void {
             if (store.npcShops()[npcId] === shopId && (store.npcShopStages()[npcId] ?? 0) === stage) return

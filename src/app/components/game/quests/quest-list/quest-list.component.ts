@@ -106,7 +106,7 @@ export class QuestListComponent {
     }))
     return [{
       id,
-      description: step.description,
+      description: i18next.t(`quests:steps.${QuestID[id]}.${status.step}`, { defaultValue: step.description }),
       requirements,
       ready: requirements.every(({ current, target }) => current >= target),
       pinned: pins.includes(id),

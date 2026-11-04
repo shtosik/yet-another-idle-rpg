@@ -1,6 +1,9 @@
+import { QuestID } from '../../../enums/ids/quest-id.enum'
+import { QuestState } from '../../../enums/quest-state.enum'
 import { DialogueNode } from '../../../interfaces/dialogues/dialogue-node.interface'
 import { NpcID } from '../../../enums/map/npc-id.enum'
 import { ARENA } from '../../arena-data'
+import { ItemID } from '../../../enums/ids/item-id.enum'
 
 export enum ArenaMasterDialogue {
   default = 0,
@@ -17,6 +20,8 @@ export enum ArenaMasterDialogue {
   claimed,
   running,
   cooldown,
+  coldForgeLead,
+  pathfindersSealInfo,
 }
 
 export type LiroldArenaMasterDialogueType = Record<ArenaMasterDialogue, DialogueNode<ArenaMasterDialogue>>
@@ -55,6 +60,14 @@ const LIROLD_ARENA_MASTER: LiroldArenaMasterDialogueType = {
     messageKey: `${NS}:default.message`,
     options: [
       {
+        responseKey: `${NS}:default.coldForge`,
+        results: [{
+          visibilityConditions: [{ type: 'quest', questId: QuestID.theColdForge, questState: QuestState.readyToAdvance, step: 1 }],
+          next: ArenaMasterDialogue.coldForgeLead,
+          effects: [{ type: 'quest', questId: QuestID.theColdForge, action: 'advance' }],
+        }],
+      },
+      {
         responseKey: `${NS}:default.claim`,
         results: [
           {
@@ -85,6 +98,16 @@ const LIROLD_ARENA_MASTER: LiroldArenaMasterDialogueType = {
       { responseKey: `${NS}:default.rules`, results: [{ next: ArenaMasterDialogue.rules }] },
       { responseKey: `${NS}:default.champions`, results: [{ next: ArenaMasterDialogue.champions }] },
       { responseKey: `${NS}:default.aboutArena`, results: [{ next: ArenaMasterDialogue.aboutArena }] },
+      {
+        responseKey: `${NS}:default.pathfindersSeal`,
+        results: [{
+          visibilityConditions: [
+            { type: 'item', itemId: ItemID.pathfindersSeal, amount: 1 },
+            { type: 'stat', stat: 'upgradedDropChance', comparison: 'lte', amount: 0, hidden: true },
+          ],
+          next: ArenaMasterDialogue.pathfindersSealInfo,
+        }],
+      },
       { responseKey: `${NS}:default.goodbye`, results: [{ next: ArenaMasterDialogue.default, closeDialogue: true }] },
     ],
   },
@@ -95,6 +118,13 @@ const LIROLD_ARENA_MASTER: LiroldArenaMasterDialogueType = {
     options: [
       { responseKey: `${NS}:rules.champions`, results: [{ next: ArenaMasterDialogue.champions }] },
       { responseKey: `${NS}:rules.ok`, results: [{ next: ArenaMasterDialogue.default }] },
+    ],
+  },
+  [ArenaMasterDialogue.pathfindersSealInfo]: {
+    id: ArenaMasterDialogue.pathfindersSealInfo,
+    messageKey: `${NS}:pathfindersSealInfo.message`,
+    options: [
+      { responseKey: `${NS}:pathfindersSealInfo.opt1`, results: [{ next: ArenaMasterDialogue.default }] },
     ],
   },
 
@@ -164,6 +194,13 @@ const LIROLD_ARENA_MASTER: LiroldArenaMasterDialogueType = {
     messageKey: `${NS}:cooldown.message`,
     options: [
       { responseKey: `${NS}:cooldown.ok`, results: [{ next: ArenaMasterDialogue.default }] },
+    ],
+  },
+  [ArenaMasterDialogue.coldForgeLead]: {
+    id: ArenaMasterDialogue.coldForgeLead,
+    messageKey: `${NS}:coldForgeLead.message`,
+    options: [
+      { responseKey: `${NS}:coldForgeLead.opt1`, results: [{ next: ArenaMasterDialogue.default }] },
     ],
   },
 }

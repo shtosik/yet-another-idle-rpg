@@ -15,6 +15,8 @@
     <button
       type="button"
       class="item__action"
+      [appForgeDrag]="forgeSelectable() ? { from: 'inventory', item: { id: item.id, tier, upgradeLevel: upgradeLevel() } } : null"
+      [attr.aria-description]="forgeSelectable() && forge.open() ? ('forge:chooseHint' | i18next) : null"
       [attr.aria-label]="displayName + ' ×' + amount"
       (click)="handleActivate($event)"
     >
@@ -39,6 +41,7 @@
     [ngSrc]="item.url"
     alt=""
     disableOptimizedSrcset
+    draggable="false"
     height="32"
     width="32"
   >
@@ -84,7 +87,7 @@
         <span class="stat">{{ 'items:grantsSpell' | i18next:{ spell: ('spells:names.' + SpellID[item.spell] + '.name') | i18next } }}</span>
       }
       @if (clickable) {
-        <span class="click">{{ 'items:rightClickToEquip' | i18next }}</span>
+        <span class="click">{{ (forgeSelectable() && forge.open() ? 'forge:chooseHint' : 'items:rightClickToEquip') | i18next }}</span>
       }
     }
     @if (item.type === ItemType.rewardsStats) {
@@ -107,6 +110,9 @@
     }
     @if (item.type === ItemType.chest) {
       <span class="stat">{{ 'items:chestRolls' | i18next:{ count: item.rolls } }}</span>
+      @if (item.bonusRoll; as bonus) {
+        <span class="stat">{{ 'items:chestBonus' | i18next:{ chance: bonus.chance, item: ('items:names.' + ItemID[bonus.itemId]) | i18next } }}</span>
+      }
     }
     @if (item.type === ItemType.spellScroll) {
       <span class="stat">{{ 'items:teachesSpell' | i18next:{ spell: ('spells:names.' + SpellID[item.spellId] + '.name') | i18next } }}</span>

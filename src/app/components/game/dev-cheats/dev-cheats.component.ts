@@ -98,6 +98,13 @@ export class DevCheatsComponent {
       this.townsStore.selectTownBuilding(TOWNS_DATA[TownID.laHarpar].buildings[0])
       this.townsStore.openShop(shopId)
     },
+    /** Opens the Forge over La Harpar's first building without adding any Forge building or NPC data. */
+    openForge: () => {
+      this.navigation.changeTab(GameTab.towns)
+      this.townsStore.selectTown(TownID.laHarpar)
+      this.townsStore.selectTownBuilding(TOWNS_DATA[TownID.laHarpar].buildings[0])
+      this.townsStore.openForge()
+    },
     /** Sets an enemy's lifetime kill count (bestiary ranks, zone mastery, quest kill steps). */
     setKills: (enemyId: EnemyID, count: number) =>
       this.playerStore.updateEnemyKillCount(enemyId, count - (this.playerStore.enemyKillCounts()[enemyId] ?? 0)),

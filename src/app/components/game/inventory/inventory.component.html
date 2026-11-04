@@ -12,9 +12,10 @@
       type="button"
       [attr.aria-label]="entry.full ? ('app:inventory.tabFullLabel' | i18next: { tab: name, count: entry.count }) : null"
       [attr.aria-selected]="selected"
+      [attr.aria-disabled]="forgeOpen() && entry.tab !== 'gear'"
       [attr.id]="'inventory-tab-' + entry.tab"
       [attr.tabindex]="selected ? 0 : -1"
-      [attr.title]="entry.full ? ('app:inventory.tabFull' | i18next: { tab: name }) : null"
+      [attr.title]="tabTitle(entry.tab, entry.full)"
       [class.active]="selected"
       [class.full]="entry.full"
       (click)="selectTab(entry.tab)"
@@ -41,11 +42,12 @@
         <app-slot>
           <app-inventory-slot
             [amount]="slotItem.amount"
+            [forgeSelectable]="forgeOpen()"
             [item]="Items[slotItem.id]"
             [tier]="slotItem.tier"
             [upgradeLevel]="slotItem.upgradeLevel ?? 0"
             (equipItem)="equipItem(slotItem)"
-            [destroyable]="slotItem.type !== ItemType.quest"
+            [destroyable]="!forgeOpen() && slotItem.type !== ItemType.quest"
             (useItem)="useItem(slotItem)"
             (destroyItem)="destroyItem(slotItem)"
           />
