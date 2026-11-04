@@ -1,6 +1,8 @@
 # The Cold Forge — Phurgo, Quest and dialogue
 
-**Status: implemented, 2026-11-04 (proposed 2026-11-01).** Lore companion to [Gear upgrading](gear-upgrading.md); its Owner decisions and mechanics remain authoritative. This file was the script for implementation; the shipped text is in `liroldPhurgo.json`, `laHarparMarvin.json` and `liroldArenaMaster.json`, and wins where they differ.
+**Status:** In progress
+
+Implemented 2026-11-04 (proposed 2026-11-01). Lore companion to [Gear upgrading](gear-upgrading.md); its Owner decisions and mechanics remain authoritative. This file was the script for implementation; the shipped text is in `liroldPhurgo.json`, `laHarparMarvin.json` and `liroldArenaMaster.json`, and wins where they differ.
 
 ## Lore already in the game
 
