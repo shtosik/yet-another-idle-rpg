@@ -269,11 +269,14 @@ export interface KillBatchResult {
 
 const STORE_KEY = 'playerStore'
 
+// Blocks are ordered by dependency (a block sees only what earlier blocks define), not by topic; each starts with
+// a label. Pure logic lives in the sibling files (stats.ts, inventory.ts, reputation.ts, zone-mastery.ts, ...).
 export const PlayerStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
   withGameStateSync(STORE_KEY, initialState, { version: SAVE_VERSION, migrations: SAVE_MIGRATIONS, transientKeys: ['manaRegenTimer'] }),
   withDevtools(STORE_KEY),
+  // Stats: derived `stats`, their sources, inventory capacity.
   withComputed((store, battleStore = inject(BattleStore)) => {
     // Buff and consumable timers tick constantly; only a change in what's active should recompute stats.
     const activeBuffs = computed(() => activeBuffSpellIds(battleStore.activeBuffs()), { equal: sameIds })
@@ -290,6 +293,7 @@ export const PlayerStore = signalStore(
       inventoryCapacity: computed(() => inventoryCapacity(modifiers())),
     }
   }),
+  // Spells: known and unseen.
   withComputed((store, battleStore = inject(BattleStore)) => {
     /** Spells from the skill tree plus spells from equipped gear. */
     const knownSpellIds = computed(() => [
@@ -308,6 +312,7 @@ export const PlayerStore = signalStore(
       unseenSpellCount: () => unseenSpells().length,
     }
   }),
+  // Guild rank and tasks, titles, bestiary, equipped weapon, zone mastery.
   withComputed((store) => ({
     /** One rank per `TASKS_PER_GUILD_RANK` completed tasks, no cap. Each rank adds a zone tier to the task pool. */
     guildRank: () => Math.floor(store.totalTasksCompleted() / TASKS_PER_GUILD_RANK),
@@ -342,6 +347,7 @@ export const PlayerStore = signalStore(
       ) as Record<ZoneID, ZoneStarProgress[]>
     }),
   })),
+  // Basic writes: stats, zone progress, kill counts, inventory and capacity, skill nodes, spell levels, guild tasks, tokens.
   withMethods((store) => ({
     resetState() {
       patchState(store, initialState)
@@ -519,6 +525,7 @@ export const PlayerStore = signalStore(
       return true
     },
   })),
+  // Equip and zone-star checks.
   withMethods((store) => ({
     canUnequip(slot: EquipmentSlotKey): boolean {
       const equipped = store.equipment()[slot]
@@ -547,6 +554,7 @@ export const PlayerStore = signalStore(
       return store.canFitItems(ZONES_DATA[zoneId].masteryReward.items)
     },
   })),
+  // Game actions: kills and drops, zone stars, selling, equipping, using items and chests, mana regen, crafting.
   withMethods((store) => ({
     processBattleEnd(enemyId: EnemyID, zoneId: ZoneID, currentWave: number, isShiny: boolean, activeQuestIds?: Set<QuestID>): ItemStack[] {
       const enemy = ENEMIES_DATA[enemyId]
@@ -789,6 +797,7 @@ export const PlayerStore = signalStore(
       return countItem(store.inventory(), id)
     },
   })),
+  // Lookups and unlocks: skills, zones, towns, titles, reputation, features, seen markers.
   withMethods((store) => ({
     hasSkillUnlocked(skillId: SkillNodeID): boolean {
       return !!store.unlockedNodes()[skillId]
@@ -872,6 +881,7 @@ export const PlayerStore = signalStore(
       if (fresh.length) patchState(store, { seenSpells: [...store.seenSpells(), ...fresh] })
     },
   })),
+  // Unlock rules (`data/unlock-conditions.ts`).
   withMethods((store) => ({
     isUnlockTargetUnlocked(target: UnlockTarget): boolean {
       switch (target.type) {

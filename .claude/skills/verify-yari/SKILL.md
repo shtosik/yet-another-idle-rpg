@@ -60,7 +60,7 @@ Run before the first drive and after anything surprising. Read-only.
 ## Drive
 
 - Click with `find` (accessible name) then `computer` `left_click` on the returned `ref`. That is a real pointer click. Use `javascript_tool` only to read state or to call `window.dev`.
-- Set up preconditions with `window.dev` (AGENTS.md rule: never edit `localStorage` to set state). Commands, from `src/app/components/game/dev-cheats/dev-cheats.component.ts`, take enum numbers: `dev.tab(GameTab)`, `dev.unlock('camp'|'skillTree'|'map'|'spellbook'|'towns')`, `dev.unlockAll()` (features, towns, zones), `dev.reset()`, `dev.giveItem(ItemID, amount?, tier?)`, `dev.equip(ItemID)`, `dev.unequip(slot)`, `dev.setZone(ZoneID)`, `dev.grantStat(stat, amount)`, `dev.learnSkill(SkillNodeID)`, `dev.openShop(ShopID)`, `dev.setKills(EnemyID, n)`, `dev.addShinyKills(ZoneID, n)`. Look IDs up in `src/enums/ids/*.enum.ts` (e.g. `GameTab.map = 5`, `ItemID.machete = 26`).
+- Set up preconditions with `window.dev` (AGENTS.md rule: never edit `localStorage` to set state). `await dev.help()` lists the commands with their arguments. IDs take enum member names or numbers: `dev.equip('machete')`, `dev.tab('map')`, `dev.setKills('crab', 50)`.
 - Read game state with `dev.state()` (every store plus derived `stats`, live), e.g. `dev.state().battle.currentZoneId`, instead of parsing `localStorage`. Prove what the player sees (kill count, XP, gold) from the DOM, and compare it with `dev.state()`. Read `localStorage` only to prove a change was saved.
 - Never use a `dev` call for the step under test: it sets the state the player's action should produce.
 - Read text with `textContent`, not `innerText`: the UI uppercases labels with CSS, so `innerText` returns `KILL COUNT` and regexes on `Kill count` miss.

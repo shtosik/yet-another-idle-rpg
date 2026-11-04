@@ -31,6 +31,18 @@ import { QuestID } from 'enums/ids/quest-id.enum'
 const DEV_FEATURES = ['camp', 'skillTree', 'map', 'spellbook', 'towns'] as const
 type DevFeature = typeof DEV_FEATURES[number]
 
+type NumericEnum = Record<string, string | number>
+/** An enum number or its member name: `dev.equip('machete')` is `dev.equip(ItemID.machete)`. */
+type Ref<E extends NumericEnum> = E[keyof E] | keyof E
+
+/** Resolves a member name to its enum number, so agents don't look numbers up in `src/enums`. */
+export function fromName<E extends NumericEnum>(e: E, kind: string, ref: Ref<E>): E[keyof E] {
+  if (typeof ref !== 'string') return ref as E[keyof E]
+  const value = e[ref]
+  if (typeof value !== 'number') throw new Error(`dev: no ${kind} named '${ref}'; names: ${Object.keys(e).filter(k => isNaN(Number(k))).join(', ')}`)
+  return value as E[keyof E]
+}
+
 // Cheat buttons for dev and testing builds. GameComponent renders it only when environment.cheats is on.
 @Component({
   selector: 'app-dev-cheats',
@@ -58,22 +70,26 @@ export class DevCheatsComponent {
 
   /**
    * `window.dev` in the browser console: puts the game into a state in one call when checking UI.
-   * IDs are the enum numbers (`ShopID`, `ZoneID`, `SkillNodeID`, `ItemID`, `EnemyID`, `QuestID`, `GameTab`).
+   * IDs are enum member names or numbers (`dev.equip('machete')`, `dev.tab('map')`); `dev.help()` lists the commands.
    */
-  private readonly devTools = {
-    tab: (tab: GameTab) => this.navigation.changeTab(tab),
-    setZone: (zoneId: ZoneID) => {
+  readonly commands = {
+    tab: (tab: Ref<typeof GameTab>) => this.navigation.changeTab(fromName(GameTab, 'GameTab', tab)),
+    setZone: (zone: Ref<typeof ZoneID>) => {
+      const zoneId = fromName(ZoneID, 'ZoneID', zone)
       this.playerStore.unlockZone(zoneId)
       this.battleStore.setZone(zoneId)
     },
     grantStat: (stat: PlayerStat, amount: number) => this.playerStore.updatePlayerStats([{ stat, amount }]),
     /** Learns the node and, first, whatever it requires (the first option of an `any`), granting the points. */
-    learnSkill: (nodeId: SkillNodeID): boolean => this.learnSkill(nodeId, 1),
-    giveItem: (itemId: ItemID, amount = 1, tier = ITEM_DATA[itemId].tier) =>
-      this.playerStore.addItems([{ id: itemId, tier, amount }]),
+    learnSkill: (node: Ref<typeof SkillNodeID>): boolean => this.learnSkill(fromName(SkillNodeID, 'SkillNodeID', node), 1),
+    giveItem: (item: Ref<typeof ItemID>, amount = 1, tier?: Ref<typeof ItemTier>) => {
+      const id = fromName(ItemID, 'ItemID', item)
+      this.playerStore.addItems([{ id, tier: this.tierOf(id, tier), amount }])
+    },
     /** Gives the item and equips it; false (with a console warning) when there's no room or it can't be equipped. */
-    equip: (itemId: ItemID, tier = ITEM_DATA[itemId].tier): boolean => {
-      const stack = { id: itemId, tier, amount: 1 }
+    equip: (itemRef: Ref<typeof ItemID>, tier?: Ref<typeof ItemTier>): boolean => {
+      const itemId = fromName(ItemID, 'ItemID', itemRef)
+      const stack = { id: itemId, tier: this.tierOf(itemId, tier), amount: 1 }
       if (!this.playerStore.canFitItems([stack])) {
         console.warn('dev.equip: no inventory space for the item')
         return false
@@ -90,18 +106,20 @@ export class DevCheatsComponent {
     },
     unequip: (slot: EquipmentSlotKey) => this.playerStore.unequipItem(slot),
     /** Opens the shop over La Harpar's first building, whatever town or building was open. */
-    openShop: (shopId: ShopID) => {
+    openShop: (shop: Ref<typeof ShopID>) => {
       this.navigation.changeTab(GameTab.towns)
       this.townsStore.selectTown(TownID.laHarpar)
       this.townsStore.selectTownBuilding(TOWNS_DATA[TownID.laHarpar].buildings[0])
-      this.townsStore.openShop(shopId)
+      this.townsStore.openShop(fromName(ShopID, 'ShopID', shop))
     },
     /** Sets an enemy's lifetime kill count (bestiary ranks, zone mastery, quest kill steps). */
-    setKills: (enemyId: EnemyID, count: number) =>
-      this.playerStore.updateEnemyKillCount(enemyId, count - (this.playerStore.enemyKillCounts()[enemyId] ?? 0)),
+    setKills: (enemy: Ref<typeof EnemyID>, count: number) => {
+      const enemyId = fromName(EnemyID, 'EnemyID', enemy)
+      this.playerStore.updateEnemyKillCount(enemyId, count - (this.playerStore.enemyKillCounts()[enemyId] ?? 0))
+    },
     /** Adds shiny kills in a zone (zone mastery's Shiny Hunter star). */
-    addShinyKills: (zoneId: ZoneID, count: number) => this.playerStore.applyKillBatch({
-      zoneId, wave: 1, kills: 0, shinies: count, killsByEnemy: {}, taskCountsByEnemy: {}, experience: 0, gold: 0, items: [],
+    addShinyKills: (zone: Ref<typeof ZoneID>, count: number) => this.playerStore.applyKillBatch({
+      zoneId: fromName(ZoneID, 'ZoneID', zone), wave: 1, kills: 0, shinies: count, killsByEnemy: {}, taskCountsByEnemy: {}, experience: 0, gold: 0, items: [],
     }),
     unlock: (feature: DevFeature) => this.unlockFeature(feature),
     /** Every feature, town and zone. */
@@ -124,12 +142,46 @@ export class DevCheatsComponent {
     /** Every store back to a fresh save, like the `reset state` button. */
     reset: () => this.resetState(),
     /** Starts and completes the quest, rewards and completed modal included; a no-op once it's done. */
-    completeQuest: (questId: QuestID) => {
+    completeQuest: (quest: Ref<typeof QuestID>) => {
+      const questId = fromName(QuestID, 'QuestID', quest)
       this.questsStore.startQuest(questId)
       this.questsStore.endQuest(questId)
     },
     /** Adds town reputation the way a quest reward does, tier-up toast included. */
-    addReputation: (townId: TownID, amount: number) => this.reputationService.gain([{ townId, amount }]),
+    addReputation: (town: Ref<typeof TownID>, amount: number) =>
+      this.reputationService.gain([{ townId: fromName(TownID, 'TownID', town), amount }]),
+  }
+
+  /** `dev.help()` output; typed by `commands`, so a new command doesn't compile without its line. */
+  private readonly usage: Record<keyof DevCheatsComponent['commands'], string> = {
+    tab: 'tab(GameTab) — switch tab',
+    setZone: 'setZone(ZoneID) — unlock and enter a zone',
+    grantStat: "grantStat(stat, amount) — add to a player stat, e.g. grantStat('goldCoins', 1000)",
+    learnSkill: 'learnSkill(SkillNodeID) — learn a node and its prerequisites, points granted',
+    giveItem: 'giveItem(ItemID, amount = 1, ItemTier?) — add to inventory',
+    equip: 'equip(ItemID, ItemTier?) — give and equip; false when it can\'t',
+    unequip: "unequip(slot) — slot name, e.g. unequip('weapon')",
+    openShop: 'openShop(ShopID) — open a shop',
+    setKills: 'setKills(EnemyID, count) — set lifetime kills',
+    addShinyKills: 'addShinyKills(ZoneID, count) — add shiny kills in a zone',
+    unlock: `unlock(${DEV_FEATURES.map(f => `'${f}'`).join('|')}) — unlock a feature`,
+    unlockAll: 'unlockAll() — every feature, town and zone',
+    state: 'state() — live state of every store plus derived stats',
+    reset: 'reset() — fresh save',
+    completeQuest: 'completeQuest(QuestID) — start and complete a quest, rewards included',
+    addReputation: 'addReputation(TownID, amount) — add town reputation',
+  }
+
+  private readonly devTools = {
+    ...this.commands,
+    /** Every command with its arguments. IDs take enum member names or numbers. */
+    help: () => Object.values(this.usage),
+  }
+
+  /** The given tier, or the item's own tier when none is given. */
+  private tierOf(id: ItemID, tier?: Ref<typeof ItemTier>): ItemTier {
+    if (tier === undefined) return ITEM_DATA[id].tier
+    return fromName(ItemTier, 'ItemTier', tier)
   }
 
   private unlockFeature(feature: DevFeature): void {

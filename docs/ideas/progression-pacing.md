@@ -1,6 +1,6 @@
 # Progression pacing & economy simulation
 
-**Scope:** S-M · **Status:** Simulation and first rescale done 2026-10-22 (`feat/gold-selling`); tuning ongoing
+**Scope:** S-M · **Status:** In progress: simulation and first rescale done 2026-10-22 (`feat/gold-selling`); tuning ongoing
 
 Targets for how fast the game opens up, and a script to tune numbers against them.
 

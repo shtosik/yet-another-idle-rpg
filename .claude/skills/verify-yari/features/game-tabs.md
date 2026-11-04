@@ -29,5 +29,5 @@ Preconditions:
 ## Gotchas
 
 - `find`/`read_page` name locked tabs just `Locked` (the `title` attribute wins), so all locked tabs look alike; pick them by `textContent` and click by coordinate.
-- There is no `Towns` tab in the menu; towns open from the Map. `dev.tab(4)` forces the hidden panel.
+- There is no `Towns` tab in the menu; towns open from the Map. `dev.tab('towns')` forces the hidden panel.
 - Tab badges are part of the name (`Bestiary 3`); `find` with the label alone still matches.

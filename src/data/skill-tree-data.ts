@@ -99,7 +99,7 @@ const EXPLORATION_SKILLS_DATA: Partial<Record<SkillNodeID, SkillNode>> = {
     url: './assets/img/skills/autoEat.png',
     type: SkillNodeType.battle,
   },
-  // Inventory slots (docs/plans/inventory-tabs.md step 5). Never lower these amounts without a save migration.
+  // Inventory slots (docs/archive/inventory-tabs-plan.md step 5). Never lower these amounts without a save migration.
   [SkillNodeID.packRat]: {
     id: SkillNodeID.packRat,
     branch: SkillBranch.exploration,
