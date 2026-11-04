@@ -8,9 +8,10 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
 import sharp from 'sharp'
+import { resolveServerDir } from './server-path.mjs'
 
 const run = promisify(execFile)
-const SERVER_DIR = join(process.env.APPDATA ?? '', 'krita', 'ai_diffusion', 'server')
+const SERVER_DIR = resolveServerDir()
 export const MATTE_PYTHON = process.env.ASSET_GEN_PYTHON ?? join(SERVER_DIR, 'venv', 'Scripts', 'python.exe')
 export const MATTE_MODEL = process.env.ASSET_GEN_MATTE_MODEL ?? join(SERVER_DIR, 'models', 'matting', 'isnet-general-use.onnx')
 const MATTE_SCRIPT = join(dirname(fileURLToPath(import.meta.url)), '..', 'py', 'matte.py')

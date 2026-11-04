@@ -8,7 +8,7 @@ import { randomUUID } from 'node:crypto'
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
-const defaultServerDir = () => join(process.env.APPDATA ?? '', 'krita', 'ai_diffusion', 'server')
+import { resolveServerDir } from './server-path.mjs'
 
 function defaultKill(pid) {
     if (process.platform === 'win32') {
@@ -23,7 +23,7 @@ export function createComfy({
     host = '127.0.0.1',
     port = 8188,
     pidFile = join('.tmp-gen', 'comfy.pid'),
-    serverDir = defaultServerDir(),
+    serverDir = resolveServerDir(),
     fetchFn = fetch,
     WebSocketImpl = globalThis.WebSocket,
     spawnFn = nodeSpawn,

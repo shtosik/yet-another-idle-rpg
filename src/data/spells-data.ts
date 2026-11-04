@@ -108,7 +108,7 @@ const SPELLS_DATA: Record<SpellID, SpellProps> = {
     requiredWeapon: WeaponCategory.ranged,
     baseManaCost: 3,
     baseCooldown: 60,
-    url: './assets/img/items/woodenBow.png',
+    url: './assets/img/skills/volley.png',
     effect: { type: SpellType.ranged, hits: 3 },
   },
   [SpellID.doubleAttack]: {

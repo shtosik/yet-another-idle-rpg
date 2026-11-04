@@ -236,7 +236,7 @@ const DAMAGE_SKILLS_DATA: Partial<Record<SkillNodeID, SkillNode>> = {
     requires: { kind: 'node', id: SkillNodeID.critMulti, minLevel: 5 },
     maxLevel: 1,
     special: true,
-    url: './assets/img/items/woodenBow.png',
+    url: './assets/img/skills/volley.png',
     type: SkillNodeType.spell,
     spellId: SpellID.volley,
   },

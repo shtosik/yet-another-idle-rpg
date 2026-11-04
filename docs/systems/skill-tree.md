@@ -45,4 +45,4 @@ A stat node with `statPercent: true` scales the stat by `statAmount` per level a
 
 New node: append a `SkillNodeID` in the branch's range, add the node to the branch's map in `skill-tree-data.ts` with `requires` pointing at its parent, add i18n and icon. For a `battle` node, read it with `hasSkillUnlocked(SkillNodeID.x)` where the mechanic lives.
 
-Volley is a 2-point, single-level damage spell node alongside Double Attack, requiring Crit Multi level 5. It fans out by 45 degrees and reuses the wooden bow icon. Learning and refunding follow the usual spell-node rules.
+Volley is a 2-point, single-level damage spell node alongside Double Attack, requiring Crit Multi level 5. It fans out by 45 degrees and uses the generated Volley icon. Learning and refunding follow the usual spell-node rules.
