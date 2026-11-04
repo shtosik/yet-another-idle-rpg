@@ -17,7 +17,7 @@
     "champions": "Tell me about your champions.",
     "aboutArena": "Who runs this place?",
     "goodbye": "Another time.",
-    "coldForge": "What happened to Toric's delivery cart?"
+    "coldForge": "What happened to Phurgo's delivery cart?"
   },
   "rules": {
     "message": "The fee opens the gate, and it stays with me whatever happens. Twenty waves, one sandglass, ten minutes; every fifth wave is a champion, and the last is Yad. Beat the sand and you walk out in a Molten Cape, with something extra the first time; walk out early or run dry and you keep only what your kills paid.",
@@ -80,7 +80,7 @@
     "ok": "On my way."
   },
   "coldForgeLead": {
-    "message": "Ha, a rescue for the tongs, challenger! I saw that cart stranded up on the Mountain Pass; Goblin Scavengers carried off the tools, big tongs and all. Look for Toric's square notch by the hinge, then take them straight to him.",
+    "message": "Ha, a rescue for the tongs, challenger! I saw that cart stranded up on the Mountain Pass; Goblin Scavengers carried off the tools, big tongs and all. Look for Phurgo's square notch by the hinge, then take them straight to him.",
     "opt1": "I'll find the scavengers."
   }
 }

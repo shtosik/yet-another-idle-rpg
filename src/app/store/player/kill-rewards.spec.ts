@@ -42,7 +42,7 @@ describe('upgraded drop rolls', () => {
     const rng = jasmine.createSpy('rng').and.returnValue(0.99)
     const drops = new Map<string, InventoryItem>()
     rollDropList([{
-      id: ItemID.toricsForgeTongs, chance: 1, minAmount: 1, maxAmount: 1, requiredActiveQuestId: QuestID.theColdForge,
+      id: ItemID.phurgosForgeTongs, chance: 1, minAmount: 1, maxAmount: 1, requiredActiveQuestId: QuestID.theColdForge,
     }], 1, 0, drops, new Set(), rng, 10)
     expect(drops.size).toBe(0)
     expect(rng).not.toHaveBeenCalled()

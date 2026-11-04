@@ -12,10 +12,10 @@ export const QuestItemsData: Partial<Record<ItemID, Item>> = {
     value: -1,
     type: ItemType.quest,
   },
-  [ItemID.toricsForgeTongs]: {
-    id: ItemID.toricsForgeTongs,
+  [ItemID.phurgosForgeTongs]: {
+    id: ItemID.phurgosForgeTongs,
     tier: ItemTier.normal,
-    url: './assets/img/items/toricsForgeTongs.png',
+    url: './assets/img/items/phurgosForgeTongs.png',
     value: -1,
     type: ItemType.quest,
   },

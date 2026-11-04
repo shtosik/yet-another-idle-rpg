@@ -62,11 +62,11 @@
   },
   "steps": {
     "theColdForge": {
-      "1": "Ask Ludo Crane at Lirold's Arena what happened to Toric's delivery cart.",
-      "2": "Recover Toric's Forge Tongs from Goblin Scavengers in the Mountain Pass and return them to Toric.",
-      "3": "Ask Marvin at the Exploration Guild in La Harpar to check Toric's old delivery record.",
-      "4": "Bring Toric one Fish & Apple Pie at Lirold's Forge.",
-      "5": "Bring Toric 10 Ancient Wood for charcoal at Lirold's Forge."
+      "1": "Ask Ludo Crane at Lirold's Arena what happened to Phurgo's delivery cart.",
+      "2": "Recover Phurgo's Forge Tongs from Goblin Scavengers in the Mountain Pass and return them to Phurgo.",
+      "3": "Ask Marvin at the Exploration Guild in La Harpar to check Phurgo's old delivery record.",
+      "4": "Bring Phurgo one Fish & Apple Pie at Lirold's Forge.",
+      "5": "Bring Phurgo 10 Ancient Wood for charcoal at Lirold's Forge."
     }
   }
 }

@@ -10,7 +10,7 @@ import { DialogueNode } from '../../interfaces/dialogues/dialogue-node.interface
 import { QUEST_STEP_AFTER_COMPLETED } from '../../data/quests-data'
 import { QuestID } from '../../enums/ids/quest-id.enum'
 import { ItemID } from '../../enums/ids/item-id.enum'
-import TORIC, { ToricDialogue } from '../../data/dialogues/liroldTown/liroldToric'
+import PHURGO, { PhurgoDialogue } from '../../data/dialogues/liroldTown/liroldPhurgo'
 import LUDO, { ArenaMasterDialogue } from '../../data/dialogues/liroldTown/liroldArenaMaster'
 import MARVIN, { MarvinDialogue } from '../../data/dialogues/laHarparTown/laHarparMarvin'
 
@@ -27,9 +27,9 @@ describe('The Cold Forge dialogue', () => {
   let towns: InstanceType<typeof TownsStore>
 
   const forgeOptions = () => [
-    option(TORIC[ToricDialogue.default], 'default.opt6'),
-    option(TORIC[ToricDialogue.aboutForgeRestored], 'aboutForgeRestored.opt1'),
-    option(TORIC[ToricDialogue.coldForgeComplete], 'coldForgeComplete.opt1'),
+    option(PHURGO[PhurgoDialogue.default], 'default.opt6'),
+    option(PHURGO[PhurgoDialogue.aboutForgeRestored], 'aboutForgeRestored.opt1'),
+    option(PHURGO[PhurgoDialogue.coldForgeComplete], 'coldForgeComplete.opt1'),
   ]
 
   beforeEach(() => {
@@ -47,34 +47,34 @@ describe('The Cold Forge dialogue', () => {
   it('delivers all three items once, advances talk steps at their NPCs, and unlocks the Forge', () => {
     const ludo = option(LUDO[ArenaMasterDialogue.default], 'default.coldForge')
     const marvin = option(MARVIN[MarvinDialogue.default], 'default.coldForge')
-    const reminder = option(TORIC[ToricDialogue.default], 'default.opt4')
+    const reminder = option(PHURGO[PhurgoDialogue.default], 'default.opt4')
     for (const service of forgeOptions()) expect(dialogue.getActiveResult(service)).toBeUndefined()
     expect(dialogue.getActiveResult(ludo)).toBeUndefined()
     expect(dialogue.getActiveResult(marvin)).toBeUndefined()
 
-    dialogue.selectOption(option(TORIC[ToricDialogue.coldForgeOffer], 'coldForgeOffer.opt1'))
+    dialogue.selectOption(option(PHURGO[PhurgoDialogue.coldForgeOffer], 'coldForgeOffer.opt1'))
     expect(quests.getQuestStep(QuestID.theColdForge)).toBe(1)
-    expect(dialogue.getActiveResult(reminder)?.next).toBe(ToricDialogue.coldForgeProgressOne)
+    expect(dialogue.getActiveResult(reminder)?.next).toBe(PhurgoDialogue.coldForgeProgressOne)
     dialogue.selectOption(reminder)
     expect(quests.getQuestStep(QuestID.theColdForge)).toBe(1)
     dialogue.selectOption(ludo)
     expect(quests.getQuestStep(QuestID.theColdForge)).toBe(2)
     expect(dialogue.getActiveResult(ludo)).toBeUndefined()
 
-    const tongs = option(TORIC[ToricDialogue.default], 'default.opt3')
+    const tongs = option(PHURGO[PhurgoDialogue.default], 'default.opt3')
     expect(dialogue.getActiveResult(tongs)).toBeUndefined()
-    player.addItems([{ id: ItemID.toricsForgeTongs, amount: 1 }])
+    player.addItems([{ id: ItemID.phurgosForgeTongs, amount: 1 }])
     dialogue.selectOption(tongs)
-    expect(player.itemCount(ItemID.toricsForgeTongs)).toBe(0)
+    expect(player.itemCount(ItemID.phurgosForgeTongs)).toBe(0)
     expect(quests.getQuestStep(QuestID.theColdForge)).toBe(3)
-    expect(dialogue.getActiveResult(reminder)?.next).toBe(ToricDialogue.coldForgeProgressThree)
+    expect(dialogue.getActiveResult(reminder)?.next).toBe(PhurgoDialogue.coldForgeProgressThree)
     dialogue.selectOption(reminder)
     expect(quests.getQuestStep(QuestID.theColdForge)).toBe(3)
     dialogue.selectOption(marvin)
     expect(quests.getQuestStep(QuestID.theColdForge)).toBe(4)
     expect(dialogue.getActiveResult(marvin)).toBeUndefined()
 
-    const pie = option(TORIC[ToricDialogue.default], 'default.opt2')
+    const pie = option(PHURGO[PhurgoDialogue.default], 'default.opt2')
     expect(dialogue.getActiveResult(pie)).toBeUndefined()
     player.addItems([{ id: ItemID.fishApplePie, amount: 2 }])
     dialogue.selectOption(pie)
@@ -82,7 +82,7 @@ describe('The Cold Forge dialogue', () => {
     expect(quests.getQuestStep(QuestID.theColdForge)).toBe(5)
     for (const service of forgeOptions()) expect(dialogue.getActiveResult(service)).toBeUndefined()
 
-    const wood = option(TORIC[ToricDialogue.default], 'default.opt1')
+    const wood = option(PHURGO[PhurgoDialogue.default], 'default.opt1')
     player.addItems([{ id: ItemID.ancientWood, amount: 9 }])
     expect(dialogue.getActiveResult(wood)).toBeUndefined()
     player.addItems([{ id: ItemID.ancientWood, amount: 2 }])
@@ -102,10 +102,10 @@ describe('The Cold Forge dialogue', () => {
   })
 
   it('keeps the lore link usable while hiding repeat offers', () => {
-    const help = option(TORIC[ToricDialogue.aboutForge], 'aboutForge.opt1')
-    expect(dialogue.getActiveResult(help)?.next).toBe(ToricDialogue.coldForgeOffer)
-    dialogue.selectOption(option(TORIC[ToricDialogue.coldForgeOffer], 'coldForgeOffer.opt1'))
-    expect(dialogue.getActiveResult(help)?.next).toBe(ToricDialogue.default)
-    expect(dialogue.getActiveResult(option(TORIC[ToricDialogue.default], 'default.opt5'))).toBeUndefined()
+    const help = option(PHURGO[PhurgoDialogue.aboutForge], 'aboutForge.opt1')
+    expect(dialogue.getActiveResult(help)?.next).toBe(PhurgoDialogue.coldForgeOffer)
+    dialogue.selectOption(option(PHURGO[PhurgoDialogue.coldForgeOffer], 'coldForgeOffer.opt1'))
+    expect(dialogue.getActiveResult(help)?.next).toBe(PhurgoDialogue.default)
+    expect(dialogue.getActiveResult(option(PHURGO[PhurgoDialogue.default], 'default.opt5'))).toBeUndefined()
   })
 })

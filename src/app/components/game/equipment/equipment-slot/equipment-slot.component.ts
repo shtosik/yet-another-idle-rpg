@@ -1,5 +1,7 @@
 import { CommonModule, NgOptimizedImage } from '@angular/common'
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core'
+import { ForgeSelection } from '../../../../services/forge-selection'
+import { ForgeDrag } from '../../../../directives/forge-drag'
 import { EquipmentSlot, EquipmentSlotKey } from 'enums/equipment-slot.enum'
 import { ItemTier } from 'enums/items/item-tier.enum'
 import { Item } from 'interfaces/item.interface'
@@ -18,10 +20,11 @@ import { upgradedStatAmount } from '../../../../store/player/stats'
     templateUrl: 'equipment-slot.component.html',
     styleUrls: ['./equipment-slot.component.sass'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [NgOptimizedImage, CommonModule, I18nextPipe, TooltipTemplateDirective, StatToPercentagePipe],
+    imports: [NgOptimizedImage, CommonModule, I18nextPipe, TooltipTemplateDirective, StatToPercentagePipe, ForgeDrag],
 })
 
 export class EquipmentItemComponent {
+    protected readonly forge = inject(ForgeSelection)
     readonly item = input<Item | undefined>()
     readonly tier = input<ItemTier | undefined>()
     readonly upgradeLevel = input(0)
@@ -33,16 +36,21 @@ export class EquipmentItemComponent {
 
     readonly hintKey = computed(() => {
         if (!this.item()) return 'app:equipment.emptyHint'
+        if (this.forge.open()) return 'forge:chooseHint'
         if (this.unequipBlocked()) return 'app:equipment.unequipBlocked'
         return 'app:equipment.unequipHint'
     })
 
     // detail is 0 for Enter, Space and screen-reader activation, 1+ for a mouse click, which stays inert.
     handleActivate(event: MouseEvent): void {
-        if (event.detail === 0) this.handleUnequip()
+        if (this.forge.open() || event.detail === 0) this.handleUnequip()
     }
 
     handleUnequip(): void {
+        if (this.forge.open()) {
+            if (this.item()) this.forge.select({ from: 'equipped', slot: this.slotName() })
+            return
+        }
         if (this.item() && !this.unequipBlocked()) this.unequipItem.emit(this.slotName())
     }
 
