@@ -75,7 +75,7 @@
         },
         "doubleAttack": {
             "name": "Double Attack",
-            "desc": "Unlocks a Double Attack spell."
+            "desc": "Unlock Double Attack: two separate melee weapon hits against the current enemy. Requires an equipped melee weapon."
         },
         "fireStrike": {
             "name": "Fire Strike",
@@ -152,6 +152,10 @@
         "autoEat": {
             "name": "Hearty Appetite",
             "desc": "Automatically eats your last food again when the food slot unlocks."
+        },
+        "volley": {
+            "name": "Volley",
+            "desc": "Unlock Volley: three ranged weapon hits against the current enemy. Requires an equipped ranged weapon."
         }
     },
     "cost": "{{ amount }} SP",

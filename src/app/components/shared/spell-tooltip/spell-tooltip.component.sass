@@ -17,6 +17,9 @@
     .melee
       color: map.get(palette.$spellTypePalette, melee)
 
+    .ranged
+      color: palette.$yellow
+
     .magic
       color: map.get(palette.$spellTypePalette, magic)
 
@@ -46,3 +49,6 @@
 
     .duration
       color: palette.$cyan
+
+  &__missing-weapon
+    color: palette.$red

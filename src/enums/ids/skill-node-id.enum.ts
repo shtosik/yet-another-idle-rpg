@@ -23,6 +23,7 @@ export enum SkillNodeID {
     critChance = 208,
     critMulti = 209,
     doubleAttack = 210,
+    volley = 211,
 
     // Magic Skill Tree
     fireStrike = 400,

@@ -14,5 +14,10 @@
       <span class="duration">{{ 'spells:duration' | i18next: { duration: spellData.effect.duration } }}</span>
     }
   </div>
+  @if (spellData.requiredWeapon !== undefined) {
+    <span [class.spell-tooltip__missing-weapon]="!hasRequiredWeapon()">
+      {{ ('spells:weaponRequirements.' + WeaponCategory[spellData.requiredWeapon]) | i18next }}
+    </span>
+  }
   <span class="spell-tooltip__desc">{{ ('spells:names.' + SpellID[spellData.id] + '.desc') | i18next }}</span>
 </div>

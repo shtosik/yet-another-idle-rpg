@@ -1,3 +1,4 @@
+import { WeaponCategory } from '../enums/weapon-category.enum'
 import { DamageElement } from '../enums/damage-element.enum'
 import { SpellID } from '../enums/ids/spell-id.enum'
 import { SpellType } from '../enums/spell-type.enum'
@@ -102,13 +103,23 @@ const SPELLS_DATA: Record<SpellID, SpellProps> = {
       hits: 5,
     },
   },
+  [SpellID.volley]: {
+    id: SpellID.volley,
+    requiredWeapon: WeaponCategory.ranged,
+    baseManaCost: 3,
+    baseCooldown: 60,
+    url: './assets/img/items/woodenBow.png',
+    effect: { type: SpellType.ranged, hits: 3 },
+  },
   [SpellID.doubleAttack]: {
     id: SpellID.doubleAttack,
+    requiredWeapon: WeaponCategory.melee,
     baseManaCost: 2,
     baseCooldown: 60,
     url: './assets/img/skills/doubleAttack.png',
     effect: {
       type: SpellType.melee,
+      hits: 2,
     },
   },
 }
