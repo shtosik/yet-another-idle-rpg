@@ -28,7 +28,7 @@ import { ItemType } from '../../../enums/items/item-type.enum'
 import RECIPES_DATA from '../../../data/recipes-data'
 import { RecipeID } from '../../../enums/ids/recipe-id.enum'
 import { EnemyID } from '../../../enums/ids/enemy-id.enum'
-import { QuestID } from '../../../enums/ids/quest-id.enum'
+import type { QuestDropLimits } from '../../services/quest-status'
 import { SkillNodeID } from '../../../enums/ids/skill-node-id.enum'
 import { SpellID } from '../../../enums/ids/spell-id.enum'
 import { ZoneID } from '../../../enums/ids/zone-id.enum'
@@ -567,12 +567,12 @@ export const PlayerStore = signalStore(
   })),
   // Game actions: kills and drops, zone stars, selling, equipping, using items and chests, mana regen, crafting.
   withMethods((store) => ({
-    processBattleEnd(enemyId: EnemyID, zoneId: ZoneID, currentWave: number, isShiny: boolean, activeQuestIds?: Set<QuestID>): ItemStack[] {
+    processBattleEnd(enemyId: EnemyID, zoneId: ZoneID, currentWave: number, isShiny: boolean, questDropLimits?: QuestDropLimits): ItemStack[] {
       const enemy = ENEMIES_DATA[enemyId]
       const { experience, gold, dropRolls } = killReward(enemy, ZONES_DATA[zoneId], currentWave, isShiny, store.stats())
       const drops = new Map<string, InventoryItem>()
       const { dropChance } = rankBonus(enemyId, store.enemyKillCounts()[enemyId] ?? 0)
-      rollEnemyDrops(enemy, dropRolls, isShiny, dropChance, drops, activeQuestIds, undefined, store.stats().upgradedDropChance)
+      rollEnemyDrops(enemy, dropRolls, isShiny, dropChance, drops, questDropLimits, undefined, store.stats().upgradedDropChance)
       const itemsToUpdate = [...drops.values()]
 
       store.updatePlayerStats([

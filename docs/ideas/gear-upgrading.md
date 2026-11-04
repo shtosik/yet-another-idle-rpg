@@ -15,7 +15,7 @@ Merge two copies of the same piece of gear into one copy a level higher, at a ne
 - Gold cost follows the item's value.
 - The Blacksmith is Phurgo, a dwarf who loves apple pie; one quest Step brings him the shipped Fish & Apple Pie (`ItemID.fishApplePie`).
 - Phurgo's Forge Tongs are a Quest item (`ItemType.quest`); exactly 1 is required. Goblin Scavengers drop them at **1 in 50**, only while `theColdForge` is active: `drop(ItemID.phurgosForgeTongs, 1, 1, 50)` (the last argument means "1 in N").
-- **No leftover Quest items** (all quest-only drops, not only this Quest): a quest-only drop rolls only while the player still needs it, that is while the active Step that asks for the item isn't met yet, and never for more than the missing amount. Today `kill-rewards.ts` checks only that the Quest is active (`requiredActiveQuestId`), so items keep dropping after the Step is met or delivered.
+- **No leftover Quest items** (all quest-only drops, not only this Quest): a quest-only drop rolls only while the player still needs it, that is while the active Step that asks for the item isn't met yet, and never for more than the missing amount.
 - Pathfinder's Seal: **1 in 10 Arena Chests**, until it is registered.
 
 ## Naming
