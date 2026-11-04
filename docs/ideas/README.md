@@ -44,7 +44,7 @@ Owner decisions in force:
 | [Town reputation: Exalted town pets](town-reputation-pets.md) | S-M | Built |
 | [Achievements](achievements.md) | M | Proposed |
 | [Gear upgrading](gear-upgrading.md) | M | Proposed |
-| [The Cold Forge: Toric, Quest and dialogue](gear-upgrading-cold-forge.md) | M | Proposed lore companion to gear upgrading; owner mechanics preserved |
+| [The Cold Forge: Toric, Quest and dialogue](gear-upgrading-cold-forge.md) | M | Proposed |
 | [Item sets](item-sets.md) | S-M | Proposed |
 | [Gathering skills (professions)](gathering-skills.md) | M-L | Proposed |
 | [Enemy affixes](enemy-affixes.md) | S-M | Noted (owner not keen) |
