@@ -23,7 +23,7 @@ Merge two copies of the same piece of gear into one copy a level higher, at a ne
 
 ## Rules
 - **Merge**: two copies with the same `id + tier + upgradeLevel` → one copy at `upgradeLevel + 1`, plus gold. Every new item starts at +0.
-- **Gold cost** follows the item's `value`, so early gear is cheap to upgrade and late gear expensive: +N → +N+1 costs `value × 2^N × k` (`k` tunable, start at 1: the sell price of the copy being sacrificed). Merging one item from +0 to +5 costs `80 × value × k` in all.
+- **Gold cost** follows the item's `value`, so early gear is cheap to upgrade and late gear expensive: +N → +N+1 costs `value × 2^N × k` (`k` tunable, start at 1: the sell price of the copy being sacrificed). Merging one item from +0 to +5 costs at least `80 × value × k` in all: the total when no merge fails.
 - **Chance**: +1 100%, then 10% less per level: +2 90%, +3 80%, +4 70%, +5 60% (owner change 2026-11-03, was 100% up to +5). Later levels continue the step: +6 50% … +10 10% (not decided).
 - **Failure** (possible from +2 onward): the gold and the sacrificed copy are lost; the base copy keeps its level.
 - **Stats**: each level adds +10% (tunable) of the item's base stats, rounded. +5 is a milestone: it adds another +25% of base on top, and the item frame gets a mark. +10 gets the same later.
@@ -59,7 +59,7 @@ Uses Slatefall's closure as proposed background from [Slatefall & the Deeper Min
 ## Pathfinder's Seal
 Keep **Pathfinder's Seal** (`pathfindersSeal`). A brass Exploration Guild token showing an open route through a ring, with a small inspection notch on its rim. It recognises an explorer who brings useful things home as well as finding a way out; the Arena keeps a few among its prizes for challengers who can return alive. This is a proposed connection between the Arena and the Exploration Guild, not a Guild rank or permission to enter Slatefall.
 
-Arena Chest reward, **1 in 10 chests** ([Combat Arena](../systems/arena.md)). Register it once with **Marvin at the Exploration Guild in La Harpar**. He enters the player's name in the salvage register and teaches what to look for in recovered gear: the permanent benefit is learned judgement, not an enchantment spent on each drop. From then on, permanently, **10% (tunable) of gear drops arrive at +1**. Each such drop already embodies its first merge; the benefit does not halve the copies needed across all drops.
+Arena Chest reward, **1 in 10 chests** ([Combat Arena](../systems/arena.md)). Register it once with **Marvin at the Exploration Guild in La Harpar**. He enters the player's name in the salvage register and teaches what to look for in recovered gear: the permanent benefit is learned judgement, not an enchantment spent on each drop. From then on, permanently, **10% (tunable) of eligible gear drops arrive at +1**, never unique gear or pets. Each such drop already embodies its first merge; the benefit does not halve the copies needed across all drops.
 
 The chest rolls it only while the player neither holds an unregistered Seal nor has registered one, so no second Seal exists. Quest-type item so it can't be sold or destroyed. Registration is independent of *The Cold Forge* and needs neither its completion nor Varrow's proposed hall. Marvin's scripts and the proposed one-time registration effect are in [the companion](gear-upgrading-cold-forge.md). If the Exploration Guild relocation ships later, decide registration ownership then; this proposal remains implementable with today's Marvin.
 
@@ -73,7 +73,7 @@ The chest rolls it only while the player neither holds an unregistered Seal nor 
 
 ## Open
 - `k` for the gold cost (check with `npm run sim`).
-- Lore pass complete; Step 4 uses shipped Fish & Apple Pie and the tongs are a Quest item, exactly 1 required, with a Quest-active-only 1-in-50 drop by owner decision. The [dwarven foundations](../lore/dwarves.md) are proposed; their names, Keldrath and Bramhold, are owner-approved (2026-11-01). The everyday details, Phurgo's personal history and the XP/gold rewards still await approval. See the [companion's Owner calls](gear-upgrading-cold-forge.md#owner-calls). Forge art, the Forge-opening dialogue effect and the Seal's permanent registration effect remain implementation work.
+- Lore pass complete; Step 4 uses shipped Fish & Apple Pie and the tongs are a Quest item, exactly 1 required, with a Quest-active-only 1-in-50 drop by owner decision. The [dwarven foundations](../lore/dwarves.md) ship in Phurgo's home conversations; their names, Keldrath and Bramhold, are owner-approved (2026-11-01). The everyday details, Phurgo's personal history and the XP/gold rewards still await approval. See the [companion's Owner calls](gear-upgrading-cold-forge.md#owner-calls).
 - Seal name retained: **Pathfinder's Seal**.
 
 ## Touch-points

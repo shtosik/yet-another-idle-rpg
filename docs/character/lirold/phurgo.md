@@ -12,9 +12,9 @@ Apple pie breaks through that reserve. He asks for a proper meal before lighting
 
 He knows Slatefall through deliveries and workshop business, not through its buried mysteries. Any link between dwarves and the mine's stairs, the Stone Warden's marks or the black sap is undecided (T-25–T-27); Phurgo offers no special knowledge of them.
 
-## Home and departure (proposed)
+## Home and departure
 
-Source: [Dwarven foundations](../../lore/dwarves.md), **(proposed)** for his home conversations in [The Cold Forge](../../ideas/gear-upgrading-cold-forge.md). Phurgo comes from **Bramhold**, an underground Town in **Keldrath**, the dwarven homeland beyond the drawn map north of Elderreach. His age, family and exact birthplace remain open.
+Source: [Dwarven foundations](../../lore/dwarves.md), used by his home conversations (`liroldPhurgo.json`; script: [The Cold Forge](../../ideas/gear-upgrading-cold-forge.md)). Phurgo comes from **Bramhold**, an underground Town in **Keldrath**, the dwarven homeland beyond the drawn map north of Elderreach. His age, family and exact birthplace remain open.
 
 He learned his habits in shared workshops, where a repair tally beside a joint tells the next worker where to look. He misses suppers of mushroom-and-barley stew, dark bread and baked apples at the shared table. His workshop's joke that surface customers promise faster than metal cools conceals warmth: someone who keeps a promise gets a chair. Fish & Apple Pie is still his later coastal discovery.
 

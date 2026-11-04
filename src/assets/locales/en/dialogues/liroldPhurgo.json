@@ -100,7 +100,7 @@
     "opt2": "Something else first."
   },
   "coldForgeComplete": {
-    "message": "There she goes; I'd forgotten how the hearth sounds. Bring me two matching pieces, alike in quality and workmanship, and gold for the work. I'll make you one stronger piece.",
+    "message": "There she goes; I'd forgotten how the hearth sounds. Bring me two matching pieces, alike in quality and workmanship, and gold for the work. If the metal takes it, you get one stronger piece; if not, the gold and the spare are gone.",
     "opt1": "Can you strengthen my gear?",
     "opt2": "I'll come back with gear."
   }
