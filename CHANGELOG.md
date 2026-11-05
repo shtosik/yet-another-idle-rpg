@@ -6,6 +6,7 @@ Versions follow [Semantic Versioning](https://semver.org/). Each note is `- [typ
 New notes go under `[Unreleased]`; `npm run release -- <major|minor|patch>` moves them into a version (docs/deployment.md).
 
 ## [Unreleased]
+- [bug] The quest log's "Talk to" button now appears only once the step's requirements are met, so it no longer sends you to an NPC before you have what they asked for.
 - [feature] Pathfinder's Seal: a rare Arena Chest find. Register it with Marvin and some gear drops arrive already upgraded to +1.
 - [feature] Phurgo's Forge in Lirold: finish The Cold Forge and Phurgo upgrades two matching pieces of gear into one, up to +5. The first upgrade always works; each later one is 10% less likely (+5: 60%), and a failure costs the gold and the spare. Ask him how his Forge works, then fill both inputs with matching gear from inventory or equipment: the first piece is upgraded and the second is consumed. The first piece stays equipped if selected from equipment; an equipped second piece is consumed.
 - [bug] Quest items no longer drop once you have enough.

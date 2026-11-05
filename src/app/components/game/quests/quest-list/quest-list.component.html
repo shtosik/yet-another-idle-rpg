@@ -65,7 +65,7 @@
         }
       </ul>
 
-      @if (quest.giver; as giver) {
+      @if (quest.ready && quest.giver; as giver) {
         <button class="quest__giver" type="button" (click)="talkTo(giver)">
           {{ 'quests:panel.talkTo' | i18next:{ npc: ('npc:names.' + NpcID[giver.npcId]) | i18next } }}
         </button>
