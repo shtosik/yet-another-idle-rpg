@@ -13,7 +13,7 @@ import { isTaskDone } from '../store/player/player.store'
 import { SkillNodeID } from '../../enums/ids/skill-node-id.enum'
 import { BattleManagerService } from './battle-manager.service'
 import { ModalService } from './modal.service'
-import { getActiveQuestIds } from './quest-status'
+import { getQuestDropLimits } from './quest-status'
 import { MS_PER_SECOND } from './combat-timing'
 import { OfflineSegment, seededRng, simulateOfflineKills } from './offline-simulation'
 import { InventoryItem } from '../../interfaces/item.interface'
@@ -154,7 +154,7 @@ export class OfflineProgressService {
       damageType: this.playerStore.equippedWeaponDamageType(),
       isMeleeWeapon: this.playerStore.equippedWeaponCategory() === WeaponCategory.melee,
       hasWeaknessSkill: this.playerStore.hasSkillUnlocked(SkillNodeID.weaknesses),
-      activeQuestIds: getActiveQuestIds(this.questsStore.questStepProgression()),
+      questDropLimits: getQuestDropLimits(this.questsStore.questStepProgression(), this.playerStore.itemCount),
       taskEnemyIds: new Set(this.playerStore.activeTasks().filter(task => !isTaskDone(task)).map(task => task.monsterId)),
       enemyKillCounts: this.playerStore.enemyKillCounts(),
       rollingKillMs: this.offlineStore.rollingKillMs(zone.id, wave),

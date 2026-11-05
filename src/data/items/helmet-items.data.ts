@@ -39,6 +39,7 @@ export const HelmetItemsData: Partial<Record<ItemID, Item>> = {
   },
   [ItemID.harpyCrown]: {
     id: ItemID.harpyCrown,
+    unique: true,
     tier: ItemTier.rare,
     url: './assets/img/items/harpyCrown.png',
     value: 5000,
@@ -61,6 +62,7 @@ export const HelmetItemsData: Partial<Record<ItemID, Item>> = {
   },
   [ItemID.mysticHood]: {
     id: ItemID.mysticHood,
+    unique: true,
     tier: ItemTier.uncommon,
     url: './assets/img/items/mysticHood.png',
     value: 1300,

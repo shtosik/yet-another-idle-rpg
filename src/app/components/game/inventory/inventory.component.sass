@@ -31,6 +31,11 @@
     padding: 0 0.4rem
     text-align: center
 
+    &[aria-disabled='true']
+      opacity: 0.35
+      cursor: not-allowed
+      filter: grayscale(1)
+
     &.active
       @include mixins.tab-active
 

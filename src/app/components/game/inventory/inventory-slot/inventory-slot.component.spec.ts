@@ -3,6 +3,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import { InventoryItemComponent } from './inventory-slot.component'
 import ITEM_DATA from 'data/items-data'
 import { ItemID } from 'enums/ids/item-id.enum'
+import i18next from 'i18next'
+import itemText from '../../../../../assets/locales/en/items.json'
 
 describe('InventoryItemComponent', () => {
   let fixture: ComponentFixture<InventoryItemComponent>
@@ -10,6 +12,10 @@ describe('InventoryItemComponent', () => {
 
   const action = () => (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>('.item__action')
   const click = (detail: number) => action().dispatchEvent(new MouseEvent('click', { bubbles: true, detail }))
+
+  beforeAll(async () => {
+    await i18next.init({ lng: 'en', resources: { en: { items: itemText } } })
+  })
 
   beforeEach(async () => {
     TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] })
@@ -36,5 +42,22 @@ describe('InventoryItemComponent', () => {
     fixture.componentRef.setInput('clickable', false)
     await fixture.whenStable()
     expect(action()).toBeNull()
+  })
+
+  it('includes +N in the slot and accessible name, marking only the milestone', async () => {
+    fixture.componentRef.setInput('upgradeLevel', 4)
+    await fixture.whenStable()
+    const element: HTMLElement = fixture.nativeElement
+    expect(action().getAttribute('aria-label')).toContain('Knife +4')
+    expect(element.querySelector('.upgrade-level')?.textContent).toBe('+4')
+    expect(element.querySelector('.milestone-mark')).toBeNull()
+    fixture.componentRef.setInput('upgradeLevel', 5)
+    await fixture.whenStable()
+    expect(element.querySelector('.item--milestone')).not.toBeNull()
+    expect(element.querySelector('.milestone-mark')?.getAttribute('aria-label')).toBe('Upgrade level +5 milestone')
+    fixture.componentRef.setInput('upgradeLevel', 0)
+    await fixture.whenStable()
+    expect(element.querySelector('.upgrade-level')).toBeNull()
+    expect(element.querySelector('.milestone-mark')).toBeNull()
   })
 })

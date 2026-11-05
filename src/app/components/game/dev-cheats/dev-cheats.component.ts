@@ -82,14 +82,12 @@ export class DevCheatsComponent {
     grantStat: (stat: PlayerStat, amount: number) => this.playerStore.updatePlayerStats([{ stat, amount }]),
     /** Learns the node and, first, whatever it requires (the first option of an `any`), granting the points. */
     learnSkill: (node: Ref<typeof SkillNodeID>): boolean => this.learnSkill(fromName(SkillNodeID, 'SkillNodeID', node), 1),
-    giveItem: (item: Ref<typeof ItemID>, amount = 1, tier?: Ref<typeof ItemTier>) => {
-      const id = fromName(ItemID, 'ItemID', item)
-      this.playerStore.addItems([{ id, tier: this.tierOf(id, tier), amount }])
-    },
+    giveItem: (item: Ref<typeof ItemID>, amount = 1, tier?: Ref<typeof ItemTier>, upgradeLevel = 0) => this.addItem(item, amount, tier, upgradeLevel),
+    addItem: (item: Ref<typeof ItemID>, amount = 1, tier?: Ref<typeof ItemTier>, upgradeLevel = 0) => this.addItem(item, amount, tier, upgradeLevel),
     /** Gives the item and equips it; false (with a console warning) when there's no room or it can't be equipped. */
-    equip: (itemRef: Ref<typeof ItemID>, tier?: Ref<typeof ItemTier>): boolean => {
+    equip: (itemRef: Ref<typeof ItemID>, tier?: Ref<typeof ItemTier>, upgradeLevel = 0): boolean => {
       const itemId = fromName(ItemID, 'ItemID', itemRef)
-      const stack = { id: itemId, tier: this.tierOf(itemId, tier), amount: 1 }
+      const stack = { id: itemId, tier: this.tierOf(itemId, tier), amount: 1, upgradeLevel }
       if (!this.playerStore.canFitItems([stack])) {
         console.warn('dev.equip: no inventory space for the item')
         return false
@@ -111,6 +109,13 @@ export class DevCheatsComponent {
       this.townsStore.selectTown(TownID.laHarpar)
       this.townsStore.selectTownBuilding(TOWNS_DATA[TownID.laHarpar].buildings[0])
       this.townsStore.openShop(fromName(ShopID, 'ShopID', shop))
+    },
+    /** Opens the Forge over La Harpar's first building without adding any Forge building or NPC data. */
+    openForge: () => {
+      this.navigation.changeTab(GameTab.towns)
+      this.townsStore.selectTown(TownID.laHarpar)
+      this.townsStore.selectTownBuilding(TOWNS_DATA[TownID.laHarpar].buildings[0])
+      this.townsStore.openForge()
     },
     /** Sets an enemy's lifetime kill count (bestiary ranks, zone mastery, quest kill steps). */
     setKills: (enemy: Ref<typeof EnemyID>, count: number) => {
@@ -158,10 +163,12 @@ export class DevCheatsComponent {
     setZone: 'setZone(ZoneID) — unlock and enter a zone',
     grantStat: "grantStat(stat, amount) — add to a player stat, e.g. grantStat('goldCoins', 1000)",
     learnSkill: 'learnSkill(SkillNodeID) — learn a node and its prerequisites, points granted',
-    giveItem: 'giveItem(ItemID, amount = 1, ItemTier?) — add to inventory',
-    equip: 'equip(ItemID, ItemTier?) — give and equip; false when it can\'t',
+    giveItem: 'giveItem(ItemID, amount = 1, ItemTier?, upgradeLevel = 0) — add to inventory',
+    addItem: 'addItem(ItemID, amount = 1, ItemTier?, upgradeLevel = 0) — same as giveItem',
+    equip: 'equip(ItemID, ItemTier?, upgradeLevel = 0) — give and equip; false when it can\'t',
     unequip: "unequip(slot) — slot name, e.g. unequip('weapon')",
     openShop: 'openShop(ShopID) — open a shop',
+    openForge: 'openForge() — open the Forge',
     setKills: 'setKills(EnemyID, count) — set lifetime kills',
     addShinyKills: 'addShinyKills(ZoneID, count) — add shiny kills in a zone',
     unlock: `unlock(${DEV_FEATURES.map(f => `'${f}'`).join('|')}) — unlock a feature`,
@@ -182,6 +189,11 @@ export class DevCheatsComponent {
   private tierOf(id: ItemID, tier?: Ref<typeof ItemTier>): ItemTier {
     if (tier === undefined) return ITEM_DATA[id].tier
     return fromName(ItemTier, 'ItemTier', tier)
+  }
+
+  private addItem(item: Ref<typeof ItemID>, amount: number, tier: Ref<typeof ItemTier> | undefined, upgradeLevel: number): void {
+    const id = fromName(ItemID, 'ItemID', item)
+    this.playerStore.addItems([{ id, tier: this.tierOf(id, tier), amount, upgradeLevel }])
   }
 
   private unlockFeature(feature: DevFeature): void {
@@ -253,6 +265,8 @@ export class DevCheatsComponent {
   }
 
   unlockAllZones() {
+    this.playerStore.unlockMap()
+    this.unlockFeature('towns')
     for (const id of Object.values(ZoneID)) {
       if (typeof id === 'number') this.playerStore.unlockZone(id)
     }

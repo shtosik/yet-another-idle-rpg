@@ -1,14 +1,18 @@
 @let gear = item();
+@let name = gear ? ('items:names.' + ItemID[gear.id] | i18next) : ('app:equipment.empty' | i18next);
+@let displayName = gear && upgradeLevel() > 0 ? ('items:upgradedName' | i18next: { name, level: upgradeLevel() }) : name;
 @let slotLabel = ('app:equipment.slots.' + slotName()) | i18next;
 <button
     type="button"
     class="item"
+    [appForgeDrag]="gear ? { from: 'equipped', slot: slotName() } : null"
     [class.item--empty]="!gear"
+    [class.item--milestone]="!!gear && upgradeLevel() >= milestoneLevel"
     [attr.data-tier]="gear ? ItemTier[tier()] : null"
-    [attr.aria-label]="slotLabel + ': ' + (gear ? ('items:names.' + ItemID[gear.id] | i18next) : ('app:equipment.empty' | i18next))"
+    [attr.aria-label]="slotLabel + ': ' + displayName"
     [attr.aria-description]="hintKey() | i18next"
-    [attr.aria-disabled]="!gear || unequipBlocked()"
-    [tooltipContext]="{ item: gear, tier: tier(), blocked: unequipBlocked(), slotLabel }"
+    [attr.aria-disabled]="!gear || (!forge.open() && unequipBlocked())"
+    [tooltipContext]="{ item: gear, tier: tier(), level: upgradeLevel(), blocked: unequipBlocked(), slotLabel }"
     [tooltipTemplate]="tooltip"
     #details="tooltipTemplate"
     placement="left"
@@ -20,9 +24,15 @@
     (click)="handleActivate($event); details.hide()"
     (keydown.escape)="details.hide()"
 >
-    <!-- Filled slots show only the art; the name is in the tooltip and aria-label. -->
+    <!-- Filled slots show art and upgrade level; the name is in the tooltip and aria-label. -->
     @if (gear) {
-        <img height="48" width="48" disableOptimizedSrcset alt="" [ngSrc]="gear.url">
+        @if (upgradeLevel() > 0) {
+            <span class="upgrade-level">{{ 'items:upgradeLevel' | i18next: { level: upgradeLevel() } }}</span>
+        }
+        @if (upgradeLevel() >= milestoneLevel) {
+            <span class="milestone-mark" role="img" [attr.aria-label]="'items:upgradeMilestone' | i18next: { level: milestoneLevel }">&#9670;</span>
+        }
+        <img draggable="false" height="48" width="48" disableOptimizedSrcset alt="" [ngSrc]="gear.url">
     } @else {
         <span class="empty-mark" aria-hidden="true">&#9671;</span>
         <span class="slot-name">{{ slotLabel }}</span>
@@ -33,6 +43,7 @@
     #tooltip
     let-item="item"
     let-tier="tier"
+    let-level="level"
     let-blocked="blocked"
     let-slotLabel="slotLabel"
 >
@@ -41,7 +52,7 @@
             <span
                 [attr.data-tier]="ItemTier[tier]"
                 class="name"
-            >{{ ('items:names.' + ItemID[item.id]) | i18next }}</span>
+            >{{ level > 0 ? ('items:upgradedName' | i18next: { name: ('items:names.' + ItemID[item.id] | i18next), level }) : ('items:names.' + ItemID[item.id] | i18next) }}</span>
             <span class="tier-line">
                 <span
                     [attr.data-tier]="ItemTier[tier]"
@@ -59,12 +70,14 @@
 
             @if (item.type === ItemType.equipment) {
                 @for (stat of $any(item.stats); track stat.id) {
-                    <span class="stat">{{ stat.id | statToPercentage:stat.amount }} {{ ('app:playerStats.' + stat.id) | i18next }}</span>
+                    <span class="stat">{{ stat.id | statToPercentage:upgradedStatAmount(stat.amount, level) }} {{ ('app:playerStats.' + stat.id) | i18next }}</span>
                 }
                 @if (item.spell !== undefined) {
                     <span class="stat">{{ 'items:grantsSpell' | i18next:{ spell: ('spells:names.' + SpellID[item.spell] + '.name') | i18next } }}</span>
                 }
-                @if (blocked) {
+                @if (forge.open()) {
+                    <span class="click">{{ 'forge:chooseHint' | i18next }}</span>
+                } @else if (blocked) {
                     <span class="click click--blocked">{{ 'app:equipment.unequipBlocked' | i18next }}</span>
                 } @else {
                     <span class="click">{{ 'app:equipment.unequipHint' | i18next }}</span>

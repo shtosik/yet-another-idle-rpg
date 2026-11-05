@@ -3,7 +3,7 @@ import { InventoryItem } from '../../interfaces/item.interface'
 import { Zone } from '../../interfaces/zone.interface'
 import { DamageElement } from '../../enums/damage-element.enum'
 import { EnemyID } from '../../enums/ids/enemy-id.enum'
-import { QuestID } from '../../enums/ids/quest-id.enum'
+import type { QuestDropLimits } from './quest-status'
 import ENEMIES_DATA from '../../data/enemies-data'
 import { waveMultipliers } from '../store/battle/wave-scaling'
 import { killReward, Rng, rollEnemyDrops } from '../store/player/kill-rewards'
@@ -27,7 +27,7 @@ export interface OfflineSimulationInput {
   /** The equipped weapon is melee (or none). */
   isMeleeWeapon: boolean
   hasWeaknessSkill: boolean
-  activeQuestIds: Set<QuestID>
+  questDropLimits: QuestDropLimits
   /** Enemies with an unfinished Exploration Guild task. */
   taskEnemyIds: Set<EnemyID>
   /** Kills when the claim starts; bestiary rank bonuses stay at these ranks for the whole claim. */
@@ -154,7 +154,7 @@ export function simulateOfflineKills(input: OfflineSimulationInput): OfflineSimu
     result.gold += reward.gold
     result.killsByEnemy[enemy.id] = (result.killsByEnemy[enemy.id] ?? 0) + 1
     const { dropChance } = rankBonus(enemy.id, input.enemyKillCounts[enemy.id] ?? 0)
-    rollEnemyDrops(enemy, reward.dropRolls, isShiny, dropChance, drops, input.activeQuestIds, rng)
+    rollEnemyDrops(enemy, reward.dropRolls, isShiny, dropChance, drops, input.questDropLimits, rng, stats.upgradedDropChance)
 
     if (input.taskEnemyIds.has(enemy.id)) {
       const counts = rng() * 100 < stats.taskDoubleKillChance ? 2 : 1

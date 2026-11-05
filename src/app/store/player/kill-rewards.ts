@@ -1,37 +1,67 @@
 import { Enemy } from '../../../interfaces/enemy.interface'
 import { EnemyDrop } from '../../../interfaces/enemy-drop.interface'
 import { InventoryItem } from '../../../interfaces/item.interface'
-import { QuestID } from '../../../enums/ids/quest-id.enum'
+import type { QuestDropLimits } from '../../services/quest-status'
 import { Zone } from '../../../interfaces/zone.interface'
 import ITEM_DATA from '../../../data/items-data'
 import { waveMultipliers } from '../battle/wave-scaling'
 import type { PlayerStatsType } from './stats'
+import { stackKey } from './inventory'
+import { ItemType } from '../../../enums/items/item-type.enum'
+import { EquipmentSlot } from '../../../enums/equipment-slot.enum'
+import { ItemID } from '../../../enums/ids/item-id.enum'
 
 /** Returns a value in [0, 1). Online kills use `Math.random`; offline claims use a seeded one. */
 export type Rng = () => number
 
-/** Adds each drop that hits to `accumulator`, keyed by id + tier. */
+/** Each eligible copy gets its own upgrade roll, keeping +0 and +1 copies in separate stacks. */
+function addRolledDrop(id: ItemID, amount: number, accumulator: Map<string, InventoryItem>, upgradedDropChance: number, rng: Rng) {
+  const item = ITEM_DATA[id]
+  const canUpgrade = upgradedDropChance > 0 && item.type === ItemType.equipment && item.slot !== EquipmentSlot.pet && !item.unique
+  const add = (count: number, upgradeLevel?: number) => {
+    if (count === 0) return
+    const stack: InventoryItem = { id, type: item.type, tier: item.tier, amount: count, ...(upgradeLevel === undefined ? {} : { upgradeLevel }) }
+    const key = stackKey(stack)
+    const existing = accumulator.get(key)
+    if (existing) existing.amount += count
+    else accumulator.set(key, stack)
+  }
+  if (!canUpgrade) {
+    add(amount)
+    return
+  }
+  let upgraded = 0
+  for (let copy = 0; copy < amount; copy++) {
+    if (rng() * 100 < upgradedDropChance) upgraded++
+  }
+  add(amount - upgraded)
+  add(upgraded, 1)
+}
+
+/** Adds each drop that hits to `accumulator`, keyed by id + tier + upgradeLevel. */
 export const rollDropList = (
   drops: EnemyDrop[],
   rolls: number,
   dropChanceBonus: number,
   accumulator: Map<string, InventoryItem>,
-  activeQuestIds?: Set<QuestID>,
+  questDropLimits?: QuestDropLimits,
   rng: Rng = Math.random,
+  upgradedDropChance = 0,
 ) => {
   for (let r = 0; r < rolls; r++) {
     drops.forEach(drop => {
-      if (drop.requiredActiveQuestId !== undefined && !activeQuestIds?.has(drop.requiredActiveQuestId)) return
+      const existing = accumulator.get(stackKey({ id: drop.id }))
+      let missing = Infinity
+      if (drop.requiredActiveQuestId !== undefined) {
+        missing = (questDropLimits?.get(drop.requiredActiveQuestId)?.get(drop.id) ?? 0) - (existing?.amount ?? 0)
+        if (missing <= 0) return
+      }
 
       // Hits with probability (1 + bonus) / chance.
       if (rng() * drop.chance <= drop.chance - 1 - dropChanceBonus) return
 
-      const amount = Math.floor(rng() * (drop.maxAmount - drop.minAmount + 1) + drop.minAmount)
-      const { type, tier } = ITEM_DATA[drop.id]
-      const key = `${drop.id}:${tier}`
-      const existing = accumulator.get(key)
-      if (existing) existing.amount += amount
-      else accumulator.set(key, { id: drop.id, type, tier, amount })
+      const amount = Math.min(missing, Math.floor(rng() * (drop.maxAmount - drop.minAmount + 1) + drop.minAmount))
+      addRolledDrop(drop.id, amount, accumulator, upgradedDropChance, rng)
     })
   }
 }
@@ -63,9 +93,10 @@ export function rollEnemyDrops(
   isShiny: boolean,
   dropChanceBonus: number,
   accumulator: Map<string, InventoryItem>,
-  activeQuestIds?: Set<QuestID>,
+  questDropLimits?: QuestDropLimits,
   rng: Rng = Math.random,
+  upgradedDropChance = 0,
 ) {
-  rollDropList(enemy.drops, rolls, dropChanceBonus, accumulator, activeQuestIds, rng)
-  if (isShiny && enemy.shinyDrops?.length) rollDropList(enemy.shinyDrops, 1, dropChanceBonus, accumulator, activeQuestIds, rng)
+  rollDropList(enemy.drops, rolls, dropChanceBonus, accumulator, questDropLimits, rng, upgradedDropChance)
+  if (isShiny && enemy.shinyDrops?.length) rollDropList(enemy.shinyDrops, 1, dropChanceBonus, accumulator, questDropLimits, rng, upgradedDropChance)
 }

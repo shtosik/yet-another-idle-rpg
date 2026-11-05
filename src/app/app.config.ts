@@ -17,7 +17,7 @@ import { UrlPipe } from './pipes/url.pipe'
 import { CalculateXpPipe } from './pipes/calculate-xp.pipe'
 
 const translations = [
-    'app', 'enemies', 'zones', 'skill-tree', 'items', 'spells', 'map', 'camp', 'npc', 'quests', 'shop', 'bestiary', 'unlocks',
+    'app', 'enemies', 'zones', 'skill-tree', 'items', 'spells', 'map', 'camp', 'npc', 'quests', 'shop', 'forge', 'bestiary', 'unlocks',
     'dialogues/laHarparBartender',
     'dialogues/laHarparJosh',
     'dialogues/laHarparTrader',
@@ -29,6 +29,7 @@ const translations = [
     'dialogues/mawoodBrenn',
     'dialogues/mawoodMilo',
     'dialogues/liroldArenaMaster',
+    'dialogues/liroldPhurgo',
     'dialogues/mawoodElarion',
 ]
 

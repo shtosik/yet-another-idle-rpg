@@ -74,6 +74,18 @@ describe('EquipmentComponent', () => {
         expect(store.equipment().weapon?.id).toBe(ItemID.knife)
     })
 
+    it('shows the upgrade level and milestone mark on equipped gear', async () => {
+        const item = ITEM_DATA[ItemID.knife]
+        store.addItems([{ id: item.id, amount: 1, upgradeLevel: 5 }])
+        store.equipItem({ id: item.id, type: item.type, tier: item.tier, amount: 1, upgradeLevel: 5 })
+        await fixture.whenStable()
+        const button = weaponButton()
+        expect(button.getAttribute('aria-label')).toBe('Weapon: Knife +5')
+        expect(button.querySelector('.upgrade-level')?.textContent).toBe('+5')
+        expect(button.classList.contains('item--milestone')).toBeTrue()
+        expect(button.querySelector('.milestone-mark')?.getAttribute('aria-label')).toBe('Upgrade level +5 milestone')
+    })
+
     it('unequips on keyboard or assistive-technology activation (click with detail 0)', async () => {
         equip(ItemID.knife)
         await fixture.whenStable()

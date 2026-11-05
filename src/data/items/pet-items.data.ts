@@ -310,7 +310,7 @@ export const PetItemsData: Partial<Record<ItemID, Item>> = Object.fromEntries([
     [p.petId, buildPetItem(p, false)],
     [p.shinyId, buildPetItem(p, true)],
   ]),
-  ...ARENA_PETS.map(p => [p.petId, buildPetItem({ ...p, shinyId: p.petId, shinyStats: [] }, false)]),
+  ...ARENA_PETS.map(p => [p.petId, { ...buildPetItem({ ...p, shinyId: p.petId, shinyStats: [] }, false), unique: true }]),
   ...TOWN_PETS.map(p => [p.id, p]),
 ])
 

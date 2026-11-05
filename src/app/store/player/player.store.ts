@@ -1,4 +1,6 @@
 import { ChestContents, rollChest } from './chest'
+import { PATHFINDERS_SEAL_UPGRADED_DROP_CHANCE } from '../../../data/upgrade-data'
+import { evaluateMerge, MergeResult, MergeSource, rollMerge } from './merge'
 import { WeaponCategory } from '../../../enums/weapon-category.enum'
 import { computed, effect, inject } from '@angular/core'
 import { patchState, signalStore, withComputed, withHooks, withMethods, withState } from '@ngrx/signals'
@@ -26,7 +28,7 @@ import { ItemType } from '../../../enums/items/item-type.enum'
 import RECIPES_DATA from '../../../data/recipes-data'
 import { RecipeID } from '../../../enums/ids/recipe-id.enum'
 import { EnemyID } from '../../../enums/ids/enemy-id.enum'
-import { QuestID } from '../../../enums/ids/quest-id.enum'
+import type { QuestDropLimits } from '../../services/quest-status'
 import { SkillNodeID } from '../../../enums/ids/skill-node-id.enum'
 import { SpellID } from '../../../enums/ids/spell-id.enum'
 import { ZoneID } from '../../../enums/ids/zone-id.enum'
@@ -36,6 +38,7 @@ import { withDevtools } from '../helpers/devtools'
 import { saveGameStateNow, SaveMigrations, withGameStateSync } from '../helpers/with-game-state-sync.hook'
 import {
   addItems,
+  stackKey,
   lostItems,
   canFit,
   countFreeSlots,
@@ -74,6 +77,7 @@ import {
   consumableModifiers,
   deriveStats,
   equipmentModifiers,
+  gearModifiers,
   foodMultiplierOf,
   initialResources,
   isResourceStat,
@@ -82,7 +86,6 @@ import {
   sameIds,
   skillNodeModifiers,
   SourcedModifiers,
-  StatModifier,
 } from './stats'
 
 export type { PlayerStatsType } from './stats'
@@ -185,10 +188,6 @@ const equipmentSpells = (equipment: EquipmentType): SpellID[] =>
 
 const unseen = <T>(ids: T[], seen: T[]): T[] => ids.filter(id => !seen.includes(id))
 
-/** Stat modifiers one piece of gear grants (none for an empty slot). */
-const gearModifiers = (equipped: { id: ItemID } | null): StatModifier[] =>
-  equipped ? ((ITEM_DATA[equipped.id] as EquipmentItem).stats ?? []).map(s => ({ stat: s.id, amount: s.amount })) : []
-
 /** Version 1 Guild Satchels gave +5 slots; version 2 gives +2 to each slot tab. They were the only permanent slot source. */
 const V1_SATCHEL_SLOTS = 5
 const V2_SATCHEL_SLOTS = 2
@@ -218,14 +217,13 @@ const handleExperience = (resources: Resources) => {
   handleExperience(resources)
 }
 
-const stackAmount = (inventory: Inventories, id: ItemID, tier: ItemTier): number =>
-  inventory[tabOf(id)].reduce((sum, slot) => slot?.id === id && slot.tier === tier ? sum + slot.amount : sum, 0)
-
-/** Takes `items` out; a kept chest roll goes with the last chest of its id (sold, destroyed), so a later one rolls fresh. */
+/** Takes `items` out; a kept chest roll goes with the last chest of its id at any upgrade level (sold, destroyed), so a later one rolls fresh. */
 const withoutItems = (state: PlayerState, items: ItemStack[]): Pick<PlayerState, 'inventory' | 'rolledChests'> => {
   const inventory = removeItems(state.inventory, items)
-  const rolledChests = Object.fromEntries(
-    Object.entries(state.rolledChests).filter(([id]) => countItem(inventory, Number(id) as ItemID) > 0))
+  const rolledChests = Object.fromEntries(Object.entries(state.rolledChests).filter(([key]) => {
+    const id = Number(key) as ItemID
+    return inventory[tabOf(id)].some(slot => slot?.id === id)
+  }))
   return { inventory, rolledChests }
 }
 
@@ -314,6 +312,8 @@ export const PlayerStore = signalStore(
   }),
   // Guild rank and tasks, titles, bestiary, equipped weapon, zone mastery.
   withComputed((store) => ({
+    canRegisterPathfindersSeal: computed(() => (store.permanentBonuses().upgradedDropChance ?? 0) === 0
+      && countItem(store.inventory(), ItemID.pathfindersSeal) > 0),
     /** One rank per `TASKS_PER_GUILD_RANK` completed tasks, no cap. Each rank adds a zone tier to the task pool. */
     guildRank: () => Math.floor(store.totalTasksCompleted() / TASKS_PER_GUILD_RANK),
     /** Titles whose source is met, in `TitleID` order. */
@@ -413,10 +413,21 @@ export const PlayerStore = signalStore(
       patchState(store, (state) => withoutItems(state, items))
     },
 
-    /** Throws away the whole stack (same id and tier). Quest items can't be destroyed; returns whether anything was. */
+    /** Consume the Seal and save its one-time lesson together; repeated or stale effects do nothing. */
+    registerPathfindersSeal(): boolean {
+      if (!store.canRegisterPathfindersSeal()) return false
+      patchState(store, state => ({
+        inventory: removeItems(state.inventory, [{ id: ItemID.pathfindersSeal, amount: 1 }]),
+        permanentBonuses: { ...state.permanentBonuses, upgradedDropChance: PATHFINDERS_SEAL_UPGRADED_DROP_CHANCE },
+      }))
+      saveGameStateNow()
+      return true
+    },
+
+    /** Throws away the whole stack (same id, tier and upgrade level). Quest items can't be destroyed; returns whether anything was. */
     destroyItem(item: InventoryItem): boolean {
       if (item.type === ItemType.quest) return false
-      patchState(store, (state) => withoutItems(state, [{ id: item.id, amount: item.amount, tier: item.tier }]))
+      patchState(store, (state) => withoutItems(state, [{ id: item.id, amount: item.amount, tier: item.tier, upgradeLevel: item.upgradeLevel }]))
       return true
     },
 
@@ -532,7 +543,7 @@ export const PlayerStore = signalStore(
       if (!equipped) return false
       return store.canChangeInventorySlots(
         slotDeltas([], gearModifiers(equipped)),
-        [{ id: equipped.id, tier: equipped.tier, amount: 1 }],
+        [{ id: equipped.id, tier: equipped.tier, upgradeLevel: equipped.upgradeLevel, amount: 1 }],
       )
     },
 
@@ -543,8 +554,8 @@ export const PlayerStore = signalStore(
       const slotKey = EquipmentSlot[slot] as EquipmentSlotKey
       const equipped = store.equipment()[slotKey]
       const deltas = slotDeltas(gearModifiers(item), gearModifiers(equipped))
-      const adding = equipped ? [{ id: equipped.id, tier: equipped.tier, amount: 1 }] : []
-      return store.canChangeInventorySlots(deltas, adding, [{ id: item.id, tier: item.tier, amount: 1 }])
+      const adding = equipped ? [{ id: equipped.id, tier: equipped.tier, upgradeLevel: equipped.upgradeLevel, amount: 1 }] : []
+      return store.canChangeInventorySlots(deltas, adding, [{ id: item.id, tier: item.tier, upgradeLevel: item.upgradeLevel, amount: 1 }])
     },
 
     /** Finished, unclaimed, and its chest's items fit in the inventory. */
@@ -556,12 +567,12 @@ export const PlayerStore = signalStore(
   })),
   // Game actions: kills and drops, zone stars, selling, equipping, using items and chests, mana regen, crafting.
   withMethods((store) => ({
-    processBattleEnd(enemyId: EnemyID, zoneId: ZoneID, currentWave: number, isShiny: boolean, activeQuestIds?: Set<QuestID>): ItemStack[] {
+    processBattleEnd(enemyId: EnemyID, zoneId: ZoneID, currentWave: number, isShiny: boolean, questDropLimits?: QuestDropLimits): ItemStack[] {
       const enemy = ENEMIES_DATA[enemyId]
       const { experience, gold, dropRolls } = killReward(enemy, ZONES_DATA[zoneId], currentWave, isShiny, store.stats())
       const drops = new Map<string, InventoryItem>()
       const { dropChance } = rankBonus(enemyId, store.enemyKillCounts()[enemyId] ?? 0)
-      rollEnemyDrops(enemy, dropRolls, isShiny, dropChance, drops, activeQuestIds)
+      rollEnemyDrops(enemy, dropRolls, isShiny, dropChance, drops, questDropLimits, undefined, store.stats().upgradedDropChance)
       const itemsToUpdate = [...drops.values()]
 
       store.updatePlayerStats([
@@ -595,11 +606,11 @@ export const PlayerStore = signalStore(
       const { stations, rest, installed } = installStations(store.stations(), batch.items)
       const inventoryBefore = store.inventory()
       const inventory = addItems(inventoryBefore, capacity, rest)
-      // Each stack arrives whole or not at all; `rest` holds one entry per id + tier (rolled into a map).
-      const receivedItems: InventoryItem[] = rest.flatMap(({ id, tier: requestedTier }) => {
+      // Each stack arrives whole or not at all; `rest` holds one entry per id + tier + upgradeLevel (rolled into a map).
+      const receivedItems: InventoryItem[] = rest.flatMap(({ id, tier: requestedTier, upgradeLevel }) => {
         const tier = requestedTier ?? ITEM_DATA[id].tier
-        const amount = stackAmount(inventory, id, tier) - stackAmount(inventoryBefore, id, tier)
-        return amount > 0 ? [{ id, type: ITEM_DATA[id].type, tier, amount }] : []
+        const amount = countItem(inventory, id, tier, upgradeLevel) - countItem(inventoryBefore, id, tier, upgradeLevel)
+        return amount > 0 ? [{ id, type: ITEM_DATA[id].type, tier, amount, ...(upgradeLevel === undefined ? {} : { upgradeLevel }) }] : []
       })
       const received = receivedItems.reduce((sum, item) => sum + item.amount, 0)
       const lostDrops = rest.reduce((sum, item) => sum + item.amount, 0) - received
@@ -654,13 +665,29 @@ export const PlayerStore = signalStore(
 
     /** Sells up to `amount` from one stack at `shopId`'s price (`sellPrice`). No-op when that shop won't buy it. */
     sellItem(item: InventoryItem, shopId: ShopID, amount = 1) {
-      const price = sellPrice(shopId, item.id)
-      const owned = store.inventory()[tabOf(item.id)].find(slot => slot?.id === item.id && slot.tier === item.tier)?.amount ?? 0
+      const price = sellPrice(shopId, item.id, item.upgradeLevel)
+      const owned = store.inventory()[tabOf(item.id)].find(slot => slot !== null && stackKey(slot) === stackKey(item))?.amount ?? 0
       const sold = Math.min(amount, owned)
       if (price <= 0 || sold <= 0) return
 
-      store.removeItems([{ id: item.id, tier: item.tier, amount: sold }])
+      store.removeItems([{ id: item.id, tier: item.tier, upgradeLevel: item.upgradeLevel, amount: sold }])
       store.updatePlayerStats([{ stat: 'goldCoins', amount: price * sold }])
+    },
+
+    /** Merges owned copies atomically, so refusals spend nothing and never roll. */
+    mergeItem(base: MergeSource, sacrifice: MergeSource, rng: () => number = Math.random): MergeResult {
+      const plan = evaluateMerge({
+        base, sacrifice, inventory: store.inventory(), equipment: store.equipment(),
+        capacity: store.inventoryCapacity(), goldCoins: store.resources().goldCoins,
+      })
+      if (plan.status === 'refused') return plan
+      const { result, state } = rollMerge(plan, rng)
+      patchState(store, {
+        inventory: state.inventory,
+        equipment: state.equipment,
+        resources: { ...store.resources(), goldCoins: state.goldCoins },
+      })
+      return result
     },
 
     equipItem(item: InventoryItem) {
@@ -671,14 +698,14 @@ export const PlayerStore = signalStore(
       const currentlyEquipped = store.equipment()[slotKey]
 
       // Remove first so the swapped-out item always has a free slot to return to.
-      store.removeItems([{ id: item.id, tier: item.tier, amount: 1 }])
+      store.removeItems([{ id: item.id, tier: item.tier, upgradeLevel: item.upgradeLevel, amount: 1 }])
 
       if (currentlyEquipped) {
-        store.addItems([{ id: currentlyEquipped.id, tier: currentlyEquipped.tier, amount: 1 }])
+        store.addItems([{ id: currentlyEquipped.id, tier: currentlyEquipped.tier, upgradeLevel: currentlyEquipped.upgradeLevel, amount: 1 }])
       }
 
       patchState(store, (state) => ({
-        equipment: { ...state.equipment, [slotKey]: { id: item.id, tier: item.tier } },
+        equipment: { ...state.equipment, [slotKey]: { id: item.id, tier: item.tier, upgradeLevel: item.upgradeLevel } },
       }))
     },
 
@@ -687,7 +714,7 @@ export const PlayerStore = signalStore(
 
       if (!equippedItem || !store.canUnequip(slot)) return
 
-      store.addItems([{ id: equippedItem.id, tier: equippedItem.tier, amount: 1 }])
+      store.addItems([{ id: equippedItem.id, tier: equippedItem.tier, upgradeLevel: equippedItem.upgradeLevel, amount: 1 }])
 
       patchState(store, (state) => ({
         equipment: { ...state.equipment, [slot]: null },
@@ -699,7 +726,7 @@ export const PlayerStore = signalStore(
       const itemData = ITEM_DATA[item.id]
       if (itemData.type !== ItemType.stationUpgrade || !canInstall(store.stations(), itemData)) return false
 
-      store.removeItems([{ id: item.id, tier: item.tier, amount: 1 }])
+      store.removeItems([{ id: item.id, tier: item.tier, upgradeLevel: item.upgradeLevel, amount: 1 }])
       store.addItems([{ id: item.id, amount: 1 }])
       return true
     },
@@ -711,14 +738,14 @@ export const PlayerStore = signalStore(
         const recipeData = itemData as RecipeItem
         if (store.unlockedRecipes().includes(recipeData.recipeId)) return
         patchState(store, state => ({ unlockedRecipes: [...state.unlockedRecipes, recipeData.recipeId] }))
-        store.removeItems([{ id: item.id, tier: item.tier, amount: 1 }])
+        store.removeItems([{ id: item.id, tier: item.tier, upgradeLevel: item.upgradeLevel, amount: 1 }])
         return
       }
 
       if (itemData.type === ItemType.spellScroll) {
         if (store.knownSpellIds().includes(itemData.spellId)) return
         store.levelUpSpell(itemData.spellId)
-        store.removeItems([{ id: item.id, tier: item.tier, amount: 1 }])
+        store.removeItems([{ id: item.id, tier: item.tier, upgradeLevel: item.upgradeLevel, amount: 1 }])
         return
       }
 
@@ -726,7 +753,7 @@ export const PlayerStore = signalStore(
 
       const statsToUpdate = itemData.stats.map(s => ({ stat: s.id, amount: s.amount }))
       store.updatePlayerStats(statsToUpdate)
-      store.removeItems([{ id: item.id, tier: item.tier, amount: 1 }])
+      store.removeItems([{ id: item.id, tier: item.tier, upgradeLevel: item.upgradeLevel, amount: 1 }])
     },
 
     /**
@@ -737,8 +764,11 @@ export const PlayerStore = signalStore(
     openChest(item: InventoryItem, rng: () => number = Math.random): { contents: ChestContents | null, missing: MissingSlots } {
       const itemData = ITEM_DATA[item.id]
       if (itemData.type !== ItemType.chest) return { contents: null, missing: {} }
-      const chest = { id: item.id, tier: item.tier, amount: 1 }
-      const contents = store.rolledChests()[item.id] ?? rollChest(itemData, rng)
+      const chest = { id: item.id, tier: item.tier, upgradeLevel: item.upgradeLevel, amount: 1 }
+      const bonus = itemData.bonusRoll
+      const bonusEligible = !!bonus && (store.permanentBonuses()[bonus.registeredStat] ?? 0) === 0
+        && countItem(store.inventory(), bonus.itemId) === 0
+      const contents = store.rolledChests()[item.id] ?? rollChest(itemData, rng, bonusEligible)
       const missing = store.missingSlotsByTab(contents.items, [chest])
       const rolledChests = { ...store.rolledChests() }
       const blocked = Object.keys(missing).length > 0
@@ -793,8 +823,8 @@ export const PlayerStore = signalStore(
       return { crafted: count, installed }
     },
 
-    itemCount(id: ItemID): number {
-      return countItem(store.inventory(), id)
+    itemCount(id: ItemID, tier?: ItemTier, upgradeLevel = 0): number {
+      return countItem(store.inventory(), id, tier, upgradeLevel)
     },
   })),
   // Lookups and unlocks: skills, zones, towns, titles, reputation, features, seen markers.

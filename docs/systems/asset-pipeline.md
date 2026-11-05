@@ -34,6 +34,8 @@ A family (an entry in `styles.mjs`) is a named art recipe: checkpoint, style pro
 
 The equipment paper doll uses `src/assets/img/icons/equipment-body.svg`, a code-drawn decorative silhouette with baked-in panel colors, loaded with `img ngSrc`. It is a layout guide behind the equipment slots rather than generated character art.
 
+The Forge workbench uses a `town-painterly` backdrop under `src/assets/img/ui/`, shipped as PNG like the town backgrounds. Its accepted 1376×768 candidate is resized with Sharp to 960×536 and compressed with a 256-colour palette (`dither: 0.6`, `effort: 10`), reducing it to about 332 KiB for the desktop panel. These export settings are recorded in its manifest entry; darkening and the vignette are CSS layers on the workbench. The plaque's `item-pixel` anvil stays a native 48×48 transparent PNG, displayed at an integer scale with `image-rendering: pixelated`.
+
 ## One-time setup
 
 None of this is in git. The server is the one Krita AI Diffusion manages, in `%APPDATA%\krita\ai_diffusion\server\ComfyUI` (below: `<comfy>`).

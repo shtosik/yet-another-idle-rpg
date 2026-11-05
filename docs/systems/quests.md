@@ -8,7 +8,7 @@ Multi-step story objectives handed out by NPCs. Quests are started, advanced and
 - `src/enums/ids/quest-id.enum.ts:QuestID`.
 - `src/app/store/quests/quests.store.ts:QuestsStore` — `questStepProgression` and `stepKillBaselines` (saved), `dialogueFlags`, `pinnedQuests` (saved), `togglePin`, `startQuest`/`advanceQuest`/`endQuest`, `handleQuestCompleted` (rewards + modal), `questEnemyKills`/`questWaveKills`, `requirementProgress` (current/target for any requirement; a `reputation` one is points against the tier threshold, labelled "Mawood Honored"; the panel and `DialogueManagerService` both use it).
 - `src/app/services/quest-status.ts` — `getQuestStatus`, `canAdvanceQuest`, `isQuestAvailable`, `matchesQuestState`, `getStepItems`, `getActiveQuestIds`. Status is always derived from the saved step.
-- `src/app/components/game/quests/quests.component.ts` — quest panel: the tab bar (arrow keys move between tabs); each tab is its own component: `quest-list/` (Quests) and `reputation/` (tier and progress per unlocked reputation town). The quest list shows active quests (ready ones first, tagged **Ready**) with progress for each requirement of the current step, the step description on click, and completed quests behind a toggle. Links: "Talk to {NPC}" (the current step's `turnInNpc`, placed by `npcPlace` in `src/data/helpers/npc-places.ts`; needs the Map and the town unlocked) and a zone icon on unfinished kill requirements (`GameNavigationService.fightIn`; keeps the current wave when already in that zone). Pinned quests (`pinnedQuests`, saved, dropped on completion) sort first. Never shows a step number, step count or rewards, so quest length isn't spoiled.
+- `src/app/components/game/quests/quests.component.ts` — quest panel: the tab bar (arrow keys move between tabs); each tab is its own component: `quest-list/` (Quests) and `reputation/` (tier and progress per unlocked reputation town). The quest list shows active quests (ready ones first, tagged **Ready**) with progress for each requirement of the current step (a quest item reads "Find {item}"; a single requirement shows only Done once met), the step description on click, and completed quests behind a toggle. Links: "Talk to {NPC}" (the current step's `turnInNpc`, placed by `npcPlace` in `src/data/helpers/npc-places.ts`; shown once the step's requirements are met; needs the Map and the town unlocked) and a zone icon on unfinished kill requirements (`GameNavigationService.fightIn`; keeps the current wave when already in that zone). Pinned quests (`pinnedQuests`, saved, dropped on completion) sort first. Never shows a step number, step count or rewards, so quest length isn't spoiled.
 - `src/app/components/modals/quest-completed/` — reward modal.
 
 ## Data flow
@@ -16,13 +16,18 @@ Multi-step story objectives handed out by NPCs. Quests are started, advanced and
 2. **Progress**: requirements (`item`, `stat`, `enemy` kill count, `wave` kill count, `quest`, `reputation` tier) are checked, not tracked. When a quest reaches a step, the store snapshots the lifetime kill counters that step's `enemy`/`wave` requirements read (`stepKillBaselines`); those requirements count kills since then (`questEnemyKills`/`questWaveKills`).
 3. **Advance**: a turn-in result gated by `QuestState.readyToAdvance` (with `step`) applies `action: 'advance'`, which `advanceQuest` ignores unless the step is still ready (items can be used up while the turn-in node is open). The store first takes the step's `item` requirements from the inventory, so turn-ins never restate them. Advancing past the last step completes the quest.
 4. **Complete**: step becomes `QUEST_STEP_AFTER_COMPLETED` (9999), the step's items are taken, the kill baseline is dropped, and `handleQuestCompleted` grants `rewards` (stats, items and town `reputation` through `ReputationService.gain`, see `towns-shops-guild.md`) and opens the modal, which lists reputation as "+20 La Harpar reputation". A reputation reward names its `townId`, so a quest can credit a town other than the giver's; `validate` allows only `REPUTATION_TOWNS`. `action: 'end'` completes from any step, but only while that step is ready (`isStepReady`, the same recheck as `advanceQuest`); `endQuest` itself skips the check. `advanceQuest`/`endQuest` are no-ops unless the quest is active. Cheat: `dev.completeQuest(questId)` starts and ends a quest, rewards included.
-5. Enemy drops with `requiredActiveQuestId` only roll while that quest is active (`getActiveQuestIds`).
+5. Enemy drops with `requiredActiveQuestId` only roll while that quest's current step requires the item and the player holds fewer than required. `getQuestDropLimits` snapshots the missing amounts from current-step requirements and inventory counts once per online kill or offline claim; `rollDropList` subtracts amounts already rolled into its accumulator and caps each drop at the remainder. Nothing drops before or after the item step, once enough is held, or after completion, even if other step requirements are unmet.
 
 Saved step encoding: `undefined` = not started, `1..n` = on step n, `9999` = completed.
 
 ## Intended behavior (owner decisions)
 - **A Tale of a Captain is unfinished on purpose.** `captainsLetter` has no source and `rewards` is empty (no reputation either); it will be finished later.
 - Completing a quest must be blocked when item rewards don't fit in the inventory (see `player-stats-inventory-equipment.md`).
+
+## The Cold Forge
+Phurgo at Lirold's Forge offers `QuestID.theColdForge` (20) as soon as the player can reach him; there is no extra quest or reputation gate. Its five steps are: talk to Ludo Crane at the Arena; deliver one Phurgo's Forge Tongs to Phurgo; talk to Marvin at La Harpar's Exploration Guild; deliver one existing Fish & Apple Pie to Phurgo; deliver ten Ancient Wood to Phurgo. The two talk steps have empty requirements and advance only at their named NPC. The store consumes the three deliveries once. Completion gives 2000 XP and 400 gold and gates Phurgo's Upgrade gear service, without a separate flag or demonstration merge.
+
+Goblin Scavengers drop `ItemID.phurgosForgeTongs` (181), an unsellable, indestructible quest item, at 1 in 50 with `requiredActiveQuestId: QuestID.theColdForge`. The quest-drop cap (step 5 above) keeps it to one: it rolls only on the step that needs it, and stops once held.
 
 ## Invariants & gotchas
 - Steps are 1-based in saves and 0-based in `steps[]` (`steps[step - 1]`).
@@ -31,7 +36,7 @@ Saved step encoding: `undefined` = not started, `1..n` = on step n, `9999` = com
 - `QUEST_DATA` is the only place requirements live. Turn-ins don't add `requirementsNeeded` or `item` `take` effects for them.
 - A start result only shows while its quest is `available`, so it can't share a result with the `end` that unlocks it. Put the follow-up `start` on the next node.
 - Quests started in a save from before `stepKillBaselines` have no baseline and count lifetime kills.
-- Quest step descriptions are plain English strings, not i18n keys (see `localization.md`).
+- Quest step descriptions retain plain English fallbacks. The quest panel first resolves `quests:steps.<questKey>.<step>` (1-based); The Cold Forge provides all five translations (see `localization.md`).
 
 ## Known issues
 - The inventory space check for item rewards lives in dialogue (`DialogueManagerService.canApplyResult`); `handleQuestCompleted` itself doesn't check.

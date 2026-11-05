@@ -497,6 +497,41 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       { type: 'stat', key: 'unspentSkillPoints', amount: 1 },
     ],
   },
+  [QuestID.theColdForge]: {
+    questId: QuestID.theColdForge,
+    startRequirements: [{ type: 'stat', key: 'level', amount: 1 }],
+    steps: [
+      {
+        description: "Ask Ludo Crane at Lirold's Arena what happened to Phurgo's delivery cart.",
+        turnInNpc: NpcID.liroldArenaMaster,
+        requirements: [],
+      },
+      {
+        description: "Recover Phurgo's Forge Tongs from Goblin Scavengers in the Mountain Pass and return them to Phurgo.",
+        turnInNpc: NpcID.liroldPhurgo,
+        requirements: [{ type: 'item', itemId: ItemID.phurgosForgeTongs, amount: 1 }],
+      },
+      {
+        description: "Ask Marvin at the Exploration Guild in La Harpar to check Phurgo's old delivery record.",
+        turnInNpc: NpcID.laHarparMarvin,
+        requirements: [],
+      },
+      {
+        description: "Bring Phurgo one Fish & Apple Pie at Lirold's Forge.",
+        turnInNpc: NpcID.liroldPhurgo,
+        requirements: [{ type: 'item', itemId: ItemID.fishApplePie, amount: 1 }],
+      },
+      {
+        description: "Bring Phurgo 10 Ancient Wood for charcoal at Lirold's Forge.",
+        turnInNpc: NpcID.liroldPhurgo,
+        requirements: [{ type: 'item', itemId: ItemID.ancientWood, amount: 10 }],
+      },
+    ],
+    rewards: [
+      { type: 'stat', key: 'experience', amount: 2000 },
+      { type: 'stat', key: 'goldCoins', amount: 400 },
+    ],
+  },
 }
 
 export default QUEST_DATA

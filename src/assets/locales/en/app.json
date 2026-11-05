@@ -64,6 +64,7 @@
       "inventorySlots": "Slots in each of your Gear, Consumables and Materials inventory tabs.",
       "maxTaskSlots": "Exploration Guild tasks you can have at once.",
       "taskDoubleKillChance": "Chance for a kill to count twice toward Guild tasks.",
+      "upgradedDropChance": "Chance for non-unique gear drops, excluding pets, to arrive already upgraded to +1.",
       "shopRefreshCooldown": "Time between shop restocks.",
       "weakness": "Damage multiplier when you hit an enemy's elemental weakness with this element. Needs the Weaknesses skill.",
       "damageVs": "Extra damage against enemies of this type, added on top of everything else."
@@ -89,6 +90,7 @@
     "inventorySlots": "Inventory Slots",
     "maxTaskSlots": "Guild Task Slots",
     "taskDoubleKillChance": "Bounty Mark Chance",
+    "upgradedDropChance": "Upgraded Gear Drop Chance",
     "critChance": "Crit Chance",
     "critMulti": "Crit Multiplier",
     "experience": "XP",

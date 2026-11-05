@@ -65,6 +65,10 @@ _Avoid_: Auto-use, auto-consume
 One of the inventory's five sections (Gear, Consumables, Materials, Pets, Quest), each with its own slots; an item's tab follows from its type.
 _Avoid_: Bag, category
 
+**Upgrade level**:
+A piece of gear's enhancement level, stored as `upgradeLevel` and shown as `+N`; missing means +0. Separate from its rarity (`ItemTier`).
+_Avoid_: tier, rank
+
 ## Skill tree
 
 **Branch**:

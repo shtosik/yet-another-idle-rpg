@@ -17,7 +17,7 @@ import { Enemy } from '../../interfaces/enemy.interface'
 import { ZONE_UNLOCK_NOTIFICATIONS } from '../../data/unlock-conditions'
 import { ModalService } from './modal.service'
 import { DamageElement } from '../../enums/damage-element.enum'
-import { getActiveQuestIds } from './quest-status'
+import { getQuestDropLimits } from './quest-status'
 import { resolveHit } from './hit-resolution'
 import { ItemID } from '../../enums/ids/item-id.enum'
 import ITEM_DATA from '../../data/items-data'
@@ -271,8 +271,8 @@ export class BattleManagerService {
     const isShiny = this.battleStore.isShinyEnemy()
     this.battleStore.endBattle()
     this.offlineStore.recordKill(performance.now(), zoneId, wave)
-    const activeQuestIds = getActiveQuestIds(this.questsStore.questStepProgression())
-    const lost = this.playerStore.processBattleEnd(enemy.id, zoneId, wave, isShiny, activeQuestIds)
+    const questDropLimits = getQuestDropLimits(this.questsStore.questStepProgression(), this.playerStore.itemCount)
+    const lost = this.playerStore.processBattleEnd(enemy.id, zoneId, wave, isShiny, questDropLimits)
     if (lost.length) this.showDropsLost(lost)
 
     this.unlockNextZone(wave)

@@ -46,6 +46,7 @@ export const GlovesItemsData: Partial<Record<ItemID, Item>> = {
   // Arena Chest only: drops-and-progress gloves, a choice against power gloves.
   [ItemID.patronGloves]: {
     id: ItemID.patronGloves,
+    unique: true,
     tier: ItemTier.epic,
     url: './assets/img/items/patronGloves.png',
     value: 2500,

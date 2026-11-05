@@ -53,6 +53,7 @@ export type PlayerStat =
     | 'inventorySlots'
     | 'maxTaskSlots'
     | 'taskDoubleKillChance'
+    | 'upgradedDropChance'
     | 'offlineProgressRate'
 
 export const multiplierStats: PlayerStat[] = [
@@ -73,6 +74,7 @@ export const multiplierStats: PlayerStat[] = [
 
 export const percentageStats: PlayerStat[] = [
     'critChance',
+    'upgradedDropChance',
 ]
 
 export const additivePercentStats: PlayerStat[] = [
