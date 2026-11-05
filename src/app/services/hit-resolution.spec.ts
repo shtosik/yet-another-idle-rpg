@@ -7,7 +7,6 @@ describe('resolveHit', () => {
   const input = (stats: Partial<typeof statsInitialState> = {}): HitInput => ({
     stats: { ...statsInitialState, ...stats },
     magicDamage: 0,
-    isDoubleAttack: false,
     isMelee: true,
     damageType: DamageElement.physical,
     enemyWeakness: undefined,

@@ -40,6 +40,7 @@ export class SpellSlotComponent {
   })
   /** False for a gear spell whose gear came off; it stays until its cooldown ends. */
   isKnown = computed(() => this.playerStore.knownSpellIds().includes(this.equippedSpell().spellId))
+  hasRequiredWeapon = computed(() => this.battleManagerService.hasRequiredWeapon(this.equippedSpell().spellId))
   canAfford = computed(() => this.battleManagerService.canAffordSpell(this.equippedSpell().spellId))
   /** Seconds, after cooldown reduction. */
   cooldown = computed(() => this.battleManagerService.spellCooldown(this.equippedSpell().spellId))
@@ -50,6 +51,7 @@ export class SpellSlotComponent {
   readonly statusText = computed(() => {
     let state = 'app:battle.spellWaiting'
     if (!this.isKnown()) state = 'app:battle.spellUnknown'
+    else if (!this.hasRequiredWeapon()) state = 'app:battle.spellWeapon'
     else if (this.isActive()) state = 'app:battle.spellActive'
     else if (this.secondsUntilReady() > 0) state = 'app:battle.spellCooldown'
     else if (!this.canAfford()) state = 'app:battle.spellMana'

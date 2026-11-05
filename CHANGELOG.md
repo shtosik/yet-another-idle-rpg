@@ -6,6 +6,9 @@ Versions follow [Semantic Versioning](https://semver.org/). Each note is `- [typ
 New notes go under `[Unreleased]`; `npm run release -- <major|minor|patch>` moves them into a version (docs/deployment.md).
 
 ## [Unreleased]
+- [feature] Volley fires three separate ranged weapon hits and can be learned beside Double Attack in the damage skill tree.
+- [bug] Double Attack now strikes twice, with separate critical hits and Ambush charges. Both weapon spells stop when the enemy dies.
+- [nerf] Double Attack requires an equipped melee weapon; Volley requires a ranged weapon. Missing weapon requirements appear in red in spell tooltips.
 - [bug] The quest log's "Talk to" button now appears only once the step's requirements are met, so it no longer sends you to an NPC before you have what they asked for.
 - [feature] Quest steps that need a quest item now read "Find <item>", and steps not finished yet no longer say "Not yet".
 - [feature] Pathfinder's Seal: a rare Arena Chest find. Register it with Marvin and some gear drops arrive already upgraded to +1.

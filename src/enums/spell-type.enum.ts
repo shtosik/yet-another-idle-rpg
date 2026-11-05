@@ -4,4 +4,5 @@ export enum SpellType {
     buff = 2,
     damageOverTime = 3,
     empower = 4,
+    ranged = 5,
 }

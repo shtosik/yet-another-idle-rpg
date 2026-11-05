@@ -228,6 +228,18 @@ const DAMAGE_SKILLS_DATA: Partial<Record<SkillNodeID, SkillNode>> = {
     stat: 'critMulti',
     statAmount: 0.1,
   },
+  [SkillNodeID.volley]: {
+    id: SkillNodeID.volley,
+    branch: SkillBranch.damage,
+    turn: 45,
+    skillPointCost: 2,
+    requires: { kind: 'node', id: SkillNodeID.critMulti, minLevel: 5 },
+    maxLevel: 1,
+    special: true,
+    url: './assets/img/skills/volley.png',
+    type: SkillNodeType.spell,
+    spellId: SpellID.volley,
+  },
   [SkillNodeID.doubleAttack]: {
     id: SkillNodeID.doubleAttack,
     branch: SkillBranch.damage,

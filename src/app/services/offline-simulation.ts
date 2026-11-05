@@ -70,7 +70,6 @@ const scaledHp = (enemy: Enemy, zone: Zone, wave: number): number =>
 const autoAttackInput = (stats: PlayerStatsType, enemy: Enemy, input: OfflineSimulationInput): HitInput => ({
   stats,
   magicDamage: 0,
-  isDoubleAttack: false,
   isMelee: input.isMeleeWeapon,
   damageType: input.damageType,
   enemyWeakness: enemy.weakness,

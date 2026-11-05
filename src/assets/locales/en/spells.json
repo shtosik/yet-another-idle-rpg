@@ -2,7 +2,7 @@
     "names": {
         "doubleAttack": {
             "name": "Double Attack",
-            "desc": "A quick double attack"
+            "desc": "Strike the current enemy twice with your melee weapon. Each hit can critically strike. Stops if the enemy dies."
         },
         "haste": {
             "name": "Haste",
@@ -35,6 +35,10 @@
         "warCry": {
             "name": "War Cry",
             "desc": "A roar the stands answer: +25% melee damage for 15 seconds."
+        },
+        "volley": {
+            "name": "Volley",
+            "desc": "Fire three shots at the current enemy with your ranged weapon. Each hit can critically strike. Stops if the enemy dies."
         }
     },
     "types": {
@@ -42,9 +46,15 @@
         "magic": "Magic",
         "buff": "Buff",
         "damageOverTime": "Over time",
-        "empower": "Empower"
+        "empower": "Empower",
+        "ranged": "Ranged"
     },
     "manaCost": "Mana: {{ cost }}",
     "cooldown": "Cooldown: {{ cooldown }}",
-    "duration": "Duration: {{ duration }}"
+    "duration": "Duration: {{ duration }}",
+    "weaponRequirements": {
+        "melee": "Requires an equipped melee weapon.",
+        "ranged": "Requires an equipped ranged weapon.",
+        "magic": "Requires an equipped magic weapon."
+    }
 }

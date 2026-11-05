@@ -1,3 +1,4 @@
+import { WeaponCategory } from '../enums/weapon-category.enum'
 import { SpellID } from 'enums/ids/spell-id.enum'
 import { DamageElement } from 'enums/damage-element.enum'
 import { SpellType } from 'enums/spell-type.enum'
@@ -10,6 +11,7 @@ export type SpellProps = {
     baseCooldown: number;
     url: string;
     effect: SpellEffectProps;
+    requiredWeapon?: WeaponCategory;
     /** Skill node whose levels make this spell cheaper or faster (`BattleManagerService.manaCost`, `spellCooldown`). */
     perk?: SpellPerk;
 };
@@ -22,10 +24,11 @@ export type SpellPerk = {
     manaPerLevel?: number;
 };
 
-export type SpellEffectProps = SpellMeleeEffectProps | SpellMagicEffectProps | SpellBuffEffectProps | SpellDamageOverTimeEffectProps | SpellEmpowerEffectProps;
+export type SpellEffectProps = SpellWeaponEffectProps | SpellMagicEffectProps | SpellBuffEffectProps | SpellDamageOverTimeEffectProps | SpellEmpowerEffectProps;
 
-export type SpellMeleeEffectProps = {
-    type: SpellType.melee;
+export type SpellWeaponEffectProps = {
+    type: SpellType.melee | SpellType.ranged;
+    hits: number;
 };
 
 export type SpellMagicEffectProps = {

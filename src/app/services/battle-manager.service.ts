@@ -64,17 +64,17 @@ export class BattleManagerService {
     return this.currentWaveKillCount() >= zoneData.enemiesPerWave
   })
 
-  doDamage(magicDamage = 0, isDoubleAttack = false, damageType?: DamageElement) {
+  doDamage(magicDamage = 0, damageType?: DamageElement) {
     const enemyHp = this.battleStore.currentEnemyHp()
     const enemy = this.battleStore.enemy()
 
-    if (!enemy) return
+    if (!enemy || !this.battleStore.isInCombat()) return
     const isArena = !!this.battleStore.arenaRun()
     // A burrowed champion: nothing to hit (a damage-over-time tick is spent).
     if (isArena && this.arenaBosses.isHidden()) return
 
-    // Double Attack is the melee spell, melee whatever the weapon; an auto-attack is melee with a melee weapon.
-    const isMelee = magicDamage === 0 && (isDoubleAttack || this.playerStore.equippedWeaponCategory() === WeaponCategory.melee)
+    // Weapon spells and auto-attacks use the equipped weapon category.
+    const isMelee = magicDamage === 0 && this.playerStore.equippedWeaponCategory() === WeaponCategory.melee
     // Ambush: melee hits use up the guaranteed crits; ranged and magic hits don't.
     const forceCrit = isMelee && this.battleStore.useEmpoweredHit()
     const hitType = damageType ?? this.playerStore.equippedWeaponDamageType()
@@ -83,7 +83,6 @@ export class BattleManagerService {
       magicDamage,
       isMelee,
       forceCrit,
-      isDoubleAttack,
       damageType: hitType,
       enemyWeakness: enemy.weakness,
       enemyTypes: enemy.enemyTypes,
@@ -100,6 +99,12 @@ export class BattleManagerService {
     if (newHp === 0) {
       this.handleEnemyDeath(enemy)
     }
+  }
+
+  hasRequiredWeapon(spellId: SpellID): boolean {
+    const required = SPELLS_DATA[spellId].requiredWeapon
+    return required === undefined || (!!this.playerStore.equipment().weapon
+      && this.playerStore.equippedWeaponCategory() === required)
   }
 
   canAffordSpell(spellId: SpellID): boolean {
@@ -134,7 +139,7 @@ export class BattleManagerService {
     const slot = this.battleStore.equippedSpells().find(s => s?.spellId === spellId)
     if (!slot || slot.cooldownRemainingMs > 0 || !this.canAffordSpell(spellId)) return false
     // A gear spell waiting out its cooldown after the gear came off.
-    if (!this.playerStore.knownSpellIds().includes(spellId)) return false
+    if (!this.playerStore.knownSpellIds().includes(spellId) || !this.hasRequiredWeapon(spellId)) return false
 
     if (SPELLS_DATA[spellId].effect.type === SpellType.buff) {
       return !this.battleStore.activeBuffs().some(b => b.spellId === spellId)
@@ -155,10 +160,13 @@ export class BattleManagerService {
 
     switch (spellData.effect.type) {
       case SpellType.melee:
-        this.doDamage(0, true)
+      case SpellType.ranged:
+        for (let hit = 0; hit < spellData.effect.hits && this.battleStore.isInCombat(); hit++) {
+          this.doDamage()
+        }
         break
       case SpellType.magic:
-        this.doDamage(spellData.effect.baseDamage, false, spellData.effect.damageType)
+        this.doDamage(spellData.effect.baseDamage, spellData.effect.damageType)
         break
       case SpellType.damageOverTime:
         this.battleStore.addDamageOverTime(spellId)
@@ -205,7 +213,7 @@ export class BattleManagerService {
       remainingMs -= usedMs
       if (spellId === null) return
       const { damagePerHit, damageType } = SPELLS_DATA[spellId].effect as SpellDamageOverTimeEffectProps
-      this.doDamage(damagePerHit, false, damageType)
+      this.doDamage(damagePerHit, damageType)
     }
   }
 

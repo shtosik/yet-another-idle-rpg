@@ -7,7 +7,7 @@
   placement="top"
   tooltipClass="tooltip-override"
   [autoPlacement]="false"
-  [class.spell--disabled]="(!canAfford() || !isKnown()) && !isActive()"
+  [class.spell--disabled]="(!canAfford() || !isKnown() || !hasRequiredWeapon()) && !isActive()"
   [class.spell--active]="isActive()"
   [style]="{ 'background-image': spellData().url | url }"
   [style.--time-left]="cooldownSweepDeg() + 'deg'"

@@ -321,6 +321,7 @@
     "spellReady": "Ready to cast",
     "spellLabel": "{{name}}. {{state}}. Costs {{cost}} mana.",
     "critical": "Crit!",
-    "mastery": "Zone mastery: hover a star for its goal and reward"
+    "mastery": "Zone mastery: hover a star for its goal and reward",
+    "spellWeapon": "Required weapon is not equipped"
   }
 }

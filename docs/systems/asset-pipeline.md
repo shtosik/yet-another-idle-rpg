@@ -40,13 +40,17 @@ The Forge workbench uses a `town-painterly` backdrop under `src/assets/img/ui/`,
 
 None of this is in git. The server is the one Krita AI Diffusion manages, in `%APPDATA%\krita\ai_diffusion\server\ComfyUI` (below: `<comfy>`).
 
-`matte` needs the model once:
+`matte` needs the model once. From the repo root in PowerShell, download to the path the pipeline actually resolves (including overrides):
 
-```
-curl -L -o "%APPDATA%\krita\ai_diffusion\server\models\matting\isnet-general-use.onnx" https://github.com/danielgatis/rembg/releases/download/v0.0.0/isnet-general-use.onnx
+```powershell
+$matteTarget = node --input-type=module -e "import { resolveMattingPaths } from './scripts/asset-gen/lib/server-path.mjs'; console.log(resolveMattingPaths().model)"
+New-Item -ItemType Directory -Force -Path (Split-Path -Parent $matteTarget) | Out-Null
+curl.exe -fL -o $matteTarget https://github.com/danielgatis/rembg/releases/download/v0.0.0/isnet-general-use.onnx
 ```
 
-Override locations with `ASSET_GEN_PYTHON` / `ASSET_GEN_MATTE_MODEL`.
+Server discovery (`lib/server-path.mjs`) checks the standard `%APPDATA%/krita/ai_diffusion/server` then the relocated `D:/AppData/krita/ai_diffusion/server`, requiring ComfyUI and its Python launcher. Set `ASSET_GEN_SERVER_DIR` to select another installation explicitly.
+
+Matting resolves `python.exe` and its model independently: existing roaming files take priority, then relocated files, without requiring ComfyUI or `pythonw.exe`. Missing files default to the selected server directory, so the download command above installs the model where it will be used. `ASSET_GEN_SERVER_DIR` restricts this lookup to the explicit installation; `ASSET_GEN_PYTHON` and `ASSET_GEN_MATTE_MODEL` override the individual paths.
 
 **LayerDiffuse** (transparent generation, `layer`): `git clone https://github.com/huchenlei/ComfyUI-layerdiffuse` into `<comfy>\custom_nodes`, and install its `requirements.txt` into the server venv (the venv is uv-managed). The two models (`layer_xl_transparent_attn` 743 MB, `vae_transparent_decoder` 208 MB) download into `<comfy>\models\layer_model` on first use. A Krita AI Diffusion update can wipe `custom_nodes`; if a job fails with a missing `LayeredDiffusionApply` node, reinstall. The node's own `LayeredDiffusionDecodeRGBA` is broken on current ComfyUI (it calls a `JoinImageWithAlpha` method that no longer exists), so the graph decodes with `LayeredDiffusionDecode`, `InvertMask` and the core `JoinImageWithAlpha` instead.
 
@@ -224,3 +228,6 @@ Opaque families (backgrounds) get `edge` and `tone` instead of the cutout checks
 Calibration: the 31 shipped enemy sprites give no flags. On 12 real spider generations (a fixed seed, silhouette control) it flagged 4: the two with extra or doubled legs, one with a notch cut into the abdomen, and one with its head and abdomen stacked in the wrong place, and it passed the 3 candidates the user had accepted. It missed one candidate with a single doubled leg. The `hole` rule was first tuned on spiders and then flagged 12 of 24 troll, goblin and gnoll candidates for the gap between an arm and the torso; it was retightened on those (now only a troll with several torso patches is flagged). `fragment` and `slab` were only checked on synthetic images and the shipped sprites. Treat a pass as "nothing obvious", not as approval. The `skeleton` body and limb checks only run with a silhouette control (spider).
 
 QC cannot see a face painted on a shell, a metallic or plated surface, grey halo residue, or a wrong limb count without a control, and matted jobs (`layer: false`) have no raw alpha, so they skip the slab-by-raw and `skeleton` checks. Still judge transparency on a **magenta** backdrop, not the sheet's dark grey: grey residue and backdrop pockets disappear against grey. Count limbs, eyes and claws against the creature, and reject empty patches in the body, a face painted on a shell, a metallic or plated look on an organic creature, and several copies of the subject.
+
+Volley uses `skill-icon` with three projectiles and golden motion trails against teal; its selected candidate is recorded in the manifest and shared by the spell and damage-branch node.
+`skills/volley.png` was repainted from the frozen `refs/control/volley-source.svg` layout at denoise 0.6 and IP weight 0.5. This keeps three plain triangular steel heads; text-only generations repeatedly turned the tips into feathers.

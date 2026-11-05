@@ -57,3 +57,5 @@ Pathfinder's Seal uses `items:names.pathfindersSeal`, `app:playerStats.upgradedD
 
 ## How to extend
 New NPC dialogue: the `add-npc-dialogue` skill (creates the namespace and registers it). Any new entity: add its name key under the convention above, then run `npm run validate`.
+
+Weapon spell requirements use `spells:weaponRequirements.<WeaponCategory key>` in shared spell tooltips; unmet requirements are red. `app:battle.spellWeapon` supplies the spell-bar accessible status. Volley has spell and skill-node name/description keys.
