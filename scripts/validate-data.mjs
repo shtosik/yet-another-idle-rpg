@@ -672,11 +672,34 @@ for (const f of [...walkFiles(join(ROOT, '.claude', 'agents'), '.md'), ...walkFi
   const STATUSES = ['Proposed', 'Accepted', 'In progress', 'Done', 'Noted', 'Open']
   const readme = 'docs/ideas/README.md'
   for (const [, file, status] of readFileSync(join(IDEAS, 'README.md'), 'utf8').matchAll(/^\|[^|]*\]\((?:\.\/)?([\w.-]+\.md)\)[^|]*\|[^|]*\|\s*([^|]*?)\s*\|/gm)) {
-    if (!STATUSES.includes(status)) { error(readme, `${file}: status '${status}' is not one of ${STATUSES.join(', ')}`); continue }
+    const validStatus = STATUSES.includes(status)
+    if (!validStatus) error(readme, `${file}: status '${status}' is not one of ${STATUSES.join(', ')}`)
     if (!existsSync(join(IDEAS, file))) { error(readme, `links missing file ${file}`); continue }
     const line = /\*\*Status:\*\*[ \t]*([^\r\n]*)/.exec(readFileSync(join(IDEAS, file), 'utf8'))?.[1]
-    if (line === undefined) error(`docs/ideas/${file}`, `no '**Status:** ${status}' line`)
-    else if (!line.startsWith(status)) error(`docs/ideas/${file}`, `Status line '${line.slice(0, 40)}…' doesn't start with '${status}', the README status`)
+    if (line === undefined) error(`docs/ideas/${file}`, `no '**Status:** ${validStatus ? status : '<status>'}' line`)
+    else if (validStatus && !line.startsWith(status)) error(`docs/ideas/${file}`, `Status line '${line.slice(0, 40)}…' doesn't start with '${status}', the README status`)
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 12. Docs: relative .md links point at a file, everywhere but the archive; lore, character and system docs name real IDs.
+
+{
+  const SHIPPED_NAMES = /^docs\/(lore|character|systems)\//
+  // Characters with a doc but no data yet; remove an ID when it ships.
+  const PLANNED_IDS = new Set(['NpcID.liroldVarrow'])
+  const ENUMS = { ItemID: D.ItemID, NpcID: D.NpcID }
+  for (const doc of walkFiles(join(ROOT, 'docs'), '.md')) {
+    const rel = relative(ROOT, doc).replace(/\\/g, '/')
+    if (rel.startsWith('docs/archive/')) continue
+    const text = readFileSync(doc, 'utf8').replace(/```[\s\S]*?```/g, '')
+    for (const [, target] of text.matchAll(/\]\((?!https?:)([^)\s#]+\.md)(?:#[^)]*)?\)/g)) {
+      if (!existsSync(resolve(dirname(doc), target))) error(rel, `links missing file '${target}'`)
+    }
+    if (!SHIPPED_NAMES.test(rel)) continue
+    for (const [, name, member] of text.matchAll(/\b(ItemID|NpcID)\.(\w+)/g)) {
+      if (ENUMS[name][member] === undefined && !PLANNED_IDS.has(`${name}.${member}`)) error(rel, `names unknown ${name}.${member}`)
+    }
   }
 }
 

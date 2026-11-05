@@ -19,7 +19,7 @@ Each domain is a separate origin, so saves in `localStorage` never mix between e
 
 Feature branch from `origin/staging` → PR into `staging` → merge (deploys staging).
 
-A sub-feature branches from its parent feature branch and merges back into it. That merge deploys nothing and runs no CI (CI covers PRs into `main` and `staging` only), so run `npm run validate`, `npm run lint`, `npm run test:ci` and `npx ng build` before merging. The parent then opens its own PR into `staging`, which runs CI and deploys staging on merge. When a release is decided: `release/x.y.z` branch from `staging` → version bump → PR into `main` → merge (deploys production, tags `vx.y.z`, publishes a GitHub release) → merge `main` back into `staging`.
+A feature ships as one PR into `staging`, which runs CI and deploys staging on merge. When a release is decided: `release/x.y.z` branch from `staging` → version bump → PR into `main` → merge (deploys production, tags `vx.y.z`, publishes a GitHub release) → merge `main` back into `staging`.
 
 To put any branch on testing: GitHub → Actions → **Deploy** → **Run workflow** → pick the branch. The branch must contain `.github/workflows/deploy.yml`. Testing holds one build at a time; the next run replaces it.
 
