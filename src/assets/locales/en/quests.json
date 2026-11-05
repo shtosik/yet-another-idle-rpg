@@ -23,6 +23,7 @@
     "theColdForge": "The Cold Forge"
   },
   "requirements": {
+    "findItem": "Find {{ item }}",
     "waveKillCount": "{{ amount }} KC on wave {{ wave }} in {{ zone }}",
     "wave": "{{ zone }} wave {{ wave }}"
   },
@@ -32,7 +33,6 @@
     "reputation": "Reputation",
     "ready": "Ready",
     "done": "Done",
-    "notDone": "Not yet",
     "pin": "Pin {{quest}} to the top",
     "unpin": "Unpin {{quest}}",
     "fightIn": "Fight in {{zone}}",

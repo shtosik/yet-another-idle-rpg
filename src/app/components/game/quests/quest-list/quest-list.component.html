@@ -58,8 +58,8 @@
               <span class="requirement__bar" aria-hidden="true">
                 <span class="requirement__fill" [style.width.%]="shown / req.target * 100"></span>
               </span>
-            } @else {
-              <span class="requirement__count">{{ (done ? 'quests:panel.done' : 'quests:panel.notDone') | i18next }}</span>
+            } @else if (done) {
+              <span class="requirement__count">{{ 'quests:panel.done' | i18next }}</span>
             }
           </li>
         }
