@@ -20,6 +20,7 @@ A pannable, zoomable painted map (Leaflet) with markers for unlocked towns and z
 - `source.png` is 3072×2048: the whole map redrawn in one style (ChatGPT, 2026-10-31), upscaled 2× with the NMKD ESRGAN model; layout in `docs/design/southern-map-expansion.md`. `source.png.kra` is the old 2794×752 Krita file. To extend the map, generate window by window with `scripts/asset-gen/map-window.mjs` and the `map-painterly` asset family (`asset-pipeline.md` § World-map pieces).
 - Changing `source.png` means re-running `npm run tile` and updating `manifest` width/height (and marker positions if the art moved).
 - Marker HTML uses the CSS classes `map-marker map-marker--<type>`.
+- A `.cursor-coords` label in the bottom left corner shows the cursor position in source-image pixels (the same coordinates as marker `position`), hidden while the cursor is off the map.
 - The skill tree uses the same Leaflet approach with plain `CRS.Simple` (see `skill-tree.md`).
 
 ## Known issues

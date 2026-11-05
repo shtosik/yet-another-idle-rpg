@@ -47,6 +47,9 @@ export class WorldMapComponent {
 
   protected readonly TownID = TownID
   showTowns = signal(false)
+  /** Cursor position in map image pixels (same coords as marker data); null while the cursor is off the map. */
+  readonly cursor = signal<{ x: number; y: number } | null>(null)
+  private cursorPoint: L.Point | null = null
   /**
    * Unlocked towns: map-marker towns in marker order, then towns with Buildings but no marker yet. Stub towns and stale saved IDs have neither.
    */
@@ -103,6 +106,10 @@ export class WorldMapComponent {
   onMapReady(map: L.Map): void {
     this.map = map
     map.on('zoomend', () => this.syncMarkerVisibility())
+    // Tracked as a container point so panning or zooming under a still cursor keeps the readout current.
+    map.on('mousemove', e => this.showCursor(e.containerPoint))
+    map.on('mouseout', () => this.showCursor(null))
+    map.on('move zoom', () => this.showCursor(this.cursorPoint))
 
     setTimeout(() => {
       map.invalidateSize()
@@ -126,6 +133,12 @@ export class WorldMapComponent {
       this.placeMarkers()
       this.syncMarkerVisibility()
     })
+  }
+
+  private showCursor(point: L.Point | null): void {
+    this.cursorPoint = point
+    const latLng = point && this.map.containerPointToLatLng(point)
+    this.cursor.set(latLng ? { x: Math.round(latLng.lng), y: Math.round(-latLng.lat) } : null)
   }
 
   toggleTowns(): void {

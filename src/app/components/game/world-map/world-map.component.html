@@ -3,6 +3,9 @@
      [leafletOptions]="mapOptions"
      (leafletMapReady)="onMapReady($event)">
 </div>
+@if (cursor(); as c) {
+  <div class="cursor-coords">{{ c.x }}, {{ c.y }}</div>
+}
 @if (unlockedTowns().length) {
   <div class="towns">
     <button type="button" class="towns__toggle"
