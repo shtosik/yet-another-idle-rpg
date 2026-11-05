@@ -3,7 +3,7 @@
 ## Purpose
 `PlayerStore` holds everything about the player character: stats, level and XP, gold, the inventory grid, equipped gear, and progress flags. Most other systems read from or write to it.
 
-Phurgo's Forge Tongs (`ItemID.phurgosForgeTongs`) use the existing quest item rules: unsellable (`value: -1`), indestructible and consumed by The Cold Forge's step 2. Their temporary icon is the existing letter image; see `quests.md` for their drop source and the quest-drop cap dependency.
+Phurgo's Forge Tongs (`ItemID.phurgosForgeTongs`) use the existing quest item rules: unsellable (`value: -1`), indestructible and consumed by The Cold Forge's step 2. Their icon is `items/phurgosForgeTongs.png`; see `quests.md` for their drop source and the quest-drop cap.
 
 ## Key files
 - `src/app/store/player/player.store.ts:PlayerStore` — state, the derived `stats`, `updatePlayerStats`, `addItems`/`removeItems`, `equipItem`/`unequipItem`, `useItem`, `processBattleEnd`, unlock flags.
