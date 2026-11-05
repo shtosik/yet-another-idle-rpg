@@ -266,6 +266,7 @@ export class DevCheatsComponent {
 
   unlockAllZones() {
     this.playerStore.unlockMap()
+    this.unlockFeature('towns')
     for (const id of Object.values(ZoneID)) {
       if (typeof id === 'number') this.playerStore.unlockZone(id)
     }
