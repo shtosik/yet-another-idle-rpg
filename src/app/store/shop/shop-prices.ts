@@ -8,14 +8,14 @@ import { ShopID } from '../../../enums/ids/shop-id.enum'
  * `value <= 0` is never sellable; a preferred kind pays `value × multiplier`, rounded up so cheap items
  * (value 1) still gain from a preference.
  */
-export function sellPrice(shopId: ShopID, itemId: ItemID): number {
+export function sellPrice(shopId: ShopID, itemId: ItemID, upgradeLevel = 0): number {
   const shop = SHOPS_DATA[shopId]
   const item = ITEM_DATA[itemId]
   if (!item || item.value <= 0) return 0
   if (shop.buys && !shop.buys.includes(item.type)) return 0
 
   const multiplier = shop.sellMultipliers?.items?.[itemId] ?? shop.sellMultipliers?.types?.[item.type] ?? 1
-  return Math.max(1, Math.ceil(item.value * multiplier))
+  return Math.max(1, Math.ceil(item.value * multiplier)) * 2 ** upgradeLevel
 }
 
 /** Whether this shop pays more than the item's base `value`. */

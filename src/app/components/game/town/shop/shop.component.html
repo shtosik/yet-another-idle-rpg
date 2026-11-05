@@ -23,14 +23,15 @@
 
     @if (sellable().length) {
       <ul class="shop__grid">
-        @for (entry of sellable(); track entry.slot.id + '-' + entry.slot.tier) {
+        @for (entry of sellable(); track entry.slot.id + '-' + entry.slot.tier + '-' + (entry.slot.upgradeLevel ?? 0)) {
           <li>
-            <button type="button" class="shop__item" [attr.aria-label]="sellLabel(entry.slot.id, entry.price, entry.preferred)"
+            <button type="button" class="shop__item" [attr.aria-label]="sellLabel(entry.slot.id, entry.price, entry.preferred, entry.slot.upgradeLevel)"
                     (click)="sellItem(entry.slot, $event)">
               <app-slot>
                 <app-inventory-slot
                   [item]="entry.itemData"
                   [tier]="entry.slot.tier"
+                  [upgradeLevel]="entry.slot.upgradeLevel ?? 0"
                   [amount]="entry.slot.amount"
                   [clickable]="false"
                 />

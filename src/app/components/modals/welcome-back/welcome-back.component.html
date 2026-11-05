@@ -17,11 +17,12 @@
 
   @if (summary.items.length) {
     <div class="welcome-back__items">
-      @for (item of summary.items; track item.id + ':' + item.tier) {
+      @for (item of summary.items; track item.id + ':' + item.tier + ':' + (item.upgradeLevel ?? 0)) {
         <app-slot>
           <app-inventory-slot
             [item]="ITEM_DATA[item.id]"
             [tier]="item.tier"
+            [upgradeLevel]="item.upgradeLevel ?? 0"
             [amount]="item.amount"
             [clickable]="false"
           />

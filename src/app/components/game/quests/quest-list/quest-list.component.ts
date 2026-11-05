@@ -9,7 +9,9 @@ import { npcPlace, NpcPlace } from '../../../../../data/helpers/npc-places'
 import { ZONES_BY_ENEMY } from '../../../../../data/helpers/enemy-zones'
 import { QuestID } from '../../../../../enums/ids/quest-id.enum'
 import { QuestState } from '../../../../../enums/quest-state.enum'
+import ITEM_DATA from '../../../../../data/items-data'
 import { ItemID } from '../../../../../enums/ids/item-id.enum'
+import { ItemType } from '../../../../../enums/items/item-type.enum'
 import { EnemyID } from '../../../../../enums/ids/enemy-id.enum'
 import { ZoneID } from '../../../../../enums/ids/zone-id.enum'
 import { NpcID } from '../../../../../enums/map/npc-id.enum'
@@ -106,7 +108,7 @@ export class QuestListComponent {
     }))
     return [{
       id,
-      description: step.description,
+      description: i18next.t(`quests:steps.${QuestID[id]}.${status.step}`, { defaultValue: step.description }),
       requirements,
       ready: requirements.every(({ current, target }) => current >= target),
       pinned: pins.includes(id),
@@ -139,7 +141,9 @@ export class QuestListComponent {
   private requirementLabel(req: RequirementProps): string {
     switch (req.type) {
       case 'item':
-        return i18next.t(`items:names.${ItemID[req.itemId]}`)
+        return ITEM_DATA[req.itemId].type === ItemType.quest
+          ? i18next.t('quests:requirements.findItem', { item: i18next.t(`items:names.${ItemID[req.itemId]}`) })
+          : i18next.t(`items:names.${ItemID[req.itemId]}`)
       case 'enemy':
         return i18next.t(`enemies:names.${EnemyID[req.enemyId]}`)
       case 'wave':

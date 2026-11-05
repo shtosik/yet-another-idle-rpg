@@ -26,6 +26,7 @@ Enemy definitions and their loot. A **shiny** is a rare recolored spawn with muc
 - Pet entries reference sprite stems under `assets/img/enemies/`; the pet item's icon is the enemy sprite.
 - `EnemyType` names map to `damageVs<Type>` stats: a new type needs a new `PlayerStat`, initial value and label.
 - Quest-only drops use `requiredActiveQuestId` so they drop only while the quest is active.
+- Goblin Scavengers carry Phurgo's Forge Tongs at 1 in 50 while The Cold Forge is active. The separate quest-drop cap work will restrict rolls to the current step's missing amount (`quests.md`).
 - Bosses are defined by the zone (`bossEnemyId`), not by the enemy.
 
 ## Known issues

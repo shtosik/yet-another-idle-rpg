@@ -88,3 +88,25 @@
             color: #a8a294
 
 @include mixins.itemShadowByTier('.item')
+
+.item--milestone
+    outline: 1px solid palette.$yellow
+    outline-offset: 1px
+
+.upgrade-level
+    position: absolute
+    top: 0
+    left: 0
+    padding: 0 0.15rem
+    background: rgba(0, 0, 0, 0.8)
+    color: palette.$yellow
+    font-size: 0.75rem
+    line-height: 1rem
+
+.milestone-mark
+    position: absolute
+    bottom: -3px
+    right: -3px
+    color: palette.$yellow
+    font-size: 0.7rem
+    line-height: 1

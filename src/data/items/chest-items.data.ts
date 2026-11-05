@@ -21,6 +21,7 @@ export const ChestItemsData: Partial<Record<ItemID, Item>> = {
   },
   [ItemID.silverwoodChestplate]: {
     id: ItemID.silverwoodChestplate,
+    unique: true,
     tier: ItemTier.rare,
     url: './assets/img/items/silverwoodChestplate.png',
     value: 2500,
@@ -39,6 +40,7 @@ export const ChestItemsData: Partial<Record<ItemID, Item>> = {
   },
   [ItemID.apprenticeRobe]: {
     id: ItemID.apprenticeRobe,
+    unique: true,
     tier: ItemTier.uncommon,
     url: './assets/img/items/apprenticeRobe.png',
     value: 500,

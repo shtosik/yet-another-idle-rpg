@@ -10,6 +10,8 @@ export type DialogueEffect =
   | StatEffect
   | ItemEffect
   | ShopEffect
+  | ForgeEffect
+  | RegisterPathfindersSealEffect
   | DialogueFlagEffect
   | GuildEffect
   | ArenaEffect
@@ -38,6 +40,16 @@ export interface ShopEffect {
   shopId: number
   /** Stock stage to open at (default 0): items with a higher `minStage` stay hidden. */
   stage?: number
+}
+
+/** Opens the inline Forge panel in the current town building. */
+export interface ForgeEffect {
+  type: 'forge'
+}
+
+/** Consumes one held Seal and permanently grants its lesson, at most once. */
+export interface RegisterPathfindersSealEffect {
+  type: 'registerPathfindersSeal'
 }
 
 export interface DialogueFlagEffect {

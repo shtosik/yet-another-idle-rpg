@@ -1,5 +1,5 @@
 import { PlayerStat } from '../../../types/player/player-stat.type'
-import { EquipmentItem, isConsumableItem } from '../../../interfaces/item.interface'
+import { isConsumableItem } from '../../../interfaces/item.interface'
 import { EquipmentType } from '../../../interfaces/player/equipment.type'
 import { UnlockedNodes } from '../../../types/player/unlocked-nodes.type'
 import { SkillNodeID } from '../../../enums/ids/skill-node-id.enum'
@@ -15,6 +15,7 @@ import { ItemType } from '../../../enums/items/item-type.enum'
 import { SpellID } from '../../../enums/ids/spell-id.enum'
 import { ItemID } from '../../../enums/ids/item-id.enum'
 import type { InventoryTab } from './inventory'
+import { UPGRADE_BONUS_PER_LEVEL, UPGRADE_MILESTONE_BONUS, UPGRADE_MILESTONE_LEVEL } from '../../../data/upgrade-data'
 
 export type PlayerStatsType = Record<PlayerStat, number>
 
@@ -75,10 +76,24 @@ export const isResourceStat = (stat: PlayerStat): stat is ResourceStat =>
 export const initialResources = (): Resources =>
   Object.fromEntries(RESOURCE_STATS.map(stat => [stat, statsInitialState[stat]])) as Resources
 
+/** Preserve fractional stat units and round away float drift; +0 keeps the original amount exactly. */
+export function upgradedStatAmount(amount: number, upgradeLevel = 0): number {
+  if (upgradeLevel === 0) return amount
+  let scale = 1 + UPGRADE_BONUS_PER_LEVEL * upgradeLevel
+  if (upgradeLevel >= UPGRADE_MILESTONE_LEVEL) scale += UPGRADE_MILESTONE_BONUS
+  return round(amount * scale)
+}
+
+/** Shared by derived stats and the capacity checks for equipping/swapping one piece. */
+export function gearModifiers(equipped: { id: ItemID, upgradeLevel?: number } | null): StatModifier[] {
+  if (!equipped) return []
+  const item = ITEM_DATA[equipped.id]
+  if (item.type !== ItemType.equipment) return []
+  return item.stats.map(s => ({ stat: s.id, amount: upgradedStatAmount(s.amount, equipped.upgradeLevel) }))
+}
+
 export const equipmentModifiers = (equipment: EquipmentType): StatModifier[] =>
-  Object.values(equipment).flatMap(equipped =>
-    equipped ? ((ITEM_DATA[equipped.id] as EquipmentItem).stats ?? []).map(s => ({ stat: s.id, amount: s.amount })) : [],
-  )
+  Object.values(equipment).flatMap(gearModifiers)
 
 export const skillNodeModifiers = (unlockedNodes: UnlockedNodes): StatModifier[] =>
   Object.entries(unlockedNodes).flatMap(([id, level]) => {
