@@ -21,7 +21,7 @@ Preconditions:
 
 - **Read tabs.** `javascript_tool`: `[...document.querySelectorAll('button.game-menu__tab')].map(b => ({ text: b.textContent.replace(/\s+/g, ' ').trim(), locked: b.getAttribute('aria-disabled') === 'true', current: b.getAttribute('aria-current') === 'page' }))`. Locked tabs read e.g. `Map (Locked)` with `locked: true`.
 - **Switch.** `find` "Settings", click `button "Settings"`. `Settings` is current; `app-settings h2` reads `Settings`.
-- **Locked click.** `find` "Locked" lists the locked tabs in menu order (fresh save: Skill tree, Camp, Spellbook, Map); click the fourth (`Map`). Current tab does not change; `app-world-map` is absent.
+- **Locked click.** Locked tabs all read `Locked` to `find`, and which are locked varies, so pick Map by its text: `const map = [...document.querySelectorAll('button.game-menu__tab')].find(b => b.textContent.includes('Map')); const r = map?.getBoundingClientRect(); ({ locked: map?.getAttribute('aria-disabled') === 'true', x: r?.x + r?.width / 2, y: r?.y + r?.height / 2 })`. It must exist with `locked: true`; click those coordinates with `computer` `left_click`. Current tab does not change; `app-world-map` is absent.
 - **Unlock.** `dev.unlock('map')`. Re-read: `Map` has no `(Locked)` and `locked: false`.
 - **Open.** `find` "Map", click `button "Map"`. `Map` is current and `app-world-map` is rendered.
 - **Proof.** Tab readings before and after to `tmp/verify/<run-id>/game-tabs.txt`; screenshot of the open map to `tmp/verify/<run-id>/game-tabs.jpg`.

@@ -33,6 +33,6 @@ Preconditions:
 
 - Every equipment slot holds a `button.item`, empty or not; tell them apart by `aria-label` (`<Slot>: Empty`) or the `item--empty` class, not by `.item` presence.
 - Right-click also uses usable items (food, potions, books, chests); destroying is the separate `×` button on an inventory item.
-- Unequip is refused when the inventory is full.
+- Unequip is refused when the item can't fit in the Gear tab, or when removing it lowers capacity and strands an item. A full tab still accepts it if it stacks with a matching item and tier.
 - Hovering an item opens a tooltip (`find` may also list a `generic "<name>"` from it); take the before reading first.
 - The saved `equipment` lags the screen by up to 1 s (batched saves); poll before failing.
