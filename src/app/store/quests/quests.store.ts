@@ -17,6 +17,7 @@ import { canAdvanceQuest, getQuestStatus, getStepItems } from '../../services/qu
 import { ReputationService } from '../../services/reputation.service'
 import { ProfessionService } from '../../services/profession.service'
 import { REPUTATION_THRESHOLDS, ReputationGain } from '../player/reputation'
+import { TurnInKey } from './turn-in-cooldown'
 
 /** Lifetime kill counters at the moment the quest reached its current step. */
 export interface KillBaseline {
@@ -30,6 +31,8 @@ export interface QuestsState {
   dialogueFlags: Record<string, boolean>
   /** Active quests pinned to the top of the quest panel, in pin order. Dropped on completion. */
   pinnedQuests: QuestID[]
+  /** When each turn-in last ran (epoch ms); its cooldown is computed from this (`turnInRemainingMs`). */
+  lastTurnInAt: Partial<Record<TurnInKey, number>>
 }
 
 export const initialState: QuestsState = {
@@ -37,6 +40,7 @@ export const initialState: QuestsState = {
   stepKillBaselines: {},
   dialogueFlags: {},
   pinnedQuests: [],
+  lastTurnInAt: {},
 }
 
 const STORE_KEY = 'questsStore'
@@ -191,6 +195,11 @@ export const QuestsStore = signalStore(
             ? state.pinnedQuests.filter(id => id !== questId)
             : [...state.pinnedQuests, questId],
         }))
+      },
+
+      /** Starts the turn-in's cooldown. */
+      recordTurnIn(key: TurnInKey, now: number) {
+        patchState(store, (state) => ({ lastTurnInAt: { ...state.lastTurnInAt, [key]: now } }))
       },
 
       setDialogueFlag(flag: string) {

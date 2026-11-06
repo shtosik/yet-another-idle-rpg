@@ -76,6 +76,7 @@ export { WORLD_MAP_DATA } from 'data/world-map-data'
 export { sellPrice } from 'app/store/shop/shop-prices'
 export { REPUTATION_IDS, REPUTATION_TOWN } from 'app/store/player/reputation'
 export { REPUTATION_TURN_INS } from 'data/reputation-turn-ins'
+export { bundleKey } from 'app/store/quests/turn-in-cooldown'
 export { TitleID } from 'enums/ids/title-id.enum'
 export { CHANGELOG_NOTE_TYPES } from 'app/components/modals/changelog/changelog'
 `
@@ -329,6 +330,10 @@ for (const turnIn of D.REPUTATION_TURN_INS) {
   if (!has(D.ITEM_DATA, turnIn.itemId)) error(file, `${npc}'s turn-in has unknown ItemID ${turnIn.itemId}`)
   if (!(turnIn.bundleSize > 0 && turnIn.reputation > 0)) error(file, `${npc}'s turn-in needs a positive bundleSize and reputation`)
   if (!effectsOf(turnIn.npcId).some(e => e.type === 'reputationTurnIn')) error(file, `${npc}'s dialogue never uses their turn-in`)
+  const cooldownKeys = Object.values(D.NPC_DATA[turnIn.npcId]?.dialogue ?? {})
+    .flatMap(node => node.options ?? []).flatMap(option => option.results ?? []).flatMap(result => result.requirementsNeeded ?? [])
+    .filter(c => c.type === 'turnInCooldown').map(c => c.key)
+  if (!cooldownKeys.includes(D.bundleKey(turnIn.npcId, turnIn.itemId))) error(file, `${npc}'s turn-in option has no turnInCooldown requirement for its bundle key`)
 }
 for (const npc of Object.values(D.NPC_DATA)) {
   for (const effect of effectsOf(npc.id).filter(e => e.type === 'reputationTurnIn')) {

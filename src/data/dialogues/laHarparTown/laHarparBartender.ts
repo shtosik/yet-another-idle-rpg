@@ -6,6 +6,7 @@ import { QuestState } from '../../../enums/quest-state.enum'
 import { DialogueCondition } from '../../../types/dialogues/dialogue-condition.type'
 import { ReputationID } from '../../../enums/reputation-id.enum'
 import { ReputationTier } from '../../../enums/reputation-tier.enum'
+import { bundleKey } from '../../../app/store/quests/turn-in-cooldown'
 
 export enum BartenderDialogue {
   default = 0, // Explicitly set to 0 for returning players
@@ -163,12 +164,12 @@ const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
         }],
       },
       {
-        responseKey: 'quests:reputation.turnInOne',
-        results: [{ next: BartenderDialogue.default, effects: [{ type: 'reputationTurnIn', npcId: NpcID.laHarparBartender, bundles: 'one' }] }],
-      },
-      {
-        responseKey: 'quests:reputation.turnInAll',
-        results: [{ next: BartenderDialogue.default, effects: [{ type: 'reputationTurnIn', npcId: NpcID.laHarparBartender, bundles: 'all' }] }],
+        responseKey: 'quests:reputation.turnIn',
+        results: [{
+          requirementsNeeded: [{ type: 'turnInCooldown', key: bundleKey(NpcID.laHarparBartender, ItemID.crabMeat), state: 'ready' }],
+          next: BartenderDialogue.default,
+          effects: [{ type: 'reputationTurnIn', npcId: NpcID.laHarparBartender }],
+        }],
       },
       {
         responseKey: `${NS}:default.goodbye`,

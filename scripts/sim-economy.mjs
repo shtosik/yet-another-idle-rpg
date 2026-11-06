@@ -34,6 +34,7 @@ await build({
       export { calculateXp } from 'app/store/player/experience'
       export { default as QUEST_DATA } from 'data/quests-data'
       export { REPUTATION_TURN_INS } from 'data/reputation-turn-ins'
+      export { TURN_IN_COOLDOWN_MS } from 'app/store/quests/turn-in-cooldown'
       export { REPUTATION_THRESHOLDS, REPUTATION_IDS } from 'app/store/player/reputation'
       export { ReputationTier } from 'enums/reputation-tier.enum'
       export { NpcID } from 'enums/map/npc-id.enum'
@@ -274,7 +275,7 @@ if (process.argv.includes('--reputation')) {
   const questTotal = reputationId => Object.values(D.QUEST_DATA)
     .flatMap(q => q.rewards).filter(r => r.type === 'reputation' && r.reputationId === reputationId).reduce((s, r) => s + r.amount, 0)
 
-  /** Turn-in reputation per hour farming wave 1 of `zone` at `build`: expected drops (1/chance, no bestiary bonus) per kill. */
+  /** Turn-in reputation per hour: farming wave 1 of `zone` at `build` (expected drops, 1/chance, no bestiary bonus), capped at one bundle per cooldown. */
   const repPerHour = (turnIn, zone, build) => {
     const kills = zone.enemies.map(id => {
       const drop = D.ENEMIES_DATA[id].drops.find(d => d.id === turnIn.itemId)
@@ -282,7 +283,8 @@ if (process.argv.includes('--reputation')) {
     })
     const items = kills.reduce((s, k) => s + k.items, 0) / kills.length
     const seconds = kills.reduce((s, k) => s + k.seconds, 0) / kills.length
-    return items / turnIn.bundleSize * turnIn.reputation / seconds * 3600
+    const farmed = items / turnIn.bundleSize * turnIn.reputation / seconds * 3600
+    return Math.min(farmed, turnIn.reputation / (D.TURN_IN_COOLDOWN_MS / 3600000))
   }
 
   console.log('\nReputation turn-ins (best route zone, wave 1; reputation/h at that zone\'s arrival build and at the end-of-route build)')
@@ -296,12 +298,13 @@ if (process.argv.includes('--reputation')) {
       console.log(`  ${D.NpcID[turnIn.npcId].padEnd(18)} no route zone drops ${turnIn.itemId}`)
       continue
     }
-    bestByRep[turnIn.reputationId] = Math.max(bestByRep[turnIn.reputationId] ?? 0, best.late)
+    // Each turn-in has its own cooldown, so a town's NPCs add up.
+    bestByRep[turnIn.reputationId] = (bestByRep[turnIn.reputationId] ?? 0) + best.late
     console.log(`  ${D.NpcID[turnIn.npcId].padEnd(18)} ${best.key.padEnd(16)} ${String(Math.round(best.arrival)).padStart(5)} reputation/h   ${String(Math.round(best.late)).padStart(5)} reputation/h late`)
   }
 
   const tiers = Object.entries(D.REPUTATION_THRESHOLDS).filter(([, points]) => points > 0)
-  console.log(`\n  town       quests   hours of the best late turn-in, after all quests, to ${tiers.map(([t]) => D.ReputationTier[t]).join(' / ')}`)
+  console.log(`\n  town       quests   hours of all late turn-ins together, after all quests, to ${tiers.map(([t]) => D.ReputationTier[t]).join(' / ')}`)
   for (const reputationId of D.REPUTATION_IDS) {
     const quests = questTotal(reputationId)
     const hours = tiers.map(([, points]) => Math.max(0, points - quests) / (bestByRep[reputationId] ?? Infinity))

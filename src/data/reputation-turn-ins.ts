@@ -2,7 +2,7 @@ import { ItemID } from '../enums/ids/item-id.enum'
 import { NpcID } from '../enums/map/npc-id.enum'
 import { ReputationID } from '../enums/reputation-id.enum'
 
-/** A town NPC who takes bundles of one drop for reputation, at a flat rate with no limit. */
+/** A town NPC who takes one bundle of one drop for reputation per turn-in cooldown (`bundleKey`), at a flat rate. */
 export interface ReputationTurnIn {
   npcId: NpcID
   reputationId: ReputationID
@@ -23,8 +23,6 @@ export const REPUTATION_TURN_INS: ReputationTurnIn[] = [
 export const turnInFor = (npcId: NpcID): ReputationTurnIn | undefined =>
   REPUTATION_TURN_INS.find(turnIn => turnIn.npcId === npcId)
 
-/** Full bundles handed over: `one` or every full bundle held; 0 when not even one is held. */
-export const turnInBundles = (turnIn: ReputationTurnIn, held: number, bundles: 'one' | 'all'): number => {
-  const full = Math.floor(held / turnIn.bundleSize)
-  return bundles === 'one' ? Math.min(full, 1) : full
-}
+/** Bundles handed over per turn-in: one when a full bundle is held, else 0. */
+export const turnInBundles = (turnIn: ReputationTurnIn, held: number): number =>
+  Math.min(Math.floor(held / turnIn.bundleSize), 1)

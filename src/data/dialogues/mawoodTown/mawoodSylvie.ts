@@ -5,6 +5,8 @@ import { QuestState } from '../../../enums/quest-state.enum'
 import { ShopID } from '../../../enums/ids/shop-id.enum'
 import { ReputationID } from '../../../enums/reputation-id.enum'
 import { ReputationTier } from '../../../enums/reputation-tier.enum'
+import { ItemID } from '../../../enums/ids/item-id.enum'
+import { bundleKey } from '../../../app/store/quests/turn-in-cooldown'
 
 export enum SylvieDialogue {
   default = 0,
@@ -155,12 +157,12 @@ const MAWOOD_SYLVIE: MawoodSylvieDialogueType = {
         ],
       },
       {
-        responseKey: 'quests:reputation.turnInOne',
-        results: [{ next: SylvieDialogue.default, effects: [{ type: 'reputationTurnIn', npcId: NpcID.mawoodSylvie, bundles: 'one' }] }],
-      },
-      {
-        responseKey: 'quests:reputation.turnInAll',
-        results: [{ next: SylvieDialogue.default, effects: [{ type: 'reputationTurnIn', npcId: NpcID.mawoodSylvie, bundles: 'all' }] }],
+        responseKey: 'quests:reputation.turnIn',
+        results: [{
+          requirementsNeeded: [{ type: 'turnInCooldown', key: bundleKey(NpcID.mawoodSylvie, ItemID.spiderSilk), state: 'ready' }],
+          next: SylvieDialogue.default,
+          effects: [{ type: 'reputationTurnIn', npcId: NpcID.mawoodSylvie }],
+        }],
       },
       {
         responseKey: `${NS}:default.goodbye`,

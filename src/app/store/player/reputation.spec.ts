@@ -29,11 +29,10 @@ describe('reputation', () => {
     expect(reputationProgress(1500).nextThreshold).toBeNull()
   })
 
-  it('hands over one full bundle or all of them, never a partial one', () => {
+  it('hands over one full bundle, never a partial one or two', () => {
     const turnIn = turnInFor(NpcID.laHarparBartender)!
-    expect(turnInBundles(turnIn, 19, 'one')).toBe(0)
-    expect(turnInBundles(turnIn, 59, 'one')).toBe(1)
-    expect(turnInBundles(turnIn, 59, 'all')).toBe(2)
+    expect(turnInBundles(turnIn, 19)).toBe(0)
+    expect(turnInBundles(turnIn, 59)).toBe(1)
   })
 
   describe('PlayerStore.addReputation', () => {

@@ -6,6 +6,8 @@ import { isTaskDone, PlayerStore } from '../store/player/player.store'
 import { DialogueEffect, QuestEffect, ReputationTurnInEffect } from '../../types/dialogues/dialogue-effect.type'
 import { ReputationTurnIn, turnInBundles, turnInFor } from '../../data/reputation-turn-ins'
 import { ReputationService } from './reputation.service'
+import { TurnInCooldownService } from './turn-in-cooldown.service'
+import { bundleKey } from '../store/quests/turn-in-cooldown'
 import { QuestsStore } from '../store/quests/quests.store'
 import { DialogueOption, DialogueResult } from '../../interfaces/dialogues/dialogue-option.type'
 import { DialogueCondition } from '../../types/dialogues/dialogue-condition.type'
@@ -33,6 +35,7 @@ export class DialogueManagerService {
   private battleStore = inject(BattleStore)
   private arenaService = inject(ArenaService)
   private reputationService = inject(ReputationService)
+  private cooldowns = inject(TurnInCooldownService)
 
   private currentConversation = signal<Record<any, DialogueNode<any>> | null>(null)
   private currentNodeId = signal<any>(null)
@@ -85,7 +88,7 @@ export class DialogueManagerService {
 
   /**
    * What a turn-in hands over right now: the NPC's turn-in, how many of its item the player holds, how many the
-   * current steps of active quests keep back, and the full bundles taken from the rest.
+   * current steps of active quests keep back, and the bundle taken from the rest (0 or 1; 0 while it cools down).
    */
   turnIn(effect: ReputationTurnInEffect): { turnIn: ReputationTurnIn, held: number, kept: number, bundles: number } {
     const turnIn = turnInFor(effect.npcId)
@@ -96,7 +99,8 @@ export class DialogueManagerService {
       .filter(stack => stack.id === turnIn.itemId)
       .reduce((sum, stack) => sum + stack.amount, 0)
     const held = this.playerStore.itemCount(turnIn.itemId)
-    return { turnIn, held, kept: Math.min(held, kept), bundles: turnInBundles(turnIn, Math.max(0, held - kept), effect.bundles) }
+    const cooling = this.cooldowns.remainingMs(bundleKey(turnIn.npcId, turnIn.itemId)) > 0
+    return { turnIn, held, kept: Math.min(held, kept), bundles: cooling ? 0 : turnInBundles(turnIn, Math.max(0, held - kept)) }
   }
 
   /** Turn-ins stop once their town is Exalted: more reputation would count for nothing. */
@@ -262,6 +266,8 @@ export class DialogueManagerService {
         return this.playerStore.reputationTierOf(c.reputationId) >= c.tier
       case 'professionLevel':
         return this.playerStore.professionLevel(c.professionId) >= c.level
+      case 'turnInCooldown':
+        return (this.cooldowns.remainingMs(c.key) === 0) === (c.state === 'ready')
       case 'arena':
         switch (c.state) {
           case 'ready': return this.arenaService.isReady()
@@ -351,6 +357,7 @@ export class DialogueManagerService {
           if (bundles === 0) break
           this.playerStore.removeItems([{ id: turnIn.itemId, amount: bundles * turnIn.bundleSize }])
           this.reputationService.gain([{ reputationId: turnIn.reputationId, amount: bundles * turnIn.reputation }])
+          this.questStore.recordTurnIn(bundleKey(turnIn.npcId, turnIn.itemId), Date.now())
           break
         }
       }

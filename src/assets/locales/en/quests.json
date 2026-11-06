@@ -54,10 +54,8 @@
     "reward": "+{{ amount }} {{ town }} reputation",
     "townTier": "{{ town }} {{ tier }}",
     "requires": "Requires {{ what }} — {{ current }}/{{ target }}",
-    "turnInOne": "Hand over {{ amount }} {{ item }} (have {{ held }})",
-    "turnInOne_kept": "Hand over {{ amount }} {{ item }} (have {{ held }}, {{ kept }} kept for quests)",
-    "turnInAll": "Hand over all full bundles: {{ amount }} {{ item }} (have {{ held }})",
-    "turnInAll_kept": "Hand over all full bundles: {{ amount }} {{ item }} (have {{ held }}, {{ kept }} kept for quests)",
+    "turnIn": "Hand over {{ amount }} {{ item }} (have {{ held }})",
+    "turnIn_kept": "Hand over {{ amount }} {{ item }} (have {{ held }}, {{ kept }} kept for quests)",
     "tierUp": "{{ town }} now sees you as {{ tier }}",
     "progressLabel": "{{ town }} reputation"
   },

@@ -58,7 +58,7 @@ Every quest from a town NPC lists a reputation reward (`{ type: 'reputation', re
 
 ### Turn-ins
 
-Two NPCs per town take one existing drop each, at a flat rate with no limit until the town is Exalted; then that town's turn-in options disappear (owner decision, 2026-10-31). Items the current step of an active quest needs are kept back, so a turn-in never breaks a quest. Turn-ins pay reputation only, no gold, XP or explorer tokens. First guesses:
+Two NPCs per town take one existing drop each, at a flat rate until the town is Exalted: **one bundle per turn-in, then a 2 h cooldown of its own** (shipped nerf, farm plan C3; earlier a stack could be handed over at once). Pacing: a giver pays at most `reputation / 2` per hour however fast the drop comes, and the givers of a town run in parallel (`npm run sim -- --reputation`: La Harpar 10 + 10 per 2 h, Mawood 15 + 25 per 2 h). Exalted from the quest total is about 127 h (La Harpar) and 38 h (Mawood) of wall-clock time when turned in every 2 h, above the old 15–25 h target, so the thresholds and the target need re-tuning. Then that town's turn-in options disappear (owner decision, 2026-10-31). Items the current step of an active quest needs are kept back, so a turn-in never breaks a quest. Turn-ins pay reputation only, no gold, XP or explorer tokens. First guesses:
 
 | Town | NPC | Bundle | Reputation | Source |
 |---|---|---|---|---|

@@ -17,6 +17,8 @@ import { reputationLockText } from '../quests/reputation/reputation-text'
 import { CloseButtonComponent } from '../../shared/close-button/close-button.component'
 import { PlayerStore } from '../../../store/player/player.store'
 import { missingSlotsText } from '../inventory/tab-text'
+import { TurnInCooldownService } from '../../../services/turn-in-cooldown.service'
+import { formatCooldown } from '../../../store/quests/turn-in-cooldown'
 
 @Component({
   selector: 'app-dialogue',
@@ -31,6 +33,7 @@ import { missingSlotsText } from '../inventory/tab-text'
 export class DialogueComponent {
   protected dialogueService = inject(DialogueManagerService)
   private playerStore = inject(PlayerStore)
+  private cooldowns = inject(TurnInCooldownService)
   protected readonly NpcID = NpcID
   protected readonly QuestID = QuestID
 
@@ -101,6 +104,10 @@ export class DialogueComponent {
         return reputationLockText(condition.reputationId, condition.tier, this.playerStore.reputation()[condition.reputationId] ?? 0)
       case 'professionLevel':
         return this.expertiseLabel(condition.professionId, condition.level)
+      case 'turnInCooldown': {
+        const remaining = this.cooldowns.remainingMs(condition.key)
+        return remaining > 0 ? i18next.t('app:turnInReadyIn', { time: formatCooldown(remaining) }) : ''
+      }
       case 'manyStat':
         return condition.statsRequired
           .map(req => this.getConditionLabel({ type: 'stat', ...req }))

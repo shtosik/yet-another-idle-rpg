@@ -5,6 +5,8 @@ import { QuestState } from '../../../enums/quest-state.enum'
 import { DialogueCondition } from '../../../types/dialogues/dialogue-condition.type'
 import { ReputationID } from '../../../enums/reputation-id.enum'
 import { ReputationTier } from '../../../enums/reputation-tier.enum'
+import { ItemID } from '../../../enums/ids/item-id.enum'
+import { bundleKey } from '../../../app/store/quests/turn-in-cooldown'
 
 export enum JoshDialogue {
   default,
@@ -109,12 +111,12 @@ const LA_HARPAR_JOSH: LaHarparJoshDialogueType = {
         ],
       },
       {
-        responseKey: 'quests:reputation.turnInOne',
-        results: [{ next: JoshDialogue.talkReady, effects: [{ type: 'reputationTurnIn', npcId: NpcID.laHarparJosh, bundles: 'one' }] }],
-      },
-      {
-        responseKey: 'quests:reputation.turnInAll',
-        results: [{ next: JoshDialogue.talkReady, effects: [{ type: 'reputationTurnIn', npcId: NpcID.laHarparJosh, bundles: 'all' }] }],
+        responseKey: 'quests:reputation.turnIn',
+        results: [{
+          requirementsNeeded: [{ type: 'turnInCooldown', key: bundleKey(NpcID.laHarparJosh, ItemID.feather), state: 'ready' }],
+          next: JoshDialogue.talkReady,
+          effects: [{ type: 'reputationTurnIn', npcId: NpcID.laHarparJosh }],
+        }],
       },
       {
         responseKey: `${NS}:talkReady.opt6`,

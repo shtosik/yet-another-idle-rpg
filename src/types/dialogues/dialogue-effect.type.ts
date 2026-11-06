@@ -67,11 +67,10 @@ export interface GuildEffect {
   taskIndex?: number
 }
 
-/** Hands `npcId`'s turn-in item (`REPUTATION_TURN_INS`) over for reputation: one full bundle, or all full bundles held. */
+/** Hands one full bundle of `npcId`'s turn-in item (`REPUTATION_TURN_INS`) over for reputation and starts that bundle's cooldown. */
 export interface ReputationTurnInEffect {
   type: 'reputationTurnIn'
   npcId: NpcID
-  bundles: 'one' | 'all'
 }
 
 /** Teaches a profession (it starts at level 1); nothing happens when it is already known. */

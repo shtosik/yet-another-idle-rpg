@@ -6,6 +6,7 @@ Versions follow [Semantic Versioning](https://semver.org/). Each note is `- [typ
 New notes go under `[Unreleased]`; `npm run release -- <major|minor|patch>` moves them into a version (docs/deployment.md).
 
 ## [Unreleased]
+- [nerf] Reputation turn-ins hand over one bundle per 2 hours.
 - [feature] The world map shows the cursor coordinates in its bottom left corner.
 - [feature] Volley fires three separate ranged weapon hits and can be learned beside Double Attack in the damage skill tree.
 - [bug] Double Attack now strikes twice, with separate critical hits and Ambush charges. Both weapon spells stop when the enemy dies.

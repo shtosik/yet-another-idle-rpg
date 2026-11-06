@@ -4,6 +4,8 @@ import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
 import { ReputationID } from '../../../enums/reputation-id.enum'
 import { ReputationTier } from '../../../enums/reputation-tier.enum'
+import { ItemID } from '../../../enums/ids/item-id.enum'
+import { bundleKey } from '../../../app/store/quests/turn-in-cooldown'
 
 export enum BrennDialogue {
   default = 0,
@@ -124,12 +126,12 @@ const MAWOOD_BRENN: MawoodBrennDialogueType = {
         ],
       },
       {
-        responseKey: 'quests:reputation.turnInOne',
-        results: [{ next: BrennDialogue.default, effects: [{ type: 'reputationTurnIn', npcId: NpcID.mawoodBrenn, bundles: 'one' }] }],
-      },
-      {
-        responseKey: 'quests:reputation.turnInAll',
-        results: [{ next: BrennDialogue.default, effects: [{ type: 'reputationTurnIn', npcId: NpcID.mawoodBrenn, bundles: 'all' }] }],
+        responseKey: 'quests:reputation.turnIn',
+        results: [{
+          requirementsNeeded: [{ type: 'turnInCooldown', key: bundleKey(NpcID.mawoodBrenn, ItemID.ancientWood), state: 'ready' }],
+          next: BrennDialogue.default,
+          effects: [{ type: 'reputationTurnIn', npcId: NpcID.mawoodBrenn }],
+        }],
       },
       {
         responseKey: `${NS}:default.goodbye`,

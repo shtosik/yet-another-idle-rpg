@@ -34,6 +34,7 @@ Goblin Scavengers drop `ItemID.phurgosForgeTongs` (181), an unsellable, indestru
 - Turn-in ordering in the NPC's tree matters: see the quest hub order in `dialogue.md`.
 - `QuestState.active` means started; `readyToAdvance` means started and the current step's requirements are met.
 - `QUEST_DATA` is the only place requirements live. Turn-ins don't add `requirementsNeeded` or `item` `take` effects for them.
+- One-time quests have no cooldown. Reputation bundle turn-ins (not quests) do: `QuestsStore.lastTurnInAt` holds the last run per `TurnInKey` and is saved, so repeatable orders can share it later (`dialogue.md`, "Condition (turn-in cooldown)").
 - A start result only shows while its quest is `available`, so it can't share a result with the `end` that unlocks it. Put the follow-up `start` on the next node.
 - Quests started in a save from before `stepKillBaselines` have no baseline and count lifetime kills.
 - Quest step descriptions retain plain English fallbacks. The quest panel first resolves `quests:steps.<questKey>.<step>` (1-based); The Cold Forge provides all five translations (see `localization.md`).

@@ -4,6 +4,7 @@ import { EnemyID } from '../../enums/ids/enemy-id.enum'
 import { ItemID } from '../../enums/ids/item-id.enum'
 import { QuestState } from '../../enums/quest-state.enum'
 import { ZoneID } from '../../enums/ids/zone-id.enum'
+import { TurnInKey } from '../../app/store/quests/turn-in-cooldown'
 import { ProfessionLevelRequirement, ReputationRequirement } from '../../data/quests-data'
 
 export type DialogueCondition = { hidden?: boolean } & (
@@ -22,7 +23,15 @@ export type DialogueCondition = { hidden?: boolean } & (
   | ArenaCondition
   | ReputationRequirement
   | ProfessionLevelRequirement
+  | TurnInCooldownCondition
   )
+
+/** A turn-in (`TurnInKey`) is off cooldown (`ready`) or still cooling. Shows "Ready in …" while cooling. */
+interface TurnInCooldownCondition {
+  type: 'turnInCooldown'
+  key: TurnInKey
+  state: 'ready' | 'cooling'
+}
 
 /** Ready to enter (no run, cooldown over) / a run going on / clear rewards waiting to be claimed. */
 interface ArenaCondition {
