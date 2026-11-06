@@ -52,6 +52,7 @@ Owner decisions in force:
 | [The Farm & Farming Guild](farm-and-husbandry.md) | M-L | Accepted |
 | [Seed storage (farming seed store)](seed-storage.md) | S-M | Accepted |
 | [Farm implementation plan](farm-implementation-plan.md) | L | In progress |
+| [Farm dialogue and quest scripts](farm-dialogue-scripts.md) | M | Accepted |
 | [Enemy affixes](enemy-affixes.md) | S-M | Noted |
 | [Battle UI redesign review](battle-ui-redesign.md) | M | Proposed |
 | [Known issues](known-issues.md) | — | Open |
