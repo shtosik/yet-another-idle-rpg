@@ -3,7 +3,7 @@ import { DialogueNode } from '../../../interfaces/dialogues/dialogue-node.interf
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
 import { DialogueCondition } from '../../../types/dialogues/dialogue-condition.type'
-import { TownID } from '../../../enums/map/town-id.enum'
+import { ReputationID } from '../../../enums/reputation-id.enum'
 import { ReputationTier } from '../../../enums/reputation-tier.enum'
 
 export enum JoshDialogue {
@@ -30,8 +30,8 @@ export type LaHarparJoshDialogueType = Record<JoshDialogue, DialogueNode<JoshDia
 
 const NS = 'dialogues/laHarparJosh'
 const PAID_BEER_FLAG = 'josh_paid_beer'
-const LA_HARPAR_FRIENDLY: DialogueCondition = { type: 'reputation', townId: TownID.laHarpar, tier: ReputationTier.friendly, hidden: true }
-const LA_HARPAR_REVERED: DialogueCondition = { type: 'reputation', townId: TownID.laHarpar, tier: ReputationTier.revered, hidden: true }
+const LA_HARPAR_FRIENDLY: DialogueCondition = { type: 'reputation', reputationId: ReputationID.laHarpar, tier: ReputationTier.friendly, hidden: true }
+const LA_HARPAR_REVERED: DialogueCondition = { type: 'reputation', reputationId: ReputationID.laHarpar, tier: ReputationTier.revered, hidden: true }
 
 const LA_HARPAR_JOSH: LaHarparJoshDialogueType = {
   [JoshDialogue.default]: {

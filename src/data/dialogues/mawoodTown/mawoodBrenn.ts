@@ -2,7 +2,7 @@ import { DialogueNode } from '../../../interfaces/dialogues/dialogue-node.interf
 import { NpcID } from '../../../enums/map/npc-id.enum'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
-import { TownID } from '../../../enums/map/town-id.enum'
+import { ReputationID } from '../../../enums/reputation-id.enum'
 import { ReputationTier } from '../../../enums/reputation-tier.enum'
 
 export enum BrennDialogue {
@@ -116,7 +116,7 @@ const MAWOOD_BRENN: MawoodBrennDialogueType = {
         results: [
           {
             visibilityConditions: [
-              { type: 'reputation', townId: TownID.mawood, tier: ReputationTier.revered, hidden: true },
+              { type: 'reputation', reputationId: ReputationID.mawood, tier: ReputationTier.revered, hidden: true },
               { type: 'quest', questId: QuestID.rawMaterials, questState: QuestState.completed },
             ],
             next: BrennDialogue.reveredCommissions,

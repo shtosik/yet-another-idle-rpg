@@ -7,6 +7,7 @@ import { GameTab } from 'enums/ids/game-tab.enum'
 import { SkillNodeID } from 'enums/ids/skill-node-id.enum'
 import { ShopID } from 'enums/ids/shop-id.enum'
 import { TownID } from 'enums/map/town-id.enum'
+import { ReputationID } from 'enums/reputation-id.enum'
 import { EquipmentSlotKey } from 'enums/equipment-slot.enum'
 import { ALL_SKILLS } from '../../../../data/skill-tree-data'
 import { NodeRequirement } from '../../../../interfaces/skill-tree/skill-node.interface'
@@ -175,9 +176,9 @@ export class DevCheatsComponent {
       this.questsStore.startQuest(questId)
       this.questsStore.endQuest(questId)
     },
-    /** Adds town reputation the way a quest reward does, tier-up toast included. */
-    addReputation: (town: Ref<typeof TownID>, amount: number) =>
-      this.reputationService.gain([{ townId: fromName(TownID, 'TownID', town), amount }]),
+    /** Adds reputation the way a quest reward does, tier-up toast included. */
+    addReputation: (reputation: Ref<typeof ReputationID>, amount: number) =>
+      this.reputationService.gain([{ reputationId: fromName(ReputationID, 'ReputationID', reputation), amount }]),
   }
 
   /** `dev.help()` output; typed by `commands`, so a new command doesn't compile without its line. */
@@ -202,7 +203,7 @@ export class DevCheatsComponent {
     state: 'state() — live state of every store plus derived stats',
     reset: 'reset() — fresh save',
     completeQuest: 'completeQuest(QuestID) — start and complete a quest, rewards included',
-    addReputation: 'addReputation(TownID, amount) — add town reputation',
+    addReputation: 'addReputation(ReputationID, amount) — add reputation',
   }
 
   private readonly devTools = {

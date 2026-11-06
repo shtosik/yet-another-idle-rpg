@@ -4,7 +4,7 @@ import { DialogueNode } from '../../../interfaces/dialogues/dialogue-node.interf
 import { NpcID } from '../../../enums/map/npc-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
 import { DialogueCondition } from '../../../types/dialogues/dialogue-condition.type'
-import { TownID } from '../../../enums/map/town-id.enum'
+import { ReputationID } from '../../../enums/reputation-id.enum'
 import { ReputationTier } from '../../../enums/reputation-tier.enum'
 
 export enum BartenderDialogue {
@@ -32,8 +32,8 @@ const PAID_FOR_WORK_FLAG = 'bartender_paid_for_work'
 const PAID_FOR_PLACE_FLAG = 'bartender_paid_for_place'
 const PAID_FOR_TRAINER_FLAG = 'bartender_paid_for_trainer'
 /** At La Harpar Friendly he answers for free. */
-const LA_HARPAR_FRIENDLY: DialogueCondition = { type: 'reputation', townId: TownID.laHarpar, tier: ReputationTier.friendly, hidden: true }
-const LA_HARPAR_REVERED: DialogueCondition = { type: 'reputation', townId: TownID.laHarpar, tier: ReputationTier.revered, hidden: true }
+const LA_HARPAR_FRIENDLY: DialogueCondition = { type: 'reputation', reputationId: ReputationID.laHarpar, tier: ReputationTier.friendly, hidden: true }
+const LA_HARPAR_REVERED: DialogueCondition = { type: 'reputation', reputationId: ReputationID.laHarpar, tier: ReputationTier.revered, hidden: true }
 /** La Harpar's Exalted pet, given once. */
 const GAVE_PET_FLAG = 'bartender_gave_pet'
 
@@ -156,7 +156,7 @@ const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
         responseKey: `${NS}:default.tavernCat`,
         results: [{
           visibilityConditions: [
-            { type: 'reputation', townId: TownID.laHarpar, tier: ReputationTier.exalted, hidden: true },
+            { type: 'reputation', reputationId: ReputationID.laHarpar, tier: ReputationTier.exalted, hidden: true },
             { type: 'flag', name: GAVE_PET_FLAG, isSet: false, hidden: true },
           ],
           next: BartenderDialogue.tavernCat,

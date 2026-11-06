@@ -101,8 +101,8 @@ export class DialogueManagerService {
 
   /** Turn-ins stop once their town is Exalted: more reputation would count for nothing. */
   private isTurnInClosed(effect: ReputationTurnInEffect): boolean {
-    const townId = turnInFor(effect.npcId)?.townId
-    return townId === undefined || reputationTier(this.playerStore.reputation()[townId] ?? 0) === ReputationTier.exalted
+    const reputationId = turnInFor(effect.npcId)?.reputationId
+    return reputationId === undefined || reputationTier(this.playerStore.reputation()[reputationId] ?? 0) === ReputationTier.exalted
   }
 
   /** Gold still needed to pay the result's `deduct` effects (owner decision: gold never goes negative). */
@@ -259,7 +259,7 @@ export class DialogueManagerService {
         }
         return false
       case 'reputation':
-        return this.playerStore.townTier(c.townId) >= c.tier
+        return this.playerStore.reputationTierOf(c.reputationId) >= c.tier
       case 'arena':
         switch (c.state) {
           case 'ready': return this.arenaService.isReady()
@@ -345,7 +345,7 @@ export class DialogueManagerService {
           const { turnIn, bundles } = this.turnIn(effect)
           if (bundles === 0) break
           this.playerStore.removeItems([{ id: turnIn.itemId, amount: bundles * turnIn.bundleSize }])
-          this.reputationService.gain([{ townId: turnIn.townId, amount: bundles * turnIn.reputation }])
+          this.reputationService.gain([{ reputationId: turnIn.reputationId, amount: bundles * turnIn.reputation }])
           break
         }
       }

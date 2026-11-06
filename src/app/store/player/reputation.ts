@@ -1,8 +1,15 @@
 import { ReputationTier } from '../../../enums/reputation-tier.enum'
+import { ReputationID } from '../../../enums/reputation-id.enum'
 import { TownID } from '../../../enums/map/town-id.enum'
 
-/** Towns that keep reputation; quest rewards may only credit these (`validate` checks). */
-export const REPUTATION_TOWNS: TownID[] = [TownID.laHarpar, TownID.mawood]
+/** What keeps reputation; quest rewards may only credit these (`validate` checks). */
+export const REPUTATION_IDS: ReputationID[] = [ReputationID.laHarpar, ReputationID.mawood]
+
+/** The town a reputation belongs to, for the ones that belong to a town. */
+export const REPUTATION_TOWN: Partial<Record<ReputationID, TownID>> = {
+  [ReputationID.laHarpar]: TownID.laHarpar,
+  [ReputationID.mawood]: TownID.mawood,
+}
 
 /** Cumulative points needed for each tier. */
 export const REPUTATION_THRESHOLDS: Record<ReputationTier, number> = {
@@ -14,12 +21,12 @@ export const REPUTATION_THRESHOLDS: Record<ReputationTier, number> = {
 }
 
 export interface ReputationGain {
-  townId: TownID
+  reputationId: ReputationID
   amount: number
 }
 
 export interface TierUp {
-  townId: TownID
+  reputationId: ReputationID
   tier: ReputationTier
 }
 

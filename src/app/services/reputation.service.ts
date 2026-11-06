@@ -2,7 +2,7 @@ import { inject, Injectable, signal } from '@angular/core'
 import i18next from 'i18next'
 import { PlayerStore } from '../store/player/player.store'
 import { ReputationGain } from '../store/player/reputation'
-import { TownID } from '../../enums/map/town-id.enum'
+import { ReputationID } from '../../enums/reputation-id.enum'
 import { ReputationTier } from '../../enums/reputation-tier.enum'
 
 const TIER_UP_TOAST_MS = 4000
@@ -20,8 +20,8 @@ export class ReputationService {
     const tierUps = this.playerStore.addReputation(gains)
     if (tierUps.length === 0) return
 
-    const lines = tierUps.map(({ townId, tier }) => i18next.t('quests:reputation.tierUp', {
-      town: i18next.t(`map:towns.${TownID[townId]}`),
+    const lines = tierUps.map(({ reputationId, tier }) => i18next.t('quests:reputation.tierUp', {
+      town: i18next.t(`map:reputations.${ReputationID[reputationId]}`),
       tier: i18next.t(`quests:reputation.tiers.${ReputationTier[tier]}`),
     }))
     clearTimeout(this.tierUpTimer)

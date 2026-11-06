@@ -55,7 +55,7 @@ Same shape as the Arena pets (`ARENA_PETS`, no shiny): `tier: ItemTier.legendary
 
 - **Once: a dialogue flag**, `bartender_gave_pet` and `corwin_gave_pet` (named like `bartender_paid_for_*`, `josh_paid_beer`). Set by the same option that gives the pet. Not an item check: `itemCount` counts the inventory only (`player.store.ts` → `countItem`), so an equipped pet reads as 0 and an item check would hand out a second one.
 - **Full inventory:** the gift is an `item` `give` effect, so `DialogueManagerService.missingSlots` already counts it and `canApplyResult` disables the option with the "[free N slots]" tag (`dialogue.component.html`) if it can't fit. In practice it always fits: the Pets tab has one slot per pet item ID (`PET_SPECIES`, `inventory.ts`) and never fills, and adding the two items grows it by two. The flag is set in the same result, so a blocked option sets nothing.
-- **Hidden until Exalted:** the option's only result has `{ type: 'reputation', townId, tier: ReputationTier.exalted, hidden: true }` and `{ type: 'flag', name, isSet: false, hidden: true }`. With no matching result the option is hidden (`dialogue.md`), so it disappears after the gift.
+- **Hidden until Exalted:** the option's only result has `{ type: 'reputation', reputationId, tier: ReputationTier.exalted, hidden: true }` and `{ type: 'flag', name, isSet: false, hidden: true }`. With no matching result the option is hidden (`dialogue.md`), so it disappears after the gift.
 
 ## Dialogue scripts
 

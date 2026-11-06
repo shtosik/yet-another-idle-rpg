@@ -11,7 +11,7 @@ import { EnemyID } from '../../../../enums/ids/enemy-id.enum'
 import { DialogueEffect } from '../../../../types/dialogues/dialogue-effect.type'
 import { DialogueCondition } from '../../../../types/dialogues/dialogue-condition.type'
 import { ZoneID } from '../../../../enums/ids/zone-id.enum'
-import { TownID } from '../../../../enums/map/town-id.enum'
+import { ReputationID } from '../../../../enums/reputation-id.enum'
 import { reputationLockText } from '../quests/reputation/reputation-text'
 import { CloseButtonComponent } from '../../shared/close-button/close-button.component'
 import { PlayerStore } from '../../../store/player/player.store'
@@ -97,7 +97,7 @@ export class DialogueComponent {
         })
       }
       case 'reputation':
-        return reputationLockText(condition.townId, condition.tier, this.playerStore.reputation()[condition.townId] ?? 0)
+        return reputationLockText(condition.reputationId, condition.tier, this.playerStore.reputation()[condition.reputationId] ?? 0)
       case 'manyStat':
         return condition.statsRequired
           .map(req => this.getConditionLabel({ type: 'stat', ...req }))
@@ -172,7 +172,7 @@ export class DialogueComponent {
         const { turnIn, bundles } = this.dialogueService.turnIn(effect)
         return i18next.t('quests:reputation.reward', {
           amount: this.shownBundles(bundles) * turnIn.reputation,
-          town: i18next.t(`map:towns.${TownID[turnIn.townId]}`),
+          town: i18next.t(`map:reputations.${ReputationID[turnIn.reputationId]}`),
         })
       }
       default:

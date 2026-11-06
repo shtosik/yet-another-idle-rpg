@@ -4,7 +4,7 @@
 
 The content for each reputation tier at **La Harpar** and **Mawood**: titles, Friendly dialogue, Honored shop stock and recipe scrolls, Revered quests and lines. Every ID below exists in `src/` unless it is listed under [New content](#new-content). Numbers are first guesses; tune them with `npm run sim -- --reputation`.
 
-Tiers: Neutral 0, Friendly 50, Honored 200, Revered 600, Exalted 1500 (`ReputationTier` in `src/enums/reputation-tier.enum.ts`). Locks and requirements use `{ type: 'reputation', townId, tier }` (`ReputationRequirement`, `src/data/quests-data.ts`).
+Tiers: Neutral 0, Friendly 50, Honored 200, Revered 600, Exalted 1500 (`ReputationTier` in `src/enums/reputation-tier.enum.ts`). Locks and requirements use `{ type: 'reputation', reputationId, tier }` (`ReputationRequirement`, `src/data/quests-data.ts`).
 
 ## Lore already in the game
 
@@ -85,7 +85,7 @@ No Mawood NPC charges for answers, so Mawood's Friendly perk is trust: Sylvie le
 
 ## Honored: shop stock and recipe scrolls
 
-Each row gets `minReputation: { townId, tier: ReputationTier.honored }` next to the shop's other items. Prices follow each shop's markup: shops sell at about 3× an item's `value` (Apprentice Robe 500 → 1500, Magic Staff 800 → 3000), recipe scrolls at 3× (Fish Apple Pie Recipe 100 → 300), and basic food matches the stall (Apple 25, Fish Meat 10).
+Each row gets `minReputation: { reputationId, tier: ReputationTier.honored }` next to the shop's other items. Prices follow each shop's markup: shops sell at about 3× an item's `value` (Apprentice Robe 500 → 1500, Magic Staff 800 → 3000), recipe scrolls at 3× (Fish Apple Pie Recipe 100 → 300), and basic food matches the stall (Apple 25, Fish Meat 10).
 
 ### La Harpar (`laHarparShop`, the Trader)
 
@@ -128,7 +128,7 @@ At Revered the towns give the player what they give their own people: work that 
 | `aCleanCure` (18) | A Clean Cure | Sylvie (`mawoodSylvie`) | Mawood Revered; `theInfestation` completed | +100 Mawood, 4000 XP, 800 gold, 1 `skillPointBook` (War Trophies) |
 | `rootsAndRafters` (19) | Roots and Rafters | Brenna (`mawoodBrenn`) | Mawood Revered; `warTrophies` completed; `theBlightedHeart` completed | +100 Mawood, 5000 XP, 1000 gold, 1 `unspentSkillPoints` (What Lurks at the Top) |
 
-Start gates are `{ type: 'reputation', townId, tier: ReputationTier.revered }` plus `{ type: 'quest', questId, step: QUEST_STEP_AFTER_COMPLETED }`. Rewards list the `reputation` reward first, like the other quests.
+Start gates are `{ type: 'reputation', reputationId, tier: ReputationTier.revered }` plus `{ type: 'quest', questId, step: QUEST_STEP_AFTER_COMPLETED }`. Rewards list the `reputation` reward first, like the other quests.
 
 **Steps** (`description` is the journal line, verbatim):
 

@@ -51,6 +51,7 @@ export { SkillBranch } from 'enums/ids/skill-branch.enum'
 export { SkillNodeType } from 'enums/skill-node-type.enum'
 export { NpcID } from 'enums/map/npc-id.enum'
 export { TownID } from 'enums/map/town-id.enum'
+export { ReputationID } from 'enums/reputation-id.enum'
 export { TownBuildingID } from 'enums/map/town-building-id.enum'
 export { DamageElement } from 'enums/damage-element.enum'
 export { ItemTier } from 'enums/items/item-tier.enum'
@@ -69,7 +70,7 @@ export { ALL_SKILLS } from 'data/skill-tree-data'
 export { UNLOCK_RULES, ZONE_UNLOCK_NOTIFICATIONS } from 'data/unlock-conditions'
 export { WORLD_MAP_DATA } from 'data/world-map-data'
 export { sellPrice } from 'app/store/shop/shop-prices'
-export { REPUTATION_TOWNS } from 'app/store/player/reputation'
+export { REPUTATION_IDS, REPUTATION_TOWN } from 'app/store/player/reputation'
 export { REPUTATION_TURN_INS } from 'data/reputation-turn-ins'
 export { TitleID } from 'enums/ids/title-id.enum'
 export { CHANGELOG_NOTE_TYPES } from 'app/components/modals/changelog/changelog'
@@ -129,6 +130,7 @@ for (const [name, e, data, file, idField] of COVERAGE) {
 // 2. Cross-entity references
 
 const has = (data, id) => id !== undefined && data[id] !== undefined
+const REPUTATION_ID_KEYS = Object.fromEntries(enumValues(D.ReputationID).map(v => [v, true]))
 const REF_KEYS = {
   itemId: ['ItemID', D.ITEM_DATA],
   enemyId: ['EnemyID', D.ENEMIES_DATA],
@@ -144,6 +146,7 @@ const REF_KEYS = {
   stationId: ['StationID', D.STATIONS_DATA],
   spellId: ['SpellID', D.SPELLS_DATA],
   townId: ['TownID', D.TOWNS_DATA],
+  reputationId: ['ReputationID', REPUTATION_ID_KEYS],
 }
 
 // Walks any data structure and checks every field whose name implies a reference.
@@ -280,7 +283,7 @@ for (const quest of Object.values(D.QUEST_DATA)) {
     else if (!questsInDialogue(step.turnInNpc).has(quest.questId)) error('src/data/quests-data.ts', `${where}: turnInNpc ${npc}'s dialogue never starts, advances or ends this quest`)
   })
   for (const reward of quest.rewards.filter(r => r.type === 'reputation')) {
-    if (!D.REPUTATION_TOWNS.includes(reward.townId)) error('src/data/quests-data.ts', `${idName(D.QuestID, quest.questId)} gives reputation in ${idName(D.TownID, reward.townId)}, which isn't in REPUTATION_TOWNS`)
+    if (!D.REPUTATION_IDS.includes(reward.reputationId)) error('src/data/quests-data.ts', `${idName(D.QuestID, quest.questId)} gives reputation in ${idName(D.ReputationID, reward.reputationId)}, which isn't in REPUTATION_IDS`)
     if (!(reward.amount > 0)) error('src/data/quests-data.ts', `${idName(D.QuestID, quest.questId)} gives ${reward.amount} reputation; it must be positive`)
   }
 }
@@ -292,8 +295,8 @@ const effectsOf = npcId => Object.values(D.NPC_DATA[npcId]?.dialogue ?? {})
 for (const turnIn of D.REPUTATION_TURN_INS) {
   const npc = idName(D.NpcID, turnIn.npcId)
   const file = 'src/data/reputation-turn-ins.ts'
-  if (!D.REPUTATION_TOWNS.includes(turnIn.townId)) error(file, `${npc}'s turn-in credits ${idName(D.TownID, turnIn.townId)}, which isn't in REPUTATION_TOWNS`)
-  if (townOfNpc(turnIn.npcId) !== turnIn.townId) error(file, `${npc}'s turn-in credits ${idName(D.TownID, turnIn.townId)}, but ${npc} doesn't stand there`)
+  if (!D.REPUTATION_IDS.includes(turnIn.reputationId)) error(file, `${npc}'s turn-in credits ${idName(D.ReputationID, turnIn.reputationId)}, which isn't in REPUTATION_IDS`)
+  if (townOfNpc(turnIn.npcId) !== D.REPUTATION_TOWN[turnIn.reputationId]) error(file, `${npc}'s turn-in credits ${idName(D.ReputationID, turnIn.reputationId)}, but ${npc} doesn't stand there`)
   if (!has(D.ITEM_DATA, turnIn.itemId)) error(file, `${npc}'s turn-in has unknown ItemID ${turnIn.itemId}`)
   if (!(turnIn.bundleSize > 0 && turnIn.reputation > 0)) error(file, `${npc}'s turn-in needs a positive bundleSize and reputation`)
   if (!effectsOf(turnIn.npcId).some(e => e.type === 'reputationTurnIn')) error(file, `${npc}'s dialogue never uses their turn-in`)
@@ -443,6 +446,7 @@ const ENTITY_KEYS = [
   [D.SkillBranch, k => [`skill-tree:branches.${k}`], 'src/assets/locales/en/skill-tree.json'],
   [D.SkillNodeID, k => [`skill-tree:nodes.${k}.name`, `skill-tree:nodes.${k}.desc`], 'src/assets/locales/en/skill-tree.json'],
   [D.TownID, k => [`map:towns.${k}`], 'src/assets/locales/en/map.json'],
+  [D.ReputationID, k => [`map:reputations.${k}`], 'src/assets/locales/en/map.json'],
   [D.TownBuildingID, k => [`map:buildings.${k}`], 'src/assets/locales/en/map.json'],
   [D.TitleID, k => [`app:titles.${k}`], 'src/assets/locales/en/app.json'],
   [D.DamageElement, k => [`app:elements.${k}`], 'src/assets/locales/en/app.json'],

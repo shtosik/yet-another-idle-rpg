@@ -3,7 +3,7 @@ import { NpcID } from '../../../enums/map/npc-id.enum'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
 import { ShopID } from '../../../enums/ids/shop-id.enum'
-import { TownID } from '../../../enums/map/town-id.enum'
+import { ReputationID } from '../../../enums/reputation-id.enum'
 import { ReputationTier } from '../../../enums/reputation-tier.enum'
 
 export enum SylvieDialogue {
@@ -148,7 +148,7 @@ const MAWOOD_SYLVIE: MawoodSylvieDialogueType = {
           },
           // ...or to anyone Mawood already calls a friend.
           {
-            visibilityConditions: [{ type: 'reputation', townId: TownID.mawood, tier: ReputationTier.friendly, hidden: true }],
+            visibilityConditions: [{ type: 'reputation', reputationId: ReputationID.mawood, tier: ReputationTier.friendly, hidden: true }],
             next: SylvieDialogue.default,
             effects: [{ type: 'shop', shopId: ShopID.mawoodApothecary }],
           },

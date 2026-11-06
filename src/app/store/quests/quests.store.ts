@@ -66,7 +66,7 @@ export const QuestsStore = signalStore(
             itemsToUpdate.push({ id: reward.itemId, amount: reward.amount })
             break
           case 'reputation':
-            reputationGains.push({ townId: reward.townId, amount: reward.amount })
+            reputationGains.push({ reputationId: reward.reputationId, amount: reward.amount })
             break
         }
       })
@@ -138,7 +138,7 @@ export const QuestsStore = signalStore(
             return { current: met ? 1 : 0, target: 1 }
           }
           case 'reputation':
-            return { current: playerStore.reputation()[req.townId] ?? 0, target: REPUTATION_THRESHOLDS[req.tier] }
+            return { current: playerStore.reputation()[req.reputationId] ?? 0, target: REPUTATION_THRESHOLDS[req.tier] }
           default:
             return { current: 0, target: 1 }
         }

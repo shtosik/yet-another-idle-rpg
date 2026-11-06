@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core'
 import { I18nextPipe } from '../../../../pipes/i18next.pipe'
 import { PlayerStore } from '../../../../store/player/player.store'
-import { REPUTATION_TOWNS, reputationProgress } from '../../../../store/player/reputation'
-import { TownID } from '../../../../../enums/map/town-id.enum'
+import { REPUTATION_IDS, REPUTATION_TOWN, reputationProgress } from '../../../../store/player/reputation'
+import { ReputationID } from '../../../../../enums/reputation-id.enum'
 import { ReputationTier } from '../../../../../enums/reputation-tier.enum'
 
-/** Reputation tab of the quest panel: tier and progress per discovered town, no reward lists (docs/ideas/quest-panel.md). */
+/** Reputation tab of the quest panel: tier and progress per discovered reputation, no reward lists (docs/ideas/quest-panel.md). */
 @Component({
   selector: 'app-reputation',
   templateUrl: './reputation.component.html',
@@ -16,13 +16,13 @@ import { ReputationTier } from '../../../../../enums/reputation-tier.enum'
 export class ReputationComponent {
   private playerStore = inject(PlayerStore)
 
-  protected readonly TownID = TownID
+  protected readonly ReputationID = ReputationID
   protected readonly ReputationTier = ReputationTier
 
-  rows = computed(() => REPUTATION_TOWNS
-    .filter(townId => this.playerStore.isTownUnlocked(townId))
-    .map(townId => {
-      const points = this.playerStore.reputation()[townId] ?? 0
-      return { townId, points, ...reputationProgress(points) }
+  rows = computed(() => REPUTATION_IDS
+    .filter(id => this.playerStore.isTownUnlocked(REPUTATION_TOWN[id]!))
+    .map(reputationId => {
+      const points = this.playerStore.reputation()[reputationId] ?? 0
+      return { reputationId, points, ...reputationProgress(points) }
     }))
 }

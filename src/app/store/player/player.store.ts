@@ -33,6 +33,7 @@ import { SkillNodeID } from '../../../enums/ids/skill-node-id.enum'
 import { SpellID } from '../../../enums/ids/spell-id.enum'
 import { ZoneID } from '../../../enums/ids/zone-id.enum'
 import { TownID } from '../../../enums/map/town-id.enum'
+import { ReputationID } from '../../../enums/reputation-id.enum'
 import { DamageElement } from '../../../enums/damage-element.enum'
 import { withDevtools } from '../helpers/devtools'
 import { saveGameStateNow, SaveMigrations, withGameStateSync } from '../helpers/with-game-state-sync.hook'
@@ -126,7 +127,7 @@ interface PlayerState {
   totalTasksCompleted: number;
   explorerTokens: number;
   /** Points per town, never spent or lost; the tier is derived (`reputation.ts`). */
-  reputation: Partial<Record<TownID, number>>;
+  reputation: Partial<Record<ReputationID, number>>;
   unlockedContent: UnlockedContent;
   campUnlocked: boolean;
   stations: Stations;
@@ -319,7 +320,7 @@ export const PlayerStore = signalStore(
     /** Titles whose source is met, in `TitleID` order. */
     earnedTitles: computed(() => (Object.keys(TITLES_DATA).map(Number) as TitleID[]).filter(id => {
       const source = TITLES_DATA[id]
-      return reputationTier(store.reputation()[source.townId] ?? 0) >= source.tier
+      return reputationTier(store.reputation()[source.reputationId] ?? 0) >= source.tier
     })),
     hasAvailableTaskSlot: () => store.activeTasks().length < store.stats().maxTaskSlots,
     hasCompletedTask: () => store.activeTasks().some(isTaskDone),
@@ -862,19 +863,19 @@ export const PlayerStore = signalStore(
       if (id === null || store.earnedTitles().includes(id)) patchState(store, { selectedTitle: id })
     },
 
-    townTier(townId: TownID): ReputationTier {
-      return reputationTier(store.reputation()[townId] ?? 0)
+    reputationTierOf(reputationId: ReputationID): ReputationTier {
+      return reputationTier(store.reputation()[reputationId] ?? 0)
     },
 
-    /** Adds points per town; returns each town whose tier went up, once, with its new tier. */
+    /** Adds points per reputation; returns each one whose tier went up, once, with its new tier. */
     addReputation(gains: ReputationGain[]): TierUp[] {
       const before = store.reputation()
       const after = { ...before }
-      gains.forEach(({ townId, amount }) => after[townId] = (after[townId] ?? 0) + amount)
+      gains.forEach(({ reputationId, amount }) => after[reputationId] = (after[reputationId] ?? 0) + amount)
       patchState(store, { reputation: after })
-      return [...new Set(gains.map(gain => gain.townId))]
-        .map(townId => ({ townId, tier: reputationTier(after[townId] ?? 0) }))
-        .filter(({ townId, tier }) => tier > reputationTier(before[townId] ?? 0))
+      return [...new Set(gains.map(gain => gain.reputationId))]
+        .map(reputationId => ({ reputationId, tier: reputationTier(after[reputationId] ?? 0) }))
+        .filter(({ reputationId, tier }) => tier > reputationTier(before[reputationId] ?? 0))
     },
 
     isTownUnlocked(id: TownID): boolean {

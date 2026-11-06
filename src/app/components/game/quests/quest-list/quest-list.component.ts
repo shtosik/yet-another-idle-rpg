@@ -156,7 +156,7 @@ export class QuestListComponent {
       case 'quest':
         return i18next.t(`quests:names.${QuestID[req.questId]}`)
       case 'reputation':
-        return reputationTierLabel(req.townId, req.tier)
+        return reputationTierLabel(req.reputationId, req.tier)
     }
   }
 }

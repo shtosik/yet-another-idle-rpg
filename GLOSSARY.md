@@ -124,7 +124,7 @@ The player's Exploration Guild level, earned by completing tasks; separate from 
 _Avoid_: Rank (alone), guild level
 
 **Reputation**:
-The points a player has earned with one town; never spent and never lost.
+The points a player has earned with one town or guild (a `ReputationID`); never spent and never lost.
 _Avoid_: Rep, standing, fame, town rank
 
 **Reputation turn-in**:

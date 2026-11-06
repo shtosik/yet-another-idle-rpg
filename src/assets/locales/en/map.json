@@ -11,6 +11,12 @@
     "lirold": "Lirold",
     "mawood": "Mawood"
   },
+  "reputations": {
+    "laHarpar": "La Harpar",
+    "lirold": "Lirold",
+    "mawood": "Mawood",
+    "farmingGuild": "Farming Guild"
+  },
   "buildings": {
     "main": "Elder's Tree",
     "tavern": "Tavern",

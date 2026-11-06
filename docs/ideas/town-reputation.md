@@ -47,7 +47,7 @@ Five tiers, the same names in every town. Thresholds are cumulative and first gu
 
 ### Quests
 
-Every quest from a town NPC lists a reputation reward (`{ type: 'reputation', townId, amount }`) in its rewards, so the amount shows with the other rewards and a quest can credit another town when the story calls for it. First guesses:
+Every quest from a town NPC lists a reputation reward (`{ type: 'reputation', reputationId, amount }`) in its rewards, so the amount shows with the other rewards and a quest can credit another town when the story calls for it. First guesses:
 
 | Town | Quests | Reputation |
 |---|---|---|
@@ -102,8 +102,8 @@ Amounts come from the sim. The giver, animal and dialogue are drafted by `lore-k
 
 ## Touch-points
 
-- Reputation per `TownID` in player state (`src/app/store/player/player.store.ts`), persisted; tier is derived from points, not stored.
-- Quest reward type and `startRequirements` type `{ type: 'reputation', townId, tier }` (`src/data/quests-data.ts`, `src/app/store/quests/quests.store.ts`).
+- Reputation per `ReputationID` (`src/enums/reputation-id.enum.ts`, values kept from `TownID`) in player state (`src/app/store/player/player.store.ts`), persisted; tier is derived from points, not stored.
+- Quest reward type and `startRequirements` type `{ type: 'reputation', reputationId, tier }` (`src/data/quests-data.ts`, `src/app/store/quests/quests.store.ts`).
 - Dialogue condition (minimum tier) and turn-in effect (`src/types/dialogues/`, `src/app/services/dialogue-manager.service.ts`, via `/add-dialogue-effect`).
 - `minReputation` on shop items next to `minRank` (`src/types/shop/shop.type.ts`, `src/data/shops-data.ts`, shop store and component).
 - Title state and picker in the stats panel; new food-effect stat in `src/types/player/player-stat.type.ts` and the derived `stats` (ADR 0002).

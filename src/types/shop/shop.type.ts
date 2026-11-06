@@ -2,7 +2,7 @@ import { ShopID } from '../../enums/ids/shop-id.enum'
 import { ItemID } from '../../enums/ids/item-id.enum'
 import { ItemTier } from '../../enums/items/item-tier.enum'
 import { ItemType } from '../../enums/items/item-type.enum'
-import { TownID } from '../../enums/map/town-id.enum'
+import { ReputationID } from '../../enums/reputation-id.enum'
 import { ReputationTier } from '../../enums/reputation-tier.enum'
 
 /** What a shop's prices are paid in. */
@@ -32,7 +32,7 @@ export interface ShopItem {
   /** Exploration Guild rank needed to buy it (token shop tiers). */
   minRank?: number
   /** Town reputation tier needed to buy it; the item shows locked until then. */
-  minReputation?: { townId: TownID, tier: ReputationTier }
+  minReputation?: { reputationId: ReputationID, tier: ReputationTier }
   /** Stock stage the shop must be opened at to list it (default 0); see `ShopEffect.stage`. */
   minStage?: number
 }

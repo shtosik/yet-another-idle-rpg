@@ -2,13 +2,13 @@ import { provideZonelessChangeDetection } from '@angular/core'
 import { TestBed } from '@angular/core/testing'
 import { PlayerStore } from './player.store'
 import { reputationProgress, reputationTier } from './reputation'
-import { TownID } from '../../../enums/map/town-id.enum'
+import { ReputationID } from '../../../enums/reputation-id.enum'
 import { ReputationTier } from '../../../enums/reputation-tier.enum'
 import { NpcID } from '../../../enums/map/npc-id.enum'
 import { TitleID } from '../../../enums/ids/title-id.enum'
 import { turnInBundles, turnInFor } from '../../../data/reputation-turn-ins'
 
-describe('town reputation', () => {
+describe('reputation', () => {
   it('derives the tier from cumulative points', () => {
     expect(reputationTier(0)).toBe(ReputationTier.neutral)
     expect(reputationTier(49)).toBe(ReputationTier.neutral)
@@ -40,23 +40,33 @@ describe('town reputation', () => {
 
     afterEach(() => localStorage.clear())
 
-    it('reports one tier-up per town, at the highest tier reached', () => {
+    it('reports one tier-up per reputation, at the highest tier reached', () => {
       const tierUps = store.addReputation([
-        { townId: TownID.mawood, amount: 150 },
-        { townId: TownID.mawood, amount: 100 },
-        { townId: TownID.laHarpar, amount: 10 },
+        { reputationId: ReputationID.mawood, amount: 150 },
+        { reputationId: ReputationID.mawood, amount: 100 },
+        { reputationId: ReputationID.laHarpar, amount: 10 },
       ])
 
-      expect(tierUps).toEqual([{ townId: TownID.mawood, tier: ReputationTier.honored }])
-      expect(store.reputation()).toEqual({ [TownID.mawood]: 250, [TownID.laHarpar]: 10 })
-      expect(store.addReputation([{ townId: TownID.mawood, amount: 1 }])).toEqual([])
+      expect(tierUps).toEqual([{ reputationId: ReputationID.mawood, tier: ReputationTier.honored }])
+      expect(store.reputation()).toEqual({ [ReputationID.mawood]: 250, [ReputationID.laHarpar]: 10 })
+      expect(store.addReputation([{ reputationId: ReputationID.mawood, amount: 1 }])).toEqual([])
+    })
+
+    it('loads an old save keyed by the former TownID numbers unchanged', () => {
+      TestBed.resetTestingModule()
+      localStorage.setItem('playerStore', JSON.stringify({ v: 2, state: { reputation: { 1: 75, 3: 210 } } }))
+      TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] })
+      store = TestBed.inject(PlayerStore)
+      expect(store.reputation()).toEqual({ [ReputationID.laHarpar]: 75, [ReputationID.mawood]: 210 })
+      expect(store.reputationTierOf(ReputationID.laHarpar)).toBe(ReputationTier.friendly)
+      expect(store.reputationTierOf(ReputationID.mawood)).toBe(ReputationTier.honored)
     })
 
     it('earns titles from tiers and only lets an earned one be shown', () => {
       store.selectTitle(TitleID.mawoodFriendly)
       expect(store.selectedTitle()).toBeNull()
 
-      store.addReputation([{ townId: TownID.mawood, amount: 50 }])
+      store.addReputation([{ reputationId: ReputationID.mawood, amount: 50 }])
       expect(store.earnedTitles()).toEqual([TitleID.mawoodFriendly])
       store.selectTitle(TitleID.mawoodFriendly)
       expect(store.selectedTitle()).toBe(TitleID.mawoodFriendly)

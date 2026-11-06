@@ -9,8 +9,8 @@
       @for (stat of statsToDisplay(); track stat.key) {
         <li>{{ stat.amount }} {{ 'playerStats.' + stat.key | i18next }}</li>
       }
-      @for (reputation of reputationToDisplay(); track reputation.townId) {
-        <li>{{ 'quests:reputation.reward' | i18next: { amount: reputation.amount, town: ('map:towns.' + TownID[reputation.townId] | i18next) } }}</li>
+      @for (reputation of reputationToDisplay(); track reputation.reputationId) {
+        <li>{{ 'quests:reputation.reward' | i18next: { amount: reputation.amount, town: ('map:reputations.' + ReputationID[reputation.reputationId] | i18next) } }}</li>
       }
     </ul>
   }

@@ -3,7 +3,7 @@ import { NpcID } from '../../../enums/map/npc-id.enum'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { ItemID } from '../../../enums/ids/item-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
-import { TownID } from '../../../enums/map/town-id.enum'
+import { ReputationID } from '../../../enums/reputation-id.enum'
 import { ReputationTier } from '../../../enums/reputation-tier.enum'
 
 export enum CorwinDialogue {
@@ -153,7 +153,7 @@ const MAWOOD_CORWIN: MawoodCorwinDialogueType = {
         results: [
           {
             visibilityConditions: [
-              { type: 'reputation', townId: TownID.mawood, tier: ReputationTier.revered, hidden: true },
+              { type: 'reputation', reputationId: ReputationID.mawood, tier: ReputationTier.revered, hidden: true },
               { type: 'quest', questId: QuestID.theBlightedHeart, questState: QuestState.completed },
             ],
             next: CorwinDialogue.reveredFirstShoot,
@@ -164,7 +164,7 @@ const MAWOOD_CORWIN: MawoodCorwinDialogueType = {
         responseKey: `${NS}:default.rootglowMoth`,
         results: [{
           visibilityConditions: [
-            { type: 'reputation', townId: TownID.mawood, tier: ReputationTier.exalted, hidden: true },
+            { type: 'reputation', reputationId: ReputationID.mawood, tier: ReputationTier.exalted, hidden: true },
             { type: 'flag', name: GAVE_PET_FLAG, isSet: false, hidden: true },
           ],
           next: CorwinDialogue.rootglowMoth,
