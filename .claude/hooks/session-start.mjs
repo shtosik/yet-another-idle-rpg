@@ -36,6 +36,6 @@ if (counts) {
 }
 
 // Merged worktrees pile up because nobody remembers to remove them; clean up in the background, silently.
-spawn(process.execPath, [fileURLToPath(new URL('../../scripts/worktree-prune.mjs', import.meta.url))], { detached: true, stdio: 'ignore', windowsHide: true }).unref()
+spawn(process.execPath, [fileURLToPath(new URL('../../scripts/worktree-prune.mjs', import.meta.url))], { detached: true, stdio: 'ignore', windowsHide: true }).on('error', () => {}).unref()
 
 console.log(JSON.stringify({ hookSpecificOutput: { hookEventName: 'SessionStart', additionalContext: notes.join('\n') } }))
