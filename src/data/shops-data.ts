@@ -72,6 +72,7 @@ const SHOPS_DATA: Record<ShopID, Shop> = {
       { itemId: ItemID.vialOfWater,     tier: ItemTier.normal,   price: 15,  maxStock: 99, refreshable: true  },
       { itemId: ItemID.minorManaPotion,         tier: ItemTier.normal,   price: 60,  maxStock: 20, refreshable: true,  minReputation: { reputationId: ReputationID.mawood, tier: ReputationTier.honored } },
       { itemId: ItemID.greaterManaPotionRecipe, tier: ItemTier.uncommon, price: 300, maxStock: 1,  refreshable: false, minReputation: { reputationId: ReputationID.mawood, tier: ReputationTier.honored } },
+      { itemId: ItemID.glowcapElixirRecipe,     tier: ItemTier.rare,     price: 400, maxStock: 1,  refreshable: false },
     ],
     // Only ingredients and remedies; reagents and potions pay best.
     buys: [ItemType.resource, ItemType.potion, ItemType.food],
@@ -86,6 +87,18 @@ const SHOPS_DATA: Record<ShopID, Shop> = {
         [ItemID.ancientWood]: 1.5,
       },
     },
+  },
+  // Warden Marta: the only seeds ever sold (tiers 1-2) and two recipes; she buys nothing.
+  [ShopID.farmWardenShop]: {
+    id: ShopID.farmWardenShop,
+    nameKey: 'shop:names.farmWardenShop',
+    buys: [],
+    items: [
+      { itemId: ItemID.turnipSeeds,         tier: ItemTier.normal,   price: 20,  maxStock: 20, refreshable: true },
+      { itemId: ItemID.wheatSeeds,          tier: ItemTier.normal,   price: 60,  maxStock: 10, refreshable: true,  minReputation: { reputationId: ReputationID.farmingGuild, tier: ReputationTier.friendly } },
+      { itemId: ItemID.harvestPieRecipe,    tier: ItemTier.uncommon, price: 400, maxStock: 1,  refreshable: false, minReputation: { reputationId: ReputationID.farmingGuild, tier: ReputationTier.honored } },
+      { itemId: ItemID.mushroomStewRecipe,  tier: ItemTier.rare,     price: 600, maxStock: 1,  refreshable: false, minReputation: { reputationId: ReputationID.farmingGuild, tier: ReputationTier.revered } },
+    ],
   },
   [ShopID.explorersGuildStore]: {
     id: ShopID.explorersGuildStore,

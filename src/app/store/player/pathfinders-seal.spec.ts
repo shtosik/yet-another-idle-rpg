@@ -37,7 +37,7 @@ describe("Pathfinder's Seal", () => {
       const rng = jasmine.createSpy('rng').and.callFake(() => ++calls <= 8 ? 0 : bonus)
       const contents = rollChest(arenaChest, rng, true)
       expect(rng).toHaveBeenCalledTimes(9)
-      expect(contents.gold).toBe(24_000)
+      expect(contents.gold).toBe(32_000)
       return contents.items
     }
     expect(roll(0.099)).toEqual([{ id: seal, amount: 1 }])

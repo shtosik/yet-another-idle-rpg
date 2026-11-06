@@ -31,6 +31,8 @@ const translations = [
     'dialogues/liroldArenaMaster',
     'dialogues/liroldPhurgo',
     'dialogues/mawoodElarion',
+    'dialogues/farmWarden',
+    'dialogues/farmDrover',
 ]
 
 export function i18nextInitializer() {

@@ -19,6 +19,14 @@ export const QuestItemsData: Partial<Record<ItemID, Item>> = {
     value: -1,
     type: ItemType.quest,
   },
+  [ItemID.guildLetter]: {
+    id: ItemID.guildLetter,
+    tier: ItemTier.normal,
+    // Placeholder until the Guild Letter icon is drawn.
+    url: './assets/img/items/letter.png',
+    value: -1,
+    type: ItemType.quest,
+  },
   [ItemID.captainsLetter]: {
     id: ItemID.captainsLetter,
     tier: ItemTier.normal,

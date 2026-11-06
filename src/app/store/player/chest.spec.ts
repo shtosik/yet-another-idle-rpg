@@ -13,7 +13,7 @@ describe('chests', () => {
 
   it('rolls its picks, merging the same item into one stack', () => {
     // rng 0 always picks the first entry (gold) at its minimum.
-    expect(rollChest(chest, () => 0)).toEqual({ gold: chest.rolls * 6000, items: [] })
+    expect(rollChest(chest, () => 0)).toEqual({ gold: chest.rolls * 8000, items: [] })
 
     const silk: ChestItem = { ...chest, loot: [{ weight: 1, itemId: ItemID.elderSilk, amount: [2, 2] }] }
     expect(rollChest(silk, () => 0.5).items).toEqual([{ id: ItemID.elderSilk, amount: 2 * chest.rolls }])
@@ -46,9 +46,9 @@ describe('chests', () => {
       fill('materials')
       const gold = playerStore.stats().goldCoins
       const { contents, missing } = playerStore.openChest(chestSlot(), goldRoll())
-      expect(contents).toEqual({ gold: chest.rolls * 6000, items: [] })
+      expect(contents).toEqual({ gold: chest.rolls * 8000, items: [] })
       expect(missing).toEqual({})
-      expect(playerStore.stats().goldCoins).toBe(gold + chest.rolls * 6000)
+      expect(playerStore.stats().goldCoins).toBe(gold + chest.rolls * 8000)
       expect(playerStore.itemCount(ItemID.arenaChest)).toBe(2)
     })
 

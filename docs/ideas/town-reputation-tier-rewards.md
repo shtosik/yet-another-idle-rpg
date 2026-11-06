@@ -42,6 +42,7 @@ Display names only, no stats (`GLOSSARY.md` **Title**). i18n keys under a new `t
 | La Harpar | Exalted | Toast of La Harpar | A tavern town: the player is now the one everyone drinks to. |
 | Mawood | Friendly | Friend of Mawood | Same pattern as La Harpar. |
 | Mawood | Exalted | Keeper of Mawood | The town keeps going because of the player; it does not claim the forest is healed. |
+| Farming Guild | Exalted | Hand of the Terraces | Exalted only, no Friendly title (`TitleID.farmingGuildExalted`, `farm-and-husbandry.md` §9a). |
 
 ## Friendly: dialogue
 

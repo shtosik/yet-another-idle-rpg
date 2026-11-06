@@ -13,6 +13,8 @@ import MAWOOD_MILO from './dialogues/mawoodTown/mawoodMilo'
 import MAWOOD_ELARION from './dialogues/mawoodTown/mawoodElarion'
 import LIROLD_ARENA_MASTER from './dialogues/liroldTown/liroldArenaMaster'
 import LIROLD_PHURGO, { PhurgoDialogue } from './dialogues/liroldTown/liroldPhurgo'
+import FARM_WARDEN from './dialogues/farm/farmWarden'
+import FARM_DROVER from './dialogues/farm/farmDrover'
 
 export interface NPCProps {
   id: NpcID
@@ -87,6 +89,9 @@ const NPC_Data: Record<number, NPCProps> = {
     dialogue: MAWOOD_MILO,
     firstMeetNodeId: 1,
   },
+  // Stubs with placeholder avatars until the portraits land (C11); the trees come with C10.
+  [NpcID.farmWarden]: { id: NpcID.farmWarden, url: './assets/img/avatars/mawood/mawoodCorwin.png', dialogue: FARM_WARDEN },
+  [NpcID.farmDrover]: { id: NpcID.farmDrover, url: './assets/img/avatars/mawood/mawoodFinn.png', dialogue: FARM_DROVER },
   [NpcID.mawoodElarion]: {
     id: NpcID.mawoodElarion,
     url: './assets/img/avatars/mawood/mawoodElarion.png',

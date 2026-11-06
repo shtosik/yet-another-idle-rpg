@@ -1,12 +1,12 @@
 # Farming
 
 ## Purpose
-The farm's pure rules and seed storage. Design: `docs/ideas/farm-and-husbandry.md` (player behaviour, wins on conflict) and `docs/ideas/seed-storage.md`. Built so far (plan commit C5): seed storage and the plot rules. There is no UI, Site, NPC or quest yet, so nothing is reachable by a player; later commits (`docs/ideas/farm-implementation-plan.md`) add them.
+The farm's pure rules and seed storage. Design: `docs/ideas/farm-and-husbandry.md` (player behaviour, wins on conflict) and `docs/ideas/seed-storage.md`. Built so far (plan commit C5): seed storage and the plot rules. The farm home screen (`SiteComponent`, see `towns-shops-guild.md`) opens from the map with its Gate button still a stub; there are no plots UI, NPCs or quests yet, so nothing is reachable by a player; later commits (`docs/ideas/farm-implementation-plan.md`) add them.
 
 ## Key files
 - `src/app/store/player/farm.ts` — `FarmState`, `takeSeeds`, `plotCount`, `syncPlots`, `isReady`, `plant`, `plantAll`, `harvest`, `harvestAll`, `isFarmUnlocked`. Pure, with `farm.spec.ts` and `seed-routing.spec.ts`.
 - `src/data/farming-data.ts` — `FARM_SEEDS`: seed id → crop, tier, grow time, yield, required expertise, XP per harvest.
-- `src/data/items/farm-items.data.ts` — the seed and crop items. Only Turnip and Wheat exist so far, with placeholder icons.
+- `src/data/items/farm-items.data.ts` — the seed and crop items. All seven seeds, six crops (Apple is the existing item) and the Guild Letter, with placeholder icons.
 - `src/app/store/player/player.store.ts` — `PlayerState.farm`, `syncFarm`, and the seed split in `addItems`, `processBattleEnd`, `applyKillBatch`.
 
 ## Data flow
@@ -23,4 +23,10 @@ The farm's pure rules and seed storage. Design: `docs/ideas/farm-and-husbandry.m
 - `harvest` and `plant` do not sync: call `syncPlots` first.
 
 ## How to extend
-- A seed: an `ItemType.seed` item (value -1), a `FARM_SEEDS` entry, and a crop item; `npm run validate` checks the mapping. The remaining five seeds and crops (docs/ideas/farm-and-husbandry.md §7) come with the content commit.
+- A seed: an `ItemType.seed` item (value -1), a `FARM_SEEDS` entry, a crop item and a drop or shop source; `npm run validate` checks the mapping.
+
+## Content (C9)
+- Seeds and tiers follow `docs/ideas/farm-and-husbandry.md` §7: Turnip 15 min, Wheat 45 min, Silverleaf 2 h, Apple 4 h, Glowcap 8 h, Heartroot 12 h, Canopy Blossom 24 h; expertise 1, 2, 5, 8, 12, 17, 22.
+- Sources: enemy drops (`enemies-data.ts`, listed in `enemies-shiny-pets-bestiary.md`), the Arena Chest (`arena.md`) and Marta's shop (`towns-shops-guild.md`). Recipes: `consumables-camp-crafting.md`.
+- `NpcID.farmWarden` and `farmDrover` are stubs (placeholder avatars, one-node dialogues) so the shop opens; C10 writes the trees.
+- Art still to draw: seed and crop icons, the Terrace Hare icon, the Guild Letter, recipe scrolls, Turnip Stew, Farmer's Bread, Harvest Pie, Mushroom Stew, Silverleaf Tonic, Glowcap Elixir icons, two portraits (C11).

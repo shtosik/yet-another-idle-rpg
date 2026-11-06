@@ -11,6 +11,7 @@ const TITLES_DATA: Record<TitleID, TitleSource> = {
   [TitleID.laHarparExalted]: { type: 'reputation', reputationId: ReputationID.laHarpar, tier: ReputationTier.exalted },
   [TitleID.mawoodFriendly]: { type: 'reputation', reputationId: ReputationID.mawood, tier: ReputationTier.friendly },
   [TitleID.mawoodExalted]: { type: 'reputation', reputationId: ReputationID.mawood, tier: ReputationTier.exalted },
+  [TitleID.farmingGuildExalted]: { type: 'reputation', reputationId: ReputationID.farmingGuild, tier: ReputationTier.exalted },
 }
 
 export default TITLES_DATA
