@@ -43,6 +43,23 @@ export function fromName<E extends NumericEnum>(e: E, kind: string, ref: Ref<E>)
   return value as E[keyof E]
 }
 
+/** Added by `boostStats`: enough to trivialize combat when checking later content. */
+const STAT_BOOST: { stat: PlayerStat; amount: number }[] = [
+  { stat: 'attackPower', amount: 100 },
+  { stat: 'magicDamage', amount: 100 },
+  { stat: 'maxMana', amount: 100 },
+  { stat: 'critChance', amount: 25 },
+  { stat: 'critMulti', amount: 1 },
+]
+
+/** One stack of `amount` for every item in the game, at the item's own tier. */
+export function allItemStacks(amount: number): { id: ItemID; tier: ItemTier; amount: number; upgradeLevel: number }[] {
+  return Object.keys(ITEM_DATA).map(key => {
+    const id = Number(key) as ItemID
+    return { id, tier: ITEM_DATA[id].tier, amount, upgradeLevel: 0 }
+  })
+}
+
 // Cheat buttons for dev and testing builds. GameComponent renders it only when environment.cheats is on.
 @Component({
   selector: 'app-dev-cheats',
@@ -132,6 +149,12 @@ export class DevCheatsComponent {
       DEV_FEATURES.forEach(feature => this.unlockFeature(feature))
       this.unlockAllZones()
     },
+    /** +100 slots in every slot tab (a permanent bonus, so it also shows in the stats panel). */
+    giveSlots: () => this.giveSlots(),
+    /** 100 of every item, adding slots first until they all fit. */
+    giveAllItems: () => this.giveAllItems(),
+    /** Raises attack, magic, mana and crit by a lot (permanent bonuses, stackable). */
+    boostStats: () => this.boostStats(),
     /** Live state of every store plus derived `stats`; unlike `localStorage`, current without waiting for the batched save. */
     state: () => ({
       stats: this.playerStore.stats(),
@@ -173,6 +196,9 @@ export class DevCheatsComponent {
     addShinyKills: 'addShinyKills(ZoneID, count) — add shiny kills in a zone',
     unlock: `unlock(${DEV_FEATURES.map(f => `'${f}'`).join('|')}) — unlock a feature`,
     unlockAll: 'unlockAll() — every feature, town and zone',
+    giveSlots: 'giveSlots() — +100 inventory slots per slot tab',
+    giveAllItems: 'giveAllItems() — 100 of every item, slots added as needed',
+    boostStats: 'boostStats() — big permanent boost to attack, magic, mana and crit',
     state: 'state() — live state of every store plus derived stats',
     reset: 'reset() — fresh save',
     completeQuest: 'completeQuest(QuestID) — start and complete a quest, rewards included',
@@ -270,6 +296,21 @@ export class DevCheatsComponent {
     for (const id of Object.values(ZoneID)) {
       if (typeof id === 'number') this.playerStore.unlockZone(id)
     }
+  }
+
+  giveSlots() {
+    this.playerStore.updatePlayerStats([{ stat: 'inventorySlots', amount: 100 }])
+  }
+
+  giveAllItems() {
+    const stacks = allItemStacks(100)
+    // Capacity is derived, so each round of slots counts at once. The cap only stops a bug from looping forever.
+    for (let rounds = 0; !this.playerStore.canFitItems(stacks) && rounds < 20; rounds++) this.giveSlots()
+    this.playerStore.addItems(stacks)
+  }
+
+  boostStats() {
+    this.playerStore.updatePlayerStats(STAT_BOOST)
   }
 
   giveMachete() {
