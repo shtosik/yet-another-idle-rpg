@@ -208,6 +208,10 @@ export class DialogueManagerService {
   }
 
   checkCondition(c: DialogueCondition): boolean {
+    return this.evaluateCondition(c) !== !!c.not
+  }
+
+  private evaluateCondition(c: DialogueCondition): boolean {
     switch (c.type) {
       case 'flag':
         return !!this.questStore.dialogueFlags()[c.name] === c.isSet

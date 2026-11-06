@@ -7,7 +7,8 @@ import { ZoneID } from '../../enums/ids/zone-id.enum'
 import { TurnInKey } from '../../app/store/quests/turn-in-cooldown'
 import { ProfessionLevelRequirement, ReputationRequirement } from '../../data/quests-data'
 
-export type DialogueCondition = { hidden?: boolean } & (
+/** `not` flips the result: the condition passes when it would fail. */
+export type DialogueCondition = { hidden?: boolean, not?: boolean } & (
   | QuestCondition
   | StatCondition
   | EnemyKillCountCondition

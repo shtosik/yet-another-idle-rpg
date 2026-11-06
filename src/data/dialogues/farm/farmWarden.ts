@@ -1,4 +1,5 @@
 import { DialogueNode } from '../../../interfaces/dialogues/dialogue-node.interface'
+import { DialogueEffect } from '../../../types/dialogues/dialogue-effect.type'
 import { DialogueCondition } from '../../../types/dialogues/dialogue-condition.type'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
@@ -48,12 +49,19 @@ const ORDER_KEY = orderKey(QuestID.marthasOrder)
 
 const quest = (questId: QuestID, questState: QuestState, step?: number): DialogueCondition =>
   ({ type: 'quest', questId, questState, step })
+/** Started but not ready to hand in: the reminder, never beside the turn-in option. */
+const inProgress = (questId: QuestID): DialogueCondition[] => [quest(questId, QuestState.active), { ...quest(questId, QuestState.readyToAdvance), not: true }]
+const talkStepReady = quest(QuestID.seedsFromTheTerrace, QuestState.readyToAdvance, 1)
+const handOver: DialogueEffect[] = [
+  { type: 'quest', action: 'end', questId: QuestID.seedsFromTheTerrace },
+  { type: 'item', action: 'take', items: [{ itemId: ItemID.guildLetter, amount: 1 }] },
+]
 const hasSeeds: DialogueCondition = { type: 'farmSeeds', atLeast: 1 }
 const guildTier = (tier: ReputationTier): DialogueCondition => ({ type: 'reputation', reputationId: ReputationID.farmingGuild, tier })
 
 /** A hub option that opens `next` while `condition` holds. */
-const hubOption = (key: string, condition: DialogueCondition, next: WardenDialogue) =>
-  ({ responseKey: `${NS}:default.${key}`, results: [{ visibilityConditions: [condition], next }] })
+const hubOption = (key: string, condition: DialogueCondition | DialogueCondition[], next: WardenDialogue) =>
+  ({ responseKey: `${NS}:default.${key}`, results: [{ visibilityConditions: [condition].flat(), next }] })
 
 /** A quest's reminder node: one exit. */
 const reminder = (id: WardenDialogue, key: string): DialogueNode<WardenDialogue> => ({
@@ -104,7 +112,10 @@ const FARM_WARDEN: FarmWardenDialogueType = {
     options: [
       {
         responseKey: `${NS}:introLetter.opt1`,
+        // Hands the letter over here (ends Seeds from the Terrace), then the intro plays on.
         results: [
+          { visibilityConditions: [hasSeeds, talkStepReady], next: WardenDialogue.introSeeds, effects: handOver },
+          { visibilityConditions: [talkStepReady], next: WardenDialogue.introNoSeeds, effects: handOver },
           { visibilityConditions: [hasSeeds], next: WardenDialogue.introSeeds },
           { next: WardenDialogue.introNoSeeds },
         ],
@@ -176,11 +187,11 @@ const FARM_WARDEN: FarmWardenDialogueType = {
       hubOption('tableTurnIn', quest(QuestID.theGrowersTable, QuestState.readyToAdvance, 1), WardenDialogue.questTableComplete),
       hubOption('orderTurnIn', quest(QuestID.marthasOrder, QuestState.readyToAdvance, 1), WardenDialogue.orderComplete),
       // In progress
-      hubOption('furrowProgress', quest(QuestID.theFirstFurrow, QuestState.active), WardenDialogue.questFurrowProgress),
-      hubOption('wheatProgress', quest(QuestID.wheatForTheGuild, QuestState.active), WardenDialogue.questWheatProgress),
-      hubOption('orchardProgress', quest(QuestID.anOrchardAgain, QuestState.active), WardenDialogue.questOrchardProgress),
-      hubOption('tableProgress', quest(QuestID.theGrowersTable, QuestState.active), WardenDialogue.questTableProgress),
-      hubOption('orderProgress', quest(QuestID.marthasOrder, QuestState.active), WardenDialogue.orderProgress),
+      hubOption('furrowProgress', inProgress(QuestID.theFirstFurrow), WardenDialogue.questFurrowProgress),
+      hubOption('wheatProgress', inProgress(QuestID.wheatForTheGuild), WardenDialogue.questWheatProgress),
+      hubOption('orchardProgress', inProgress(QuestID.anOrchardAgain), WardenDialogue.questOrchardProgress),
+      hubOption('tableProgress', inProgress(QuestID.theGrowersTable), WardenDialogue.questTableProgress),
+      hubOption('orderProgress', inProgress(QuestID.marthasOrder), WardenDialogue.orderProgress),
       // Offers
       hubOption('furrowOffer', quest(QuestID.theFirstFurrow, QuestState.available), WardenDialogue.questFurrow),
       hubOption('wheatOffer', quest(QuestID.wheatForTheGuild, QuestState.available), WardenDialogue.questWheat),

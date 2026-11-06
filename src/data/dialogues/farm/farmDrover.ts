@@ -45,7 +45,7 @@ const FARM_DROVER: FarmDroverDialogueType = {
     messageKey: `${NS}:default.message`,
     options: [
       { responseKey: `${NS}:default.orderTurnIn`, results: [{ visibilityConditions: [order(QuestState.readyToAdvance, 1)], next: DroverDialogue.orderComplete }] },
-      { responseKey: `${NS}:default.orderProgress`, results: [{ visibilityConditions: [order(QuestState.active)], next: DroverDialogue.orderProgress }] },
+      { responseKey: `${NS}:default.orderProgress`, results: [{ visibilityConditions: [order(QuestState.active), { ...order(QuestState.readyToAdvance), not: true }], next: DroverDialogue.orderProgress }] },
       {
         // While the order cools down the option stays, disabled, with the "Ready in ..." tag.
         responseKey: `${NS}:default.orderOffer`,
