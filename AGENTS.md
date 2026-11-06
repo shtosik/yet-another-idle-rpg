@@ -2,7 +2,7 @@
 
 Rules for all coding agents (Claude Code, Codex). Claude-only notes are in `CLAUDE.md`.
 
-**Done** = `npm run check` passes: `validate`, `lint`, `test:tools`, `test:ci` and `build`, the same steps as CI.
+**Done** = `npm run check` passes: `validate`, `lint`, `test:tools`, `test:ci` and `build`, the same steps as CI. `npm run check:brief` runs them and prints only the failure.
 
 **Ask me** a clarifying question when a requirement or the architecture is unclear from the existing files.
 
