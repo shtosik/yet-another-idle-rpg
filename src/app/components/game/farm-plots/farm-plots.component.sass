@@ -149,11 +149,12 @@ $cell: 8rem
   display: flex
   flex-direction: column
   align-items: center
-  justify-content: center
+  justify-content: flex-end
   padding: 0
   border: 1px solid #3a3630
+  image-rendering: pixelated
   border-radius: vars.$panelBorderRadius
-  // Soil colour until a soil image is set inline.
+  // Soil colour behind locked cells; soil images are set inline.
   background: #3b2f22 center / cover no-repeat
   font-size: 0.8rem
   overflow: hidden

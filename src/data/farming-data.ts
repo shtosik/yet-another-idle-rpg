@@ -33,18 +33,13 @@ export const FARM_SEEDS: Partial<Record<ItemID, FarmSeed>> = {
 
 export type GrowthStage = 'seedling' | 'growing' | 'ready'
 
-const icon = (crop: ItemID): string => `./assets/img/items/${ItemID[crop]}.png`
+const art = (path: string): string => `./assets/img/farm/${path}.png`
 
-/**
- * Plot art: plants are 96x96 transparent PNGs drawn over a 128x128 soil layer.
- * Until the art lands each stage reuses the crop's item icon and the soil is a CSS colour (null).
- * The art commit adds `farm/plants/<cropKey>-<stage>.png`, `farm/soil-empty.png` and `farm/soil-planted.png`
- * under `src/assets/img/` and points this table at them.
- */
+/** Plot art: 96x96 transparent plants (per growth stage) drawn over a 128x128 soil layer. */
 export const FARM_ART = {
-  soil: { empty: null, planted: null } as { empty: string | null, planted: string | null },
+  soil: { empty: art('soil-empty'), planted: art('soil-planted') },
   plants: Object.fromEntries(Object.values(FARM_SEEDS).map(seed =>
-    [seed.cropId, { seedling: icon(seed.cropId), growing: icon(seed.cropId), ready: icon(seed.cropId) }])) as Partial<Record<ItemID, Record<GrowthStage, string>>>,
+    [seed.cropId, Object.fromEntries((['seedling', 'growing', 'ready'] as const).map(stage => [stage, art(`plants/${ItemID[seed.cropId]}-${stage}`)]))])) as Partial<Record<ItemID, Record<GrowthStage, string>>>,
 }
 
 /** Quests whose completion adds a plot (An Orchard Again, The Growers' Table). */

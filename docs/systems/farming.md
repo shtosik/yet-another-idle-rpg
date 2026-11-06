@@ -29,7 +29,7 @@ The farm's pure rules and seed storage. Design: `docs/ideas/farm-and-husbandry.m
 
 ## Plot art
 - Convention: `src/assets/img/farm/plants/<cropKey>-<seedling|growing|ready>.png` (96x96, transparent) per crop (`ItemID` key, e.g. `turnip`, `canopyBlossom`), and the soil-empty and soil-planted PNGs directly under src/assets/img/farm (128x128). `stageOf`: seedling below 40% progress, growing from 40%, ready at 100%.
-- `FARM_ART` in `farming-data.ts` is the table the panel reads. Until the art exists every stage reuses the crop's item icon and the soil pair is `null` (a CSS colour). The art commit adds the files and points the table at them.
+- `FARM_ART` in `farming-data.ts` is the table the panel reads. It points at the soil pair and the 21 plant sprites (bottom-centre aligned in the 128 px cell, pixelated); the CSS soil colour only shows behind locked cells.
 
 ## How to extend
 - A seed: an `ItemType.seed` item (value -1), a `FARM_SEEDS` entry, a crop item and a drop or shop source; `npm run validate` checks the mapping.
