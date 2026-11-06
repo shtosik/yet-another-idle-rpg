@@ -1,5 +1,14 @@
 import { ItemID } from 'enums/ids/item-id.enum'
-import { fromName } from './dev-cheats.component'
+import ITEM_DATA from '../../../../data/items-data'
+import { allItemStacks, fromName } from './dev-cheats.component'
+
+describe('allItemStacks', () => {
+  it('has one stack of the amount for every item, at the item\'s own tier', () => {
+    const stacks = allItemStacks(100)
+    expect(stacks.length).toBe(Object.keys(ITEM_DATA).length)
+    expect(stacks.every(s => s.amount === 100 && s.tier === ITEM_DATA[s.id].tier)).toBe(true)
+  })
+})
 
 describe('fromName', () => {
   it('resolves a member name to its enum number', () => {
