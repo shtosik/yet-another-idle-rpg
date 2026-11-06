@@ -12,12 +12,12 @@ Every finding comes from the game as it is, never from your own taste, and cites
 ## Steps
 
 1. **Pick the target.** Use the path given, else the plan or idea named in the conversation, else ask which.
-2. **Read the plan as given** (the file in the working tree, or the text in the conversation: it may be new or revised and absent from staging). **Read all evidence from `origin/staging`**: run `git fetch origin staging`, then `git show origin/staging:<path>` (PowerShell on Windows). The checkout may be stale or on `main`.
+2. **Read the plan as given** (the file in the working tree, or the text in the conversation: it may be new or revised and absent from staging; do the same for proposal docs it links that staging lacks). **Read all evidence from `origin/staging`**: run `git fetch origin staging`, then `h=$(git rev-parse origin/staging)` and `git show "$h:<path>"` (Git Bash on Windows rewrites a literal `origin/staging:<path>`). The checkout may be stale or on `main`.
 3. **Read the plan fully**, plus every idea or doc it links.
 4. **Find the systems it touches.** Open `docs/systems/README.md`, match every mechanic the plan changes or relies on (also those it does not name) to a system doc, and read each doc. Read `GLOSSARY.md`, and `docs/ideas/known-issues.md` for open bugs in those systems.
 5. **Check claims against sources**, in this order of trust: shipped code and data in `origin/staging`, `docs/systems/*`, `GLOSSARY.md`, accepted ideas, proposed ideas. When a doc and the code disagree, the code wins; report the doc as wrong.
-6. **Scan `docs/ideas/README.md`** for ideas that overlap or collide, and read the ones that do.
-7. **Run `npm run sim`** (`-- --reputation`, `-- --upgrades`; see `docs/ideas/progression-pacing.md`) only when a claim about pacing, cost or rewards needs numbers. It reads the checkout it runs in, so run it only where the branch contains the current `origin/staging` and has no local changes to `src/`; otherwise report those numbers as unavailable. Quote the output you used.
+6. **Scan `docs/ideas/README.md`** for ideas that overlap or collide, and list `docs/plans/` for plans that do; read the ones that do.
+7. **Run `npm run sim`** (`-- --reputation`, `-- --upgrades`; see `docs/ideas/progression-pacing.md`) only when a claim about pacing, cost or rewards needs numbers. It reads the checkout it runs in, so run it only where `src/`, `package.json`, `scripts/sim-economy.mjs` and `tsconfig.json` match `origin/staging` (an empty `git diff origin/staging -- <those paths>`); otherwise report those numbers as unavailable. Quote the output you used.
 8. **Write the report** (format below).
 
 ## What to flag
