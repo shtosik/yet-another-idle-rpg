@@ -1,14 +1,14 @@
 # Farming
 
 ## Purpose
-The farm's pure rules and seed storage. Design: `docs/ideas/farm-and-husbandry.md` (player behaviour, wins on conflict) and `docs/ideas/seed-storage.md`. Built so far (plan commits C5 to C9): seed storage, the plot rules, the farm home screen (`SiteComponent`, see `towns-shops-guild.md`) and the plots panel. NPCs and the quest chain follow (C10), so no player reaches the farm yet.
+The farm's pure rules and seed storage. Design: `docs/ideas/farm-and-husbandry.md` (player behaviour, wins on conflict) and `docs/ideas/seed-storage.md`. Farming only: husbandry (animals) is a later expansion. Built: seed storage, the plot rules, the farm home screen (`SiteComponent`, see `towns-shops-guild.md`), the plots panel, the Farming Guild NPCs, the quest chain and the Guild orders (`quests.md`, `dialogue.md`).
 
 ## Key files
 - `src/app/store/player/farm.ts` — `FarmState`, `takeSeeds`, `plotCount`, `syncPlots`, `isReady`, `plant`, `plantAll`, `harvest`, `harvestAll`, `isFarmUnlocked`. Pure, with `farm.spec.ts` and `seed-routing.spec.ts`.
 - `src/data/farming-data.ts` — `FARM_SEEDS`: seed id → crop, tier, grow time, yield, required expertise, XP per harvest.
 - `src/data/items/farm-items.data.ts` — the seed and crop items. All seven seeds, six crops (Apple is the existing item) and the Guild Letter, with placeholder icons.
 - `src/app/components/game/farm-plots/` — the plots panel (`GameTab.farmPlots`, class `.farm` on the map footprint): header (Farming Guild reputation bar, Farming expertise bar, plot count, close button back to the farm home), seed list, 3x3 grid, Plant all and Harvest all. A 1 s display tick redraws the timers; growth itself runs on the clock.
-- `src/app/services/farm.service.ts` — `plotLimit` (`plotCount` from the Guild tier and `PLOT_GRANT_QUEST_IDS`, empty until C10), the active seed (cleared when it runs out or its expertise is missing), and the plot actions with their harvest toast (`map:farm`).
+- `src/app/services/farm.service.ts` — `plotLimit` (`plotCount` from the Guild tier and `PLOT_GRANT_QUEST_IDS`, `anOrchardAgain` and `theGrowersTable`), the active seed (cleared when it runs out or its expertise is missing), and the plot actions with their harvest toast (`map:farm`).
 - `src/app/store/player/player.store.ts` — `PlayerState.farm`, `syncFarm`, `plantSeed`, `harvestPlots`, `growAllPlots` (cheat) and the seed split in `addItems`, `processBattleEnd`, `applyKillBatch`.
 
 ## Data flow
@@ -33,5 +33,5 @@ The farm's pure rules and seed storage. Design: `docs/ideas/farm-and-husbandry.m
 ## Content (C9)
 - Seeds and tiers follow `docs/ideas/farm-and-husbandry.md` §7: Turnip 15 min, Wheat 45 min, Silverleaf 2 h, Apple 4 h, Glowcap 8 h, Heartroot 12 h, Canopy Blossom 24 h; expertise 1, 2, 5, 8, 12, 17, 22.
 - Sources: enemy drops (`enemies-data.ts`, listed in `enemies-shiny-pets-bestiary.md`), the Arena Chest (`arena.md`) and Marta's shop (`towns-shops-guild.md`). Recipes: `consumables-camp-crafting.md`.
-- `NpcID.farmWarden` and `farmDrover` are stubs (placeholder avatars, one-node dialogues) so the shop opens; C10 writes the trees.
+- `NpcID.farmWarden` (Marta) and `farmDrover` (Wick) have full dialogue trees; their avatars are placeholders until the portraits are drawn.
 - Art still to draw: seed and crop icons, the Terrace Hare icon, the Guild Letter, recipe scrolls, Turnip Stew, Farmer's Bread, Harvest Pie, Mushroom Stew, Silverleaf Tonic, Glowcap Elixir icons, two portraits (C11).

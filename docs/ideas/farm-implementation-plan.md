@@ -1,6 +1,6 @@
 # Farm implementation plan
 
-**Scope:** L · **Status:** In progress (branch `feat/farm`, one PR into `staging`)
+**Scope:** L · **Status:** In progress (branch `feat/farm`, one PR into `staging`; C1 to C11 committed bar the final `verify-yari` run and its evidence path in the PR body)
 
 Plan for building [the Farm & Farming Guild](farm-and-husbandry.md) (owns player behaviour; no open owner calls) with [seed storage](seed-storage.md) (owns the implementation of the seed store). Steps are commits on one branch. The feature stays unreachable until C10, because only the `seedsFromTheTerrace` quest start unlocks the Site. Seeds count silently from C5 on.
 

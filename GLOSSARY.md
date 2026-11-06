@@ -131,6 +131,14 @@ _Avoid_: Rank (alone), guild level
 The points a player has earned with one town or guild (a `ReputationID`); never spent and never lost.
 _Avoid_: Rep, standing, fame, town rank
 
+**Farming Guild**:
+The growers' guild that runs the farm Site (`ReputationID.farmingGuild`); its reputation tiers open Plots and the Plant all / Harvest all buttons. Warden Marta and Wick are its givers.
+_Avoid_: Farmers' guild, Farm guild
+
+**Order**:
+A repeatable Farming Guild quest (`repeat` in quest data): the NPC asks for a rolled amount of crops or animal materials, then pays reputation, gold and Farming XP, and a turn-in cooldown applies before the next one. Not a Task (Exploration Guild) and not a reputation turn-in bundle.
+_Avoid_: Contract, bounty, delivery
+
 **Reputation turn-in**:
 Handing a town NPC full **bundles** (a fixed amount, e.g. 20 Crab Meat) of one drop for that town's reputation, repeatable until the town is Exalted. The NPC is its **giver**. Not a quest turn-in, which hands in a quest step.
 _Avoid_: Donation, trade-in, delivery

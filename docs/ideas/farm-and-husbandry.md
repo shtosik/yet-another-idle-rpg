@@ -1,6 +1,6 @@
 # The Farm (Farming Guild)
 
-**Scope:** M-L · **Status:** Accepted (owner decisions recorded 2026-11-05 and 2026-11-06; names are placeholders)
+**Scope:** M-L · **Status:** In progress (farming built on `feat/farm`, see `docs/systems/farming.md`; husbandry and animals (§11), pens and the deferred recipes are not built)
 
 A farm on the world map, run by a **Farming Guild**, where the player plants seeds that monsters drop, waits in real time and harvests ingredients for Cooking and Alchemy. Farming is the game's first **profession**; its level is called **Farming expertise** (§7a). Farming only in v1: husbandry (animals) is a later expansion (§11).
 
@@ -672,9 +672,9 @@ Not in v1. Sketch only: Wick's animals (hens, a cow, sheep; no goats, which are 
 **None open.** Every owner call is settled, including: no perks past the cap (the 0.5% growth cut and 1 skill point continue, §7a), no Farming XP from non-farm bundles (§4a), the Exalted title "Hand of the Terraces" (§9a), and no reputation re-tune after the one-bundle nerf (accepted as is). `prestige.md` is only a proposal; this doc has no rebirth question.
 
 Real engineering checks for the main thread (not owner decisions):
-1. **Site NPCs:** verify an NPC frame and the dialogue work with no selected Town (`towns.store.ts`, §2 point 3) before choosing `selectedSiteId` versus a `SiteComponent`.
-2. **Pacing numbers:** the §7a schedule is a direct model; build a farm model in `scripts/sim-economy.mjs` and re-check before shipping.
-3. **Reputation numbers:** update `town-reputation.md` and `sim-economy.mjs` to the one-bundle rule (no re-tune).
+1. **Site NPCs (resolved, C6):** verify an NPC frame and the dialogue work with no selected Town (`towns.store.ts`, §2 point 3) before choosing `selectedSiteId` versus a `SiteComponent`.
+2. **Pacing numbers (resolved, C11):** `npm run sim -- --farm` models the farm: expertise 30 in 62 days at 2 visits a day (doc 59) and 85 days at 1 (doc 85); the model assumes visits 12 h apart and the Guild tier days listed in the script.
+3. **Reputation numbers (resolved, C3):** update `town-reputation.md` and `sim-economy.mjs` to the one-bundle rule (no re-tune).
 
 ## 17. For the main thread
 

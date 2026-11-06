@@ -7,9 +7,7 @@ import { TownBuildingComponent } from '../town/town-building/town-building.compo
 import { ShopComponent } from '../town/shop/shop.component'
 import { TownsStore } from '../../../store/towns/towns.store'
 import { SITES_DATA } from '../../../../data/sites-data'
-import { TEST_SITE_NPCS } from '../../../../data/dev/test-site-npcs'
 import { SiteID } from '../../../../enums/ids/site-id.enum'
-import { environment } from '../../../../environments/environment'
 
 /** A Site's home screen: background, NPCs, dialogue, shop and the Gate button. Needs no selected Town. */
 @Component({
@@ -34,12 +32,7 @@ export class SiteComponent {
   activeShopStage = this.townsStore.activeShopStage
   dialogueActive = computed(() => this.dialogueManager.activeNpc() !== null)
 
-  /** With cheats on, a Site that has no NPCs of its own gets test NPCs, so the home screen can be tried before its real ones exist. */
-  site = computed(() => {
-    const site = SITES_DATA[this.siteId()]
-    const npcs = site.npcs.length === 0 && environment.cheats ? (TEST_SITE_NPCS[site.id] ?? []) : site.npcs
-    return { ...site, npcs }
-  })
+  site = computed(() => SITES_DATA[this.siteId()])
 
   constructor() {
     inject(DestroyRef).onDestroy(() => this.townsStore.closeShop())

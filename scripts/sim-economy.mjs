@@ -5,8 +5,9 @@
 // --weaknesses adds a separate table: kill time per zone with the Weaknesses skill and one strike spell per element.
 // --food adds a table: each food's stats alone and with the Tavern Cat's food effect multiplier.
 // --upgrades adds merge costs through +5, including all attempts to build both copies at every level.
+// --farm adds the farm model (days to Farming expertise 5..30 at 1 and 2 visits a day, against farm doc §7a) and the Arena Chest's expected gold.
 //
-// Usage: npm run sim [-- --waves] [-- --weaknesses] [-- --reputation] [-- --food] [-- --upgrades]
+// Usage: npm run sim [-- --waves] [-- --weaknesses] [-- --reputation] [-- --food] [-- --upgrades] [-- --farm]
 
 import { build } from 'esbuild'
 import { mkdirSync, readFileSync } from 'node:fs'
@@ -39,6 +40,7 @@ await build({
       export { ReputationTier } from 'enums/reputation-tier.enum'
       export { NpcID } from 'enums/map/npc-id.enum'
       export { ReputationID } from 'enums/reputation-id.enum'
+      export { FARM_SEEDS } from 'data/farming-data'
       export { default as ITEM_DATA } from 'data/items-data'
       export { ItemID } from 'enums/ids/item-id.enum'
       export { ItemType } from 'enums/items/item-type.enum'
@@ -331,4 +333,61 @@ Food (stats alone, then with the Tavern Cat ×${catMultiplier})`)
     const withCat = D.consumableModifiers([item.id], catMultiplier)
     console.log(`  ${D.ItemID[item.id].padEnd(16)} ${show(alone).padEnd(36)} ${show(withCat)}${powerShare(withCat)}`)
   }
+}
+
+// ---------------------------------------------------------------------------
+// Farm (--farm): docs/ideas/farm-and-husbandry.md §7a. Same assumptions as the doc's table: no perks, seed supply never short.
+
+if (process.argv.includes('--farm')) {
+  const seeds = Object.values(D.FARM_SEEDS).sort((a, b) => b.requiredLevel - a.requiredLevel)
+  const levelXp = level => 20 * Array.from({ length: level - 1 }, (_, i) => (i + 1) ** 2).reduce((a, b) => a + b, 0)
+  const levelOf = xp => { let level = 1; while (level < 30 && xp >= levelXp(level + 1)) level++; return level }
+  /** Plots by day: 3 (0-2), 4 (3-7), 5 (8-17), 6 (18-34), 7 (35-54), 8 (55-79), 9 (80+). */
+  const plotsOn = day => 3 + [3, 8, 18, 35, 55, 80].filter(from => day >= from).length
+  /** Wick's XP per order (15 items) by Guild tier: 22 / 45 / 90 / 150 / 240; the day each tier is reached is an assumption. */
+  const wickXp = day => (day >= 60 ? 240 : day >= 30 ? 150 : day >= 12 ? 90 : day >= 3 ? 45 : 22)
+  const MARTA_XP = 45
+  const CHAIN_XP = [[1, 30], [3, 100], [5, 400], [8, 1500], [12, 3000]]
+  const targets = [5, 8, 12, 17, 22, 26, 30]
+  const DOC = { 5: [3, 5], 8: [8, 14], 12: [15, 27], 17: [24, 44], 22: [34, 61], 26: [45, 72], 30: [59, 85] }
+
+  function daysTo(visitsPerDay) {
+    let xp = 0
+    const chainPaid = new Set()
+    let plots = []
+    const result = {}
+    for (let day = 0; day < 400 && Object.keys(result).length < targets.length; day++) {
+      for (let v = 0; v < visitsPerDay; v++) {
+        const now = day + v / visitsPerDay
+        const count = plotsOn(day)
+        while (plots.length < count) plots.push({ readyAt: 0 })
+        for (const plot of plots) {
+          if (plot.seed && plot.readyAt <= now + 1e-9) { xp += plot.seed.xp; plot.seed = null }
+          const seed = seeds.find(candidate => candidate.requiredLevel <= levelOf(xp))
+          if (!plot.seed && seed) { plot.seed = seed; plot.readyAt = now + seed.growMs / 86_400_000 }
+        }
+        xp += MARTA_XP + wickXp(day)
+        for (const [level, reward] of CHAIN_XP) if (levelOf(xp) >= level && !chainPaid.has(level)) { chainPaid.add(level); xp += reward }
+        for (const target of targets) if (!(target in result) && levelOf(xp) >= target) result[target] = day + 1
+      }
+    }
+    return result
+  }
+  const one = daysTo(1)
+  const two = daysTo(2)
+  console.log('\nFarming expertise: days to reach (model vs farm doc §7a), 2 visits/day and 1 visit/day')
+  console.table(targets.map(level => ({
+    expertise: level,
+    'total XP': levelXp(level),
+    'model 2/day': two[level], 'doc 2/day': DOC[level][0],
+    'model 1/day': one[level], 'doc 1/day': DOC[level][1],
+  })))
+
+  const chest = D.ITEM_DATA[D.ItemID.arenaChest]
+  const totalWeight = chest.loot.reduce((sum, entry) => sum + entry.weight, 0)
+  const goldEntries = chest.loot.filter(entry => entry.gold)
+  const goldPerRoll = goldEntries.reduce((sum, entry) => sum + entry.weight / totalWeight * (entry.gold[0] + entry.gold[1]) / 2, 0)
+  const seedWeight = chest.loot.filter(entry => D.ITEM_DATA[entry.itemId]?.type === D.ItemType.seed).reduce((sum, entry) => sum + entry.weight, 0)
+  console.log(`
+Arena Chest: ${chest.rolls} picks, total weight ${totalWeight} (seeds ${seedWeight}); expected gold ${Math.round(goldPerRoll * chest.rolls)} per chest (gold entry ${Math.round(goldEntries[0].weight / totalWeight * 1000) / 10}% per pick)`)
 }
