@@ -6,6 +6,8 @@ import { readFileSync } from 'node:fs'
 
 const TAIL_LINES = 40
 const ANSI = /\x1b\[[0-9;?]*[A-Za-z]/g
+// Karma keeps printing progress after a failure, which would push the failure out of the tail.
+const KARMA_PROGRESS = /: Executed \d+ of \d+/
 
 const { scripts } = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'))
 
@@ -15,7 +17,8 @@ for (const step of scripts.check.split('&&').map(s => s.trim())) {
   })
   const output = result.stdout.replace(ANSI, '').trim()
   if (result.status !== 0) {
-    console.log(`FAILED ${step}\n${output.split(/\r?\n/).slice(-TAIL_LINES).join('\n')}`)
+    const lines = output.split(/\r?\n/).filter(line => !KARMA_PROGRESS.test(line))
+    console.log(`FAILED ${step}\n${lines.slice(-TAIL_LINES).join('\n')}`)
     process.exit(result.status ?? 1)
   }
   console.log(`ok ${step}`)

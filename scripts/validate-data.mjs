@@ -692,8 +692,8 @@ for (const f of [...walkFiles(join(ROOT, '.claude', 'agents'), '.md'), ...walkFi
   for (const doc of walkFiles(join(ROOT, 'docs'), '.md')) {
     const rel = relative(ROOT, doc).replace(/\\/g, '/')
     if (rel.startsWith('docs/archive/')) continue
-    const text = readFileSync(doc, 'utf8').replace(/```[\s\S]*?```/g, '')
-    for (const [, target] of text.matchAll(/\]\((?!https?:)([^)\s#]+\.md)(?:#[^)]*)?\)/g)) {
+    const text = readFileSync(doc, 'utf8')
+    for (const [, target] of text.replace(/```[\s\S]*?```/g, '').matchAll(/\]\((?!https?:)([^)\s#]+\.md)(?:#[^)\s]*)?(?:\s+["'][^"']*["'])?\)/g)) {
       if (!existsSync(resolve(dirname(doc), target))) error(rel, `links missing file '${target}'`)
     }
     if (!SHIPPED_NAMES.test(rel)) continue
