@@ -199,4 +199,8 @@ export enum ItemID {
     petMawoodMoth = 180,
     phurgosForgeTongs = 181,
     pathfindersSeal = 182,
+    turnipSeeds = 183,
+    wheatSeeds = 184,
+    turnip = 185,
+    wheat = 186,
 }

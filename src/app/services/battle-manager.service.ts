@@ -272,7 +272,7 @@ export class BattleManagerService {
     this.battleStore.endBattle()
     this.offlineStore.recordKill(performance.now(), zoneId, wave)
     const questDropLimits = getQuestDropLimits(this.questsStore.questStepProgression(), this.playerStore.itemCount)
-    const lost = this.playerStore.processBattleEnd(enemy.id, zoneId, wave, isShiny, questDropLimits)
+    const { lost } = this.playerStore.processBattleEnd(enemy.id, zoneId, wave, isShiny, questDropLimits)
     if (lost.length) this.showDropsLost(lost)
 
     this.unlockNextZone(wave)

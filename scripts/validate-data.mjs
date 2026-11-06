@@ -54,6 +54,8 @@ export { TownID } from 'enums/map/town-id.enum'
 export { ReputationID } from 'enums/reputation-id.enum'
 export { ProfessionID } from 'enums/ids/profession-id.enum'
 export { default as PROFESSIONS_DATA } from 'data/professions-data'
+export { FARM_SEEDS } from 'data/farming-data'
+export { initialFarm, BASE_PLOTS, PLOT_REPUTATION_TIERS, PLOT_GRANT_QUESTS } from 'app/store/player/farm'
 export { TownBuildingID } from 'enums/map/town-building-id.enum'
 export { DamageElement } from 'enums/damage-element.enum'
 export { ItemTier } from 'enums/items/item-tier.enum'
@@ -209,7 +211,7 @@ for (const shop of shops) {
     }
   }
 }
-const UNSELLABLE_TYPES = new Set([D.ItemType.book, D.ItemType.stationUpgrade, D.ItemType.quest, D.ItemType.chest])
+const UNSELLABLE_TYPES = new Set([D.ItemType.book, D.ItemType.stationUpgrade, D.ItemType.quest, D.ItemType.chest, D.ItemType.seed])
 for (const item of Object.values(D.ITEM_DATA)) {
   const name = idName(D.ItemID, item.id)
   if (item.value > 0 && UNSELLABLE_TYPES.has(item.type)) {
@@ -257,6 +259,29 @@ for (const recipe of Object.values(D.RECIPES_DATA)) {
     error('src/data/recipes-data.ts', `${idName(D.RecipeID, recipe.id)} needs ${idName(D.StationID, recipe.stationId)} level ${recipe.stationLevel} > maxLevel ${station.maxLevel}`)
   }
 }
+// Seeds live in the farming state, never in the inventory: each maps to a crop, and nothing may require holding one.
+const seedItems = Object.values(D.ITEM_DATA).filter(item => item.type === D.ItemType.seed)
+for (const item of seedItems) {
+  const farmSeed = D.FARM_SEEDS[item.id]
+  if (!farmSeed) error('src/data/farming-data.ts', `seed ${idName(D.ItemID, item.id)} has no FARM_SEEDS entry`)
+  else if (D.ITEM_DATA[farmSeed.cropId]?.type === D.ItemType.seed || !has(D.ITEM_DATA, farmSeed.cropId)) error('src/data/farming-data.ts', `${idName(D.ItemID, item.id)} maps to a crop that is not an item or is a seed`)
+}
+for (const id of Object.keys(D.FARM_SEEDS)) {
+  if (D.ITEM_DATA[id]?.type !== D.ItemType.seed) error('src/data/farming-data.ts', `FARM_SEEDS key ${idName(D.ItemID, Number(id))} is not a seed item`)
+}
+const isSeedId = id => D.ITEM_DATA[id]?.type === D.ItemType.seed
+for (const recipe of Object.values(D.RECIPES_DATA)) {
+  for (const cost of recipe.itemsNeeded) if (isSeedId(cost.id)) error('src/data/recipes-data.ts', `${idName(D.RecipeID, recipe.id)} needs seed ${idName(D.ItemID, cost.id)}; seeds are not in the inventory`)
+}
+for (const quest of Object.values(D.QUEST_DATA)) {
+  for (const step of quest.steps) {
+    for (const req of step.requirements ?? []) if (req.type === 'item' && isSeedId(req.itemId)) error('src/data/quests-data.ts', `${idName(D.QuestID, quest.questId)} has an item step that needs seed ${idName(D.ItemID, req.itemId)}; seeds are not in the inventory`)
+  }
+}
+if (D.BASE_PLOTS + D.PLOT_REPUTATION_TIERS + D.PLOT_GRANT_QUESTS > D.initialFarm.plots.length) {
+  error('src/app/store/player/farm.ts', `the plot count can reach ${D.BASE_PLOTS + D.PLOT_REPUTATION_TIERS + D.PLOT_GRANT_QUESTS}, more than the ${D.initialFarm.plots.length} plot slots`)
+}
+
 for (const town of Object.values(D.TOWNS_DATA)) {
   for (const b of town.buildings) {
     if (!enumValues(D.TownBuildingID).includes(b.buildingId)) error('src/data/towns-data.ts', `${idName(D.TownID, town.id)} has unknown TownBuildingID ${b.buildingId}`)

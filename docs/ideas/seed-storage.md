@@ -1,6 +1,6 @@
 # Seed storage (where farm seeds live)
 
-**Scope:** S-M · **Status:** Accepted (owner decision 2026-11-06: seeds are removed from the inventory and live in a separate farming store). Player-facing rules live in [farm-and-husbandry.md](farm-and-husbandry.md) §9b and win on any conflict; this doc is the implementation.
+**Scope:** S-M · **Status:** Accepted (owner decision 2026-11-06: seeds are removed from the inventory and live in a separate farming store). Storage and routing are built (plan commit C5; see `docs/systems/farming.md`); the found-seed toast, the welcome-back listing in the modal, the Arena Chest entries and the side seed list wait for later commits. Player-facing rules live in [farm-and-husbandry.md](farm-and-husbandry.md) §9b and win on any conflict; this doc is the implementation.
 
 Companion to [farm-and-husbandry.md](farm-and-husbandry.md) §7 (tiered seeds that monsters and the Arena Chest drop, a few buyable low tiers). Problem: a Turnip Seed can drop at Horseshoe Beach hours before the farm unlocks (a quest after `silkAndWater`), and seeds must never crowd out other drops or cost a tab.
 

@@ -143,6 +143,14 @@ _Avoid_: Skill (that is the skill tree), gathering skill
 A profession's level as the player sees it: 'Farming expertise 7'. Each level gives 1 skill point and a stat reward; every 5th level gives a milestone stat instead of the growth bonus.
 _Avoid_: Farming level, profession level (in player-facing text)
 
+**Seed**:
+A farm item that never enters the inventory: counted per type in the farming state (`PlayerState.farm.seeds`), with no cap and no slots. Monsters, chests and shops add to the count even before the farm unlocks.
+_Avoid_: Seed item, packet, seed stack
+
+**Plot**:
+One of up to nine farm squares that grows one planted seed on a timer and is harvested for crops. The count follows Farming Guild reputation and quests.
+_Avoid_: Field, patch, slot (that is an inventory slot)
+
 **Title**:
 A display-only name the player earns from content such as reputation tiers and picks to show in the stats panel; it gives no stats.
 _Avoid_: Badge, honorific, rank

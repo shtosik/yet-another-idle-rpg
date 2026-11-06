@@ -185,7 +185,11 @@
         "petArenaBurrower": "Pet Burrower",
         "petArenaYad": "Pet Yad",
         "phurgosForgeTongs": "Phurgo's Forge Tongs",
-        "pathfindersSeal": "Pathfinder's Seal"
+        "pathfindersSeal": "Pathfinder's Seal",
+        "turnipSeeds": "Turnip Seeds",
+        "wheatSeeds": "Wheat Seeds",
+        "turnip": "Turnip",
+        "wheat": "Wheat"
     },
     "tiers": {
         "trash": "Trash",

@@ -62,9 +62,11 @@ import {
   withSlotDeltas,
 } from './inventory'
 import { canInstall, evaluateRecipe, installStations, Stations } from './camp'
+import { addSeeds, FarmState, initialFarm, isFarmUnlocked, seedStacks, syncPlots, takeSeeds } from './farm'
 import { ReputationGain, reputationTier, TierUp } from './reputation'
 import { newProfession, professionLevel, professionLevels, Professions, settleProfession } from './professions'
 import { ProfessionID } from '../../../enums/ids/profession-id.enum'
+import { SiteID } from '../../../enums/ids/site-id.enum'
 import PROFESSIONS_DATA from '../../../data/professions-data'
 import { ReputationTier } from '../../../enums/reputation-tier.enum'
 import { TitleID } from '../../../enums/ids/title-id.enum'
@@ -142,6 +144,8 @@ interface PlayerState {
   reputation: Partial<Record<ReputationID, number>>;
   /** Unlocked professions with their XP; a missing entry is locked. The level is derived (`professions.ts`). */
   professions: Professions;
+  /** Plots and the seed counts; seeds never enter the inventory (`farm.ts`). */
+  farm: FarmState;
   unlockedContent: UnlockedContent;
   campUnlocked: boolean;
   stations: Stations;
@@ -174,6 +178,7 @@ export const initialState: PlayerState = {
   explorerTokens: 0,
   reputation: {},
   professions: {},
+  farm: initialFarm,
   unlockedContent: {
     zones: [ZoneID.horseshoeBeach],
     towns: [],
@@ -416,14 +421,24 @@ export const PlayerStore = signalStore(
       }))
     },
 
-    /** Station upgrades install instead of entering the inventory. Returns the ones installed. */
+    /** Station upgrades install and seeds are counted instead of entering the inventory. Returns the upgrades installed. */
     addItems(items: ItemStack[]): ItemID[] {
-      const { stations, rest, installed } = installStations(store.stations(), items)
+      const { seeds, rest: stored } = takeSeeds(items)
+      const { stations, rest, installed } = installStations(store.stations(), stored)
       patchState(store, (state) => ({
         stations,
         inventory: addItems(state.inventory, store.inventoryCapacity(), rest),
+        farm: { ...state.farm, seeds: addSeeds(state.farm.seeds, seeds) },
       }))
       return installed
+    },
+
+    /**
+     * Accrues plot growth up to `now` at the current rate. Call it before anything changes `seedGrowthTimeReduction`
+     * (equipping, a level-up) and on load, so the old rate only covers the old time.
+     */
+    syncFarm(now = Date.now()) {
+      patchState(store, (state) => ({ farm: { ...state.farm, plots: syncPlots(state.farm.plots, now, store.stats().seedGrowthTimeReduction) } }))
     },
 
     removeItems(items: ItemStack[]) {
@@ -584,7 +599,8 @@ export const PlayerStore = signalStore(
   })),
   // Game actions: kills and drops, zone stars, selling, equipping, using items and chests, mana regen, crafting.
   withMethods((store) => ({
-    processBattleEnd(enemyId: EnemyID, zoneId: ZoneID, currentWave: number, isShiny: boolean, questDropLimits?: QuestDropLimits): ItemStack[] {
+    /** `lost`: drops that did not fit. `foundSeeds`: seeds to show a toast for (empty before the farm unlocks). */
+    processBattleEnd(enemyId: EnemyID, zoneId: ZoneID, currentWave: number, isShiny: boolean, questDropLimits?: QuestDropLimits): { lost: ItemStack[], foundSeeds: ItemStack[] } {
       const enemy = ENEMIES_DATA[enemyId]
       const { experience, gold, dropRolls } = killReward(enemy, ZONES_DATA[zoneId], currentWave, isShiny, store.stats())
       const drops = new Map<string, InventoryItem>()
@@ -602,10 +618,12 @@ export const PlayerStore = signalStore(
       store.updateTaskProgress(enemyId)
       if (isShiny) patchState(store, (state) => ({ shinyKillsByZone: addShinyKills(state.shinyKillsByZone, zoneId, 1) }))
 
-      // Station upgrades install instead of being stored, so they never count as lost.
-      const lost = lostItems(store.inventory(), store.inventoryCapacity(), installStations(store.stations(), itemsToUpdate).rest)
+      // Station upgrades install and seeds are counted instead of being stored, so neither ever counts as lost.
+      const { seeds, rest } = takeSeeds(itemsToUpdate)
+      const lost = lostItems(store.inventory(), store.inventoryCapacity(), installStations(store.stations(), rest).rest)
       if (itemsToUpdate.length) store.addItems(itemsToUpdate)
-      return lost
+      // Seeds are counted before the farm unlocks too, but only reported after it.
+      return { lost, foundSeeds: isFarmUnlocked(store.unlockedContent()) ? seedStacks(seeds) : [] }
     },
 
     /** `stats` as it would be with only these buffs and consumable effects running (offline buff segments). */
@@ -620,7 +638,8 @@ export const PlayerStore = signalStore(
     applyKillBatch(batch: KillBatch): KillBatchResult {
       const startLevel = store.resources().level
       const capacity = store.inventoryCapacity()
-      const { stations, rest, installed } = installStations(store.stations(), batch.items)
+      const { seeds, rest: stored } = takeSeeds(batch.items)
+      const { stations, rest, installed } = installStations(store.stations(), stored)
       const inventoryBefore = store.inventory()
       const inventory = addItems(inventoryBefore, capacity, rest)
       // Each stack arrives whole or not at all; `rest` holds one entry per id + tier + upgradeLevel (rolled into a map).
@@ -631,6 +650,10 @@ export const PlayerStore = signalStore(
       })
       const received = receivedItems.reduce((sum, item) => sum + item.amount, 0)
       const lostDrops = rest.reduce((sum, item) => sum + item.amount, 0) - received
+      // Seeds are counted before the farm unlocks too, but only listed after it; they are never lost.
+      if (isFarmUnlocked(store.unlockedContent())) {
+        receivedItems.push(...seedStacks(seeds).map(({ id, amount }) => ({ id, type: ItemType.seed, tier: ITEM_DATA[id].tier, amount })))
+      }
 
       patchState(store, (state) => {
         const resources = { ...state.resources }
@@ -651,6 +674,7 @@ export const PlayerStore = signalStore(
           shinyKillsByZone: addShinyKills(state.shinyKillsByZone, batch.zoneId, batch.shinies),
           stations,
           inventory,
+          farm: { ...state.farm, seeds: addSeeds(state.farm.seeds, seeds) },
           zonesProgression: {
             ...state.zonesProgression,
             [batch.zoneId]: { ...zoneProgression, [batch.wave]: (zoneProgression?.[batch.wave] ?? 0) + batch.kills },
@@ -709,6 +733,7 @@ export const PlayerStore = signalStore(
 
     equipItem(item: InventoryItem) {
       if (!store.canEquip(item)) return
+      store.syncFarm() // gear can change the growth rate (Terrace Hare): the old rate covers only the time so far
 
       const itemData = ITEM_DATA[item.id] as EquipmentItem
       const slotKey = EquipmentSlot[itemData.slot] as EquipmentSlotKey
@@ -730,6 +755,7 @@ export const PlayerStore = signalStore(
       const equippedItem = store.equipment()[slot]
 
       if (!equippedItem || !store.canUnequip(slot)) return
+      store.syncFarm()
 
       store.addItems([{ id: equippedItem.id, tier: equippedItem.tier, upgradeLevel: equippedItem.upgradeLevel, amount: 1 }])
 
@@ -874,6 +900,15 @@ export const PlayerStore = signalStore(
       })
     },
 
+    /** Opens a Site. Only the farm exists; C6 wires it to the `unlockSite` dialogue effect and the world map. */
+    unlockSite(id: SiteID): void {
+      patchState(store, (state) => {
+        const sites = state.unlockedContent.sites ?? []
+        if (sites.includes(id)) return {}
+        return { unlockedContent: { ...state.unlockedContent, sites: [...sites, id] } }
+      })
+    },
+
     /** Shows an earned title in the stats panel, or none with `null`; unearned titles are ignored. */
     selectTitle(id: TitleID | null): void {
       if (id === null || store.earnedTitles().includes(id)) patchState(store, { selectedTitle: id })
@@ -912,6 +947,7 @@ export const PlayerStore = signalStore(
     applyProfessionXp(id: ProfessionID, amount: number): ProfessionGain | null {
       const current = store.professions()[id]
       if (!current) return null
+      store.syncFarm() // a level-up changes the growth rate
       const { maxLevel } = PROFESSIONS_DATA[id]
       const from = professionLevel(store.professions(), id)
       const { progress, skillPoints } = settleProfession({ ...current, experience: Math.max(0, current.experience + amount) }, maxLevel)
@@ -1004,6 +1040,9 @@ export const PlayerStore = signalStore(
         const capacity = store.inventoryCapacity()
         patchState(store, (state) => ({ inventory: resizeInventory(state.inventory, capacity) }))
       })
+
+      // Offline time counts at the rate the save was made with.
+      store.syncFarm()
 
       // Pays skill points a save has not been paid for yet (older saves, edited XP, a raised level cap), once.
       for (const [key, progress] of Object.entries(store.professions())) {
