@@ -13,7 +13,6 @@ import { DialogueCondition } from '../../../../types/dialogues/dialogue-conditio
 import { ZoneID } from '../../../../enums/ids/zone-id.enum'
 import { ReputationID } from '../../../../enums/reputation-id.enum'
 import { ProfessionID } from '../../../../enums/ids/profession-id.enum'
-import { SiteID } from '../../../../enums/ids/site-id.enum'
 import { reputationLockText } from '../quests/reputation/reputation-text'
 import { CloseButtonComponent } from '../../shared/close-button/close-button.component'
 import { PlayerStore } from '../../../store/player/player.store'
@@ -160,6 +159,7 @@ export class DialogueComponent {
           return `${sign}${s.amount} ${name}`
         }).join(', ')
       case 'item':
+        if (effect.silent) return ''
         return effect.items.map(i => {
           const name = i18next.t(`items:names.${ItemID[i.itemId]}`)
           const sign = effect.action === 'give' ? '+' : '-'
@@ -177,10 +177,6 @@ export class DialogueComponent {
           case 'claimTask':  return 'Claim reward'
           case 'abandonTask': return 'Cancel task'
         }
-      case 'unlockProfession':
-        return i18next.t('app:expertise.learn', { profession: i18next.t(`app:professions.${ProfessionID[effect.professionId]}`) })
-      case 'unlockSite':
-        return i18next.t('map:sites.unlocked', { site: i18next.t(`map:sites.${SiteID[effect.siteId]}`) })
       case 'arena':
         return i18next.t(`app:arena.effects.${effect.action}`)
       case 'reputationTurnIn': {

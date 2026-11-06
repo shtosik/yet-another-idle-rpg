@@ -45,6 +45,24 @@ describe('Marta dialogue', () => {
     expect(playerStore.itemCount(ItemID.guildLetter)).toBe(0)
   })
 
+  it('hands the letter over on the very first open, whichever opening line is picked, and never greets again', () => {
+    questsStore.startQuest(QuestID.silkAndWater)
+    questsStore.endQuest(QuestID.silkAndWater)
+    questsStore.startQuest(QuestID.seedsFromTheTerrace)
+    playerStore.addItems([{ id: ItemID.guildLetter, amount: 1 }])
+    dialogue.startDialogue(NpcID.farmWarden)
+
+    const intro = FARM_WARDEN[WardenDialogue.intro1]
+    expect(dialogue.getActiveResult(option(intro, 'intro1.letter'))).toBeDefined()
+    dialogue.selectOption(option(intro, 'intro1.teach'))
+
+    expect(questsStore.getQuestStep(QuestID.seedsFromTheTerrace)).toBe(QUEST_STEP_AFTER_COMPLETED)
+    expect(playerStore.itemCount(ItemID.guildLetter)).toBe(0)
+    dialogue.closeDialogue()
+    dialogue.startDialogue(NpcID.farmWarden)
+    expect(dialogue.activeNode()?.id).toBe(WardenDialogue.default)
+  })
+
   it('shows a ready quest only as its turn-in, not also as a reminder', () => {
     questsStore.startQuest(QuestID.silkAndWater)
     questsStore.endQuest(QuestID.silkAndWater)

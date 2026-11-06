@@ -37,6 +37,8 @@ export interface ItemEffect {
   type: 'item'
   action: 'take' | 'give'
   items: { itemId: ItemID; amount: number }[]
+  /** Hides the effect tag, for a gift the quest tag already implies. */
+  silent?: boolean
 }
 
 export interface ShopEffect {

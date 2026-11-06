@@ -94,7 +94,10 @@ const FARM_WARDEN: FarmWardenDialogueType = {
     options: [
       {
         responseKey: `${NS}:intro1.teach`,
+        // Carrying Sylvie's letter, the first words with Marta already hand it over: no second visit needed.
         results: [
+          { visibilityConditions: [hasSeeds, talkStepReady], next: WardenDialogue.introSeeds, effects: [...handOver, { type: 'flag', name: MET_FLAG }] },
+          { visibilityConditions: [talkStepReady], next: WardenDialogue.introNoSeeds, effects: [...handOver, { type: 'flag', name: MET_FLAG }] },
           { visibilityConditions: [hasSeeds], next: WardenDialogue.introSeeds, effects: [{ type: 'flag', name: MET_FLAG }] },
           { next: WardenDialogue.introNoSeeds, effects: [{ type: 'flag', name: MET_FLAG }] },
         ],

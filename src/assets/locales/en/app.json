@@ -35,8 +35,7 @@
     "label": "{{ profession }} expertise {{ level }}",
     "levelUp": "{{ expertise }}: {{ rewards }}",
     "skillPoints_one": "+{{ count }} skill point",
-    "skillPoints_other": "+{{ count }} skill points",
-    "learn": "Learn {{ profession }}"
+    "skillPoints_other": "+{{ count }} skill points"
   },
   "statsPanel": {
     "groups": {

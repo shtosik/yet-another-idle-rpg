@@ -452,7 +452,7 @@ const MAWOOD_SYLVIE: MawoodSylvieDialogueType = {
             // The first reachable path to the farm: the Site and the profession open when the quest starts.
             effects: [
               { type: 'quest', action: 'start', questId: QuestID.seedsFromTheTerrace },
-              { type: 'item', action: 'give', items: [{ itemId: ItemID.guildLetter, amount: 1 }] },
+              { type: 'item', action: 'give', items: [{ itemId: ItemID.guildLetter, amount: 1 }], silent: true },
               { type: 'unlockSite', siteId: SiteID.farm },
               { type: 'unlockProfession', professionId: ProfessionID.farming },
             ],
