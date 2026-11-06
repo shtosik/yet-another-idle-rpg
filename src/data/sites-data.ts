@@ -7,8 +7,8 @@ export interface Site {
   id: SiteID
   /** English map label, like the other marker labels. */
   label: string
-  /** Home screen background; absent until the art lands (the view shows a plain colour). */
-  url?: string
+  /** Home screen background. */
+  url: string
   /** NPCs on the home screen, positioned in % like a town building's. */
   npcs: TownBuildingNpc[]
   /** The one button on the home screen; it opens the Site's panel. */
@@ -20,6 +20,7 @@ export const SITES_DATA: Record<SiteID, Site> = {
   [SiteID.farm]: {
     id: SiteID.farm,
     label: 'Farm',
+    url: './assets/img/backgrounds/farm.png',
     npcs: [
       { id: NpcID.farmWarden, position: { x: 28, y: 48 } },
       { id: NpcID.farmDrover, position: { x: 72, y: 50 } },

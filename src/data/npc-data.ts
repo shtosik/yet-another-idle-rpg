@@ -90,8 +90,8 @@ const NPC_Data: Record<number, NPCProps> = {
     firstMeetNodeId: 1,
   },
   // Placeholder avatars until the portraits land (C11).
-  [NpcID.farmWarden]: { id: NpcID.farmWarden, url: './assets/img/avatars/mawood/mawoodCorwin.png', dialogue: FARM_WARDEN, firstMeetNodeId: WardenDialogue.intro1 },
-  [NpcID.farmDrover]: { id: NpcID.farmDrover, url: './assets/img/avatars/mawood/mawoodFinn.png', dialogue: FARM_DROVER, firstMeetNodeId: DroverDialogue.intro1 },
+  [NpcID.farmWarden]: { id: NpcID.farmWarden, url: './assets/img/avatars/farm/farmWarden.png', dialogue: FARM_WARDEN, firstMeetNodeId: WardenDialogue.intro1 },
+  [NpcID.farmDrover]: { id: NpcID.farmDrover, url: './assets/img/avatars/farm/farmDrover.png', dialogue: FARM_DROVER, firstMeetNodeId: DroverDialogue.intro1 },
   [NpcID.mawoodElarion]: {
     id: NpcID.mawoodElarion,
     url: './assets/img/avatars/mawood/mawoodElarion.png',

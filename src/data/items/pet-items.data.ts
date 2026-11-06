@@ -305,9 +305,8 @@ const TOWN_PETS: EquipmentItem[] = [
   townPet(ItemID.petLaHarparCat, 'petLaHarparCat', [{ id: 'foodEffectMultiplier', amount: 0.5 }]),
   townPet(ItemID.petMawoodMoth, 'petMawoodMoth', [{ id: 'increasedSpellDuration', amount: 10 }]),
   // Works only while equipped in the pet slot; stats are percents (0.10 = 10%).
-  // Placeholder icon (the Moth's) until petFarmingGuildHare.png is drawn (C11).
   {
-    ...townPet(ItemID.petFarmingGuildHare, 'petMawoodMoth', [
+    ...townPet(ItemID.petFarmingGuildHare, 'petFarmingGuildHare', [
       { id: 'seedGrowthTimeReduction', amount: 0.1 },
       { id: 'farmDoubleHarvestChance', amount: 0.1 },
     ]),

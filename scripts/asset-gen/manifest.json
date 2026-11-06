@@ -1,4 +1,18 @@
 {
+  "src/assets/img/avatars/farm/farmDrover.png": {
+    "family": "portrait-pixel",
+    "tier": null,
+    "subject": "a realistic lanky teenage boy with a mop of straw-coloured hair, freckles, big wary eyes and a half-shy smile, oversized stained leather apron, sleeves too long, twine and paper labels pinned to the front, a coil of rope over one shoulder, one consistent natural skin tone on face, neck and hands, fully opaque solid figure, bust with both shoulders fully in frame",
+    "seed": 1024684451,
+    "date": "2026-11-06"
+  },
+  "src/assets/img/avatars/farm/farmWarden.png": {
+    "family": "portrait-pixel",
+    "tier": null,
+    "subject": "a realistic weathered woman in her fifties, strong forearms, sun-bleached straw hat pushed back over grey-streaked brown hair, deep tan with sharp crow's feet, stern watchful expression with a trace of tired kindness, patched green work coat over a rolled-sleeve linen shirt, a ring of small brass keys at the belt, one consistent natural skin tone on face, neck and hands, fully opaque solid figure, bust with both shoulders fully in frame",
+    "seed": 182743594,
+    "date": "2026-11-06"
+  },
   "src/assets/img/avatars/laHarpar/laHarparBartender.png": {
     "family": "portrait-pixel",
     "tier": null,
@@ -507,6 +521,13 @@
     "seed": 535645451,
     "date": "2026-10-17"
   },
+  "src/assets/img/items/appleSeeds.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single small brown paper seed packet tied with green twine and a green ribbon label, a few small dark brown teardrop seeds spilling from the top",
+    "seed": 1054544528,
+    "date": "2026-11-06"
+  },
   "src/assets/img/items/apprenticeRobe.png": {
     "family": "item-pixel",
     "tier": null,
@@ -584,6 +605,20 @@
     "seed": 1199052729,
     "date": "2026-10-17"
   },
+  "src/assets/img/items/canopyBlossom.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single large pink and purple blossom flower with a short green stem and two leaves",
+    "seed": 414108048,
+    "date": "2026-11-06"
+  },
+  "src/assets/img/items/canopyBlossomSeeds.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single small brown paper seed packet tied with purple twine and a purple ribbon label, a few tiny pink-purple seeds spilling from the top",
+    "seed": 486570428,
+    "date": "2026-11-06"
+  },
   "src/assets/img/items/cheesePlatter.png": {
     "family": "item-pixel",
     "tier": null,
@@ -654,6 +689,20 @@
     "seed": 786,
     "date": "2026-10-26"
   },
+  "src/assets/img/items/farmersBread.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single round loaf of crusty golden brown bread with three slashes on top",
+    "seed": 922261755,
+    "date": "2026-11-06"
+  },
+  "src/assets/img/items/farmersBreadRecipe.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single tall beige parchment scroll with curled rolled top and bottom and a red ribbon, with a small brown ink drawing of a loaf of bread in the centre, nothing else",
+    "seed": 154510449,
+    "date": "2026-11-06"
+  },
   "src/assets/img/items/firePit.png": {
     "family": "item-pixel",
     "tier": null,
@@ -681,6 +730,34 @@
     "subject": "one open-faced gladiator helmet of polished bronze with an iron brow band and cheek guards, a short crimson horsehair crest running along the top, a single small white feather tucked at one side, a few small dents in the metal, empty inside, no head",
     "seed": 502902317,
     "date": "2026-10-30"
+  },
+  "src/assets/img/items/glowcap.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single mushroom with a glowing pale blue cap and a short white stem",
+    "seed": 2026832767,
+    "date": "2026-11-06"
+  },
+  "src/assets/img/items/glowcapElixir.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single round glass flask with a cork stopper filled with glowing blue liquid and a tiny mushroom inside",
+    "seed": 1349597912,
+    "date": "2026-11-06"
+  },
+  "src/assets/img/items/glowcapElixirRecipe.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single tall beige parchment scroll with curled rolled top and bottom and a red ribbon, with a small brown ink drawing of a flask in the centre, nothing else",
+    "seed": 1615500117,
+    "date": "2026-11-06"
+  },
+  "src/assets/img/items/glowcapSpores.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single small brown paper seed packet tied with blue twine and a blue ribbon label, a few tiny glowing blue spores spilling from the top",
+    "seed": 334328734,
+    "date": "2026-11-06"
   },
   "src/assets/img/items/gnollCleaver.png": {
     "family": "item-pixel",
@@ -731,6 +808,13 @@
     "seed": 7331,
     "date": "2026-10-21"
   },
+  "src/assets/img/items/guildLetter.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single folded cream letter sealed with a green wax seal showing a wheat ear",
+    "seed": 860736476,
+    "date": "2026-11-06"
+  },
   "src/assets/img/items/harpyCrown.png": {
     "family": "item-pixel",
     "tier": null,
@@ -744,6 +828,34 @@
     "subject": "a single long feather, teal and brown with a pale quill, single object",
     "seed": 1114497759,
     "date": "2026-10-17"
+  },
+  "src/assets/img/items/harvestPie.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single whole round pie with a golden lattice crust in a tin dish",
+    "seed": 1818001170,
+    "date": "2026-11-06"
+  },
+  "src/assets/img/items/harvestPieRecipe.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single tall beige parchment scroll with curled rolled top and bottom and a red ribbon, with a small brown ink drawing of a round pie in the centre, nothing else",
+    "seed": 596485508,
+    "date": "2026-11-06"
+  },
+  "src/assets/img/items/heartroot.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single heart-shaped red root vegetable with thin root tendrils and a few green leaves",
+    "seed": 679085502,
+    "date": "2026-11-06"
+  },
+  "src/assets/img/items/heartrootSeeds.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single small brown paper seed packet tied with blue twine and a blue ribbon label, a few small red seeds spilling from the top",
+    "seed": 1354656507,
+    "date": "2026-11-06"
   },
   "src/assets/img/items/heartwoodAmulet.png": {
     "family": "item-pixel",
@@ -829,6 +941,20 @@
     "seed": 1581558275,
     "date": "2026-10-21"
   },
+  "src/assets/img/items/mushroomStew.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single wooden bowl of dark brown stew with sliced mushrooms",
+    "seed": 825978071,
+    "date": "2026-11-06"
+  },
+  "src/assets/img/items/mushroomStewRecipe.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single tall beige parchment scroll with curled rolled top and bottom and a red ribbon, with a small brown ink drawing of a mushroom in the centre, nothing else",
+    "seed": 791054603,
+    "date": "2026-11-06"
+  },
   "src/assets/img/items/mysticHood.png": {
     "family": "item-pixel",
     "tier": null,
@@ -842,6 +968,13 @@
     "subject": "a pair of fine crimson leather gloves with round gold coin studs along the cuffs and gold stitching",
     "seed": 1491485296,
     "date": "2026-10-27"
+  },
+  "src/assets/img/items/petFarmingGuildHare.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single brown hare sitting, with long upright ears and a small green scarf, alone",
+    "seed": 43133891,
+    "date": "2026-11-06"
   },
   "src/assets/img/items/petLaHarparCat.png": {
     "family": "enemy-pixel",
@@ -898,6 +1031,34 @@
     "subject": "a pair of pale white silk leggings laid flat, empty, with a drawstring waist",
     "seed": 790,
     "date": "2026-10-26"
+  },
+  "src/assets/img/items/silverleaf.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single sprig of three silver-grey leaves on a thin green stem",
+    "seed": 265617480,
+    "date": "2026-11-06"
+  },
+  "src/assets/img/items/silverleafSeeds.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single small brown paper seed packet tied with green twine and a green ribbon label, a few small silver-grey seeds spilling from the top",
+    "seed": 1648658446,
+    "date": "2026-11-06"
+  },
+  "src/assets/img/items/silverleafTonic.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single small glass bottle with a cork stopper filled with silvery green liquid and a silver leaf",
+    "seed": 219175584,
+    "date": "2026-11-06"
+  },
+  "src/assets/img/items/silverleafTonicRecipe.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single tall beige parchment scroll with curled rolled top and bottom and a red ribbon, with a small brown ink drawing of a leaf in the centre, nothing else",
+    "seed": 1708996818,
+    "date": "2026-11-06"
   },
   "src/assets/img/items/silverwoodChestplate.png": {
     "family": "item-pixel",
@@ -968,6 +1129,34 @@
     "seed": 790,
     "date": "2026-10-26"
   },
+  "src/assets/img/items/turnip.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single round white and purple turnip with a short green leafy top",
+    "seed": 1664262493,
+    "date": "2026-11-06"
+  },
+  "src/assets/img/items/turnipSeeds.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single small brown paper seed packet tied with white twine and a white ribbon label, a few tiny round beige seeds spilling from the top",
+    "seed": 1910188491,
+    "date": "2026-11-06"
+  },
+  "src/assets/img/items/turnipStew.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single wooden bowl of creamy stew with chunks of turnip and a wooden spoon",
+    "seed": 1401980870,
+    "date": "2026-11-06"
+  },
+  "src/assets/img/items/turnipStewRecipe.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single tall beige parchment scroll with curled rolled top and bottom and a red ribbon, with a small brown ink drawing of a bowl of stew in the centre, nothing else",
+    "seed": 1754913761,
+    "date": "2026-11-06"
+  },
   "src/assets/img/items/venison.png": {
     "family": "item-pixel",
     "tier": null,
@@ -988,6 +1177,20 @@
     "subject": "a single pair of sturdy brown leather sea boots with white salt stains, brass buckles, rope lacing at the shin and sea-blue trim at the cuffs",
     "seed": 1399112550,
     "date": "2026-10-31"
+  },
+  "src/assets/img/items/wheat.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single small bundle of golden wheat stalks tied with string",
+    "seed": 1224195693,
+    "date": "2026-11-06"
+  },
+  "src/assets/img/items/wheatSeeds.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single small brown paper seed packet tied with white twine and a white ribbon label, a few pale golden grain seeds spilling from the top",
+    "seed": 348697083,
+    "date": "2026-11-06"
   },
   "src/assets/img/skills/airMastery.png": {
     "family": "skill-icon",

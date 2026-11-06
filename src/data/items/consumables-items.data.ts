@@ -173,11 +173,11 @@ export const ConsumablesItemsData: Partial<Record<ItemID, Item>> = {
     type: ItemType.recipe,
     recipeId: RecipeID.venisonRoast,
   },
-  // Farm dishes and potions (docs/ideas/farm-and-husbandry.md §7). Scroll icons are the shared placeholders until C11.
+  // Farm dishes and potions (docs/ideas/farm-and-husbandry.md §7).
   [ItemID.turnipStew]: {
     id: ItemID.turnipStew,
     tier: ItemTier.normal,
-    url: './assets/img/items/crabStew.png',
+    url: './assets/img/items/turnipStew.png',
     value: 25,
     type: ItemType.food,
     effect: { slot: 'food', duration: 10 * MINUTE, cooldown: 15 * MINUTE, stats: [{ stat: 'attackPower', amount: 3 }] },
@@ -185,7 +185,7 @@ export const ConsumablesItemsData: Partial<Record<ItemID, Item>> = {
   [ItemID.farmersBread]: {
     id: ItemID.farmersBread,
     tier: ItemTier.normal,
-    url: './assets/img/items/cheesePlatter.png',
+    url: './assets/img/items/farmersBread.png',
     value: 40,
     type: ItemType.food,
     effect: { slot: 'food', duration: 20 * MINUTE, cooldown: 25 * MINUTE, stats: [{ stat: 'attackPower', amount: 2 }] },
@@ -193,7 +193,7 @@ export const ConsumablesItemsData: Partial<Record<ItemID, Item>> = {
   [ItemID.harvestPie]: {
     id: ItemID.harvestPie,
     tier: ItemTier.uncommon,
-    url: './assets/img/items/fishApplePie.png',
+    url: './assets/img/items/harvestPie.png',
     value: 100,
     type: ItemType.food,
     effect: {
@@ -209,7 +209,7 @@ export const ConsumablesItemsData: Partial<Record<ItemID, Item>> = {
   [ItemID.mushroomStew]: {
     id: ItemID.mushroomStew,
     tier: ItemTier.uncommon,
-    url: './assets/img/items/crabStew.png',
+    url: './assets/img/items/mushroomStew.png',
     value: 110,
     type: ItemType.food,
     effect: { slot: 'food', duration: 10 * MINUTE, cooldown: 15 * MINUTE, stats: [{ stat: 'xpMultiplier', amount: 0.15 }] },
@@ -217,7 +217,7 @@ export const ConsumablesItemsData: Partial<Record<ItemID, Item>> = {
   [ItemID.silverleafTonic]: {
     id: ItemID.silverleafTonic,
     tier: ItemTier.uncommon,
-    url: './assets/img/items/minorManaPotion.png',
+    url: './assets/img/items/silverleafTonic.png',
     value: 60,
     type: ItemType.potion,
     effect: { slot: 'potion', cooldown: 2 * MINUTE, manaRestore: 10 },
@@ -225,7 +225,7 @@ export const ConsumablesItemsData: Partial<Record<ItemID, Item>> = {
   [ItemID.glowcapElixir]: {
     id: ItemID.glowcapElixir,
     tier: ItemTier.rare,
-    url: './assets/img/items/greaterManaPotion.png',
+    url: './assets/img/items/glowcapElixir.png',
     value: 120,
     type: ItemType.potion,
     effect: { slot: 'potion', cooldown: 2 * MINUTE, manaRestore: 25 },
@@ -233,7 +233,7 @@ export const ConsumablesItemsData: Partial<Record<ItemID, Item>> = {
   [ItemID.turnipStewRecipe]: {
     id: ItemID.turnipStewRecipe,
     tier: ItemTier.normal,
-    url: './assets/img/items/cookingRecipe.png',
+    url: './assets/img/items/turnipStewRecipe.png',
     value: 50,
     type: ItemType.recipe,
     recipeId: RecipeID.turnipStew,
@@ -241,7 +241,7 @@ export const ConsumablesItemsData: Partial<Record<ItemID, Item>> = {
   [ItemID.farmersBreadRecipe]: {
     id: ItemID.farmersBreadRecipe,
     tier: ItemTier.normal,
-    url: './assets/img/items/cookingRecipe.png',
+    url: './assets/img/items/farmersBreadRecipe.png',
     value: 50,
     type: ItemType.recipe,
     recipeId: RecipeID.farmersBread,
@@ -249,7 +249,7 @@ export const ConsumablesItemsData: Partial<Record<ItemID, Item>> = {
   [ItemID.harvestPieRecipe]: {
     id: ItemID.harvestPieRecipe,
     tier: ItemTier.uncommon,
-    url: './assets/img/items/cookingRecipe.png',
+    url: './assets/img/items/harvestPieRecipe.png',
     value: 100,
     type: ItemType.recipe,
     recipeId: RecipeID.harvestPie,
@@ -257,7 +257,7 @@ export const ConsumablesItemsData: Partial<Record<ItemID, Item>> = {
   [ItemID.mushroomStewRecipe]: {
     id: ItemID.mushroomStewRecipe,
     tier: ItemTier.rare,
-    url: './assets/img/items/cookingRecipe.png',
+    url: './assets/img/items/mushroomStewRecipe.png',
     value: 150,
     type: ItemType.recipe,
     recipeId: RecipeID.mushroomStew,
@@ -265,7 +265,7 @@ export const ConsumablesItemsData: Partial<Record<ItemID, Item>> = {
   [ItemID.silverleafTonicRecipe]: {
     id: ItemID.silverleafTonicRecipe,
     tier: ItemTier.uncommon,
-    url: './assets/img/items/greaterManaPotionRecipe.png',
+    url: './assets/img/items/silverleafTonicRecipe.png',
     value: 100,
     type: ItemType.recipe,
     recipeId: RecipeID.silverleafTonic,
@@ -273,7 +273,7 @@ export const ConsumablesItemsData: Partial<Record<ItemID, Item>> = {
   [ItemID.glowcapElixirRecipe]: {
     id: ItemID.glowcapElixirRecipe,
     tier: ItemTier.rare,
-    url: './assets/img/items/greaterManaPotionRecipe.png',
+    url: './assets/img/items/glowcapElixirRecipe.png',
     value: 150,
     type: ItemType.recipe,
     recipeId: RecipeID.glowcapElixir,
