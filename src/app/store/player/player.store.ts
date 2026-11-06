@@ -63,6 +63,9 @@ import {
 } from './inventory'
 import { canInstall, evaluateRecipe, installStations, Stations } from './camp'
 import { ReputationGain, reputationTier, TierUp } from './reputation'
+import { newProfession, professionLevel, professionLevels, Professions, settleProfession } from './professions'
+import { ProfessionID } from '../../../enums/ids/profession-id.enum'
+import PROFESSIONS_DATA from '../../../data/professions-data'
 import { ReputationTier } from '../../../enums/reputation-tier.enum'
 import { TitleID } from '../../../enums/ids/title-id.enum'
 import TITLES_DATA from '../../../data/titles-data'
@@ -78,6 +81,7 @@ import {
   consumableModifiers,
   deriveStats,
   equipmentModifiers,
+  expertiseModifiers,
   gearModifiers,
   foodMultiplierOf,
   initialResources,
@@ -101,6 +105,14 @@ export interface Task {
 }
 
 export const TASKS_PER_GUILD_RANK = 5
+
+/** What one XP change did to a profession; `skillPoints` were paid for the levels in between. */
+export interface ProfessionGain {
+  professionId: ProfessionID
+  from: number
+  to: number
+  skillPoints: number
+}
 
 export const isTaskDone = (task: Task): boolean => task.currentCount >= task.targetCount
 
@@ -128,6 +140,8 @@ interface PlayerState {
   explorerTokens: number;
   /** Points per town, never spent or lost; the tier is derived (`reputation.ts`). */
   reputation: Partial<Record<ReputationID, number>>;
+  /** Unlocked professions with their XP; a missing entry is locked. The level is derived (`professions.ts`). */
+  professions: Professions;
   unlockedContent: UnlockedContent;
   campUnlocked: boolean;
   stations: Stations;
@@ -159,6 +173,7 @@ export const initialState: PlayerState = {
   totalTasksCompleted: 0,
   explorerTokens: 0,
   reputation: {},
+  professions: {},
   unlockedContent: {
     zones: [ZoneID.horseshoeBeach],
     towns: [],
@@ -228,7 +243,7 @@ const withoutItems = (state: PlayerState, items: ItemStack[]): Pick<PlayerState,
   return { inventory, rolledChests }
 }
 
-type StatSources = { [K in 'resources' | 'permanentBonuses' | 'equipment' | 'unlockedNodes' | 'claimedZoneStars']: () => PlayerState[K] }
+type StatSources = { [K in 'resources' | 'permanentBonuses' | 'equipment' | 'unlockedNodes' | 'claimedZoneStars' | 'professions']: () => PlayerState[K] }
 
 /** Every stat modifier, grouped by where it comes from (the stats panel's breakdown order). */
 const sourcedModifiersOf = (store: StatSources, buffSpellIds: SpellID[], consumableItemIds: ItemID[]): SourcedModifiers => {
@@ -240,6 +255,7 @@ const sourcedModifiersOf = (store: StatSources, buffSpellIds: SpellID[], consuma
     consumables: consumableModifiers(consumableItemIds, foodMultiplierOf(equipment)),
     bonuses: bonusModifiers(store.permanentBonuses()),
     mastery: masteryModifiers(store.claimedZoneStars()),
+    expertise: expertiseModifiers(professionLevels(store.professions())),
   }
 }
 
@@ -878,6 +894,34 @@ export const PlayerStore = signalStore(
         .filter(({ reputationId, tier }) => tier > reputationTier(before[reputationId] ?? 0))
     },
 
+    /** Starts the profession at level 1; no-op when already unlocked. */
+    unlockProfession(id: ProfessionID): void {
+      if (store.professions()[id]) return
+      patchState(store, (state) => ({ professions: { ...state.professions, [id]: newProfession() } }))
+    },
+
+    /** 0 while locked. */
+    professionLevel(id: ProfessionID): number {
+      return professionLevel(store.professions(), id)
+    },
+
+    /**
+     * Adds XP (negative removes it, for cheats) to an unlocked profession and pays the skill points of every new level,
+     * in the same state update. Null while the profession is locked: its XP is not kept.
+     */
+    applyProfessionXp(id: ProfessionID, amount: number): ProfessionGain | null {
+      const current = store.professions()[id]
+      if (!current) return null
+      const { maxLevel } = PROFESSIONS_DATA[id]
+      const from = professionLevel(store.professions(), id)
+      const { progress, skillPoints } = settleProfession({ ...current, experience: Math.max(0, current.experience + amount) }, maxLevel)
+      patchState(store, (state) => ({
+        professions: { ...state.professions, [id]: progress },
+        resources: { ...state.resources, unspentSkillPoints: state.resources.unspentSkillPoints + skillPoints },
+      }))
+      return { professionId: id, from, to: professionLevel(store.professions(), id), skillPoints }
+    },
+
     isTownUnlocked(id: TownID): boolean {
       return (store.unlockedContent().towns ?? []).includes(id)
     },
@@ -960,6 +1004,18 @@ export const PlayerStore = signalStore(
         const capacity = store.inventoryCapacity()
         patchState(store, (state) => ({ inventory: resizeInventory(state.inventory, capacity) }))
       })
+
+      // Pays skill points a save has not been paid for yet (older saves, edited XP, a raised level cap), once.
+      for (const [key, progress] of Object.entries(store.professions())) {
+        const id = Number(key) as ProfessionID
+        if (!PROFESSIONS_DATA[id]) continue
+        const { progress: settled, skillPoints } = settleProfession(progress, PROFESSIONS_DATA[id].maxLevel)
+        if (settled.pointsPaidLevel === progress.pointsPaidLevel) continue
+        patchState(store, (state) => ({
+          professions: { ...state.professions, [id]: settled },
+          resources: { ...state.resources, unspentSkillPoints: state.resources.unspentSkillPoints + skillPoints },
+        }))
+      }
 
       // Losing maxMana (buff expiry, unequip, respec) drops stored mana with it, so it can't come back later.
       effect(() => {

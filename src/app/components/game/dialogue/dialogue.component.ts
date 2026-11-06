@@ -12,6 +12,7 @@ import { DialogueEffect } from '../../../../types/dialogues/dialogue-effect.type
 import { DialogueCondition } from '../../../../types/dialogues/dialogue-condition.type'
 import { ZoneID } from '../../../../enums/ids/zone-id.enum'
 import { ReputationID } from '../../../../enums/reputation-id.enum'
+import { ProfessionID } from '../../../../enums/ids/profession-id.enum'
 import { reputationLockText } from '../quests/reputation/reputation-text'
 import { CloseButtonComponent } from '../../shared/close-button/close-button.component'
 import { PlayerStore } from '../../../store/player/player.store'
@@ -98,6 +99,8 @@ export class DialogueComponent {
       }
       case 'reputation':
         return reputationLockText(condition.reputationId, condition.tier, this.playerStore.reputation()[condition.reputationId] ?? 0)
+      case 'professionLevel':
+        return this.expertiseLabel(condition.professionId, condition.level)
       case 'manyStat':
         return condition.statsRequired
           .map(req => this.getConditionLabel({ type: 'stat', ...req }))
@@ -166,6 +169,8 @@ export class DialogueComponent {
           case 'claimTask':  return 'Claim reward'
           case 'abandonTask': return 'Cancel task'
         }
+      case 'unlockProfession':
+        return i18next.t('app:expertise.learn', { profession: i18next.t(`app:professions.${ProfessionID[effect.professionId]}`) })
       case 'arena':
         return i18next.t(`app:arena.effects.${effect.action}`)
       case 'reputationTurnIn': {
@@ -178,6 +183,10 @@ export class DialogueComponent {
       default:
         return ''
     }
+  }
+
+  private expertiseLabel(professionId: ProfessionID, level: number): string {
+    return i18next.t('app:expertise.label', { profession: i18next.t(`app:professions.${ProfessionID[professionId]}`), level })
   }
 
   /** A disabled turn-in (no full bundle yet) still shows one bundle's worth, so the player sees the rate. */

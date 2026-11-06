@@ -52,6 +52,8 @@ export { SkillNodeType } from 'enums/skill-node-type.enum'
 export { NpcID } from 'enums/map/npc-id.enum'
 export { TownID } from 'enums/map/town-id.enum'
 export { ReputationID } from 'enums/reputation-id.enum'
+export { ProfessionID } from 'enums/ids/profession-id.enum'
+export { default as PROFESSIONS_DATA } from 'data/professions-data'
 export { TownBuildingID } from 'enums/map/town-building-id.enum'
 export { DamageElement } from 'enums/damage-element.enum'
 export { ItemTier } from 'enums/items/item-tier.enum'
@@ -109,6 +111,7 @@ const COVERAGE = [
   ['SkillNodeID', D.SkillNodeID, D.ALL_SKILLS, 'src/data/skill-tree-data.ts', 'id'],
   ['NpcID', D.NpcID, D.NPC_DATA, 'src/data/npc-data.ts', 'id'],
   ['TownID', D.TownID, D.TOWNS_DATA, 'src/data/towns-data.ts', 'id'],
+  ['ProfessionID', D.ProfessionID, D.PROFESSIONS_DATA, 'src/data/professions-data.ts', 'id'],
 ]
 
 for (const [name, e, data, file, idField] of COVERAGE) {
@@ -147,6 +150,7 @@ const REF_KEYS = {
   spellId: ['SpellID', D.SPELLS_DATA],
   townId: ['TownID', D.TOWNS_DATA],
   reputationId: ['ReputationID', REPUTATION_ID_KEYS],
+  professionId: ['ProfessionID', D.PROFESSIONS_DATA],
 }
 
 // Walks any data structure and checks every field whose name implies a reference.
@@ -448,6 +452,7 @@ const ENTITY_KEYS = [
   [D.TownID, k => [`map:towns.${k}`], 'src/assets/locales/en/map.json'],
   [D.ReputationID, k => [`map:reputations.${k}`], 'src/assets/locales/en/map.json'],
   [D.TownBuildingID, k => [`map:buildings.${k}`], 'src/assets/locales/en/map.json'],
+  [D.ProfessionID, k => [`app:professions.${k}`], 'src/assets/locales/en/app.json'],
   [D.TitleID, k => [`app:titles.${k}`], 'src/assets/locales/en/app.json'],
   [D.DamageElement, k => [`app:elements.${k}`], 'src/assets/locales/en/app.json'],
   [D.ItemTier, k => [`items:tiers.${k}`], 'src/assets/locales/en/items.json'],

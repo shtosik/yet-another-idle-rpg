@@ -59,6 +59,7 @@
 <!-- Fixed above dialogs: a tier-up usually lands while the quest completed modal is open.
      Always rendered, so screen readers announce the text when it changes. -->
 <div class="tier-up-toast" role="status" [class.tier-up-toast--shown]="tierUpToast()">{{ tierUpToast() }}</div>
+<div class="tier-up-toast tier-up-toast--below" role="status" [class.tier-up-toast--shown]="levelUpToast()">{{ levelUpToast() }}</div>
 @if (cheats) {
   <!-- Deferred so the cheat code lands in its own chunk that production never loads. -->
   @defer {

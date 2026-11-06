@@ -27,13 +27,24 @@
     "mawoodFriendly": "Friend of Mawood",
     "mawoodExalted": "Keeper of Mawood"
   },
+  "professions": {
+    "farming": "Farming"
+  },
+  "expertise": {
+    "label": "{{ profession }} expertise {{ level }}",
+    "levelUp": "{{ expertise }}: {{ rewards }}",
+    "skillPoints_one": "+{{ count }} skill point",
+    "skillPoints_other": "+{{ count }} skill points",
+    "learn": "Learn {{ profession }}"
+  },
   "statsPanel": {
     "groups": {
       "combat": "Combat",
       "magic": "Magic",
       "progress": "Progress",
       "weaknesses": "Weakness damage",
-      "vsEnemies": "Damage vs enemy types"
+      "vsEnemies": "Damage vs enemy types",
+      "farming": "Farming"
     },
     "sources": {
       "base": "Base",
@@ -42,7 +53,8 @@
       "buffs": "Buffs",
       "consumables": "Food & potions",
       "bonuses": "Permanent bonuses",
-      "mastery": "Zone mastery"
+      "mastery": "Zone mastery",
+      "expertise": "Expertise"
     },
     "descriptions": {
       "attackPower": "Damage of each auto-attack, before crits and bonuses.",
@@ -67,7 +79,14 @@
       "upgradedDropChance": "Chance for non-unique gear drops, excluding pets, to arrive already upgraded to +1.",
       "shopRefreshCooldown": "Time between shop restocks.",
       "weakness": "Damage multiplier when you hit an enemy's elemental weakness with this element. Needs the Weaknesses skill.",
-      "damageVs": "Extra damage against enemies of this type, added on top of everything else."
+      "damageVs": "Extra damage against enemies of this type, added on top of everything else.",
+      "seedGrowthTimeReduction": "Shortens how long every seed takes to grow. At most 50% in total.",
+      "farmDoubleHarvestChance": "Chance for a harvested plot to yield double.",
+      "farmSeedSaveChance": "Chance for planting not to use up the seed.",
+      "farmBonusCropChance": "Chance for a harvest to give one extra crop.",
+      "turnInCooldownReduction": "Shortens the wait between turn-ins. At most 75%.",
+      "farmXpMultiplier": "More Farming expertise XP from harvests and orders.",
+      "seedDropChance": "More seeds from monster and chest drops. Shops are not affected."
     },
     "total": "Total",
     "showAll": "Show all stats",
@@ -129,7 +148,14 @@
     "damageVsTreant": "Damage vs Treants",
     "damageVsBear": "Damage vs Bears",
     "damageVsUndead": "Damage vs Undead",
-    "damageVsHarpy": "Damage vs Harpies"
+    "damageVsHarpy": "Damage vs Harpies",
+    "seedGrowthTimeReduction": "Seed Grow Time Reduction",
+    "farmDoubleHarvestChance": "Double Harvest Chance",
+    "farmSeedSaveChance": "Seed Save Chance",
+    "farmBonusCropChance": "Bonus Crop Chance",
+    "turnInCooldownReduction": "Turn-in Cooldown Reduction",
+    "farmXpMultiplier": "Farming XP Bonus",
+    "seedDropChance": "Seed Drop Chance"
   },
   "damage": {
     "strong": "Strong!",

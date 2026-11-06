@@ -3,6 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
 import { QuestProps } from '../../../../data/quests-data'
 import { QuestID } from '../../../../enums/ids/quest-id.enum'
 import { ReputationID } from '../../../../enums/reputation-id.enum'
+import { ProfessionID } from '../../../../enums/ids/profession-id.enum'
 import { I18nextPipe } from '../../../pipes/i18next.pipe'
 import { InventoryItemComponent } from '../../game/inventory/inventory-slot/inventory-slot.component'
 import ITEM_DATA from '../../../../data/items-data'
@@ -37,6 +38,11 @@ export class QuestCompletedComponent {
     return this.questData().rewards.filter(i => i.type === 'reputation')
   })
 
+  professionXpToDisplay = computed(() => {
+    return this.questData().rewards.filter(i => i.type === 'professionXp')
+  })
+
+  protected readonly ProfessionID = ProfessionID
   protected readonly QuestID = QuestID
   protected readonly ReputationID = ReputationID
   protected readonly ITEM_DATA = ITEM_DATA

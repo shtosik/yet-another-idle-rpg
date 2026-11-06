@@ -15,6 +15,7 @@ import { ItemType } from '../../../../../enums/items/item-type.enum'
 import { EnemyID } from '../../../../../enums/ids/enemy-id.enum'
 import { ZoneID } from '../../../../../enums/ids/zone-id.enum'
 import { NpcID } from '../../../../../enums/map/npc-id.enum'
+import { ProfessionID } from '../../../../../enums/ids/profession-id.enum'
 import { getQuestStatus } from '../../../../services/quest-status'
 import { I18nextPipe } from '../../../../pipes/i18next.pipe'
 import { reputationTierLabel } from '../reputation/reputation-text'
@@ -155,6 +156,8 @@ export class QuestListComponent {
         return i18next.t(`app:playerStats.${req.key}`)
       case 'quest':
         return i18next.t(`quests:names.${QuestID[req.questId]}`)
+      case 'professionLevel':
+        return i18next.t('quests:requirements.professionLevel', { profession: i18next.t(`app:professions.${ProfessionID[req.professionId]}`) })
       case 'reputation':
         return reputationTierLabel(req.reputationId, req.tier)
     }

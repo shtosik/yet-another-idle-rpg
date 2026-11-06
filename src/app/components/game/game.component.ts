@@ -3,6 +3,7 @@ import TOWNS_DATA from '../../../data/towns-data'
 import { GameNavigationService } from '../../services/game-navigation.service'
 import { UnlockService } from '../../services/unlock.service'
 import { ReputationService } from '../../services/reputation.service'
+import { ProfessionService } from '../../services/profession.service'
 import { GameTab } from 'enums/ids/game-tab.enum'
 import { AsyncPipe, CommonModule } from '@angular/common'
 import { TownsComponent } from './town/towns.component'
@@ -73,6 +74,7 @@ export class GameComponent {
   private navigation = inject(GameNavigationService)
   gameTab = this.navigation.tab
   tierUpToast = inject(ReputationService).tierUpToast
+  levelUpToast = inject(ProfessionService).levelUpToast
 
   readonly GameTab = GameTab
   readonly cheats = environment.cheats

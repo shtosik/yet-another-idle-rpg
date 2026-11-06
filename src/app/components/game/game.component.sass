@@ -94,5 +94,9 @@ $equipment-height: 26rem
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6)
   pointer-events: none
 
+  // The level-up toast sits under the tier-up one, since a quest can give both at once.
+  &--below
+    top: 4.5rem
+
   &--shown
     opacity: 1

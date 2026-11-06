@@ -11,9 +11,11 @@ import { ItemStack } from '../player/inventory'
 import { ENTRANCE_ZONES_BY_QUEST } from '../../../data/helpers/entrance-zones'
 import { EnemyID } from '../../../enums/ids/enemy-id.enum'
 import { ZoneID } from '../../../enums/ids/zone-id.enum'
+import { ProfessionID } from '../../../enums/ids/profession-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
 import { canAdvanceQuest, getQuestStatus, getStepItems } from '../../services/quest-status'
 import { ReputationService } from '../../services/reputation.service'
+import { ProfessionService } from '../../services/profession.service'
 import { REPUTATION_THRESHOLDS, ReputationGain } from '../player/reputation'
 
 /** Lifetime kill counters at the moment the quest reached its current step. */
@@ -51,11 +53,13 @@ export const QuestsStore = signalStore(
     modalService = inject(ModalService),
     playerStore = inject(PlayerStore),
     reputationService = inject(ReputationService),
+    professionService = inject(ProfessionService),
   ) => ({
     handleQuestCompleted(data: QuestProps) {
       const statsToUpdate = []
       const itemsToUpdate: ItemStack[] = []
       const reputationGains: ReputationGain[] = []
+      const professionRewards: { professionId: ProfessionID, amount: number }[] = []
 
       data.rewards.forEach((reward) => {
         switch (reward.type) {
@@ -68,6 +72,9 @@ export const QuestsStore = signalStore(
           case 'reputation':
             reputationGains.push({ reputationId: reward.reputationId, amount: reward.amount })
             break
+          case 'professionXp':
+            professionRewards.push({ professionId: reward.professionId, amount: reward.amount })
+            break
         }
       })
 
@@ -76,6 +83,7 @@ export const QuestsStore = signalStore(
       playerStore.updatePlayerStats(statsToUpdate)
       playerStore.addItems(itemsToUpdate)
       reputationService.gain(reputationGains)
+      professionRewards.forEach(({ professionId, amount }) => professionService.gainXp(professionId, amount))
     },
 
     /** Zones entered from a town building open when that building's quest starts. */
@@ -137,6 +145,8 @@ export const QuestsStore = signalStore(
             const met = !!step && (req.step === undefined || step === req.step)
             return { current: met ? 1 : 0, target: 1 }
           }
+          case 'professionLevel':
+            return { current: playerStore.professionLevel(req.professionId), target: req.level }
           case 'reputation':
             return { current: playerStore.reputation()[req.reputationId] ?? 0, target: REPUTATION_THRESHOLDS[req.tier] }
           default:

@@ -260,6 +260,8 @@ export class DialogueManagerService {
         return false
       case 'reputation':
         return this.playerStore.reputationTierOf(c.reputationId) >= c.tier
+      case 'professionLevel':
+        return this.playerStore.professionLevel(c.professionId) >= c.level
       case 'arena':
         switch (c.state) {
           case 'ready': return this.arenaService.isReady()
@@ -340,6 +342,9 @@ export class DialogueManagerService {
         case 'arena':
           if (effect.action === 'enter') this.arenaService.enter()
           else this.arenaService.claimRewards()
+          break
+        case 'unlockProfession':
+          this.playerStore.unlockProfession(effect.professionId)
           break
         case 'reputationTurnIn': {
           const { turnIn, bundles } = this.turnIn(effect)

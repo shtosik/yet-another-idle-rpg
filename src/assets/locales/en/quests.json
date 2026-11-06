@@ -25,7 +25,8 @@
   "requirements": {
     "findItem": "Find {{ item }}",
     "waveKillCount": "{{ amount }} KC on wave {{ wave }} in {{ zone }}",
-    "wave": "{{ zone }} wave {{ wave }}"
+    "wave": "{{ zone }} wave {{ wave }}",
+    "professionLevel": "{{ profession }} expertise"
   },
   "panel": {
     "label": "Quest panel",
@@ -68,5 +69,8 @@
       "4": "Bring Phurgo one Fish & Apple Pie at Lirold's Forge.",
       "5": "Bring Phurgo 10 Ancient Wood for charcoal at Lirold's Forge."
     }
+  },
+  "professionXp": {
+    "reward": "+{{ amount }} {{ profession }} XP"
   }
 }

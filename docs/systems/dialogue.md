@@ -41,6 +41,9 @@ Kill-count requirements inside quest conditions count kills since the quest reac
 ## Conditions (reputation)
 `{ type: 'reputation', reputationId, tier }` passes when `PlayerStore.reputationTierOf(reputationId) >= tier`. Gate a free or extra branch with it, before the paid one; with `hidden: true` it stays a silent gate. A shown lock label is `reputationLockText` ("Requires Mawood Honored — 140/200"). See `towns-shops-guild.md`.
 
+## Condition and effect (profession)
+`{ type: 'professionLevel', professionId, level }` passes when `PlayerStore.professionLevel(professionId) >= level` (0 while the profession is locked, so `level: 1` means unlocked); it is the same type quests use as a requirement, and its label reads 'Farming expertise 5'. The `{ type: 'unlockProfession', professionId }` effect calls `PlayerStore.unlockProfession` (idempotent) and its tag reads 'Learn Farming'. See `player-stats-inventory-equipment.md`.
+
 ## Conditions and effects (arena)
 `{ type: 'arena', state: 'ready' | 'running' | 'rewardsWaiting' }`: ready to enter (no run, entry cooldown over) / a run going on / clear rewards waiting to be claimed. The `arena` effect's `action` is `enter` (start a run; pair it with the fee's `stat` deduct) or `claim` (move the waiting rewards into the inventory; counted by `missingSlots`). See `arena.md`.
 

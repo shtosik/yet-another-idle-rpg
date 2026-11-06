@@ -135,6 +135,14 @@ _Avoid_: Donation, trade-in, delivery
 A named step of reputation reached at a threshold, the same five for every town: Neutral, Friendly, Honored, Revered, Exalted.
 _Avoid_: Rank, level, reputation level
 
+**Profession**:
+A non-combat trade with its own XP and level (`ProfessionID`, saved in `professions`), earned by using it and separate from the character level. Farming is the first. Player-facing text says **expertise**.
+_Avoid_: Skill (that is the skill tree), gathering skill
+
+**Expertise**:
+A profession's level as the player sees it: 'Farming expertise 7'. Each level gives 1 skill point and a stat reward; every 5th level gives a milestone stat instead of the growth bonus.
+_Avoid_: Farming level, profession level (in player-facing text)
+
 **Title**:
 A display-only name the player earns from content such as reputation tiers and picks to show in the stats panel; it gives no stats.
 _Avoid_: Badge, honorific, rank

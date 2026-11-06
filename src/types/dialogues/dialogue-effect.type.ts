@@ -2,6 +2,7 @@ import { QuestID } from '../../enums/ids/quest-id.enum'
 import { ItemID } from '../../enums/ids/item-id.enum'
 import { PlayerStat } from '../player/player-stat.type'
 import { NpcID } from '../../enums/map/npc-id.enum'
+import { ProfessionID } from '../../enums/ids/profession-id.enum'
 
 export type TaskLength = 'short' | 'medium' | 'long'
 
@@ -16,6 +17,7 @@ export type DialogueEffect =
   | GuildEffect
   | ArenaEffect
   | ReputationTurnInEffect
+  | UnlockProfessionEffect
 
 export interface QuestEffect {
   type: 'quest'
@@ -70,6 +72,12 @@ export interface ReputationTurnInEffect {
   type: 'reputationTurnIn'
   npcId: NpcID
   bundles: 'one' | 'all'
+}
+
+/** Teaches a profession (it starts at level 1); nothing happens when it is already known. */
+export interface UnlockProfessionEffect {
+  type: 'unlockProfession'
+  professionId: ProfessionID
 }
 
 /** Start a Combat Arena run (pair it with the entry fee's `stat` deduct), or claim the rewards waiting from clears. */

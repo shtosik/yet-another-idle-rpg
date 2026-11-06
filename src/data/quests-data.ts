@@ -6,6 +6,7 @@ import { EnemyID } from '../enums/ids/enemy-id.enum'
 import { NpcID } from '../enums/map/npc-id.enum'
 import { ReputationID } from '../enums/reputation-id.enum'
 import { ReputationTier } from '../enums/reputation-tier.enum'
+import { ProfessionID } from '../enums/ids/profession-id.enum'
 
 export const QUEST_STEP_AFTER_COMPLETED = 9999
 
@@ -29,7 +30,15 @@ export type RequirementProps =
   | EnemyKillCountRequirement
   | QuestRequirement
   | StatRequirement
-  | ReputationRequirement;
+  | ReputationRequirement
+  | ProfessionLevelRequirement;
+
+/** At least `level` in `professionId` (0 while it is locked). Also a dialogue condition. */
+export interface ProfessionLevelRequirement {
+  type: 'professionLevel'
+  professionId: ProfessionID
+  level: number
+}
 
 /** At least `tier` with `reputationId`. Also a dialogue condition and a shop item's `minReputation`. */
 export interface ReputationRequirement {
@@ -88,7 +97,14 @@ interface ReputationReward {
   amount: number
 }
 
-export type QuestReward = StatReward | ItemReward | ReputationReward
+/** Adds profession XP (Farming expertise); ignored while that profession is locked. */
+interface ProfessionXpReward {
+  type: 'professionXp'
+  professionId: ProfessionID
+  amount: number
+}
+
+export type QuestReward = StatReward | ItemReward | ReputationReward | ProfessionXpReward
 
 // interface SkillReward {
 //     type: 'skill'

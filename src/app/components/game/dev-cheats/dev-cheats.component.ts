@@ -3,6 +3,10 @@ import { getState } from '@ngrx/signals'
 import { SkillTreeService } from '../../../services/skill-tree.service'
 import { GameNavigationService } from '../../../services/game-navigation.service'
 import { ReputationService } from '../../../services/reputation.service'
+import { ProfessionService } from '../../../services/profession.service'
+import { ProfessionID } from 'enums/ids/profession-id.enum'
+import { xpForLevel } from '../../../store/player/professions'
+import PROFESSIONS_DATA from '../../../../data/professions-data'
 import { GameTab } from 'enums/ids/game-tab.enum'
 import { SkillNodeID } from 'enums/ids/skill-node-id.enum'
 import { ShopID } from 'enums/ids/shop-id.enum'
@@ -85,6 +89,7 @@ export class DevCheatsComponent {
   private skillTree = inject(SkillTreeService)
   private navigation = inject(GameNavigationService)
   private reputationService = inject(ReputationService)
+  private professionService = inject(ProfessionService)
 
   /**
    * `window.dev` in the browser console: puts the game into a state in one call when checking UI.
@@ -179,6 +184,14 @@ export class DevCheatsComponent {
     /** Adds reputation the way a quest reward does, tier-up toast included. */
     addReputation: (reputation: Ref<typeof ReputationID>, amount: number) =>
       this.reputationService.gain([{ reputationId: fromName(ReputationID, 'ReputationID', reputation), amount }]),
+    /** Unlocks the profession and sets its expertise to `level` (skill points are paid once, never refunded on a lower level). */
+    setExpertise: (profession: Ref<typeof ProfessionID>, level: number) => {
+      const professionId = fromName(ProfessionID, 'ProfessionID', profession)
+      const target = Math.min(Math.max(1, Math.floor(level)), PROFESSIONS_DATA[professionId].maxLevel)
+      this.playerStore.unlockProfession(professionId)
+      const current = this.playerStore.professions()[professionId]?.experience ?? 0
+      this.professionService.gainXp(professionId, xpForLevel(target) - current)
+    },
   }
 
   /** `dev.help()` output; typed by `commands`, so a new command doesn't compile without its line. */
@@ -204,6 +217,7 @@ export class DevCheatsComponent {
     reset: 'reset() — fresh save',
     completeQuest: 'completeQuest(QuestID) — start and complete a quest, rewards included',
     addReputation: 'addReputation(ReputationID, amount) — add reputation',
+    setExpertise: 'setExpertise(ProfessionID, level) — unlock a profession and set its expertise level',
   }
 
   private readonly devTools = {
