@@ -2,7 +2,8 @@
 // so a session doesn't read a stale local branch (AGENTS.md: explore and develop on origin/staging).
 // A clean `staging` checkout with no local commits is fast-forwarded, so the docs, skills and agents
 // sessions load from it stay current.
-import { execFileSync } from 'node:child_process'
+import { execFileSync, spawn } from 'node:child_process'
+import { fileURLToPath } from 'node:url'
 
 const git = (...args) => {
   try {
@@ -33,5 +34,8 @@ if (counts) {
 } else {
   notes.push(`Checkout is on ${branch}; comparing it with origin/staging failed, so check \`git fetch origin staging\` before reading code here.`)
 }
+
+// Merged worktrees pile up because nobody remembers to remove them; clean up in the background, silently.
+spawn(process.execPath, [fileURLToPath(new URL('../../scripts/worktree-prune.mjs', import.meta.url))], { detached: true, stdio: 'ignore', windowsHide: true }).on('error', () => {}).unref()
 
 console.log(JSON.stringify({ hookSpecificOutput: { hookEventName: 'SessionStart', additionalContext: notes.join('\n') } }))
