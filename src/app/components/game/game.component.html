@@ -24,8 +24,8 @@
 
     <app-equipment class="equipment"/>
 
-    <!-- The Bestiary and the farm take both rows instead. -->
-    @if (tab !== GameTab.bestiary && tab !== GameTab.farm && tab !== GameTab.farmPlots) {
+    <!-- The Bestiary and the plots panel take both rows instead. -->
+    @if (tab !== GameTab.bestiary && tab !== GameTab.farmPlots) {
       <app-inventory class="inventory"/>
     }
     <app-quests class="quests"/>

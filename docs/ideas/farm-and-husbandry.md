@@ -277,7 +277,7 @@ The second visit uses `default` (quest hub, then order, shop, Guild lore). Marta
 
 ## 7. Seeds and crops (the tier table)
 
-**Rule.** A seed's tier equals the tier of the Zone its enemy lives in. Higher tiers take longer to grow (owner decision) and yield fewer, richer crops. The first seed grows in about 15 minutes.
+**Rule.** A seed's tier equals the tier of the Zone its enemy lives in. Higher tiers take longer to grow (owner decision) and yield fewer, richer crops. The Yield column is a min-max range (owner decision), rolled once per harvest. The first seed grows in about 15 minutes.
 
 **Sources (owner decision 2026-11-06): drops are the main source.** Monsters and Arena Chests drop seeds; the Guild sells **a few, low tiers only** (Turnip always, Wheat from Friendly). No other seed is ever sold.
 
@@ -285,13 +285,13 @@ Drop is 1-2 seeds, 1 in N per kill, added to the farming seed count (§9b); `see
 
 | Tier | Seed | Source: enemy (Zone) | Drop chance | Shop (Warden Marta) | Grow time | Yield | Crop | Uses |
 |---|---|---|---|---|---|---|---|---|
-| 1 | Turnip Seeds | Seagull (Horseshoe Beach) | 1 in 20 | 20 g, always, stock 20 | **15 min** | 4 | Turnip | Turnip Stew (Cooking 1), Marta's order, chain quest |
-| 2 | Wheat Seeds | Green, Red, Blue Slime (Plains) | 1 in 25 each | 60 g from Friendly, stock 10 | 45 min | 5 | Wheat | Farmer's Bread (Cooking 1), Harvest Pie (Cooking 2), Marta's order |
-| 3 | Silverleaf Seeds | Deer (The Long Path) | 1 in 30 | none | 2 h | 4 | Silverleaf | Silverleaf Tonic (Alchemy 1), chain quest |
-| 4 | Apple Seeds | Goat (Mountain Pass) | 1 in 30 | none | 4 h | 6 | Apple (existing item) | Baked Apple, Fish & Apple Pie, Harvest Pie, Minor Mana Potion |
-| 5 | Glowcap Spores | Forest Spider (Elderwood Wilds) | 1 in 35 | none | 8 h | 4 | Glowcap | Mushroom Stew (Cooking 2), Glowcap Elixir (Alchemy 1) |
-| 6 | Heartroot Seeds | Treant Sprout (Deepwood) | 1 in 40 | none | 12 h | 3 | Heartroot | Sells; Heartroot Elixir and Feast of the Wood are **deferred** (need Alchemy 2 / Cooking 3 gear) |
-| 7 | Canopy Blossom Seeds | Harpy (Upper Canopy) | 1 in 40 | none | 24 h | 2 | Canopy Blossom | Sells; Blossom Draught is **deferred** (needs Alchemy 2 gear) |
+| 1 | Turnip Seeds | Seagull (Horseshoe Beach) | 1 in 20 | 20 g, always, stock 20 | **15 min** | 3-5 | Turnip | Turnip Stew (Cooking 1), Marta's order, chain quest |
+| 2 | Wheat Seeds | Green, Red, Blue Slime (Plains) | 1 in 25 each | 60 g from Friendly, stock 10 | 45 min | 4-6 | Wheat | Farmer's Bread (Cooking 1), Harvest Pie (Cooking 2), Marta's order |
+| 3 | Silverleaf Seeds | Deer (The Long Path) | 1 in 30 | none | 2 h | 3-5 | Silverleaf | Silverleaf Tonic (Alchemy 1), chain quest |
+| 4 | Apple Seeds | Goat (Mountain Pass) | 1 in 30 | none | 4 h | 5-7 | Apple (existing item) | Baked Apple, Fish & Apple Pie, Harvest Pie, Minor Mana Potion |
+| 5 | Glowcap Spores | Forest Spider (Elderwood Wilds) | 1 in 35 | none | 8 h | 3-5 | Glowcap | Mushroom Stew (Cooking 2), Glowcap Elixir (Alchemy 1) |
+| 6 | Heartroot Seeds | Treant Sprout (Deepwood) | 1 in 40 | none | 12 h | 2-4 | Heartroot | Sells; Heartroot Elixir and Feast of the Wood are **deferred** (need Alchemy 2 / Cooking 3 gear) |
+| 7 | Canopy Blossom Seeds | Harpy (Upper Canopy) | 1 in 40 | none | 24 h | 1-3 | Canopy Blossom | Sells; Blossom Draught is **deferred** (needs Alchemy 2 gear) |
 
 Seed drops use the enemy drop shape (`id, min, max, chance`); a quest-gated drop (`requiredActiveQuestId`) is available if a tier should only drop while a quest is active. Tier 1 and 2 are buyable so a new player is never stalled by a bad roll; every higher tier has to be found.
 
@@ -450,7 +450,7 @@ export interface FarmSeed {
   cropId: ItemID          // item granted on harvest
   tier: number
   growMs: number          // 15 min for tier 1 … 24 h for tier 7
-  yield: number           // fixed, see §7
+  yield: [min: number, max: number]   // rolled uniformly, see §7 and the harvest rules
   requiredLevel: number   // Farming expertise to plant it, §7a
   xp: number              // Farming XP per harvested plot, §7a
 }
@@ -498,7 +498,7 @@ harvestAll(farm, stats, rng): { farm; crops: ItemStack[]; xp }           // Frie
 
 `Math.random` as the chest rolls (`rollChest`) use; none of it runs offline (nothing rolls until the player acts).
 - **Planting:** one seed per plant action. The seed-save roll (`farmSeedSaveChance`) happens **once per successful planting**; on success the seed is not consumed. A planting blocked by missing seeds or a locked expertise rolls nothing. Plant all rolls per plot in order and stops when the count reaches 0.
-- **Harvest output:** `base = FarmSeed.yield`. Roll `farmDoubleHarvestChance`: on success `base × 2`. Then roll `farmBonusCropChance` independently: on success `+1`. Output `= base × (double ? 2 : 1) + (bonus ? 1 : 0)`.
+- **Harvest output:** `base` is rolled uniformly (integers) from `FarmSeed.yield` min to max, the same averages as the old fixed yields (4, 5, 4, 6, 4, 3, 2). Roll `farmDoubleHarvestChance`: on success `base × 2`. Then roll `farmBonusCropChance` independently: on success `+1`. Output `= base × (double ? 2 : 1) + (bonus ? 1 : 0)`.
 - **XP** is once per plot at harvest, from the seed's XP (§7a), unaffected by double or bonus.
 - **Blocked harvest:** if the crops don't fit the Materials tab, the plot **stays ready, pays no XP, grants nothing** and the roll is **not redone**: the first attempt saves `rolledYield` on the plot, every retry reuses it (the `rolledChests` pattern), and it is cleared when the harvest succeeds. Harvest all stops at the first blocked plot.
 

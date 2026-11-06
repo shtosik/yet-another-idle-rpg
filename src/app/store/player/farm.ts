@@ -1,6 +1,6 @@
 import { ItemID } from '../../../enums/ids/item-id.enum'
 import { SiteID } from '../../../enums/ids/site-id.enum'
-import { FARM_SEEDS, FarmSeed } from '../../../data/farming-data'
+import { FARM_SEEDS, FarmSeed, GrowthStage } from '../../../data/farming-data'
 import { UnlockedContent } from '../../../types/player/unlocked-content.type'
 import { isSeed, ItemStack } from './inventory'
 
@@ -123,11 +123,19 @@ export interface HarvestResult {
   xp: number
 }
 
-/** `base x2` on a double, then an independent `+1` on a bonus crop. */
+/** Growth stage by progress fraction (0 to 1): seedling below 40%, growing until full, ready at 100%. */
+export function stageOf(progress: number): GrowthStage {
+  if (progress >= 1) return 'ready'
+  return progress >= 0.4 ? 'growing' : 'seedling'
+}
+
+/** Base rolled uniformly from the seed's min to max, doubled on a double roll, then an independent +1 on a bonus crop. */
 const rollYield = (seed: FarmSeed, ctx: HarvestContext, rng: Rng): number => {
   const doubled = rng() < ctx.doubleChance
   const bonus = rng() < ctx.bonusChance
-  return seed.yield * (doubled ? 2 : 1) + (bonus ? 1 : 0)
+  const [min, max] = seed.yield
+  const base = Math.min(max, min + Math.floor(rng() * (max - min + 1)))
+  return base * (doubled ? 2 : 1) + (bonus ? 1 : 0)
 }
 
 /** Harvests one ready plot (sync it first). A blocked harvest pays nothing but saves its roll, which every retry reuses. */

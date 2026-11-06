@@ -58,10 +58,17 @@ $equipment-height: 26rem
     grid-row: 1 / span 2
 
   .map,
-  .farm,
-  .farm-home
+  .farm
     grid-column: 2 / span 2
     grid-row: 1 / span 2
+
+  .map
+    padding: 0
+
+  // The farm home is one row high like a town; only the plots panel takes the map footprint.
+  .farm-home
+    grid-column: 2 / span 2
+    grid-row: 1 / 2
     padding: 0
 
   .bestiary

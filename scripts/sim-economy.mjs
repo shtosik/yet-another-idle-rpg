@@ -373,6 +373,11 @@ if (process.argv.includes('--farm')) {
     }
     return result
   }
+  console.log('\nFarm crops per plot (yield range, average) and per hour on one plot')
+  console.table(Object.values(D.FARM_SEEDS).sort((a, b) => a.tier - b.tier).map(seed => {
+    const average = (seed.yield[0] + seed.yield[1]) / 2
+    return { tier: seed.tier, crop: D.ItemID[seed.cropId], yield: seed.yield.join('-'), average, 'crops/h': Math.round(average / (seed.growMs / 3600000) * 10) / 10 }
+  }))
   const one = daysTo(1)
   const two = daysTo(2)
   console.log('\nFarming expertise: days to reach (model vs farm doc §7a), 2 visits/day and 1 visit/day')

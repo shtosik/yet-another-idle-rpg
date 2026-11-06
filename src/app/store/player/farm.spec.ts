@@ -1,10 +1,11 @@
 import { FARM_SEEDS } from '../../../data/farming-data'
 import { ItemID } from '../../../enums/ids/item-id.enum'
-import { FarmState, harvest, harvestAll, HarvestContext, initialFarm, isReady, plant, plantAll, PlantContext, plotCount, syncPlots } from './farm'
+import { FarmState, harvest, stageOf, harvestAll, HarvestContext, initialFarm, isReady, plant, plantAll, PlantContext, plotCount, syncPlots } from './farm'
 
 const MIN = 60_000
 const turnip = FARM_SEEDS[ItemID.turnipSeeds]!
 const wheat = FARM_SEEDS[ItemID.wheatSeeds]!
+const [lo, hi] = turnip.yield
 
 const plantCtx = (over: Partial<PlantContext> = {}): PlantContext => ({ now: 0, level: 30, plotLimit: 3, seedSaveChance: 0, ...over })
 const harvestCtx = (over: Partial<HarvestContext> = {}): HarvestContext =>
@@ -13,6 +14,10 @@ const withSeeds = (seeds: FarmState['seeds']): FarmState => ({ ...initialFarm, s
 const grown = (farm: FarmState, now: number, reduction = 0): FarmState => ({ ...farm, plots: syncPlots(farm.plots, now, reduction) })
 
 describe('farm rules', () => {
+  it('maps progress to a growth stage', () => {
+    expect([0, 0.39, 0.4, 0.99, 1, 1.5].map(stageOf)).toEqual(['seedling', 'seedling', 'growing', 'growing', 'ready', 'ready'])
+  })
+
   it('counts plots from reputation tiers and quests, capped at 9', () => {
     expect(plotCount(0, 0)).toBe(3)
     expect(plotCount(2, 1)).toBe(6)
@@ -105,17 +110,22 @@ describe('farm rules', () => {
       const result = harvest(readyFarm(), 0, harvestCtx({ xpMultiplier: 0.1 }), () => 1)
 
       expect(result.status).toBe('harvested')
-      expect(result.crops).toEqual([{ id: ItemID.turnip, amount: turnip.yield }])
+      expect(result.crops).toEqual([{ id: ItemID.turnip, amount: hi }])
       expect(result.xp).toBe(Math.round(turnip.xp * 1.1))
       expect(result.farm.plots[0]).toBeNull()
     })
 
+    it('rolls the base uniformly from the yield range', () => {
+      const amounts = [0, 0.4, 0.99].map(roll => harvest(readyFarm(), 0, harvestCtx(), jasmine.createSpy().and.returnValues(1, 1, roll)).crops[0].amount)
+      expect(amounts).toEqual([lo, lo + 1, hi])
+    })
+
     it('doubles, then adds a bonus crop independently', () => {
       const all = harvest(readyFarm(), 0, harvestCtx({ doubleChance: 1, bonusChance: 1 }), () => 0)
-      expect(all.crops[0].amount).toBe(turnip.yield * 2 + 1)
+      expect(all.crops[0].amount).toBe(lo * 2 + 1)
 
-      const bonusOnly = harvest(readyFarm(), 0, harvestCtx({ doubleChance: 0.5, bonusChance: 0.5 }), jasmine.createSpy().and.returnValues(0.9, 0.1))
-      expect(bonusOnly.crops[0].amount).toBe(turnip.yield + 1)
+      const bonusOnly = harvest(readyFarm(), 0, harvestCtx({ doubleChance: 0.5, bonusChance: 0.5 }), jasmine.createSpy().and.returnValues(0.9, 0.1, 0.99))
+      expect(bonusOnly.crops[0].amount).toBe(hi + 1)
     })
 
     it('is unavailable for an empty or unripe plot', () => {
@@ -132,13 +142,13 @@ describe('farm rules', () => {
       expect(blocked.status).toBe('blocked')
       expect(blocked.xp).toBe(0)
       expect(blocked.crops).toEqual([])
-      expect(blocked.farm.plots[0]!.rolledYield).toBe(turnip.yield * 2)
+      expect(blocked.farm.plots[0]!.rolledYield).toBe(lo * 2)
 
       // A retry that would roll no double still pays the saved roll, without calling the rng.
       open = true
       const rng = jasmine.createSpy('rng').and.returnValue(1)
       const retry = harvest(blocked.farm, 0, { ...ctx, doubleChance: 0 }, rng)
-      expect(retry.crops).toEqual([{ id: ItemID.turnip, amount: turnip.yield * 2 }])
+      expect(retry.crops).toEqual([{ id: ItemID.turnip, amount: lo * 2 }])
       expect(rng).not.toHaveBeenCalled()
       expect(retry.farm.plots[0]).toBeNull()
     })
@@ -146,13 +156,13 @@ describe('farm rules', () => {
     it('harvests all ready plots and stops at the first blocked one', () => {
       const farm = readyFarm(ItemID.turnipSeeds, 3)
       // Room for two plots' crops (cumulative check).
-      const result = harvestAll(farm, harvestCtx({ fits: crops => crops.reduce((sum, c) => sum + c.amount, 0) <= 2 * turnip.yield }), () => 1)
+      const result = harvestAll(farm, harvestCtx({ fits: crops => crops.reduce((sum, c) => sum + c.amount, 0) <= 2 * hi }), () => 1)
 
       expect(result.blocked).toBeTrue()
-      expect(result.crops).toEqual([{ id: ItemID.turnip, amount: 2 * turnip.yield }])
+      expect(result.crops).toEqual([{ id: ItemID.turnip, amount: 2 * hi }])
       expect(result.xp).toBe(2 * turnip.xp)
       expect(result.farm.plots.filter(Boolean).length).toBe(1)
-      expect(result.farm.plots[2]!.rolledYield).toBe(turnip.yield)
+      expect(result.farm.plots[2]!.rolledYield).toBe(hi)
     })
   })
 })

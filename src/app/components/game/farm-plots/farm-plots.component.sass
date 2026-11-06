@@ -28,7 +28,8 @@ $barBackground: #171717
   @include mixins.panel
   display: flex
   flex-direction: column
-  gap: 0.5rem
+  gap: 0.75rem
+  padding: 1rem
   position: relative
   // Like the forge: the art fills the panel under a dark wash that bounds text contrast.
   background: linear-gradient(#000a, #000a), url('/assets/img/backgrounds/farm-plots.png') center / cover no-repeat
@@ -45,8 +46,7 @@ button
   display: flex
   align-items: center
   gap: 1rem
-  padding-right: 3rem
-  padding-bottom: 0.5rem
+  padding: 0 2.5rem 0.75rem 0
   border-bottom: vars.$panelBorder
 
   &__title
@@ -83,21 +83,22 @@ button
 
 app-close-button
   position: absolute
-  top: 0.5rem
-  right: 0.5rem
+  top: 0.75rem
+  right: 0.75rem
   z-index: 10
 
 .body
   display: grid
   flex: 1
   grid-template-columns: 14rem 1fr
-  gap: 0.5rem
+  gap: 1rem
   min-height: 0
 
 .seeds
   display: flex
   flex-direction: column
   gap: 4px
+  padding-right: 0.25rem
   overflow-y: auto
 
   &__empty
@@ -131,24 +132,31 @@ app-close-button
   &--locked
     opacity: 0.55
 
+// Fixed-size cells, centred: soil layer behind (background image), plant sprite on top.
+$cell: 8rem
+
 .grid
   display: grid
-  grid-template-columns: repeat(3, 1fr)
-  grid-template-rows: repeat(3, 1fr)
+  grid-template-columns: repeat(3, $cell)
+  grid-template-rows: repeat(3, $cell)
+  justify-content: center
+  align-content: center
   gap: 0.5rem
   min-height: 0
 
 .plot
+  position: relative
   display: flex
   flex-direction: column
   align-items: center
   justify-content: center
-  gap: 0.25rem
-  padding: 0.25rem
+  padding: 0
   border: 1px solid #3a3630
   border-radius: vars.$panelBorderRadius
-  background: #3b2f22
+  // Soil colour until a soil image is set inline.
+  background: #3b2f22 center / cover no-repeat
   font-size: 0.8rem
+  overflow: hidden
 
   &--locked
     background: $barBackground
@@ -162,31 +170,101 @@ app-close-button
       border-color: palette.$yellow
       color: palette.$yellow
 
-  &--growing
-    background: #2f3a22
+    &:disabled .plot__hint
+      opacity: 0.4
 
   &--ready
     border-color: palette.$yellow
-    background: #3d4a26
+    box-shadow: 0 0 8px #facc1566
 
     &:hover
-      background: #4a5a2e
+      filter: brightness(1.15)
+
+  &__plant
+    width: 6rem
+    height: 6rem
+    object-fit: contain
+    image-rendering: pixelated
+    pointer-events: none
 
   &__bar
-    width: 80%
-    height: 0.4rem
+    position: absolute
+    left: 0
+    right: 0
+    bottom: 0
+    width: 100%
+    height: 0.25rem
+    border-radius: 0
+    opacity: 0.8
     @include bar(palette.$green)
 
   &__time
+    position: absolute
+    top: 0.2rem
+    right: 0.3rem
+    padding: 0 0.25rem
+    border-radius: 2px
+    background: #0008
     color: $muted
-    font-size: 0.75rem
+    font-size: 0.7rem
 
   &__action
-    color: palette.$yellow
+    position: absolute
+    left: 0.4rem
+    right: 0.4rem
+    bottom: 0.4rem
+    padding: 0.15rem 0
+    border-radius: 3px
+    background: palette.$yellow
+    color: #1a1a1a
+    font-weight: bold
+    text-align: center
 
   &__missing
+    position: absolute
+    top: 0.2rem
+    left: 0.2rem
+    right: 0.2rem
+    padding: 0.1rem 0.25rem
+    border-radius: 2px
+    background: #000b
     color: #f87171
     font-size: 0.7rem
+
+// Harvest popups: stacked above the footer, newest at the bottom; they clear themselves.
+.toasts
+  position: absolute
+  left: 50%
+  bottom: 4.5rem
+  z-index: 10
+  display: flex
+  flex-direction: column
+  gap: 0.35rem
+  transform: translateX(-50%)
+  pointer-events: none
+
+.toast
+  display: flex
+  flex-direction: column
+  align-items: center
+  gap: 0.15rem
+  padding: 0.5rem 1rem
+  border: 1px solid palette.$yellow
+  border-radius: vars.$panelBorderRadius
+  background: #0a0a0a
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6)
+  font-size: 0.85rem
+
+  &__crop
+    display: flex
+    align-items: center
+    gap: 0.35rem
+
+  &__xp
+    color: palette.$yellow
+
+  &__blocked
+    color: #f87171
 
 .footer
   display: grid
@@ -209,10 +287,3 @@ app-close-button
   &__lock
     color: $muted
     font-size: 0.7rem
-
-  &__toast
-    margin: 0
-    color: palette.$yellow
-    font-size: 0.8rem
-    text-align: center
-    white-space: pre-line

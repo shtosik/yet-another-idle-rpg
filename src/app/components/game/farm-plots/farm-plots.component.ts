@@ -5,12 +5,12 @@ import { I18nextPipe } from '../../../pipes/i18next.pipe'
 import { CloseButtonComponent } from '../../shared/close-button/close-button.component'
 import { FarmService } from '../../../services/farm.service'
 import { PlayerStore } from '../../../store/player/player.store'
-import { isReady, PLOT_SLOTS, syncPlots } from '../../../store/player/farm'
+import { isReady, PLOT_SLOTS, stageOf, syncPlots } from '../../../store/player/farm'
 import { reputationProgress } from '../../../store/player/reputation'
 import { xpForLevel, xpToNextLevel } from '../../../store/player/professions'
 import { reputationLockText, reputationTierLabel } from '../quests/reputation/reputation-text'
 import { missingSlotsText } from '../inventory/tab-text'
-import { FARM_SEEDS } from '../../../../data/farming-data'
+import { FARM_ART, FARM_SEEDS } from '../../../../data/farming-data'
 import ITEM_DATA from '../../../../data/items-data'
 import PROFESSIONS_DATA from '../../../../data/professions-data'
 import { ItemID } from '../../../../enums/ids/item-id.enum'
@@ -48,7 +48,7 @@ export class FarmPlotsComponent {
 
   /** Back to the farm home. */
   closed = output<void>()
-  toast = this.farmService.toast
+  toasts = this.farmService.toasts
   plotLimit = this.farmService.plotLimit
   activeSeed = this.farmService.activeSeed
 
@@ -85,7 +85,8 @@ export class FarmPlotsComponent {
       url: ITEM_DATA[seed.seedId].url,
       count: this.playerStore.farm().seeds[seed.seedId] ?? 0,
       time: formatDuration(seed.growMs * (1 - this.playerStore.stats().seedGrowthTimeReduction)),
-      yield: seed.yield,
+      min: seed.yield[0],
+      max: seed.yield[1],
       locked: this.farmService.level() < seed.requiredLevel ? i18next.t('map:farm.seedLocked', { level: seed.requiredLevel }) : null,
     })))
 
@@ -96,17 +97,21 @@ export class FarmPlotsComponent {
     return syncPlots(this.playerStore.farm().plots, now, reduction).map((plot, index) => {
       const seed = plot && FARM_SEEDS[plot.seedId]
       if (index >= limit) return { index, state: 'locked' as const }
-      if (!plot || !seed) return { index, state: 'empty' as const }
+      if (!plot || !seed) return { index, state: 'empty' as const, soil: FARM_ART.soil.empty }
 
-      const crop = { name: `items:names.${ItemID[seed.cropId]}`, url: ITEM_DATA[seed.cropId].url }
+      const stage = stageOf(plot.progressMs / seed.growMs)
+      const crop = { name: `items:names.${ItemID[seed.cropId]}`, url: FARM_ART.plants[seed.cropId]?.[stage] ?? ITEM_DATA[seed.cropId].url, soil: FARM_ART.soil.planted }
       if (!isReady(plot, seed.growMs)) {
         const remaining = (seed.growMs - plot.progressMs) * (1 - reduction)
-        return { index, state: 'growing' as const, ...crop, progress: plot.progressMs, max: seed.growMs, time: formatDuration(remaining) }
+        return { index, state: 'growing' as const, stage, ...crop, progress: plot.progressMs, max: seed.growMs, time: formatDuration(remaining) }
       }
-      const missing = this.playerStore.missingSlotsByTab([{ id: seed.cropId, amount: plot.rolledYield ?? seed.yield }])
-      return { index, state: 'ready' as const, ...crop, missing: Object.keys(missing).length > 0 ? missingSlotsText(missing) : null }
+      const missing = this.playerStore.missingSlotsByTab([{ id: seed.cropId, amount: plot.rolledYield ?? seed.yield[1] }])
+      return { index, state: 'ready' as const, stage, ...crop, missing: Object.keys(missing).length > 0 ? missingSlotsText(missing) : null }
     })
   })
+
+  /** CSS for a soil layer: its image, or nothing so the plot's colour shows. */
+  protected soilImage = (soil: string | null | undefined): string | null => soil ? `url(${soil})` : null
 
   hasReadyPlot = computed(() => this.plots().some(plot => plot.state === 'ready'))
   hasEmptyPlot = computed(() => this.plots().some(plot => plot.state === 'empty'))

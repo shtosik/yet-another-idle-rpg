@@ -38,7 +38,7 @@
       >
         <img alt="" class="seed__icon" height="30" width="30" [ngSrc]="seed.url">
         <span class="seed__name">{{ seed.name | i18next }} <span class="seed__count">x{{ seed.count }}</span></span>
-        <span class="seed__stats">{{ seed.locked ?? ('map:farm.seedStats' | i18next: { time: seed.time, yield: seed.yield }) }}</span>
+        <span class="seed__stats">{{ seed.locked ?? ('map:farm.seedStats' | i18next: { time: seed.time, min: seed.min, max: seed.max }) }}</span>
       </button>
     } @empty {
       <p class="seeds__empty">{{ 'map:farm.noSeeds' | i18next }}</p>
@@ -52,22 +52,20 @@
           <div class="plot plot--locked">{{ 'map:farm.locked' | i18next }}</div>
         }
         @case ('empty') {
-          <button type="button" class="plot plot--empty" [disabled]="activeSeed() === null" (click)="clickPlot(plot.index, 'empty')">
-            {{ 'map:farm.plant' | i18next }}
+          <button type="button" class="plot plot--empty" [style.background-image]="soilImage(plot.soil)" [disabled]="activeSeed() === null" (click)="clickPlot(plot.index, 'empty')">
+            <span class="plot__hint">{{ 'map:farm.plant' | i18next }}</span>
           </button>
         }
         @case ('growing') {
-          <div class="plot plot--growing">
-            <img alt="" height="30" width="30" [ngSrc]="plot.url">
-            <span class="plot__name">{{ plot.name | i18next }}</span>
-            <progress class="plot__bar" [max]="plot.max" [value]="plot.progress" [attr.aria-label]="plot.name | i18next"></progress>
+          <div class="plot plot--growing" [style.background-image]="soilImage(plot.soil)">
+            <img [class]="'plot__plant plot__plant--' + plot.stage" [alt]="plot.name | i18next" height="96" width="96" [ngSrc]="plot.url">
             <span class="plot__time">{{ plot.time }}</span>
+            <progress class="plot__bar" [max]="plot.max" [value]="plot.progress" [attr.aria-label]="plot.name | i18next"></progress>
           </div>
         }
         @case ('ready') {
-          <button type="button" class="plot plot--ready" (click)="clickPlot(plot.index, 'ready')">
-            <img alt="" height="30" width="30" [ngSrc]="plot.url">
-            <span class="plot__name">{{ plot.name | i18next }}</span>
+          <button type="button" class="plot plot--ready" [style.background-image]="soilImage(plot.soil)" (click)="clickPlot(plot.index, 'ready')">
+            <img [class]="'plot__plant plot__plant--' + plot.stage" [alt]="plot.name | i18next" height="96" width="96" [ngSrc]="plot.url">
             <span class="plot__action">{{ 'map:farm.harvest' | i18next }}</span>
             @if (plot.missing) {
               <span class="plot__missing">{{ 'app:inventory.slotsNeeded' | i18next: { slots: plot.missing } }}</span>
@@ -79,6 +77,25 @@
   </div>
 </div>
 
+<div class="toasts" role="status">
+  @for (toast of toasts(); track toast.id) {
+    <div class="toast">
+      @for (crop of toast.crops; track crop.id) {
+        <span class="toast__crop">
+          <img alt="" height="24" width="24" [ngSrc]="crop.url">
+          +{{ crop.amount }} {{ crop.name | i18next }}
+        </span>
+      }
+      @if (toast.xp > 0) {
+        <span class="toast__xp">{{ 'map:farm.xpGain' | i18next: { xp: toast.xp } }}</span>
+      }
+      @if (toast.blocked) {
+        <span class="toast__blocked">{{ toast.blocked }}</span>
+      }
+    </div>
+  }
+</div>
+
 <footer class="footer">
   <div class="footer__action">
     <button type="button" class="footer__button" [disabled]="plantAllLock() !== null || activeSeed() === null || !hasEmptyPlot()" (click)="farmService.plantAll()">
@@ -88,7 +105,7 @@
       <span class="footer__lock">{{ lock }}</span>
     }
   </div>
-  <p class="footer__toast" role="status">{{ toast() }}</p>
+  <span></span>
   <div class="footer__action">
     <button type="button" class="footer__button" [disabled]="harvestAllLock() !== null || !hasReadyPlot()" (click)="farmService.harvest()">
       {{ 'map:farm.harvestAll' | i18next }}
