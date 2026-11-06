@@ -5,6 +5,7 @@ import { GameNavigationService } from '../../../services/game-navigation.service
 import { ReputationService } from '../../../services/reputation.service'
 import { ProfessionService } from '../../../services/profession.service'
 import { ProfessionID } from 'enums/ids/profession-id.enum'
+import { PLOT_SLOTS } from '../../../store/player/farm'
 import { xpForLevel } from '../../../store/player/professions'
 import PROFESSIONS_DATA from '../../../../data/professions-data'
 import { GameTab } from 'enums/ids/game-tab.enum'
@@ -195,6 +196,16 @@ export class DevCheatsComponent {
       const current = this.playerStore.professions()[professionId]?.experience ?? 0
       this.professionService.gainXp(professionId, xpForLevel(target) - current)
     },
+    /** Fills every plot with the seed (default Turnip Seeds), granting the seeds and the Farming profession; false when its expertise is too low. */
+    plantAll: (seed: Ref<typeof ItemID> = ItemID.turnipSeeds): boolean => {
+      this.playerStore.unlockProfession(ProfessionID.farming)
+      this.playerStore.addItems([{ id: fromName(ItemID, 'ItemID', seed), amount: PLOT_SLOTS }])
+      const planted = this.playerStore.plantSeed(fromName(ItemID, 'ItemID', seed), PLOT_SLOTS)
+      if (!planted) console.warn('dev.plantAll: nothing planted (not a seed, expertise too low, or every plot busy)')
+      return planted
+    },
+    /** Every planted plot is ready to harvest. */
+    growAll: () => this.playerStore.growAllPlots(),
   }
 
   /** `dev.help()` output; typed by `commands`, so a new command doesn't compile without its line. */
@@ -222,6 +233,8 @@ export class DevCheatsComponent {
     completeQuest: 'completeQuest(QuestID) — start and complete a quest, rewards included',
     addReputation: 'addReputation(ReputationID, amount) — add reputation',
     setExpertise: 'setExpertise(ProfessionID, level) — unlock a profession and set its expertise level',
+    plantAll: "plantAll(ItemID = 'turnipSeeds') — fill every plot, seeds granted",
+    growAll: 'growAll() — every planted plot is ready to harvest',
   }
 
   private readonly devTools = {

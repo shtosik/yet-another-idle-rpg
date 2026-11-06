@@ -17,6 +17,24 @@
     "farmGate": "Gate",
     "unlocked": "{{site}} opens on the map"
   },
+  "farm": {
+    "plots": "Plots {{count}} / {{max}}",
+    "seeds": "Seeds",
+    "noSeeds": "No seeds yet. Monsters and the Arena Chest drop them, and Warden Marta sells some.",
+    "seedStats": "{{time}}, {{yield}} crops",
+    "seedLocked": "Requires Farming expertise {{level}}",
+    "plant": "Plant",
+    "harvest": "Harvest",
+    "locked": "Locked",
+    "plantAll": "Plant all",
+    "harvestAll": "Harvest all",
+    "expertiseNext": "Next: {{seed}} at expertise {{level}}",
+    "expertiseMax": "Nothing left to unlock",
+    "harvested": "Harvested {{crops}}, +{{xp}} Farming XP",
+    "harvestBlocked": "Harvest blocked: {{slots}} needed",
+    "seedFound": "Found: {{seeds}}",
+    "progressLabel": "Farming expertise progress"
+  },
   "reputations": {
     "laHarpar": "La Harpar",
     "lirold": "Lirold",

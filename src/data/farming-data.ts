@@ -1,4 +1,5 @@
 import { ItemID } from '../enums/ids/item-id.enum'
+import { QuestID } from '../enums/ids/quest-id.enum'
 
 const MINUTE = 60_000
 const HOUR = 60 * MINUTE
@@ -29,3 +30,6 @@ export const FARM_SEEDS: Partial<Record<ItemID, FarmSeed>> = {
   [ItemID.heartrootSeeds]: { seedId: ItemID.heartrootSeeds, cropId: ItemID.heartroot, tier: 6, growMs: 12 * HOUR, yield: 3, requiredLevel: 17, xp: 260 },
   [ItemID.canopyBlossomSeeds]: { seedId: ItemID.canopyBlossomSeeds, cropId: ItemID.canopyBlossom, tier: 7, growMs: 24 * HOUR, yield: 2, requiredLevel: 22, xp: 520 },
 }
+
+/** Quests whose completion adds a plot (An Orchard Again, The Growers' Table); the quest chain (plan commit C10) fills it. */
+export const PLOT_GRANT_QUEST_IDS: QuestID[] = []

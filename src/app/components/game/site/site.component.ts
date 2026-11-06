@@ -27,6 +27,8 @@ export class SiteComponent {
 
   siteId = input.required<SiteID>()
   closed = output<void>()
+  /** The Gate button: the plots panel opens. */
+  gate = output<void>()
 
   activeShopId = this.townsStore.activeShopId
   activeShopStage = this.townsStore.activeShopStage
@@ -45,10 +47,5 @@ export class SiteComponent {
 
   closeShop() {
     this.townsStore.closeShop()
-  }
-
-  /** Stub: the plots panel (plan commit C8) takes over from here. */
-  openGate() {
-    // intentionally empty until C8
   }
 }

@@ -21,6 +21,7 @@ import { TownsStore } from '../../store/towns/towns.store'
 import { QuestsComponent } from './quests/quests.component'
 import { WorldMapComponent } from './world-map/world-map.component'
 import { SiteComponent } from './site/site.component'
+import { FarmPlotsComponent } from './farm-plots/farm-plots.component'
 import { SiteID } from 'enums/ids/site-id.enum'
 import { BestiaryComponent } from './bestiary/bestiary.component'
 import { ShopStore } from '../../store/shop/shop.store'
@@ -53,6 +54,7 @@ const imports = [
     QuestsComponent,
     WorldMapComponent,
     SiteComponent,
+    FarmPlotsComponent,
     BestiaryComponent,
     SpellbookComponent,
     CampComponent,

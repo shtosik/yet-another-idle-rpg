@@ -8,4 +8,5 @@ export enum GameTab {
     spellbook = 7,
     settings = 8,
     farm = 9,
+    farmPlots = 10,
 }

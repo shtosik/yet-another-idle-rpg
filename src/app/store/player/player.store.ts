@@ -62,7 +62,8 @@ import {
   withSlotDeltas,
 } from './inventory'
 import { canInstall, evaluateRecipe, installStations, Stations } from './camp'
-import { addSeeds, FarmState, initialFarm, isFarmUnlocked, seedStacks, syncPlots, takeSeeds } from './farm'
+import { FARM_SEEDS } from '../../../data/farming-data'
+import { addSeeds, FarmState, harvest as harvestPlot, harvestAll as harvestEveryPlot, initialFarm, isFarmUnlocked, plant as plantInPlot, plantAll as plantEveryPlot, seedStacks, syncPlots, takeSeeds } from './farm'
 import { ReputationGain, reputationTier, TierUp } from './reputation'
 import { newProfession, professionLevel, professionLevels, Professions, settleProfession } from './professions'
 import { ProfessionID } from '../../../enums/ids/profession-id.enum'
@@ -927,6 +928,47 @@ export const PlayerStore = signalStore(
       return [...new Set(gains.map(gain => gain.reputationId))]
         .map(reputationId => ({ reputationId, tier: reputationTier(after[reputationId] ?? 0) }))
         .filter(({ reputationId, tier }) => tier > reputationTier(before[reputationId] ?? 0))
+    },
+
+    /** Cheat: every planted plot is fully grown. */
+    growAllPlots(): void {
+      patchState(store, (state) => ({
+        farm: { ...state.farm, plots: state.farm.plots.map(plot => plot && { ...plot, progressMs: FARM_SEEDS[plot.seedId]?.growMs ?? plot.progressMs }) },
+      }))
+    },
+
+    /** Plants the seed in one plot, or in every empty plot when `plotIndex` is omitted; false when nothing was planted. Plots from `plotLimit` on are locked. */
+    plantSeed(seedId: ItemID, plotLimit: number, plotIndex?: number): boolean {
+      store.syncFarm()
+      const stats = store.stats()
+      const ctx = { now: Date.now(), level: professionLevel(store.professions(), ProfessionID.farming), plotLimit, seedSaveChance: stats.farmSeedSaveChance }
+      const farm = store.farm()
+      const next = plotIndex === undefined ? plantEveryPlot(farm, seedId, ctx) : plantInPlot(farm, plotIndex, seedId, ctx)
+      if (!next || next === farm) return false
+      patchState(store, { farm: next })
+      return true
+    },
+
+    /**
+     * Harvests one plot, or every ready plot when `plotIndex` is omitted. The crops go to the inventory; the caller pays the XP.
+     * A harvest the inventory has no room for leaves the plot with its roll saved (`missing`: the slots to free).
+     */
+    harvestPlots(plotIndex?: number): { crops: ItemStack[], xp: number, blocked: boolean, missing: MissingSlots } {
+      store.syncFarm()
+      const stats = store.stats()
+      let notFitting: ItemStack[] = []
+      const fits = (crops: ItemStack[]) => {
+        const ok = store.canFitItems(crops)
+        if (!ok) notFitting = crops
+        return ok
+      }
+      const ctx = { doubleChance: stats.farmDoubleHarvestChance, bonusChance: stats.farmBonusCropChance, xpMultiplier: stats.farmXpMultiplier, fits }
+      const farm = store.farm()
+      const result = plotIndex === undefined ? harvestEveryPlot(farm, ctx) : harvestPlot(farm, plotIndex, ctx)
+      const blocked = 'blocked' in result ? result.blocked : result.status === 'blocked'
+      patchState(store, { farm: result.farm })
+      if (result.crops.length) store.addItems(result.crops)
+      return { crops: result.crops, xp: result.xp, blocked, missing: blocked ? store.missingSlotsByTab(notFitting) : {} }
     },
 
     /** Starts the profession at level 1; no-op when already unlocked. */

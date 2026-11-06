@@ -1,0 +1,216 @@
+@use 'palette' as palette
+@use 'variables' as vars
+@use 'mixins' as mixins
+
+$muted: #a3a3a3
+$rowBackground: #2c2c2c
+$barBackground: #171717
+
+@mixin bar($color)
+  appearance: none
+  border: 0
+  border-radius: 2px
+  background: $barBackground
+
+  &::-webkit-progress-bar
+    border-radius: 2px
+    background: $barBackground
+
+  &::-webkit-progress-value
+    border-radius: 2px
+    background: $color
+
+  &::-moz-progress-bar
+    border-radius: 2px
+    background: $color
+
+:host
+  @include mixins.panel
+  display: flex
+  flex-direction: column
+  gap: 0.5rem
+  position: relative
+
+button
+  font: inherit
+  color: inherit
+  cursor: pointer
+
+  &:disabled
+    cursor: default
+
+.header
+  display: flex
+  align-items: center
+  gap: 1rem
+  padding-right: 3rem
+  padding-bottom: 0.5rem
+  border-bottom: vars.$panelBorder
+
+  &__title
+    color: palette.$yellow
+    font-size: 1rem
+    font-weight: normal
+
+  &__bars
+    display: flex
+    flex: 1
+    gap: 1rem
+
+  &__count
+    color: $muted
+    font-size: 0.8rem
+
+.meter
+  display: flex
+  flex: 1
+  flex-direction: column
+  gap: 0.15rem
+  font-size: 0.75rem
+
+  &__label
+    color: palette.$yellow
+
+  &__bar
+    width: 100%
+    height: 0.5rem
+    @include bar(palette.$yellow)
+
+  &__detail
+    color: $muted
+
+app-close-button
+  position: absolute
+  top: 0.5rem
+  right: 0.5rem
+  z-index: 10
+
+.body
+  display: grid
+  flex: 1
+  grid-template-columns: 14rem 1fr
+  gap: 0.5rem
+  min-height: 0
+
+.seeds
+  display: flex
+  flex-direction: column
+  gap: 4px
+  overflow-y: auto
+
+  &__empty
+    color: $muted
+    font-size: 0.8rem
+
+.seed
+  display: grid
+  grid-template-columns: auto 1fr
+  column-gap: 0.5rem
+  align-items: center
+  padding: 0.375rem 0.5rem
+  border: 1px solid transparent
+  border-radius: 4px
+  background: $rowBackground
+  text-align: left
+
+  &__icon
+    grid-row: span 2
+
+  &__count, &__stats
+    color: $muted
+    font-size: 0.75rem
+
+  &:hover:not(:disabled), &--active
+    border-color: palette.$yellow
+
+  &--active
+    background: #3a3630
+
+  &--locked
+    opacity: 0.55
+
+.grid
+  display: grid
+  grid-template-columns: repeat(3, 1fr)
+  grid-template-rows: repeat(3, 1fr)
+  gap: 0.5rem
+  min-height: 0
+
+.plot
+  display: flex
+  flex-direction: column
+  align-items: center
+  justify-content: center
+  gap: 0.25rem
+  padding: 0.25rem
+  border: 1px solid #3a3630
+  border-radius: vars.$panelBorderRadius
+  background: #3b2f22
+  font-size: 0.8rem
+
+  &--locked
+    background: $barBackground
+    color: $muted
+    opacity: 0.6
+
+  &--empty
+    color: $muted
+
+    &:hover:not(:disabled)
+      border-color: palette.$yellow
+      color: palette.$yellow
+
+  &--growing
+    background: #2f3a22
+
+  &--ready
+    border-color: palette.$yellow
+    background: #3d4a26
+
+    &:hover
+      background: #4a5a2e
+
+  &__bar
+    width: 80%
+    height: 0.4rem
+    @include bar(palette.$green)
+
+  &__time
+    color: $muted
+    font-size: 0.75rem
+
+  &__action
+    color: palette.$yellow
+
+  &__missing
+    color: #f87171
+    font-size: 0.7rem
+
+.footer
+  display: grid
+  grid-template-columns: 1fr 1fr 1fr
+  align-items: start
+  gap: 0.5rem
+
+  &__action
+    display: flex
+    flex-direction: column
+    gap: 0.25rem
+
+  &__button
+    @include mixins.button
+    padding: 0.4rem 0.75rem
+
+    &:disabled
+      opacity: 0.5
+
+  &__lock
+    color: $muted
+    font-size: 0.7rem
+
+  &__toast
+    margin: 0
+    color: palette.$yellow
+    font-size: 0.8rem
+    text-align: center
+    white-space: pre-line

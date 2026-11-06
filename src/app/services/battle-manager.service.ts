@@ -28,6 +28,7 @@ import { OfflineStore } from '../store/offline/offline.store'
 const MIN_SPELL_COOLDOWN_IN_SECONDS = 1
 const MS_PER_SECOND = 1000
 const DROPS_LOST_TOAST_MS = 3000
+const SEED_FOUND_TOAST_MS = 3000
 
 @Injectable({ providedIn: 'root' })
 export class BattleManagerService {
@@ -43,6 +44,10 @@ export class BattleManagerService {
   /** Drops a full tab lost on the last kill, one line per tab; clears itself after `DROPS_LOST_TOAST_MS`. */
   dropsLostToast = signal<string | null>(null)
   private dropsLostTimer?: ReturnType<typeof setTimeout>
+
+  /** "Found: Turnip Seeds x1" for seeds a kill dropped once the farm is unlocked; clears itself. */
+  seedFoundToast = signal<string | null>(null)
+  private seedFoundTimer?: ReturnType<typeof setTimeout>
 
   currentWaveKillCount = computed(() => {
     const zoneProgression = this.playerStore.zonesProgression()[this.battleStore.currentZoneId()] || {}
@@ -272,8 +277,9 @@ export class BattleManagerService {
     this.battleStore.endBattle()
     this.offlineStore.recordKill(performance.now(), zoneId, wave)
     const questDropLimits = getQuestDropLimits(this.questsStore.questStepProgression(), this.playerStore.itemCount)
-    const { lost } = this.playerStore.processBattleEnd(enemy.id, zoneId, wave, isShiny, questDropLimits)
+    const { lost, foundSeeds } = this.playerStore.processBattleEnd(enemy.id, zoneId, wave, isShiny, questDropLimits)
     if (lost.length) this.showDropsLost(lost)
+    if (foundSeeds.length) this.showSeedsFound(foundSeeds)
 
     this.unlockNextZone(wave)
 
@@ -287,6 +293,13 @@ export class BattleManagerService {
     if (isAutoEnabled && isEnoughKillCountToProgress) {
       this.battleStore.changeWave(true)
     }
+  }
+
+  private showSeedsFound(seeds: ItemStack[]): void {
+    const names = seeds.map(({ id, amount }) => `${i18next.t(`items:names.${ItemID[id]}`)} x${amount}`)
+    clearTimeout(this.seedFoundTimer)
+    this.seedFoundToast.set(i18next.t('map:farm.seedFound', { seeds: names.join(', ') }))
+    this.seedFoundTimer = setTimeout(() => this.seedFoundToast.set(null), SEED_FOUND_TOAST_MS)
   }
 
   private showDropsLost(lost: ItemStack[]): void {

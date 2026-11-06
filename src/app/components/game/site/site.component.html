@@ -12,7 +12,7 @@
       class="site__gate"
       [style.left.%]="siteData.gate.position.x"
       [style.top.%]="siteData.gate.position.y"
-      (click)="openGate()"
+      (click)="gate.emit()"
     >{{ 'map:sites.' + SiteID[siteData.id] + 'Gate' | i18next }}
     </button>
     <!-- Over the home screen, not in place of the inventory, so items stay visible during turn-ins. -->

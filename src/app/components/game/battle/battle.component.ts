@@ -26,6 +26,7 @@ export class BattleComponent {
   battleStore = inject(BattleStore)
 
   dropsLostToast = inject(BattleManagerService).dropsLostToast
+  seedFoundToast = inject(BattleManagerService).seedFoundToast
   isInCombat = this.battleStore.isInCombat
   currentZoneData = this.battleStore.currentZoneData
 
