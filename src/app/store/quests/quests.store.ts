@@ -17,11 +17,10 @@ import { canAdvanceQuest, getQuestStatus, getStepItems } from '../../services/qu
 import { ReputationService } from '../../services/reputation.service'
 import { ProfessionService } from '../../services/profession.service'
 import { REPUTATION_THRESHOLDS, ReputationGain } from '../player/reputation'
-import { TurnInKey, turnInRemainingMs } from './turn-in-cooldown'
+import { orderKey, TurnInKey, turnInRemainingMs } from './turn-in-cooldown'
 import { Orders, rollOrder } from './orders'
 
-/** The turn-in cooldown key of a repeatable order. */
-export const orderKey = (questId: QuestID): TurnInKey => `order:${questId}`
+export { orderKey }
 
 /** Lifetime kill counters at the moment the quest reached its current step. */
 export interface KillBaseline {

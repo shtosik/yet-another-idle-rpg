@@ -24,6 +24,7 @@ Peoples, organisations and creature groups. Source shorthand as in world.md. NPC
 | Treasure seekers | Not an organisation: no permit; "travel to the most dangerous places and hope no one else got there first". Seek ancient artifacts. Theron Tidecaller is one. | `Elara#treasureInfo`, `Elara#permitInfo` |
 | La Harpar fishermen | Famous across all four Regions; decades of experience. | `Trader#aboutVillage`, `Trader#aboutFishermen` |
 | Drenhollow court | Employed Elarion as court mage; "terrible politics". | `Elarion#aboutElarion` |
+| Farming Guild | Growers north of the Mountain Pass who kept seed lines pure and passed them hand to hand. Two winters ago half their seed vaults sprouted black, and **Warden Marta** shut the gate; she does not apologise. Sylvie wrote to them for years, and her word is why one stranger who fights outside the gate is let in. **Wick**, a shy drover's boy, keeps the tack oiled for a herd lost in the sap winter. Their orchard burned; the Guild asks for monster-carried wild seed. Names are placeholders. | `farmWarden.json`, `farmDrover.json`, `mawoodSylvie.json` `questTerrace`; `docs/ideas/farm-dialogue-scripts.md` |
 | Mawood | ~300-year-old platform Town led by Elder Corwin. | `Corwin#intro1`, `Corwin#aboutMawood` |
 
 ## Creature groups

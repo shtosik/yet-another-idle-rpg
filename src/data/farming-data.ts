@@ -31,5 +31,5 @@ export const FARM_SEEDS: Partial<Record<ItemID, FarmSeed>> = {
   [ItemID.canopyBlossomSeeds]: { seedId: ItemID.canopyBlossomSeeds, cropId: ItemID.canopyBlossom, tier: 7, growMs: 24 * HOUR, yield: 2, requiredLevel: 22, xp: 520 },
 }
 
-/** Quests whose completion adds a plot (An Orchard Again, The Growers' Table); the quest chain (plan commit C10) fills it. */
-export const PLOT_GRANT_QUEST_IDS: QuestID[] = []
+/** Quests whose completion adds a plot (An Orchard Again, The Growers' Table). */
+export const PLOT_GRANT_QUEST_IDS: QuestID[] = [QuestID.anOrchardAgain, QuestID.theGrowersTable]

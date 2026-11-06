@@ -24,7 +24,14 @@ export type DialogueCondition = { hidden?: boolean } & (
   | ReputationRequirement
   | ProfessionLevelRequirement
   | TurnInCooldownCondition
+  | FarmSeedsCondition
   )
+
+/** The seed tally (all seeds counted, held or not yet usable) holds at least `atLeast` seeds in total. */
+interface FarmSeedsCondition {
+  type: 'farmSeeds'
+  atLeast: number
+}
 
 /** A turn-in (`TurnInKey`) is off cooldown (`ready`) or still cooling. Shows "Ready in …" while cooling. */
 interface TurnInCooldownCondition {

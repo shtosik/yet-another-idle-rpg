@@ -271,6 +271,8 @@ export class DialogueManagerService {
         return this.playerStore.reputationTierOf(c.reputationId) >= c.tier
       case 'professionLevel':
         return this.playerStore.professionLevel(c.professionId) >= c.level
+      case 'farmSeeds':
+        return Object.values(this.playerStore.farm().seeds).reduce((sum, n) => sum + (n ?? 0), 0) >= c.atLeast
       case 'turnInCooldown':
         return (this.cooldowns.remainingMs(c.key) === 0) === (c.state === 'ready')
       case 'arena':

@@ -20,7 +20,15 @@
     "lastOrders": "Last Orders",
     "aCleanCure": "A Clean Cure",
     "rootsAndRafters": "Roots and Rafters",
-    "theColdForge": "The Cold Forge"
+    "theColdForge": "The Cold Forge",
+    "seedsFromTheTerrace": "Seeds from the Terrace",
+    "theFirstFurrow": "The First Furrow",
+    "wheatForTheGuild": "Wheat for the Guild",
+    "silverleafForSylvie": "Silverleaf for Sylvie",
+    "anOrchardAgain": "An Orchard Again",
+    "theGrowersTable": "The Growers' Table",
+    "marthasOrder": "Marta's Order",
+    "wicksOrder": "Wick's Order"
   },
   "requirements": {
     "findItem": "Find {{ item }}",

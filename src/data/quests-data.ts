@@ -577,6 +577,166 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       { type: 'stat', key: 'goldCoins', amount: 400 },
     ],
   },
+  // ── Farming Guild ─────────────────────────────────────────────────────────
+  [QuestID.seedsFromTheTerrace]: {
+    questId: QuestID.seedsFromTheTerrace,
+    startRequirements: [{ type: 'quest', questId: QuestID.silkAndWater, step: QUEST_STEP_AFTER_COMPLETED }],
+    steps: [
+      {
+        description: 'Sylvie gave me a letter for the Farming Guild north of the Pass. Warden Marta is waiting at the farm.',
+        turnInNpc: NpcID.farmWarden,
+        requirements: [],
+      },
+    ],
+    rewards: [
+      { type: 'stat', key: 'experience', amount: 600 },
+      { type: 'stat', key: 'goldCoins', amount: 100 },
+      { type: 'reputation', reputationId: ReputationID.farmingGuild, amount: 10 },
+      { type: 'item', itemId: ItemID.turnipSeeds, amount: 5 },
+    ],
+  },
+  [QuestID.theFirstFurrow]: {
+    questId: QuestID.theFirstFurrow,
+    startRequirements: [{ type: 'quest', questId: QuestID.seedsFromTheTerrace, step: QUEST_STEP_AFTER_COMPLETED }],
+    steps: [
+      {
+        description: 'Marta wants four turnips from my first plot.',
+        turnInNpc: NpcID.farmWarden,
+        requirements: [{ type: 'item', itemId: ItemID.turnip, amount: 4 }],
+      },
+    ],
+    rewards: [
+      { type: 'stat', key: 'experience', amount: 800 },
+      { type: 'stat', key: 'goldCoins', amount: 150 },
+      { type: 'reputation', reputationId: ReputationID.farmingGuild, amount: 15 },
+      { type: 'professionXp', professionId: ProfessionID.farming, amount: 30 },
+      { type: 'item', itemId: ItemID.wheatSeeds, amount: 5 },
+    ],
+  },
+  [QuestID.wheatForTheGuild]: {
+    questId: QuestID.wheatForTheGuild,
+    startRequirements: [{ type: 'quest', questId: QuestID.theFirstFurrow, step: QUEST_STEP_AFTER_COMPLETED }],
+    steps: [
+      {
+        description: 'The Guild needs ten wheat.',
+        turnInNpc: NpcID.farmWarden,
+        requirements: [{ type: 'item', itemId: ItemID.wheat, amount: 10 }],
+      },
+    ],
+    rewards: [
+      { type: 'stat', key: 'experience', amount: 800 },
+      { type: 'stat', key: 'goldCoins', amount: 150 },
+      { type: 'reputation', reputationId: ReputationID.farmingGuild, amount: 25 },
+      { type: 'professionXp', professionId: ProfessionID.farming, amount: 100 },
+      { type: 'item', itemId: ItemID.farmersBreadRecipe, amount: 1 },
+    ],
+  },
+  [QuestID.silverleafForSylvie]: {
+    questId: QuestID.silverleafForSylvie,
+    startRequirements: [{ type: 'quest', questId: QuestID.wheatForTheGuild, step: QUEST_STEP_AFTER_COMPLETED }, { type: 'professionLevel', professionId: ProfessionID.farming, level: 5 }],
+    steps: [
+      {
+        description: 'Sylvie\'s herb shelf is thin. She wants six silverleaf.',
+        turnInNpc: NpcID.mawoodSylvie,
+        requirements: [{ type: 'item', itemId: ItemID.silverleaf, amount: 6 }],
+      },
+    ],
+    rewards: [
+      { type: 'stat', key: 'experience', amount: 1000 },
+      { type: 'stat', key: 'goldCoins', amount: 200 },
+      { type: 'reputation', reputationId: ReputationID.mawood, amount: 25 },
+      { type: 'reputation', reputationId: ReputationID.farmingGuild, amount: 15 },
+      { type: 'professionXp', professionId: ProfessionID.farming, amount: 400 },
+      { type: 'item', itemId: ItemID.silverleafTonicRecipe, amount: 1 },
+    ],
+  },
+  [QuestID.anOrchardAgain]: {
+    questId: QuestID.anOrchardAgain,
+    startRequirements: [{ type: 'quest', questId: QuestID.silverleafForSylvie, step: QUEST_STEP_AFTER_COMPLETED }, { type: 'professionLevel', professionId: ProfessionID.farming, level: 8 }],
+    steps: [
+      {
+        description: 'Marta wants twelve apples from the Guild\'s own trees.',
+        turnInNpc: NpcID.farmWarden,
+        requirements: [{ type: 'item', itemId: ItemID.apple, amount: 12 }],
+      },
+    ],
+    rewards: [
+      { type: 'stat', key: 'experience', amount: 1200 },
+      { type: 'stat', key: 'goldCoins', amount: 250 },
+      { type: 'reputation', reputationId: ReputationID.farmingGuild, amount: 40 },
+      { type: 'professionXp', professionId: ProfessionID.farming, amount: 1500 },
+    ],
+  },
+  [QuestID.theGrowersTable]: {
+    questId: QuestID.theGrowersTable,
+    startRequirements: [{ type: 'quest', questId: QuestID.anOrchardAgain, step: QUEST_STEP_AFTER_COMPLETED }, { type: 'reputation', reputationId: ReputationID.farmingGuild, tier: ReputationTier.honored }],
+    steps: [
+      {
+        description: 'Marta will cook again if I bring five turnip stew and five harvest pie.',
+        turnInNpc: NpcID.farmWarden,
+        requirements: [{ type: 'item', itemId: ItemID.turnipStew, amount: 5 }, { type: 'item', itemId: ItemID.harvestPie, amount: 5 }],
+      },
+    ],
+    rewards: [
+      { type: 'stat', key: 'experience', amount: 2500 },
+      { type: 'stat', key: 'goldCoins', amount: 500 },
+      { type: 'item', itemId: ItemID.skillPointBook, amount: 1 },
+      { type: 'reputation', reputationId: ReputationID.farmingGuild, amount: 60 },
+      { type: 'professionXp', professionId: ProfessionID.farming, amount: 3000 },
+    ],
+  },
+  [QuestID.marthasOrder]: {
+    questId: QuestID.marthasOrder,
+    startRequirements: [{ type: 'quest', questId: QuestID.theFirstFurrow, step: QUEST_STEP_AFTER_COMPLETED }],
+    steps: [
+      {
+        description: 'Marta needs crops for the Guild larder.',
+        turnInNpc: NpcID.farmWarden,
+        requirements: [{ type: 'pickedItems' }],
+      },
+    ],
+    rewards: [],
+    repeat: {
+      reputationId: ReputationID.farmingGuild,
+      professionId: ProfessionID.farming,
+      picks: 1,
+      pool: [
+        { itemId: ItemID.turnip, minTier: ReputationTier.neutral, reputationPer10: 4, goldPerItem: 3, xpPerItem: 1.5 },
+        { itemId: ItemID.wheat, minTier: ReputationTier.friendly, reputationPer10: 7, goldPerItem: 6, xpPerItem: 3 },
+      ],
+    },
+  },
+  [QuestID.wicksOrder]: {
+    questId: QuestID.wicksOrder,
+    startRequirements: [{ type: 'quest', questId: QuestID.wheatForTheGuild, step: QUEST_STEP_AFTER_COMPLETED }],
+    steps: [
+      {
+        description: 'Wick needs animal materials for tack and charms.',
+        turnInNpc: NpcID.farmDrover,
+        requirements: [{ type: 'pickedItems' }],
+      },
+    ],
+    rewards: [],
+    repeat: {
+      reputationId: ReputationID.farmingGuild,
+      professionId: ProfessionID.farming,
+      picks: 1,
+      pool: [
+        { itemId: ItemID.feather, minTier: ReputationTier.neutral, reputationPer10: 4, goldPerItem: 3, xpPerItem: 1.5, sourceZones: [ZoneID.horseshoeBeach] },
+        { itemId: ItemID.crabMeat, minTier: ReputationTier.neutral, reputationPer10: 4, goldPerItem: 3, xpPerItem: 1.5, sourceZones: [ZoneID.horseshoeBeach] },
+        { itemId: ItemID.ratTail, minTier: ReputationTier.neutral, reputationPer10: 4, goldPerItem: 3, xpPerItem: 1.5, sourceZones: [ZoneID.tradersBasement] },
+        { itemId: ItemID.turtleShell, minTier: ReputationTier.friendly, reputationPer10: 7, goldPerItem: 6, xpPerItem: 3, sourceZones: [ZoneID.horseshoeBeach] },
+        { itemId: ItemID.wolfFangs, minTier: ReputationTier.friendly, reputationPer10: 7, goldPerItem: 6, xpPerItem: 3, sourceZones: [ZoneID.theLongPath] },
+        { itemId: ItemID.deerPelt, minTier: ReputationTier.friendly, reputationPer10: 7, goldPerItem: 6, xpPerItem: 3, sourceZones: [ZoneID.theLongPath, ZoneID.mountainPass] },
+        { itemId: ItemID.venison, minTier: ReputationTier.friendly, reputationPer10: 7, goldPerItem: 6, xpPerItem: 3, sourceZones: [ZoneID.theLongPath, ZoneID.mountainPass] },
+        { itemId: ItemID.spiderSilk, minTier: ReputationTier.honored, reputationPer10: 10, goldPerItem: 10, xpPerItem: 6, sourceZones: [ZoneID.elderwoodWilds] },
+        { itemId: ItemID.bearPelt, minTier: ReputationTier.revered, reputationPer10: 14, goldPerItem: 20, xpPerItem: 10, sourceZones: [ZoneID.deepwood] },
+        { itemId: ItemID.boneFragment, minTier: ReputationTier.revered, reputationPer10: 14, goldPerItem: 20, xpPerItem: 10, sourceZones: [ZoneID.deepwood] },
+        { itemId: ItemID.elderSilk, minTier: ReputationTier.revered, reputationPer10: 14, goldPerItem: 20, xpPerItem: 10, sourceZones: [ZoneID.deepwood] },
+        { itemId: ItemID.harpyFeather, minTier: ReputationTier.exalted, reputationPer10: 0, goldPerItem: 25, xpPerItem: 16, sourceZones: [ZoneID.upperCanopy] },
+      ],
+    },
+  },
 }
 
 export default QUEST_DATA

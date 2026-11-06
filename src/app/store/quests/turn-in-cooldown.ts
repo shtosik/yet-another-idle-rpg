@@ -1,5 +1,6 @@
 import { ItemID } from '../../../enums/ids/item-id.enum'
 import { NpcID } from '../../../enums/map/npc-id.enum'
+import { QuestID } from '../../../enums/ids/quest-id.enum'
 
 /**
  * One cooldown per turn-in (docs/ideas/farm-and-husbandry.md §4a): `order:<QuestID>` or `bundle:<NpcID>:<ItemID>`.
@@ -11,6 +12,9 @@ export const TURN_IN_COOLDOWN_MS = 2 * 60 * 60 * 1000
 
 /** The stat can't shorten a cooldown by more than this, so it never reaches zero. */
 export const MAX_TURN_IN_COOLDOWN_REDUCTION = 0.75
+
+/** The turn-in cooldown key of a repeatable order. */
+export const orderKey = (questId: QuestID): TurnInKey => `order:${questId}`
 
 export const bundleKey = (npcId: NpcID, itemId: ItemID): TurnInKey => `bundle:${npcId}:${itemId}`
 

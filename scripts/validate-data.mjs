@@ -70,6 +70,7 @@ export { default as SPELLS_DATA } from 'data/spells-data'
 export { default as STATIONS_DATA } from 'data/stations-data'
 export { default as NPC_DATA } from 'data/npc-data'
 export { default as TOWNS_DATA } from 'data/towns-data'
+export { SITES_DATA } from 'data/sites-data'
 export { ALL_SKILLS } from 'data/skill-tree-data'
 export { UNLOCK_RULES, ZONE_UNLOCK_NOTIFICATIONS } from 'data/unlock-conditions'
 export { WORLD_MAP_DATA } from 'data/world-map-data'
@@ -296,8 +297,11 @@ for (const town of Object.values(D.TOWNS_DATA)) {
   }
 }
 // A step's turnInNpc backs the quest panel's "Talk to" link: the NPC must stand in a town
-// and their dialogue must start, advance or end that quest.
-const placedNpcs = new Set(Object.values(D.TOWNS_DATA).flatMap(t => t.buildings.flatMap(b => b.npcs.map(n => n.id))))
+// or on a Site and their dialogue must start, advance or end that quest.
+const placedNpcs = new Set([
+  ...Object.values(D.TOWNS_DATA).flatMap(t => t.buildings.flatMap(b => b.npcs.map(n => n.id))),
+  ...Object.values(D.SITES_DATA).flatMap(site => site.npcs.map(n => n.id)),
+])
 const questsInDialogue = npcId => new Set(Object.values(D.NPC_DATA[npcId]?.dialogue ?? {})
   .flatMap(node => node.options ?? [])
   .flatMap(option => option.results ?? [])
@@ -309,7 +313,7 @@ for (const quest of Object.values(D.QUEST_DATA)) {
     const where = `${idName(D.QuestID, quest.questId)} step ${i + 1}`
     const npc = idName(D.NpcID, step.turnInNpc)
     if (!has(D.NPC_DATA, step.turnInNpc)) error('src/data/quests-data.ts', `${where} has unknown turnInNpc ${step.turnInNpc}`)
-    else if (!placedNpcs.has(step.turnInNpc)) error('src/data/quests-data.ts', `${where}: turnInNpc ${npc} isn't in any town building`)
+    else if (!placedNpcs.has(step.turnInNpc)) error('src/data/quests-data.ts', `${where}: turnInNpc ${npc} isn't in any town building or Site`)
     else if (!questsInDialogue(step.turnInNpc).has(quest.questId)) error('src/data/quests-data.ts', `${where}: turnInNpc ${npc}'s dialogue never starts, advances or ends this quest`)
   })
   for (const reward of quest.rewards.filter(r => r.type === 'reputation')) {
@@ -457,7 +461,7 @@ function walkKeys(node, file) {
   if (typeof node === 'string') {
     const m = node.match(KEY_RE)
     if (m && namespaces.has(m[1])) requireKey(file, node)
-    else if (m && /^[a-z]/i.test(m[1])) error(file, `i18n key '${node}' uses unknown namespace '${m[1]}'`)
+    else if (m && /^[a-z]/i.test(m[1]) && m[1] !== 'order') // a TurnInKey, not an i18n key error(file, `i18n key '${node}' uses unknown namespace '${m[1]}'`)
     return
   }
   if (Array.isArray(node)) { node.forEach(n => walkKeys(n, file)); return }

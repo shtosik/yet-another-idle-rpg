@@ -3,7 +3,7 @@ import { ReputationID } from '../../../enums/reputation-id.enum'
 import { TownID } from '../../../enums/map/town-id.enum'
 
 /** What keeps reputation; quest rewards may only credit these (`validate` checks). */
-export const REPUTATION_IDS: ReputationID[] = [ReputationID.laHarpar, ReputationID.mawood]
+export const REPUTATION_IDS: ReputationID[] = [ReputationID.laHarpar, ReputationID.mawood, ReputationID.farmingGuild]
 
 /** The town a reputation belongs to, for the ones that belong to a town. */
 export const REPUTATION_TOWN: Partial<Record<ReputationID, TownID>> = {

@@ -1,7 +1,138 @@
 {
+  "intro1": {
+    "message": "The gate's open because Sylvie vouches for you. Don't make her regret it.",
+    "teach": "Sylvie said you could teach me to farm.",
+    "letter": "Here's her letter."
+  },
+  "introLetter": {
+    "message": "Hm. Her hand. All right. She says you carry silk through the Elderwood. That counts for something.",
+    "opt1": "She talks about you a lot."
+  },
+  "introSeeds": {
+    "message": "You've already found seeds, walker. Monsters carry wild seed, a few in every dozen. Everything that stuck to you since the beach went into the Guild's tally. It doesn't weigh on your pack.",
+    "why": "I never noticed any seeds.",
+    "show": "Show me.",
+    "guild": "Tell me about the Guild."
+  },
+  "introSeedsWhy": {
+    "message": "You wouldn't. A seed's small and a fight's loud. The list left of the plots is your tally. Slimes, gulls, deer, goats: they all carry some.",
+    "opt1": "Show me."
+  },
+  "introNoSeeds": {
+    "message": "Nothing in the tally yet. Monsters carry wild seed, a few in every dozen. Meanwhile I sell turnip seed, twenty gold. Plant that first.",
+    "shop": "I'll take some.",
+    "later": "I'll go find some."
+  },
+  "introGate": {
+    "message": "Through the gate, then. Plot one's yours. Pick a seed from the list, then pick the plot.",
+    "opt1": "Thanks."
+  },
   "default": {
-    "message": "Dirt doesn't care how brave you are, walker. Seeds are by the gate.",
+    "message": "Speak, walker. Daylight is short.",
+    "letter": "Letter delivered.",
+    "furrowTurnIn": "I've got the turnips.",
+    "wheatTurnIn": "I've got the wheat.",
+    "orchardTurnIn": "I've got the apples.",
+    "tableTurnIn": "The stew and the pie are ready.",
+    "orderTurnIn": "About my order...",
+    "furrowProgress": "About the first furrow...",
+    "wheatProgress": "About the wheat...",
+    "orchardProgress": "About the orchard...",
+    "tableProgress": "About the Growers' Table...",
+    "orderProgress": "About my order...",
+    "furrowOffer": "Where do I begin?",
+    "wheatOffer": "The Guild needs more wheat?",
+    "orchardOffer": "The orchard burned, you said?",
+    "tableOffer": "Honored folk get something...",
+    "orderOffer": "Any order for me?",
     "shop": "Let me see your seeds.",
+    "petGift": "Here's something for the pet.",
+    "aboutGuild": "Tell me about the Guild.",
+    "aboutGate": "Why did you close the gate?",
     "bye": "Goodbye."
+  },
+  "aboutGuild": {
+    "message": "Growers. Seed lines kept pure and passed hand to hand. Two winters ago half the vaults sprouted black. We shut the gate. Now we need hands.",
+    "hands": "I'll be those hands.",
+    "blight": "What about the blight?"
+  },
+  "aboutGate": {
+    "message": "Closed it. Not sorry. The sap came through the Spires and took half of what we had. A stranger could have carried more.",
+    "now": "And now?",
+    "bye": "Understood."
+  },
+  "questFurrow": {
+    "message": "First lesson. Plant turnip. Four, to start. Plot one, pick the seed, wait fifteen minutes. Go hit something. Dirt doesn't care how brave you are.",
+    "accept": "I'll plant it.",
+    "decline": "Later."
+  },
+  "questFurrowProgress": {
+    "message": "Four turnips. Through the gate, plot one. Fifteen minutes, walker.",
+    "opt1": "On it."
+  },
+  "questFurrowComplete": {
+    "message": "Not bad. First one's yours to eat. I'll pay you in coin and seed. And I've an order for you now, if you want the work.",
+    "opt1": "Thank you."
+  },
+  "questWheat": {
+    "message": "Wheat now. Ten. The plots run side by side, so use more than one. Slimes carry the seed. I sell it too, once you're Friendly.",
+    "accept": "Ten wheat.",
+    "decline": "Later."
+  },
+  "questWheatProgress": {
+    "message": "Ten wheat, walker. Forty-five minutes a plot. Use two.",
+    "opt1": "On it."
+  },
+  "questWheatComplete": {
+    "message": "Ten! In a day. Well. Here's the Guild's bread recipe, and my thanks. Wick has something for you, too.",
+    "opt1": "I'll find Wick."
+  },
+  "questOrchard": {
+    "message": "The orchard burned in the sap winter. Twelve apples from our own trees would say the Guild is open again. Goats on the Pass carry the seed. The trees take four hours.",
+    "accept": "Twelve apples.",
+    "decline": "Later."
+  },
+  "questOrchardProgress": {
+    "message": "Twelve apples. Goats on the Mountain Pass carry the seed. Four hours a tree.",
+    "opt1": "On it."
+  },
+  "questOrchardComplete": {
+    "message": "Apples. From our own ground. ... Take a plot. A new one, by the south wall. It's yours.",
+    "opt1": "Thank you, Warden."
+  },
+  "questTable": {
+    "message": "Honored folk get my pie recipe, walker. It's in the shop. Cook me five turnip stew and five harvest pie. I haven't cooked in two years.",
+    "accept": "Five and five.",
+    "decline": "Later."
+  },
+  "questTableProgress": {
+    "message": "Five stew, five pie. Fire Pit for the stew, Cooking Pot for the pie. Cheese from a Giant Rat, or buy it. Rats don't make cheese, walker. They steal it.",
+    "opt1": "Working on it."
+  },
+  "questTableComplete": {
+    "message": "... Warm. Salt's right. Sit. I'll eat first. Take the plot. And tell Corwin the Guild has bread.",
+    "opt1": "I will."
+  },
+  "orderOffer": {
+    "message": "The larder is low. I need crops, and the Guild pays for them. Bring what the quest panel says.",
+    "accept": "I'll bring it.",
+    "decline": "Not now."
+  },
+  "orderProgress": {
+    "message": "The order's in your quest panel, walker. The plots won't hurry for you.",
+    "opt1": "On it."
+  },
+  "orderComplete": {
+    "message": "That'll do. Come back in two hours, walker.",
+    "opt1": "See you then."
+  },
+  "petGift": {
+    "message": "There's a hare on the terraces. Nobody keeps it. It keeps itself. Feed it and it will find the ripe row first. It likes you.",
+    "accept": "I'll take care of it.",
+    "decline": "Not now."
+  },
+  "petGiftDone": {
+    "message": "Hand of the Terraces. That is what the Guild calls you now. Wear it well, walker.",
+    "opt1": "Thank you."
   }
 }

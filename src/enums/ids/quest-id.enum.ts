@@ -26,4 +26,13 @@ export enum QuestID {
     aCleanCure = 18,
     rootsAndRafters = 19,
     theColdForge = 20,
+    // Farming Guild
+    seedsFromTheTerrace = 21,
+    theFirstFurrow = 22,
+    wheatForTheGuild = 23,
+    silverleafForSylvie = 24,
+    anOrchardAgain = 25,
+    theGrowersTable = 26,
+    marthasOrder = 27,
+    wicksOrder = 28,
 }

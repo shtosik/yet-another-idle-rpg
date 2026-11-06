@@ -3,6 +3,7 @@ import { I18nextPipe } from '../../../../pipes/i18next.pipe'
 import { PlayerStore } from '../../../../store/player/player.store'
 import { REPUTATION_IDS, REPUTATION_TOWN, reputationProgress } from '../../../../store/player/reputation'
 import { ReputationID } from '../../../../../enums/reputation-id.enum'
+import { SiteID } from '../../../../../enums/ids/site-id.enum'
 import { ReputationTier } from '../../../../../enums/reputation-tier.enum'
 
 /** Reputation tab of the quest panel: tier and progress per discovered reputation, no reward lists (docs/ideas/quest-panel.md). */
@@ -19,8 +20,9 @@ export class ReputationComponent {
   protected readonly ReputationID = ReputationID
   protected readonly ReputationTier = ReputationTier
 
-  /** A town reputation shows once its town is unlocked; one with no town (the Farming Guild) shows once it is in `REPUTATION_IDS` and gets its own rule when its Site exists. */
+  /** A town reputation shows once its town is unlocked; the Farming Guild (no town) shows once the farm is unlocked. */
   private isDiscovered(id: ReputationID): boolean {
+    if (id === ReputationID.farmingGuild) return this.playerStore.isSiteUnlocked(SiteID.farm)
     const townId = REPUTATION_TOWN[id]
     return townId === undefined || this.playerStore.isTownUnlocked(townId)
   }

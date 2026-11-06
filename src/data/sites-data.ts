@@ -1,4 +1,5 @@
 import { SiteID } from 'enums/ids/site-id.enum'
+import { NpcID } from 'enums/map/npc-id.enum'
 import { TownBuildingNpc } from 'interfaces/town.interface'
 
 /** A non-combat place outside the towns (docs/ideas/farm-and-husbandry.md §2). */
@@ -19,7 +20,10 @@ export const SITES_DATA: Record<SiteID, Site> = {
   [SiteID.farm]: {
     id: SiteID.farm,
     label: 'Farm',
-    npcs: [], // The Farming Guild's NPCs arrive with their dialogue (plan commit C10).
+    npcs: [
+      { id: NpcID.farmWarden, position: { x: 28, y: 48 } },
+      { id: NpcID.farmDrover, position: { x: 72, y: 50 } },
+    ],
     gate: { position: { x: 50, y: 78 } },
     marker: { position: { x: 1400, y: 400 }, minZoom: 2 },
   },

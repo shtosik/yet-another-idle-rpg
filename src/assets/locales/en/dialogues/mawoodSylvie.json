@@ -16,7 +16,12 @@
     "work": "Do you have any work for me?",
     "goodbye": "Take care of yourself.",
     "browseWares": "Could I see your remedies and tools?",
-    "safePassage": "The La Harpar trader sends his regards. And salt fish."
+    "safePassage": "The La Harpar trader sends his regards. And salt fish.",
+    "silverleafTurnIn": "I have the silverleaf.",
+    "silverleafProgress": "About the silverleaf...",
+    "terraceProgress": "About the Farming Guild...",
+    "silverleafOffer": "Is something wrong with the herb shelf?",
+    "terraceOffer": "You mentioned a farming guild?"
   },
   "aboutSylvie": {
     "message": "I studied herbal medicine in the coastal settlements — La Harpar, mostly. Apprenticed under an old herbalist who smelled permanently of pine resin and had opinions about everything. When I heard about the Elderwood, I had to come. The plants here are extraordinary. Or they were, before the blight started.",
@@ -99,5 +104,31 @@
   "questCleanCureComplete": {
     "message": "It slows it! It doesn't undo it, and the trees that have fully turned are beyond saving, but it slows it. That's years we didn't have, so take this. I mean it.",
     "opt1": "Years is a start."
+  },
+  "questTerrace": {
+    "message": "You've been so good to me, dear, and I keep thinking: there's a Farming Guild north of the Pass. Growers. I've written to them for years. I told them about you.",
+    "opt1": "What do they want?"
+  },
+  "questTerraceAsk": {
+    "message": "Hands, mostly. Their seed lines went black in the sap winter and they shut the gate. But they'd open it for someone who fights out there. Take my letter to the Warden. Keep anything that looks like seed, dear. The Warden will want to see it.",
+    "accept": "I'll take the letter.",
+    "decline": "Not right now."
+  },
+  "questTerraceProgress": {
+    "message": "Take the road north, past the Pass. The Warden is called Marta, and she's blunt. Don't take it personally. I do talk a lot, but she doesn't.",
+    "opt1": "I'll find her."
+  },
+  "questSilverleaf": {
+    "message": "My herb shelf is so thin! The black-bark lines were burned. Silverleaf, though... the Guild could grow it. You can grow it. Six leaves would restock me.",
+    "accept": "I'll bring silverleaf.",
+    "decline": "Later, Sylvie."
+  },
+  "questSilverleafProgress": {
+    "message": "Six silverleaf. The seeds drop from deer on The Long Path, and the terraces do the rest. No rush. Well, a little rush.",
+    "opt1": "Working on it."
+  },
+  "questSilverleafComplete": {
+    "message": "Oh, look at the colour on these! Fresh silverleaf, in Mawood, again. Here's the tonic recipe, and the thanks of a woman with a full shelf.",
+    "opt1": "Glad to help."
   }
 }

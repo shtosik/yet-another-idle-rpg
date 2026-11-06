@@ -28,6 +28,7 @@ export enum CorwinDialogue {
   rootsAndRaftersComplete,
   rootglowMoth,
   rootglowMothGiven,
+  farmFinaleLine,
 }
 
 export type MawoodCorwinDialogueType = Record<CorwinDialogue, DialogueNode<CorwinDialogue>>
@@ -88,6 +89,16 @@ const MAWOOD_CORWIN: MawoodCorwinDialogueType = {
       {
         responseKey: `${NS}:default.rootsAndRafters`,
         results: [{ visibilityConditions: [{ type: 'quest', questId: QuestID.rootsAndRafters, questState: QuestState.readyToAdvance, step: 2 }], next: CorwinDialogue.rootsAndRaftersComplete }],
+      },
+      {
+        responseKey: `${NS}:default.farmFinale`,
+        results: [{
+          visibilityConditions: [
+            { type: 'quest', questId: QuestID.theGrowersTable, questState: QuestState.completed },
+            { type: 'flag', name: 'corwin_heard_table', isSet: false },
+          ],
+          next: CorwinDialogue.farmFinaleLine,
+        }],
       },
       {
         responseKey: `${NS}:default.work`,
@@ -437,6 +448,13 @@ const MAWOOD_CORWIN: MawoodCorwinDialogueType = {
     messageKey: `${NS}:rootglowMothGiven.message`,
     options: [
       { responseKey: `${NS}:rootglowMothGiven.opt1`, results: [{ next: CorwinDialogue.default }] },
+    ],
+  },
+  [CorwinDialogue.farmFinaleLine]: {
+    id: CorwinDialogue.farmFinaleLine,
+    messageKey: `${NS}:farmFinaleLine.message`,
+    options: [
+      { responseKey: `${NS}:farmFinaleLine.opt1`, results: [{ next: CorwinDialogue.default, effects: [{ type: 'flag', name: 'corwin_heard_table' }] }] },
     ],
   },
 }

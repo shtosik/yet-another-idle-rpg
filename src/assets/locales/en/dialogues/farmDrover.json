@@ -1,6 +1,41 @@
 {
+  "intro1": {
+    "message": "Oh. Um. You're the one Sylvie... the walker. I'm Wick. I do the, um, animals. Well. There aren't any now.",
+    "herd": "What happened to the herd?",
+    "hello": "Nice to meet you, Wick."
+  },
+  "introHerd": {
+    "message": "The sap. Winter before last. I keep the tack oiled anyway. Somebody should. In case.",
+    "opt1": "That's kind of you."
+  },
   "default": {
-    "message": "Um. The, um, tack needs oiling.",
+    "message": "Um... yes? Hello. Do you need something?",
+    "orderTurnIn": "About your order...",
+    "orderProgress": "About your order...",
+    "orderOffer": "Any order for me?",
+    "aboutWick": "What do you do here?",
     "bye": "Goodbye."
+  },
+  "aboutWick": {
+    "message": "I'm the drover. And the tanner's boy. Pelts for the, um, saddle blankets. And fangs. For the fence. Charms, I mean.",
+    "charms": "Fence charms?",
+    "thanks": "Thanks."
+  },
+  "aboutWickCharms": {
+    "message": "Fangs keep things off. Maybe. I label them so I know which ones I tried.",
+    "opt1": "Good idea."
+  },
+  "orderOffer": {
+    "message": "Um. I need some things. For the... things. If you have some. Please? It is in your quest panel.",
+    "accept": "I'll bring them.",
+    "decline": "Not now."
+  },
+  "orderProgress": {
+    "message": "What the panel says. No rush. ... well, a little.",
+    "opt1": "On it."
+  },
+  "orderComplete": {
+    "message": "Oh! That's... perfect. Thank you. Come back in two hours? If that's all right.",
+    "opt1": "See you then."
   }
 }
