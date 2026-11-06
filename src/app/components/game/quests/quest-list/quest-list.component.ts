@@ -5,7 +5,7 @@ import { QuestsStore } from '../../../../store/quests/quests.store'
 import { PlayerStore } from '../../../../store/player/player.store'
 import { GameNavigationService } from '../../../../services/game-navigation.service'
 import QUEST_DATA, { RequirementProps } from '../../../../../data/quests-data'
-import { npcPlace, NpcPlace } from '../../../../../data/helpers/npc-places'
+import { isNpcPlaceUnlocked, npcPlace, NpcPlace } from '../../../../../data/helpers/npc-places'
 import { ZONES_BY_ENEMY } from '../../../../../data/helpers/enemy-zones'
 import { QuestID } from '../../../../../enums/ids/quest-id.enum'
 import { QuestState } from '../../../../../enums/quest-state.enum'
@@ -87,7 +87,7 @@ export class QuestListComponent {
   }
 
   talkTo(giver: NpcPlace): void {
-    this.navigation.talkTo(giver.townId, giver.buildingId, giver.npcId)
+    this.navigation.talkTo(giver)
   }
 
   fightIn(zoneId: ZoneID): void {
@@ -124,7 +124,7 @@ export class QuestListComponent {
   private reachableGiver(npcId: NpcID): NpcPlace | null {
     const giver = npcPlace(npcId)
     if (!giver || !this.playerStore.mapUnlocked()) return null
-    if (!this.playerStore.isTownUnlocked(giver.townId)) return null
+    if (!isNpcPlaceUnlocked(giver, this.playerStore)) return null
     return giver
   }
 

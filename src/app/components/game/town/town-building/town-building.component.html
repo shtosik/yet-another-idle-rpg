@@ -2,9 +2,11 @@
 
 <section
   class="building"
-  [style.background-image]="buildingData.url | url"
+  [style.background-image]="buildingData.url ? (buildingData.url | url) : null"
 >
-  <h2 class="building__title">{{ 'map:buildings.' + TownBuildingID[buildingData.buildingId] | i18next }}</h2>
+  @if (buildingData.buildingId !== undefined) {
+    <h2 class="building__title">{{ 'map:buildings.' + TownBuildingID[buildingData.buildingId] | i18next }}</h2>
+  }
   @for (npc of buildingData.npcs; track npc.id) {
     <app-npc-frame
       [npc]="npc"

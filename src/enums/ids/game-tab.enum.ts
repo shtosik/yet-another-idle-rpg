@@ -7,4 +7,5 @@ export enum GameTab {
     bestiary = 6,
     spellbook = 7,
     settings = 8,
+    farm = 9,
 }

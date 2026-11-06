@@ -30,7 +30,8 @@ export class TownBuildingComponent {
 
   protected readonly TownBuildingID = TownBuildingID
 
-  building = input<TownBuilding>(null)
+  /** A town building, or a Site home screen (no building id, so no title). */
+  building = input<Pick<TownBuilding, 'npcs' | 'url'> & Partial<Pick<TownBuilding, 'buildingId'>>>(null)
 
   constructor() {
     this.destroyRef.onDestroy(() => {

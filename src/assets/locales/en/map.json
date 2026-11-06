@@ -14,6 +14,7 @@
   "sitesLabel": "Sites",
   "sites": {
     "farm": "Farm",
+    "farmGate": "Gate",
     "unlocked": "{{site}} opens on the map"
   },
   "reputations": {

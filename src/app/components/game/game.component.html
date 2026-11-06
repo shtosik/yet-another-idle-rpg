@@ -7,7 +7,7 @@
     <app-player-stats class="stats"/>
   }
 
-  @if (tab === GameTab.main || tab === GameTab.camp || tab === GameTab.towns || tab === GameTab.bestiary || tab === GameTab.map || tab === GameTab.spellbook) {
+  @if (tab === GameTab.main || tab === GameTab.camp || tab === GameTab.towns || tab === GameTab.bestiary || tab === GameTab.map || tab === GameTab.spellbook || tab === GameTab.farm) {
     @switch (tab) {
       @case (GameTab.camp) {
         @defer {
@@ -24,8 +24,8 @@
 
     <app-equipment class="equipment"/>
 
-    <!-- The Bestiary takes both rows instead. -->
-    @if (tab !== GameTab.bestiary) {
+    <!-- The Bestiary and the farm take both rows instead. -->
+    @if (tab !== GameTab.bestiary && tab !== GameTab.farm) {
       <app-inventory class="inventory"/>
     }
     <app-quests class="quests"/>
@@ -39,6 +39,15 @@
     <app-world-map
       class="map"
       (changeTab)="changeTab($event)"
+      (siteSelected)="openSite($event)"
+    />
+  }
+
+  @if (tab === GameTab.farm) {
+    <app-site
+      class="farm-home"
+      [siteId]="siteId()"
+      (closed)="changeTab(GameTab.map)"
     />
   }
 

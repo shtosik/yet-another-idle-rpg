@@ -20,6 +20,8 @@ import { QuestsStore } from '../../store/quests/quests.store'
 import { TownsStore } from '../../store/towns/towns.store'
 import { QuestsComponent } from './quests/quests.component'
 import { WorldMapComponent } from './world-map/world-map.component'
+import { SiteComponent } from './site/site.component'
+import { SiteID } from 'enums/ids/site-id.enum'
 import { BestiaryComponent } from './bestiary/bestiary.component'
 import { ShopStore } from '../../store/shop/shop.store'
 import { CampStore } from '../../store/camp/camp.store'
@@ -50,6 +52,7 @@ const imports = [
     imports,
     QuestsComponent,
     WorldMapComponent,
+    SiteComponent,
     BestiaryComponent,
     SpellbookComponent,
     CampComponent,
@@ -73,6 +76,7 @@ export class GameComponent {
   private unlockService = inject(UnlockService)
   private navigation = inject(GameNavigationService)
   gameTab = this.navigation.tab
+  siteId = this.navigation.siteId
   tierUpToast = inject(ReputationService).tierUpToast
   levelUpToast = inject(ProfessionService).levelUpToast
 
@@ -96,5 +100,9 @@ export class GameComponent {
 
   changeTab(tab: GameTab) {
     this.navigation.changeTab(tab)
+  }
+
+  openSite(siteId: SiteID) {
+    this.navigation.openSite(siteId)
   }
 }
