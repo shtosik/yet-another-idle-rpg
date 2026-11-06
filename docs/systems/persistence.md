@@ -11,7 +11,7 @@ Saves game state to `localStorage` (at most once a second per store) and restore
 |---|---|---|
 | `playerStore` (v2) | `src/app/store/player/player.store.ts:PlayerStore` | resources, permanent bonuses, inventory (per tab), equipment, unlocked nodes, stations, recipes, tasks, unlocked content, seen bestiary entries and spells, shiny kills per zone, claimed zone mastery stars, professions, the farm (`farm`: plots and seed counts; a key added after v2, so old saves take its default, no version bump) |
 | `battleStore` (v2) | `src/app/store/battle/battle.store.ts:BattleStore` | current zone/wave, enemy id + shiny + HP, spells, buffs, consumable slots |
-| `questsStore` | `src/app/store/quests/quests.store.ts:QuestsStore` | quest step progression (completion is step 9999), dialogue flags, pinned quests |
+| `questsStore` | `src/app/store/quests/quests.store.ts:QuestsStore` | quest step progression (completion is step 9999), dialogue flags, pinned quests, `lastTurnInAt`, started repeatable `orders` (the rolled pick, saved at start) and `questCompletions` |
 | `townsStore` (v2) | `src/app/store/towns/towns.store.ts:TownsStore` | selected town and building id, `npcShops` (NPC → shop opened through their dialogue; the open shop isn't saved) |
 | `shopStore` | `src/app/store/shop/shop.store.ts:ShopStore` | stock and refresh timers |
 | `campStore` | `src/app/store/camp/camp.store.ts:CampStore` | Camp tab UI selection |

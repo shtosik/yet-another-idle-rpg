@@ -900,7 +900,7 @@ export const PlayerStore = signalStore(
       })
     },
 
-    /** Opens a Site. Only the farm exists; C6 wires it to the `unlockSite` dialogue effect and the world map. */
+    /** Opens a Site (the `unlockSite` dialogue effect, a `site` unlock target or a cheat). */
     unlockSite(id: SiteID): void {
       patchState(store, (state) => {
         const sites = state.unlockedContent.sites ?? []
@@ -962,6 +962,10 @@ export const PlayerStore = signalStore(
       return (store.unlockedContent().towns ?? []).includes(id)
     },
 
+    isSiteUnlocked(id: SiteID): boolean {
+      return (store.unlockedContent().sites ?? []).includes(id)
+    },
+
     /** Camp starts with the Workbench. */
     unlockCamp(): void {
       patchState(store, (state) => ({
@@ -998,6 +1002,8 @@ export const PlayerStore = signalStore(
       switch (target.type) {
         case 'town':
           return store.isTownUnlocked(target.townId)
+        case 'site':
+          return store.isSiteUnlocked(target.siteId)
         case 'feature':
           return target.feature === 'camp' ? store.campUnlocked() : store.skillTreeUnlocked()
       }
@@ -1007,6 +1013,10 @@ export const PlayerStore = signalStore(
       switch (target.type) {
         case 'town':
           store.unlockTown(target.townId)
+          store.unlockMap()
+          break
+        case 'site':
+          store.unlockSite(target.siteId)
           store.unlockMap()
           break
         case 'feature':

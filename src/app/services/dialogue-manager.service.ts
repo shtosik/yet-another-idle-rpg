@@ -6,9 +6,11 @@ import { isTaskDone, PlayerStore } from '../store/player/player.store'
 import { DialogueEffect, QuestEffect, ReputationTurnInEffect } from '../../types/dialogues/dialogue-effect.type'
 import { ReputationTurnIn, turnInBundles, turnInFor } from '../../data/reputation-turn-ins'
 import { ReputationService } from './reputation.service'
+import { ModalService } from './modal.service'
+import { SiteID } from '../../enums/ids/site-id.enum'
 import { TurnInCooldownService } from './turn-in-cooldown.service'
 import { bundleKey } from '../store/quests/turn-in-cooldown'
-import { QuestsStore } from '../store/quests/quests.store'
+import { orderKey, QuestsStore } from '../store/quests/quests.store'
 import { DialogueOption, DialogueResult } from '../../interfaces/dialogues/dialogue-option.type'
 import { DialogueCondition } from '../../types/dialogues/dialogue-condition.type'
 import { NpcID } from '../../enums/map/npc-id.enum'
@@ -36,6 +38,7 @@ export class DialogueManagerService {
   private arenaService = inject(ArenaService)
   private reputationService = inject(ReputationService)
   private cooldowns = inject(TurnInCooldownService)
+  private modalService = inject(ModalService)
 
   private currentConversation = signal<Record<any, DialogueNode<any>> | null>(null)
   private currentNodeId = signal<any>(null)
@@ -68,6 +71,8 @@ export class DialogueManagerService {
   }
 
   private isQuestAvailable(questId: QuestID): boolean {
+    // A repeatable order is not offered while its own turn-in cooldown runs.
+    if (QUEST_DATA[questId].repeat && this.cooldowns.remainingMs(orderKey(questId)) > 0) return false
     return matchesQuestState(
       this.questStore.questStepProgression(),
       questId,
@@ -95,7 +100,7 @@ export class DialogueManagerService {
     if (!turnIn) throw new Error(`No reputation turn-in for NPC ${effect.npcId}`)
     const progression = this.questStore.questStepProgression()
     const kept = [...getActiveQuestIds(progression)]
-      .flatMap(questId => getStepItems(questId, progression[questId] as QuestStep))
+      .flatMap(questId => getStepItems(questId, progression[questId] as QuestStep, this.questStore.orders()))
       .filter(stack => stack.id === turnIn.itemId)
       .reduce((sum, stack) => sum + stack.amount, 0)
     const held = this.playerStore.itemCount(turnIn.itemId)
@@ -136,7 +141,7 @@ export class DialogueManagerService {
         const status = getQuestStatus(this.questStore.questStepProgression(), effect.questId)
         if (status.state !== QuestState.active) continue
 
-        removing.push(...getStepItems(effect.questId, status.step))
+        removing.push(...getStepItems(effect.questId, status.step, this.questStore.orders()))
         adding.push(...this.questCompletionRewards(effect, status.step))
       }
     }
@@ -352,6 +357,13 @@ export class DialogueManagerService {
         case 'unlockProfession':
           this.playerStore.unlockProfession(effect.professionId)
           break
+        case 'unlockSite': {
+          if (this.playerStore.isSiteUnlocked(effect.siteId)) break
+          this.playerStore.applyUnlockTarget({ type: 'site', siteId: effect.siteId })
+          const key = `unlocks:sites.${SiteID[effect.siteId]}`
+          this.modalService.openUnlockNotification({ titleKey: `${key}.title`, bodyKey: `${key}.body` })
+          break
+        }
         case 'reputationTurnIn': {
           const { turnIn, bundles } = this.turnIn(effect)
           if (bundles === 0) break

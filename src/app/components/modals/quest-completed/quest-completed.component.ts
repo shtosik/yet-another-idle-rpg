@@ -9,6 +9,9 @@ import { InventoryItemComponent } from '../../game/inventory/inventory-slot/inve
 import ITEM_DATA from '../../../../data/items-data'
 import { SlotComponent } from '../../shared/slot/slot.component'
 import { CloseButtonComponent } from '../../shared/close-button/close-button.component'
+import { TurnInCooldownService } from '../../../services/turn-in-cooldown.service'
+import { orderKey } from '../../../store/quests/quests.store'
+import { formatCooldown } from '../../../store/quests/turn-in-cooldown'
 
 @Component({
   selector: 'app-quest-complete-component',
@@ -25,6 +28,11 @@ export class QuestCompletedComponent {
   modalRef = inject(MatDialogRef)
   data = inject<QuestProps>(MAT_DIALOG_DATA)
   questData = signal(this.data)
+
+  private cooldowns = inject(TurnInCooldownService)
+
+  /** "2 h 0 m" until a repeatable order can be asked for again; null for one-time quests. Read once, as the modal opens. */
+  nextOrderIn = this.data.repeat ? formatCooldown(this.cooldowns.remainingMs(orderKey(this.data.questId))) : null
 
   itemsToDisplay = computed(() => {
     return this.questData().rewards.filter(i => i.type === 'item')

@@ -12,7 +12,7 @@ Zones are the combat areas; each has waves of regular enemies ending in a boss. 
 - `src/app/store/battle/battle.store.ts` — `currentZoneId`, `currentWave`, `changeWave`, `setZone`, `requiredKillCountOnCurrentWave`.
 - `src/app/services/battle-manager.service.ts` — `canMoveToNextWave`, `canMoveToPreviousWave`, `unlockNextZone` (boss kill opens `nextZoneId`).
 - `src/app/services/unlock.service.ts:UnlockService` — applies `UNLOCK_RULES` with their notification whenever the player state they read changes.
-- `src/app/store/player/player.store.ts` — `zonesProgression` (kills per zone per wave), `unlockedContent` (`zones`, `towns`), `campUnlocked`, `skillTreeUnlocked`, `mapUnlocked`, `isUnlockTargetUnlocked`, `applyUnlockTarget`, `isUnlockConditionMet` (also re-applies rules silently on load).
+- `src/app/store/player/player.store.ts` — `zonesProgression` (kills per zone per wave), `unlockedContent` (`zones`, `towns`, `sites`), `campUnlocked`, `skillTreeUnlocked`, `mapUnlocked`, `isSiteUnlocked`, `unlockSite`, `isUnlockTargetUnlocked`, `applyUnlockTarget`, `isUnlockConditionMet` (also re-applies rules silently on load).
 - `src/data/helpers/enemy-zones.ts:ZONES_BY_ENEMY` — reverse lookup (bestiary).
 
 ## Data flow
@@ -45,7 +45,7 @@ On load, `PlayerStore.onInit` re-applies every rule already met, silently, so ne
 - Task rows stay under the header in a bounded scrolling list. Completed tasks support mouse, Enter and Space navigation to Marvin.
 
 ## Invariants & gotchas
-- `UNLOCK_RULES` only target towns and features (`UnlockTarget`); zones unlock by the boss chain or a town entrance.
+- `UNLOCK_RULES` only target towns, Sites and features (`UnlockTarget`); the farm Site has no rule and opens through the `unlockSite` dialogue effect (popup `unlocks:sites.farm`, shown once), or `dev.unlockSite`. Opening a Site also unlocks the Map tab; zones unlock by the boss chain or a town entrance.
 - A zone's boss must not be listed in its `enemies` (`npm run validate` warns).
 - Horseshoe Beach is always unlocked (initial state and the `?? [horseshoeBeach]` fallbacks).
 - `waveReached` means "killed something on that wave or a later one of the zone" (`zonesProgression`), the same on load and during play. Rules react to any change (kills, loot, quest XP), not only kills.

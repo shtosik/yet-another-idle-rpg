@@ -24,6 +24,10 @@ _Avoid_: Elite, champion
 A non-combat hub made of buildings.
 _Avoid_: City, location
 
+**Site**:
+A non-combat place outside the towns with one purpose, reached from the world map or the Sites list (the farm).
+_Avoid_: Location, area
+
 **Building**:
 One place inside a town, holding NPCs and objects such as zone entrances.
 _Avoid_: Tab, room

@@ -102,11 +102,7 @@ export class QuestListComponent {
     const step = QUEST_DATA[id]?.steps[status.step - 1] // saved steps start from 1
     if (!step) return []
 
-    const requirements = step.requirements.map(req => ({
-      label: this.requirementLabel(req),
-      zoneId: this.requirementZone(req),
-      ...this.questsStore.requirementProgress(id, req),
-    }))
+    const requirements = step.requirements.flatMap(req => this.requirementRows(id, req))
     return [{
       id,
       description: i18next.t(`quests:steps.${QuestID[id]}.${status.step}`, { defaultValue: step.description }),
@@ -130,6 +126,23 @@ export class QuestListComponent {
     if (!giver || !this.playerStore.mapUnlocked()) return null
     if (!this.playerStore.isTownUnlocked(giver.townId)) return null
     return giver
+  }
+
+  /** One row per requirement; a `pickedItems` one is a row per rolled item ("Turnip 3 / 14"). */
+  private requirementRows(id: QuestID, req: RequirementProps): RequirementRow[] {
+    if (req.type === 'pickedItems') {
+      return (this.questsStore.orders()[id]?.requirements ?? []).map(({ itemId, amount }) => ({
+        label: i18next.t(`items:names.${ItemID[itemId]}`),
+        zoneId: null,
+        current: this.playerStore.itemCount(itemId),
+        target: amount,
+      }))
+    }
+    return [{
+      label: this.requirementLabel(req),
+      zoneId: this.requirementZone(req),
+      ...this.questsStore.requirementProgress(id, req),
+    }]
   }
 
   private requirementZone(req: RequirementProps): ZoneID | null {
@@ -160,6 +173,8 @@ export class QuestListComponent {
         return i18next.t('quests:requirements.professionLevel', { profession: i18next.t(`app:professions.${ProfessionID[req.professionId]}`) })
       case 'reputation':
         return reputationTierLabel(req.reputationId, req.tier)
+      case 'pickedItems':
+        return '' // shown per item by `requirementRows`
     }
   }
 }

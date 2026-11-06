@@ -1,5 +1,7 @@
 import { TownID } from 'enums/map/town-id.enum'
 import { ZoneID } from 'enums/ids/zone-id.enum'
+import { SiteID } from 'enums/ids/site-id.enum'
+import { SITES_DATA } from 'data/sites-data'
 
 // All positions are image pixel coords: x=right, y=down from top-left.
 // Convert to Leaflet CRS.Simple: latLng(-y, x).
@@ -25,7 +27,12 @@ export interface PoiMarker extends BaseMarker {
   i18nKey: string
 }
 
-export type WorldMapMarker = TownMarker | ZoneMarker | PoiMarker
+export interface SiteMarker extends BaseMarker {
+  type: 'site'
+  siteId: SiteID
+}
+
+export type WorldMapMarker = TownMarker | ZoneMarker | SiteMarker | PoiMarker
 
 export interface WorldMapManifest {
   width: number
@@ -138,5 +145,6 @@ export const WORLD_MAP_DATA: WorldMap = {
   markers: [
     ...portStocksmarMarkers,
     ...elderreachMarkers,
+    ...Object.values(SITES_DATA).map((site): SiteMarker => ({ type: 'site', siteId: site.id, label: site.label, ...site.marker })),
   ],
 }

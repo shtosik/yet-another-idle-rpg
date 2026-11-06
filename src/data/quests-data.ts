@@ -15,6 +15,29 @@ export interface QuestProps {
   rewards: QuestReward[]
   startRequirements: RequirementProps[]
   steps: QuestStepProps[]
+  /** A repeatable order: after completion it can start again with a new pick, once its own turn-in cooldown is over. */
+  repeat?: RepeatProps
+}
+
+/** What a repeatable order may ask for. Its quest `rewards` stay empty: the pick's rewards are saved in `QuestsStore.orders`. */
+export interface RepeatProps {
+  reputationId: ReputationID
+  professionId: ProfessionID
+  /** How many distinct entries one order picks. */
+  picks: number
+  pool: OrderEntry[]
+}
+
+/** One item an order can ask for, and what 10 of it pay; the amount is rolled 10 to 20. */
+export interface OrderEntry {
+  itemId: ItemID
+  /** The order's `reputationId` tier needed before this entry is picked. */
+  minTier: ReputationTier
+  reputationPer10: number
+  goldPerItem: number
+  xpPerItem: number
+  /** Only picked while one of these zones is unlocked. */
+  sourceZones?: ZoneID[]
 }
 
 export type QuestStepProps = {
@@ -31,7 +54,13 @@ export type RequirementProps =
   | QuestRequirement
   | StatRequirement
   | ReputationRequirement
-  | ProfessionLevelRequirement;
+  | ProfessionLevelRequirement
+  | PickedItemsRequirement;
+
+/** The items rolled for this quest's order (`QuestsStore.orders`); their amounts differ per start. */
+export interface PickedItemsRequirement {
+  type: 'pickedItems'
+}
 
 /** At least `level` in `professionId` (0 while it is locked). Also a dialogue condition. */
 export interface ProfessionLevelRequirement {

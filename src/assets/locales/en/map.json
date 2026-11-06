@@ -11,6 +11,11 @@
     "lirold": "Lirold",
     "mawood": "Mawood"
   },
+  "sitesLabel": "Sites",
+  "sites": {
+    "farm": "Farm",
+    "unlocked": "{{site}} opens on the map"
+  },
   "reputations": {
     "laHarpar": "La Harpar",
     "lirold": "Lirold",

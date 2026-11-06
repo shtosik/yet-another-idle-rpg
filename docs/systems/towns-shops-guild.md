@@ -6,6 +6,7 @@ Towns are non-combat hubs. Each town has **buildings**; a building holds NPCs (d
 ## Key files
 - `src/app/components/game/town/forge/forge.component.ts:ForgeComponent` — inline gear merge panel, preview and result toast.
 - `src/data/towns-data.ts:TOWNS_DATA` — per town: `regionId`, background `url`, `buildings[]` (`buildingId`, `position` of the button on the town view, `npcs` with positions, `url` background, optional `zoneId` and `questRequirement`).
+- `src/data/sites-data.ts:SITES_DATA`, `src/enums/ids/site-id.enum.ts:SiteID` — a **Site** is a non-combat place that is not a Town (the farm); it has a map marker and an entry in the map tab's Sites list (beside Towns), unlocked through `unlockedContent.sites` (the `unlockSite` dialogue effect). Its home screen, NPCs and Gate come with the farm view; see `world-map.md`.
 - `src/enums/map/town-id.enum.ts:TownID`, `town-building-id.enum.ts:TownBuildingID`, `npc-id.enum.ts:NpcID`, `region-id.enum.ts:RegionID`.
 - `src/interfaces/town.interface.ts:Town`, `TownBuilding`.
 - `src/app/store/towns/towns.store.ts:TownsStore` — `selectedTownId`, `selectedTownBuildingId` (computed `selectedTownBuilding` from `TOWNS_DATA`), `activeShopId` (not saved).

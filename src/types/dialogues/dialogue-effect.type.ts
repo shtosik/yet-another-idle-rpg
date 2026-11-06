@@ -3,6 +3,7 @@ import { ItemID } from '../../enums/ids/item-id.enum'
 import { PlayerStat } from '../player/player-stat.type'
 import { NpcID } from '../../enums/map/npc-id.enum'
 import { ProfessionID } from '../../enums/ids/profession-id.enum'
+import { SiteID } from '../../enums/ids/site-id.enum'
 
 export type TaskLength = 'short' | 'medium' | 'long'
 
@@ -18,6 +19,7 @@ export type DialogueEffect =
   | ArenaEffect
   | ReputationTurnInEffect
   | UnlockProfessionEffect
+  | UnlockSiteEffect
 
 export interface QuestEffect {
   type: 'quest'
@@ -77,6 +79,12 @@ export interface ReputationTurnInEffect {
 export interface UnlockProfessionEffect {
   type: 'unlockProfession'
   professionId: ProfessionID
+}
+
+/** Opens a Site on the world map and in the Sites list; nothing happens when it is already open. */
+export interface UnlockSiteEffect {
+  type: 'unlockSite'
+  siteId: SiteID
 }
 
 /** Start a Combat Arena run (pair it with the entry fee's `stat` deduct), or claim the rewards waiting from clears. */

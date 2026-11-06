@@ -6,6 +6,30 @@
 @if (cursor(); as c) {
   <div class="cursor-coords">{{ c.x }}, {{ c.y }}</div>
 }
+@if (unlockedTowns().length || unlockedSites().length) {
+<div class="map-lists">
+@if (unlockedSites().length) {
+  <div class="sites">
+    <button type="button" class="sites__toggle"
+            [class.sites__toggle--open]="showSites()"
+            [attr.aria-expanded]="showSites()"
+            aria-controls="map-site-list"
+            (click)="toggleSites()">
+      {{ 'map:sitesLabel' | i18next }}
+    </button>
+    @if (showSites()) {
+      <ul id="map-site-list" class="sites__list">
+        @for (siteId of unlockedSites(); track siteId) {
+          <li>
+            <button type="button" class="sites__site" (click)="openSite(siteId)">
+              {{ 'map:sites.' + SiteID[siteId] | i18next }}
+            </button>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+}
 @if (unlockedTowns().length) {
   <div class="towns">
     <button type="button" class="towns__toggle"
@@ -27,4 +51,6 @@
       </ul>
     }
   </div>
+}
+</div>
 }

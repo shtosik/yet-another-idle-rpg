@@ -27,6 +27,7 @@ import { CampStore } from '../../../store/camp/camp.store'
 import { OfflineStore } from '../../../store/offline/offline.store'
 import { PlayerStat } from '../../../../types/player/player-stat.type'
 import { ZoneID } from 'enums/ids/zone-id.enum'
+import { SiteID } from 'enums/ids/site-id.enum'
 import { ItemID } from 'enums/ids/item-id.enum'
 import { ItemTier } from 'enums/items/item-tier.enum'
 import { EnemyID } from 'enums/ids/enemy-id.enum'
@@ -150,6 +151,8 @@ export class DevCheatsComponent {
       zoneId: fromName(ZoneID, 'ZoneID', zone), wave: 1, kills: 0, shinies: count, killsByEnemy: {}, taskCountsByEnemy: {}, experience: 0, gold: 0, items: [],
     }),
     unlock: (feature: DevFeature) => this.unlockFeature(feature),
+    /** Opens a Site and the map; no notification. */
+    unlockSite: (site: Ref<typeof SiteID>) => this.playerStore.applyUnlockTarget({ type: 'site', siteId: fromName(SiteID, 'SiteID', site) }),
     /** Every feature, town and zone. */
     unlockAll: () => {
       DEV_FEATURES.forEach(feature => this.unlockFeature(feature))
@@ -209,6 +212,7 @@ export class DevCheatsComponent {
     setKills: 'setKills(EnemyID, count) — set lifetime kills',
     addShinyKills: 'addShinyKills(ZoneID, count) — add shiny kills in a zone',
     unlock: `unlock(${DEV_FEATURES.map(f => `'${f}'`).join('|')}) — unlock a feature`,
+    unlockSite: "unlockSite(SiteID) — open a Site, e.g. unlockSite('farm')",
     unlockAll: 'unlockAll() — every feature, town and zone',
     giveSlots: 'giveSlots() — +100 inventory slots per slot tab',
     giveAllItems: 'giveAllItems() — 100 of every item, slots added as needed',

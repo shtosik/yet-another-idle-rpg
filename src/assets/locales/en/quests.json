@@ -68,6 +68,9 @@
       "5": "Bring Phurgo 10 Ancient Wood for charcoal at Lirold's Forge."
     }
   },
+  "orders": {
+    "nextIn": "Next order in {{ time }}"
+  },
   "professionXp": {
     "reward": "+{{ amount }} {{ profession }} XP"
   }
