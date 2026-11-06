@@ -4,11 +4,18 @@ import { PlayerStore } from './player.store'
 import { reputationProgress, reputationTier } from './reputation'
 import { ReputationID } from '../../../enums/reputation-id.enum'
 import { ReputationTier } from '../../../enums/reputation-tier.enum'
+import { TownID } from '../../../enums/map/town-id.enum'
 import { NpcID } from '../../../enums/map/npc-id.enum'
 import { TitleID } from '../../../enums/ids/title-id.enum'
 import { turnInBundles, turnInFor } from '../../../data/reputation-turn-ins'
 
 describe('reputation', () => {
+  it('keeps the town reputation ids equal to their TownID values (old saves key by them)', () => {
+    expect(Number(ReputationID.laHarpar)).toBe(Number(TownID.laHarpar))
+    expect(Number(ReputationID.lirold)).toBe(Number(TownID.lirold))
+    expect(Number(ReputationID.mawood)).toBe(Number(TownID.mawood))
+  })
+
   it('derives the tier from cumulative points', () => {
     expect(reputationTier(0)).toBe(ReputationTier.neutral)
     expect(reputationTier(49)).toBe(ReputationTier.neutral)

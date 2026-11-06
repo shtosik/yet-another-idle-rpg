@@ -28,6 +28,7 @@ All player-facing text comes from i18next JSON files, so content can be added an
 | Skill node | `skill-tree:nodes.<SkillNodeID key>.name` / `.desc` |
 | Skill branch | `skill-tree:branches.<SkillBranch key>` |
 | Town / building | `map:towns.<TownID key>`, `map:buildings.<TownBuildingID key>` |
+| Reputation | `map:reputations.<ReputationID key>` |
 | Station | `camp:stations.<StationID key>.name`, `.levels.<n>` |
 | Stat label | `app:playerStats.<PlayerStat>` |
 | Element | `app:elements.<DamageElement key>` |

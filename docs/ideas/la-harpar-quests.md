@@ -80,7 +80,7 @@ XP and gold follow existing quests: beach/basement ≈ Meat Shortage / Rats (100
 
 Not built. This proposal only reserves the hooks; it fits with [town building upgrades & reputation](town-building-upgrades.md).
 
-- **Earning:** add `{ type: 'reputation', townId, amount }` to quest rewards. Suggested: side quests 10–20, Tidecaller quests 25, T4 50. All 11 new quests plus the 4 existing ones ≈ 300 La Harpar rep.
+- **Earning:** add `{ type: 'reputation', reputationId, amount }` to quest rewards. Suggested: side quests 10–20, Tidecaller quests 25, T4 50. All 11 new quests plus the 4 existing ones ≈ 300 La Harpar rep.
 - **Gating:** add a `reputation` `RequirementProps` and a `DialogueCondition` variant via `/add-dialogue-effect`; the skill already lists "checking reputation".
 - **Tier ideas** (50 / 150 / 300):
   - *Known:* the Bartender stops charging for answers; Josh talks without beer.
