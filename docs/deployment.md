@@ -40,7 +40,7 @@ The version is `version` in `package.json`, `MAJOR.MINOR.PATCH` ([semver](https:
 ### What the player sees
 
 - `npm run build` and `npm run build:testing` end with `scripts/write-version.mjs`, which writes `version.json` (`version`, `commit`, `builtAt`) next to the build.
-- `src/app/services/version-check.service.ts` fetches it on load, every 5 minutes and when the tab becomes visible. A different `commit` (any new deploy, also staging without a bump) or a `version` other than the bundle's shows a banner with a Reload button; the reload saves first. `npm start` has no `version.json`, so no banner in dev.
+- `src/app/services/version-check.service.ts` fetches it on load, every 5 minutes and when the tab becomes visible. A different `commit` (any new deploy, also staging without a bump) or a `version` other than the bundle's shows a yellow chip with Reload in the notification bar under the HUD (`NotificationBarComponent`); the reload saves first, and a failed save turns the chip red and keeps the game running. `npm start` has no `version.json`, so no chip in dev.
 - Settings shows the running version (`src/app/version.ts`, read from `package.json`).
 
 ## Workflows

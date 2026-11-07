@@ -2,13 +2,11 @@ import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/cor
 import { GameIntervalService } from './services/game-interval.service'
 import { GameComponent } from './components/game/game.component'
 import { VersionCheckService } from './services/version-check.service'
-import { UpdateBannerComponent } from './components/shared/update-banner/update-banner.component'
 
 @Component({
     selector: 'app-root',
     imports: [
         GameComponent,
-        UpdateBannerComponent,
     ],
     templateUrl: './app.html',
     styleUrl: './app.sass',
