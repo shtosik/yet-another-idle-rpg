@@ -93,6 +93,13 @@ describe('EquipmentComponent', () => {
         expect(store.equipment().weapon).toBeNull()
     })
 
+    it('unequips on a touch tap', async () => {
+        equip(ItemID.knife)
+        await fixture.whenStable()
+        weaponButton().dispatchEvent(new PointerEvent('click', { bubbles: true, detail: 1, pointerType: 'touch' }))
+        expect(store.equipment().weapon).toBeNull()
+    })
+
     it('unequips on right-click and returns the item to inventory', async () => {
         equip(ItemID.knife)
         await fixture.whenStable()
