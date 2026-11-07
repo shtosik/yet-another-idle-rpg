@@ -75,7 +75,11 @@ type Result = DialogueResult<DroverDialogue>
 const toHub: Result = { next: D.default }
 const close: Result = { closeDialogue: true }
 const startOrder = (...effects: DialogueEffect[]): Result => ({ closeDialogue: true, effects: [{ type: 'quest', action: 'start', questId: QuestID.wicksOrder }, ...effects] })
-const endOrder = (...effects: DialogueEffect[]): Result => ({ next: D.default, effects: [{ type: 'quest', action: 'end', questId: QuestID.wicksOrder }, ...effects] })
+/** Rechecks readiness: the player can spend the items while the turn-in node is open, and then only goes back to the hub. */
+const endOrder = (...effects: DialogueEffect[]): Result[] => [
+  { visibilityConditions: [order(QuestState.readyToAdvance)], next: D.default, effects: [{ type: 'quest', action: 'end', questId: QuestID.wicksOrder }, ...effects] },
+  toHub,
+]
 const firstOrder = startOrder(setFlag(ORDER_EXPLAINED_FLAG))
 
 const FARM_DROVER: FarmDroverDialogueType = {
@@ -101,7 +105,12 @@ const FARM_DROVER: FarmDroverDialogueType = {
     ],
     // Lore
     ['bearShow', { visibilityConditions: [{ type: 'item', itemId: ItemID.bearPelt, amount: 1 }, flag(ORDER_EXPLAINED_FLAG), flag(SHOWED_PELT_FLAG, false)], next: D.bearPelt }],
-    ['names', { visibilityConditions: [guildTier(ReputationTier.revered), flag(SHOWED_NAMES_FLAG, false)], next: D.aboutNames }],
+    [
+      'names',
+      { visibilityConditions: [guildTier(ReputationTier.revered), flag(SHOWED_NAMES_FLAG, false)], next: D.aboutNames },
+      // Offered with the pelt and put off: it stays open.
+      { visibilityConditions: [flag(SHOWED_PELT_FLAG), flag(SHOWED_NAMES_FLAG, false)], next: D.aboutNames },
+    ],
     ['table', { visibilityConditions: [quest(QuestID.theGrowersTable, QuestState.completed)], next: D.aboutTable }],
     ['aboutWick', { next: D.aboutWick }],
     ['stalls', { next: D.aboutStalls }],
@@ -143,8 +152,8 @@ const FARM_DROVER: FarmDroverDialogueType = {
   [D.orderOffer]: say(D.orderOffer, ['accept', startOrder()], ['decline', toHub]),
   [D.orderOfferTrusted]: say(D.orderOfferTrusted, ['opt1', startOrder()], ['opt2', toHub]),
   [D.orderProgress]: say(D.orderProgress, ['opt1', close]),
-  [D.orderCompleteFirst]: say(D.orderCompleteFirst, ['opt1', endOrder(setFlag(FIRST_LOAD_FLAG))]),
-  [D.orderComplete]: say(D.orderComplete, ['opt1', endOrder()]),
+  [D.orderCompleteFirst]: say(D.orderCompleteFirst, ['opt1', ...endOrder(setFlag(FIRST_LOAD_FLAG))]),
+  [D.orderComplete]: say(D.orderComplete, ['opt1', ...endOrder()]),
   [D.aboutUses]: say(D.aboutUses, ['opt1', toHub]),
 
   // Out there

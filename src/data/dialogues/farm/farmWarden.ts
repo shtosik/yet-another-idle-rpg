@@ -109,8 +109,11 @@ const toHub: Result = { next: W.default }
 const close: Result = { closeDialogue: true }
 const start = (questId: QuestID, ...effects: DialogueEffect[]): Result =>
   ({ closeDialogue: true, effects: [{ type: 'quest', action: 'start', questId }, ...effects] })
-const end = (questId: QuestID, next: WardenDialogue = W.default): Result =>
-  ({ next, effects: [{ type: 'quest', action: 'end', questId }] })
+/** Rechecks readiness: the player can spend the items while the turn-in node is open, and then only goes back to the hub. */
+const end = (questId: QuestID, next: WardenDialogue = W.default): Result[] => [
+  { visibilityConditions: [quest(questId, QuestState.readyToAdvance)], next, effects: [{ type: 'quest', action: 'end', questId }] },
+  toHub,
+]
 /** A hub option that opens `next` while `condition` holds. */
 const hub = (key: string, condition: DialogueCondition | DialogueCondition[], next: WardenDialogue): [string, Result] =>
   [key, { visibilityConditions: [condition].flat(), next }]
@@ -193,7 +196,8 @@ const FARM_WARDEN: FarmWardenDialogueType = {
     ],
     hub('petGift', [guildTier(ReputationTier.exalted), flag(GAVE_PET_FLAG, false)], W.petGift),
     // Lore
-    hub('aboutClean', [completed(QuestID.wheatForTheGuild), flag(SAW_CLEAN_FLAG, false)], W.fourthTerrace),
+    // Asks what to put on the bare top terrace, so it goes once the orchard is under way.
+    hub('aboutClean', [completed(QuestID.wheatForTheGuild), flag(SAW_CLEAN_FLAG, false), quest(QuestID.anOrchardAgain, QuestState.notStarted)], W.fourthTerrace),
     hub('aboutKitchen', [flag('wick_mentioned_kitchen'), flag(ASKED_DOOR_FLAG, false), notCompleted(QuestID.theGrowersTable)], W.askKitchen),
     hub('aboutSeed', furrowStarted, W.aboutSeed),
     hub('aboutHerd', completed(QuestID.theFirstFurrow), W.aboutHerd),
@@ -220,7 +224,7 @@ const FARM_WARDEN: FarmWardenDialogueType = {
   [W.questFurrow]: say(W.questFurrow, ['accept', start(QuestID.theFirstFurrow)], ['why', { next: W.questFurrowWhy }], ['decline', toHub]),
   [W.questFurrowWhy]: say(W.questFurrowWhy, ['opt1', start(QuestID.theFirstFurrow)], ['opt2', toHub]),
   [W.questFurrowProgress]: say(W.questFurrowProgress, ['opt1', close]),
-  [W.questFurrowComplete]: say(W.questFurrowComplete, ['opt1', end(QuestID.theFirstFurrow, W.questFurrowAfter)]),
+  [W.questFurrowComplete]: say(W.questFurrowComplete, ['opt1', ...end(QuestID.theFirstFurrow, W.questFurrowAfter)]),
   [W.questFurrowAfter]: say(W.questFurrowAfter, ['opt1', toHub], ['opt2', { next: W.questFurrowNoCook }]),
   [W.questFurrowNoCook]: say(W.questFurrowNoCook, ['opt1', toHub]),
 
@@ -228,13 +232,13 @@ const FARM_WARDEN: FarmWardenDialogueType = {
   [W.questWheat]: say(W.questWheat, ['accept', start(QuestID.wheatForTheGuild)], ['ask', { next: W.questWheatAsk }], ['decline', toHub]),
   [W.questWheatAsk]: say(W.questWheatAsk, ['opt1', start(QuestID.wheatForTheGuild)], ['opt2', toHub]),
   [W.questWheatProgress]: say(W.questWheatProgress, ['opt1', close]),
-  [W.questWheatComplete]: say(W.questWheatComplete, ['opt1', end(QuestID.wheatForTheGuild)]),
+  [W.questWheatComplete]: say(W.questWheatComplete, ['opt1', ...end(QuestID.wheatForTheGuild)]),
 
   // The larder: the pick is rolled when the order starts, so the offer cannot name it; the quest panel does.
   [W.orderOfferFirst]: say(W.orderOfferFirst, ['accept', start(QuestID.marthasOrder, setFlag(ORDER_EXPLAINED_FLAG))], ['decline', toHub]),
   [W.orderOffer]: say(W.orderOffer, ['accept', start(QuestID.marthasOrder)], ['decline', toHub]),
   [W.orderProgress]: say(W.orderProgress, ['opt1', close]),
-  [W.orderComplete]: say(W.orderComplete, ['opt1', end(QuestID.marthasOrder)]),
+  [W.orderComplete]: say(W.orderComplete, ['opt1', ...end(QuestID.marthasOrder)]),
 
   // What comes after wheat
   [W.workNextSylvie]: say(W.workNextSylvie, ['opt1', toHub]),
@@ -255,13 +259,13 @@ const FARM_WARDEN: FarmWardenDialogueType = {
   [W.questOrchard]: say(W.questOrchard, ['accept', start(QuestID.anOrchardAgain)], ['why', { next: W.questOrchardWhy }], ['decline', toHub]),
   [W.questOrchardWhy]: say(W.questOrchardWhy, ['opt1', start(QuestID.anOrchardAgain)], ['opt2', toHub]),
   [W.questOrchardProgress]: say(W.questOrchardProgress, ['opt1', close]),
-  [W.questOrchardComplete]: say(W.questOrchardComplete, ['opt1', end(QuestID.anOrchardAgain)]),
+  [W.questOrchardComplete]: say(W.questOrchardComplete, ['opt1', ...end(QuestID.anOrchardAgain)]),
 
   // The Growers' Table
   [W.questTable]: say(W.questTable, ['accept', start(QuestID.theGrowersTable)], ['pie', { next: W.questTablePie }], ['decline', toHub]),
   [W.questTablePie]: say(W.questTablePie, ['opt1', start(QuestID.theGrowersTable)], ['opt2', toHub]),
   [W.questTableProgress]: say(W.questTableProgress, ['opt1', close]),
-  [W.questTableComplete]: say(W.questTableComplete, ['opt1', end(QuestID.theGrowersTable, W.questTableAfter)]),
+  [W.questTableComplete]: say(W.questTableComplete, ['opt1', ...end(QuestID.theGrowersTable, W.questTableAfter)]),
   [W.questTableAfter]: say(W.questTableAfter, ['opt1', toHub], ['opt2', toHub]),
 
   [W.shopFirst]: say(W.shopFirst, ['opt1', { next: W.default, effects: [openShop, setFlag(SHOP_EXPLAINED_FLAG)] }]),

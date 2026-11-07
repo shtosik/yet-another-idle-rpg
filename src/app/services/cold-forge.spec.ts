@@ -78,7 +78,9 @@ describe('The Cold Forge dialogue', () => {
 
     const pie = option(PHURGO[PhurgoDialogue.default], 'default.opt2')
     expect(dialogue.getActiveResult(pie)).toBeUndefined()
+    expect(dialogue.getActiveResult(reminder)?.next).toBe(PhurgoDialogue.coldForgeProgressFour)
     player.addItems([{ id: ItemID.fishApplePie, amount: 2 }])
+    expect(dialogue.getActiveResult(reminder)).toBeUndefined()
     dialogue.selectOption(pie)
     expect(player.itemCount(ItemID.fishApplePie)).toBe(1)
     expect(quests.getQuestStep(QuestID.theColdForge)).toBe(5)
@@ -87,7 +89,9 @@ describe('The Cold Forge dialogue', () => {
     const wood = option(PHURGO[PhurgoDialogue.default], 'default.opt1')
     player.addItems([{ id: ItemID.ancientWood, amount: 9 }])
     expect(dialogue.getActiveResult(wood)).toBeUndefined()
+    expect(dialogue.getActiveResult(reminder)?.next).toBe(PhurgoDialogue.coldForgeProgressFive)
     player.addItems([{ id: ItemID.ancientWood, amount: 2 }])
+    expect(dialogue.getActiveResult(reminder)).toBeUndefined()
     const gold = player.stats().goldCoins
     dialogue.selectOption(wood)
     expect(player.itemCount(ItemID.ancientWood)).toBe(1)

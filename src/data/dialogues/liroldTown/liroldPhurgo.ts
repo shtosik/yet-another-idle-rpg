@@ -55,6 +55,7 @@ const P = PhurgoDialogue
 const say = dialogueNodes<PhurgoDialogue>('dialogues/liroldPhurgo', PhurgoDialogue)
 
 const TABLE_APPLE_FLAG = 'phurgo_table_apple'
+const FORGE_USED_FLAG = 'phurgo_forge_used'
 const metFlag: DialogueEffect = { type: 'flag', name: `met_${NpcID.liroldPhurgo}` }
 
 const forgeQuest = (questState: QuestState, step?: number): DialogueCondition => ({ type: 'quest', questId: QuestID.theColdForge, questState, step })
@@ -70,7 +71,7 @@ const toHub: Result = { next: P.default }
 const close: Result = { closeDialogue: true }
 const advance: DialogueEffect = { type: 'quest', questId: QuestID.theColdForge, action: 'advance' }
 const startQuest: Result = { next: P.default, effects: [{ type: 'quest', questId: QuestID.theColdForge, action: 'start' }] }
-const openForge: Result = { visibilityConditions: [completed], closeDialogue: true, effects: [{ type: 'forge' }] }
+const openForge: Result = { visibilityConditions: [completed], closeDialogue: true, effects: [{ type: 'flag', name: FORGE_USED_FLAG }, { type: 'forge' }] }
 
 /** A step reminder: leave, or back to the hub. */
 const reminder = (id: PhurgoDialogue) => say(id, ['opt1', close], ['opt2', toHub])
@@ -104,7 +105,8 @@ const LIROLD_PHURGO: LiroldPhurgoDialogueType = {
     ['opt10', { next: P.aboutPie }],
     ['opt11', { next: P.aboutHome }],
     ['opt12', { visibilityConditions: [completed], next: P.idleHot }, { next: P.idleForge }],
-    ['opt13', { visibilityConditions: [completed, { type: 'flag', name: TABLE_APPLE_FLAG, isSet: false }], next: P.aboutTable, effects: [{ type: 'flag', name: TABLE_APPLE_FLAG }] }],
+    // The table takes him some time to build, so it waits until the player has been back to use the Forge.
+    ['opt13', { visibilityConditions: [completed, { type: 'flag', name: FORGE_USED_FLAG, isSet: true }, { type: 'flag', name: TABLE_APPLE_FLAG, isSet: false }], next: P.aboutTable, effects: [{ type: 'flag', name: TABLE_APPLE_FLAG }] }],
     ['opt14', close],
   ),
 
