@@ -606,7 +606,7 @@ export const PlayerStore = signalStore(
       const { experience, gold, dropRolls } = killReward(enemy, ZONES_DATA[zoneId], currentWave, isShiny, store.stats())
       const drops = new Map<string, InventoryItem>()
       const { dropChance } = rankBonus(enemyId, store.enemyKillCounts()[enemyId] ?? 0)
-      rollEnemyDrops(enemy, dropRolls, isShiny, dropChance, drops, questDropLimits, undefined, store.stats().upgradedDropChance)
+      rollEnemyDrops(enemy, dropRolls, isShiny, dropChance, drops, questDropLimits, undefined, store.stats().upgradedDropChance, store.stats().seedDropChance)
       const itemsToUpdate = [...drops.values()]
 
       store.updatePlayerStats([
@@ -812,7 +812,7 @@ export const PlayerStore = signalStore(
       const bonus = itemData.bonusRoll
       const bonusEligible = !!bonus && (store.permanentBonuses()[bonus.registeredStat] ?? 0) === 0
         && countItem(store.inventory(), bonus.itemId) === 0
-      const contents = store.rolledChests()[item.id] ?? rollChest(itemData, rng, bonusEligible)
+      const contents = store.rolledChests()[item.id] ?? rollChest(itemData, rng, bonusEligible, store.stats().seedDropChance)
       const missing = store.missingSlotsByTab(contents.items, [chest])
       const rolledChests = { ...store.rolledChests() }
       const blocked = Object.keys(missing).length > 0

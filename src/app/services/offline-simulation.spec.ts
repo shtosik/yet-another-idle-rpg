@@ -3,6 +3,7 @@ import { deriveStats, initialResources } from '../store/player/stats'
 import ZONES_DATA from '../../data/zones-data'
 import { ZoneID } from '../../enums/ids/zone-id.enum'
 import { DamageElement } from '../../enums/damage-element.enum'
+import ENEMIES_DATA from '../../data/enemies-data'
 import { EnemyID } from '../../enums/ids/enemy-id.enum'
 import { ItemID } from '../../enums/ids/item-id.enum'
 import ITEM_DATA from '../../data/items-data'
@@ -106,6 +107,24 @@ describe('simulateOfflineKills', () => {
 
     expect(sticks({})).toBe(0)
     expect(sticks({ [EnemyID.turtle]: 10_000 })).toBe(1)
+  })
+
+  it('rolls seed drops with seedDropChance', () => {
+    // As above, on a 1-in-4 seed drop: misses at no bonus (hit above 3), hits at +25% (above 2.75).
+    const turtle = ENEMIES_DATA[EnemyID.turtle]
+    const originalDrops = turtle.drops
+    turtle.drops = [...originalDrops, { id: ItemID.turnipSeeds, minAmount: 1, maxAmount: 1, chance: 4 }]
+    const seeds = (seedDropChance: number) => simulateOfflineKills(input({
+      rng: () => 0.74,
+      segments: [{ durationMs: HOUR_IN_MS, stats: { ...stats, seedDropChance } }],
+    })).items.filter(item => item.id === ItemID.turnipSeeds).length
+
+    try {
+      expect(seeds(0)).toBe(0)
+      expect(seeds(0.25)).toBe(1)
+    } finally {
+      turtle.drops = originalDrops
+    }
   })
 
   it('sums XP and gold per kill', () => {

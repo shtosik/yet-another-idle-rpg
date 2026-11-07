@@ -9,6 +9,26 @@ import { rollDropList, rollEnemyDrops } from './kill-rewards'
 import ENEMIES_DATA from '../../../data/enemies-data'
 import { EnemyID } from '../../../enums/ids/enemy-id.enum'
 
+describe('seed drop chance', () => {
+  const hits = (id: ItemID, roll: number, seedDropChance: number, dropChanceBonus = 0) => {
+    const drops = new Map<string, InventoryItem>()
+    rollDropList([{ id, chance: 10, minAmount: 1, maxAmount: 1 }], 1, dropChanceBonus, drops, undefined, () => roll, 0, seedDropChance)
+    return drops.size === 1
+  }
+
+  it('raises seed odds by (1 + x), on top of the rank bonus', () => {
+    // 1 in 10 hits above 0.9; +25% above 0.875; with a +10% rank bonus also above 0.8625.
+    expect(hits(ItemID.turnipSeeds, 0.88, 0)).toBeFalse()
+    expect(hits(ItemID.turnipSeeds, 0.88, 0.25)).toBeTrue()
+    expect(hits(ItemID.turnipSeeds, 0.87, 0.25)).toBeFalse()
+    expect(hits(ItemID.turnipSeeds, 0.87, 0.25, 0.1)).toBeTrue()
+  })
+
+  it('leaves other drops alone', () => {
+    expect(hits(ItemID.stick, 0.88, 0.25)).toBeFalse()
+  })
+})
+
 describe('upgraded drop rolls', () => {
   it('rolls each copy independently and accumulates +0 and +1 stacks separately at the 10% boundary', () => {
     const drops = new Map<string, InventoryItem>()

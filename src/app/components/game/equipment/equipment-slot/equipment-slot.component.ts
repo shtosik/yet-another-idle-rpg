@@ -41,9 +41,9 @@ export class EquipmentItemComponent {
         return 'app:equipment.unequipHint'
     })
 
-    // detail is 0 for Enter, Space and screen-reader activation, 1+ for a mouse click, which stays inert.
+    // detail is 0 for Enter, Space and screen-reader activation, 1+ for a pointer click; only a mouse click stays inert.
     handleActivate(event: MouseEvent): void {
-        if (this.forge.open() || event.detail === 0) this.handleUnequip()
+        if (this.forge.open() || event.detail === 0 || (event as PointerEvent).pointerType === 'touch') this.handleUnequip()
     }
 
     handleUnequip(): void {
