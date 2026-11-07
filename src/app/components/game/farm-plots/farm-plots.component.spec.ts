@@ -91,6 +91,13 @@ describe('FarmPlotsComponent', () => {
     expect(element.querySelector('.meter__detail')?.textContent).toBe('1.5% faster growth time, +10% Seed Save Chance')
   })
 
+  it('shows no bonus line at expertise 1, which gives none yet', async () => {
+    store.unlockProfession(ProfessionID.farming)
+    await render()
+
+    expect(element.querySelector('.meter__detail')).toBeNull()
+  })
+
   it('floats a harvest popup from the click point; Harvest all from its button', async () => {
     growTurnip()
     await render()

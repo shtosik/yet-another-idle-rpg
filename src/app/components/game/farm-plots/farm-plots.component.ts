@@ -151,6 +151,7 @@ export class FarmPlotsComponent {
   private expertiseBonus(level: number): string {
     const growthStat = PROFESSIONS_DATA[ProfessionID.farming].perLevel.stat
     const gains = expertiseGain(ProfessionID.farming, 1, level)
+    if (gains.length === 0) return ''
     const growth = i18next.t('map:farm.growthBonus', { bonus: formatStat('bonus', gains.find(gain => gain.stat === growthStat)?.amount ?? 0) })
     const milestones = gains
       .filter(gain => gain.stat !== growthStat)

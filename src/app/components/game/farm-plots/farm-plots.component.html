@@ -16,7 +16,9 @@
         <div class="meter__bar-fill" [style.width.%]="expertiseInfo.percent"></div>
         <span class="meter__bar-text">{{ expertiseInfo.current | number: '1.0-0' }} / {{ expertiseInfo.needed | number: '1.0-0' }}</span>
       </div>
-      <span class="meter__detail">{{ expertiseInfo.bonus }}</span>
+      @if (expertiseInfo.bonus) {
+        <span class="meter__detail">{{ expertiseInfo.bonus }}</span>
+      }
     </div>
   </div>
   <app-close-button (onClose)="closed.emit()"/>
