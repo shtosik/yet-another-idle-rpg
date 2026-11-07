@@ -18,6 +18,7 @@ import { EnemyType } from 'enums/enemy-type.enum'
 import { SkillNodeID } from 'enums/ids/skill-node-id.enum'
 import { WEAKNESS_ICONS } from '../battle/enemy/monster-debuff-bar/monster-debuff-bar.component'
 import { bestiaryRank, MAX_BESTIARY_RANK, RANK_BONUSES, rankThresholds } from '../../../store/player/bestiary-rank'
+import { dropOddsMultiplier } from '../../../store/player/kill-rewards'
 
 const LOCKED_SPRITE = './assets/img/enemies/unknown.png'
 
@@ -107,7 +108,8 @@ export class BestiaryComponent {
         const { revealsDropOdds, dropChance } = RANK_BONUSES[rank]
         if (!revealsDropOdds) return '?'
         // A 1-in-1 drop with a bonus still drops once per roll, so cap at 100%.
-        const percent = Math.min(100, (100 * (1 + dropChance)) / drop.chance)
+        const multiplier = dropOddsMultiplier(drop.id, dropChance, this.playerStore.stats().seedDropChance)
+        const percent = Math.min(100, (100 * multiplier) / drop.chance)
         return `${percent.toLocaleString('en-US', { maximumSignificantDigits: 3 })}%`
     }
 

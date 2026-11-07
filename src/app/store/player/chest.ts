@@ -1,5 +1,5 @@
 import { ChestItem } from '../../../interfaces/item.interface'
-import { ItemStack, stackKey } from './inventory'
+import { isSeed, ItemStack, stackKey } from './inventory'
 
 export interface ChestContents {
   gold: number
@@ -8,14 +8,18 @@ export interface ChestContents {
 
 const between = ([min, max]: [number, number], rng: () => number) => min + Math.floor(rng() * (max - min + 1))
 
-/** Weighted picks plus an optional guarded bonus; callers keep the entire result when it cannot fit. */
-export function rollChest(chest: ChestItem, rng: () => number = Math.random, bonusEligible = false): ChestContents {
-  const totalWeight = chest.loot.reduce((sum, entry) => sum + entry.weight, 0)
+/**
+ * Weighted picks plus an optional guarded bonus; callers keep the entire result when it cannot fit.
+ * `seedDropChance` scales seed weights, so a seed pick's share rises slightly less than (1 + x).
+ */
+export function rollChest(chest: ChestItem, rng: () => number = Math.random, bonusEligible = false, seedDropChance = 0): ChestContents {
+  const weights = chest.loot.map(entry => entry.weight * ('itemId' in entry && isSeed(entry.itemId) ? 1 + seedDropChance : 1))
+  const totalWeight = weights.reduce((sum, weight) => sum + weight, 0)
   const contents: ChestContents = { gold: 0, items: [] }
 
   for (let roll = 0; roll < chest.rolls; roll++) {
     let pick = rng() * totalWeight
-    const entry = chest.loot.find(e => (pick -= e.weight) < 0) ?? chest.loot[chest.loot.length - 1]
+    const entry = chest.loot.find((_, index) => (pick -= weights[index]) < 0) ?? chest.loot[chest.loot.length - 1]
     if ('gold' in entry) {
       contents.gold += between(entry.gold, rng)
       continue

@@ -9,6 +9,7 @@ import { ItemType } from '../../../enums/items/item-type.enum'
 import { ZoneID } from '../../../enums/ids/zone-id.enum'
 import { ItemTier } from '../../../enums/items/item-tier.enum'
 import { EnemyID } from '../../../enums/ids/enemy-id.enum'
+import { ProfessionID } from '../../../enums/ids/profession-id.enum'
 import ENEMIES_DATA from '../../../data/enemies-data'
 
 describe('seed routing', () => {
@@ -75,6 +76,22 @@ describe('seed routing', () => {
     spyOn(Math, 'random').and.returnValue(0.5)
 
     expect(store.processBattleEnd(EnemyID.crab, ZoneID.horseshoeBeach, 1, false).foundSeeds).toEqual([{ id: ItemID.turnipSeeds, amount: 1 }])
+  })
+
+  it('rolls online kill seeds with the expertise seedDropChance', () => {
+    crab.drops = [...crab.drops, { ...seedDrop, chance: 4 }]
+    // 0.74 x 4 = 2.96 misses at no bonus (hit above 3) and hits at +25% (above 2.75).
+    spyOn(Math, 'random').and.returnValue(0.74)
+    store.processBattleEnd(EnemyID.crab, ZoneID.horseshoeBeach, 1, false)
+    expect(store.farm().seeds[ItemID.turnipSeeds] ?? 0).toBe(0)
+
+    store.unlockProfession(ProfessionID.farming)
+    store.applyProfessionXp(ProfessionID.farming, 1_000_000)
+    expect(store.stats().seedDropChance).toBe(0.25)
+    store.processBattleEnd(EnemyID.crab, ZoneID.horseshoeBeach, 1, false)
+    crab.drops = crab.drops.filter(drop => drop.id !== ItemID.turnipSeeds)
+
+    expect(store.farm().seeds[ItemID.turnipSeeds]).toBe(1)
   })
 
   it('counts offline seeds without reporting or losing them before the unlock', () => {

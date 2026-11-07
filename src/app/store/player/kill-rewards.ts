@@ -6,7 +6,7 @@ import { Zone } from '../../../interfaces/zone.interface'
 import ITEM_DATA from '../../../data/items-data'
 import { waveMultipliers } from '../battle/wave-scaling'
 import type { PlayerStatsType } from './stats'
-import { stackKey } from './inventory'
+import { isSeed, stackKey } from './inventory'
 import { ItemType } from '../../../enums/items/item-type.enum'
 import { EquipmentSlot } from '../../../enums/equipment-slot.enum'
 import { ItemID } from '../../../enums/ids/item-id.enum'
@@ -38,6 +38,10 @@ function addRolledDrop(id: ItemID, amount: number, accumulator: Map<string, Inve
   add(upgraded, 1)
 }
 
+/** A drop hits with probability (this / `drop.chance`); only seeds get `seedDropChance`. */
+export const dropOddsMultiplier = (id: ItemID, dropChanceBonus: number, seedDropChance: number): number =>
+  (1 + dropChanceBonus) * (isSeed(id) ? 1 + seedDropChance : 1)
+
 /** Adds each drop that hits to `accumulator`, keyed by id + tier + upgradeLevel. */
 export const rollDropList = (
   drops: EnemyDrop[],
@@ -47,6 +51,7 @@ export const rollDropList = (
   questDropLimits?: QuestDropLimits,
   rng: Rng = Math.random,
   upgradedDropChance = 0,
+  seedDropChance = 0,
 ) => {
   for (let r = 0; r < rolls; r++) {
     drops.forEach(drop => {
@@ -57,8 +62,7 @@ export const rollDropList = (
         if (missing <= 0) return
       }
 
-      // Hits with probability (1 + bonus) / chance.
-      if (rng() * drop.chance <= drop.chance - 1 - dropChanceBonus) return
+      if (rng() * drop.chance <= drop.chance - dropOddsMultiplier(drop.id, dropChanceBonus, seedDropChance)) return
 
       const amount = Math.min(missing, Math.floor(rng() * (drop.maxAmount - drop.minAmount + 1) + drop.minAmount))
       addRolledDrop(drop.id, amount, accumulator, upgradedDropChance, rng)
@@ -96,7 +100,8 @@ export function rollEnemyDrops(
   questDropLimits?: QuestDropLimits,
   rng: Rng = Math.random,
   upgradedDropChance = 0,
+  seedDropChance = 0,
 ) {
-  rollDropList(enemy.drops, rolls, dropChanceBonus, accumulator, questDropLimits, rng, upgradedDropChance)
-  if (isShiny && enemy.shinyDrops?.length) rollDropList(enemy.shinyDrops, 1, dropChanceBonus, accumulator, questDropLimits, rng, upgradedDropChance)
+  rollDropList(enemy.drops, rolls, dropChanceBonus, accumulator, questDropLimits, rng, upgradedDropChance, seedDropChance)
+  if (isShiny && enemy.shinyDrops?.length) rollDropList(enemy.shinyDrops, 1, dropChanceBonus, accumulator, questDropLimits, rng, upgradedDropChance, seedDropChance)
 }

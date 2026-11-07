@@ -154,7 +154,7 @@ export function simulateOfflineKills(input: OfflineSimulationInput): OfflineSimu
     result.gold += reward.gold
     result.killsByEnemy[enemy.id] = (result.killsByEnemy[enemy.id] ?? 0) + 1
     const { dropChance } = rankBonus(enemy.id, input.enemyKillCounts[enemy.id] ?? 0)
-    rollEnemyDrops(enemy, reward.dropRolls, isShiny, dropChance, drops, input.questDropLimits, rng, stats.upgradedDropChance)
+    rollEnemyDrops(enemy, reward.dropRolls, isShiny, dropChance, drops, input.questDropLimits, rng, stats.upgradedDropChance, stats.seedDropChance)
 
     if (input.taskEnemyIds.has(enemy.id)) {
       const counts = rng() * 100 < stats.taskDoubleKillChance ? 2 : 1
