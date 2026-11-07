@@ -75,6 +75,13 @@ export function syncPlots(plots: (Plot | null)[], now: number, reduction: number
 
 export const isReady = (plot: Plot, growMs: number): boolean => plot.progressMs >= growMs
 
+/** How many of `plots` are ready at `now`, growth since their last sync included. */
+export const readyPlotCount = (plots: (Plot | null)[], now: number, reduction: number): number =>
+  syncPlots(plots, now, reduction).filter(plot => {
+    const seed = plot && FARM_SEEDS[plot.seedId]
+    return plot && seed && isReady(plot, seed.growMs)
+  }).length
+
 export interface PlantContext {
   now: number
   /** Farming expertise level. */

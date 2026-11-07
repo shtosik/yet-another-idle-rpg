@@ -185,7 +185,12 @@
   },
   "hud": {
     "level": "Lv {{level}}",
-    "explorerTokens": "Explorer Tokens"
+    "explorerTokens": "Explorer Tokens",
+    "notifications": {
+      "label": "Ready to claim",
+      "harvest_one": "{{count}} plot ready to harvest",
+      "harvest_other": "{{count}} plots ready to harvest"
+    }
   },
   "starts": "Starts",
   "requires": "Requires",

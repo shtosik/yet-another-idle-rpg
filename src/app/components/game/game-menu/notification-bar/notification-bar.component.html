@@ -1,0 +1,14 @@
+<ul class="notifications" aria-live="polite" [attr.aria-label]="'hud.notifications.label' | i18next">
+  @for (notification of notifications(); track notification.kind) {
+    <li>
+      <button
+        type="button"
+        [class]="'notification notification--' + notification.kind"
+        (click)="notification.open()"
+      >
+        <img alt="" class="notification__icon" height="18" width="18" [ngSrc]="notification.icon">
+        {{ ('hud.notifications.' + notification.kind) | i18next: { count: notification.count } }}
+      </button>
+    </li>
+  }
+</ul>

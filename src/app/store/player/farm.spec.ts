@@ -1,6 +1,6 @@
 import { FARM_SEEDS } from '../../../data/farming-data'
 import { ItemID } from '../../../enums/ids/item-id.enum'
-import { FarmState, harvest, stageOf, harvestAll, HarvestContext, initialFarm, isReady, plant, plantAll, PlantContext, plotCount, syncPlots } from './farm'
+import { FarmState, harvest, stageOf, harvestAll, HarvestContext, initialFarm, isReady, plant, plantAll, PlantContext, plotCount, readyPlotCount, syncPlots } from './farm'
 
 const MIN = 60_000
 const turnip = FARM_SEEDS[ItemID.turnipSeeds]!
@@ -16,6 +16,15 @@ const grown = (farm: FarmState, now: number, reduction = 0): FarmState => ({ ...
 describe('farm rules', () => {
   it('maps progress to a growth stage', () => {
     expect([0, 0.39, 0.4, 0.99, 1, 1.5].map(stageOf)).toEqual(['seedling', 'seedling', 'growing', 'growing', 'ready', 'ready'])
+  })
+
+  it('counts ready plots at the given time, without a saved sync', () => {
+    const { plots } = plantAll(withSeeds({ [ItemID.turnipSeeds]: 1, [ItemID.wheatSeeds]: 1 }), ItemID.turnipSeeds, plantCtx())
+    const both = plant({ plots, seeds: { [ItemID.wheatSeeds]: 1 } }, 1, ItemID.wheatSeeds, plantCtx())!.plots
+
+    expect(readyPlotCount(both, turnip.growMs - 1, 0)).toBe(0)
+    expect(readyPlotCount(both, turnip.growMs, 0)).toBe(1)
+    expect(readyPlotCount(both, wheat.growMs, 0)).toBe(2)
   })
 
   it('counts plots from reputation tiers and quests, capped at 9', () => {
