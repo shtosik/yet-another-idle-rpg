@@ -15,6 +15,8 @@
 //   9. Codex skills mirror .claude/skills
 //  10. Agent and skill frontmatter parses (description quoting)
 //  11. docs/ideas/README.md statuses match each idea file's Status line
+//  12. Docs: relative .md links resolve; lore, character and system docs name real IDs
+//  13. NPC voice: lines stay in the world, no repeated phrases, no "Then…" narration
 //
 // Usage: npm run validate
 
@@ -743,6 +745,44 @@ for (const f of [...walkFiles(join(ROOT, '.claude', 'agents'), '.md'), ...walkFi
     for (const [, name, member] of text.matchAll(/\b(ItemID|NpcID)\.(\w+)/g)) {
       if (ENUMS[name][member] === undefined && !PLANNED_IDS.has(`${name}.${member}`)) error(rel, `names unknown ${name}.${member}`)
     }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 13. NPC voice: lines stay in the world, no NPC repeats a phrase, no NPC narrates with "Then…". The owner kept
+//     correcting these by hand in the Forge and Farm dialogue; the rules are in .claude/agents/lore-keeper.md.
+
+{
+  const OUT_OF_WORLD = /\b(?:buttons?|tabs?|menus?|screens?|click(?:s|ed)?|panels?|tooltips?|inventory|cooldowns?|xp|drop (?:rate|chance)s?|quest log|waves?|(?:from|in|on) the list|list (?:on the )?(?:left|right|above|below))\b|\d+\s*%|\bpercent\b/i
+  const REPEAT_WORDS = 5
+  const MAX_THEN_OPENERS = 1
+  // Shipped before this check; reword a line and drop it here. Add nothing new.
+  const OUT_OF_WORLD_BASELINE = new Set(['laHarparJosh.workInfo.message', 'mawoodMilo.questWhatLurksProgress.message', 'mawoodSylvie.questInfestationProgress.message'])
+  const REPEAT_BASELINE = new Set(["a store under your name","a tavern are you blind","and ten vials of clean","at the end of a","i want to know what","in a store under your","last name on the card","saplings in the outer wilds","ten vials of clean water","the end of a shift","three pelts from the elder","up on the top terrace","we map the unknown and"])
+  const THEN_BASELINE = { mawoodMilo: 2 }
+  const leaves = (value, path) => typeof value === 'string' ? [[path, value]] : Object.entries(value).flatMap(([k, v]) => leaves(v, `${path}.${k}`))
+  for (const f of walkFiles(join(LOCALES, 'dialogues'), '.json')) {
+    const npc = f.replace(/^.*[\\/]|\.json$/g, '')
+    const file = repoPath(f)
+    const strings = leaves(JSON.parse(readFileSync(f, 'utf8')), npc)
+    for (const [path, text] of strings) {
+      const hit = OUT_OF_WORLD.exec(text)
+      if (hit && !OUT_OF_WORLD_BASELINE.has(path)) error(file, `${path} says '${hit[0]}': NPCs are people in the world, so teach it in fiction ("choose a seed and plant it"), not by naming UI or game terms`)
+    }
+    // NPC lines only: player options ("I'll let you get on") may recur.
+    const messages = strings.filter(([path]) => path.endsWith('.message'))
+    const firstSeen = new Map()
+    for (const [path, text] of messages) {
+      const words = text.toLowerCase().replace(/[^\p{L}\p{N}' ]+/gu, ' ').split(/\s+/).filter(Boolean)
+      for (let i = 0; i + REPEAT_WORDS <= words.length; i++) {
+        const phrase = words.slice(i, i + REPEAT_WORDS).join(' ')
+        const first = firstSeen.get(phrase)
+        if (first === undefined) firstSeen.set(phrase, path)
+        else if (first !== path && !REPEAT_BASELINE.has(phrase)) { error(file, `'${phrase}' is in both ${first} and ${path}: state a fact or phrase once, in the node that owns it`); break }
+      }
+    }
+    const thens = messages.flatMap(([, text]) => text.match(/(?:^|[.!?…—]\s+)(?:and )?then\b/gi) ?? []).length
+    if (thens > (THEN_BASELINE[npc] ?? MAX_THEN_OPENERS)) error(file, `${thens} sentences open with "Then": at most ${MAX_THEN_OPENERS} per NPC, people don't narrate in sequence; skip the connector or jump to what mattered`)
   }
 }
 
