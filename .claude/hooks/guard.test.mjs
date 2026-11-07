@@ -60,6 +60,18 @@ test('allows file restores, worktrees and other git commands', () => {
   assert.equal(run('Bash', { command: 'git switch staging' }, base), 0)
 })
 
+test('blocks PRs based on anything but staging or main', () => {
+  for (const command of ['gh pr create --base feat/upgrade-level --title x', 'gh pr create -B feat/reputation-state', 'gh pr create --base=feat/arena-run',
+    'gh pr create --base "feat/cold-forge"', 'gh pr create --title "x" --body "use --base staging"', 'gh pr edit 102 --base feat/upgrade-level', 'git push && gh pr create --fill'])
+    assert.equal(run('Bash', { command }), 2, command)
+})
+
+test('allows PRs into staging or main and PR edits without a base', () => {
+  for (const command of ['gh pr create --base staging --title "x"', 'gh pr create --title "x; y" --body "z" --base staging', 'gh pr create -B staging', 'gh pr create --base main --head release/0.4.0',
+    'gh pr edit 102 --base staging', 'gh pr edit 102 --title "--base feat/x"', 'gh pr view 102'])
+    assert.equal(run('PowerShell', { command }), 0, command)
+})
+
 test('blocks EnterWorktree from a worktree into a sibling worktree', () => {
   assert.equal(run('EnterWorktree', { path: '../yari-other' }), 2)
   assert.equal(run('EnterWorktree', { path: '../yari-feature' }, MAIN), 0)

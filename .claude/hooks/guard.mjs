@@ -56,6 +56,19 @@ if (/^(Bash|PowerShell)$/.test(tool)) {
   }
 }
 
+// A PR based on another feature branch is a stack: 31 of the first 101 PRs were, and those got no CI. A `gh pr create`
+// without --base goes to main, the repo default, which only takes release/* and hotfix/*.
+if (/^(Bash|PowerShell)$/.test(tool)) {
+  for (const { index, 1: verb } of text.matchAll(/\bgh\s+pr\s+(create|edit)\b/g)) {
+    // shortcut: reads flags up to the end of the text, so a later chained command's --base counts; no agent chains these.
+    const flags = text.slice(index).replace(/(?<!(?:--base|-B)[= ]\s*)("[^"]*"|'[^']*')/g, '')
+    const base = /(?:--base|-B)[= ]\s*["']?([^\s"']+)/.exec(flags)?.[1]
+    if (base ? !['staging', 'main'].includes(base) : verb === 'create') {
+      block(`Blocked: PR base ${base ? `'${base}'` : 'is missing'}. One feature, one PR into staging: plan steps are commits on one branch, no stacked PRs (docs/git-workflow.md). Pass --base staging; only release/* and hotfix/* use --base main.`)
+    }
+  }
+}
+
 // From inside a worktree, EnterWorktree only reaches worktrees under .claude/worktrees; for a sibling yari-* one it fails
 // with ".claude\worktrees does not exist", which agents retried up to 19 times. One worktree per session: branch inside it.
 const target = String(input.tool_input?.path ?? '')

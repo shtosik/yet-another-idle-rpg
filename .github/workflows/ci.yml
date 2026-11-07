@@ -1,8 +1,8 @@
 name: CI
 
 on:
+  # Every base branch, so a stacked PR fails the check below instead of getting no CI.
   pull_request:
-    branches: [main, staging]
   # Commits pushed straight to staging skip PR CI; this catches them.
   push:
     branches: [staging]
@@ -16,6 +16,13 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      - name: Check PR base
+        if: github.event_name == 'pull_request' && github.base_ref != 'main' && github.base_ref != 'staging'
+        run: |
+          echo "::error::PR base is '$BASE_REF'. One feature, one PR into staging: plan steps are commits on one branch, no stacked PRs (docs/git-workflow.md). Retarget it with gh pr edit --base staging."
+          exit 1
+        env:
+          BASE_REF: ${{ github.base_ref }}
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:

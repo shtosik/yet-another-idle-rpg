@@ -44,3 +44,4 @@ A rule here fails a check when broken. When the owner corrects the same mistake 
 | Codex gets the same project skills | `npm run validate` (`scripts/sync-skills.mjs`) |
 | Data references, i18n keys, assets, doc paths, changelog format, agent and skill frontmatter, idea statuses | `npm run validate` (checks listed at the top of `scripts/validate-data.mjs`) |
 | PRs into `main` come from `release/*` or `hotfix/*` with a version bump | CI (`.github/workflows/ci.yml`) |
+| One feature, one PR into `staging`: no stacked PRs | CI (`.github/workflows/ci.yml`); `.claude/hooks/guard.mjs` blocks it earlier (Claude) |
