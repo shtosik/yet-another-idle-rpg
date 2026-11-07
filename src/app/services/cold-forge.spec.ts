@@ -63,7 +63,9 @@ describe('The Cold Forge dialogue', () => {
 
     const tongs = option(PHURGO[PhurgoDialogue.default], 'default.opt3')
     expect(dialogue.getActiveResult(tongs)).toBeUndefined()
+    expect(dialogue.getActiveResult(reminder)?.next).toBe(PhurgoDialogue.coldForgeProgressTwo)
     player.addItems([{ id: ItemID.phurgosForgeTongs, amount: 1 }])
+    expect(dialogue.getActiveResult(reminder)).toBeUndefined()
     dialogue.selectOption(tongs)
     expect(player.itemCount(ItemID.phurgosForgeTongs)).toBe(0)
     expect(quests.getQuestStep(QuestID.theColdForge)).toBe(3)

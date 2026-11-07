@@ -1,86 +1,194 @@
 {
   "intro1": {
-    "message": "Ha, a new challenger, and the whole city's heard about the harpy queen! Ludo Crane, Master of the Arena, eleven seasons champion of this sand. Want to hear how it works?",
-    "opt1": "Tell me.",
-    "opt2": "Maybe later."
+    "message": "Ha! Hold the gate, hold the gate! Look who's wandered in, and not a soul in the stands to see it. This is the one from the harpy nest, friends. The whole city's been talking, and I've got the biggest ears in it.",
+    "opt1": "Word travels fast, but who are you?",
+    "opt2": "What does it cost to get on your sand?",
+    "opt3": "I'm only looking."
   },
-  "pathfindersSealInfo": {
-    "message": "The Exploration Guild leaves a few of those among the prizes, challenger. Finding a road out is useful when the last champion wants to keep you! Show it to Marvin in La Harpar; he keeps the register.",
-    "opt1": "I'll ask Marvin."
+  "introName": {
+    "message": "Ludo Crane. This is my sand, or the castle's on paper. Turn around, let me see how you carry that thing. Mm. Your left shoulder drops when you're tired, doesn't it? Never mind. They'll like you.",
+    "opt1": "Who's they, and what does it cost to meet them?",
+    "opt2": "My shoulder's fine.",
+    "opt3": "I'll come back when I've got the gold."
   },
   "default": {
-    "pathfindersSeal": "Why give a Pathfinder's Seal as an Arena prize?",
-    "message": "The sand's raked and the stands are filling. Fight, talk or gawk, challenger?",
-    "claim": "I've come for my winnings.",
-    "fight": "I'll fight.",
-    "rules": "Remind me of the rules.",
-    "champions": "Tell me about your champions.",
-    "aboutArena": "Who runs this place?",
-    "goodbye": "Another time.",
-    "coldForge": "What happened to Phurgo's delivery cart?"
+    "message": "Challenger! What'll it be?",
+    "coldForge": "Phurgo says you know what happened to his delivery cart.",
+    "opt2": "Yad's down, and I'd like to hear you say it.",
+    "opt3": "You saw the Brute go down, then.",
+    "opt4": "I've come for what I won.",
+    "opt5": "Open the gate.",
+    "opt6": "Walk me through how this works.",
+    "opt7": "Who's on the card?",
+    "opt8": "What is this place?",
+    "opt9": "How's business?",
+    "opt10": "What's it like, watching from the gate?",
+    "opt11": "How's the knee?",
+    "opt12": "Has that silk helped the knee?",
+    "pathfindersSeal": "What am I supposed to do with this Seal?",
+    "opt14": "Later, Ludo."
   },
   "rules": {
-    "message": "The fee opens the gate, and it stays with me whatever happens. Twenty waves, one sandglass, ten minutes; every fifth wave is a champion, and the last is Yad. Beat the sand and you walk out in a Molten Cape, with something extra the first time; walk out early or run dry and you keep only what your kills paid.",
-    "champions": "Tell me about your champions.",
-    "ok": "Understood."
+    "message": "The fee is ten thousand gold. You pay it at this gate before you step through, you don't get it back if you lose, and nobody has ever owed it to me. I'd sooner you heard that first.",
+    "opt1": "For ten thousand I'd better get a good fight.",
+    "opt2": "Who would I be fighting?",
+    "opt3": "That's all I needed."
+  },
+  "rulesBouts": {
+    "message": "Twenty bouts, one on the heels of another, and that big glass turns once for the lot. Ten minutes! Trappers' stock for the most part, three to a bout, whatever came out of the Elderwood biting, and on every fifth bout I send out a champion. This one's paying for the privilege, so let's see if this one can do the sum. Twenty into ten, challenger?",
+    "opt1": "What if the sand runs out?",
+    "opt2": "What if I get through all twenty?",
+    "opt3": "Never mind the sum, who are the champions?"
+  },
+  "rulesSand": {
+    "message": "The crowd goes home and so do you. You keep what each kill paid you, as it fell, and that's all you keep. Same if you walk off partway through. Some do. No shame in it, just ten thousand gold.",
+    "opt1": "What if I get through all twenty?",
+    "opt2": "I'll try not to need that."
+  },
+  "rulesPurse": {
+    "message": "\"If!\" Did you hear that, friends? This one can count! There's a chest every time and a Molten Cape that'll keep you warmer than you'd like, and between those and what you earn per head you come out ahead, which I don't say about much in this city. The first time through, the castle throws in two books out of its library. They're meant to teach you something. I've never opened one. And win or lose, it's half an hour from the moment you went in before I'll let you through again. Nobody pays to watch a fighter shake.",
+    "opt1": "Who's the hardest of the four?",
+    "opt2": "I'll bring the gold."
   },
   "champions": {
-    "message": "Four of them, and none just stands there and bleeds. Each has a trick, and each trick wants a different answer. Who do you want to hear about?",
-    "brute": "The Brute.",
-    "arcanist": "The Arcanist.",
-    "burrower": "The Burrower.",
-    "yad": "Yad.",
-    "enough": "That's enough."
+    "message": "The card! Four names, friends, and they've sent better than this one home on a door. Fifth bout, tenth, fifteenth, twentieth, and don't come at all four the same way, because that's how you get the door. Who d'you want to hear about?",
+    "opt1": "The Brute.",
+    "opt2": "The Arcanist.",
+    "opt3": "The Burrower.",
+    "opt4": "Yad.",
+    "opt5": "That's enough."
   },
   "aboutBrute": {
-    "message": "Wave five. The Brute's all iron and old scars, and his old wounds open up when he's working hard. Watch him, not your blade, and hit where it shows.",
-    "more": "Who else?",
-    "thanks": "Thanks, Ludo."
+    "message": "The Brute! Half the scars on that man are mine and I want that known. Twenty years in the river-ward pits before he ever came here, and his old hurts don't close, they only rest. Give him a count of five after the bell and one of them opens, right there in front of the whole house, and it's open for about as long as it took me to say so. Get your weapon into it and you'll hit half as hard again for a slow count of ten. Miss it and you wait, half a minute or so, till the next one goes. He sends me a ham at midwinter. I've never been sure it isn't a threat.",
+    "opt1": "Who else is on the card?",
+    "opt2": "That'll do."
   },
   "aboutArcanist": {
-    "message": "Wave ten. The Arcanist wears a ward that drinks from your sandglass every time a spell hits her. Steel and staff don't bother it, so save your spells; you'll want them for Yad.",
-    "more": "Who else?",
-    "thanks": "Thanks, Ludo."
+    "message": "She read my contract back to me the day she signed it. Out loud, with her finger on the clauses. Nobody's ever done that, and nobody's ever asked me what I meant by \"reasonable\" either. Ha! So here's what you get for free, challenger. She's warded, and the ward drinks from your glass. Every spell you land costs you sand, the bigger the spell the more sand, and anything you've left burning on her goes on costing you. Swing iron at her, or just knock her with that staff, and she's a thin woman in a bad mood. A minute's the most she's ever had off anyone, out of your ten. And you'll want those spells later on, for the last name on the card.",
+    "opt1": "Who else is on the card?",
+    "opt2": "That'll do."
   },
   "aboutBurrower": {
-    "message": "Wave fifteen. Trappers dug it out of a turnip field south of the walls, and it still won't stay above ground. When it goes under, watch the mounds: the one that shakes has teeth in it, and a wrong guess sends it up fresher.",
-    "more": "Who else?",
-    "thanks": "Thanks, Ludo."
+    "message": "Pay attention, friends, this one cost me a turnip field! A farmer south of the walls turns up at my gate with no crop and a very long face. \"It's eating them from underneath.\" The trappers had it out in a week, I bought it, and he sent the bill for the turnips to me, and the castle upheld it. Every count of twenty or so it goes under and up come three heaps. One of them shakes. You've a count of four to put your weapon in that one, and do it and the thing's on its back for a count of five, taking half again what you give it. Choose wrong, or stand there admiring, and it comes up with a tenth of its hide mended. Nothing touches it while it's down there, either, so whatever you've left burning on it is burning for nobody.",
+    "opt1": "Who else is on the card?",
+    "opt2": "That'll do."
   },
   "aboutYad": {
-    "message": "Wave twenty, and the reason the stands fill. Yad's guard shifts like the weather: fire one minute, wind or water the next. A fighter with one trick won't last.",
-    "origin": "Where did Yad come from?",
-    "more": "Who else?",
-    "thanks": "Thanks, Ludo."
+    "message": "Yad. Last name on the card, the reason this place fills, and the only one on my sand who doesn't ask what the purse is. Everyone else wants paying. I've no idea what Yad wants, and I'm the one who feeds it. It raises a guard, fire or air or water, a new one every little while and never the same twice running, and you'll know it when it comes, the whole house goes quiet. While that's up nothing lands but its own kind. Fire for fire, friends! One good hit of the right sort breaks it, and you've got a few moments of honest work before the next.",
+    "opt1": "Where did you get a thing like that?",
+    "opt2": "What do you feed it?",
+    "opt3": "Who else is on the card?",
+    "opt4": "That'll do."
   },
   "yadOrigin": {
-    "message": "Came in a crate last spring, from trappers who took their pay and wouldn't say where they'd been. \"Yad\" was the one word chalked on the lid. When its guard goes up, the air in the stands turns like a storm's coming.",
-    "more": "Who else?",
-    "thanks": "Thanks, Ludo."
+    "message": "Now you're asking what the whole city asks. Last spring, four trappers come in on a dray with a crate, and not one of them will look at it. I say where'd you get this. The old one counts my money twice and tells me I don't want that on my paper. So what do I know? I know what's chalked on the lid. Three letters in somebody's bad hand. Y, A, D. I've still got the lid. And here's what I wonder, some nights, and I'll give you odds. Is that its name? Or is that a town? Or the poor fool who nailed the crate shut? Because if it's him, I've been bellowing a carter's name at a full house all these months.",
+    "opt1": "Who else is on the card?",
+    "opt2": "That'll do."
+  },
+  "yadFeed": {
+    "message": "Mutton, a side every other day, and the castle pays last year's price for it, so I've had words. It won't eat while you're looking. Won't touch the water if it's been standing. It's had two feeding poles off my boys this year, and one of those boys won't go down there now, so that's me with the bucket, on this knee.",
+    "opt1": "Who else is on the card?",
+    "opt2": "That'll do."
   },
   "aboutArena": {
-    "message": "The castle holds the Arena's charter; I keep the sand and the crowd happy. Trappers sell me whatever the Elderwood coughs up, so you'll know half the beasts out there. Champions sign on for the purse, all but Yad.",
-    "aboutLudo": "And you?",
-    "ok": "Got it."
+    "message": "What is this place! Friends, hear that? Sand, challenger! Stone on four sides, stands up to the sky, and the castle's charter nailed up in a room I don't go in. They hold the paper and I keep the floor. The trappers bring me whatever comes snapping out of the Elderwood, I've three fighters who'll step out for a purse and one who won't ask, and there's nobody in this city who didn't come here once as a child and get sick on their mother's shoes. The stands start filling about an hour before the bell.",
+    "opt1": "And what's your part in it?",
+    "opt2": "I've seen enough."
   },
   "aboutLudo": {
-    "message": "Eleven seasons champion, never once beaten on this sand. Then a cart wheel took my knee on market day, and the castle gave me the gate. Now I shout louder than I swing!",
-    "ok": "Fair enough."
+    "message": "Ah, now you've asked the right man! Ten years old, I raked this floor for a copper a day and whatever fell out of the purses. Eleven seasons I stood on it with a sword, and nobody, not one of them, ever put me down. And look at this knee. So who got me, challenger? Go on. They're waiting.",
+    "opt1": "Something the trappers dragged out of the Elderwood, I'd guess.",
+    "opt2": "Somebody better than you, and you won't admit it.",
+    "opt3": "I don't bet on what I can't see."
+  },
+  "aboutLudoCart": {
+    "message": "Ha! That's what I let them say in the taverns. A cart. Market day, outside the chandler's, me with a bag of onions, and a wheel driven by a boy who was looking at a girl. Onions all the way down the street.",
+    "opt1": "A cart took you out?",
+    "opt2": "You're joking, and I've heard enough."
+  },
+  "aboutLudoGate": {
+    "message": "A cart took me out. The bone came through in two places and the surgeon was honest about it. A week later the castle sent a man round with a very polite letter. I could still shout and somebody has to hold the gate, so they gave me the gate. It pays regular, which the fighting never did.",
+    "opt1": "Does it still trouble you?",
+    "opt2": "You tell it well."
+  },
+  "kneeTalk": {
+    "message": "Bad in the mornings and worse on ladders. That glass has to be turned from the top, so I've got a boy for it, and I give him a copper not to tell anyone why. The surgeon binds it in linen, which is a board by noon. They tell me those Mawood people wrap a joint in spider silk and walk off on it, and they charge like it, and the castle doesn't pay for knees. What are you looking at it for?",
+    "opt1": "Here's ten bundles of spider silk.",
+    "opt2": "Sounds like you need a cheaper boy."
+  },
+  "kneeThanks": {
+    "message": "What do I owe you? No, I mean it, what's that fetch up there, I'll have it off the gate money. Nothing. Right. Well. You don't go telling the stands about this, they paid to see a man nothing can hurt. Hand it over, quick, before somebody sees.",
+    "opt1": "Nobody's looking, Ludo."
+  },
+  "kneeBetter": {
+    "message": "Keep your voice down, the whole... there's nobody here. Habit. It's better. I slept through till the bells two mornings running, and I can't tell you when I last did that. I never asked you to go all that way up the trees, you know. On account of a knee you've only ever heard me joke about. Why'd you do it?",
+    "opt1": "You limp worse when you think nobody's watching.",
+    "opt2": "You walk worse than you tell it."
+  },
+  "kneeHome": {
+    "message": "Do I. Huh. I put on a good walk for the stands, I've been at it for years, and I'd have bet the gate money nobody had spotted it. You'd have taken that bet, wouldn't you? I'm tired of calling you challenger when there's nobody here to hear it. What do they call you at home?",
+    "opt1": "Challenger's fine, I've got used to it.",
+    "opt2": "Nobody's called me anything at home for a long while."
+  },
+  "kneeName": {
+    "message": "Then I'll keep it, and you can have it off me when you want it back. I'd only get the other one wrong in front of people anyway. There's a knack to bellowing a name, you need a good vowel at the end.",
+    "opt1": "I'll hold you to that."
+  },
+  "gateTalk": {
+    "message": "What's it like! They want to know what it's like, friends, up there in the cheap row! It's like being a king, with a better view and none of the poison. Did I ever tell you about the bear that got loose in the top seats? You'll like this one, there's a magistrate in it.",
+    "opt1": "There's nobody up there, Ludo, I'm the one asking.",
+    "opt2": "Not the bear again."
+  },
+  "gateTalkQuiet": {
+    "message": "No. There isn't, is there. It's louder from the gate, you know. Out there you never heard a thing, you could've been at the bottom of a well, it was all your own breath. From here I hear every one of them. Some kid goes down on my floor and I'm standing here with a stick, and I know exactly what I'd have... Nobody ever beat me. I used to think that was the good part. Ha! Listen to him, ladies and gentlemen. Somebody get this man a bigger crowd!",
+    "opt1": "I'll let you get back to it."
+  },
+  "firstBlood": {
+    "message": "Saw it! Half the cheap row saw it! And I'll tell you what they didn't see, because they were on their feet shouting. The shoulder. The left one. No, listen, I'm telling you for money now. About a quarter of the way down the card it drops, and you start hurrying everything you do. I've got ten thousand of your gold and I'd like another ten thousand, and I can't have that if it falls off. Breathe out before you strike. That's free, and it's the last free thing you'll get from me.",
+    "opt1": "Mind your own shoulder.",
+    "opt2": "I'll try it."
+  },
+  "yadFelled": {
+    "message": "Say it! Friends, on your feet! Yad, the Arena Champion, flat on its back on my sand, and this one standing over it with the glass still running! Ha! Did you hear them? I've been in this building since I was ten and I've heard them make that noise maybe four times. They took it out on the big door, breathing. It was up by supper, ate its mutton, and stood looking at me through the bars as if I'd done it.",
+    "opt1": "Could you have beaten it, with two good knees?",
+    "opt2": "I'll be back for another go."
+  },
+  "yadFelledAsk": {
+    "message": "With two knees! Ladies and gentlemen, the challenger would like to know! Oh, easily. In my sleep. With onions. I'll say this once, though. You read that thing before it moved, over and over, and I never had to do that. Everyone I ever fought wanted what I wanted. Anyway. You'll have another cape off me every time you do that, and word is that dwarf at the Forge can use two of a thing, or will once he's got his fire going. Get some sleep. You look terrible.",
+    "opt1": "You look worse."
   },
   "claimed": {
-    "message": "Your winnings, challenger, every last stitch. The stands are still shouting your name.",
-    "ok": "Thanks, Ludo."
-  },
-  "cooldown": {
-    "message": "Easy, challenger! The sand's still being raked from your last bout. Give it half an hour and the gate's yours again.",
-    "ok": "I'll be back."
+    "message": "There you go, all of it. Count it if you like.",
+    "opt1": "I'll count it outside."
   },
   "running": {
-    "message": "You've got a fight going and the sand's still falling! Get back out there, challenger.",
-    "ok": "On my way."
+    "message": "Your glass is still running, challenger, and it won't wait while you chat. Get back out there.",
+    "opt1": "Going."
+  },
+  "cooldown": {
+    "message": "Not yet, challenger, the half hour's not up. Come back when it is.",
+    "opt1": "Half an hour, then."
   },
   "coldForgeLead": {
-    "message": "Ha, a rescue for the tongs, challenger! I saw that cart stranded up on the Mountain Pass; Goblin Scavengers carried off the tools, big tongs and all. Look for Phurgo's square notch by the hinge, then take them straight to him.",
-    "opt1": "I'll find the scavengers."
+    "message": "The dwarf! He said that? How many words did it take him? I've had longer talks with that post. He's the only man in Lirold who's never laughed at my cart story, and now he wants to hear about a cart. Stand here, you'll like this. The castle shuts the mine road two winters back, and his carter's out on it with a load and the heaviest pair of tongs you ever saw. So he goes the long way, up over the Mountain Pass, with snow coming and one bad wheel. Carts, friends! I've got views! And the next soul to lay eyes on that cart is yours truly, on a mule, up there with the trappers to look at stock, and I'll thank you not to picture it. So who had the load off it, challenger? Take a guess.",
+    "opt1": "Whoever found the cart.",
+    "opt2": "Just tell me, Ludo."
+  },
+  "coldForgeCart": {
+    "message": "Goblins. Scavengers, the Pass is lousy with them. The carter had left it where it stopped and walked down with his skin, which I'd have done. There were three of them on the load when we came by, and one going off up the rocks with those tongs on his shoulder, near as long as he was. We didn't stop. I was on a mule. They pick a wreck clean and trade it round among themselves, so don't expect the first one you open up to have them. You might go through a good many. Tell him Ludo said hello. He won't say it back.",
+    "opt1": "I'll tell him."
+  },
+  "pathfindersSealInfo": {
+    "message": "Let me see that. Ha! That came out of my chest? The Exploration Guild leaves a few of those in with my prizes, and I don't ask why, they pay the carriage. Take it down to Marvin in La Harpar. He'll put you in his book and show you how his people tell sound gear from scrap, and after that about one piece in ten you pull off a body comes up better than it looks. He only does it the once. And don't bother selling it, nobody'll touch it. I tried.",
+    "opt1": "La Harpar it is."
+  },
+  "idleBusiness": {
+    "message": "Slow. I'll tell you what's killing me, it's sand. It has to be river sand and it comes up by barge, and the bargemen have gone up a third since spring, while the castle still pays on the old price. So I'm raking the same floor twice as long and hoping nobody looks at the corners.",
+    "opt1": "I thought you'd tell me the crowds were roaring.",
+    "opt2": "Sorry I asked."
+  },
+  "idleCrowd": {
+    "message": "Ha! They are, they are, you should've heard them on... well. Yesterday was thin. There was a man selling nuts in the top row and I think he came for the quiet. I've got two brothers from the river wards on the card this week who can't stand each other, though. Want to put money on it?",
+    "opt1": "Not with you."
   }
 }

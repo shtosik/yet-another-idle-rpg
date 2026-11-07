@@ -2,6 +2,8 @@
 
 **Scope:** M · **Status:** Done (wired in plan commit C10 on `feat/farm`)
 
+Superseded text: the shipped dialogue was rewritten on 2026-11-07, so the locale JSON and `docs/character/` win over the script below.
+
 Scripts for [the Farm & Farming Guild](farm-and-husbandry.md) (owns the rules) in the plan's C10 ([`farm-implementation-plan.md`](farm-implementation-plan.md)). Voices: [Marta](../character/farm/marta-tillbrook.md), [Wick](../character/farm/wick.md), Sylvie (`src/assets/locales/en/dialogues/mawoodSylvie.json`: warm, chatty, "I know I talk a lot"). Names are placeholders (farm doc §1).
 
 ## Lore already in the game

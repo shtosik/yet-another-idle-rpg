@@ -1,8 +1,13 @@
 import { DialogueNode } from '../../../interfaces/dialogues/dialogue-node.interface'
+import { DialogueResult } from '../../../interfaces/dialogues/dialogue-option.type'
+import { DialogueCondition } from '../../../types/dialogues/dialogue-condition.type'
+import { DialogueEffect } from '../../../types/dialogues/dialogue-effect.type'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
 import { NpcID } from '../../../enums/map/npc-id.enum'
+import { dialogueNodes } from '../dialogue-nodes'
 
+// Character and voice: docs/character/lirold/phurgo.md. Text: dialogues/liroldPhurgo.json.
 export enum PhurgoDialogue {
   default = 0,
   intro1,
@@ -24,450 +29,135 @@ export enum PhurgoDialogue {
   forgeWork,
   forgeCost,
   forgeLimits,
+  introBuckle,
+  aboutSlatefall,
+  aboutSlatefallGuess,
+  coldForgeWhyTongs,
+  coldForgeChair,
+  coldForgeRecord,
+  coldForgeWood,
+  forgeJoin,
+  forgeMatch,
+  forgeRisk,
+  aboutPieFirst,
+  aboutTally,
+  hearthPress,
+  hearthPressArm,
+  hearthPressEnd,
+  idleForge,
+  idleHot,
+  aboutTable,
 }
 
 export type LiroldPhurgoDialogueType = Record<PhurgoDialogue, DialogueNode<PhurgoDialogue>>
 
-const NS = 'dialogues/liroldPhurgo'
+const P = PhurgoDialogue
+const say = dialogueNodes<PhurgoDialogue>('dialogues/liroldPhurgo', PhurgoDialogue)
+
+const TABLE_APPLE_FLAG = 'phurgo_table_apple'
+const metFlag: DialogueEffect = { type: 'flag', name: `met_${NpcID.liroldPhurgo}` }
+
+const forgeQuest = (questState: QuestState, step?: number): DialogueCondition => ({ type: 'quest', questId: QuestID.theColdForge, questState, step })
+const completed = forgeQuest(QuestState.completed)
+const available = forgeQuest(QuestState.available)
+const ready = (step: number) => forgeQuest(QuestState.readyToAdvance, step)
+const active = (step: number) => forgeQuest(QuestState.active, step)
+/** Item steps: the reminder never shows beside the turn-in. Talk steps 1 and 3 are ready at once, at another NPC. */
+const stillGathering = (step: number): DialogueCondition[] => [active(step), { ...ready(step), not: true }]
+
+type Result = DialogueResult<PhurgoDialogue>
+const toHub: Result = { next: P.default }
+const close: Result = { closeDialogue: true }
+const advance: DialogueEffect = { type: 'quest', questId: QuestID.theColdForge, action: 'advance' }
+const startQuest: Result = { next: P.default, effects: [{ type: 'quest', questId: QuestID.theColdForge, action: 'start' }] }
+const openForge: Result = { visibilityConditions: [completed], closeDialogue: true, effects: [{ type: 'forge' }] }
+
+/** A step reminder: leave, or back to the hub. */
+const reminder = (id: PhurgoDialogue) => say(id, ['opt1', close], ['opt2', toHub])
 
 const LIROLD_PHURGO: LiroldPhurgoDialogueType = {
-  [PhurgoDialogue.intro1]: {
-    id: PhurgoDialogue.intro1,
-    messageKey: `${NS}:intro1.message`,
-    options: [
-      {
-        responseKey: `${NS}:intro1.opt1`,
-        results: [
-          { next: PhurgoDialogue.aboutForge, effects: [{ type: 'flag', name: `met_${NpcID.liroldPhurgo}` }] },
-        ],
-      },
-      {
-        responseKey: `${NS}:intro1.opt2`,
-        results: [
-          { closeDialogue: true, effects: [{ type: 'flag', name: `met_${NpcID.liroldPhurgo}` }] },
-        ],
-      },
+  [P.intro1]: say(P.intro1, ['opt1', { next: P.introBuckle, effects: [metFlag] }], ['opt2', { closeDialogue: true, effects: [metFlag] }]),
+  [P.introBuckle]: say(P.introBuckle, ['opt1', { next: P.aboutForge }], ['opt2', close]),
+
+  [P.default]: say(P.default,
+    // Turn-ins
+    ['opt1', { visibilityConditions: [ready(5)], next: P.coldForgeComplete, effects: [advance] }],
+    ['opt2', { visibilityConditions: [ready(4)], next: P.coldForgePie, effects: [advance] }],
+    ['opt3', { visibilityConditions: [ready(2)], next: P.coldForgeTongs, effects: [advance] }],
+    // Reminders
+    [
+      'opt4',
+      { visibilityConditions: stillGathering(5), next: P.coldForgeProgressFive },
+      { visibilityConditions: stillGathering(4), next: P.coldForgeProgressFour },
+      { visibilityConditions: [active(3)], next: P.coldForgeProgressThree },
+      { visibilityConditions: stillGathering(2), next: P.coldForgeProgressTwo },
+      { visibilityConditions: [active(1)], next: P.coldForgeProgressOne },
     ],
-  },
-  [PhurgoDialogue.default]: {
-    id: PhurgoDialogue.default,
-    messageKey: `${NS}:default.message`,
-    options: [
-      {
-        responseKey: `${NS}:default.opt1`,
-        results: [
-          {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.theColdForge, questState: QuestState.readyToAdvance, step: 5 }],
-            next: PhurgoDialogue.coldForgeComplete,
-            effects: [{ type: 'quest', questId: QuestID.theColdForge, action: 'advance' }],
-          },
-        ],
-      },
-      {
-        responseKey: `${NS}:default.opt2`,
-        results: [
-          {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.theColdForge, questState: QuestState.readyToAdvance, step: 4 }],
-            next: PhurgoDialogue.coldForgePie,
-            effects: [{ type: 'quest', questId: QuestID.theColdForge, action: 'advance' }],
-          },
-        ],
-      },
-      {
-        responseKey: `${NS}:default.opt3`,
-        results: [
-          {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.theColdForge, questState: QuestState.readyToAdvance, step: 2 }],
-            next: PhurgoDialogue.coldForgeTongs,
-            effects: [{ type: 'quest', questId: QuestID.theColdForge, action: 'advance' }],
-          },
-        ],
-      },
-      {
-        responseKey: `${NS}:default.opt4`,
-        results: [
-          {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.theColdForge, questState: QuestState.active, step: 5 }],
-            next: PhurgoDialogue.coldForgeProgressFive,
-          },
-          {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.theColdForge, questState: QuestState.active, step: 4 }],
-            next: PhurgoDialogue.coldForgeProgressFour,
-          },
-          {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.theColdForge, questState: QuestState.active, step: 3 }],
-            next: PhurgoDialogue.coldForgeProgressThree,
-          },
-          {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.theColdForge, questState: QuestState.active, step: 2 }],
-            next: PhurgoDialogue.coldForgeProgressTwo,
-          },
-          {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.theColdForge, questState: QuestState.active, step: 1 }],
-            next: PhurgoDialogue.coldForgeProgressOne,
-          },
-        ],
-      },
-      {
-        responseKey: `${NS}:default.opt5`,
-        results: [
-          {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.theColdForge, questState: QuestState.available }],
-            next: PhurgoDialogue.coldForgeOffer,
-          },
-        ],
-      },
-      {
-        responseKey: `${NS}:default.opt6`,
-        results: [
-          {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.theColdForge, questState: QuestState.completed }],
-            closeDialogue: true,
-            effects: [{ type: 'forge' }],
-          },
-        ],
-      },
-      {
-        responseKey: `${NS}:default.opt11`,
-        results: [
-          {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.theColdForge, questState: QuestState.completed }],
-            next: PhurgoDialogue.forgeWork,
-          },
-        ],
-      },
-      {
-        responseKey: `${NS}:default.opt7`,
-        results: [
-          {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.theColdForge, questState: QuestState.completed }],
-            next: PhurgoDialogue.aboutForgeRestored,
-          },
-          { next: PhurgoDialogue.aboutForge },
-        ],
-      },
-      {
-        responseKey: `${NS}:default.opt8`,
-        results: [
-          { next: PhurgoDialogue.aboutPie },
-        ],
-      },
-      {
-        responseKey: `${NS}:default.opt9`,
-        results: [
-          { next: PhurgoDialogue.aboutHome },
-        ],
-      },
-      {
-        responseKey: `${NS}:default.opt10`,
-        results: [
-          { closeDialogue: true },
-        ],
-      },
-    ],
-  },
-  [PhurgoDialogue.aboutForge]: {
-    id: PhurgoDialogue.aboutForge,
-    messageKey: `${NS}:aboutForge.message`,
-    options: [
-      {
-        responseKey: `${NS}:aboutForge.opt1`,
-        results: [
-          {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.theColdForge, questState: QuestState.available }],
-            next: PhurgoDialogue.coldForgeOffer,
-          },
-          { next: PhurgoDialogue.default },
-        ],
-      },
-      {
-        responseKey: `${NS}:aboutForge.opt2`,
-        results: [
-          { closeDialogue: true },
-        ],
-      },
-    ],
-  },
-  [PhurgoDialogue.aboutForgeRestored]: {
-    id: PhurgoDialogue.aboutForgeRestored,
-    messageKey: `${NS}:aboutForgeRestored.message`,
-    options: [
-      {
-        responseKey: `${NS}:aboutForgeRestored.opt1`,
-        results: [
-          {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.theColdForge, questState: QuestState.completed }],
-            closeDialogue: true,
-            effects: [{ type: 'forge' }],
-          },
-        ],
-      },
-      {
-        responseKey: `${NS}:aboutForgeRestored.opt2`,
-        results: [
-          { next: PhurgoDialogue.default },
-        ],
-      },
-    ],
-  },
-  [PhurgoDialogue.forgeWork]: {
-    id: PhurgoDialogue.forgeWork,
-    messageKey: `${NS}:forgeWork.message`,
-    options: [
-      {
-        responseKey: `${NS}:forgeWork.opt1`,
-        results: [{ next: PhurgoDialogue.forgeCost }],
-      },
-      {
-        responseKey: `${NS}:forgeWork.opt2`,
-        results: [{ next: PhurgoDialogue.default }],
-      },
-    ],
-  },
-  [PhurgoDialogue.forgeCost]: {
-    id: PhurgoDialogue.forgeCost,
-    messageKey: `${NS}:forgeCost.message`,
-    options: [
-      {
-        responseKey: `${NS}:forgeCost.opt1`,
-        results: [{ next: PhurgoDialogue.forgeLimits }],
-      },
-      {
-        responseKey: `${NS}:forgeCost.opt2`,
-        results: [{ next: PhurgoDialogue.default }],
-      },
-    ],
-  },
-  [PhurgoDialogue.forgeLimits]: {
-    id: PhurgoDialogue.forgeLimits,
-    messageKey: `${NS}:forgeLimits.message`,
-    options: [
-      {
-        responseKey: `${NS}:forgeLimits.opt1`,
-        results: [{ next: PhurgoDialogue.default }],
-      },
-    ],
-  },
-  [PhurgoDialogue.aboutPie]: {
-    id: PhurgoDialogue.aboutPie,
-    messageKey: `${NS}:aboutPie.message`,
-    options: [
-      {
-        responseKey: `${NS}:aboutPie.opt1`,
-        results: [
-          { next: PhurgoDialogue.default },
-        ],
-      },
-    ],
-  },
-  [PhurgoDialogue.aboutHome]: {
-    id: PhurgoDialogue.aboutHome,
-    messageKey: `${NS}:aboutHome.message`,
-    options: [
-      {
-        responseKey: `${NS}:aboutHome.opt1`,
-        results: [
-          { next: PhurgoDialogue.aboutHomeLife },
-        ],
-      },
-      {
-        responseKey: `${NS}:aboutHome.opt2`,
-        results: [
-          { next: PhurgoDialogue.aboutLeaving },
-        ],
-      },
-      {
-        responseKey: `${NS}:aboutHome.opt3`,
-        results: [
-          { next: PhurgoDialogue.default },
-        ],
-      },
-    ],
-  },
-  [PhurgoDialogue.aboutHomeLife]: {
-    id: PhurgoDialogue.aboutHomeLife,
-    messageKey: `${NS}:aboutHomeLife.message`,
-    options: [
-      {
-        responseKey: `${NS}:aboutHomeLife.opt1`,
-        results: [
-          { next: PhurgoDialogue.aboutLeaving },
-        ],
-      },
-      {
-        responseKey: `${NS}:aboutHomeLife.opt2`,
-        results: [
-          { next: PhurgoDialogue.default },
-        ],
-      },
-    ],
-  },
-  [PhurgoDialogue.aboutLeaving]: {
-    id: PhurgoDialogue.aboutLeaving,
-    messageKey: `${NS}:aboutLeaving.message`,
-    options: [
-      {
-        responseKey: `${NS}:aboutLeaving.opt1`,
-        results: [
-          { next: PhurgoDialogue.default },
-        ],
-      },
-    ],
-  },
-  [PhurgoDialogue.coldForgeOffer]: {
-    id: PhurgoDialogue.coldForgeOffer,
-    messageKey: `${NS}:coldForgeOffer.message`,
-    options: [
-      {
-        responseKey: `${NS}:coldForgeOffer.opt1`,
-        results: [
-          { next: PhurgoDialogue.default, effects: [{ type: 'quest', questId: QuestID.theColdForge, action: 'start' }] },
-        ],
-      },
-      {
-        responseKey: `${NS}:coldForgeOffer.opt2`,
-        results: [
-          { next: PhurgoDialogue.default },
-        ],
-      },
-    ],
-  },
-  [PhurgoDialogue.coldForgeProgressOne]: {
-    id: PhurgoDialogue.coldForgeProgressOne,
-    messageKey: `${NS}:coldForgeProgressOne.message`,
-    options: [
-      {
-        responseKey: `${NS}:coldForgeProgressOne.opt1`,
-        results: [
-          { closeDialogue: true },
-        ],
-      },
-      {
-        responseKey: `${NS}:coldForgeProgressOne.opt2`,
-        results: [
-          { next: PhurgoDialogue.default },
-        ],
-      },
-    ],
-  },
-  [PhurgoDialogue.coldForgeProgressTwo]: {
-    id: PhurgoDialogue.coldForgeProgressTwo,
-    messageKey: `${NS}:coldForgeProgressTwo.message`,
-    options: [
-      {
-        responseKey: `${NS}:coldForgeProgressTwo.opt1`,
-        results: [
-          { closeDialogue: true },
-        ],
-      },
-      {
-        responseKey: `${NS}:coldForgeProgressTwo.opt2`,
-        results: [
-          { next: PhurgoDialogue.default },
-        ],
-      },
-    ],
-  },
-  [PhurgoDialogue.coldForgeTongs]: {
-    id: PhurgoDialogue.coldForgeTongs,
-    messageKey: `${NS}:coldForgeTongs.message`,
-    options: [
-      {
-        responseKey: `${NS}:coldForgeTongs.opt1`,
-        results: [
-          { next: PhurgoDialogue.default },
-        ],
-      },
-    ],
-  },
-  [PhurgoDialogue.coldForgeProgressThree]: {
-    id: PhurgoDialogue.coldForgeProgressThree,
-    messageKey: `${NS}:coldForgeProgressThree.message`,
-    options: [
-      {
-        responseKey: `${NS}:coldForgeProgressThree.opt1`,
-        results: [
-          { closeDialogue: true },
-        ],
-      },
-      {
-        responseKey: `${NS}:coldForgeProgressThree.opt2`,
-        results: [
-          { next: PhurgoDialogue.default },
-        ],
-      },
-    ],
-  },
-  [PhurgoDialogue.coldForgeProgressFour]: {
-    id: PhurgoDialogue.coldForgeProgressFour,
-    messageKey: `${NS}:coldForgeProgressFour.message`,
-    options: [
-      {
-        responseKey: `${NS}:coldForgeProgressFour.opt1`,
-        results: [
-          { closeDialogue: true },
-        ],
-      },
-      {
-        responseKey: `${NS}:coldForgeProgressFour.opt2`,
-        results: [
-          { next: PhurgoDialogue.default },
-        ],
-      },
-    ],
-  },
-  [PhurgoDialogue.coldForgePie]: {
-    id: PhurgoDialogue.coldForgePie,
-    messageKey: `${NS}:coldForgePie.message`,
-    options: [
-      {
-        responseKey: `${NS}:coldForgePie.opt1`,
-        results: [
-          { next: PhurgoDialogue.default },
-        ],
-      },
-    ],
-  },
-  [PhurgoDialogue.coldForgeProgressFive]: {
-    id: PhurgoDialogue.coldForgeProgressFive,
-    messageKey: `${NS}:coldForgeProgressFive.message`,
-    options: [
-      {
-        responseKey: `${NS}:coldForgeProgressFive.opt1`,
-        results: [
-          { closeDialogue: true },
-        ],
-      },
-      {
-        responseKey: `${NS}:coldForgeProgressFive.opt2`,
-        results: [
-          { next: PhurgoDialogue.default },
-        ],
-      },
-    ],
-  },
-  [PhurgoDialogue.coldForgeComplete]: {
-    id: PhurgoDialogue.coldForgeComplete,
-    messageKey: `${NS}:coldForgeComplete.message`,
-    options: [
-      {
-        responseKey: `${NS}:coldForgeComplete.opt1`,
-        results: [
-          {
-            visibilityConditions: [{ type: 'quest', questId: QuestID.theColdForge, questState: QuestState.completed }],
-            closeDialogue: true,
-            effects: [{ type: 'forge' }],
-          },
-        ],
-      },
-      {
-        responseKey: `${NS}:coldForgeComplete.opt2`,
-        results: [
-          { next: PhurgoDialogue.default },
-        ],
-      },
-    ],
-  },
+    // Offer
+    ['opt5', { visibilityConditions: [available], next: P.coldForgeOffer }],
+    // The Forge
+    ['opt6', openForge],
+    ['opt7', { visibilityConditions: [completed], next: P.forgeWork }],
+    ['opt8', { visibilityConditions: [completed], next: P.aboutForgeRestored }, { next: P.aboutForge }],
+    // Talk
+    ['opt9', { visibilityConditions: [active(4)], next: P.hearthPress }, { visibilityConditions: [active(5)], next: P.hearthPress }],
+    ['opt10', { next: P.aboutPie }],
+    ['opt11', { next: P.aboutHome }],
+    ['opt12', { visibilityConditions: [completed], next: P.idleHot }, { next: P.idleForge }],
+    ['opt13', { visibilityConditions: [completed, { type: 'flag', name: TABLE_APPLE_FLAG, isSet: false }], next: P.aboutTable, effects: [{ type: 'flag', name: TABLE_APPLE_FLAG }] }],
+    ['opt14', close],
+  ),
+
+  // The cold Forge
+  [P.aboutForge]: say(P.aboutForge,
+    ['opt1', { visibilityConditions: [available], next: P.coldForgeOffer }, toHub],
+    ['opt2', { next: P.aboutSlatefall }],
+    ['opt3', close],
+  ),
+  [P.aboutSlatefall]: say(P.aboutSlatefall, ['opt1', { next: P.aboutSlatefallGuess }], ['opt2', toHub]),
+  [P.aboutSlatefallGuess]: say(P.aboutSlatefallGuess, ['opt1', toHub]),
+
+  // The Cold Forge
+  [P.coldForgeOffer]: say(P.coldForgeOffer, ['opt1', startQuest], ['opt2', { next: P.coldForgeWhyTongs }], ['opt3', toHub]),
+  [P.coldForgeWhyTongs]: say(P.coldForgeWhyTongs, ['opt1', startQuest], ['opt2', toHub]),
+  [P.coldForgeProgressOne]: reminder(P.coldForgeProgressOne),
+  [P.coldForgeProgressTwo]: reminder(P.coldForgeProgressTwo),
+  [P.coldForgeTongs]: say(P.coldForgeTongs, ['opt1', { next: P.coldForgeChair }]),
+  [P.coldForgeChair]: say(P.coldForgeChair, ['opt1', { next: P.coldForgeRecord }], ['opt2', { next: P.coldForgeRecord }]),
+  [P.coldForgeRecord]: say(P.coldForgeRecord, ['opt1', toHub]),
+  [P.coldForgeProgressThree]: reminder(P.coldForgeProgressThree),
+  [P.coldForgeProgressFour]: reminder(P.coldForgeProgressFour),
+  [P.coldForgePie]: say(P.coldForgePie, ['opt1', { next: P.coldForgeWood }]),
+  [P.coldForgeWood]: say(P.coldForgeWood, ['opt1', toHub]),
+  [P.coldForgeProgressFive]: reminder(P.coldForgeProgressFive),
+  [P.coldForgeComplete]: say(P.coldForgeComplete, ['opt1', openForge], ['opt2', toHub]),
+
+  // The hot Forge
+  [P.aboutForgeRestored]: say(P.aboutForgeRestored, ['opt1', openForge], ['opt2', toHub]),
+  [P.forgeWork]: say(P.forgeWork, ['opt1', { next: P.forgeJoin }], ['opt2', { next: P.forgeCost }], ['opt3', toHub]),
+  [P.forgeJoin]: say(P.forgeJoin, ['opt1', { next: P.forgeMatch }], ['opt2', { next: P.forgeCost }], ['opt3', toHub]),
+  [P.forgeMatch]: say(P.forgeMatch, ['opt1', { next: P.forgeCost }], ['opt2', toHub]),
+  [P.forgeCost]: say(P.forgeCost, ['opt1', { next: P.forgeRisk }], ['opt2', { next: P.forgeLimits }], ['opt3', toHub]),
+  [P.forgeRisk]: say(P.forgeRisk, ['opt1', { next: P.forgeLimits }], ['opt2', toHub]),
+  [P.forgeLimits]: say(P.forgeLimits, ['opt1', toHub], ['opt2', openForge]),
+
+  // Pie and home
+  [P.aboutPie]: say(P.aboutPie, ['opt1', { next: P.aboutPieFirst }], ['opt2', toHub]),
+  [P.aboutPieFirst]: say(P.aboutPieFirst, ['opt1', toHub]),
+  [P.aboutHome]: say(P.aboutHome, ['opt1', { next: P.aboutHomeLife }], ['opt2', { next: P.aboutLeaving }], ['opt3', toHub]),
+  [P.aboutHomeLife]: say(P.aboutHomeLife, ['opt1', { next: P.aboutLeaving }], ['opt2', { next: P.aboutTally }], ['opt3', toHub]),
+  [P.aboutTally]: say(P.aboutTally, ['opt1', toHub]),
+  [P.aboutLeaving]: say(P.aboutLeaving, ['opt1', { next: P.aboutHomeLife }], ['opt2', toHub]),
+
+  // The thing he won't say
+  [P.hearthPress]: say(P.hearthPress, ['opt1', { next: P.hearthPressArm }], ['opt2', toHub]),
+  [P.hearthPressArm]: say(P.hearthPressArm, ['opt1', { next: P.hearthPressEnd }], ['opt2', toHub]),
+  [P.hearthPressEnd]: say(P.hearthPressEnd, ['opt1', toHub]),
+
+  // Idle
+  [P.idleForge]: say(P.idleForge, ['opt1', { next: P.aboutPie }], ['opt2', toHub]),
+  [P.idleHot]: say(P.idleHot, ['opt1', toHub], ['opt2', toHub]),
+  [P.aboutTable]: say(P.aboutTable, ['opt1', toHub], ['opt2', close]),
 }
 
 export default LIROLD_PHURGO

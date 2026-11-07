@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core'
+import { Component, ElementRef, effect, inject, viewChild } from '@angular/core'
 import { DialogueManagerService } from '../../../services/dialogue-manager.service'
 import { DialogueOption } from '../../../../interfaces/dialogues/dialogue-option.type'
 import i18next from 'i18next'
@@ -39,6 +39,15 @@ export class DialogueComponent {
 
   protected activeNpc = this.dialogueService.activeNpc
   protected activeNode = this.dialogueService.activeNode
+  private scroller = viewChild<ElementRef<HTMLElement>>('scroller')
+
+  constructor() {
+    // Each new message starts at its first line, wherever the last one was scrolled to.
+    effect(() => {
+      this.activeNode()
+      this.scroller()?.nativeElement.scrollTo({ top: 0 })
+    })
+  }
 
   handleOptionClicked(option: DialogueOption<any>): void {
     this.dialogueService.selectOption(option)

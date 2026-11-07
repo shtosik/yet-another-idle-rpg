@@ -1,107 +1,203 @@
 {
   "intro1": {
-    "message": "Phurgo, blacksmith. Mind the tools; they're cleaner than the floor, and I'd like them to stay that way. If you've come for hot work, the hearth's cold.",
-    "opt1": "Why is the hearth cold?",
-    "opt2": "I'll let you work."
+    "message": "Your buckle's loose. No, the other one. Give it here.",
+    "opt1": "Never mind the buckle, are you the smith?",
+    "opt2": "Hands off, I'm just passing through."
+  },
+  "introBuckle": {
+    "message": "Phurgo. Smith, yes, with a cold hearth, so nothing hot and nothing today. This isn't a job, mind. I haven't agreed to a job. I just can't look at it.",
+    "opt1": "Why's the hearth cold?",
+    "opt2": "Then I'll take my buckle and go."
   },
   "default": {
-    "message": "Come in. What needs seeing to?",
-    "opt1": "Here's the wood for your hearth.",
-    "opt2": "One Fish & Apple Pie, Phurgo.",
-    "opt3": "I've brought your forge tongs.",
-    "opt4": "About getting the hearth going...",
-    "opt5": "Can I help you get it burning again?",
-    "opt6": "Can you strengthen my gear?",
-    "opt7": "Tell me about the Forge.",
-    "opt8": "You really like apple pie?",
-    "opt9": "Where did you live before Lirold?",
-    "opt10": "Goodbye, Phurgo.",
-    "opt11": "How does your Forge work?"
+    "message": "What do you need?",
+    "opt1": "Ten Ancient Wood, and I'm staying to watch you light it.",
+    "opt2": "I made you a Fish & Apple Pie.",
+    "opt3": "The goblins on the Pass had these, and I thought you'd want them back.",
+    "opt4": "Where are we with the hearth?",
+    "opt5": "What would it take to light that hearth?",
+    "opt6": "I've got gear to upgrade.",
+    "opt7": "How does your Forge work?",
+    "opt8": "Tell me about the Forge.",
+    "opt9": "Marvin says you could've worked salvage all along, so the iron was never why that hearth stayed cold, was it?",
+    "opt10": "Is that pie crust on your apron?",
+    "opt11": "Where are you from?",
+    "opt12": "How are things?",
+    "opt13": "You've got a table now.",
+    "opt14": "I'll get out of your way."
   },
   "aboutForge": {
-    "message": "Slatefall sent my iron until the castle shut the mine two winters ago. I've kept busy with cold repairs, but the hearth's been waiting. Then scavengers took my heavy tongs off a stranded cart on the Pass.",
-    "opt1": "Can I help?",
-    "opt2": "I'll leave you to it."
+    "message": "Cold. Two winters. Slatefall iron came down the mine road every few weeks, you could set the bells by the carter's cough, and the castle shut the mine and it stopped. I do what can be done cold. Rivets, straps, bent hinges. Hearth's swept. Bellows oiled.",
+    "opt1": "Let's talk about getting it lit.",
+    "opt2": "Why did they shut the mine?",
+    "opt3": "I'll leave you to it."
   },
-  "aboutForgeRestored": {
-    "message": "The mine is still shut, but there's useful metal coming through this door again. Two matching pieces give me something to work with. I'll show you the cost before the hammer falls.",
-    "opt1": "Can you strengthen my gear?",
-    "opt2": "Good to see the fire back."
+  "aboutSlatefall": {
+    "message": "Castle's business. They didn't write to me.",
+    "opt1": "You're a dwarf, you must have a guess.",
+    "opt2": "Then let's talk about something else."
   },
-  "forgeWork": {
-    "message": "Two places on my bench: lay the piece to strengthen in the first, its matching spare in the second. Both must be the same piece, alike in quality and worked the same number of times, or I won't strike. The spare feeds the fire.",
-    "opt1": "How do we begin, and what will it cost?",
-    "opt2": "Back to business."
-  },
-  "forgeCost": {
-    "message": "A worn piece laid first stays on you; laid second, it burns like any spare. I'll show you the stronger piece and price before I strike. Finer pieces and those already worked cost more gold.",
-    "opt1": "How far can you take a piece?",
-    "opt2": "Back to business."
-  },
-  "forgeLimits": {
-    "message": "Five workings is as far as I can take a piece for now; more would need better tools and a steadier hand. Heirlooms and one-of-a-kind gifts stay off my anvil. And keep your animals clear of the hearth; I mend gear, not living creatures.",
-    "opt1": "Back to business."
-  },
-  "aboutPie": {
-    "message": "Apple pie makes a person sit down properly. Coastal traders got me used to La Harpar's fish filling; a proper lunch for a long day at the anvil. Bring it hot, and I'll put the hammer down.",
-    "opt1": "I'll remember that."
-  },
-  "aboutHome": {
-    "message": "Bramhold, under the highlands of Keldrath, north beyond Elderreach. Workshops off the halls, trading doors to the surface. I miss the shared table more than the ceiling.",
-    "opt1": "What is life like there?",
-    "opt2": "Why did you leave?",
-    "opt3": "Back to business."
-  },
-  "aboutHomeLife": {
-    "message": "We tally a repaired joint so the next pair of hands knows where to look; a good repair earns its place beside new work. Supper is often mushroom-and-barley stew, dark bread and baked apples. We say surface folk promise faster than metal cools, but keep your word and there's a chair for you.",
-    "opt1": "Why exchange that for Lirold?",
-    "opt2": "Back to business."
-  },
-  "aboutLeaving": {
-    "message": "I wanted a workshop of my own, and work I hadn't learned by heart. Traders spoke of Lirold's repairs and Slatefall iron, so I came here before the mine closed. No one sent me away; I chose this hearth.",
-    "opt1": "I hope it serves you well."
+  "aboutSlatefallGuess": {
+    "message": "I'm a smith. Bramhold never had a hand in that mine, and being a dwarf doesn't make a hole in a hillside mine to know. I can tell you what seam a bar came out of by how it takes a file. That stopped being useful. People come in here with reasons. Bad air. Flood. A lost crew, one of them told me, and the next said no crew at all. I weigh things. I've got nothing to put on the scale.",
+    "opt1": "I'll stop asking."
   },
   "coldForgeOffer": {
-    "message": "Ludo Crane saw what became of my cart, and he remembers every load that might have fed his Arena. Ask him about the tongs. We'll see what can be saved before we talk about new iron.",
-    "opt1": "I'll ask Ludo at the Arena.",
-    "opt2": "Another time."
+    "message": "Tongs, first. Heavy pair, mine. Nothing I'd work hot would sit in anything lighter. I lent them up to Slatefall for a job their smith couldn't hold, and they were coming home on the last cart. Cart stranded on the Pass, and scavengers had the load. That's what I know. Ludo Crane went past it and saw the rest, and he's told everyone in Lirold but me, because I don't go in there. I could. I don't. I'm not asking you, either. You asked me.",
+    "opt1": "I'll go and ask him.",
+    "opt2": "Can't you just make another pair?",
+    "opt3": "That's your problem."
+  },
+  "coldForgeWhyTongs": {
+    "message": "With what? Takes tongs to make tongs. I could do it, in a light pair and a light pair and three months of bad work. And they're mine.",
+    "opt1": "All right, I'll go and ask Ludo.",
+    "opt2": "Three months sounds fine to me."
   },
   "coldForgeProgressOne": {
-    "message": "Ludo Crane, at the Arena. Ask about my stranded cart, not his eleven seasons, unless you've brought a chair.",
-    "opt1": "I'll find him.",
-    "opt2": "Something else first."
+    "message": "Arena. The loud gate. He'll tell it long. Somewhere in there's the part you want.",
+    "opt1": "On my way.",
+    "opt2": "Something else, first."
   },
   "coldForgeProgressTwo": {
-    "message": "Goblin Scavengers, up on the Mountain Pass. My tongs have a square notch by the hinge. Bring them back here.",
-    "opt1": "I'll keep looking.",
-    "opt2": "Something else first."
+    "message": "Long as your leg, black, with a square notch by the hinge. No notch, not mine, whatever a goblin tells you. The Pass is cold, so eat first.",
+    "opt1": "I'll find them.",
+    "opt2": "Something else, first."
   },
   "coldForgeTongs": {
-    "message": "Jaws still meet, and that's my notch. The old delivery stamp is here too; tell Marvin in La Harpar it was Phurgo's last Slatefall load. He keeps the Exploration Guild's road records.",
-    "opt1": "I'll ask him to check it."
+    "message": "Give them here. That's my notch. Let me feel the rivet. Somebody's used these to pull a wagon pin, and badly, and they've sat out in the wet, and I'd know this left jaw in the dark, it closes a hair ahead of the right. I was going to fix that. Every winter I was going to fix that, and I got used to it.",
+    "opt1": "So they're still good?"
+  },
+  "coldForgeChair": {
+    "message": "Still good. Sit. Not the bench, the chair. Where I come from, surface folk promise faster than metal cools, and one who keeps a promise gets a chair at the table, and I've no table, so that's the whole of it. Did you eat? I've half a heel of bread. And I want to know what you like, because I've been talking at you about pie for weeks and never asked.",
+    "opt1": "Anything hot, I'm not fussy.",
+    "opt2": "Never mind food, what's next?"
+  },
+  "coldForgeRecord": {
+    "message": "I'll ask again. Tongs were half of it. See the handle, the delivery stamp? Still reads. My last Slatefall load, and it had more on it than tongs, and I never saw the list. Marvin keeps the road records for the Exploration Guild, in La Harpar. Tell him what the stamp says. I want to know what I'm still owed, and whether any of it's an excuse.",
+    "opt1": "I'll ask him."
   },
   "coldForgeProgressThree": {
-    "message": "Marvin, in La Harpar. Tell him the stamp says Phurgo's last Slatefall load; he won't need the tongs in his lap to find a record.",
-    "opt1": "I'll go to La Harpar.",
-    "opt2": "Something else first."
+    "message": "It'll be in a book. He'll want to tell you about the book. Let him.",
+    "opt1": "On my way.",
+    "opt2": "Something else, first."
   },
   "coldForgeProgressFour": {
-    "message": "Marvin's right about one thing: I haven't stopped for a proper meal. Bring me one Fish & Apple Pie, hot enough to make me put the hammer down. The recipe is sold in La Harpar; it takes a well-equipped kitchen.",
-    "opt1": "One Fish & Apple Pie.",
-    "opt2": "Something else first."
+    "message": "Marvin told you pie. I know what he's doing. I know when I'm being managed. Bring one anyway. Not one off a cart, and hot if you can. The recipe's for sale in La Harpar, and it wants a proper kitchen, not a fire in a ditch.",
+    "opt1": "One pie, coming.",
+    "opt2": "Something else, first."
   },
   "coldForgePie": {
-    "message": "You've made room for me to sit down; I suppose I can make room for different work. I've been waiting for that old cart to come home. Bring ten Ancient Wood for charcoal, and we'll try the metal we've got.",
-    "opt1": "I'll bring the wood."
+    "message": "Put it there. No, there, I cleared that end of the bench when I heard you were back in town, don't look at it like that. You made this? Give me a minute.\n\nWho crimped this crust? Look at that, it's gone all the way round and it's the same the whole way, and it's holding up the sides by itself with nothing to help it, and when you get in under it there's no place you could point to and say here's the fish and here's the apple, because somebody took their time and they've gone into one another, and you can't do that by being clever, you can only do it by leaving it alone and trusting what you did first. That's a joint. That's all a joint is. I spent years trying to say that to apprentices. Sit down, you're making me eat alone.",
+    "opt1": "So can you light it now?"
+  },
+  "coldForgeWood": {
+    "message": "Nearly. Salvage, then. Marvin's right, and don't repeat that. Salvage wants a heat that holds, and my charcoal's had two winters in a damp shed. It'd spit. Ten of Ancient Wood, burned down slow, the dense stuff off the treants in the Deepwood. Ten. Not nine. I've counted.",
+    "opt1": "Ten Ancient Wood, then."
   },
   "coldForgeProgressFive": {
-    "message": "Ten Ancient Wood will make the charcoal I need. The old treants of the Deepwood have wood dense enough for the job. Then I can put these tongs back to work.",
+    "message": "Keep it dry. Bark on is fine. Those tongs are getting bored.",
     "opt1": "I'll bring it.",
-    "opt2": "Something else first."
+    "opt2": "Something else, first."
   },
   "coldForgeComplete": {
-    "message": "There she goes; I'd forgotten how the hearth sounds. Bring me two matching pieces, alike in quality and workmanship, and gold for the work. If the metal takes it, you get one stronger piece; if not, the gold and the spare are gone.",
-    "opt1": "Can you strengthen my gear?",
-    "opt2": "I'll come back with gear."
+    "message": "Stack it there. No, stay, you might as well. It takes as long as it takes.\n\nHear that? That's the draw. Thought the swifts would've had that flue. Hold this. Not like that.\n\nThere. That. Did you see it? No, it's gone already. Doesn't matter. I did.\n\nHere's your pay, and it isn't enough. Bring me two of anything that match and I'll show you what all that was for.",
+    "opt1": "Let's see what it can do.",
+    "opt2": "I'll leave you with it."
+  },
+  "aboutForgeRestored": {
+    "message": "Hot. Slatefall's still shut, before you ask, and I'm no closer to a new bar of iron than I was. It's all old work now, other people's, pulled out of ditches, and I said some things about salvage over the years, because I'd look at a dead man's sword and his brother's and think that's scrap, and now I take the good of the one and the good of the other and bring them up together, slowly, and watch the two of them stop being two, and I'd have told you that couldn't be done with scrap. I did tell people. Not you. Somebody.",
+    "opt1": "Then I've got a pair for you.",
+    "opt2": "You almost sound happy."
+  },
+  "forgeWork": {
+    "message": "Show me. No, two of something, it's always two. Same make, same weight.",
+    "opt1": "Why two, when you could just sharpen the one?",
+    "opt2": "What do you charge?",
+    "opt3": "That's enough for now."
+  },
+  "forgeJoin": {
+    "message": "Sharpening takes metal away. What I do puts it in. You bring me two pieces that match, and I take the better of each and work them together until there's no seam I could find with a thumbnail, and you get back one piece, stronger than either was. The second one's gone. I'll say that now, so you don't stand there afterwards looking round the bench for it.",
+    "opt1": "Match how?",
+    "opt2": "What do you charge?",
+    "opt3": "That's enough for now."
+  },
+  "forgeMatch": {
+    "message": "First place on the bench is the one you keep. Second place is the spare. Same piece, same quality, worked the same number of times, or I don't strike. You can stand there wearing the first, I'll work round you. Wear the second and you'll walk out without it.",
+    "opt1": "What do you charge?",
+    "opt2": "That's enough for now."
+  },
+  "forgeCost": {
+    "message": "Gold. My time and the charcoal. Finer the piece, the more, and every working it's had already doubles it. I'll name the price and show you what you'd get before I strike. Don't like it, pick them up and go.",
+    "opt1": "And if it doesn't take?",
+    "opt2": "Is there anything you won't work?",
+    "opt3": "That's enough for now."
+  },
+  "forgeRisk": {
+    "message": "First working always takes. Second, nine times in ten, and one fewer each time after, so the fifth's six in ten. When it doesn't take, the spare's gone and so's the gold. Your piece comes back as it went in, not a mark on it. No promises till it's cool.",
+    "opt1": "Is there anything you won't work?",
+    "opt2": "That's enough for now."
+  },
+  "forgeLimits": {
+    "message": "Five workings, with these tongs and what I know now. A piece comes up about a tenth stronger each time, and on the fifth it settles and gives you more than that. Past five I'd be guessing. Not heirlooms. Not anything there's only one of, somebody gave you that for a reason and there's no second to work with. Not animals. Someone asked.",
+    "opt1": "I'll keep my pets clear of it.",
+    "opt2": "Then let's begin."
+  },
+  "aboutPie": {
+    "message": "A carter came through from La Harpar with a Fish & Apple Pie, three days old, and I bought it anyway, because you don't get the chance. People hear fish and apple and make a face, and they've never had it when the apple's been let alone, cooked down slow until it gives up and takes the salt off the fish, under a crust with some lard in it and no ambition. This one they'd hurried. You could tell at the first bite, the apple still had its corners. I ate it. But somebody should say something to that baker. Do you know her?",
+    "opt1": "How does a dwarf end up eating fish pie?",
+    "opt2": "I don't know any bakers."
+  },
+  "aboutPieFirst": {
+    "message": "A woman off the coast road broke a hub outside my door my first winter here, and she paid half in coin and half in pie. I told her half in coin wasn't what we'd said. She left it on the bench and I went on not eating it for most of an afternoon. It was the smell. At home an apple's a thing that gets baked in its skin at the end of a shift, nobody had told me you could marry it to anything. I ate it cold, standing up. Next day I went round to ask if she had any more hubs that wanted looking at.",
+    "opt1": "You're a hard man to pay."
+  },
+  "aboutHome": {
+    "message": "Bramhold. In Keldrath. North, past Elderreach, farther than anyone's bothered to draw. It's under the highland, the whole town. Yes, under. Halls, kitchens, workshops. There's doors up top for trading, and grain and fruit come in by them same as anywhere. People up here ask if we've seen the sun. I've got eyes.",
+    "opt1": "Do you miss it?",
+    "opt2": "Did something happen back home to drive you out?",
+    "opt3": "I'll let you get back to work."
+  },
+  "aboutHomeLife": {
+    "message": "The table. Every workshop on our hall ate at the one table, and at the end of a shift there'd be a pot of mushroom-and-barley stew that somebody's aunt had been at since morning, and dark bread you could sole a boot with, and if you got there ahead of the apprentices, a baked apple with the skin split and the whole inside of it gone soft enough to take with a spoon. You can't get a mushroom up here that tastes of anything. The work, no. Work's wherever there's a hearth.",
+    "opt1": "Did something drive you out, then?",
+    "opt2": "What's that mark you scratch next to a rivet?",
+    "opt3": "I'll let you get back to work."
+  },
+  "aboutTally": {
+    "message": "Tally. Set a rivet, scratch one beside it. Tells the next one who opens this up where to look. Every workshop at home does it. Nobody here's opening your gear but me, and nobody'd read it if they did. Keep doing it anyway.",
+    "opt1": "I'll let you get back to work."
+  },
+  "aboutLeaving": {
+    "message": "No. Surface folk want that. Nobody drove me out, nobody died, there's no feud. They're all down there now doing what they did yesterday. Traders kept telling me about the repair work here and Slatefall iron coming in regular, and I wanted a bench I didn't share, and work I couldn't do asleep. So.",
+    "opt1": "Do you miss it?",
+    "opt2": "You don't sound sorry."
+  },
+  "hearthPress": {
+    "message": "That strap's been sewn by someone in a hurry. Hold still.",
+    "opt1": "Leave the strap and answer me.",
+    "opt2": "Fine, mend the strap."
+  },
+  "hearthPressArm": {
+    "message": "I heard you. Arm up. There's a colour steel goes just before it's ready, and it goes off it again inside a breath, and nobody can tell you what colour that is, you have to have stood there. All my working life I knew it without looking. It isn't a thing you can keep in a drawer with the nails. Two winters is... I've good hands. I keep them clean. You'd think that would...",
+    "opt1": "So you're afraid you've lost it.",
+    "opt2": "I'll leave it."
+  },
+  "hearthPressEnd": {
+    "message": "Mind that when it's wet. Who sewed this, anyway? They want telling.",
+    "opt1": "I did."
+  },
+  "idleForge": {
+    "message": "Quiet. Sorted the nails.",
+    "opt1": "Nothing else going on?",
+    "opt2": "Sounds restful."
+  },
+  "idleHot": {
+    "message": "Busy. Ludo Crane sent his cane round for a new ferrule and paid me with a story. I asked for coin. Got both in the end, and most of the story twice.",
+    "opt1": "Better you than me.",
+    "opt2": "Good to see you working."
+  },
+  "aboutTable": {
+    "message": "Legs are iron. First thing off the hearth that wasn't for anybody. Don't look at the top, the top's a door, I'll get to it. Two stools. You never did tell me what you like, so you're having this. It's been up on the hood since first light, where the heat comes off the back of the flue, and you don't touch it, that's the whole of the art, the skin goes tight first and you think it's done and it's lying to you, and you leave it, and you go and do something else with your hands, and a long while after that it lets go all at once and the whole room smells like home, near enough, with no bread and no aunt. Sit. It wants a minute. No, it does.",
+    "opt1": "I can wait a minute.",
+    "opt2": "I've got to go, save me half."
   }
 }

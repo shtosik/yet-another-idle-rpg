@@ -611,6 +611,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       { type: 'reputation', reputationId: ReputationID.farmingGuild, amount: 15 },
       { type: 'professionXp', professionId: ProfessionID.farming, amount: 30 },
       { type: 'item', itemId: ItemID.wheatSeeds, amount: 5 },
+      { type: 'item', itemId: ItemID.turnipStewRecipe, amount: 1 },
     ],
   },
   [QuestID.wheatForTheGuild]: {

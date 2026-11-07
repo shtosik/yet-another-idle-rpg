@@ -1,138 +1,298 @@
 {
   "intro1": {
-    "message": "The gate's open because Sylvie vouches for you, walker, so don't make her regret it.",
-    "teach": "Sylvie said you could teach me to farm.",
-    "letter": "Here's her letter."
+    "message": "You're standing on a seed bed. Step back onto the path and I'll ask you who you are.",
+    "teach": "Sylvie says you can teach me to farm, and I'd like to get on with it.",
+    "letter": "I've got a letter for the Warden, from Sylvie in Mawood."
   },
   "introLetter": {
-    "message": "Hm, that's her hand all right, and as many pages as usual. She says you carry silk through the Elderwood, which counts for something around here.",
-    "opt1": "She talks about you a lot."
+    "message": "Sylvie writes a good letter, and she's been writing them for years. That gets you as far as where you're standing and no farther, until I've seen you do something useful with your hands. What have you ever grown?",
+    "opt1": "Nothing, and that's what I came to fix.",
+    "boast": "I've killed most of what's between here and the beach, if that counts."
   },
   "introSeeds": {
-    "message": "You've made a start already, walker, whether you meant to or not. Monsters carry wild seed, a few in every dozen, and everything that's stuck to you since the beach has gone into the Guild's tally, so it won't weigh down your pack.",
-    "why": "I never noticed any seeds.",
-    "show": "Show me.",
-    "guild": "Tell me about the Guild."
+    "message": "Hold your coat open. Now look in the seam, and in the turn of your boot. That's seed, and you've been carrying it since the beach, because every beast you've put down has shed some on you and you never once looked. It'll be shaken out and kept in a store under your name, and whatever you pick up from now on goes the same way, so it won't weigh on your pack. That's more than most people bring me on purpose.",
+    "why": "Why would a beast be carrying seed?",
+    "show": "Show me where it goes in the ground.",
+    "guild": "Before that, what exactly is this Guild?"
   },
   "introSeedsWhy": {
-    "message": "You wouldn't, because a seed's small and a fight's loud. Your tally is the list on the left of the plots, and it fills up as you go, since slimes, gulls, deer and goats all carry some.",
-    "opt1": "Show me."
+    "message": "It rides in their fur and their guts, and they carry it farther than we ever could. The Guild used to pay children to walk the hedges for wild seed. What's left of it now has to be taken off something with teeth, so you're what I've got, and I'd sooner have had the children.",
+    "opt1": "Fine, show me the ground."
   },
   "introNoSeeds": {
-    "message": "Your tally's thin, walker, but it'll fill. Monsters carry wild seed, a few in every dozen, and it all comes to you as you fight. Until then I sell turnip seed at twenty gold, and turnip is what you should plant first anyway.",
-    "shop": "I'll take some.",
-    "later": "I'll go find some."
+    "message": "Nothing on you, not so much as a husk, so you've either been lucky or you've been washing. Beasts carry wild seed in their fur and guts, and it'll start sticking to you as soon as you stop looking at their teeth. I've put five turnip seeds in a store under your name, for carrying the letter. If you want more than that today, I sell them at twenty gold.",
+    "shop": "I'll buy some now.",
+    "later": "I'll start with the five."
   },
   "introGate": {
-    "message": "Through the gate with you, then. The first plot is yours, so choose a seed from your tally, choose the plot to put it in, and after that all it needs is time.",
-    "opt1": "Thanks."
+    "message": "Through that gate the first three beds are yours to work, and the rest of the terrace isn't, so you'll keep your boots where I can see them. There's five turnip seeds in your store, from me, for the letter. Don't plant anything until you've talked to me again, because I've got a use for them.",
+    "opt1": "I'll stay on the path this time."
   },
   "default": {
-    "message": "Say what you need, walker. The daylight won't wait for either of us.",
-    "letter": "I've brought Sylvie's letter.",
-    "furrowTurnIn": "I've got the turnips.",
-    "wheatTurnIn": "I've got the wheat.",
-    "orchardTurnIn": "I've got the apples.",
-    "tableTurnIn": "The stew and the pie are ready.",
-    "orderTurnIn": "About my order...",
-    "furrowProgress": "About the first furrow...",
+    "message": "What is it, walker?",
+    "letter": "Here's Sylvie's letter.",
+    "furrowTurnIn": "Here are your four turnips.",
+    "wheatTurnIn": "That's your ten wheat.",
+    "orchardTurnIn": "I've got your twelve apples.",
+    "tableTurnIn": "The stew and the pies are here.",
+    "orderTurnIn": "I've got what's on your slate.",
+    "furrowProgress": "About those turnips...",
     "wheatProgress": "About the wheat...",
-    "orchardProgress": "About the orchard...",
-    "tableProgress": "About the Growers' Table...",
-    "orderProgress": "About my order...",
-    "furrowOffer": "Where do I begin?",
-    "wheatOffer": "The Guild needs more wheat?",
-    "orchardOffer": "What happened to the orchard?",
-    "tableOffer": "Honored folk get something...",
-    "orderOffer": "Any order for me?",
+    "orchardProgress": "About the apples...",
+    "tableProgress": "About the table...",
+    "orderProgress": "About the slate...",
+    "furrowOffer": "What do you want done with those five seeds?",
+    "wheatOffer": "The turnips are done, so what's next?",
+    "orchardOffer": "You've got good ground up there doing nothing.",
+    "tableOffer": "Your kitchen's cold, so what would it take to light it?",
+    "orderOfferFirst": "Is the larder short of anything?",
+    "orderOffer": "What's on the slate?",
+    "workNext": "Have you got more for me to do?",
     "shop": "Let me see your seeds.",
-    "petGift": "Is something on your mind, Warden?",
-    "aboutGuild": "Tell me about the Guild.",
-    "aboutGate": "Why did you close the gate?",
-    "bye": "Goodbye."
+    "petGift": "Something's been at my rows, and it has long ears.",
+    "aboutClean": "Did any of the seed I brought in come up clean?",
+    "aboutKitchen": "Wick says you used to cook for the whole Guild, so why did you stop?",
+    "aboutSeed": "Which beasts carry what?",
+    "aboutHerd": "What happened to Wick's herd?",
+    "aboutGuild": "What is the Farming Guild, exactly?",
+    "aboutGate": "Why did you shut the gate?",
+    "idleTerraces": "How are things on the terraces?",
+    "idleHeart": "The Gnarled Treant's dead, if that helps you any.",
+    "bye": "That's all for now."
   },
   "aboutGuild": {
-    "message": "We're growers. We keep our seed lines pure and pass them from hand to hand, or we did, until half the vaults sprouted black two winters ago. So we shut the gate, and now we're short of hands.",
-    "hands": "I'll be those hands.",
-    "blight": "What about the blight?"
+    "message": "Every line we hold has a name and a jar and a book that says whose hands it went through, back further than I can read the writing. You don't own a line. You keep it clean and you hand it on, and it took me twenty years to understand that I'd been told all of it on my first day.",
+    "hands": "So you need hands.",
+    "blight": "Sylvie says the lines went black.",
+    "who": "How does someone end up running a place like this?",
+    "spring": "Why is the valley still green, with the Elderwood this close?"
+  },
+  "aboutWho": {
+    "message": "Badly. I came up the valley at seventeen to pick for one harvest, because my mother had too many mouths and I was the one who could carry. That was thirty-six harvests ago.",
+    "opt1": "And they just made you Warden?",
+    "opt2": "That's a long time to stay for one harvest."
+  },
+  "aboutWhoWheat": {
+    "message": "They made me a picker, and a poor one. The old Warden had a line of wheat he was proud of, and it had gone soft, and everyone on the terrace knew it, but nobody would tell him because he fed us. I told him over supper, in front of his family. He didn't speak to me for a year.",
+    "opt1": "That doesn't sound like the road to his job.",
+    "opt2": "I'd have kept quiet and eaten."
+  },
+  "aboutWhoKeys": {
+    "message": "It's the only road there was. When his hands went he gave me the keys, and his reason was that he wanted them on someone who'd say it at supper. I've wondered since whether that was a kindness. Who tells you when your wheat's gone soft, walker?",
+    "opt1": "Nobody, which is probably why I'm here.",
+    "opt2": "You, by the sound of it."
+  },
+  "aboutSpring": {
+    "message": "The spring comes out of the rock above the top terrace and it runs clean. I've tested it every week since the sap, with seed I could spare. There's no black in the water and none in the soil, and half my vaults went black anyway, in their jars, in the dark, with the lids on. So the green's the easy part.",
+    "opt1": "So how did it get into the jars?",
+    "opt2": "That sounds like your problem and not mine."
   },
   "aboutGate": {
-    "message": "I closed it, and I'm not sorry. The sap came through the Spires and took half of what we had, and any stranger could have carried in more of it on their boots.",
-    "now": "Fair enough. There was something else.",
-    "bye": "Understood."
+    "message": "The sap came through the Spires, they tell me, and I couldn't say how it got from there into a jar in my vaults. It was two winters back and half of them sprouted in one season, and when you don't know how a thing gets in you shut everything it could come through. Traders, carters, cousins. What's left of the seed lines is what's left because of that gate, and I'd do it again tomorrow. You're through it because Sylvie asked me, and because you're out there killing what I'd otherwise be afraid of.",
+    "now": "I'll leave the gate to you.",
+    "bye": "I'd better get back to work."
+  },
+  "aboutSeed": {
+    "message": "Gulls on the beach carry turnip, and the slimes on the plains are full of wheat, and nobody's ever told me how. Deer on the Long Path have silverleaf in their coats. Goats on the Pass have apple, which they'll have eaten off somebody's tree. Past that you're into the Elderwood, where the forest spiders carry glowcap spores, and the Deepwood, where it's heartroot on those treant sprouts, and there's canopy blossom on the harpies if you can get up that high. You'll want to keep all of it, even the seed you can't plant yet. I don't let anyone put a line in the ground before their hands are ready for it.",
+    "opt1": "I'll keep my eyes open."
+  },
+  "aboutHerd": {
+    "message": "The sap took them, the winter I shut the gate. I've told him so twice and he says \"yes, Warden\" and goes off to oil something.",
+    "opt1": "All of them?",
+    "opt2": "He's still sweeping those stalls."
+  },
+  "aboutHerdAll": {
+    "message": "All of them. Was there something you wanted grown?",
+    "opt1": "No."
   },
   "questFurrow": {
-    "message": "You begin with turnips, and I want four of them. Pick the seed, put it in plot one and give it fifteen minutes, and in the meantime go and hit something, because dirt doesn't care how brave you are.",
-    "accept": "I'll plant it.",
-    "decline": "Later."
+    "message": "You'll grow me four turnips, because I don't teach anyone who can't bring me a turnip. Choose your seed, put it in an empty bed and leave it alone, which is the part most fighters can't manage. A turnip gives you a crop in fifteen minutes and nothing you do will hurry it, so go and hit something while you wait. You come back, you pull what's ready, and the bed's free for the next one.",
+    "accept": "Four turnips, then.",
+    "why": "That's fast for a turnip.",
+    "decline": "Give me a minute."
+  },
+  "questFurrowWhy": {
+    "message": "It's Guild soil and a Guild line, and we've had a long time to work on both. I'd show you the books, if I thought you'd read them.",
+    "opt1": "Four turnips, then.",
+    "opt2": "Give me a minute."
   },
   "questFurrowProgress": {
-    "message": "Four turnips, walker, from plot one through the gate. They only ask for fifteen minutes, and standing over them won't make it fourteen.",
-    "opt1": "On it."
+    "message": "Four, when you've got them. They don't need you standing over them.",
+    "opt1": "I'll check the beds."
   },
   "questFurrowComplete": {
-    "message": "Not bad for a first crop. The first one you pull is yours to eat, and the Guild pays for the rest in coin and seed. I've an order for you now as well, if you want the work.",
-    "opt1": "Thank you."
+    "message": "Put them on the wall where I can look at them. That one's split, that one's been pulled early, and the other two are turnips, and that's closer than I told Sylvie you'd get. You'll have five of wheat from me, and I've started a page for you in the book.",
+    "opt1": "Is that a compliment?"
+  },
+  "questFurrowAfter": {
+    "message": "No. Eat the split one, you grew it. Go on, raw, the way it came out. It tastes of nothing much, and you'll eat the next one anyway. I've written out how to stew them, because you'll want some better use for them than that, and all it takes is a fire and some water. Once you've got more than you can eat, ask me about the larder.",
+    "opt1": "Is it meant to taste like dirt?",
+    "opt2": "You don't make it yourself?"
+  },
+  "questFurrowNoCook": {
+    "message": "Not these days. You've got wheat to think about.",
+    "opt1": "Right."
   },
   "questWheat": {
-    "message": "It always does. Bring me ten, and use more than one plot, since they all grow side by side and there's no sense waiting on them one at a time. Slimes carry the seed, and I'll sell it to you myself once you're Friendly with us.",
-    "accept": "Ten wheat.",
+    "message": "Ten wheat, and you'll have it off more than one bed at a time, because I've got no use for someone who plants one row and goes off to wait on it. It takes forty-five minutes, so you'll want to plan your day around it for once, and if the five I gave you run out, go and lean on the slimes. We're into the last of the old flour and it's gone sour at the bottom of the bin.",
+    "accept": "Ten wheat, off more than one bed.",
+    "ask": "You must have people for this.",
     "decline": "Later."
+  },
+  "questWheatAsk": {
+    "message": "I had thirty at my table. There's six of us now, counting the boy, and two of the six are past lifting. You can do the sum, if you can do sums.",
+    "opt1": "Ten wheat, off more than one bed.",
+    "opt2": "Later."
   },
   "questWheatProgress": {
-    "message": "Ten wheat, walker. Each plot takes forty-five minutes, so put two of them to work and you'll save yourself the wait.",
-    "opt1": "On it."
+    "message": "Ten, and the bin's not getting any fuller.",
+    "opt1": "It's on its way."
   },
   "questWheatComplete": {
-    "message": "Ten, and sooner than I'd have bet. Here's the Guild's bread recipe, with my thanks. You'd better go and see Wick as well, because he has something for you and he'll never work up the nerve to come and find you.",
-    "opt1": "I'll find Wick."
+    "message": "That's bread, real bread, which nobody's had up here from fresh flour in two years. I've written that one out for you as well, and you'll notice I'm running out of paper. I'll sell you wheat seed from now on, and you can pull a whole terrace in one go without asking me first, and there's another bed in it for you, if you haven't found it already. The boy's got things he wants fetched, if you can stand being apologised to.",
+    "opt1": "I'll take the bed and leave the apologies."
   },
-  "questOrchard": {
-    "message": "It burned in the sap winter. Twelve apples from our own trees would say the Guild is open again, and I'd like that said. Goats on the Mountain Pass carry the seed, and the trees take four hours, so don't plant them and stand about.",
-    "accept": "Twelve apples.",
-    "decline": "Later."
-  },
-  "questOrchardProgress": {
-    "message": "Twelve apples, walker. The goats on the Mountain Pass carry the seed, and after that each tree wants four hours of your patience.",
-    "opt1": "On it."
-  },
-  "questOrchardComplete": {
-    "message": "Apples, and off our own ground at that. ... There's a new plot by the south wall, and I want you to take it. It's yours.",
-    "opt1": "Thank you, Warden."
-  },
-  "questTable": {
-    "message": "They get my pie recipe, walker, and you'll find it in the shop now that you're one of them. Cook me five turnip stew and five harvest pie, because I haven't cooked in two years and I'd like to remember what a full table looks like.",
-    "accept": "Five and five.",
-    "decline": "Later."
-  },
-  "questTableProgress": {
-    "message": "Five stew and five pie. The stew goes on the Fire Pit and the pie in the Cooking Pot, and the pie wants cheese, which you can buy or take off a Giant Rat. Rats don't make cheese, walker. They steal it.",
-    "opt1": "Working on it."
-  },
-  "questTableComplete": {
-    "message": "... It's still warm, and the salt's right. Sit down, walker, though I'm eating first, and the next pot is mine to cook. The new plot is yours, and you can tell Corwin the Guild has bread.",
-    "opt1": "I will."
+  "orderOfferFirst": {
+    "message": "The larder's been short since the gate shut, and I've stopped pretending the terraces will fix it on their own. I'll chalk up what's wanted on the slate by the door, turnip or wheat as it falls, ten to twenty at a go, and you'll bring the lot together. The Guild pays by the piece and writes it in the book. After that the slate stays clean for about two hours, because that's how long it takes to get it stored, and I don't want to see you about it before then.",
+    "accept": "I'll take what's on the slate.",
+    "decline": "Not today."
   },
   "orderOffer": {
-    "message": "The larder's low, so I need crops, and the Guild pays for them. What I need changes from one order to the next, so take the job and your quest panel will tell you what to bring.",
-    "accept": "I'll bring it.",
-    "decline": "Not now."
+    "message": "The larder's short again. It's on the slate.",
+    "accept": "I'll take it.",
+    "decline": "Not today."
   },
   "orderProgress": {
-    "message": "Your quest panel has what I asked for, walker. The plots won't hurry for you, so don't leave it to the last minute.",
-    "opt1": "On it."
+    "message": "Not all of it yet, by my count.",
+    "opt1": "I'll bring the rest."
   },
   "orderComplete": {
-    "message": "That'll do, and the larder's glad of it. Come back in two hours, walker, and I'll have another for you.",
-    "opt1": "See you then."
+    "message": "That's the lot. Your pay's there on the wall.",
+    "opt1": "Until the next slate."
+  },
+  "workNextSylvie": {
+    "message": "Not from me, not yet, because there's nothing else I want grown that you could manage. Sylvie's been writing about her herb shelf, three pages of it. Silverleaf will be in your reach once you've pulled more turnips than you'd like, and you'll go and see her when it is.",
+    "opt1": "More turnips, then."
+  },
+  "workNextHands": {
+    "message": "You took Sylvie her silverleaf, and she's written to tell me so, at length. I've got ground for you, but it wants apple, and apple's a long wait and easy to spoil, so you'll keep planting until your hands have learned patience. I'll say when.",
+    "opt1": "I'll keep planting."
+  },
+  "fourthTerrace": {
+    "message": "Go and look at the fourth terrace and tell me what you see. No, don't bother, I'll tell you, because I've been up there twice this morning already like a girl. Green! Every row, right down to the root, and I cut three open to be sure. I took a spoon of your seed out of the store to try it, and I didn't ask you, and I'm not sorry. It's the first planting since the black that I haven't had to burn.",
+    "opt1": "So I've earned my keep?",
+    "opt2": "You went through my seed?"
+  },
+  "topTerrace": {
+    "message": "Don't push it. I've got a real question for you, walker, since you're the only one up here who doesn't flinch when I talk. What would you put on the top terrace? It's been bare two years and it gets the first sun, and I've stood there so long I've got no opinion left.",
+    "opt1": "Silverleaf, because Sylvie needs it.",
+    "opt2": "Turnips, because nobody ever starved on turnips.",
+    "opt3": "Nothing yet, not until you're sure it's safe.",
+    "opt4": "That's your ground and your call."
+  },
+  "topSilverleaf": {
+    "message": "It'd scorch by noon. You've got the right reason and the wrong ground, which is how most of my mistakes started.",
+    "opt1": "What was up there before?",
+    "opt2": "I'll keep thinking."
+  },
+  "topTurnip": {
+    "message": "People have starved on turnips, walker. They just took longer about it.",
+    "opt1": "What was up there before?",
+    "opt2": "I'll keep thinking."
+  },
+  "topNothing": {
+    "message": "That's what I've been doing, and I've been calling it caution. I don't think I like hearing it from someone else.",
+    "opt1": "What was up there before?",
+    "opt2": "I'll keep thinking."
+  },
+  "topOrchard": {
+    "message": "Apples, for longer than anyone wrote down. We'll talk about that when you've got the hands for it.",
+    "opt1": "I'll hold you to that."
+  },
+  "questOrchard": {
+    "message": "I burned the orchard in the sap winter, every tree, because the black came up through the grafts and I couldn't tell which ones it had reached. You'll grow me twelve apples, four hours to a bed, and I'll plant what's in them up on the top terrace. The seed's on the Pass goats. There's a stall in La Harpar that'll sell you apples too, and I'd take those. An apple's an apple in the basket. I'd know, though, and I wouldn't say anything, and you wouldn't enjoy it.",
+    "accept": "Twelve apples, then.",
+    "why": "Did you have to burn all of them?",
+    "decline": "Not yet."
+  },
+  "questOrchardWhy": {
+    "message": "How many would you have left standing? Which ones? You've got about an hour of daylight, and the sap's on your boots, and there's a man crying on the wall who planted half of them. Go on, walker, you're the one who's good with an axe. Which ones?",
+    "opt1": "Twelve apples, then.",
+    "opt2": "I don't know."
+  },
+  "questOrchardProgress": {
+    "message": "The holes are dug. Twelve, when you have them.",
+    "opt1": "They're coming."
+  },
+  "questOrchardComplete": {
+    "message": "Give me one of those. No, the ugly one, the ugly ones tell you more. Look at that, look at the core, it's clean, it's clean right through and it smells like... well. That's an apple. They'll go up on the top terrace before dark and the boy can carry. You can see that terrace from the bend in the road, so by spring anyone passing will know we've planted, and I'll worry about that when it's spring. You've been looking at my south bed since you got here, and I've said nothing, and now I'm telling you it's yours, and you needn't thank me, because it's mostly rocks.",
+    "opt1": "I'll take the rocks."
+  },
+  "questTable": {
+    "message": "Everyone goes through that kitchen, it's the shortest way to the stalls, so I suppose you've seen it. The range still draws, because I've had the boy clean it every autumn, and I've told him it's so the mice don't nest. I won't stand in there and make a meal out of nothing and have it turn into an occasion. You'll bring the food. Five turnip stews and five harvest pies, and they'll be yours, and I'll bake the bread to go with them. That's all I'll do. If anyone asks, I only brought the bread.",
+    "accept": "Five stews and five pies.",
+    "pie": "How do I make a harvest pie?",
+    "decline": "Not yet."
+  },
+  "questTablePie": {
+    "message": "Apples, wheat and a bit of cheese, and you'll need a proper pot, because a fire pit won't do it. The recipe's on my stall now at four hundred gold. You've earned the right to buy it and not the right to have it for nothing. Cheese I can't help you with, we've had none since the herd, so you'll pay La Harpar for it or you'll get it off rats. Rats don't make cheese, walker. They steal it.",
+    "opt1": "Five stews and five pies.",
+    "opt2": "Not yet."
+  },
+  "questTableProgress": {
+    "message": "Five and five. I've got the flour put by.",
+    "opt1": "I'll be back with them."
+  },
+  "questTableComplete": {
+    "message": "Put them on the long table, stews at this end. I've had the bread in since before it was light, because I couldn't sleep, and I'd as soon you knew that as not. It isn't very good. I've lost the feel of that oven and the back loaves went too far, and the boy's had one already and told me it's the best thing he's ever eaten, which tells you about the boy. Sit down, walker. No, there.",
+    "opt1": "Who else is sitting here?"
+  },
+  "questTableAfter": {
+    "message": "I set thirty, because my hands did it before I was awake enough to stop them, and I've left it. There's seven of us eating. That book by your plate is yours, and the old Warden wrote in it, and he wouldn't have liked you. There's another bed along the east wall, too. The wind's going east tonight, so they'll smell this in Mawood, and you can tell Corwin that's what it was. The gate's on the latch until morning. It's only a latch.",
+    "opt1": "Pass the bread.",
+    "opt2": "I'll eat, then."
+  },
+  "shopFirst": {
+    "message": "I sell turnip to anyone on these terraces and wheat once I've seen what you do with it, and that's all the seed I sell, because I've got little enough and the rest you'll take off the beasts. I'm not trusting silverleaf to someone who's grown two turnips. I don't buy, either, so don't show me what you found in a goat. There's a recipe or two under the counter for later, if you stay.",
+    "opt1": "Show me the turnip seed, then."
   },
   "petGift": {
-    "message": "There's a hare on the terraces that nobody keeps, because it keeps itself. Feed it and it'll find the ripe row before you do. It seems to like you, walker, which is more than it's ever done for me.",
-    "accept": "I'll take care of it.",
-    "decline": "Not now."
+    "message": "That hare's been going along your rows ahead of you all this while, and it's never once touched a crop that wasn't ready, so you've had a better eye on your beds than you knew. I've spent years trying to run it off. It's decided it's yours, which is more than I ever got out of it. It's no use to you unless it's at your heel, but when it is, your beds come up quicker around it, and now and again one gives you double.",
+    "accept": "I'll have the hare.",
+    "decline": "Leave it be for now."
   },
   "petGiftDone": {
-    "message": "The Guild calls you Hand of the Terraces now, and I didn't argue when they did. Wear it well, walker.",
-    "opt1": "Thank you."
+    "message": "It won't come when it's called, so don't embarrass yourself. They've started calling you Hand of the Terraces up on the top rows, and I haven't corrected them, and that's all you'll hear about it from me. I wouldn't name the hare, either. The boy already has, I expect, and you'll want a free afternoon before you ask him.",
+    "opt1": "I'll ask him."
+  },
+  "idleTerraces": {
+    "message": "Dry on the top one and wet on the bottom one, the same as every year. The jackdaws have worked out that we're short of hands, and one of them has taken to sitting on the scarecrow's head, which I take as a comment.",
+    "opt1": "You could put out a net.",
+    "opt2": "I'll leave you to the jackdaws."
+  },
+  "idleNet": {
+    "message": "I could, and I've got the net, but it wants mending and the boy's soft about birds. Did you want something, or did you come up here to talk about jackdaws? I don't mind either way. I'd just like to know which.",
+    "opt1": "Jackdaws, mostly.",
+    "opt2": "I wanted something."
+  },
+  "idleHeart": {
+    "message": "Sylvie wrote. She wrote twice. I'll tell you what I told her, which is that I've sown the black lines again, and in six weeks I'll know something, and until then it's a dead tree in somebody else's forest. What did the wood look like at the centre, when it came down? Nobody who's told me about it has ever been a grower.",
+    "opt1": "Black all the way in, and it smelled burnt.",
+    "opt2": "I was busy at the time."
+  },
+  "askKitchen": {
+    "message": "Wick says that, does he. Have you got family, walker? I don't recall you mentioning any. Who's keeping a fire for you while you're up here asking about mine?",
+    "opt1": "You shut that gate and stopped cooking the same winter, so don't turn this round.",
+    "opt2": "Nobody, and I'll leave it."
+  },
+  "askKitchenGate": {
+    "message": "I've told you why I shut it, and you heard me. You're very interested in my kitchen for someone who eats on the road. When did you last write to anybody?",
+    "opt1": "Who was on the other side of that gate, Marta?",
+    "opt2": "Not since Mawood, and I'll drop it."
+  },
+  "askKitchenDoor": {
+    "message": "People knock the way they knock. You'd know that if you'd ever called the same thirty faces in to dinner. You can tell them apart through a door, you can tell who's tired, and you... Who taught you to be this rude? I'd like to know. I'd like to know if they're still alive, and whether you've told them where you are.",
+    "opt1": "I'm sorry, Marta.",
+    "opt2": "I'll tell them you asked."
   }
 }
