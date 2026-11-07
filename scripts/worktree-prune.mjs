@@ -22,7 +22,7 @@ const dry = process.argv.includes('--dry')
 
 const run = (cmd, args, cwd = ROOT) => {
   try {
-    return execFileSync(cmd, args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 120000, shell: false }).trim()
+    return execFileSync(cmd, args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 120000, shell: false, windowsHide: true }).trim()
   } catch {
     return null
   }
