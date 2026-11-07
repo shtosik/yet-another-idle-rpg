@@ -6,6 +6,8 @@ Versions follow [Semantic Versioning](https://semver.org/). Each note is `- [typ
 New notes go under `[Unreleased]`; `npm run release -- <major|minor|patch>` moves them into a version (docs/deployment.md).
 
 ## [Unreleased]
+
+## [0.3.0] - 2026-11-07
 - [feature] The new game version notice moved from the bottom of the screen to the notification bar. Click it to save and reload.
 - [feature] A new notification bar under the XP and currency bar shows what you can claim. For now it tells you when farm plots are ready to harvest; click it to go straight to your plots.
 - [feature] Marta, Wick, Ludo Crane and Phurgo have all-new dialogue: each sounds like their own person, with new stories, idle talk and scenes that change as they come to trust you. Ask them about themselves, and listen closely to what they won't say.
