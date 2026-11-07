@@ -3,6 +3,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import i18next from 'i18next'
 import { FarmPlotsComponent, formatDuration } from './farm-plots.component'
 import { PlayerStore } from '../../../store/player/player.store'
+import { ProfessionService } from '../../../services/profession.service'
 import { PLOT_SLOTS } from '../../../store/player/farm'
 import { tabOf } from '../../../store/player/inventory'
 import ITEM_DATA from '../../../../data/items-data'
@@ -38,7 +39,7 @@ describe('FarmPlotsComponent', () => {
     await fixture.whenStable()
     fixture.detectChanges()
   }
-  const locks = () => [...element.querySelectorAll('.footer__lock')].map(lock => lock.textContent?.trim())
+  const locks = () => [...element.querySelectorAll('.actions__item[aria-label]')].map(lock => lock.getAttribute('aria-label'))
   const growTurnip = () => {
     store.unlockProfession(ProfessionID.farming)
     store.addItems([{ id: ItemID.turnipSeeds, amount: 1 }])
@@ -53,15 +54,16 @@ describe('FarmPlotsComponent', () => {
   })
 
   it('locks Plant all and Harvest all with the Guild tier they need', () => {
-    expect(locks()).toEqual(['Requires Farming Guild Honored — 0/200', 'Requires Farming Guild Friendly — 0/50'])
-    expect([...element.querySelectorAll<HTMLButtonElement>('.footer__button')].every(button => button.disabled)).toBeTrue()
+    expect(locks()).toEqual(['Requires Honored reputation', 'Requires Friendly reputation'])
+    expect([...element.querySelectorAll<HTMLButtonElement>('.actions__button')].every(button => button.disabled)).toBeTrue()
+    expect(element.querySelector('.actions')?.textContent).not.toContain('Requires')
   })
 
-  it('drops a lock text once its tier is reached', async () => {
+  it('drops a lock tooltip once its tier is reached', async () => {
     store.addReputation([{ reputationId: ReputationID.farmingGuild, amount: 60 }])
     await render()
 
-    expect(locks()).toEqual(['Requires Farming Guild Honored — 60/200'])
+    expect(locks()).toEqual(['Requires Honored reputation'])
   })
 
   it('tags a ready plot with the slots its harvest needs when the Materials tab is full', async () => {
@@ -77,6 +79,42 @@ describe('FarmPlotsComponent', () => {
     await render()
 
     expect(element.querySelector('.plot__missing')?.textContent?.trim()).toBe('1 Materials slot needed')
+  })
+
+  it('shows current / needed on both bars and only the bonus expertise gives so far', async () => {
+    store.addReputation([{ reputationId: ReputationID.farmingGuild, amount: 60 }])
+    store.unlockProfession(ProfessionID.farming)
+    TestBed.inject(ProfessionService).gainXp(ProfessionID.farming, 620)
+    await render()
+
+    expect([...element.querySelectorAll('.meter__bar-text')].map(text => text.textContent?.trim())).toEqual(['10 / 150', '20 / 500'])
+    expect(element.querySelector('.meter__detail')?.textContent).toBe('1.5% faster growth time, +10% Seed Save Chance')
+  })
+
+  it('floats a harvest popup from the click point; Harvest all from its button', async () => {
+    growTurnip()
+    await render()
+    const panel = element.getBoundingClientRect()
+    element.querySelector('.plot--ready')?.dispatchEvent(new MouseEvent('click', { clientX: panel.left + 70, clientY: panel.top + 90, detail: 1 }))
+    await render()
+
+    const popup = element.querySelector<HTMLElement>('.toast')
+    expect(parseFloat(popup?.style.left ?? '')).toBeCloseTo(70, 3)
+    expect(parseFloat(popup?.style.top ?? '')).toBeCloseTo(90, 3)
+    expect(popup?.textContent).toContain('+3 Farming XP')
+
+    store.addReputation([{ reputationId: ReputationID.farmingGuild, amount: 60 }])
+    store.addItems([{ id: ItemID.turnipSeeds, amount: 1 }])
+    store.plantSeed(ItemID.turnipSeeds, 3, 0)
+    store.growAllPlots()
+    await render()
+    const button = element.querySelectorAll<HTMLButtonElement>('.actions__button')[1]
+    button.dispatchEvent(new MouseEvent('click', { clientX: 1, clientY: 1, detail: 1 }))
+    await render()
+
+    const rect = button.getBoundingClientRect()
+    const popups = element.querySelectorAll<HTMLElement>('.toast')
+    expect(parseFloat(popups[1].style.left)).toBeCloseTo(rect.left + rect.width / 2 - panel.left, 0)
   })
 
   it('formats timers', () => {

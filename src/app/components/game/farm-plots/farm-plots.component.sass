@@ -46,8 +46,7 @@ button
   display: flex
   align-items: center
   gap: 1rem
-  padding: 0 2.5rem 0.75rem 0
-  border-bottom: vars.$panelBorder
+  padding: 0 2.5rem 0 0
 
   &__title
     color: palette.$yellow
@@ -58,10 +57,6 @@ button
     display: flex
     flex: 1
     gap: 1rem
-
-  &__count
-    color: $muted
-    font-size: 0.8rem
 
 .meter
   display: flex
@@ -75,8 +70,7 @@ button
 
   &__bar
     width: 100%
-    height: 0.5rem
-    @include bar(palette.$yellow)
+    @include mixins.xp-bar(rgba(palette.$green, 0.6))
 
   &__detail
     color: $muted
@@ -132,6 +126,30 @@ app-close-button
   &--locked
     opacity: 0.55
 
+.field
+  display: flex
+  flex-direction: column
+  align-items: center
+  justify-content: center
+  gap: 0.5rem
+  min-height: 0
+
+.actions
+  display: flex
+  gap: 0.5rem
+
+  &__item
+    display: inline-flex
+
+  &__button
+    @include mixins.button
+    padding: 0.4rem 0.75rem
+
+    // Lets the hover reach the wrapper that holds the tooltip.
+    &:disabled
+      opacity: 0.5
+      pointer-events: none
+
 // Fixed-size cells, centred: soil layer behind (background image), plant sprite on top.
 $cell: 8rem
 
@@ -139,10 +157,7 @@ $cell: 8rem
   display: grid
   grid-template-columns: repeat(3, $cell)
   grid-template-rows: repeat(3, $cell)
-  justify-content: center
-  align-content: center
   gap: 0.5rem
-  min-height: 0
 
 .plot
   position: relative
@@ -232,29 +247,23 @@ $cell: 8rem
     color: #f87171
     font-size: 0.7rem
 
-// Harvest popups: stacked above the footer, newest at the bottom; they clear themselves.
+// Harvest popups: each floats up beside its own click point and fades; they clear themselves (`TOAST_MS`).
 .toasts
   position: absolute
-  left: 50%
-  bottom: 4.5rem
+  inset: 0
   z-index: 10
-  display: flex
-  flex-direction: column
-  gap: 0.35rem
-  transform: translateX(-50%)
   pointer-events: none
 
 .toast
+  position: absolute
   display: flex
   flex-direction: column
-  align-items: center
   gap: 0.15rem
-  padding: 0.5rem 1rem
-  border: 1px solid palette.$yellow
-  border-radius: vars.$panelBorderRadius
-  background: #0a0a0a
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6)
-  font-size: 0.85rem
+  width: max-content
+  font-size: 1.05rem
+  font-weight: bold
+  text-shadow: vars.$textShadow, 0 2px 0 #000
+  animation: harvest-float 1.6s ease-out forwards
 
   &__crop
     display: flex
@@ -267,24 +276,25 @@ $cell: 8rem
   &__blocked
     color: #f87171
 
-.footer
-  display: grid
-  grid-template-columns: 1fr 1fr 1fr
-  align-items: start
-  gap: 0.5rem
+@keyframes harvest-float
+  0%
+    opacity: 0
+    transform: translate(1rem, -50%)
+  10%
+    opacity: 1
+  65%
+    opacity: 1
+  100%
+    opacity: 0
+    transform: translate(1rem, calc(-50% - 4rem))
 
-  &__action
-    display: flex
-    flex-direction: column
-    gap: 0.25rem
+@media (prefers-reduced-motion: reduce)
+  .toast
+    animation-name: harvest-fade
+    transform: translate(1rem, -50%)
 
-  &__button
-    @include mixins.button
-    padding: 0.4rem 0.75rem
-
-    &:disabled
-      opacity: 0.5
-
-  &__lock
-    color: $muted
-    font-size: 0.7rem
+@keyframes harvest-fade
+  70%
+    opacity: 1
+  100%
+    opacity: 0

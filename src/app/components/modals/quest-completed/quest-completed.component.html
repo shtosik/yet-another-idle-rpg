@@ -15,9 +15,6 @@
       @for (xp of professionXpToDisplay(); track xp.professionId) {
         <li>{{ 'quests:professionXp.reward' | i18next: { amount: xp.amount, profession: ('app:professions.' + ProfessionID[xp.professionId] | i18next) } }}</li>
       }
-      @if (nextOrderIn) {
-        <li>{{ 'quests:orders.nextIn' | i18next: { time: nextOrderIn } }}</li>
-      }
     </ul>
   }
 

@@ -1,6 +1,7 @@
-import { NgOptimizedImage } from '@angular/common'
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, output, signal } from '@angular/core'
+import { DecimalPipe, NgOptimizedImage } from '@angular/common'
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, ElementRef, inject, output, signal } from '@angular/core'
 import i18next from 'i18next'
+import { TooltipStrDirective } from 'ngx-tooltip-directives'
 import { I18nextPipe } from '../../../pipes/i18next.pipe'
 import { CloseButtonComponent } from '../../shared/close-button/close-button.component'
 import { FarmService } from '../../../services/farm.service'
@@ -8,7 +9,9 @@ import { PlayerStore } from '../../../store/player/player.store'
 import { isReady, PLOT_SLOTS, stageOf, syncPlots } from '../../../store/player/farm'
 import { reputationProgress } from '../../../store/player/reputation'
 import { xpForLevel, xpToNextLevel } from '../../../store/player/professions'
-import { reputationLockText, reputationTierLabel } from '../quests/reputation/reputation-text'
+import { expertiseGain } from '../../../store/player/stats'
+import { reputationTierLabel, tierName } from '../quests/reputation/reputation-text'
+import { formatStat } from '../player-stats/stat-rows'
 import { missingSlotsText } from '../inventory/tab-text'
 import { FARM_ART, FARM_SEEDS } from '../../../../data/farming-data'
 import ITEM_DATA from '../../../../data/items-data'
@@ -22,6 +25,8 @@ import { ReputationTier } from '../../../../enums/reputation-tier.enum'
 const HARVEST_ALL_TIER = ReputationTier.friendly
 const PLANT_ALL_TIER = ReputationTier.honored
 
+const percentOf = (current: number, needed: number): number => needed > 0 ? current / needed * 100 : 0
+
 /** "2h 5m", "14m 30s", "45s". */
 export function formatDuration(ms: number): string {
   const seconds = Math.ceil(ms / 1000)
@@ -32,16 +37,17 @@ export function formatDuration(ms: number): string {
   return `${seconds}s`
 }
 
-/** The farm's plots panel: Guild and expertise header, seed list, 3x3 plot grid, Plant all and Harvest all. */
+/** The farm's plots panel: Guild and expertise header, seed list, Plant all and Harvest all over the 3x3 plot grid. */
 @Component({
   selector: 'app-farm-plots',
   templateUrl: './farm-plots.component.html',
   styleUrl: './farm-plots.component.sass',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [I18nextPipe, NgOptimizedImage, CloseButtonComponent],
+  imports: [I18nextPipe, DecimalPipe, NgOptimizedImage, CloseButtonComponent, TooltipStrDirective],
 })
 export class FarmPlotsComponent {
   private playerStore = inject(PlayerStore)
+  private host = inject<ElementRef<HTMLElement>>(ElementRef)
   protected farmService = inject(FarmService)
 
   protected readonly PLOT_SLOTS = PLOT_SLOTS
@@ -57,23 +63,23 @@ export class FarmPlotsComponent {
 
   private points = computed(() => this.playerStore.reputation()[ReputationID.farmingGuild] ?? 0)
   guild = computed(() => {
-    const progress = reputationProgress(this.points())
-    return { ...progress, label: reputationTierLabel(ReputationID.farmingGuild, progress.tier) }
+    const points = this.points()
+    const { tier, nextThreshold, current, needed } = reputationProgress(points)
+    const label = reputationTierLabel(ReputationID.farmingGuild, tier)
+    // Exalted has no next tier: a full bar with the total.
+    if (nextThreshold === null) return { label, current: points, needed: points, percent: 100 }
+    return { label, current, needed, percent: percentOf(current, needed) }
   })
 
   expertise = computed(() => {
     const level = this.farmService.level()
     const experience = this.playerStore.professions()[ProfessionID.farming]?.experience ?? 0
-    const maxed = level >= PROFESSIONS_DATA[ProfessionID.farming].maxLevel
-    const next = Object.values(FARM_SEEDS)
-      .filter(seed => seed.requiredLevel > level)
-      .sort((a, b) => a.requiredLevel - b.requiredLevel)[0]
-    return {
-      level,
-      current: maxed ? 1 : experience - xpForLevel(level),
-      needed: maxed ? 1 : xpToNextLevel(level),
-      next: next ? i18next.t('map:farm.expertiseNext', { seed: i18next.t(`items:names.${ItemID[next.seedId]}`), level: next.requiredLevel }) : null,
-    }
+    const bonus = this.expertiseBonus(level)
+    // Max level has no next one: a full bar with the total.
+    if (level >= PROFESSIONS_DATA[ProfessionID.farming].maxLevel) return { level, bonus, current: experience, needed: experience, percent: 100 }
+    const current = experience - xpForLevel(level)
+    const needed = xpToNextLevel(level)
+    return { level, bonus, current, needed, percent: percentOf(current, needed) }
   })
 
   seeds = computed(() => Object.values(FARM_SEEDS)
@@ -116,7 +122,7 @@ export class FarmPlotsComponent {
   hasReadyPlot = computed(() => this.plots().some(plot => plot.state === 'ready'))
   hasEmptyPlot = computed(() => this.plots().some(plot => plot.state === 'empty'))
 
-  /** Why Plant all / Harvest all are locked; null once the Guild tier is reached. */
+  /** Tooltip saying why Plant all / Harvest all are locked; null once the Guild tier is reached. */
   plantAllLock = computed(() => this.lockText(PLANT_ALL_TIER))
   harvestAllLock = computed(() => this.lockText(HARVEST_ALL_TIER))
 
@@ -125,13 +131,35 @@ export class FarmPlotsComponent {
     inject(DestroyRef).onDestroy(() => clearInterval(timer))
   }
 
-  clickPlot(index: number, state: 'empty' | 'ready'): void {
-    if (state === 'empty') this.farmService.plant(index)
-    else this.farmService.harvest(index)
+  harvestPlot(index: number, event: MouseEvent): void {
+    this.farmService.harvest(this.popupPoint(event, true), index)
+  }
+
+  harvestAll(event: MouseEvent): void {
+    this.farmService.harvest(this.popupPoint(event, false))
+  }
+
+  /** In panel coordinates: the cursor, or the clicked element's centre for Harvest all and keyboard clicks (`detail` 0, no cursor position). */
+  private popupPoint(event: MouseEvent, atCursor: boolean): { x: number, y: number } {
+    const panel = this.host.nativeElement.getBoundingClientRect()
+    if (atCursor && event.detail > 0) return { x: event.clientX - panel.left, y: event.clientY - panel.top }
+    const target = (event.currentTarget as HTMLElement).getBoundingClientRect()
+    return { x: target.left + target.width / 2 - panel.left, y: target.top + target.height / 2 - panel.top }
+  }
+
+  /** "1.5% faster growth time, +10% Seed Save Chance": what expertise gives so far, not gear or pets. */
+  private expertiseBonus(level: number): string {
+    const growthStat = PROFESSIONS_DATA[ProfessionID.farming].perLevel.stat
+    const gains = expertiseGain(ProfessionID.farming, 1, level)
+    const growth = i18next.t('map:farm.growthBonus', { bonus: formatStat('bonus', gains.find(gain => gain.stat === growthStat)?.amount ?? 0) })
+    const milestones = gains
+      .filter(gain => gain.stat !== growthStat)
+      .map(({ stat, amount }) => `+${formatStat('bonus', amount)} ${i18next.t(`app:playerStats.${stat}`)}`)
+    return [growth, ...milestones].join(', ')
   }
 
   private lockText(tier: ReputationTier): string | null {
     if (this.farmService.guildTier() >= tier) return null
-    return reputationLockText(ReputationID.farmingGuild, tier, this.points())
+    return i18next.t('map:farm.reputationLock', { tier: tierName(tier) })
   }
 }

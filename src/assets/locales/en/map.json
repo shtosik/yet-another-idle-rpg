@@ -14,7 +14,7 @@
   "sitesLabel": "Sites",
   "sites": {
     "farm": "Farm",
-    "farmGate": "Gate"
+    "farmGate": "To the fields"
   },
   "farm": {
     "plots": "Plots {{count}} / {{max}}",
@@ -27,8 +27,8 @@
     "locked": "Locked",
     "plantAll": "Plant all",
     "harvestAll": "Harvest all",
-    "expertiseNext": "Next: {{seed}} at expertise {{level}}",
-    "expertiseMax": "Nothing left to unlock",
+    "reputationLock": "Requires {{tier}} reputation",
+    "growthBonus": "{{bonus}} faster growth time",
     "xpGain": "+{{xp}} Farming XP",
     "harvestBlocked": "Harvest blocked: {{slots}} needed",
     "seedFound": "Found: {{seeds}}",

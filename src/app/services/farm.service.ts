@@ -13,11 +13,13 @@ import ITEM_DATA from '../../data/items-data'
 import { FARM_SEEDS, PLOT_GRANT_QUEST_IDS } from '../../data/farming-data'
 import { missingSlotsText } from '../components/game/inventory/tab-text'
 
-const TOAST_MS = 3000
+/** The popup's float-and-fade animation in the plots panel's styles lasts as long. */
+const TOAST_MS = 1600
 
-/** One harvest action's popup: each crop with its icon and amount, the XP, or what a blocked harvest needs. */
+/** One harvest action's popup at its own point in the panel: each crop with its icon and amount, the XP, or what a blocked harvest needs. */
 export interface HarvestToast {
   id: number
+  at: { x: number, y: number }
   crops: { id: ItemID, name: string, url: string, amount: number }[]
   xp: number
   blocked: string | null
@@ -71,8 +73,8 @@ export class FarmService {
     if (seedId !== null) this.playerStore.plantSeed(seedId, this.plotLimit())
   }
 
-  /** One plot, or every ready plot when `plotIndex` is omitted. */
-  harvest(plotIndex?: number): void {
+  /** One plot, or every ready plot when `plotIndex` is omitted. The popup floats from `at`. */
+  harvest(at: { x: number, y: number }, plotIndex?: number): void {
     const { crops, xp, blocked, missing } = this.playerStore.harvestPlots(plotIndex)
     if (xp > 0) this.professionService.gainXp(ProfessionID.farming, xp)
     if (crops.length === 0 && !blocked) return
@@ -80,6 +82,7 @@ export class FarmService {
     const id = this.nextToastId++
     this.toasts.update(current => [...current, {
       id,
+      at,
       crops: crops.map(crop => ({ ...crop, name: `items:names.${ItemID[crop.id]}`, url: ITEM_DATA[crop.id].url })),
       xp,
       blocked: blocked ? i18next.t('map:farm.harvestBlocked', { slots: missingSlotsText(missing) }) : null,
