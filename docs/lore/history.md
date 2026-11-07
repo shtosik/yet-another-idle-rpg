@@ -39,6 +39,7 @@ Timeline relative to the present (the player's arrival). Source shorthand as in 
 | The Sap That Burns | Corwin brews the sap to stop the Treant's regeneration. | `Corwin#questTheSapComplete` |
 | The Blighted Heart | Gnarled Treant killed; the Spires go quiet; Deepwood to recover over "years, perhaps decades"; gnolls to scatter. | `Corwin#questBlightedHeartComplete`, `Corwin#postQuestLore` |
 | Silk and Water / The Infestation | Sylvie resupplied; spiders pushed back. | `Sylvie#questSilkWaterComplete`, `Sylvie#questInfestationComplete` |
+| Seeds from the Terrace to The Growers' Table | The Farming Guild opens its gate to the player on Sylvie's word; the orchard is replanted; Marta cooks for the first time in two years, and Corwin smells the bread on a Mawood wind and calls the sap containable. | `farmWarden.json` `questOrchardComplete`, `questTableComplete`; `mawoodCorwin.json` `farmFinaleLine` |
 | Prove Your Aim / Big Game | Finn's trust; old one-eared bear spared; Ashwood Bow. | `Finn#questProveYourAimComplete`, `Finn#questBigGameComplete` |
 | Raw Materials / War Trophies | Silverwood Chestplate; Warchief killed three times. | `Brenna#questRawMaterialsComplete`, `Brenna#questWarTrophiesComplete` |
 | Feathers for a Kite / What Lurks at the Top | Harpy Matriarch killed; Milo reaches the nest, finds the Harpy Crown and a door in the tallest Spire. | `Milo#questWhatLurksComplete`, `Milo#questWhatLurksPostQuest` |

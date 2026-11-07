@@ -11,11 +11,14 @@ import { EnemyID } from '../../../../enums/ids/enemy-id.enum'
 import { DialogueEffect } from '../../../../types/dialogues/dialogue-effect.type'
 import { DialogueCondition } from '../../../../types/dialogues/dialogue-condition.type'
 import { ZoneID } from '../../../../enums/ids/zone-id.enum'
-import { TownID } from '../../../../enums/map/town-id.enum'
+import { ReputationID } from '../../../../enums/reputation-id.enum'
+import { ProfessionID } from '../../../../enums/ids/profession-id.enum'
 import { reputationLockText } from '../quests/reputation/reputation-text'
 import { CloseButtonComponent } from '../../shared/close-button/close-button.component'
 import { PlayerStore } from '../../../store/player/player.store'
 import { missingSlotsText } from '../inventory/tab-text'
+import { TurnInCooldownService } from '../../../services/turn-in-cooldown.service'
+import { formatCooldown } from '../../../store/quests/turn-in-cooldown'
 
 @Component({
   selector: 'app-dialogue',
@@ -30,6 +33,7 @@ import { missingSlotsText } from '../inventory/tab-text'
 export class DialogueComponent {
   protected dialogueService = inject(DialogueManagerService)
   private playerStore = inject(PlayerStore)
+  private cooldowns = inject(TurnInCooldownService)
   protected readonly NpcID = NpcID
   protected readonly QuestID = QuestID
 
@@ -97,7 +101,13 @@ export class DialogueComponent {
         })
       }
       case 'reputation':
-        return reputationLockText(condition.townId, condition.tier, this.playerStore.reputation()[condition.townId] ?? 0)
+        return reputationLockText(condition.reputationId, condition.tier, this.playerStore.reputation()[condition.reputationId] ?? 0)
+      case 'professionLevel':
+        return this.expertiseLabel(condition.professionId, condition.level)
+      case 'turnInCooldown': {
+        const remaining = this.cooldowns.remainingMs(condition.key)
+        return remaining > 0 ? i18next.t('app:turnInReadyIn', { time: formatCooldown(remaining) }) : ''
+      }
       case 'manyStat':
         return condition.statsRequired
           .map(req => this.getConditionLabel({ type: 'stat', ...req }))
@@ -149,6 +159,7 @@ export class DialogueComponent {
           return `${sign}${s.amount} ${name}`
         }).join(', ')
       case 'item':
+        if (effect.silent) return ''
         return effect.items.map(i => {
           const name = i18next.t(`items:names.${ItemID[i.itemId]}`)
           const sign = effect.action === 'give' ? '+' : '-'
@@ -172,12 +183,16 @@ export class DialogueComponent {
         const { turnIn, bundles } = this.dialogueService.turnIn(effect)
         return i18next.t('quests:reputation.reward', {
           amount: this.shownBundles(bundles) * turnIn.reputation,
-          town: i18next.t(`map:towns.${TownID[turnIn.townId]}`),
+          town: i18next.t(`map:reputations.${ReputationID[turnIn.reputationId]}`),
         })
       }
       default:
         return ''
     }
+  }
+
+  private expertiseLabel(professionId: ProfessionID, level: number): string {
+    return i18next.t('app:expertise.label', { profession: i18next.t(`app:professions.${ProfessionID[professionId]}`), level })
   }
 
   /** A disabled turn-in (no full bundle yet) still shows one bundle's worth, so the player sees the rate. */

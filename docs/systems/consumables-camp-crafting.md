@@ -45,4 +45,6 @@ Then ingredients are removed and the result added (×`createsAmount` × count). 
 - Buying the Spellbook is blocked on a full inventory, although it never enters the inventory.
 
 ## How to extend
+Farm recipes (`farming.md`): Turnip Stew (Cooking 1; 3 Turnip, 1 Vial of Water), Farmer's Bread (Cooking 1; 4 Wheat), Harvest Pie (Cooking 2; 2 Apple, 3 Wheat, 1 Cheese), Mushroom Stew (Cooking 2; 3 Glowcap, 2 Turnip), Silverleaf Tonic (Alchemy 1; 2 Silverleaf, 1 Vial of Water, 10 mana), Glowcap Elixir (Alchemy 1; 2 Glowcap, 1 Vial of Water, 25 mana). All need their scroll: Harvest Pie and Mushroom Stew from Warden Marta at Farming Guild Honored and Revered, Glowcap Elixir from Sylvie, the other three as quest rewards (C10). Feast of the Wood, Heartroot Elixir and Blossom Draught are deferred until Cooking 3 / Alchemy 2 gear exists.
+
 New recipe, food or potion: the `add-recipe-or-consumable` skill. New station gear: a `stationUpgrade` item with the next `level`, a recipe or shop entry that produces it, and `unlocks:stations.<ItemID key>.title`/`.body` keys for the install notification.

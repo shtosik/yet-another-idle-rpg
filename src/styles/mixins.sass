@@ -65,6 +65,29 @@
   box-shadow: vars.$panelShadow
   padding: vars.$panelPadding
 
+// The navbar XP bar: numbers over a tinted fill. Needs `-fill` and `-text` children; the caller sets the width.
+@mixin xp-bar($fill)
+  position: relative
+  height: 1.15rem
+  border: vars.$panelBorder
+  border-radius: vars.$panelBorderRadius
+  background: vars.$panelBackgroundColor
+  overflow: hidden
+
+  &-fill
+    height: 100%
+    background: $fill
+    transition: width 0.3s ease
+
+  &-text
+    position: absolute
+    inset: 0
+    display: flex
+    align-items: center
+    justify-content: center
+    font-size: 0.8rem
+    text-shadow: vars.$textShadow
+
 @mixin button
   background: vars.$panelBackgroundColor
   border: 1px solid palette.$yellow

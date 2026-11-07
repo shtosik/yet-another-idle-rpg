@@ -106,7 +106,7 @@ export class ShopComponent implements OnInit {
     if ((entry.staticItem.minRank ?? 0) > this.guildRank()) return 'rank'
 
     const minReputation = entry.staticItem.minReputation
-    if (minReputation && this.playerStore.townTier(minReputation.townId) < minReputation.tier) return 'reputation'
+    if (minReputation && this.playerStore.reputationTierOf(minReputation.reputationId) < minReputation.tier) return 'reputation'
 
     if (this.balance() < entry.staticItem.price) return 'currency'
 
@@ -166,8 +166,8 @@ export class ShopComponent implements OnInit {
   reputationLock(index: number): string {
     const minReputation = this.items()[index].staticItem.minReputation
     if (!minReputation) return ''
-    const { townId, tier } = minReputation
-    return reputationLockText(townId, tier, this.playerStore.reputation()[townId] ?? 0)
+    const { reputationId, tier } = minReputation
+    return reputationLockText(reputationId, tier, this.playerStore.reputation()[reputationId] ?? 0)
   }
 
   /** Shops always pay gold for what they buy. */

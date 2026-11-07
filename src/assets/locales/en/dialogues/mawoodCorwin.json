@@ -16,7 +16,8 @@
     "goodbye": "Goodbye, Elder.",
     "recovery": "How is the forest?",
     "rootsAndRafters": "Brenna asks you to bless the new walkway.",
-    "rootglowMoth": "There's a moth on your shoulder, Elder."
+    "rootglowMoth": "There's a moth on your shoulder, Elder.",
+    "farmFinale": "Marta has cooked for the first time in two years."
   },
   "aboutMawood": {
     "message": "Mawood has stood for three hundred years. Not on the ground — that would have been foolish. The forest floor belongs to roots and rot and things older than memory. So we built up, in the light. It has always worked. Until two years ago, when the black sap first appeared.",
@@ -95,5 +96,9 @@
   "rootglowMothGiven": {
     "message": "Mawood keeps its friends, traveler. Now a little of it goes with you. Keep it away from Elarion's shop; he sets things on fire.",
     "opt1": "Thank you, Elder."
+  },
+  "farmFinaleLine": {
+    "message": "Fresh bread on a Mawood wind. I haven't smelled that since the sap came, and for two years I have told anyone who would listen that it could be contained. It seems I was right after all. Well done, traveler.",
+    "opt1": "Thank you."
   }
 }

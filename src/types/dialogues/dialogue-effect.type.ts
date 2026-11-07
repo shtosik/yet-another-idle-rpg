@@ -2,6 +2,8 @@ import { QuestID } from '../../enums/ids/quest-id.enum'
 import { ItemID } from '../../enums/ids/item-id.enum'
 import { PlayerStat } from '../player/player-stat.type'
 import { NpcID } from '../../enums/map/npc-id.enum'
+import { ProfessionID } from '../../enums/ids/profession-id.enum'
+import { SiteID } from '../../enums/ids/site-id.enum'
 
 export type TaskLength = 'short' | 'medium' | 'long'
 
@@ -16,6 +18,8 @@ export type DialogueEffect =
   | GuildEffect
   | ArenaEffect
   | ReputationTurnInEffect
+  | UnlockProfessionEffect
+  | UnlockSiteEffect
 
 export interface QuestEffect {
   type: 'quest'
@@ -33,6 +37,8 @@ export interface ItemEffect {
   type: 'item'
   action: 'take' | 'give'
   items: { itemId: ItemID; amount: number }[]
+  /** Hides the effect tag, for a gift the quest tag already implies. */
+  silent?: boolean
 }
 
 export interface ShopEffect {
@@ -65,11 +71,22 @@ export interface GuildEffect {
   taskIndex?: number
 }
 
-/** Hands `npcId`'s turn-in item (`REPUTATION_TURN_INS`) over for reputation: one full bundle, or all full bundles held. */
+/** Hands one full bundle of `npcId`'s turn-in item (`REPUTATION_TURN_INS`) over for reputation and starts that bundle's cooldown. */
 export interface ReputationTurnInEffect {
   type: 'reputationTurnIn'
   npcId: NpcID
-  bundles: 'one' | 'all'
+}
+
+/** Teaches a profession (it starts at level 1); nothing happens when it is already known. */
+export interface UnlockProfessionEffect {
+  type: 'unlockProfession'
+  professionId: ProfessionID
+}
+
+/** Opens a Site on the world map and in the Sites list; nothing happens when it is already open. */
+export interface UnlockSiteEffect {
+  type: 'unlockSite'
+  siteId: SiteID
 }
 
 /** Start a Combat Arena run (pair it with the entry fee's `stat` deduct), or claim the rewards waiting from clears. */

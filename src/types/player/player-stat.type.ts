@@ -55,6 +55,13 @@ export type PlayerStat =
     | 'taskDoubleKillChance'
     | 'upgradedDropChance'
     | 'offlineProgressRate'
+    | 'seedGrowthTimeReduction'
+    | 'farmDoubleHarvestChance'
+    | 'farmSeedSaveChance'
+    | 'farmBonusCropChance'
+    | 'turnInCooldownReduction'
+    | 'farmXpMultiplier'
+    | 'seedDropChance'
 
 export const multiplierStats: PlayerStat[] = [
     'critMulti',

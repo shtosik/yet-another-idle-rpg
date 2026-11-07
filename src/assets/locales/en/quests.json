@@ -20,12 +20,21 @@
     "lastOrders": "Last Orders",
     "aCleanCure": "A Clean Cure",
     "rootsAndRafters": "Roots and Rafters",
-    "theColdForge": "The Cold Forge"
+    "theColdForge": "The Cold Forge",
+    "seedsFromTheTerrace": "Seeds from the Terrace",
+    "theFirstFurrow": "The First Furrow",
+    "wheatForTheGuild": "Wheat for the Guild",
+    "silverleafForSylvie": "Silverleaf for Sylvie",
+    "anOrchardAgain": "An Orchard Again",
+    "theGrowersTable": "The Growers' Table",
+    "marthasOrder": "Marta's Order",
+    "wicksOrder": "Wick's Order"
   },
   "requirements": {
     "findItem": "Find {{ item }}",
     "waveKillCount": "{{ amount }} KC on wave {{ wave }} in {{ zone }}",
-    "wave": "{{ zone }} wave {{ wave }}"
+    "wave": "{{ zone }} wave {{ wave }}",
+    "professionLevel": "{{ profession }} expertise"
   },
   "panel": {
     "label": "Quest panel",
@@ -53,10 +62,8 @@
     "reward": "+{{ amount }} {{ town }} reputation",
     "townTier": "{{ town }} {{ tier }}",
     "requires": "Requires {{ what }} — {{ current }}/{{ target }}",
-    "turnInOne": "Hand over {{ amount }} {{ item }} (have {{ held }})",
-    "turnInOne_kept": "Hand over {{ amount }} {{ item }} (have {{ held }}, {{ kept }} kept for quests)",
-    "turnInAll": "Hand over all full bundles: {{ amount }} {{ item }} (have {{ held }})",
-    "turnInAll_kept": "Hand over all full bundles: {{ amount }} {{ item }} (have {{ held }}, {{ kept }} kept for quests)",
+    "turnIn": "Hand over {{ amount }} {{ item }} (have {{ held }})",
+    "turnIn_kept": "Hand over {{ amount }} {{ item }} (have {{ held }}, {{ kept }} kept for quests)",
     "tierUp": "{{ town }} now sees you as {{ tier }}",
     "progressLabel": "{{ town }} reputation"
   },
@@ -68,5 +75,8 @@
       "4": "Bring Phurgo one Fish & Apple Pie at Lirold's Forge.",
       "5": "Bring Phurgo 10 Ancient Wood for charcoal at Lirold's Forge."
     }
+  },
+  "professionXp": {
+    "reward": "+{{ amount }} {{ profession }} XP"
   }
 }

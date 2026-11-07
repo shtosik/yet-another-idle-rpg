@@ -60,12 +60,12 @@ Each profession has **gathering spots**: one per zone where it fits, on that zon
 - **Feeds:** Earth Rune (stone), Workbench tools and weapons (Stone Club), **gear upgrading** (ore per tier is the obvious upgrade material), town building upgrades. A smelting step (ore + coal → ingot) would need a Forge station; skip it in v1 and use ore directly.
 - **New items:** Coal, Copper Ore, Iron Ore, Rough Gem, pickaxes (tool gear).
 
-### Farming (Camp, later)
-- **Fantasy:** a vegetable patch next to the Camp fire.
-- **Where:** Camp, as a new tab with 2–4 plots. Not tied to a zone.
-- **Loop:** plant a seed, wait real time (10 min – 4 h), harvest. Runs alongside everything else, offline included: growth is a timestamp, not a tick.
-- **Outputs:** apple (orchard sapling), **Wheat**, **Potato**, herbs grown from foraged seeds; cheese stays a rat drop on purpose (Trader's Basement keeps a reason to exist).
-- **Feeds:** Cooking (bread, pies), Alchemy (cultivated herbs).
+### Farming (shipped as a Site, not a Camp tab)
+Built first and by itself: see [farm-and-husbandry.md](farm-and-husbandry.md) and `docs/systems/farming.md`. It is the first profession (`ProfessionID.farming = 4`) and shows its level as **Farming expertise**. It has no spots, tools or activity switch, and no `gatherSpeed`.
+- **Where:** the Farm Site north of the Mountain Pass (a plots panel with up to 9 plots), not the Camp.
+- **Loop:** plant a monster-dropped seed (no Foraging seeds), wait real time (15 min – 24 h), harvest. Growth is a timestamp, so it runs offline.
+- **Outputs:** Turnip, Wheat, Silverleaf, Apple, Glowcap, Heartroot, Canopy Blossom.
+- **Feeds:** Cooking (bread, pies, stews), Alchemy (tonics, elixirs).
 
 ### Trapping (Camp, later)
 - **Fantasy:** Finn Ashwood, hunter and trapper, teaches snares.
@@ -89,7 +89,7 @@ Each profession has **gathering spots**: one per zone where it fits, on that zon
 ### Recommendation: B for zone professions, C for farming and trapping
 
 - **Fishing, foraging, woodcutting and mining are zone activities (B).** The battle view gets an activity switch (`Fight · Fish · Forage …`, only professions that are unlocked and have a spot in this zone). Switching clears the current enemy, exactly like changing wave. The spot replaces the enemy area: spot art, a progress bar per action, catch popups.
-- **Farming and trapping are Camp timers (C)**, added later. They are the "always on" side, and cost nothing per tick.
+- **Trapping is a Camp timer (C)**, added later; Farming is a Site panel with timers and shipped separately. They are the "always on" side, and cost nothing per tick.
 - Why B: the game's only active decision today is where to fight. B keeps that decision and adds a second axis to it, with a real cost (no XP, gold or wave progress while gathering), so enemy drops keep their value. It fits the offline claim cleanly, and its tick cost is smaller than combat's.
 - Not chosen: A makes gathering a free bonus that devalues every drop table, and complicates the offline simulation. Pure C loses the zone fantasy.
 
@@ -100,6 +100,7 @@ Each profession has **gathering spots**: one per zone where it fits, on that zon
 
 ### Leveling
 - Each profession levels 1–50 (MVP: cap 30). Per-level XP `20 × L²`: level 10 ≈ 5 700 XP total, level 25 ≈ 98 000, level 50 ≈ 808 000. At ~10 XP per action and 4 s per action at the first spot, level 10 is ~40 min of gathering; higher spots pay more XP per action, so level 25 is roughly 5–8 h and 50 a long tail. Tune with `npm run sim`.
+- **Terms:** a profession's level is called **expertise** in player-facing text ("Fishing expertise 4"; GLOSSARY *Expertise*). Farming already does.
 - **Level gives:** access to spots (`requiredLevel`), −1% action time per level (cap −30%), and perk milestones at 10 / 25 / 40 (double-gather chance, rare-find chance, a second loot roll). Profession levels are separate from player level and give no skill points (open question).
 - **Economy guard rails** (for the sim): an hour of gathering yields roughly the materials of 1.5–2 h of combat drops of the same tier, but sells for at most ~50% of the gold an hour of combat there earns. Gathering must not be the best gold farm.
 
@@ -149,7 +150,7 @@ Global, not per profession, to keep the stat list small; tools and levels apply 
 | Foraging | **Sylvie** (Mawood apothecary) | after Silk and Water | she gives a Herb Knife (tier 1). |
 | Woodcutting | **Brenna** (Mawood Hunter's Lodge) | after Raw Materials | she gives a Hatchet. |
 | Mining | no NPC fits yet | — | an item unlock: a **Battered Pickaxe** dropped by the Goblin Scavenger (Mountain Pass), using the existing `hasItem` unlock rule. Or a miner NPC in North Lirold, which has no buildings yet (owner call). |
-| Farming | **Elder Corwin** (druid, forest restoration) | after The Blighted Heart | seeds and a Camp plot. |
+| Farming | **Sylvie, then Warden Marta** (shipped) | after Silk and Water | unlocks the Farm Site (quest *Seeds from the Terrace*). |
 | Trapping | **Finn** | after Big Game | Snare kit. |
 
 Order matters: Fishing (La Harpar) is the only early profession; foraging and woodcutting arrive with Mawood. That leaves foraging spots in Plains and Long Path below the player's current tier when unlocked: fine, they're the low-level spots, and the player walks back for them.
@@ -173,7 +174,7 @@ Done when a fresh save can unlock Fishing from Josh, fish on the beach online an
 3. Woodcutting + Workbench tool recipes (tier 3 tools from logs).
 4. Mining + gear upgrading materials (pairs with `gear-upgrading.md`).
 5. Guild gather tasks, reputation turn-ins, item sets, achievements.
-6. Farming plots, then trapping, as Camp timers.
+6. Trapping, as a Camp timer (Farming shipped earlier as a Site).
 
 ## 6. Data shapes, touch-points, open questions
 

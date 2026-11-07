@@ -11,6 +11,8 @@ import { MawoodMiloDialogueType } from './mawoodTown/mawoodMilo'
 import { MawoodElarionDialogueType } from './mawoodTown/mawoodElarion'
 import { LiroldArenaMasterDialogueType } from './liroldTown/liroldArenaMaster'
 import { LiroldPhurgoDialogueType } from './liroldTown/liroldPhurgo'
+import { FarmWardenDialogueType } from './farm/farmWarden'
+import { FarmDroverDialogueType } from './farm/farmDrover'
 
 export type DialogueType =
   | LaHarparBartenderDialogueType
@@ -26,3 +28,5 @@ export type DialogueType =
   | MawoodElarionDialogueType
   | LiroldArenaMasterDialogueType
   | LiroldPhurgoDialogueType
+  | FarmWardenDialogueType
+  | FarmDroverDialogueType

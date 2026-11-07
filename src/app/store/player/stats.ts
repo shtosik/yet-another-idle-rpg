@@ -15,6 +15,8 @@ import { ItemType } from '../../../enums/items/item-type.enum'
 import { SpellID } from '../../../enums/ids/spell-id.enum'
 import { ItemID } from '../../../enums/ids/item-id.enum'
 import type { InventoryTab } from './inventory'
+import PROFESSIONS_DATA from '../../../data/professions-data'
+import { ProfessionID } from '../../../enums/ids/profession-id.enum'
 import { UPGRADE_BONUS_PER_LEVEL, UPGRADE_MILESTONE_BONUS, UPGRADE_MILESTONE_LEVEL } from '../../../data/upgrade-data'
 
 export type PlayerStatsType = Record<PlayerStat, number>
@@ -39,7 +41,7 @@ const INVERTED_STATS = new Set<PlayerStat>(['attackSpeed', 'manaRegenRate', 'sho
 export const isInvertedStat = (stat: PlayerStat): boolean => INVERTED_STATS.has(stat)
 
 /** Where a stat modifier comes from; the stats panel breaks each stat down by these. */
-export type StatSource = 'equipment' | 'skills' | 'buffs' | 'consumables' | 'bonuses' | 'mastery'
+export type StatSource = 'equipment' | 'skills' | 'buffs' | 'consumables' | 'bonuses' | 'mastery' | 'expertise'
 export type SourcedModifiers = Record<StatSource, StatModifier[]>
 
 export interface StatContribution {
@@ -135,6 +137,38 @@ export const foodMultiplierOf = (modifiers: StatModifier[]): number =>
 
 export const bonusModifiers = (bonuses: Partial<Record<PlayerStat, number>>): StatModifier[] =>
   (Object.entries(bonuses) as [PlayerStat, number][]).map(([stat, amount]) => ({ stat, amount }))
+
+/**
+ * What a profession's levels above `from` up to `to` grant: the level's milestone, else the per-level reward, which stops at its
+ * cap. Derived from the level alone (ADR 0002), so respecs, reloads and rebalances can't drift it.
+ */
+function expertiseGrants(id: ProfessionID, from: number, to: number): StatModifier[] {
+  const { milestones, perLevel, perLevelTotalCap } = PROFESSIONS_DATA[id]
+  const modifiers: StatModifier[] = []
+  let perLevelTotal = 0
+  for (let level = 2; level <= to; level++) {
+    const milestone = milestones[level]
+    if (milestone) {
+      if (level > from) modifiers.push({ ...milestone })
+    } else {
+      const amount = round(Math.min(perLevel.amount, perLevelTotalCap - perLevelTotal))
+      perLevelTotal += amount
+      if (level > from && amount > 0) modifiers.push({ stat: perLevel.stat, amount })
+    }
+  }
+  return modifiers
+}
+
+/** Stats granted by each profession's current level (`professionLevels`: 0 or missing = locked). */
+export const expertiseModifiers = (professionLevels: Partial<Record<ProfessionID, number>>): StatModifier[] =>
+  (Object.keys(PROFESSIONS_DATA).map(Number) as ProfessionID[]).flatMap(id => expertiseGrants(id, 1, professionLevels[id] ?? 0))
+
+/** What going from level `from` to `to` adds, per stat (for the level-up toast). */
+export function expertiseGain(id: ProfessionID, from: number, to: number): StatModifier[] {
+  const gained = new Map<PlayerStat, number>()
+  for (const { stat, amount } of expertiseGrants(id, from, to)) gained.set(stat, round((gained.get(stat) ?? 0) + amount))
+  return [...gained].map(([stat, amount]) => ({ stat, amount }))
+}
 
 /** Base stats plus every modifier, with saved resources on top. Mana never shows above `maxMana`. */
 export function deriveStats(resources: Resources, modifiers: StatModifier[]): PlayerStatsType {

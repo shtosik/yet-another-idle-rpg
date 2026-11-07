@@ -1,5 +1,6 @@
 @use 'palette' as palette
 @use 'variables' as vars
+@use 'mixins' as mixins
 
 :host
   display: block
@@ -24,27 +25,8 @@
     color: palette.$cyan
 
   &__xp
-    position: relative
     width: 14rem
-    height: 1.15rem
-    border: vars.$panelBorder
-    border-radius: vars.$panelBorderRadius
-    background: vars.$panelBackgroundColor
-    overflow: hidden
-
-  &__xp-fill
-    height: 100%
-    background: rgba(6, 182, 212, 0.45)
-    transition: width 0.3s ease
-
-  &__xp-text
-    position: absolute
-    inset: 0
-    display: flex
-    align-items: center
-    justify-content: center
-    font-size: 0.8rem
-    text-shadow: vars.$textShadow
+    @include mixins.xp-bar(rgba(6, 182, 212, 0.45))
 
   &__currencies
     display: flex

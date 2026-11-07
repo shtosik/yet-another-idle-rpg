@@ -31,6 +31,7 @@ Rolling rate: every online kill calls `OfflineStore.recordKill(performance.now()
 ## Invariants & gotchas
 - **`offlineProgressRate` is a `PlayerStat`** (base 0.5). New sources go into `PlayerStore.stats` like any stat (ADR 0002).
 - **Same seed on reload.** A reload before the save lands replays the same rolls, so rerolling offline loot by reloading gains nothing.
+- **Seeds:** seed drops are counted in `farm.seeds` (never the inventory, never lost). Once the farm is unlocked (`isFarmUnlocked`), `applyKillBatch` lists them in the receipt's `receivedItems` and the welcome-back modal shows them like any drop; before the unlock they are counted silently. See `farming.md`.
 - **Pathfinder's Seal:** segment stats carry the permanent `upgradedDropChance` bonus. Shared `rollEnemyDrops` / `rollDropList` uses the same seeded RNG for each eligible gear copy's +1 roll (10% after registration), never for unique gear, pets or non-equipment. Mixed +0/+1 copies accumulate and land as separate stacks, preserving their levels in receipts.
 - Stats are read per segment at claim start; level-ups during the claim don't change the rate.
 - The enemy alive when the page closed is untouched; the simulation starts from fresh spawns.

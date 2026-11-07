@@ -1,5 +1,5 @@
-@for (row of rows(); track row.townId) {
-  @let town = 'map:towns.' + TownID[row.townId] | i18next;
+@for (row of rows(); track row.reputationId) {
+  @let town = 'map:reputations.' + ReputationID[row.reputationId] | i18next;
   <div class="reputation">
     <div class="reputation__header">
       <span class="reputation__town">{{ town }}</span>

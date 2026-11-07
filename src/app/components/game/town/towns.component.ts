@@ -15,7 +15,7 @@ import { GameTab } from '../../../../enums/ids/game-tab.enum'
 import { ShopComponent } from './shop/shop.component'
 import { ForgeComponent } from './forge/forge.component'
 import { PlayerStore } from '../../../store/player/player.store'
-import { REPUTATION_TOWNS, reputationTier } from '../../../store/player/reputation'
+import { REPUTATION_IDS, REPUTATION_TOWN, reputationTier } from '../../../store/player/reputation'
 import { ReputationTier } from '../../../../enums/reputation-tier.enum'
 
 @Component({
@@ -50,9 +50,9 @@ export class TownsComponent {
   dialogueActive = computed(() => this.dialogueManager.activeNpc() !== null)
   /** Wrapped so Neutral (0) still shows; `null` for towns without reputation. */
   townTier = computed(() => {
-    const townId = this.selectedTownId()
-    if (!REPUTATION_TOWNS.includes(townId)) return null
-    return { value: reputationTier(this.playerStore.reputation()[townId] ?? 0) }
+    const reputationId = REPUTATION_IDS.find(id => REPUTATION_TOWN[id] === this.selectedTownId())
+    if (reputationId === undefined) return null
+    return { value: reputationTier(this.playerStore.reputation()[reputationId] ?? 0) }
   })
   protected readonly ReputationTier = ReputationTier
 

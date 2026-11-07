@@ -3,10 +3,16 @@ import { getState } from '@ngrx/signals'
 import { SkillTreeService } from '../../../services/skill-tree.service'
 import { GameNavigationService } from '../../../services/game-navigation.service'
 import { ReputationService } from '../../../services/reputation.service'
+import { ProfessionService } from '../../../services/profession.service'
+import { ProfessionID } from 'enums/ids/profession-id.enum'
+import { PLOT_SLOTS } from '../../../store/player/farm'
+import { xpForLevel } from '../../../store/player/professions'
+import PROFESSIONS_DATA from '../../../../data/professions-data'
 import { GameTab } from 'enums/ids/game-tab.enum'
 import { SkillNodeID } from 'enums/ids/skill-node-id.enum'
 import { ShopID } from 'enums/ids/shop-id.enum'
 import { TownID } from 'enums/map/town-id.enum'
+import { ReputationID } from 'enums/reputation-id.enum'
 import { EquipmentSlotKey } from 'enums/equipment-slot.enum'
 import { ALL_SKILLS } from '../../../../data/skill-tree-data'
 import { NodeRequirement } from '../../../../interfaces/skill-tree/skill-node.interface'
@@ -22,6 +28,7 @@ import { CampStore } from '../../../store/camp/camp.store'
 import { OfflineStore } from '../../../store/offline/offline.store'
 import { PlayerStat } from '../../../../types/player/player-stat.type'
 import { ZoneID } from 'enums/ids/zone-id.enum'
+import { SiteID } from 'enums/ids/site-id.enum'
 import { ItemID } from 'enums/ids/item-id.enum'
 import { ItemTier } from 'enums/items/item-tier.enum'
 import { EnemyID } from 'enums/ids/enemy-id.enum'
@@ -84,6 +91,7 @@ export class DevCheatsComponent {
   private skillTree = inject(SkillTreeService)
   private navigation = inject(GameNavigationService)
   private reputationService = inject(ReputationService)
+  private professionService = inject(ProfessionService)
 
   /**
    * `window.dev` in the browser console: puts the game into a state in one call when checking UI.
@@ -144,6 +152,8 @@ export class DevCheatsComponent {
       zoneId: fromName(ZoneID, 'ZoneID', zone), wave: 1, kills: 0, shinies: count, killsByEnemy: {}, taskCountsByEnemy: {}, experience: 0, gold: 0, items: [],
     }),
     unlock: (feature: DevFeature) => this.unlockFeature(feature),
+    /** Opens a Site and the map; no notification. */
+    unlockSite: (site: Ref<typeof SiteID>) => this.playerStore.applyUnlockTarget({ type: 'site', siteId: fromName(SiteID, 'SiteID', site) }),
     /** Every feature, town and zone. */
     unlockAll: () => {
       DEV_FEATURES.forEach(feature => this.unlockFeature(feature))
@@ -175,9 +185,27 @@ export class DevCheatsComponent {
       this.questsStore.startQuest(questId)
       this.questsStore.endQuest(questId)
     },
-    /** Adds town reputation the way a quest reward does, tier-up toast included. */
-    addReputation: (town: Ref<typeof TownID>, amount: number) =>
-      this.reputationService.gain([{ townId: fromName(TownID, 'TownID', town), amount }]),
+    /** Adds reputation the way a quest reward does, tier-up toast included. */
+    addReputation: (reputation: Ref<typeof ReputationID>, amount: number) =>
+      this.reputationService.gain([{ reputationId: fromName(ReputationID, 'ReputationID', reputation), amount }]),
+    /** Unlocks the profession and sets its expertise to `level` (skill points are paid once, never refunded on a lower level). */
+    setExpertise: (profession: Ref<typeof ProfessionID>, level: number) => {
+      const professionId = fromName(ProfessionID, 'ProfessionID', profession)
+      const target = Math.min(Math.max(1, Math.floor(level)), PROFESSIONS_DATA[professionId].maxLevel)
+      this.playerStore.unlockProfession(professionId)
+      const current = this.playerStore.professions()[professionId]?.experience ?? 0
+      this.professionService.gainXp(professionId, xpForLevel(target) - current)
+    },
+    /** Fills every plot with the seed (default Turnip Seeds), granting the seeds and the Farming profession; false when its expertise is too low. */
+    plantAll: (seed: Ref<typeof ItemID> = ItemID.turnipSeeds): boolean => {
+      this.playerStore.unlockProfession(ProfessionID.farming)
+      this.playerStore.addItems([{ id: fromName(ItemID, 'ItemID', seed), amount: PLOT_SLOTS }])
+      const planted = this.playerStore.plantSeed(fromName(ItemID, 'ItemID', seed), PLOT_SLOTS)
+      if (!planted) console.warn('dev.plantAll: nothing planted (not a seed, expertise too low, or every plot busy)')
+      return planted
+    },
+    /** Every planted plot is ready to harvest. */
+    growAll: () => this.playerStore.growAllPlots(),
   }
 
   /** `dev.help()` output; typed by `commands`, so a new command doesn't compile without its line. */
@@ -195,6 +223,7 @@ export class DevCheatsComponent {
     setKills: 'setKills(EnemyID, count) — set lifetime kills',
     addShinyKills: 'addShinyKills(ZoneID, count) — add shiny kills in a zone',
     unlock: `unlock(${DEV_FEATURES.map(f => `'${f}'`).join('|')}) — unlock a feature`,
+    unlockSite: "unlockSite(SiteID) — open a Site, e.g. unlockSite('farm')",
     unlockAll: 'unlockAll() — every feature, town and zone',
     giveSlots: 'giveSlots() — +100 inventory slots per slot tab',
     giveAllItems: 'giveAllItems() — 100 of every item, slots added as needed',
@@ -202,7 +231,10 @@ export class DevCheatsComponent {
     state: 'state() — live state of every store plus derived stats',
     reset: 'reset() — fresh save',
     completeQuest: 'completeQuest(QuestID) — start and complete a quest, rewards included',
-    addReputation: 'addReputation(TownID, amount) — add town reputation',
+    addReputation: 'addReputation(ReputationID, amount) — add reputation',
+    setExpertise: 'setExpertise(ProfessionID, level) — unlock a profession and set its expertise level',
+    plantAll: "plantAll(ItemID = 'turnipSeeds') — fill every plot, seeds granted",
+    growAll: 'growAll() — every planted plot is ready to harvest',
   }
 
   private readonly devTools = {
