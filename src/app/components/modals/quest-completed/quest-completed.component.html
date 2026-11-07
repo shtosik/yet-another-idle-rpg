@@ -9,6 +9,12 @@
       @for (stat of statsToDisplay(); track stat.key) {
         <li>{{ stat.amount }} {{ 'playerStats.' + stat.key | i18next }}</li>
       }
+      @for (reputation of reputationToDisplay(); track reputation.reputationId) {
+        <li>{{ 'quests:reputation.reward' | i18next: { amount: reputation.amount, town: ('map:reputations.' + ReputationID[reputation.reputationId] | i18next) } }}</li>
+      }
+      @for (xp of professionXpToDisplay(); track xp.professionId) {
+        <li>{{ 'quests:professionXp.reward' | i18next: { amount: xp.amount, profession: ('app:professions.' + ProfessionID[xp.professionId] | i18next) } }}</li>
+      }
     </ul>
   }
 

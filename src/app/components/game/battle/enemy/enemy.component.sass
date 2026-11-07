@@ -1,55 +1,107 @@
 @use 'variables'
 @use 'palette'
 
+:host
+  display: block
+  min-width: 0
+  // Equal space on both sides keeps HP centered while clearing the control rail.
+  width: calc(100% - 7rem)
+  animation: enemy-arrive 220ms ease-out
+
 .enemy
   display: flex
   flex-direction: column
-  justify-content: center
   align-items: center
+  text-shadow: variables.$textShadow
 
   h2
-    text-shadow: variables.$textShadow
+    width: 100%
+    font-size: 1.125rem
+    font-weight: 400
+    line-height: 1.4
     text-align: center
-    margin-bottom: 1rem
+    margin-bottom: 0.625rem
+    overflow-wrap: anywhere
+
+  &__tags
+    display: flex
+    justify-content: center
+    gap: 0.375rem
+    min-height: 1.625rem
+
+  &__tag
+    align-self: flex-start
+    padding: 0.125rem 0.375rem
+    background: #171717ed
+    border: 1px solid palette.$yellow
+    border-radius: 3px
+    color: palette.$yellow
+    font-size: 0.85rem
+
+    &--boss
+      color: #ffb4a2
+      border-color: #d36e6e
 
   .hp-bar
-    margin-bottom: 4px
-    width: 8rem
-    height: 2rem
-    border: 1px solid black
-    background-color: red
+    position: relative
+    width: 100%
+    height: 1.625rem
+    border: 1px solid #b77770
+    border-radius: 4px
+    background: #171717e6
+    overflow: hidden
     display: flex
     justify-content: center
     align-items: center
 
+    &__fill
+      position: absolute
+      inset: 0
+      transform-origin: left
+      background: linear-gradient(180deg, #b94e4e, #862d39)
+      transition: transform 140ms ease-out
+
     span
       position: relative
+      font-size: 0.95rem
+      font-variant-numeric: tabular-nums
+
+  &--boss .hp-bar
+    border-color: palette.$yellow
 
   &__status
     display: flex
     align-items: center
+    justify-content: center
     gap: 0.3rem
-    font-size: 0.8rem
-    text-shadow: variables.$textShadow
-    color: palette.$yellow
+    padding: 0.25rem 0.375rem
+    margin-bottom: 0.25rem
+    border: 1px solid #eab30866
+    border-radius: 4px
+    background: #171717e6
+    font-size: 0.85rem
+    color: #fde68a
+    text-align: center
 
   &__sprite-box
     position: relative
     display: flex
     align-items: flex-end
     justify-content: center
-    height: 8rem
+    height: 9rem
+    max-width: 100%
 
   img
     object-fit: contain
 
   &__sprite
     image-rendering: pixelated
+    max-width: 100%
+    max-height: 9rem
 
     &--shiny
       filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.85))
 
-    // Yad's shield: an aura in the shield's element colour
     &--shield-fire
       filter: drop-shadow(0 0 10px rgba(255, 110, 30, 0.95))
 
@@ -58,6 +110,21 @@
 
     &--shield-water
       filter: drop-shadow(0 0 10px rgba(40, 130, 255, 0.95))
+
+@keyframes enemy-arrive
+  from
+    opacity: 0
+    transform: translateY(8px) scale(0.97)
+  to
+    opacity: 1
+    transform: translateY(0) scale(1)
+
+@media (prefers-reduced-motion: reduce)
+  :host
+    animation: none
+
+  .enemy .hp-bar__fill
+    transition: none
 
 .weak-point
   position: absolute
@@ -101,6 +168,5 @@
   .weak-point, .mound--shaking
     animation: none
 
-  // The shaking mound still needs a tell without motion.
   .mound--shaking
     box-shadow: inset 0 -4px 0 #5b4127, 0 0 0 2px palette.$yellow

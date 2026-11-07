@@ -1,21 +1,30 @@
+@let name = ('items:names.' + ItemID[item.id]) | i18next;
+@let displayName = upgradeLevel() > 0 ? ('items:upgradedName' | i18next: { name, level: upgradeLevel() }) : name;
 <div
   [attr.data-tier]="ItemTier[tier]"
-  [tooltipContext]="{ item, tier }"
+  [tooltipContext]="{ item, tier, level: upgradeLevel() }"
+  [class.item--milestone]="upgradeLevel() >= milestoneLevel"
   [tooltipTemplate]="tooltip"
   class="item"
   placement="bottom"
   tooltipClass="tooltip-override"
-  (click)="handleClick()"
   (contextmenu)="handleRightClick($event)"
 >
-  <img
-    [ngSrc]="item.url"
-    alt=""
-    disableOptimizedSrcset
-    height="32"
-    width="32"
-  >
-  <span>{{ amount }}</span>
+  <!-- Shop and modal slots sit inside other controls or take no action, so only clickable slots get a button. -->
+  @if (clickable) {
+    <button
+      type="button"
+      class="item__action"
+      [appForgeDrag]="forgeSelectable() ? { from: 'inventory', item: { id: item.id, tier, upgradeLevel: upgradeLevel() } } : null"
+      [attr.aria-description]="forgeSelectable() && forge.open() ? ('forge:chooseHint' | i18next) : null"
+      [attr.aria-label]="displayName + ' ×' + amount"
+      (click)="handleActivate($event)"
+    >
+      <ng-container [ngTemplateOutlet]="art" />
+    </button>
+  } @else {
+    <ng-container [ngTemplateOutlet]="art" />
+  }
   @if (destroyable) {
     <button
       type="button"
@@ -27,13 +36,35 @@
   }
 </div>
 
+<ng-template #art>
+  <img
+    [ngSrc]="item.url"
+    alt=""
+    disableOptimizedSrcset
+    draggable="false"
+    height="32"
+    width="32"
+  >
+  @if (upgradeLevel() > 0) {
+    <span class="upgrade-level">{{ 'items:upgradeLevel' | i18next: { level: upgradeLevel() } }}</span>
+  }
+  @if (upgradeLevel() >= milestoneLevel) {
+    <span class="milestone-mark" role="img" [attr.aria-label]="'items:upgradeMilestone' | i18next: { level: milestoneLevel }">&#9670;</span>
+  }
+  <span>{{ amount }}</span>
+</ng-template>
+
 <ng-template
   #tooltip
   let-item="item"
   let-tier="tier"
+  let-level="level"
 >
   <div class="item__tooltip">
-    <span>{{ ('items:names.' + ItemID[item.id]) | i18next }}</span>
+    <span
+      [attr.data-tier]="ItemTier[tier]"
+      class="name"
+    >{{ level > 0 ? ('items:upgradedName' | i18next: { name: ('items:names.' + ItemID[item.id] | i18next), level }) : ('items:names.' + ItemID[item.id] | i18next) }}</span>
     <span class="tier-line">
       <span
         [attr.data-tier]="ItemTier[tier]"
@@ -50,13 +81,13 @@
     </span>
     @if (item.type === ItemType.equipment) {
       @for (stat of $any(item.stats); track stat.id) {
-        <span class="stat">{{ stat.id | statToPercentage:stat.amount }} {{ ('app:playerStats.' + stat.id) | i18next }}</span>
+        <span class="stat">{{ stat.id | statToPercentage:upgradedStatAmount(stat.amount, level) }} {{ ('app:playerStats.' + stat.id) | i18next }}</span>
       }
       @if (item.spell !== undefined) {
         <span class="stat">{{ 'items:grantsSpell' | i18next:{ spell: ('spells:names.' + SpellID[item.spell] + '.name') | i18next } }}</span>
       }
       @if (clickable) {
-        <span class="click">{{ 'items:clickToEquip' | i18next }}</span>
+        <span class="click">{{ (forgeSelectable() && forge.open() ? 'forge:chooseHint' : 'items:rightClickToEquip') | i18next }}</span>
       }
     }
     @if (item.type === ItemType.rewardsStats) {
@@ -79,6 +110,9 @@
     }
     @if (item.type === ItemType.chest) {
       <span class="stat">{{ 'items:chestRolls' | i18next:{ count: item.rolls } }}</span>
+      @if (item.bonusRoll; as bonus) {
+        <span class="stat">{{ 'items:chestBonus' | i18next:{ chance: bonus.chance, item: ('items:names.' + ItemID[bonus.itemId]) | i18next } }}</span>
+      }
     }
     @if (item.type === ItemType.spellScroll) {
       <span class="stat">{{ 'items:teachesSpell' | i18next:{ spell: ('spells:names.' + SpellID[item.spellId] + '.name') | i18next } }}</span>

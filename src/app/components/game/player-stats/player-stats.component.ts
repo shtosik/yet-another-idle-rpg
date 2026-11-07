@@ -5,6 +5,7 @@ import { PlayerStore } from 'app/store/player/player.store'
 import { isInvertedStat, StatSource, statContributions } from 'app/store/player/stats'
 import { statsInitialState } from 'app/store/player/player'
 import { formatStat, STAT_GROUPS, StatFormat, StatRow } from './stat-rows'
+import { TitlePickerComponent } from './title-picker/title-picker.component'
 
 interface BreakdownLine {
   /** `app:statsPanel.sources.<key>`, or `base`. */
@@ -16,7 +17,7 @@ interface BreakdownLine {
 @Component({
   selector: 'app-player-stats',
   templateUrl: 'player-stats.component.html',
-  imports: [I18nextPipe, TooltipTemplateDirective],
+  imports: [I18nextPipe, TooltipTemplateDirective, TitlePickerComponent],
   styleUrls: ['./player-stats.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

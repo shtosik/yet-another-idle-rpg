@@ -12,7 +12,7 @@ Zones are the combat areas; each has waves of regular enemies ending in a boss. 
 - `src/app/store/battle/battle.store.ts` — `currentZoneId`, `currentWave`, `changeWave`, `setZone`, `requiredKillCountOnCurrentWave`.
 - `src/app/services/battle-manager.service.ts` — `canMoveToNextWave`, `canMoveToPreviousWave`, `unlockNextZone` (boss kill opens `nextZoneId`).
 - `src/app/services/unlock.service.ts:UnlockService` — applies `UNLOCK_RULES` with their notification whenever the player state they read changes.
-- `src/app/store/player/player.store.ts` — `zonesProgression` (kills per zone per wave), `unlockedContent` (`zones`, `towns`), `campUnlocked`, `skillTreeUnlocked`, `mapUnlocked`, `isUnlockTargetUnlocked`, `applyUnlockTarget`, `isUnlockConditionMet` (also re-applies rules silently on load).
+- `src/app/store/player/player.store.ts` — `zonesProgression` (kills per zone per wave), `unlockedContent` (`zones`, `towns`, `sites`), `campUnlocked`, `skillTreeUnlocked`, `mapUnlocked`, `isSiteUnlocked`, `unlockSite`, `isUnlockTargetUnlocked`, `applyUnlockTarget`, `isUnlockConditionMet` (also re-applies rules silently on load).
 - `src/data/helpers/enemy-zones.ts:ZONES_BY_ENEMY` — reverse lookup (bestiary).
 
 ## Data flow
@@ -20,7 +20,9 @@ Zones are the combat areas; each has waves of regular enemies ending in a boss. 
 
 **Wave scaling** (`waveMultipliers`): with `t = (wave - 1) / (lastRegularWave - 1)`, HP is `× (1 + WAVE_HP_SCALING·t)` and XP/gold `× (1 + WAVE_REWARD_SCALING·t)` (1.0 and 1.2: the last regular wave has ×2 HP and ×2.2 rewards, so pushing waves pays per second). `startBattle` saves the scaled `maxHp` on the enemy; `processBattleEnd` applies the reward multiplier. Not scaled: the boss wave, drop chances, the shiny chance and shiny rewards (a shiny pays ×5 XP / ×10 gold of the unscaled base), so low waves are where materials and shinies come from. The multipliers aren't shown in the UI (owner decision: too much info for the nav bar).
 
-**Zone chain**: each tier's mean regular-enemy HP, XP and gold is ×1, ×3, ×6, ×12, ×24, ×48, ×96 of Horseshoe Beach's (4 HP, 6 XP, 3 gold); a boss has 25× its zone's mean HP and 10× its rewards. No enemy is shared between zones. Tune with `npm run sim` (`docs/ideas/progression-pacing.md`).
+**Zone chain**: each tier's mean regular-enemy HP, XP and gold is ×1, ×3, ×6, ×12, ×24, ×48, ×96 of Horseshoe Beach's (4 HP, 6 XP, 3 gold); a boss has 25× its zone's mean HP and 10× its rewards. No enemy is shared between zones. Tune with `npm run sim` (`docs/ideas/progression-pacing.md`; `-- --reputation` adds town reputation pacing).
+
+`npm run sim -- --upgrades` adds a gold-cost table for every non-unique equipment item other than pets. It uses the game's `mergeCost` helper and `UPGRADE_COST_FACTOR` (`k` in `src/data/upgrade-data.ts`), printing each single attempt from +0 → +1 through +4 → +5. The total to build one +5 from 32 +0 copies includes making the sacrifices: 16, 8, 4, 2 and 1 attempts respectively, for `80 × value × k` gold. The five single-attempt prices alone sum to `31 × value × k`.
 
 **Zone unlocks**, two paths:
 1. **Chain**: killing the boss of a zone adds its `nextZoneId` to `unlockedContent.zones` and shows `ZONE_UNLOCK_NOTIFICATIONS[next]`. Chain: Horseshoe Beach → Plains → The Long Path → Mountain Pass → Elderwood Wilds.
@@ -36,8 +38,14 @@ On load, `PlayerStore.onInit` re-applies every rule already met, silently, so ne
 
 **Navbar** (`src/app/components/game/game-menu/`): tabs in a fixed order (Battle, Skill tree, Camp, Spellbook, Map, Bestiary, Settings). A locked feature keeps its slot, greyed with a lock and `aria-disabled` (still focusable, clicks ignored, a hidden "Locked" label for screen readers), so the bar doesn't shift as features unlock: Map ← `mapUnlocked`, Skill tree ← `skillTreeUnlocked`, Camp ← `campUnlocked`, Spellbook ← `spellbookUnlocked`; Battle, Bestiary and Settings are always open. The open tab (`GameNavigationService.tab`) is highlighted; inside a town the Map tab stays lit, since towns are reached through the map. Badges: unspent skill points on Skill tree, `unseenEnemyCount` on Bestiary, `unseenSpellCount` on Spellbook. A slim resource strip under the tabs (`player-hud/`) shows, left-aligned, level, the XP bar and currencies: gold, plus Explorer Tokens once the player has earned any (`totalTasksCompleted > 0` or tokens above 0). Player actions float `+N` (green) or `−N` (red) just below the currency they changed (`CurrencyFeedService`; same-currency, same-sign changes within 400 ms merge): gold on shop buy and sell, tokens on a token-shop buy and on claiming Guild tasks. Kill gold doesn't float.
 
+## Battle header and controls
+- The zone name and three framed mastery stars occupy the header, followed by kills, wave number and a progress strip showing kills toward the wave requirement (capped at full while farming). Mastery goals, reward tooltips and claim rules are unchanged.
+- Wave arrows are a consistent framed pair in the right-side control rail, using yellow CSS shapes without an image background (up for previous, down for next). Unavailable arrows stay visible and disabled; tooltips name previous/next wave and crossing a zone boundary. In the Arena the pair is hidden.
+- Unlocked auto wave progression and auto-eat toggles form a separate group, with pressed states, lit indicators and tooltips naming their on/off state. Toggling and progression rules are unchanged.
+- Task rows stay under the header in a bounded scrolling list. Completed tasks support mouse, Enter and Space navigation to Marvin.
+
 ## Invariants & gotchas
-- `UNLOCK_RULES` only target towns and features (`UnlockTarget`); zones unlock by the boss chain or a town entrance.
+- `UNLOCK_RULES` only target towns, Sites and features (`UnlockTarget`); the farm Site has no rule and opens through the `unlockSite` dialogue effect (popup `unlocks:sites.farm`, shown once), or `dev.unlockSite`. Opening a Site also unlocks the Map tab; zones unlock by the boss chain or a town entrance.
 - A zone's boss must not be listed in its `enemies` (`npm run validate` warns).
 - Horseshoe Beach is always unlocked (initial state and the `?? [horseshoeBeach]` fallbacks).
 - `waveReached` means "killed something on that wave or a later one of the zone" (`zonesProgression`), the same on load and during play. Rules react to any change (kills, loot, quest XP), not only kills.

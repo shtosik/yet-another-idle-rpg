@@ -13,6 +13,10 @@ import { BattleStore } from '../../../store/battle/battle.store'
 import { QuestsStore } from '../../../store/quests/quests.store'
 import { GameTab } from '../../../../enums/ids/game-tab.enum'
 import { ShopComponent } from './shop/shop.component'
+import { ForgeComponent } from './forge/forge.component'
+import { PlayerStore } from '../../../store/player/player.store'
+import { REPUTATION_IDS, REPUTATION_TOWN, reputationTier } from '../../../store/player/reputation'
+import { ReputationTier } from '../../../../enums/reputation-tier.enum'
 
 @Component({
   selector: 'app-towns',
@@ -24,6 +28,7 @@ import { ShopComponent } from './shop/shop.component'
     CloseButtonComponent,
     TownBuildingComponent,
     ShopComponent,
+    ForgeComponent,
     DialogueComponent,
   ],
 })
@@ -34,13 +39,22 @@ export class TownsComponent {
   private townsStore = inject(TownsStore)
   private battleStore = inject(BattleStore)
   private questsStore = inject(QuestsStore)
+  private playerStore = inject(PlayerStore)
   private destroyRef = inject(DestroyRef)
   private dialogueManager = inject(DialogueManagerService)
   selectedTownId = this.townsStore.selectedTownId
   selectedTownBuilding = this.townsStore.selectedTownBuilding
   activeShopId = this.townsStore.activeShopId
   activeShopStage = this.townsStore.activeShopStage
+  forgeOpen = this.townsStore.forgeOpen
   dialogueActive = computed(() => this.dialogueManager.activeNpc() !== null)
+  /** Wrapped so Neutral (0) still shows; `null` for towns without reputation. */
+  townTier = computed(() => {
+    const reputationId = REPUTATION_IDS.find(id => REPUTATION_TOWN[id] === this.selectedTownId())
+    if (reputationId === undefined) return null
+    return { value: reputationTier(this.playerStore.reputation()[reputationId] ?? 0) }
+  })
+  protected readonly ReputationTier = ReputationTier
 
   @Output() changeTab = new EventEmitter<GameTab>()
 
@@ -61,6 +75,10 @@ export class TownsComponent {
 
   closeShop() {
     this.townsStore.closeShop()
+  }
+
+  closeForge() {
+    this.townsStore.closeForge()
   }
 
   isBuildingAvailable(building: TownBuilding): boolean {

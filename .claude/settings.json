@@ -7,6 +7,11 @@
       "Bash(node scripts/*)",
       "Bash(git worktree add *)",
       "Bash(git worktree list)",
+      "Bash(git fetch origin)",
+      "Bash(git fetch origin staging)",
+      "Bash(git fetch -q origin)",
+      "Bash(git fetch -q origin staging)",
+      "Bash(npm ci)",
       "Bash(git status*)",
       "Bash(git diff*)",
       "Bash(git log*)",
@@ -16,9 +21,15 @@
       "PowerShell(node scripts/*)",
       "PowerShell(git worktree add *)",
       "PowerShell(git worktree list)",
+      "PowerShell(git fetch origin)",
+      "PowerShell(git fetch origin staging)",
+      "PowerShell(git fetch -q origin)",
+      "PowerShell(git fetch -q origin staging)",
+      "PowerShell(npm ci)",
       "PowerShell(git status*)",
       "PowerShell(git diff*)",
-      "PowerShell(git log*)"
+      "PowerShell(git log*)",
+      "EnterWorktree"
     ]
   },
   "hooks": {
@@ -28,7 +39,20 @@
           {
             "type": "command",
             "shell": "bash",
-            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"SessionStart\",\"additionalContext\":\"Angular repo: before writing or reviewing Angular code (components, templates, signals, stores, routing, forms, tests), load the angular-developer skill with the Skill tool once per session.\"}}'"
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.mjs\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash|PowerShell|EnterWorktree|.*javascript_tool",
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "bash",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard.mjs\""
           }
         ]
       }

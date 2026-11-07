@@ -27,6 +27,8 @@ export interface EquipmentItemPossibleStat {
 
 export interface EquipmentItem extends ItemData {
     type: ItemType.equipment
+    /** One-off gear cannot be merged, even when the player owns duplicates. */
+    unique?: true
     stats: EquipmentItemPossibleStat[]
     slot: EquipmentSlot
     damageType?: DamageElement
@@ -85,6 +87,8 @@ export interface ChestItem extends ItemData {
     type: ItemType.chest
     rolls: number
     loot: ChestLootEntry[]
+    /** Separate 1-in-`chance` item roll, suppressed while held or after its permanent benefit is registered. */
+    bonusRoll?: { itemId: ItemID; chance: number; registeredStat: PlayerStat }
 }
 
 export interface RecipeItem extends ItemData {
@@ -102,7 +106,13 @@ export interface StationUpgradeItem extends ItemData {
 export const isStationUpgradeItem = (item: Item): item is StationUpgradeItem =>
     item.type === ItemType.stationUpgrade
 
-export type Item = EquipmentItem | ResourceItem | RewardsStatsItem | QuestItem | FoodItem | BookItem | PotionItem | RecipeItem | StationUpgradeItem | SpellScrollItem | ChestItem
+/** Counted in `PlayerState.farm.seeds`, never in the inventory; has no sell price (`value` is -1). */
+export interface SeedItem extends ItemData {
+    type: ItemType.seed
+    value: -1
+}
+
+export type Item = EquipmentItem | ResourceItem | RewardsStatsItem | QuestItem | FoodItem | BookItem | PotionItem | RecipeItem | StationUpgradeItem | SpellScrollItem | ChestItem | SeedItem
 
 export type UseItemProps = UseItemStatProps
 
@@ -117,6 +127,8 @@ export type InventoryItem = {
     type: ItemType
     tier: ItemTier
     amount: number
+    /** Missing in older saves means +0. */
+    upgradeLevel?: number
 }
 
 export type ResourceInventoryItem = {

@@ -1,6 +1,12 @@
+import { NpcID } from '../../../enums/map/npc-id.enum'
 import { DialogueNode } from '../../../interfaces/dialogues/dialogue-node.interface'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
+import { DialogueCondition } from '../../../types/dialogues/dialogue-condition.type'
+import { ReputationID } from '../../../enums/reputation-id.enum'
+import { ReputationTier } from '../../../enums/reputation-tier.enum'
+import { ItemID } from '../../../enums/ids/item-id.enum'
+import { bundleKey } from '../../../app/store/quests/turn-in-cooldown'
 
 export enum JoshDialogue {
   default,
@@ -17,12 +23,17 @@ export enum JoshDialogue {
   dangerMountain,
   mountainRumors,
   missionCheck,
+  talkFree,
+  aboutHeirloom,
+  aboutHeirloomWho,
 }
 
 export type LaHarparJoshDialogueType = Record<JoshDialogue, DialogueNode<JoshDialogue>>
 
 const NS = 'dialogues/laHarparJosh'
 const PAID_BEER_FLAG = 'josh_paid_beer'
+const LA_HARPAR_FRIENDLY: DialogueCondition = { type: 'reputation', reputationId: ReputationID.laHarpar, tier: ReputationTier.friendly, hidden: true }
+const LA_HARPAR_REVERED: DialogueCondition = { type: 'reputation', reputationId: ReputationID.laHarpar, tier: ReputationTier.revered, hidden: true }
 
 const LA_HARPAR_JOSH: LaHarparJoshDialogueType = {
   [JoshDialogue.default]: {
@@ -31,9 +42,10 @@ const LA_HARPAR_JOSH: LaHarparJoshDialogueType = {
     options: [
       {
         responseKey: `${NS}:greeting.opt1`,
-        // One beer buys his company for good.
+        // One beer buys his company for good; La Harpar Friendly skips it.
         results: [
           { visibilityConditions: [{ type: 'flag', name: PAID_BEER_FLAG, isSet: true }], next: JoshDialogue.talkReady },
+          { visibilityConditions: [LA_HARPAR_FRIENDLY], next: JoshDialogue.talkFree, effects: [{ type: 'flag', name: PAID_BEER_FLAG }] },
           { next: JoshDialogue.payBeer },
         ],
       },
@@ -98,7 +110,49 @@ const LA_HARPAR_JOSH: LaHarparJoshDialogueType = {
           { next: JoshDialogue.workInfo },
         ],
       },
+      {
+        responseKey: 'quests:reputation.turnIn',
+        results: [{
+          requirementsNeeded: [{ type: 'turnInCooldown', key: bundleKey(NpcID.laHarparJosh, ItemID.feather), state: 'ready' }],
+          next: JoshDialogue.talkReady,
+          effects: [{ type: 'reputationTurnIn', npcId: NpcID.laHarparJosh }],
+        }],
+      },
+      {
+        responseKey: `${NS}:talkReady.opt6`,
+        results: [
+          {
+            visibilityConditions: [
+              LA_HARPAR_REVERED,
+              { type: 'quest', questId: QuestID.clearingOutTheBeach, questState: QuestState.completed },
+            ],
+            next: JoshDialogue.aboutHeirloom,
+          },
+        ],
+      },
       { responseKey: `${NS}:talkReady.opt5`, results: [{ next: JoshDialogue.talkReady, closeDialogue: true }] },
+    ],
+  },
+  [JoshDialogue.talkFree]: {
+    id: JoshDialogue.talkFree,
+    messageKey: `${NS}:talkFree.message`,
+    options: [
+      { responseKey: `${NS}:talkFree.opt1`, results: [{ next: JoshDialogue.talkReady }] },
+    ],
+  },
+  [JoshDialogue.aboutHeirloom]: {
+    id: JoshDialogue.aboutHeirloom,
+    messageKey: `${NS}:aboutHeirloom.message`,
+    options: [
+      { responseKey: `${NS}:aboutHeirloom.opt1`, results: [{ next: JoshDialogue.talkReady }] },
+      { responseKey: `${NS}:aboutHeirloom.opt2`, results: [{ next: JoshDialogue.aboutHeirloomWho }] },
+    ],
+  },
+  [JoshDialogue.aboutHeirloomWho]: {
+    id: JoshDialogue.aboutHeirloomWho,
+    messageKey: `${NS}:aboutHeirloomWho.message`,
+    options: [
+      { responseKey: `${NS}:aboutHeirloomWho.opt1`, results: [{ next: JoshDialogue.talkReady }] },
     ],
   },
   [JoshDialogue.intro]: {

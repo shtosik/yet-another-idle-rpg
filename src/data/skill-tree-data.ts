@@ -99,7 +99,7 @@ const EXPLORATION_SKILLS_DATA: Partial<Record<SkillNodeID, SkillNode>> = {
     url: './assets/img/skills/autoEat.png',
     type: SkillNodeType.battle,
   },
-  // Inventory slots (docs/plans/inventory-tabs.md step 5). Never lower these amounts without a save migration.
+  // Inventory slots (docs/archive/inventory-tabs-plan.md step 5). Never lower these amounts without a save migration.
   [SkillNodeID.packRat]: {
     id: SkillNodeID.packRat,
     branch: SkillBranch.exploration,
@@ -227,6 +227,18 @@ const DAMAGE_SKILLS_DATA: Partial<Record<SkillNodeID, SkillNode>> = {
     type: SkillNodeType.stat,
     stat: 'critMulti',
     statAmount: 0.1,
+  },
+  [SkillNodeID.volley]: {
+    id: SkillNodeID.volley,
+    branch: SkillBranch.damage,
+    turn: 45,
+    skillPointCost: 2,
+    requires: { kind: 'node', id: SkillNodeID.critMulti, minLevel: 5 },
+    maxLevel: 1,
+    special: true,
+    url: './assets/img/skills/volley.png',
+    type: SkillNodeType.spell,
+    spellId: SpellID.volley,
   },
   [SkillNodeID.doubleAttack]: {
     id: SkillNodeID.doubleAttack,

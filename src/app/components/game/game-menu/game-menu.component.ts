@@ -5,6 +5,7 @@ import { I18nextPipe } from '../../../pipes/i18next.pipe'
 import { PlayerStore } from '../../../store/player/player.store'
 import { GameNavigationService } from '../../../services/game-navigation.service'
 import { PlayerHudComponent } from './player-hud/player-hud.component'
+import { NotificationBarComponent } from './notification-bar/notification-bar.component'
 
 interface NavTab {
   tab: GameTab
@@ -18,7 +19,7 @@ interface NavTab {
   templateUrl: 'game-menu.component.html',
   styleUrls: ['./game-menu.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgOptimizedImage, I18nextPipe, PlayerHudComponent],
+  imports: [NgOptimizedImage, I18nextPipe, PlayerHudComponent, NotificationBarComponent],
 })
 export class GameMenuComponent {
   private playerStore = inject(PlayerStore)

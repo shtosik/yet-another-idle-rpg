@@ -13,13 +13,13 @@ For **an enemy in an existing zone**, do steps 1–4 and add it to that zone's `
 
 1. **EnemyID** — append the next value to `src/enums/ids/enemy-id.enum.ts:EnemyID`.
 
-2. **Enemy data** — add to `src/data/enemies-data.ts:ENEMIES_DATA`: `id`, `maxHp`, `experience`, optional `weakness` (see `add-monster-weakness`), `enemyTypes` (each maps to a `damageVs<Type>` stat; a new `EnemyType` needs that stat too), `url: './assets/img/enemies/<enemyKey>.png'`, and `drops` built with `drop(itemId, min, max, chance)` (`chance` = 1 in N). Quest-only drops add `requiredActiveQuestId`. Keep HP and XP in line with the neighbouring zones.
+2. **Enemy data** — add to `src/data/enemies-data.ts:ENEMIES_DATA`: `id`, `maxHp`, `experience`, `gold` (per kill, before multipliers), optional `weakness` (see `add-monster-weakness`), `enemyTypes` (each maps to a `damageVs<Type>` stat; a new `EnemyType` needs that stat too), `url: './assets/img/enemies/<enemyKey>.png'`, and `drops` built with `drop(itemId, min, max, chance)` (`chance` = 1 in N). Quest-only drops add `requiredActiveQuestId`. Keep HP, XP and gold in line with the neighbouring zones.
 
 3. **Pet and shiny** (recommended for regulars) — run `add-shiny-variant`.
 
 4. **Name and sprite** — `enemies:names.<enemyKey>` in `src/assets/locales/en/enemies.json`; sprite via `/generate-2d-asset` (enemies use the `enemy-pixel` family; give the Size tier). Brief all enemies of one zone as one batch.
 
-5. **ZoneID and zone data** — append to `src/enums/ids/zone-id.enum.ts:ZoneID`; add to `src/data/zones-data.ts:ZONES_DATA`: `id`, `url` (background), `enemies` (regulars only), `bossEnemyId`, `maxWave`, `enemiesPerWave`.
+5. **ZoneID and zone data** — append to `src/enums/ids/zone-id.enum.ts:ZoneID`; add to `src/data/zones-data.ts:ZONES_DATA`: `id`, `url` (background), `enemies` (regulars only), `bossEnemyId`, `maxWave`, `enemiesPerWave`, `tier` (position in progression order: next after the previous zone; a side zone takes its place in the quest line) and `masteryReward` (`{ gold, explorerTokens, items }`, the chest per claimed mastery star; scale it from the neighbouring zones, items themed on the zone's drops).
 
 6. **How it unlocks** — pick one:
    - **Chain**: set `nextZoneId` on the previous zone and `previousZoneId` on the new one; killing the previous boss unlocks it. Add `ZONE_UNLOCK_NOTIFICATIONS[zone]` in `src/data/unlock-conditions.ts` with `unlocks:zones.<zoneKey>.title`/`.body` keys.
@@ -31,4 +31,4 @@ For **an enemy in an existing zone**, do steps 1–4 and add it to that zone's `
 
 9. **Town or feature unlocked by this zone** (optional) — a `waveReached` rule in `UNLOCK_RULES`.
 
-Done when `npm run validate` and `npx ng build` pass, and in the dev server the zone opens the way step 6 intends and its waves end in the boss.
+Done when `npm run check` passes, and in the dev server the zone opens the way step 6 intends and its waves end in the boss.

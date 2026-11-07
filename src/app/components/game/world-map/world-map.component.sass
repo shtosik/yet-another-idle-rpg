@@ -10,18 +10,23 @@
 
 // Game UI panel styling, not map-marker styling, so it doesn't read as part of the map.
 // Above Leaflet's panes and controls (z-index up to 1000).
-.towns
+.map-lists
   position: absolute
   top: 10px
   right: 10px
   z-index: 1001
+  display: flex
+  align-items: flex-start
+  gap: 8px
+
+@mixin list-panel($entry)
   display: flex
   flex-direction: column
   align-items: flex-end
   gap: 4px
   font-size: 0.75rem
 
-  &__toggle, &__town
+  &__toggle, &__#{$entry}
     border: 0
     background: transparent
     color: inherit
@@ -51,7 +56,7 @@
     border-radius: vars.$panelBorderRadius
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6)
 
-  &__town
+  &__#{$entry}
     display: block
     width: 100%
     padding: 0.375rem 0.5rem
@@ -61,6 +66,26 @@
     &:hover, &:focus-visible
       background: vars.$hoverBackground
       color: palette.$yellow
+
+.towns
+  @include list-panel(town)
+
+.sites
+  @include list-panel(site)
+
+.cursor-coords
+  position: absolute
+  bottom: 10px
+  left: 10px
+  z-index: 1001
+  padding: 0.25rem 0.5rem
+  font-size: 0.75rem
+  font-variant-numeric: tabular-nums
+  pointer-events: none
+  background: vars.$panelBackgroundColor
+  border: vars.$panelBorder
+  border-radius: vars.$panelBorderRadius
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.6)
 
 ::ng-deep .leaflet-container
   width: 100%

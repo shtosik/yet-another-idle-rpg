@@ -18,6 +18,10 @@ export enum TraderDialogue {
   aboutDanger,
   questOffer,
   questCompleted,
+  questSafePassage,
+  questSafePassageProgress,
+  questSafePassageStep1Complete,
+  questSafePassageStep2,
 }
 
 export type LaHarparTraderDialogueType = Record<TraderDialogue, DialogueNode<TraderDialogue>>
@@ -98,6 +102,11 @@ const LA_HARPAR_TRADER: LaHarparTraderDialogueType = {
         // Hidden while Rats Were Rats is in progress; opt1 is the turn-in
         responseKey: `${NS}:default.opt6`,
         results: [
+          // Safe Passage (La Harpar Revered): step 1 turn-in, on step 2, in progress, offer
+          { visibilityConditions: [{ type: 'quest', questId: QuestID.safePassage, questState: QuestState.readyToAdvance, step: 1 }], next: TraderDialogue.questSafePassageStep1Complete },
+          { visibilityConditions: [{ type: 'quest', questId: QuestID.safePassage, questState: QuestState.active, step: 2 }], next: TraderDialogue.questSafePassageStep2 },
+          { visibilityConditions: [{ type: 'quest', questId: QuestID.safePassage, questState: QuestState.active }], next: TraderDialogue.questSafePassageProgress },
+          { visibilityConditions: [{ type: 'quest', questId: QuestID.safePassage, questState: QuestState.available }], next: TraderDialogue.questSafePassage },
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.ratsWereRats, questState: QuestState.completed }],
             next: TraderDialogue.questCompleted,
@@ -209,6 +218,35 @@ const LA_HARPAR_TRADER: LaHarparTraderDialogueType = {
         responseKey: `${NS}:questCompleted.opt1`,
         results: [{ next: TraderDialogue.default }],
       },
+    ],
+  },
+  [TraderDialogue.questSafePassage]: {
+    id: TraderDialogue.questSafePassage,
+    messageKey: `${NS}:questSafePassage.message`,
+    options: [
+      { responseKey: `${NS}:questSafePassage.opt1`, results: [{ next: TraderDialogue.default, effects: [{ type: 'quest', action: 'start', questId: QuestID.safePassage }] }] },
+      { responseKey: `${NS}:questSafePassage.opt2`, results: [{ next: TraderDialogue.default }] },
+    ],
+  },
+  [TraderDialogue.questSafePassageProgress]: {
+    id: TraderDialogue.questSafePassageProgress,
+    messageKey: `${NS}:questSafePassageProgress.message`,
+    options: [
+      { responseKey: `${NS}:questSafePassageProgress.opt1`, results: [{ next: TraderDialogue.default }] },
+    ],
+  },
+  [TraderDialogue.questSafePassageStep1Complete]: {
+    id: TraderDialogue.questSafePassageStep1Complete,
+    messageKey: `${NS}:questSafePassageStep1Complete.message`,
+    options: [
+      { responseKey: `${NS}:questSafePassageStep1Complete.opt1`, results: [{ next: TraderDialogue.default, effects: [{ type: 'quest', action: 'advance', questId: QuestID.safePassage }] }] },
+    ],
+  },
+  [TraderDialogue.questSafePassageStep2]: {
+    id: TraderDialogue.questSafePassageStep2,
+    messageKey: `${NS}:questSafePassageStep2.message`,
+    options: [
+      { responseKey: `${NS}:questSafePassageStep2.opt1`, results: [{ next: TraderDialogue.default }] },
     ],
   },
 }

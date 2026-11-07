@@ -7,6 +7,39 @@ New notes go under `[Unreleased]`; `npm run release -- <major|minor|patch>` move
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-07
+- [feature] The new game version notice moved from the bottom of the screen to the notification bar. Click it to save and reload.
+- [feature] A new notification bar under the XP and currency bar shows what you can claim. For now it tells you when farm plots are ready to harvest; click it to go straight to your plots.
+- [feature] Marta, Wick, Ludo Crane and Phurgo have all-new dialogue: each sounds like their own person, with new stories, idle talk and scenes that change as they come to trust you. Ask them about themselves, and listen closely to what they won't say.
+- [feature] The Farming Guild: Sylvie in Mawood sends you to a farm north of the Pass. Plant seeds that monsters and the Arena Chest drop, wait for them to grow (even while you are away), and harvest crops for new cooking and alchemy recipes. Farming has its own expertise level that gives skill points and bonuses, and Warden Marta and Wick give a quest chain and repeatable orders for crops and animal materials.
+- [nerf] Reputation turn-ins hand over one bundle per 2 hours.
+- [feature] The world map shows the cursor coordinates in its bottom left corner.
+- [feature] Volley fires three separate ranged weapon hits and can be learned beside Double Attack in the damage skill tree.
+- [bug] Double Attack now strikes twice, with separate critical hits and Ambush charges. Both weapon spells stop when the enemy dies.
+- [nerf] Double Attack requires an equipped melee weapon; Volley requires a ranged weapon. Missing weapon requirements appear in red in spell tooltips.
+- [bug] The quest log's "Talk to" button now appears only once the step's requirements are met, so it no longer sends you to an NPC before you have what they asked for.
+- [feature] Quest steps that need a quest item now read "Find <item>", and steps not finished yet no longer say "Not yet".
+- [feature] Pathfinder's Seal: a rare Arena Chest find. Register it with Marvin and some gear drops arrive already upgraded to +1.
+- [feature] Phurgo's Forge in Lirold: finish The Cold Forge and Phurgo upgrades two matching pieces of gear into one, up to +5. The first upgrade always works; each later one is 10% less likely (+5: 60%), and a failure costs the gold and the spare. Ask him how his Forge works, then fill both inputs with matching gear from inventory or equipment: the first piece is upgraded and the second is consumed. The first piece stays equipped if selected from equipment; an equipped second piece is consumed.
+- [bug] Quest items no longer drop once you have enough.
+- [feature] The equipment window is now a proper character sheet: every slot sits in its place around your character with a label, empty slots say what goes there, and the header counts what you have on. Hover a slot for details; right-click, Enter or Space unequips. The equipment window is taller, so the quest log below it is a little shorter.
+- [feature] New fonts: Cinzel for titles and tabs, Alegreya Sans for everything else, so descriptions, numbers and dialogue are much easier to read than the old pixel font.
+- [feature] Equip and unequip items with right-click instead of left-click, the same as using consumables. Left-click no longer swaps gear by accident. With a keyboard, Tab to an item and press Enter or Space to equip or use it; on touch screens, tap it.
+- [feature] Item, equipment and zone star tooltips are bigger, left-aligned and easier to scan; item names show in their tier colour.
+- [feature] Dialogue text and answers are bigger, and town building labels no longer grow when you hover them.
+- [feature] The quest log, bestiary, stats panel, crafting panel, popups, top menu, XP and gold bar, and battle bar have bigger, clearer text. Long quest names and requirements wrap instead of being cut off.
+- [feature] Inventory, quest log and camp tabs share one look: a yellow line runs along the whole tab strip and the active tab opens into the panel.
+- [feature] Recipes no longer show a "Missing" line; the ingredient counters already show what you still need.
+- [feature] The battle panel has clearer enemy HP, boss and weakness labels, wave progress, framed controls, and a compact spell bar showing mana costs and cooldowns. Hits and enemy arrivals have new visual feedback.
+- [bug] Item tooltips now show the unit on seconds bonuses (e.g. "+5s Spell Cooldown Reduction", not "+5").
+- [feature] Town pets: reach Exalted to get a pet. In La Harpar the Bartender gives the Tavern Cat (food effects ×1.5); in Mawood, Corwin gives the Rootglow Moth (+10 s to buff spells). Each is given once and can't be sold.
+- [bug] A quest turn-in no longer completes if you used up one of its items while the dialogue was open.
+- [feature] Reputation tier rewards. Friendly: the Bartender and Josh answer for free, and Sylvie opens her shop to friends of Mawood. Honored: new stock in the Trader's shop (Cheese, Venison Roast Recipe, Wharf Runner's Boots), Sylvie's apothecary (Minor Mana Potion, Greater Mana Potion Recipe) and Elarion's magic shop (Rootwalker Boots). Revered: four new quests (Safe Passage from the Trader, Last Orders from the Bartender, A Clean Cure from Sylvie, Roots and Rafters from Brenna), and a few townsfolk have something new to say.
+- [feature] Titles: Friendly and Exalted with a town earn a title (Friend of La Harpar, Toast of La Harpar, Friend of Mawood, Keeper of Mawood). Pick the one to show on the stats panel.
+- [feature] Greater Mana Potion: restores 15 mana. Learn the recipe from Sylvie's apothecary at Mawood Honored, then brew it with a Vial of Water and 3 Spider Silk.
+- [feature] Reputation turn-ins: four townsfolk take bundles of drops for reputation, as often as you like. In La Harpar, the Bartender takes 20 Crab Meat and Josh (once he'll talk to you: buy him a beer, or be Friendly with La Harpar) 20 Feathers, for 10 reputation each. In Mawood, Sylvie takes 15 Spider Silk for 15 and Brenna 10 Ancient Wood for 25. Hand over one bundle or all your full bundles at once; items your active quests still need are kept back. Once you reach Exalted with a town, its turn-ins close.
+- [feature] Town reputation: La Harpar and Mawood quests now also give reputation with their town. Reach Friendly, Honored, Revered and Exalted; a message shows when you reach a new tier. The quest panel's Reputation tab shows your tier and progress in each town you've found, and the town view shows your tier next to the town's name.
+
 ## [0.2.0] - 2026-10-31
 - [feature] The world map is redrawn and now reaches south, with Lirold's castle under the Ironspine mountains, the Saltmere gulf and the Blackwater Fens. Lirold and the Trader's Basement have their own map markers.
 - [feature] When an enemy drop is lost because its inventory tab is full, the battle view now shows which tab was full and what was lost.

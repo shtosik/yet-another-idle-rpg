@@ -2,6 +2,10 @@ import { DialogueNode } from '../../../interfaces/dialogues/dialogue-node.interf
 import { NpcID } from '../../../enums/map/npc-id.enum'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
+import { ReputationID } from '../../../enums/reputation-id.enum'
+import { ReputationTier } from '../../../enums/reputation-tier.enum'
+import { ItemID } from '../../../enums/ids/item-id.enum'
+import { bundleKey } from '../../../app/store/quests/turn-in-cooldown'
 
 export enum BrennDialogue {
   default = 0,
@@ -16,6 +20,11 @@ export enum BrennDialogue {
   questWarTrophies,
   questWarTrophiesProgress,
   questWarTrophiesComplete,
+  reveredCommissions,
+  questRootsAndRafters,
+  questRootsAndRaftersProgress,
+  questRootsAndRaftersStep1Complete,
+  questRootsAndRaftersStep2,
 }
 
 export type MawoodBrennDialogueType = Record<BrennDialogue, DialogueNode<BrennDialogue>>
@@ -63,6 +72,11 @@ const MAWOOD_BRENN: MawoodBrennDialogueType = {
       {
         responseKey: `${NS}:default.work`,
         results: [
+          // Roots and Rafters (Mawood Revered): step 1 turn-in, on step 2, in progress, offer
+          { visibilityConditions: [{ type: 'quest', questId: QuestID.rootsAndRafters, questState: QuestState.readyToAdvance, step: 1 }], next: BrennDialogue.questRootsAndRaftersStep1Complete },
+          { visibilityConditions: [{ type: 'quest', questId: QuestID.rootsAndRafters, questState: QuestState.active, step: 2 }], next: BrennDialogue.questRootsAndRaftersStep2 },
+          { visibilityConditions: [{ type: 'quest', questId: QuestID.rootsAndRafters, questState: QuestState.active }], next: BrennDialogue.questRootsAndRaftersProgress },
+          { visibilityConditions: [{ type: 'quest', questId: QuestID.rootsAndRafters, questState: QuestState.available }], next: BrennDialogue.questRootsAndRafters },
           // War Trophies: turn-in
           {
             visibilityConditions: [{ type: 'quest', questId: QuestID.warTrophies, questState: QuestState.readyToAdvance, step: 1 }],
@@ -100,8 +114,39 @@ const MAWOOD_BRENN: MawoodBrennDialogueType = {
         ],
       },
       {
+        responseKey: `${NS}:default.commissions`,
+        results: [
+          {
+            visibilityConditions: [
+              { type: 'reputation', reputationId: ReputationID.mawood, tier: ReputationTier.revered, hidden: true },
+              { type: 'quest', questId: QuestID.rawMaterials, questState: QuestState.completed },
+            ],
+            next: BrennDialogue.reveredCommissions,
+          },
+        ],
+      },
+      {
+        responseKey: 'quests:reputation.turnIn',
+        results: [{
+          requirementsNeeded: [{ type: 'turnInCooldown', key: bundleKey(NpcID.mawoodBrenn, ItemID.ancientWood), state: 'ready' }],
+          next: BrennDialogue.default,
+          effects: [{ type: 'reputationTurnIn', npcId: NpcID.mawoodBrenn }],
+        }],
+      },
+      {
         responseKey: `${NS}:default.goodbye`,
         results: [{ next: BrennDialogue.default, closeDialogue: true }],
+      },
+    ],
+  },
+
+  [BrennDialogue.reveredCommissions]: {
+    id: BrennDialogue.reveredCommissions,
+    messageKey: `${NS}:reveredCommissions.message`,
+    options: [
+      {
+        responseKey: `${NS}:reveredCommissions.opt1`,
+        results: [{ next: BrennDialogue.default }],
       },
     ],
   },
@@ -255,6 +300,35 @@ const MAWOOD_BRENN: MawoodBrennDialogueType = {
           },
         ],
       },
+    ],
+  },
+  [BrennDialogue.questRootsAndRafters]: {
+    id: BrennDialogue.questRootsAndRafters,
+    messageKey: `${NS}:questRootsAndRafters.message`,
+    options: [
+      { responseKey: `${NS}:questRootsAndRafters.opt1`, results: [{ next: BrennDialogue.default, effects: [{ type: 'quest', action: 'start', questId: QuestID.rootsAndRafters }] }] },
+      { responseKey: `${NS}:questRootsAndRafters.opt2`, results: [{ next: BrennDialogue.default }] },
+    ],
+  },
+  [BrennDialogue.questRootsAndRaftersProgress]: {
+    id: BrennDialogue.questRootsAndRaftersProgress,
+    messageKey: `${NS}:questRootsAndRaftersProgress.message`,
+    options: [
+      { responseKey: `${NS}:questRootsAndRaftersProgress.opt1`, results: [{ next: BrennDialogue.default }] },
+    ],
+  },
+  [BrennDialogue.questRootsAndRaftersStep1Complete]: {
+    id: BrennDialogue.questRootsAndRaftersStep1Complete,
+    messageKey: `${NS}:questRootsAndRaftersStep1Complete.message`,
+    options: [
+      { responseKey: `${NS}:questRootsAndRaftersStep1Complete.opt1`, results: [{ next: BrennDialogue.default, effects: [{ type: 'quest', action: 'advance', questId: QuestID.rootsAndRafters }] }] },
+    ],
+  },
+  [BrennDialogue.questRootsAndRaftersStep2]: {
+    id: BrennDialogue.questRootsAndRaftersStep2,
+    messageKey: `${NS}:questRootsAndRaftersStep2.message`,
+    options: [
+      { responseKey: `${NS}:questRootsAndRaftersStep2.opt1`, results: [{ next: BrennDialogue.default }] },
     ],
   },
 }

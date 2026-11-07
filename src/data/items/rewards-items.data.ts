@@ -61,8 +61,9 @@ export const RewardsItemsData: Partial<Record<ItemID, Item>> = {
     value: -1,
     type: ItemType.chest,
     rolls: 4,
+    bonusRoll: { itemId: ItemID.pathfindersSeal, chance: 10, registeredStat: 'upgradedDropChance' },
     loot: [
-      { weight: 300, gold: [6000, 12000] },
+      { weight: 300, gold: [8000, 14000] },
       { weight: 200, itemId: ItemID.elderSilk, amount: [4, 8] },
       { weight: 200, itemId: ItemID.harpyFeather, amount: [4, 8] },
       { weight: 150, itemId: ItemID.ancientWood, amount: [2, 6] },
@@ -73,7 +74,14 @@ export const RewardsItemsData: Partial<Record<ItemID, Item>> = {
       { weight: 50, itemId: ItemID.gladiatorHelmRecipe, amount: [1, 1] },
       { weight: 30, itemId: ItemID.warCryScroll, amount: [1, 1] },
       { weight: 30, itemId: ItemID.patronGloves, amount: [1, 1] },
-      // Champion pets: about 1 in 47 per chest each (never shiny).
+      // Seeds go to the farming seed count, never a tab (docs/ideas/farm-and-husbandry.md §7).
+      { weight: 25, itemId: ItemID.wheatSeeds, amount: [3, 5] },
+      { weight: 40, itemId: ItemID.silverleafSeeds, amount: [2, 4] },
+      { weight: 40, itemId: ItemID.appleSeeds, amount: [2, 4] },
+      { weight: 40, itemId: ItemID.glowcapSpores, amount: [2, 3] },
+      { weight: 30, itemId: ItemID.heartrootSeeds, amount: [1, 2] },
+      { weight: 20, itemId: ItemID.canopyBlossomSeeds, amount: [1, 2] },
+      // Champion pets: about 1 in 54 per chest each (never shiny).
       { weight: 7, itemId: ItemID.petArenaBrute, amount: [1, 1] },
       { weight: 7, itemId: ItemID.petArenaArcanist, amount: [1, 1] },
       { weight: 7, itemId: ItemID.petArenaBurrower, amount: [1, 1] },

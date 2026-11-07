@@ -1,14 +1,20 @@
-<div class="damage-container">
+<div class="damage-container" aria-hidden="true">
   @for (dmg of floatingDamages(); track dmg.id) {
     <div
       class="damage-number"
       [style.margin-left.px]="dmg.offsetX"
+      [style.top.px]="dmg.offsetY"
       [class.critical]="dmg.isCriticalHit"
       [class.strong]="dmg.isStrong"
     >
-      {{ dmg.damage }}@if (dmg.isStrong) {
-        <span class="strong-label">{{ 'app:damage.strong' | i18next }}</span>
+      @if (dmg.isCriticalHit && dmg.isStrong) {
+        <span class="hit-label">{{ 'app:damage.strongCritical' | i18next }}</span>
+      } @else if (dmg.isCriticalHit) {
+        <span class="hit-label">{{ 'app:battle.critical' | i18next }}</span>
+      } @else if (dmg.isStrong) {
+        <span class="hit-label">{{ 'app:damage.strong' | i18next }}</span>
       }
+      {{ dmg.damage }}
     </div>
   }
 </div>

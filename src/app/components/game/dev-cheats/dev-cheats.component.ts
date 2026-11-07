@@ -1,10 +1,18 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject } from '@angular/core'
+import { getState } from '@ngrx/signals'
 import { SkillTreeService } from '../../../services/skill-tree.service'
 import { GameNavigationService } from '../../../services/game-navigation.service'
+import { ReputationService } from '../../../services/reputation.service'
+import { ProfessionService } from '../../../services/profession.service'
+import { ProfessionID } from 'enums/ids/profession-id.enum'
+import { PLOT_SLOTS } from '../../../store/player/farm'
+import { xpForLevel } from '../../../store/player/professions'
+import PROFESSIONS_DATA from '../../../../data/professions-data'
 import { GameTab } from 'enums/ids/game-tab.enum'
 import { SkillNodeID } from 'enums/ids/skill-node-id.enum'
 import { ShopID } from 'enums/ids/shop-id.enum'
 import { TownID } from 'enums/map/town-id.enum'
+import { ReputationID } from 'enums/reputation-id.enum'
 import { EquipmentSlotKey } from 'enums/equipment-slot.enum'
 import { ALL_SKILLS } from '../../../../data/skill-tree-data'
 import { NodeRequirement } from '../../../../interfaces/skill-tree/skill-node.interface'
@@ -20,12 +28,44 @@ import { CampStore } from '../../../store/camp/camp.store'
 import { OfflineStore } from '../../../store/offline/offline.store'
 import { PlayerStat } from '../../../../types/player/player-stat.type'
 import { ZoneID } from 'enums/ids/zone-id.enum'
+import { SiteID } from 'enums/ids/site-id.enum'
 import { ItemID } from 'enums/ids/item-id.enum'
 import { ItemTier } from 'enums/items/item-tier.enum'
 import { EnemyID } from 'enums/ids/enemy-id.enum'
+import { QuestID } from 'enums/ids/quest-id.enum'
 
 /** Features `window.dev.unlock` can open. */
-type DevFeature = 'camp' | 'skillTree' | 'map' | 'spellbook' | 'towns'
+const DEV_FEATURES = ['camp', 'skillTree', 'map', 'spellbook', 'towns'] as const
+type DevFeature = typeof DEV_FEATURES[number]
+
+type NumericEnum = Record<string, string | number>
+/** An enum number or its member name: `dev.equip('machete')` is `dev.equip(ItemID.machete)`. */
+type Ref<E extends NumericEnum> = E[keyof E] | keyof E
+
+/** Resolves a member name to its enum number, so agents don't look numbers up in `src/enums`. */
+export function fromName<E extends NumericEnum>(e: E, kind: string, ref: Ref<E>): E[keyof E] {
+  if (typeof ref !== 'string') return ref as E[keyof E]
+  const value = e[ref]
+  if (typeof value !== 'number') throw new Error(`dev: no ${kind} named '${ref}'; names: ${Object.keys(e).filter(k => isNaN(Number(k))).join(', ')}`)
+  return value as E[keyof E]
+}
+
+/** Added by `boostStats`: enough to trivialize combat when checking later content. */
+const STAT_BOOST: { stat: PlayerStat; amount: number }[] = [
+  { stat: 'attackPower', amount: 100 },
+  { stat: 'magicDamage', amount: 100 },
+  { stat: 'maxMana', amount: 100 },
+  { stat: 'critChance', amount: 25 },
+  { stat: 'critMulti', amount: 1 },
+]
+
+/** One stack of `amount` for every item in the game, at the item's own tier. */
+export function allItemStacks(amount: number): { id: ItemID; tier: ItemTier; amount: number; upgradeLevel: number }[] {
+  return Object.keys(ITEM_DATA).map(key => {
+    const id = Number(key) as ItemID
+    return { id, tier: ITEM_DATA[id].tier, amount, upgradeLevel: 0 }
+  })
+}
 
 // Cheat buttons for dev and testing builds. GameComponent renders it only when environment.cheats is on.
 @Component({
@@ -50,25 +90,29 @@ export class DevCheatsComponent {
   private offlineStore = inject(OfflineStore)
   private skillTree = inject(SkillTreeService)
   private navigation = inject(GameNavigationService)
+  private reputationService = inject(ReputationService)
+  private professionService = inject(ProfessionService)
 
   /**
    * `window.dev` in the browser console: puts the game into a state in one call when checking UI.
-   * IDs are the enum numbers (`ShopID`, `ZoneID`, `SkillNodeID`, `ItemID`, `EnemyID`, `GameTab`).
+   * IDs are enum member names or numbers (`dev.equip('machete')`, `dev.tab('map')`); `dev.help()` lists the commands.
    */
-  private readonly devTools = {
-    tab: (tab: GameTab) => this.navigation.changeTab(tab),
-    setZone: (zoneId: ZoneID) => {
+  readonly commands = {
+    tab: (tab: Ref<typeof GameTab>) => this.navigation.changeTab(fromName(GameTab, 'GameTab', tab)),
+    setZone: (zone: Ref<typeof ZoneID>) => {
+      const zoneId = fromName(ZoneID, 'ZoneID', zone)
       this.playerStore.unlockZone(zoneId)
       this.battleStore.setZone(zoneId)
     },
     grantStat: (stat: PlayerStat, amount: number) => this.playerStore.updatePlayerStats([{ stat, amount }]),
     /** Learns the node and, first, whatever it requires (the first option of an `any`), granting the points. */
-    learnSkill: (nodeId: SkillNodeID): boolean => this.learnSkill(nodeId, 1),
-    giveItem: (itemId: ItemID, amount = 1, tier = ITEM_DATA[itemId].tier) =>
-      this.playerStore.addItems([{ id: itemId, tier, amount }]),
+    learnSkill: (node: Ref<typeof SkillNodeID>): boolean => this.learnSkill(fromName(SkillNodeID, 'SkillNodeID', node), 1),
+    giveItem: (item: Ref<typeof ItemID>, amount = 1, tier?: Ref<typeof ItemTier>, upgradeLevel = 0) => this.addItem(item, amount, tier, upgradeLevel),
+    addItem: (item: Ref<typeof ItemID>, amount = 1, tier?: Ref<typeof ItemTier>, upgradeLevel = 0) => this.addItem(item, amount, tier, upgradeLevel),
     /** Gives the item and equips it; false (with a console warning) when there's no room or it can't be equipped. */
-    equip: (itemId: ItemID, tier = ITEM_DATA[itemId].tier): boolean => {
-      const stack = { id: itemId, tier, amount: 1 }
+    equip: (itemRef: Ref<typeof ItemID>, tier?: Ref<typeof ItemTier>, upgradeLevel = 0): boolean => {
+      const itemId = fromName(ItemID, 'ItemID', itemRef)
+      const stack = { id: itemId, tier: this.tierOf(itemId, tier), amount: 1, upgradeLevel }
       if (!this.playerStore.canFitItems([stack])) {
         console.warn('dev.equip: no inventory space for the item')
         return false
@@ -85,20 +129,129 @@ export class DevCheatsComponent {
     },
     unequip: (slot: EquipmentSlotKey) => this.playerStore.unequipItem(slot),
     /** Opens the shop over La Harpar's first building, whatever town or building was open. */
-    openShop: (shopId: ShopID) => {
+    openShop: (shop: Ref<typeof ShopID>) => {
       this.navigation.changeTab(GameTab.towns)
       this.townsStore.selectTown(TownID.laHarpar)
       this.townsStore.selectTownBuilding(TOWNS_DATA[TownID.laHarpar].buildings[0])
-      this.townsStore.openShop(shopId)
+      this.townsStore.openShop(fromName(ShopID, 'ShopID', shop))
+    },
+    /** Opens the Forge over La Harpar's first building without adding any Forge building or NPC data. */
+    openForge: () => {
+      this.navigation.changeTab(GameTab.towns)
+      this.townsStore.selectTown(TownID.laHarpar)
+      this.townsStore.selectTownBuilding(TOWNS_DATA[TownID.laHarpar].buildings[0])
+      this.townsStore.openForge()
     },
     /** Sets an enemy's lifetime kill count (bestiary ranks, zone mastery, quest kill steps). */
-    setKills: (enemyId: EnemyID, count: number) =>
-      this.playerStore.updateEnemyKillCount(enemyId, count - (this.playerStore.enemyKillCounts()[enemyId] ?? 0)),
+    setKills: (enemy: Ref<typeof EnemyID>, count: number) => {
+      const enemyId = fromName(EnemyID, 'EnemyID', enemy)
+      this.playerStore.updateEnemyKillCount(enemyId, count - (this.playerStore.enemyKillCounts()[enemyId] ?? 0))
+    },
     /** Adds shiny kills in a zone (zone mastery's Shiny Hunter star). */
-    addShinyKills: (zoneId: ZoneID, count: number) => this.playerStore.applyKillBatch({
-      zoneId, wave: 1, kills: 0, shinies: count, killsByEnemy: {}, taskCountsByEnemy: {}, experience: 0, gold: 0, items: [],
+    addShinyKills: (zone: Ref<typeof ZoneID>, count: number) => this.playerStore.applyKillBatch({
+      zoneId: fromName(ZoneID, 'ZoneID', zone), wave: 1, kills: 0, shinies: count, killsByEnemy: {}, taskCountsByEnemy: {}, experience: 0, gold: 0, items: [],
     }),
     unlock: (feature: DevFeature) => this.unlockFeature(feature),
+    /** Opens a Site and the map; no notification. */
+    unlockSite: (site: Ref<typeof SiteID>) => this.playerStore.applyUnlockTarget({ type: 'site', siteId: fromName(SiteID, 'SiteID', site) }),
+    /** Every feature, town and zone. */
+    unlockAll: () => {
+      DEV_FEATURES.forEach(feature => this.unlockFeature(feature))
+      this.unlockAllZones()
+    },
+    /** +100 slots in every slot tab (a permanent bonus, so it also shows in the stats panel). */
+    giveSlots: () => this.giveSlots(),
+    /** 100 of every item, adding slots first until they all fit. */
+    giveAllItems: () => this.giveAllItems(),
+    /** Raises attack, magic, mana and crit by a lot (permanent bonuses, stackable). */
+    boostStats: () => this.boostStats(),
+    /** Live state of every store plus derived `stats`; unlike `localStorage`, current without waiting for the batched save. */
+    state: () => ({
+      stats: this.playerStore.stats(),
+      player: getState(this.playerStore),
+      battle: getState(this.battleStore),
+      quests: getState(this.questsStore),
+      towns: getState(this.townsStore),
+      shop: getState(this.shopStore),
+      camp: getState(this.campStore),
+      offline: getState(this.offlineStore),
+      settings: getState(this.settingsStore),
+    }),
+    /** Every store back to a fresh save, like the `reset state` button. */
+    reset: () => this.resetState(),
+    /** Starts and completes the quest, rewards and completed modal included; a no-op once it's done. */
+    completeQuest: (quest: Ref<typeof QuestID>) => {
+      const questId = fromName(QuestID, 'QuestID', quest)
+      this.questsStore.startQuest(questId)
+      this.questsStore.endQuest(questId)
+    },
+    /** Adds reputation the way a quest reward does, tier-up toast included. */
+    addReputation: (reputation: Ref<typeof ReputationID>, amount: number) =>
+      this.reputationService.gain([{ reputationId: fromName(ReputationID, 'ReputationID', reputation), amount }]),
+    /** Unlocks the profession and sets its expertise to `level` (skill points are paid once, never refunded on a lower level). */
+    setExpertise: (profession: Ref<typeof ProfessionID>, level: number) => {
+      const professionId = fromName(ProfessionID, 'ProfessionID', profession)
+      const target = Math.min(Math.max(1, Math.floor(level)), PROFESSIONS_DATA[professionId].maxLevel)
+      this.playerStore.unlockProfession(professionId)
+      const current = this.playerStore.professions()[professionId]?.experience ?? 0
+      this.professionService.gainXp(professionId, xpForLevel(target) - current)
+    },
+    /** Fills every plot with the seed (default Turnip Seeds), granting the seeds and the Farming profession; false when its expertise is too low. */
+    plantAll: (seed: Ref<typeof ItemID> = ItemID.turnipSeeds): boolean => {
+      this.playerStore.unlockProfession(ProfessionID.farming)
+      this.playerStore.addItems([{ id: fromName(ItemID, 'ItemID', seed), amount: PLOT_SLOTS }])
+      const planted = this.playerStore.plantSeed(fromName(ItemID, 'ItemID', seed), PLOT_SLOTS)
+      if (!planted) console.warn('dev.plantAll: nothing planted (not a seed, expertise too low, or every plot busy)')
+      return planted
+    },
+    /** Every planted plot is ready to harvest. */
+    growAll: () => this.playerStore.growAllPlots(),
+  }
+
+  /** `dev.help()` output; typed by `commands`, so a new command doesn't compile without its line. */
+  private readonly usage: Record<keyof DevCheatsComponent['commands'], string> = {
+    tab: 'tab(GameTab) — switch tab',
+    setZone: 'setZone(ZoneID) — unlock and enter a zone',
+    grantStat: "grantStat(stat, amount) — add to a player stat, e.g. grantStat('goldCoins', 1000)",
+    learnSkill: 'learnSkill(SkillNodeID) — learn a node and its prerequisites, points granted',
+    giveItem: 'giveItem(ItemID, amount = 1, ItemTier?, upgradeLevel = 0) — add to inventory',
+    addItem: 'addItem(ItemID, amount = 1, ItemTier?, upgradeLevel = 0) — same as giveItem',
+    equip: 'equip(ItemID, ItemTier?, upgradeLevel = 0) — give and equip; false when it can\'t',
+    unequip: "unequip(slot) — slot name, e.g. unequip('weapon')",
+    openShop: 'openShop(ShopID) — open a shop',
+    openForge: 'openForge() — open the Forge',
+    setKills: 'setKills(EnemyID, count) — set lifetime kills',
+    addShinyKills: 'addShinyKills(ZoneID, count) — add shiny kills in a zone',
+    unlock: `unlock(${DEV_FEATURES.map(f => `'${f}'`).join('|')}) — unlock a feature`,
+    unlockSite: "unlockSite(SiteID) — open a Site, e.g. unlockSite('farm')",
+    unlockAll: 'unlockAll() — every feature, town and zone',
+    giveSlots: 'giveSlots() — +100 inventory slots per slot tab',
+    giveAllItems: 'giveAllItems() — 100 of every item, slots added as needed',
+    boostStats: 'boostStats() — big permanent boost to attack, magic, mana and crit',
+    state: 'state() — live state of every store plus derived stats',
+    reset: 'reset() — fresh save',
+    completeQuest: 'completeQuest(QuestID) — start and complete a quest, rewards included',
+    addReputation: 'addReputation(ReputationID, amount) — add reputation',
+    setExpertise: 'setExpertise(ProfessionID, level) — unlock a profession and set its expertise level',
+    plantAll: "plantAll(ItemID = 'turnipSeeds') — fill every plot, seeds granted",
+    growAll: 'growAll() — every planted plot is ready to harvest',
+  }
+
+  private readonly devTools = {
+    ...this.commands,
+    /** Every command with its arguments. IDs take enum member names or numbers. */
+    help: () => Object.values(this.usage),
+  }
+
+  /** The given tier, or the item's own tier when none is given. */
+  private tierOf(id: ItemID, tier?: Ref<typeof ItemTier>): ItemTier {
+    if (tier === undefined) return ITEM_DATA[id].tier
+    return fromName(ItemTier, 'ItemTier', tier)
+  }
+
+  private addItem(item: Ref<typeof ItemID>, amount: number, tier: Ref<typeof ItemTier> | undefined, upgradeLevel: number): void {
+    const id = fromName(ItemID, 'ItemID', item)
+    this.playerStore.addItems([{ id, tier: this.tierOf(id, tier), amount, upgradeLevel }])
   }
 
   private unlockFeature(feature: DevFeature): void {
@@ -170,9 +323,26 @@ export class DevCheatsComponent {
   }
 
   unlockAllZones() {
+    this.playerStore.unlockMap()
+    this.unlockFeature('towns')
     for (const id of Object.values(ZoneID)) {
       if (typeof id === 'number') this.playerStore.unlockZone(id)
     }
+  }
+
+  giveSlots() {
+    this.playerStore.updatePlayerStats([{ stat: 'inventorySlots', amount: 100 }])
+  }
+
+  giveAllItems() {
+    const stacks = allItemStacks(100)
+    // Capacity is derived, so each round of slots counts at once. The cap only stops a bug from looping forever.
+    for (let rounds = 0; !this.playerStore.canFitItems(stacks) && rounds < 20; rounds++) this.giveSlots()
+    this.playerStore.addItems(stacks)
+  }
+
+  boostStats() {
+    this.playerStore.updatePlayerStats(STAT_BOOST)
   }
 
   giveMachete() {

@@ -1,4 +1,6 @@
 import { ChestContents, rollChest } from './chest'
+import { PATHFINDERS_SEAL_UPGRADED_DROP_CHANCE } from '../../../data/upgrade-data'
+import { evaluateMerge, MergeResult, MergeSource, rollMerge } from './merge'
 import { WeaponCategory } from '../../../enums/weapon-category.enum'
 import { computed, effect, inject } from '@angular/core'
 import { patchState, signalStore, withComputed, withHooks, withMethods, withState } from '@ngrx/signals'
@@ -26,16 +28,18 @@ import { ItemType } from '../../../enums/items/item-type.enum'
 import RECIPES_DATA from '../../../data/recipes-data'
 import { RecipeID } from '../../../enums/ids/recipe-id.enum'
 import { EnemyID } from '../../../enums/ids/enemy-id.enum'
-import { QuestID } from '../../../enums/ids/quest-id.enum'
+import type { QuestDropLimits } from '../../services/quest-status'
 import { SkillNodeID } from '../../../enums/ids/skill-node-id.enum'
 import { SpellID } from '../../../enums/ids/spell-id.enum'
 import { ZoneID } from '../../../enums/ids/zone-id.enum'
 import { TownID } from '../../../enums/map/town-id.enum'
+import { ReputationID } from '../../../enums/reputation-id.enum'
 import { DamageElement } from '../../../enums/damage-element.enum'
 import { withDevtools } from '../helpers/devtools'
 import { saveGameStateNow, SaveMigrations, withGameStateSync } from '../helpers/with-game-state-sync.hook'
 import {
   addItems,
+  stackKey,
   lostItems,
   canFit,
   countFreeSlots,
@@ -58,6 +62,16 @@ import {
   withSlotDeltas,
 } from './inventory'
 import { canInstall, evaluateRecipe, installStations, Stations } from './camp'
+import { FARM_SEEDS } from '../../../data/farming-data'
+import { addSeeds, FarmState, harvest as harvestPlot, harvestAll as harvestEveryPlot, initialFarm, isFarmUnlocked, plant as plantInPlot, plantAll as plantEveryPlot, seedStacks, syncPlots, takeSeeds } from './farm'
+import { ReputationGain, reputationTier, TierUp } from './reputation'
+import { newProfession, professionLevel, professionLevels, Professions, settleProfession } from './professions'
+import { ProfessionID } from '../../../enums/ids/profession-id.enum'
+import { SiteID } from '../../../enums/ids/site-id.enum'
+import PROFESSIONS_DATA from '../../../data/professions-data'
+import { ReputationTier } from '../../../enums/reputation-tier.enum'
+import { TitleID } from '../../../enums/ids/title-id.enum'
+import TITLES_DATA from '../../../data/titles-data'
 import { StationID } from '../../../enums/ids/station-id.enum'
 import { UNLOCK_RULES, UnlockCondition, UnlockTarget } from '../../../data/unlock-conditions'
 import { BattleStore } from '../battle/battle.store'
@@ -70,6 +84,9 @@ import {
   consumableModifiers,
   deriveStats,
   equipmentModifiers,
+  expertiseModifiers,
+  gearModifiers,
+  foodMultiplierOf,
   initialResources,
   isResourceStat,
   PlayerStatsType,
@@ -77,7 +94,6 @@ import {
   sameIds,
   skillNodeModifiers,
   SourcedModifiers,
-  StatModifier,
 } from './stats'
 
 export type { PlayerStatsType } from './stats'
@@ -92,6 +108,14 @@ export interface Task {
 }
 
 export const TASKS_PER_GUILD_RANK = 5
+
+/** What one XP change did to a profession; `skillPoints` were paid for the levels in between. */
+export interface ProfessionGain {
+  professionId: ProfessionID
+  from: number
+  to: number
+  skillPoints: number
+}
 
 export const isTaskDone = (task: Task): boolean => task.currentCount >= task.targetCount
 
@@ -117,6 +141,12 @@ interface PlayerState {
   activeTasks: Task[];
   totalTasksCompleted: number;
   explorerTokens: number;
+  /** Points per town, never spent or lost; the tier is derived (`reputation.ts`). */
+  reputation: Partial<Record<ReputationID, number>>;
+  /** Unlocked professions with their XP; a missing entry is locked. The level is derived (`professions.ts`). */
+  professions: Professions;
+  /** Plots and the seed counts; seeds never enter the inventory (`farm.ts`). */
+  farm: FarmState;
   unlockedContent: UnlockedContent;
   campUnlocked: boolean;
   stations: Stations;
@@ -127,6 +157,8 @@ interface PlayerState {
   /** Bestiary entries and spells the player has looked at; the rest show as a navbar badge. */
   seenEnemies: EnemyID[];
   seenSpells: SpellID[];
+  /** The earned title shown in the stats panel; `null` shows none. Earned titles are derived, not saved. */
+  selectedTitle: TitleID | null;
 }
 
 export const initialState: PlayerState = {
@@ -145,6 +177,9 @@ export const initialState: PlayerState = {
   activeTasks: [],
   totalTasksCompleted: 0,
   explorerTokens: 0,
+  reputation: {},
+  professions: {},
+  farm: initialFarm,
   unlockedContent: {
     zones: [ZoneID.horseshoeBeach],
     towns: [],
@@ -157,6 +192,7 @@ export const initialState: PlayerState = {
   spellbookUnlocked: false,
   seenEnemies: [],
   seenSpells: [],
+  selectedTitle: null,
 }
 
 const revealedEnemies = (kills: PlayerState['enemyKillCounts']): EnemyID[] =>
@@ -173,10 +209,6 @@ const equipmentSpells = (equipment: EquipmentType): SpellID[] =>
   })
 
 const unseen = <T>(ids: T[], seen: T[]): T[] => ids.filter(id => !seen.includes(id))
-
-/** Stat modifiers one piece of gear grants (none for an empty slot). */
-const gearModifiers = (equipped: { id: ItemID } | null): StatModifier[] =>
-  equipped ? ((ITEM_DATA[equipped.id] as EquipmentItem).stats ?? []).map(s => ({ stat: s.id, amount: s.amount })) : []
 
 /** Version 1 Guild Satchels gave +5 slots; version 2 gives +2 to each slot tab. They were the only permanent slot source. */
 const V1_SATCHEL_SLOTS = 5
@@ -207,28 +239,31 @@ const handleExperience = (resources: Resources) => {
   handleExperience(resources)
 }
 
-const stackAmount = (inventory: Inventories, id: ItemID, tier: ItemTier): number =>
-  inventory[tabOf(id)].reduce((sum, slot) => slot?.id === id && slot.tier === tier ? sum + slot.amount : sum, 0)
-
-/** Takes `items` out; a kept chest roll goes with the last chest of its id (sold, destroyed), so a later one rolls fresh. */
+/** Takes `items` out; a kept chest roll goes with the last chest of its id at any upgrade level (sold, destroyed), so a later one rolls fresh. */
 const withoutItems = (state: PlayerState, items: ItemStack[]): Pick<PlayerState, 'inventory' | 'rolledChests'> => {
   const inventory = removeItems(state.inventory, items)
-  const rolledChests = Object.fromEntries(
-    Object.entries(state.rolledChests).filter(([id]) => countItem(inventory, Number(id) as ItemID) > 0))
+  const rolledChests = Object.fromEntries(Object.entries(state.rolledChests).filter(([key]) => {
+    const id = Number(key) as ItemID
+    return inventory[tabOf(id)].some(slot => slot?.id === id)
+  }))
   return { inventory, rolledChests }
 }
 
-type StatSources = { [K in 'resources' | 'permanentBonuses' | 'equipment' | 'unlockedNodes' | 'claimedZoneStars']: () => PlayerState[K] }
+type StatSources = { [K in 'resources' | 'permanentBonuses' | 'equipment' | 'unlockedNodes' | 'claimedZoneStars' | 'professions']: () => PlayerState[K] }
 
 /** Every stat modifier, grouped by where it comes from (the stats panel's breakdown order). */
-const sourcedModifiersOf = (store: StatSources, buffSpellIds: SpellID[], consumableItemIds: ItemID[]): SourcedModifiers => ({
-  equipment: equipmentModifiers(store.equipment()),
-  skills: skillNodeModifiers(store.unlockedNodes()),
-  buffs: buffModifiers(buffSpellIds),
-  consumables: consumableModifiers(consumableItemIds),
-  bonuses: bonusModifiers(store.permanentBonuses()),
-  mastery: masteryModifiers(store.claimedZoneStars()),
-})
+const sourcedModifiersOf = (store: StatSources, buffSpellIds: SpellID[], consumableItemIds: ItemID[]): SourcedModifiers => {
+  const equipment = equipmentModifiers(store.equipment())
+  return {
+    equipment,
+    skills: skillNodeModifiers(store.unlockedNodes()),
+    buffs: buffModifiers(buffSpellIds),
+    consumables: consumableModifiers(consumableItemIds, foodMultiplierOf(equipment)),
+    bonuses: bonusModifiers(store.permanentBonuses()),
+    mastery: masteryModifiers(store.claimedZoneStars()),
+    expertise: expertiseModifiers(professionLevels(store.professions())),
+  }
+}
 
 /** Totals of a batch of kills (an offline claim), applied in one store update. */
 export interface KillBatch {
@@ -255,11 +290,14 @@ export interface KillBatchResult {
 
 const STORE_KEY = 'playerStore'
 
+// Blocks are ordered by dependency (a block sees only what earlier blocks define), not by topic; each starts with
+// a label. Pure logic lives in the sibling files (stats.ts, inventory.ts, reputation.ts, zone-mastery.ts, ...).
 export const PlayerStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
   withGameStateSync(STORE_KEY, initialState, { version: SAVE_VERSION, migrations: SAVE_MIGRATIONS, transientKeys: ['manaRegenTimer'] }),
   withDevtools(STORE_KEY),
+  // Stats: derived `stats`, their sources, inventory capacity.
   withComputed((store, battleStore = inject(BattleStore)) => {
     // Buff and consumable timers tick constantly; only a change in what's active should recompute stats.
     const activeBuffs = computed(() => activeBuffSpellIds(battleStore.activeBuffs()), { equal: sameIds })
@@ -276,6 +314,7 @@ export const PlayerStore = signalStore(
       inventoryCapacity: computed(() => inventoryCapacity(modifiers())),
     }
   }),
+  // Spells: known and unseen.
   withComputed((store, battleStore = inject(BattleStore)) => {
     /** Spells from the skill tree plus spells from equipped gear. */
     const knownSpellIds = computed(() => [
@@ -294,9 +333,17 @@ export const PlayerStore = signalStore(
       unseenSpellCount: () => unseenSpells().length,
     }
   }),
+  // Guild rank and tasks, titles, bestiary, equipped weapon, zone mastery.
   withComputed((store) => ({
+    canRegisterPathfindersSeal: computed(() => (store.permanentBonuses().upgradedDropChance ?? 0) === 0
+      && countItem(store.inventory(), ItemID.pathfindersSeal) > 0),
     /** One rank per `TASKS_PER_GUILD_RANK` completed tasks, no cap. Each rank adds a zone tier to the task pool. */
     guildRank: () => Math.floor(store.totalTasksCompleted() / TASKS_PER_GUILD_RANK),
+    /** Titles whose source is met, in `TitleID` order. */
+    earnedTitles: computed(() => (Object.keys(TITLES_DATA).map(Number) as TitleID[]).filter(id => {
+      const source = TITLES_DATA[id]
+      return reputationTier(store.reputation()[source.reputationId] ?? 0) >= source.tier
+    })),
     hasAvailableTaskSlot: () => store.activeTasks().length < store.stats().maxTaskSlots,
     hasCompletedTask: () => store.activeTasks().some(isTaskDone),
     hasTaskInProgress: () => store.activeTasks().some(task => !isTaskDone(task)),
@@ -323,6 +370,7 @@ export const PlayerStore = signalStore(
       ) as Record<ZoneID, ZoneStarProgress[]>
     }),
   })),
+  // Basic writes: stats, zone progress, kill counts, inventory and capacity, skill nodes, spell levels, guild tasks, tokens.
   withMethods((store) => ({
     resetState() {
       patchState(store, initialState)
@@ -374,24 +422,45 @@ export const PlayerStore = signalStore(
       }))
     },
 
-    /** Station upgrades install instead of entering the inventory. Returns the ones installed. */
+    /** Station upgrades install and seeds are counted instead of entering the inventory. Returns the upgrades installed. */
     addItems(items: ItemStack[]): ItemID[] {
-      const { stations, rest, installed } = installStations(store.stations(), items)
+      const { seeds, rest: stored } = takeSeeds(items)
+      const { stations, rest, installed } = installStations(store.stations(), stored)
       patchState(store, (state) => ({
         stations,
         inventory: addItems(state.inventory, store.inventoryCapacity(), rest),
+        farm: { ...state.farm, seeds: addSeeds(state.farm.seeds, seeds) },
       }))
       return installed
+    },
+
+    /**
+     * Accrues plot growth up to `now` at the current rate. Call it before anything changes `seedGrowthTimeReduction`
+     * (equipping, a level-up) and on load, so the old rate only covers the old time.
+     */
+    syncFarm(now = Date.now()) {
+      patchState(store, (state) => ({ farm: { ...state.farm, plots: syncPlots(state.farm.plots, now, store.stats().seedGrowthTimeReduction) } }))
     },
 
     removeItems(items: ItemStack[]) {
       patchState(store, (state) => withoutItems(state, items))
     },
 
-    /** Throws away the whole stack (same id and tier). Quest items can't be destroyed; returns whether anything was. */
+    /** Consume the Seal and save its one-time lesson together; repeated or stale effects do nothing. */
+    registerPathfindersSeal(): boolean {
+      if (!store.canRegisterPathfindersSeal()) return false
+      patchState(store, state => ({
+        inventory: removeItems(state.inventory, [{ id: ItemID.pathfindersSeal, amount: 1 }]),
+        permanentBonuses: { ...state.permanentBonuses, upgradedDropChance: PATHFINDERS_SEAL_UPGRADED_DROP_CHANCE },
+      }))
+      saveGameStateNow()
+      return true
+    },
+
+    /** Throws away the whole stack (same id, tier and upgrade level). Quest items can't be destroyed; returns whether anything was. */
     destroyItem(item: InventoryItem): boolean {
       if (item.type === ItemType.quest) return false
-      patchState(store, (state) => withoutItems(state, [{ id: item.id, amount: item.amount, tier: item.tier }]))
+      patchState(store, (state) => withoutItems(state, [{ id: item.id, amount: item.amount, tier: item.tier, upgradeLevel: item.upgradeLevel }]))
       return true
     },
 
@@ -500,13 +569,14 @@ export const PlayerStore = signalStore(
       return true
     },
   })),
+  // Equip and zone-star checks.
   withMethods((store) => ({
     canUnequip(slot: EquipmentSlotKey): boolean {
       const equipped = store.equipment()[slot]
       if (!equipped) return false
       return store.canChangeInventorySlots(
         slotDeltas([], gearModifiers(equipped)),
-        [{ id: equipped.id, tier: equipped.tier, amount: 1 }],
+        [{ id: equipped.id, tier: equipped.tier, upgradeLevel: equipped.upgradeLevel, amount: 1 }],
       )
     },
 
@@ -517,8 +587,8 @@ export const PlayerStore = signalStore(
       const slotKey = EquipmentSlot[slot] as EquipmentSlotKey
       const equipped = store.equipment()[slotKey]
       const deltas = slotDeltas(gearModifiers(item), gearModifiers(equipped))
-      const adding = equipped ? [{ id: equipped.id, tier: equipped.tier, amount: 1 }] : []
-      return store.canChangeInventorySlots(deltas, adding, [{ id: item.id, tier: item.tier, amount: 1 }])
+      const adding = equipped ? [{ id: equipped.id, tier: equipped.tier, upgradeLevel: equipped.upgradeLevel, amount: 1 }] : []
+      return store.canChangeInventorySlots(deltas, adding, [{ id: item.id, tier: item.tier, upgradeLevel: item.upgradeLevel, amount: 1 }])
     },
 
     /** Finished, unclaimed, and its chest's items fit in the inventory. */
@@ -528,13 +598,15 @@ export const PlayerStore = signalStore(
       return store.canFitItems(ZONES_DATA[zoneId].masteryReward.items)
     },
   })),
+  // Game actions: kills and drops, zone stars, selling, equipping, using items and chests, mana regen, crafting.
   withMethods((store) => ({
-    processBattleEnd(enemyId: EnemyID, zoneId: ZoneID, currentWave: number, isShiny: boolean, activeQuestIds?: Set<QuestID>): ItemStack[] {
+    /** `lost`: drops that did not fit. `foundSeeds`: seeds to show a toast for (empty before the farm unlocks). */
+    processBattleEnd(enemyId: EnemyID, zoneId: ZoneID, currentWave: number, isShiny: boolean, questDropLimits?: QuestDropLimits): { lost: ItemStack[], foundSeeds: ItemStack[] } {
       const enemy = ENEMIES_DATA[enemyId]
       const { experience, gold, dropRolls } = killReward(enemy, ZONES_DATA[zoneId], currentWave, isShiny, store.stats())
       const drops = new Map<string, InventoryItem>()
       const { dropChance } = rankBonus(enemyId, store.enemyKillCounts()[enemyId] ?? 0)
-      rollEnemyDrops(enemy, dropRolls, isShiny, dropChance, drops, activeQuestIds)
+      rollEnemyDrops(enemy, dropRolls, isShiny, dropChance, drops, questDropLimits, undefined, store.stats().upgradedDropChance, store.stats().seedDropChance)
       const itemsToUpdate = [...drops.values()]
 
       store.updatePlayerStats([
@@ -547,10 +619,12 @@ export const PlayerStore = signalStore(
       store.updateTaskProgress(enemyId)
       if (isShiny) patchState(store, (state) => ({ shinyKillsByZone: addShinyKills(state.shinyKillsByZone, zoneId, 1) }))
 
-      // Station upgrades install instead of being stored, so they never count as lost.
-      const lost = lostItems(store.inventory(), store.inventoryCapacity(), installStations(store.stations(), itemsToUpdate).rest)
+      // Station upgrades install and seeds are counted instead of being stored, so neither ever counts as lost.
+      const { seeds, rest } = takeSeeds(itemsToUpdate)
+      const lost = lostItems(store.inventory(), store.inventoryCapacity(), installStations(store.stations(), rest).rest)
       if (itemsToUpdate.length) store.addItems(itemsToUpdate)
-      return lost
+      // Seeds are counted before the farm unlocks too, but only reported after it.
+      return { lost, foundSeeds: isFarmUnlocked(store.unlockedContent()) ? seedStacks(seeds) : [] }
     },
 
     /** `stats` as it would be with only these buffs and consumable effects running (offline buff segments). */
@@ -565,17 +639,22 @@ export const PlayerStore = signalStore(
     applyKillBatch(batch: KillBatch): KillBatchResult {
       const startLevel = store.resources().level
       const capacity = store.inventoryCapacity()
-      const { stations, rest, installed } = installStations(store.stations(), batch.items)
+      const { seeds, rest: stored } = takeSeeds(batch.items)
+      const { stations, rest, installed } = installStations(store.stations(), stored)
       const inventoryBefore = store.inventory()
       const inventory = addItems(inventoryBefore, capacity, rest)
-      // Each stack arrives whole or not at all; `rest` holds one entry per id + tier (rolled into a map).
-      const receivedItems: InventoryItem[] = rest.flatMap(({ id, tier: requestedTier }) => {
+      // Each stack arrives whole or not at all; `rest` holds one entry per id + tier + upgradeLevel (rolled into a map).
+      const receivedItems: InventoryItem[] = rest.flatMap(({ id, tier: requestedTier, upgradeLevel }) => {
         const tier = requestedTier ?? ITEM_DATA[id].tier
-        const amount = stackAmount(inventory, id, tier) - stackAmount(inventoryBefore, id, tier)
-        return amount > 0 ? [{ id, type: ITEM_DATA[id].type, tier, amount }] : []
+        const amount = countItem(inventory, id, tier, upgradeLevel) - countItem(inventoryBefore, id, tier, upgradeLevel)
+        return amount > 0 ? [{ id, type: ITEM_DATA[id].type, tier, amount, ...(upgradeLevel === undefined ? {} : { upgradeLevel }) }] : []
       })
       const received = receivedItems.reduce((sum, item) => sum + item.amount, 0)
       const lostDrops = rest.reduce((sum, item) => sum + item.amount, 0) - received
+      // Seeds are counted before the farm unlocks too, but only listed after it; they are never lost.
+      if (isFarmUnlocked(store.unlockedContent())) {
+        receivedItems.push(...seedStacks(seeds).map(({ id, amount }) => ({ id, type: ItemType.seed, tier: ITEM_DATA[id].tier, amount })))
+      }
 
       patchState(store, (state) => {
         const resources = { ...state.resources }
@@ -596,6 +675,7 @@ export const PlayerStore = signalStore(
           shinyKillsByZone: addShinyKills(state.shinyKillsByZone, batch.zoneId, batch.shinies),
           stations,
           inventory,
+          farm: { ...state.farm, seeds: addSeeds(state.farm.seeds, seeds) },
           zonesProgression: {
             ...state.zonesProgression,
             [batch.zoneId]: { ...zoneProgression, [batch.wave]: (zoneProgression?.[batch.wave] ?? 0) + batch.kills },
@@ -627,31 +707,48 @@ export const PlayerStore = signalStore(
 
     /** Sells up to `amount` from one stack at `shopId`'s price (`sellPrice`). No-op when that shop won't buy it. */
     sellItem(item: InventoryItem, shopId: ShopID, amount = 1) {
-      const price = sellPrice(shopId, item.id)
-      const owned = store.inventory()[tabOf(item.id)].find(slot => slot?.id === item.id && slot.tier === item.tier)?.amount ?? 0
+      const price = sellPrice(shopId, item.id, item.upgradeLevel)
+      const owned = store.inventory()[tabOf(item.id)].find(slot => slot !== null && stackKey(slot) === stackKey(item))?.amount ?? 0
       const sold = Math.min(amount, owned)
       if (price <= 0 || sold <= 0) return
 
-      store.removeItems([{ id: item.id, tier: item.tier, amount: sold }])
+      store.removeItems([{ id: item.id, tier: item.tier, upgradeLevel: item.upgradeLevel, amount: sold }])
       store.updatePlayerStats([{ stat: 'goldCoins', amount: price * sold }])
+    },
+
+    /** Merges owned copies atomically, so refusals spend nothing and never roll. */
+    mergeItem(base: MergeSource, sacrifice: MergeSource, rng: () => number = Math.random): MergeResult {
+      const plan = evaluateMerge({
+        base, sacrifice, inventory: store.inventory(), equipment: store.equipment(),
+        capacity: store.inventoryCapacity(), goldCoins: store.resources().goldCoins,
+      })
+      if (plan.status === 'refused') return plan
+      const { result, state } = rollMerge(plan, rng)
+      patchState(store, {
+        inventory: state.inventory,
+        equipment: state.equipment,
+        resources: { ...store.resources(), goldCoins: state.goldCoins },
+      })
+      return result
     },
 
     equipItem(item: InventoryItem) {
       if (!store.canEquip(item)) return
+      store.syncFarm() // gear can change the growth rate (Terrace Hare): the old rate covers only the time so far
 
       const itemData = ITEM_DATA[item.id] as EquipmentItem
       const slotKey = EquipmentSlot[itemData.slot] as EquipmentSlotKey
       const currentlyEquipped = store.equipment()[slotKey]
 
       // Remove first so the swapped-out item always has a free slot to return to.
-      store.removeItems([{ id: item.id, tier: item.tier, amount: 1 }])
+      store.removeItems([{ id: item.id, tier: item.tier, upgradeLevel: item.upgradeLevel, amount: 1 }])
 
       if (currentlyEquipped) {
-        store.addItems([{ id: currentlyEquipped.id, tier: currentlyEquipped.tier, amount: 1 }])
+        store.addItems([{ id: currentlyEquipped.id, tier: currentlyEquipped.tier, upgradeLevel: currentlyEquipped.upgradeLevel, amount: 1 }])
       }
 
       patchState(store, (state) => ({
-        equipment: { ...state.equipment, [slotKey]: { id: item.id, tier: item.tier } },
+        equipment: { ...state.equipment, [slotKey]: { id: item.id, tier: item.tier, upgradeLevel: item.upgradeLevel } },
       }))
     },
 
@@ -659,8 +756,9 @@ export const PlayerStore = signalStore(
       const equippedItem = store.equipment()[slot]
 
       if (!equippedItem || !store.canUnequip(slot)) return
+      store.syncFarm()
 
-      store.addItems([{ id: equippedItem.id, tier: equippedItem.tier, amount: 1 }])
+      store.addItems([{ id: equippedItem.id, tier: equippedItem.tier, upgradeLevel: equippedItem.upgradeLevel, amount: 1 }])
 
       patchState(store, (state) => ({
         equipment: { ...state.equipment, [slot]: null },
@@ -672,7 +770,7 @@ export const PlayerStore = signalStore(
       const itemData = ITEM_DATA[item.id]
       if (itemData.type !== ItemType.stationUpgrade || !canInstall(store.stations(), itemData)) return false
 
-      store.removeItems([{ id: item.id, tier: item.tier, amount: 1 }])
+      store.removeItems([{ id: item.id, tier: item.tier, upgradeLevel: item.upgradeLevel, amount: 1 }])
       store.addItems([{ id: item.id, amount: 1 }])
       return true
     },
@@ -684,14 +782,14 @@ export const PlayerStore = signalStore(
         const recipeData = itemData as RecipeItem
         if (store.unlockedRecipes().includes(recipeData.recipeId)) return
         patchState(store, state => ({ unlockedRecipes: [...state.unlockedRecipes, recipeData.recipeId] }))
-        store.removeItems([{ id: item.id, tier: item.tier, amount: 1 }])
+        store.removeItems([{ id: item.id, tier: item.tier, upgradeLevel: item.upgradeLevel, amount: 1 }])
         return
       }
 
       if (itemData.type === ItemType.spellScroll) {
         if (store.knownSpellIds().includes(itemData.spellId)) return
         store.levelUpSpell(itemData.spellId)
-        store.removeItems([{ id: item.id, tier: item.tier, amount: 1 }])
+        store.removeItems([{ id: item.id, tier: item.tier, upgradeLevel: item.upgradeLevel, amount: 1 }])
         return
       }
 
@@ -699,7 +797,7 @@ export const PlayerStore = signalStore(
 
       const statsToUpdate = itemData.stats.map(s => ({ stat: s.id, amount: s.amount }))
       store.updatePlayerStats(statsToUpdate)
-      store.removeItems([{ id: item.id, tier: item.tier, amount: 1 }])
+      store.removeItems([{ id: item.id, tier: item.tier, upgradeLevel: item.upgradeLevel, amount: 1 }])
     },
 
     /**
@@ -710,8 +808,11 @@ export const PlayerStore = signalStore(
     openChest(item: InventoryItem, rng: () => number = Math.random): { contents: ChestContents | null, missing: MissingSlots } {
       const itemData = ITEM_DATA[item.id]
       if (itemData.type !== ItemType.chest) return { contents: null, missing: {} }
-      const chest = { id: item.id, tier: item.tier, amount: 1 }
-      const contents = store.rolledChests()[item.id] ?? rollChest(itemData, rng)
+      const chest = { id: item.id, tier: item.tier, upgradeLevel: item.upgradeLevel, amount: 1 }
+      const bonus = itemData.bonusRoll
+      const bonusEligible = !!bonus && (store.permanentBonuses()[bonus.registeredStat] ?? 0) === 0
+        && countItem(store.inventory(), bonus.itemId) === 0
+      const contents = store.rolledChests()[item.id] ?? rollChest(itemData, rng, bonusEligible, store.stats().seedDropChance)
       const missing = store.missingSlotsByTab(contents.items, [chest])
       const rolledChests = { ...store.rolledChests() }
       const blocked = Object.keys(missing).length > 0
@@ -766,10 +867,11 @@ export const PlayerStore = signalStore(
       return { crafted: count, installed }
     },
 
-    itemCount(id: ItemID): number {
-      return countItem(store.inventory(), id)
+    itemCount(id: ItemID, tier?: ItemTier, upgradeLevel = 0): number {
+      return countItem(store.inventory(), id, tier, upgradeLevel)
     },
   })),
+  // Lookups and unlocks: skills, zones, towns, titles, reputation, features, seen markers.
   withMethods((store) => ({
     hasSkillUnlocked(skillId: SkillNodeID): boolean {
       return !!store.unlockedNodes()[skillId]
@@ -799,8 +901,111 @@ export const PlayerStore = signalStore(
       })
     },
 
+    /** Opens a Site (the `unlockSite` dialogue effect, a `site` unlock target or a cheat). */
+    unlockSite(id: SiteID): void {
+      patchState(store, (state) => {
+        const sites = state.unlockedContent.sites ?? []
+        if (sites.includes(id)) return {}
+        return { unlockedContent: { ...state.unlockedContent, sites: [...sites, id] } }
+      })
+    },
+
+    /** Shows an earned title in the stats panel, or none with `null`; unearned titles are ignored. */
+    selectTitle(id: TitleID | null): void {
+      if (id === null || store.earnedTitles().includes(id)) patchState(store, { selectedTitle: id })
+    },
+
+    reputationTierOf(reputationId: ReputationID): ReputationTier {
+      return reputationTier(store.reputation()[reputationId] ?? 0)
+    },
+
+    /** Adds points per reputation; returns each one whose tier went up, once, with its new tier. */
+    addReputation(gains: ReputationGain[]): TierUp[] {
+      const before = store.reputation()
+      const after = { ...before }
+      gains.forEach(({ reputationId, amount }) => after[reputationId] = (after[reputationId] ?? 0) + amount)
+      patchState(store, { reputation: after })
+      return [...new Set(gains.map(gain => gain.reputationId))]
+        .map(reputationId => ({ reputationId, tier: reputationTier(after[reputationId] ?? 0) }))
+        .filter(({ reputationId, tier }) => tier > reputationTier(before[reputationId] ?? 0))
+    },
+
+    /** Cheat: every planted plot is fully grown. */
+    growAllPlots(): void {
+      patchState(store, (state) => ({
+        farm: { ...state.farm, plots: state.farm.plots.map(plot => plot && { ...plot, progressMs: FARM_SEEDS[plot.seedId]?.growMs ?? plot.progressMs }) },
+      }))
+    },
+
+    /** Plants the seed in one plot, or in every empty plot when `plotIndex` is omitted; false when nothing was planted. Plots from `plotLimit` on are locked. */
+    plantSeed(seedId: ItemID, plotLimit: number, plotIndex?: number): boolean {
+      store.syncFarm()
+      const stats = store.stats()
+      const ctx = { now: Date.now(), level: professionLevel(store.professions(), ProfessionID.farming), plotLimit, seedSaveChance: stats.farmSeedSaveChance }
+      const farm = store.farm()
+      const next = plotIndex === undefined ? plantEveryPlot(farm, seedId, ctx) : plantInPlot(farm, plotIndex, seedId, ctx)
+      if (!next || next === farm) return false
+      patchState(store, { farm: next })
+      return true
+    },
+
+    /**
+     * Harvests one plot, or every ready plot when `plotIndex` is omitted. The crops go to the inventory; the caller pays the XP.
+     * A harvest the inventory has no room for leaves the plot with its roll saved (`missing`: the slots to free).
+     */
+    harvestPlots(plotIndex?: number): { crops: ItemStack[], xp: number, blocked: boolean, missing: MissingSlots } {
+      store.syncFarm()
+      const stats = store.stats()
+      let notFitting: ItemStack[] = []
+      const fits = (crops: ItemStack[]) => {
+        const ok = store.canFitItems(crops)
+        if (!ok) notFitting = crops
+        return ok
+      }
+      const ctx = { doubleChance: stats.farmDoubleHarvestChance, bonusChance: stats.farmBonusCropChance, xpMultiplier: stats.farmXpMultiplier, fits }
+      const farm = store.farm()
+      const result = plotIndex === undefined ? harvestEveryPlot(farm, ctx) : harvestPlot(farm, plotIndex, ctx)
+      const blocked = 'blocked' in result ? result.blocked : result.status === 'blocked'
+      patchState(store, { farm: result.farm })
+      if (result.crops.length) store.addItems(result.crops)
+      return { crops: result.crops, xp: result.xp, blocked, missing: blocked ? store.missingSlotsByTab(notFitting) : {} }
+    },
+
+    /** Starts the profession at level 1; no-op when already unlocked. */
+    unlockProfession(id: ProfessionID): void {
+      if (store.professions()[id]) return
+      patchState(store, (state) => ({ professions: { ...state.professions, [id]: newProfession() } }))
+    },
+
+    /** 0 while locked. */
+    professionLevel(id: ProfessionID): number {
+      return professionLevel(store.professions(), id)
+    },
+
+    /**
+     * Adds XP (negative removes it, for cheats) to an unlocked profession and pays the skill points of every new level,
+     * in the same state update. Null while the profession is locked: its XP is not kept.
+     */
+    applyProfessionXp(id: ProfessionID, amount: number): ProfessionGain | null {
+      const current = store.professions()[id]
+      if (!current) return null
+      store.syncFarm() // a level-up changes the growth rate
+      const { maxLevel } = PROFESSIONS_DATA[id]
+      const from = professionLevel(store.professions(), id)
+      const { progress, skillPoints } = settleProfession({ ...current, experience: Math.max(0, current.experience + amount) }, maxLevel)
+      patchState(store, (state) => ({
+        professions: { ...state.professions, [id]: progress },
+        resources: { ...state.resources, unspentSkillPoints: state.resources.unspentSkillPoints + skillPoints },
+      }))
+      return { professionId: id, from, to: professionLevel(store.professions(), id), skillPoints }
+    },
+
     isTownUnlocked(id: TownID): boolean {
       return (store.unlockedContent().towns ?? []).includes(id)
+    },
+
+    isSiteUnlocked(id: SiteID): boolean {
+      return (store.unlockedContent().sites ?? []).includes(id)
     },
 
     /** Camp starts with the Workbench. */
@@ -833,11 +1038,14 @@ export const PlayerStore = signalStore(
       if (fresh.length) patchState(store, { seenSpells: [...store.seenSpells(), ...fresh] })
     },
   })),
+  // Unlock rules (`data/unlock-conditions.ts`).
   withMethods((store) => ({
     isUnlockTargetUnlocked(target: UnlockTarget): boolean {
       switch (target.type) {
         case 'town':
           return store.isTownUnlocked(target.townId)
+        case 'site':
+          return store.isSiteUnlocked(target.siteId)
         case 'feature':
           return target.feature === 'camp' ? store.campUnlocked() : store.skillTreeUnlocked()
       }
@@ -847,6 +1055,10 @@ export const PlayerStore = signalStore(
       switch (target.type) {
         case 'town':
           store.unlockTown(target.townId)
+          store.unlockMap()
+          break
+        case 'site':
+          store.unlockSite(target.siteId)
           store.unlockMap()
           break
         case 'feature':
@@ -880,6 +1092,21 @@ export const PlayerStore = signalStore(
         const capacity = store.inventoryCapacity()
         patchState(store, (state) => ({ inventory: resizeInventory(state.inventory, capacity) }))
       })
+
+      // Offline time counts at the rate the save was made with.
+      store.syncFarm()
+
+      // Pays skill points a save has not been paid for yet (older saves, edited XP, a raised level cap), once.
+      for (const [key, progress] of Object.entries(store.professions())) {
+        const id = Number(key) as ProfessionID
+        if (!PROFESSIONS_DATA[id]) continue
+        const { progress: settled, skillPoints } = settleProfession(progress, PROFESSIONS_DATA[id].maxLevel)
+        if (settled.pointsPaidLevel === progress.pointsPaidLevel) continue
+        patchState(store, (state) => ({
+          professions: { ...state.professions, [id]: settled },
+          resources: { ...state.resources, unspentSkillPoints: state.resources.unspentSkillPoints + skillPoints },
+        }))
+      }
 
       // Losing maxMana (buff expiry, unequip, respec) drops stored mana with it, so it can't come back later.
       effect(() => {

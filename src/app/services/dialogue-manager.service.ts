@@ -3,14 +3,22 @@ import { ArenaService } from './arena.service'
 import { DialogueNode } from '../../interfaces/dialogues/dialogue-node.interface'
 import { computed, inject, Injectable, signal } from '@angular/core'
 import { isTaskDone, PlayerStore } from '../store/player/player.store'
-import { DialogueEffect, QuestEffect } from '../../types/dialogues/dialogue-effect.type'
-import { QuestsStore } from '../store/quests/quests.store'
+import { DialogueEffect, QuestEffect, ReputationTurnInEffect } from '../../types/dialogues/dialogue-effect.type'
+import { ReputationTurnIn, turnInBundles, turnInFor } from '../../data/reputation-turn-ins'
+import { ReputationService } from './reputation.service'
+import { ModalService } from './modal.service'
+import { SiteID } from '../../enums/ids/site-id.enum'
+import { TurnInCooldownService } from './turn-in-cooldown.service'
+import { bundleKey } from '../store/quests/turn-in-cooldown'
+import { orderKey, QuestsStore } from '../store/quests/quests.store'
 import { DialogueOption, DialogueResult } from '../../interfaces/dialogues/dialogue-option.type'
 import { DialogueCondition } from '../../types/dialogues/dialogue-condition.type'
 import { NpcID } from '../../enums/map/npc-id.enum'
 import npcData, { NPCProps } from '../../data/npc-data'
 import QUEST_DATA, { RequirementProps } from '../../data/quests-data'
-import { getQuestStatus, getStepItems, matchesQuestState } from './quest-status'
+import { getActiveQuestIds, getQuestStatus, getStepItems, matchesQuestState } from './quest-status'
+import { reputationTier } from '../store/player/reputation'
+import { ReputationTier } from '../../enums/reputation-tier.enum'
 import { QuestID } from '../../enums/ids/quest-id.enum'
 import { QuestState } from '../../enums/quest-state.enum'
 import { QuestStep } from '../../types/quests/quest-progression.type'
@@ -28,6 +36,9 @@ export class DialogueManagerService {
   private currencyFeed = inject(CurrencyFeedService)
   private battleStore = inject(BattleStore)
   private arenaService = inject(ArenaService)
+  private reputationService = inject(ReputationService)
+  private cooldowns = inject(TurnInCooldownService)
+  private modalService = inject(ModalService)
 
   private currentConversation = signal<Record<any, DialogueNode<any>> | null>(null)
   private currentNodeId = signal<any>(null)
@@ -40,7 +51,10 @@ export class DialogueManagerService {
 
   activeNpc = signal<NPCProps | null>(null)
 
-  /** The shown and executed branch: the first result whose conditions pass, skipping quest starts that aren't available. */
+  /**
+   * The shown and executed branch: the first result whose conditions pass, skipping quest starts that aren't available
+   * and turn-ins whose town is Exalted.
+   */
   getActiveResult<T>(option: DialogueOption<T>): DialogueResult<T> | undefined {
     if (!option.results || option.results.length === 0) return undefined
 
@@ -49,12 +63,16 @@ export class DialogueManagerService {
         (e): e is QuestEffect => e.type === 'quest' && e.action === 'start',
       )
       if (questStart && !this.isQuestAvailable(questStart.questId)) return false
+      const turnIn = result.effects?.find((e): e is ReputationTurnInEffect => e.type === 'reputationTurnIn')
+      if (turnIn && this.isTurnInClosed(turnIn)) return false
 
       return this.checkConditions(result.visibilityConditions)
     })
   }
 
   private isQuestAvailable(questId: QuestID): boolean {
+    // A repeatable order is not offered while its own turn-in cooldown runs.
+    if (QUEST_DATA[questId].repeat && this.cooldowns.remainingMs(orderKey(questId)) > 0) return false
     return matchesQuestState(
       this.questStore.questStepProgression(),
       questId,
@@ -63,9 +81,37 @@ export class DialogueManagerService {
     )
   }
 
-  /** False when the result's rewards would not fit in the inventory, or its gold fee can't be paid. */
+  /** Rechecks capacity, fees and one-time effects, including Seal registration and reputation bundles. */
   canApplyResult(result: DialogueResult<any> | undefined): boolean {
     return Object.keys(this.missingSlots(result)).length === 0 && this.missingGold(result) === 0
+      && (result?.effects ?? []).every(effect => {
+        if (effect.type === 'reputationTurnIn') return this.turnIn(effect).bundles > 0
+        if (effect.type === 'registerPathfindersSeal') return this.playerStore.canRegisterPathfindersSeal()
+        return true
+      })
+  }
+
+  /**
+   * What a turn-in hands over right now: the NPC's turn-in, how many of its item the player holds, how many the
+   * current steps of active quests keep back, and the bundle taken from the rest (0 or 1; 0 while it cools down).
+   */
+  turnIn(effect: ReputationTurnInEffect): { turnIn: ReputationTurnIn, held: number, kept: number, bundles: number } {
+    const turnIn = turnInFor(effect.npcId)
+    if (!turnIn) throw new Error(`No reputation turn-in for NPC ${effect.npcId}`)
+    const progression = this.questStore.questStepProgression()
+    const kept = [...getActiveQuestIds(progression)]
+      .flatMap(questId => getStepItems(questId, progression[questId] as QuestStep, this.questStore.orders()))
+      .filter(stack => stack.id === turnIn.itemId)
+      .reduce((sum, stack) => sum + stack.amount, 0)
+    const held = this.playerStore.itemCount(turnIn.itemId)
+    const cooling = this.cooldowns.remainingMs(bundleKey(turnIn.npcId, turnIn.itemId)) > 0
+    return { turnIn, held, kept: Math.min(held, kept), bundles: cooling ? 0 : turnInBundles(turnIn, Math.max(0, held - kept)) }
+  }
+
+  /** Turn-ins stop once their town is Exalted: more reputation would count for nothing. */
+  private isTurnInClosed(effect: ReputationTurnInEffect): boolean {
+    const reputationId = turnInFor(effect.npcId)?.reputationId
+    return reputationId === undefined || reputationTier(this.playerStore.reputation()[reputationId] ?? 0) === ReputationTier.exalted
   }
 
   /** Gold still needed to pay the result's `deduct` effects (owner decision: gold never goes negative). */
@@ -95,7 +141,7 @@ export class DialogueManagerService {
         const status = getQuestStatus(this.questStore.questStepProgression(), effect.questId)
         if (status.state !== QuestState.active) continue
 
-        removing.push(...getStepItems(effect.questId, status.step))
+        removing.push(...getStepItems(effect.questId, status.step, this.questStore.orders()))
         adding.push(...this.questCompletionRewards(effect, status.step))
       }
     }
@@ -162,6 +208,10 @@ export class DialogueManagerService {
   }
 
   checkCondition(c: DialogueCondition): boolean {
+    return this.evaluateCondition(c) !== !!c.not
+  }
+
+  private evaluateCondition(c: DialogueCondition): boolean {
     switch (c.type) {
       case 'flag':
         return !!this.questStore.dialogueFlags()[c.name] === c.isSet
@@ -221,6 +271,14 @@ export class DialogueManagerService {
           }
         }
         return false
+      case 'reputation':
+        return this.playerStore.reputationTierOf(c.reputationId) >= c.tier
+      case 'professionLevel':
+        return this.playerStore.professionLevel(c.professionId) >= c.level
+      case 'farmSeeds':
+        return Object.values(this.playerStore.farm().seeds).reduce((sum, n) => sum + (n ?? 0), 0) >= c.atLeast
+      case 'turnInCooldown':
+        return (this.cooldowns.remainingMs(c.key) === 0) === (c.state === 'ready')
       case 'arena':
         switch (c.state) {
           case 'ready': return this.arenaService.isReady()
@@ -258,12 +316,19 @@ export class DialogueManagerService {
               this.questStore.advanceQuest(effect.questId)
               break
             case 'end':
-              this.questStore.endQuest(effect.questId)
+              // Dialogue ends are turn-ins, so recheck like `advanceQuest`; `dev.completeQuest` calls `endQuest` directly.
+              if (this.questStore.isStepReady(effect.questId)) this.questStore.endQuest(effect.questId)
               break
           }
           break
         case 'shop':
           this.openShop(effect.shopId, effect.stage)
+          break
+        case 'forge':
+          this.townsStore.openForge()
+          break
+        case 'registerPathfindersSeal':
+          this.playerStore.registerPathfindersSeal()
           break
         case 'flag':
           this.questStore.setDialogueFlag(effect.name)
@@ -295,6 +360,24 @@ export class DialogueManagerService {
           if (effect.action === 'enter') this.arenaService.enter()
           else this.arenaService.claimRewards()
           break
+        case 'unlockProfession':
+          this.playerStore.unlockProfession(effect.professionId)
+          break
+        case 'unlockSite': {
+          if (this.playerStore.isSiteUnlocked(effect.siteId)) break
+          this.playerStore.applyUnlockTarget({ type: 'site', siteId: effect.siteId })
+          const key = `unlocks:sites.${SiteID[effect.siteId]}`
+          this.modalService.openUnlockNotification({ titleKey: `${key}.title`, bodyKey: `${key}.body` })
+          break
+        }
+        case 'reputationTurnIn': {
+          const { turnIn, bundles } = this.turnIn(effect)
+          if (bundles === 0) break
+          this.playerStore.removeItems([{ id: turnIn.itemId, amount: bundles * turnIn.bundleSize }])
+          this.reputationService.gain([{ reputationId: turnIn.reputationId, amount: bundles * turnIn.reputation }])
+          this.questStore.recordTurnIn(bundleKey(turnIn.npcId, turnIn.itemId), Date.now())
+          break
+        }
       }
     })
   }

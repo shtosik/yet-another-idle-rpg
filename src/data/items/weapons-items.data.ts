@@ -97,6 +97,7 @@ export const WeaponsItemsData: Partial<Record<ItemID, Item>> = {
   },
   [ItemID.ashwoodBow]: {
     id: ItemID.ashwoodBow,
+    unique: true,
     tier: ItemTier.uncommon,
     url: './assets/img/items/ashwoodBow.png',
     value: 1200,
@@ -117,6 +118,7 @@ export const WeaponsItemsData: Partial<Record<ItemID, Item>> = {
   },
   [ItemID.magicStaff]: {
     id: ItemID.magicStaff,
+    unique: true,
     tier: ItemTier.uncommon,
     url: './assets/img/items/magicStaff.png',
     value: 800,

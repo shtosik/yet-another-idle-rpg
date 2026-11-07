@@ -46,6 +46,14 @@ export class BattleNavBarComponent {
   currentZone = this.battleStore.currentZoneData
   currentKillCount = this.battleManagerService.currentWaveKillCount
 
+  readonly waveProgressPercent = computed(() => {
+    const run = this.arenaRun()
+    const kills = run ? run.waveKills : this.currentKillCount()
+    const required = run ? this.arenaWaveKills() : this.requiredKillCount()
+    if (required <= 0) return 0
+    return Math.min(100, Math.round(kills / required * 100))
+  })
+
   killCountToShow = computed(() => {
     const current = this.currentKillCount()
     const required = this.requiredKillCount()

@@ -1,65 +1,83 @@
-@use 'variables'
+@use 'palette'
+@use 'variables' as vars
 
 :host
   position: absolute
-  top: 47%
-  right: 1rem
+  z-index: 2
+  top: 50%
+  right: 0.5rem
   transform: translateY(-50%)
 
-  aside
-    display: flex
-    flex-direction: column
-    gap: 0.5rem
+aside, .button-group
+  display: flex
+  flex-direction: column
+  gap: 0.375rem
 
-  .wave-button
-    border: none
-    background: none
-    cursor: pointer
-    transition: filter 0.2s ease-in-out
+.button-group + .button-group
+  margin-top: 0.375rem
+  padding-top: 0.625rem
+  border-top: 1px solid #eab30855
 
-    &:hover
-      filter: brightness(90%)
+button
+  position: relative
+  display: flex
+  align-items: center
+  justify-content: center
+  width: 2.5rem
+  height: 2.5rem
+  border: 1px solid #81725a
+  border-radius: vars.$panelBorderRadius
+  background: #202020ed
+  box-shadow: 0 2px 0 #0008
+  cursor: pointer
+  transition: transform 100ms ease, background-color 100ms ease
 
-    &:active
-      img
-        transform: scale(0.8)
+  img
+    object-fit: contain
+    image-rendering: pixelated
 
-    img
-      object-fit: contain
-      transition: transform .2s ease-in-out
+  &:hover:not(:disabled), &:focus-visible
+    border-color: palette.$yellow
+    background: #39342a
+    outline: 2px solid palette.$yellow
+    outline-offset: 2px
 
-    &.hidden
-      visibility: hidden
+  &:active:not(:disabled)
+    transform: translateY(2px)
+    box-shadow: none
 
-  .auto-button
-    padding: 0
-    margin: 0
-    width: 32px
-    height: 32px
-    border: 1px solid #1a1a1a
-    border-radius: 4px
-    cursor: pointer
-    transition: background-color, filter 0.2s ease
-    box-shadow: variables.$panelShadow
-    background-color: #39383f
-    display: flex
-    align-items: center
-    justify-content: center
-    filter: brightness(0.7)
+  &:disabled
+    opacity: 0.35
+    cursor: not-allowed
 
-    &:hover
-      filter: brightness(0.9)
+.wave-arrow
+  width: 1.25rem
+  height: 1.25rem
+  background: palette.$yellow
+  clip-path: polygon(50% 0, 100% 50%, 65% 50%, 65% 100%, 35% 100%, 35% 50%, 0 50%)
 
-    &.active
-      background-color: #2c7528
+  &--down
+    transform: rotate(180deg)
 
-      &:not(:hover)
-        filter: none
+.auto-button
+  &::after
+    content: ''
+    position: absolute
+    right: 3px
+    bottom: 3px
+    width: 5px
+    height: 5px
+    border-radius: 50%
+    background: #a3a3a3
+    box-shadow: 0 0 0 2px #171717
 
-    img
-      object-fit: contain
-      transition: transform 0.15s ease
+  &[aria-pressed="true"]
+    border-color: #86efac
+    background: #204226
 
-    &:active
-      img
-        transform: scale(0.9)
+    &::after
+      background: #86efac
+
+@media (prefers-reduced-motion: reduce)
+  button
+    transition: none

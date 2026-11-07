@@ -1,0 +1,11 @@
+@if (earnedTitles().length > 0) {
+  <label class="title-picker">
+    <span class="title-picker__label">{{ 'app:titles.label' | i18next }}</span>
+    <select class="title-picker__select" (change)="select($any($event.target).value)">
+      <option value="" [selected]="selectedTitle() === null">{{ 'app:titles.none' | i18next }}</option>
+      @for (id of earnedTitles(); track id) {
+        <option [value]="id" [selected]="selectedTitle() === id">{{ 'app:titles.' + TitleID[id] | i18next }}</option>
+      }
+    </select>
+  </label>
+}

@@ -63,5 +63,22 @@
   "questCompleted": {
     "message": "No help needed at the moment! I'm busy moving my merchandise back into the cellar.",
     "opt1": "Alright, see you later."
+  },
+  "questSafePassage": {
+    "message": "Aye, and it's a proper job, for someone the whole village trusts. That troll and his goblins on the Mountain Pass turn back every cart I send to Mawood. Clear the road and I'll open the finest trade route this side of the mountains!",
+    "opt1": "A new market? I'll clear the road.",
+    "opt2": "Not today."
+  },
+  "questSafePassageProgress": {
+    "message": "The troll three times, and forty of those scavengers. Carts don't argue with goblins, and neither do I.",
+    "opt1": "Working on it."
+  },
+  "questSafePassageStep1Complete": {
+    "message": "The road's clear? Then the first crate of salt fish goes up today, aye! Find Sylvie at the apothecary in Mawood and tell her La Harpar is open for business.",
+    "opt1": "I'll tell her."
+  },
+  "questSafePassageStep2": {
+    "message": "Off to Mawood with you. Sylvie, at the apothecary. And don't eat the salt fish on the way.",
+    "opt1": "On my way."
   }
 }

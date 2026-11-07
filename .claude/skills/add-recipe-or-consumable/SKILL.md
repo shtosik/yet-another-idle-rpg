@@ -34,4 +34,4 @@ Do the steps that apply: a food or potion usually needs 1, 2, 3 and 5; a crafted
 
 5. **Ingredients reachable** — every `itemsNeeded` item has a source (drop, shop, or another recipe).
 
-Done when `npm run validate` and `npx ng build` pass, and in the dev server the recipe shows at the right station level, crafts, and (for consumables) the effect applies and expires.
+Done when `npm run check` passes, and in the dev server the recipe shows at the right station level, crafts, and (for consumables) the effect applies and expires.

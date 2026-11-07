@@ -29,7 +29,7 @@ Battle nodes read in code: `autoWaveProgression`, `autoEat`, `weaknesses`, `spel
 - **Overkill** (node exists, `maxLevel` 4, no effect yet): overflow damage, or the kill itself, lets the player hit the next monster sooner instead of waiting for the 2 s respawn delay (`RESPAWN_DELAY_IN_MS`, see `game-loop-and-combat.md`). Implementation approach still open.
 
 ## Invariants & gotchas
-- Saved state is `PlayerState.unlockedNodes` (`SkillNodeID` → level). Skill points are the `unspentSkillPoints` stat.
+- Saved state is `PlayerState.unlockedNodes` (`SkillNodeID` → level). Skill points are the `unspentSkillPoints` stat. Sources: 1 per character level, Skill Point Books and quest rewards, and 1 per profession expertise level gained (Farming levels 2 to 30, paid once through `pointsPaidLevel`; see `player-stats-inventory-equipment.md`). A respec refunds only what nodes cost.
 - Stat nodes are read from `unlockedNodes` by the derived `stats`; buy and refund only change the level (see `player-stats-inventory-equipment.md`).
 - `skillPointCost` is per level. `levelsRefunded` counts levels, not points.
 - Every node needs `skill-tree:nodes.<key>.name` and `.desc`, and an icon under `assets/img/skills/` (`npm run validate` checks).
@@ -44,3 +44,5 @@ Battle nodes read in code: `autoWaveProgression`, `autoEat`, `weaknesses`, `spel
 A stat node with `statPercent: true` scales the stat by `statAmount` per level after flat modifiers (`manaRegen`: 10% faster regen per level).
 
 New node: append a `SkillNodeID` in the branch's range, add the node to the branch's map in `skill-tree-data.ts` with `requires` pointing at its parent, add i18n and icon. For a `battle` node, read it with `hasSkillUnlocked(SkillNodeID.x)` where the mechanic lives.
+
+Volley is a 2-point, single-level damage spell node alongside Double Attack, requiring Crit Multi level 5. It fans out by 45 degrees and uses the generated Volley icon. Learning and refunding follow the usual spell-node rules.

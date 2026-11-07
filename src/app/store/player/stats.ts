@@ -1,5 +1,5 @@
 import { PlayerStat } from '../../../types/player/player-stat.type'
-import { EquipmentItem, isConsumableItem } from '../../../interfaces/item.interface'
+import { isConsumableItem } from '../../../interfaces/item.interface'
 import { EquipmentType } from '../../../interfaces/player/equipment.type'
 import { UnlockedNodes } from '../../../types/player/unlocked-nodes.type'
 import { SkillNodeID } from '../../../enums/ids/skill-node-id.enum'
@@ -11,9 +11,13 @@ import { ALL_SKILLS } from '../../../data/skill-tree-data'
 import ITEM_DATA from '../../../data/items-data'
 import SPELLS_DATA from '../../../data/spells-data'
 import { statsInitialState } from './player'
+import { ItemType } from '../../../enums/items/item-type.enum'
 import { SpellID } from '../../../enums/ids/spell-id.enum'
 import { ItemID } from '../../../enums/ids/item-id.enum'
 import type { InventoryTab } from './inventory'
+import PROFESSIONS_DATA from '../../../data/professions-data'
+import { ProfessionID } from '../../../enums/ids/profession-id.enum'
+import { UPGRADE_BONUS_PER_LEVEL, UPGRADE_MILESTONE_BONUS, UPGRADE_MILESTONE_LEVEL } from '../../../data/upgrade-data'
 
 export type PlayerStatsType = Record<PlayerStat, number>
 
@@ -37,7 +41,7 @@ const INVERTED_STATS = new Set<PlayerStat>(['attackSpeed', 'manaRegenRate', 'sho
 export const isInvertedStat = (stat: PlayerStat): boolean => INVERTED_STATS.has(stat)
 
 /** Where a stat modifier comes from; the stats panel breaks each stat down by these. */
-export type StatSource = 'equipment' | 'skills' | 'buffs' | 'consumables' | 'bonuses' | 'mastery'
+export type StatSource = 'equipment' | 'skills' | 'buffs' | 'consumables' | 'bonuses' | 'mastery' | 'expertise'
 export type SourcedModifiers = Record<StatSource, StatModifier[]>
 
 export interface StatContribution {
@@ -74,10 +78,24 @@ export const isResourceStat = (stat: PlayerStat): stat is ResourceStat =>
 export const initialResources = (): Resources =>
   Object.fromEntries(RESOURCE_STATS.map(stat => [stat, statsInitialState[stat]])) as Resources
 
+/** Preserve fractional stat units and round away float drift; +0 keeps the original amount exactly. */
+export function upgradedStatAmount(amount: number, upgradeLevel = 0): number {
+  if (upgradeLevel === 0) return amount
+  let scale = 1 + UPGRADE_BONUS_PER_LEVEL * upgradeLevel
+  if (upgradeLevel >= UPGRADE_MILESTONE_LEVEL) scale += UPGRADE_MILESTONE_BONUS
+  return round(amount * scale)
+}
+
+/** Shared by derived stats and the capacity checks for equipping/swapping one piece. */
+export function gearModifiers(equipped: { id: ItemID, upgradeLevel?: number } | null): StatModifier[] {
+  if (!equipped) return []
+  const item = ITEM_DATA[equipped.id]
+  if (item.type !== ItemType.equipment) return []
+  return item.stats.map(s => ({ stat: s.id, amount: upgradedStatAmount(s.amount, equipped.upgradeLevel) }))
+}
+
 export const equipmentModifiers = (equipment: EquipmentType): StatModifier[] =>
-  Object.values(equipment).flatMap(equipped =>
-    equipped ? ((ITEM_DATA[equipped.id] as EquipmentItem).stats ?? []).map(s => ({ stat: s.id, amount: s.amount })) : [],
-  )
+  Object.values(equipment).flatMap(gearModifiers)
 
 export const skillNodeModifiers = (unlockedNodes: UnlockedNodes): StatModifier[] =>
   Object.entries(unlockedNodes).flatMap(([id, level]) => {
@@ -102,14 +120,55 @@ export const buffModifiers = (spellIds: SpellID[]): StatModifier[] =>
     return { stat, amount, percent }
   })
 
-export const consumableModifiers = (itemIds: ItemID[]): StatModifier[] =>
+/** Food stats count `foodMultiplier` times (`foodEffectMultiplier`); potions are not scaled. */
+export const consumableModifiers = (itemIds: ItemID[], foodMultiplier = 1): StatModifier[] =>
   itemIds.flatMap(itemId => {
     const itemData = ITEM_DATA[itemId]
-    return isConsumableItem(itemData) ? (itemData.effect.stats ?? []) : []
+    if (!isConsumableItem(itemData)) return []
+    const scale = itemData.type === ItemType.food ? foodMultiplier : 1
+    return (itemData.effect.stats ?? []).map(m => ({ ...m, amount: m.amount * scale }))
   })
+
+/** `foodEffectMultiplier` from these modifiers, read before the food it scales (only gear gives it). */
+export const foodMultiplierOf = (modifiers: StatModifier[]): number =>
+  modifiers
+    .filter(m => m.stat === 'foodEffectMultiplier')
+    .reduce((total, m) => total + m.amount, statsInitialState.foodEffectMultiplier)
 
 export const bonusModifiers = (bonuses: Partial<Record<PlayerStat, number>>): StatModifier[] =>
   (Object.entries(bonuses) as [PlayerStat, number][]).map(([stat, amount]) => ({ stat, amount }))
+
+/**
+ * What a profession's levels above `from` up to `to` grant: the level's milestone, else the per-level reward, which stops at its
+ * cap. Derived from the level alone (ADR 0002), so respecs, reloads and rebalances can't drift it.
+ */
+function expertiseGrants(id: ProfessionID, from: number, to: number): StatModifier[] {
+  const { milestones, perLevel, perLevelTotalCap } = PROFESSIONS_DATA[id]
+  const modifiers: StatModifier[] = []
+  let perLevelTotal = 0
+  for (let level = 2; level <= to; level++) {
+    const milestone = milestones[level]
+    if (milestone) {
+      if (level > from) modifiers.push({ ...milestone })
+    } else {
+      const amount = round(Math.min(perLevel.amount, perLevelTotalCap - perLevelTotal))
+      perLevelTotal += amount
+      if (level > from && amount > 0) modifiers.push({ stat: perLevel.stat, amount })
+    }
+  }
+  return modifiers
+}
+
+/** Stats granted by each profession's current level (`professionLevels`: 0 or missing = locked). */
+export const expertiseModifiers = (professionLevels: Partial<Record<ProfessionID, number>>): StatModifier[] =>
+  (Object.keys(PROFESSIONS_DATA).map(Number) as ProfessionID[]).flatMap(id => expertiseGrants(id, 1, professionLevels[id] ?? 0))
+
+/** What going from level `from` to `to` adds, per stat (for the level-up toast). */
+export function expertiseGain(id: ProfessionID, from: number, to: number): StatModifier[] {
+  const gained = new Map<PlayerStat, number>()
+  for (const { stat, amount } of expertiseGrants(id, from, to)) gained.set(stat, round((gained.get(stat) ?? 0) + amount))
+  return [...gained].map(([stat, amount]) => ({ stat, amount }))
+}
 
 /** Base stats plus every modifier, with saved resources on top. Mana never shows above `maxMana`. */
 export function deriveStats(resources: Resources, modifiers: StatModifier[]): PlayerStatsType {

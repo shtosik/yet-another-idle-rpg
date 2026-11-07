@@ -23,14 +23,15 @@
 
     @if (sellable().length) {
       <ul class="shop__grid">
-        @for (entry of sellable(); track entry.slot.id + '-' + entry.slot.tier) {
+        @for (entry of sellable(); track entry.slot.id + '-' + entry.slot.tier + '-' + (entry.slot.upgradeLevel ?? 0)) {
           <li>
-            <button type="button" class="shop__item" [attr.aria-label]="sellLabel(entry.slot.id, entry.price, entry.preferred)"
+            <button type="button" class="shop__item" [attr.aria-label]="sellLabel(entry.slot.id, entry.price, entry.preferred, entry.slot.upgradeLevel)"
                     (click)="sellItem(entry.slot, $event)">
               <app-slot>
                 <app-inventory-slot
                   [item]="entry.itemData"
                   [tier]="entry.slot.tier"
+                  [upgradeLevel]="entry.slot.upgradeLevel ?? 0"
                   [amount]="entry.slot.amount"
                   [clickable]="false"
                 />
@@ -63,9 +64,9 @@
               [class.shop__item--sold-out]="reason === 'stock'"
               [class.shop__item--cant-afford]="reason === 'currency'"
               [class.shop__item--full]="reason === 'inventory'"
-              [class.shop__item--locked]="reason === 'rank' || reason === 'station'"
+              [class.shop__item--locked]="reason === 'rank' || reason === 'reputation' || reason === 'station'"
               [attr.aria-label]="buyLabel(i, reason)"
-              [attr.title]="reason === 'inventory' ? buyLabel(i, reason) : null"
+              [attr.title]="reason === 'inventory' || reason === 'reputation' ? buyLabel(i, reason) : null"
               (click)="buyItem(i, $event)"
             >
               <app-slot>
@@ -79,6 +80,12 @@
                 <span class="shop__lock" aria-hidden="true">
                   <img alt="" height="10" ngSrc="./assets/img/icons/lock.svg" width="10">
                   {{ 'shop:ui.rankShort' | i18next: { rank: entry.staticItem.minRank } }}
+                </span>
+              }
+              @if (reason === 'reputation') {
+                <span class="shop__lock" aria-hidden="true">
+                  <img alt="" height="10" ngSrc="./assets/img/icons/lock.svg" width="10">
+                  {{ tierName(entry.staticItem.minReputation!.tier) }}
                 </span>
               }
               @if (reason === 'station') {

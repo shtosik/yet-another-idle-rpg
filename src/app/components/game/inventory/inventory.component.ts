@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common'
-import { ChangeDetectionStrategy, Component, computed, ElementRef, inject, signal, viewChildren } from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, ElementRef, inject, linkedSignal, signal, viewChildren } from '@angular/core'
+import { TownsStore } from '../../../store/towns/towns.store'
 import { SlotComponent } from 'app/components/shared/slot/slot.component'
 import ITEM_DATA from 'data/items-data'
 import { InventoryItem, isConsumableItem } from 'interfaces/item.interface'
@@ -9,7 +10,8 @@ import { ItemType } from '../../../../enums/items/item-type.enum'
 import { BattleManagerService } from '../../../services/battle-manager.service'
 import { ModalService } from '../../../services/modal.service'
 import { countFreeSlots, INVENTORY_PAGE_SIZE, INVENTORY_TABS, InventoryTab, pageCount, SLOT_TABS } from '../../../store/player/inventory'
-import { missingSlotsText } from './tab-text'
+import { missingSlotsText, tabName } from './tab-text'
+import i18next from 'i18next'
 import { firstValueFrom } from 'rxjs'
 import { needsDestroyConfirm, SettingsStore } from '../../../store/settings/settings.store'
 import { I18nextPipe } from '../../../pipes/i18next.pipe'
@@ -29,7 +31,11 @@ export class InventoryWindow {
   private battleManagerService = inject(BattleManagerService)
   private modalService = inject(ModalService)
   private settingsStore = inject(SettingsStore)
-  tab = signal<InventoryTab>('gear')
+  readonly forgeOpen = inject(TownsStore).forgeOpen
+  tab = linkedSignal<InventoryTab>(() => {
+    this.forgeOpen()
+    return 'gear'
+  })
   inventory = computed(() => this.playerStore.inventory()[this.tab()])
   private tabButtons = viewChildren<ElementRef<HTMLButtonElement>>('tabButton')
 
@@ -70,13 +76,24 @@ export class InventoryWindow {
   readonly Items = ITEM_DATA
   protected readonly ItemType = ItemType
 
+  tabTitle(tab: InventoryTab, full: boolean): string | null {
+    if (this.forgeOpen() && tab !== 'gear') return i18next.t('forge:tabsLocked')
+    if (full) return i18next.t('app:inventory.tabFull', { tab: tabName(tab) })
+    return null
+  }
+
   selectTab(tab: InventoryTab) {
+    if (this.forgeOpen() && tab !== 'gear') return
     this.tab.set(tab)
     this.requestedPage.set(0)
   }
 
   /** Arrow keys, Home and End move between tabs (roving tabindex), as in the quests panel. */
   onTabKeydown(event: KeyboardEvent): void {
+    if (this.forgeOpen()) {
+      if (['ArrowRight', 'ArrowLeft', 'Home', 'End'].includes(event.key)) event.preventDefault()
+      return
+    }
     const index = INVENTORY_TABS.indexOf(this.tab())
     let next: number
     switch (event.key) {

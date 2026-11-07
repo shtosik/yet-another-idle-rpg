@@ -1,4 +1,18 @@
 {
+  "src/assets/img/avatars/farm/farmDrover.png": {
+    "family": "portrait-pixel",
+    "tier": null,
+    "subject": "a realistic lanky teenage boy with a mop of straw-coloured hair, freckles, big wary eyes and a half-shy smile, oversized stained leather apron, sleeves too long, twine and paper labels pinned to the front, a coil of rope over one shoulder, one consistent natural skin tone on face, neck and hands, fully opaque solid figure, bust with both shoulders fully in frame",
+    "seed": 1024684451,
+    "date": "2026-11-06"
+  },
+  "src/assets/img/avatars/farm/farmWarden.png": {
+    "family": "portrait-pixel",
+    "tier": null,
+    "subject": "a realistic weathered woman in her fifties, strong forearms, sun-bleached straw hat pushed back over grey-streaked brown hair, deep tan with sharp crow's feet, stern watchful expression with a trace of tired kindness, patched green work coat over a rolled-sleeve linen shirt, a ring of small brass keys at the belt, one consistent natural skin tone on face, neck and hands, fully opaque solid figure, bust with both shoulders fully in frame",
+    "seed": 182743594,
+    "date": "2026-11-06"
+  },
   "src/assets/img/avatars/laHarpar/laHarparBartender.png": {
     "family": "portrait-pixel",
     "tier": null,
@@ -40,6 +54,13 @@
     "subject": "a realistic broad heavy-set man in his fifties, bust, very thick neck, clean shaved bald head, a huge bushy grey walrus moustache and a clean-shaven chin, laughing with his mouth wide open in a booming grin, a sleeveless brown leather jerkin, one wide bright crimson red cloth sash with gold edging worn diagonally across the chest from shoulder to hip, bare heavy arms, one consistent natural skin tone on face, neck and arms, fully opaque solid figure, bust with both shoulders fully in frame",
     "seed": 7511,
     "date": "2026-10-27"
+  },
+  "src/assets/img/avatars/lirold/liroldPhurgo.png": {
+    "family": "portrait-pixel",
+    "tier": null,
+    "subject": "a single stocky fantasy dwarf blacksmith, waist-up, very wide and short, a big head sitting directly on massive shoulders with no neck, a huge bushy near-black beard with a few iron-grey streaks that covers his chest down to his belt, dark hair tied back, square face, heavy brows, calm brown eyes, a small reluctant smile, huge bare forearms with an old burn scar on one, rolled-up slate-blue shirt sleeves, a smoke-dark leather apron with copper rivets, his right hand resting on a plain flat-topped iron anvil in front of him, nothing else in his hands",
+    "seed": 7201,
+    "date": "2026-11-03"
   },
   "src/assets/img/avatars/mawood/mawoodBrenn.png": {
     "family": "portrait-pixel",
@@ -110,6 +131,13 @@
     "subject": "inside a large round stone colosseum: an empty flat sand fighting floor in the foreground seen from its edge, a low stone wall around the sand, a heavy iron portcullis gate set in the far stone wall, tiered stone stands rising all around with a small distant crowd only in the high stands, red and gold banners hanging from the top rim, bright daylight, nobody on the sand",
     "seed": 7702,
     "date": "2026-10-27"
+  },
+  "src/assets/img/backgrounds/liroldForge.png": {
+    "family": "town-painterly",
+    "tier": null,
+    "subject": "Interior of a blacksmith's forge with pale limestone walls and dark timber beams under a slate roof; at the back a big stone forge hearth with a hooded chimney and a large leather bellows, its coals cold and swept clean; in the centre a heavy black iron anvil on a tree stump; a quench barrel of water; racks of neatly hung hammers and tongs on the walls; a workbench with tidy rows of repaired tools; an empty iron hook by the door; empty room",
+    "seed": 7311,
+    "date": "2026-11-02"
   },
   "src/assets/img/backgrounds/mawood.png": {
     "family": "town-painterly",
@@ -472,6 +500,13 @@
     "shinySaturation": 4,
     "shinyBrightness": 1.2
   },
+  "src/assets/img/icons/forge-anvil.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "One squat forged iron blacksmith anvil with a single horn pointing left, worn bronze highlights along its upper edge",
+    "seed": 531180,
+    "date": "2026-11-03"
+  },
   "src/assets/img/items/ambushScroll.png": {
     "family": "item-pixel",
     "tier": null,
@@ -485,6 +520,13 @@
     "subject": "a thick gnarled chunk of old pale wood log with deep bark ridges and rings, single object",
     "seed": 535645451,
     "date": "2026-10-17"
+  },
+  "src/assets/img/items/appleSeeds.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "Four small flat glossy dark brown seeds, each a smooth teardrop shape pointed at one end, like watermelon seeds, loosely grouped, nothing else.",
+    "seed": 31,
+    "date": "2026-11-06"
   },
   "src/assets/img/items/apprenticeRobe.png": {
     "family": "item-pixel",
@@ -563,6 +605,20 @@
     "seed": 1199052729,
     "date": "2026-10-17"
   },
+  "src/assets/img/items/canopyBlossom.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single large pink and purple blossom flower with a short green stem and two leaves",
+    "seed": 414108048,
+    "date": "2026-11-06"
+  },
+  "src/assets/img/items/canopyBlossomSeeds.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "Exactly four loose seeds in a small pile, no container, no bag, nothing else. Each seed is a light feathery winged seed in gold and pink.",
+    "seed": 1598183456,
+    "date": "2026-11-06"
+  },
   "src/assets/img/items/cheesePlatter.png": {
     "family": "item-pixel",
     "tier": null,
@@ -633,6 +689,20 @@
     "seed": 786,
     "date": "2026-10-26"
   },
+  "src/assets/img/items/farmersBread.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single round loaf of crusty golden brown bread with three slashes on top",
+    "seed": 922261755,
+    "date": "2026-11-06"
+  },
+  "src/assets/img/items/farmersBreadRecipe.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single tall beige parchment scroll with curled rolled top and bottom and a red ribbon, with a small brown ink drawing of a loaf of bread in the centre, nothing else",
+    "seed": 154510449,
+    "date": "2026-11-06"
+  },
   "src/assets/img/items/firePit.png": {
     "family": "item-pixel",
     "tier": null,
@@ -660,6 +730,34 @@
     "subject": "one open-faced gladiator helmet of polished bronze with an iron brow band and cheek guards, a short crimson horsehair crest running along the top, a single small white feather tucked at one side, a few small dents in the metal, empty inside, no head",
     "seed": 502902317,
     "date": "2026-10-30"
+  },
+  "src/assets/img/items/glowcap.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single mushroom with a glowing pale blue cap and a short white stem",
+    "seed": 2026832767,
+    "date": "2026-11-06"
+  },
+  "src/assets/img/items/glowcapElixir.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single round glass flask with a cork stopper filled with glowing blue liquid and a tiny mushroom inside",
+    "seed": 1349597912,
+    "date": "2026-11-06"
+  },
+  "src/assets/img/items/glowcapElixirRecipe.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single tall beige parchment scroll with curled rolled top and bottom and a red ribbon, with a small brown ink drawing of a flask in the centre, nothing else",
+    "seed": 1615500117,
+    "date": "2026-11-06"
+  },
+  "src/assets/img/items/glowcapSpores.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "Exactly four loose spore pods in a small pile, no container, no bag, nothing else. Each pod is tiny, glowing teal blue-green, with a few glowing teal dots around.",
+    "seed": 54359095,
+    "date": "2026-11-06"
   },
   "src/assets/img/items/gnollCleaver.png": {
     "family": "item-pixel",
@@ -689,12 +787,33 @@
     "seed": 200018096,
     "date": "2026-10-26"
   },
+  "src/assets/img/items/greaterManaPotion.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "one large round glass flask with a cork stopper, filled with deep-blue liquid with faint silver sparkles",
+    "seed": 2256485,
+    "date": "2026-10-31"
+  },
+  "src/assets/img/items/greaterManaPotionRecipe.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "one flat open parchment sheet with rolled-up top and bottom edges, a small blue round potion flask symbol drawn in the middle, a few lines of scribbles below it",
+    "seed": 77123,
+    "date": "2026-10-31"
+  },
   "src/assets/img/items/grilledFish.png": {
     "family": "item-pixel",
     "tier": null,
     "subject": "one whole roasted fish pierced lengthwise by a plain wooden stick, deep amber-brown cooked skin with several thick black char stripes across its body, crispy blackened tail and fins, nothing else",
     "seed": 7331,
     "date": "2026-10-21"
+  },
+  "src/assets/img/items/guildLetter.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single folded cream letter sealed with a green wax seal showing a wheat ear",
+    "seed": 860736476,
+    "date": "2026-11-06"
   },
   "src/assets/img/items/harpyCrown.png": {
     "family": "item-pixel",
@@ -709,6 +828,34 @@
     "subject": "a single long feather, teal and brown with a pale quill, single object",
     "seed": 1114497759,
     "date": "2026-10-17"
+  },
+  "src/assets/img/items/harvestPie.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single whole round pie with a golden lattice crust in a tin dish",
+    "seed": 1818001170,
+    "date": "2026-11-06"
+  },
+  "src/assets/img/items/harvestPieRecipe.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single tall beige parchment scroll with curled rolled top and bottom and a red ribbon, with a small brown ink drawing of a round pie in the centre, nothing else",
+    "seed": 596485508,
+    "date": "2026-11-06"
+  },
+  "src/assets/img/items/heartroot.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single heart-shaped red root vegetable with thin root tendrils and a few green leaves",
+    "seed": 679085502,
+    "date": "2026-11-06"
+  },
+  "src/assets/img/items/heartrootSeeds.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "Exactly four loose seeds in a small pile, no container, no bag, nothing else. Each seed is a knobbly red-brown nut.",
+    "seed": 1280661006,
+    "date": "2026-11-06"
   },
   "src/assets/img/items/heartwoodAmulet.png": {
     "family": "item-pixel",
@@ -794,6 +941,20 @@
     "seed": 1581558275,
     "date": "2026-10-21"
   },
+  "src/assets/img/items/mushroomStew.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single wooden bowl of dark brown stew with sliced mushrooms",
+    "seed": 825978071,
+    "date": "2026-11-06"
+  },
+  "src/assets/img/items/mushroomStewRecipe.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single tall beige parchment scroll with curled rolled top and bottom and a red ribbon, with a small brown ink drawing of a mushroom in the centre, nothing else",
+    "seed": 791054603,
+    "date": "2026-11-06"
+  },
   "src/assets/img/items/mysticHood.png": {
     "family": "item-pixel",
     "tier": null,
@@ -807,6 +968,41 @@
     "subject": "a pair of fine crimson leather gloves with round gold coin studs along the cuffs and gold stitching",
     "seed": 1491485296,
     "date": "2026-10-27"
+  },
+  "src/assets/img/items/petFarmingGuildHare.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single brown hare sitting, with long upright ears and a small green scarf, alone",
+    "seed": 43133891,
+    "date": "2026-11-06"
+  },
+  "src/assets/img/items/petLaHarparCat.png": {
+    "family": "enemy-pixel",
+    "tier": "small",
+    "subject": "a single scruffy ginger tabby cat alone, sitting upright on its haunches, exactly four legs, one head, two eyes, one torn ear, white chest fur, smug half-closed eyes, a small fish bone held in its mouth",
+    "seed": 1343676971,
+    "date": "2026-11-01"
+  },
+  "src/assets/img/items/petMawoodMoth.png": {
+    "family": "enemy-pixel",
+    "tier": "small",
+    "subject": "a single large pale moth alone, exactly four soft silver-white wings veined with bright glowing pale-green lines, a fluffy white body, two feathery antennae",
+    "seed": 4242,
+    "date": "2026-11-01"
+  },
+  "src/assets/img/items/phurgosForgeTongs.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "One pair of heavy dark iron blacksmith tongs shaped like scissors, two long straight handles crossing at a single round rivet near one end, short thick gripping jaws with a square notch, a small round stamp pressed into one handle",
+    "seed": 7313,
+    "date": "2026-11-02"
+  },
+  "src/assets/img/items/rootwalkerBoots.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single pair of soft dark-green leather boots wrapped with thin brown root tendrils, small glowing silver-green runes on the shafts",
+    "seed": 1636038567,
+    "date": "2026-10-31"
   },
   "src/assets/img/items/rootwoodStaff.png": {
     "family": "item-pixel",
@@ -835,6 +1031,34 @@
     "subject": "a pair of pale white silk leggings laid flat, empty, with a drawstring waist",
     "seed": 790,
     "date": "2026-10-26"
+  },
+  "src/assets/img/items/silverleaf.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single sprig of three silver-grey leaves on a thin green stem",
+    "seed": 265617480,
+    "date": "2026-11-06"
+  },
+  "src/assets/img/items/silverleafSeeds.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "Exactly four loose seeds in a small pile, no container, no bag, nothing else. Each seed is tiny, oval, pale silvery-green.",
+    "seed": 1352806162,
+    "date": "2026-11-06"
+  },
+  "src/assets/img/items/silverleafTonic.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single small glass bottle with a cork stopper filled with silvery green liquid and a silver leaf",
+    "seed": 219175584,
+    "date": "2026-11-06"
+  },
+  "src/assets/img/items/silverleafTonicRecipe.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single tall beige parchment scroll with curled rolled top and bottom and a red ribbon, with a small brown ink drawing of a leaf in the centre, nothing else",
+    "seed": 1708996818,
+    "date": "2026-11-06"
   },
   "src/assets/img/items/silverwoodChestplate.png": {
     "family": "item-pixel",
@@ -905,6 +1129,34 @@
     "seed": 790,
     "date": "2026-10-26"
   },
+  "src/assets/img/items/turnip.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single round white and purple turnip with a short green leafy top",
+    "seed": 1664262493,
+    "date": "2026-11-06"
+  },
+  "src/assets/img/items/turnipSeeds.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "Five tiny round dark purple seeds scattered loosely together, each a small dark sphere, nothing else.",
+    "seed": 777,
+    "date": "2026-11-06"
+  },
+  "src/assets/img/items/turnipStew.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single wooden bowl of creamy stew with chunks of turnip and a wooden spoon",
+    "seed": 1401980870,
+    "date": "2026-11-06"
+  },
+  "src/assets/img/items/turnipStewRecipe.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single tall beige parchment scroll with curled rolled top and bottom and a red ribbon, with a small brown ink drawing of a bowl of stew in the centre, nothing else",
+    "seed": 1754913761,
+    "date": "2026-11-06"
+  },
   "src/assets/img/items/venison.png": {
     "family": "item-pixel",
     "tier": null,
@@ -918,6 +1170,27 @@
     "subject": "one browned roast meat joint with a short white bone sticking out of one end, one red apple beside it, nothing underneath",
     "seed": 1268499607,
     "date": "2026-10-21"
+  },
+  "src/assets/img/items/wharfRunnersBoots.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single pair of sturdy brown leather sea boots with white salt stains, brass buckles, rope lacing at the shin and sea-blue trim at the cuffs",
+    "seed": 1399112550,
+    "date": "2026-10-31"
+  },
+  "src/assets/img/items/wheat.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single small bundle of golden wheat stalks tied with string",
+    "seed": 1224195693,
+    "date": "2026-11-06"
+  },
+  "src/assets/img/items/wheatSeeds.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "Five loose golden-yellow wheat kernels, each a short plump oval grain with a thin center line, in a small pile, nothing else.",
+    "seed": 777,
+    "date": "2026-11-06"
   },
   "src/assets/img/skills/airMastery.png": {
     "family": "skill-icon",
@@ -1024,6 +1297,13 @@
     "seed": 1215728485,
     "date": "2026-10-25"
   },
+  "src/assets/img/skills/volley.png": {
+    "family": "skill-icon",
+    "tier": null,
+    "subject": "three arrows flying upward right, solid triangular steel arrowheads with sharp corners and flat metal facets, long wooden shafts, teal textured painted background with gold speed streaks, bold dark ink strokes",
+    "seed": 1000949156,
+    "date": "2026-11-04"
+  },
   "src/assets/img/skills/warCry.png": {
     "family": "skill-icon",
     "tier": null,
@@ -1037,5 +1317,21 @@
     "subject": "a round bronze medallion seen straight on, with a glowing blue water droplet symbol embossed in its centre, on a dark blue background",
     "seed": 424242,
     "date": "2026-10-25"
+  },
+  "src/assets/img/ui/forge-workbench.png": {
+    "family": "town-painterly",
+    "tier": null,
+    "subject": "Close overhead view of a blacksmith workbench surface, broad worn dark oak planks filling the entire frame, thick forged iron edging with bronze rivets around the perimeter, small hammer and iron tongs resting along the far upper edge, broad empty central working surface, warm reflected ember light at the edges, no people, no lettering",
+    "seed": 531170,
+    "date": "2026-11-03",
+    "export": {
+      "width": 960,
+      "height": 536,
+      "format": "png",
+      "palette": true,
+      "colours": 256,
+      "dither": 0.6,
+      "effort": 10
+    }
   }
 }

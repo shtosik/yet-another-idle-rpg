@@ -1,6 +1,4 @@
-import { EquipmentSlotKey } from 'enums/equipment-slot.enum'
-import { ItemID } from 'enums/ids/item-id.enum'
-import { ItemTier } from 'enums/items/item-tier.enum'
+import { EquipmentType } from 'interfaces/player/equipment.type'
 import type { PlayerStatsType } from './stats'
 
 export const statsInitialState: PlayerStatsType = {
@@ -12,6 +10,7 @@ export const statsInitialState: PlayerStatsType = {
     // gold
     goldCoins: 0,
     goldCoinsMultiplier: 1,
+    foodEffectMultiplier: 1,
     // attack
     attackPower: 1,
     attackSpeed: 3,
@@ -45,8 +44,17 @@ export const statsInitialState: PlayerStatsType = {
     // Exploration Guild
     maxTaskSlots: 1,
     taskDoubleKillChance: 0, // percent: chance a kill counts twice toward tasks
+    upgradedDropChance: 0, // percent: chance non-unique gear (excluding pets) drops at +1
     // Offline progress: fraction of the online kill rate earned while away
     offlineProgressRate: 0.5,
+    // farming (additive fractions: 0.1 = 10%); sources are Farming expertise and the Exalted pet
+    seedGrowthTimeReduction: 0,
+    farmDoubleHarvestChance: 0,
+    farmSeedSaveChance: 0,
+    farmBonusCropChance: 0,
+    turnInCooldownReduction: 0,
+    farmXpMultiplier: 0,
+    seedDropChance: 0,
     // damage vs enemy type (additive, fraction: 0.2 = +20% of total damage)
     damageVsCrab: 0,
     damageVsBird: 0,
@@ -72,7 +80,7 @@ export const statsInitialState: PlayerStatsType = {
     damageVsHarpy: 0,
 }
 
-export const initialEquipmentState: Record<EquipmentSlotKey, { id: ItemID, tier: ItemTier } | null> = {
+export const initialEquipmentState: EquipmentType = {
     weapon: null,
     cape: null,
     belt: null,

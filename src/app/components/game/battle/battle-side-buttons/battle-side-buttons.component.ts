@@ -1,4 +1,5 @@
-import { Component, computed, inject } from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core'
+import { I18nextPipe } from '../../../../pipes/i18next.pipe'
 import { BattleStore } from '../../../../store/battle/battle.store'
 import { BattleManagerService } from '../../../../services/battle-manager.service'
 import { NgOptimizedImage } from '@angular/common'
@@ -9,9 +10,11 @@ import { PlayerStore } from '../../../../store/player/player.store'
   selector: 'app-battle-side-buttons',
   imports: [
     NgOptimizedImage,
+    I18nextPipe,
   ],
   templateUrl: './battle-side-buttons.component.html',
   styleUrl: './battle-side-buttons.component.sass',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BattleSideButtonsComponent {
   private battleStore = inject(BattleStore)

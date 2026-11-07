@@ -15,11 +15,26 @@
     "rawMaterials": "Raw Materials",
     "warTrophies": "War Trophies",
     "feathersForAKite": "Feathers for a Kite",
-    "whatLurksAtTheTop": "What Lurks at the Top"
+    "whatLurksAtTheTop": "What Lurks at the Top",
+    "safePassage": "Safe Passage",
+    "lastOrders": "Last Orders",
+    "aCleanCure": "A Clean Cure",
+    "rootsAndRafters": "Roots and Rafters",
+    "theColdForge": "The Cold Forge",
+    "seedsFromTheTerrace": "Seeds from the Terrace",
+    "theFirstFurrow": "The First Furrow",
+    "wheatForTheGuild": "Wheat for the Guild",
+    "silverleafForSylvie": "Silverleaf for Sylvie",
+    "anOrchardAgain": "An Orchard Again",
+    "theGrowersTable": "The Growers' Table",
+    "marthasOrder": "Marta's Order",
+    "wicksOrder": "Wick's Order"
   },
   "requirements": {
+    "findItem": "Find {{ item }}",
     "waveKillCount": "{{ amount }} KC on wave {{ wave }} in {{ zone }}",
-    "wave": "{{ zone }} wave {{ wave }}"
+    "wave": "{{ zone }} wave {{ wave }}",
+    "professionLevel": "{{ profession }} expertise"
   },
   "panel": {
     "label": "Quest panel",
@@ -27,7 +42,6 @@
     "reputation": "Reputation",
     "ready": "Ready",
     "done": "Done",
-    "notDone": "Not yet",
     "pin": "Pin {{quest}} to the top",
     "unpin": "Unpin {{quest}}",
     "fightIn": "Fight in {{zone}}",
@@ -36,5 +50,33 @@
     "showCompleted": "Completed ({{count}})",
     "hideCompleted": "Hide completed ({{count}})",
     "reputationEmpty": "No reputation yet."
+  },
+  "reputation": {
+    "tiers": {
+      "neutral": "Neutral",
+      "friendly": "Friendly",
+      "honored": "Honored",
+      "revered": "Revered",
+      "exalted": "Exalted"
+    },
+    "reward": "+{{ amount }} {{ town }} reputation",
+    "townTier": "{{ town }} {{ tier }}",
+    "requires": "Requires {{ what }} — {{ current }}/{{ target }}",
+    "turnIn": "Hand over {{ amount }} {{ item }} (have {{ held }})",
+    "turnIn_kept": "Hand over {{ amount }} {{ item }} (have {{ held }}, {{ kept }} kept for quests)",
+    "tierUp": "{{ town }} now sees you as {{ tier }}",
+    "progressLabel": "{{ town }} reputation"
+  },
+  "steps": {
+    "theColdForge": {
+      "1": "Ask Ludo Crane at Lirold's Arena what happened to Phurgo's delivery cart.",
+      "2": "Recover Phurgo's Forge Tongs from Goblin Scavengers in the Mountain Pass and return them to Phurgo.",
+      "3": "Ask Marvin at the Exploration Guild in La Harpar to check Phurgo's old delivery record.",
+      "4": "Bring Phurgo one Fish & Apple Pie at Lirold's Forge.",
+      "5": "Bring Phurgo 10 Ancient Wood for charcoal at Lirold's Forge."
+    }
+  },
+  "professionXp": {
+    "reward": "+{{ amount }} {{ profession }} XP"
   }
 }

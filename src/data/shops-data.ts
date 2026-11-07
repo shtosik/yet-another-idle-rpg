@@ -3,6 +3,8 @@ import { ItemID } from '../enums/ids/item-id.enum'
 import { ItemTier } from '../enums/items/item-tier.enum'
 import { ItemType } from '../enums/items/item-type.enum'
 import { Shop } from '../types/shop/shop.type'
+import { ReputationID } from '../enums/reputation-id.enum'
+import { ReputationTier } from '../enums/reputation-tier.enum'
 
 const SHOPS_DATA: Record<ShopID, Shop> = {
   [ShopID.mawoodMagicShop]: {
@@ -16,6 +18,7 @@ const SHOPS_DATA: Record<ShopID, Shop> = {
       { itemId: ItemID.earthRuneRecipe, tier: ItemTier.uncommon,  price: 500,  maxStock: 1,  refreshable: false },
       { itemId: ItemID.magicStaff,      tier: ItemTier.uncommon,  price: 3000, maxStock: 1,  refreshable: false },
       { itemId: ItemID.mysticHood,      tier: ItemTier.uncommon,  price: 4000, maxStock: 1,  refreshable: false },
+      { itemId: ItemID.rootwalkerBoots, tier: ItemTier.rare,      price: 6000, maxStock: 1,  refreshable: false, minReputation: { reputationId: ReputationID.mawood, tier: ReputationTier.honored } },
     ],
     // A collector of the arcane: runes, gear and rare monster parts, nothing else.
     buys: [ItemType.resource, ItemType.equipment],
@@ -46,6 +49,9 @@ const SHOPS_DATA: Record<ShopID, Shop> = {
       { itemId: ItemID.earthRune,      tier: ItemTier.normal,    price: 20,   maxStock: 99, refreshable: true  },
       { itemId: ItemID.waterRune,      tier: ItemTier.normal,    price: 20,   maxStock: 99, refreshable: true  },
       { itemId: ItemID.fishApplePieRecipe, tier: ItemTier.uncommon, price: 300, maxStock: 1, refreshable: false },
+      { itemId: ItemID.cheese,             tier: ItemTier.normal,   price: 30,   maxStock: 99, refreshable: true,  minReputation: { reputationId: ReputationID.laHarpar, tier: ReputationTier.honored } },
+      { itemId: ItemID.venisonRoastRecipe, tier: ItemTier.uncommon, price: 300,  maxStock: 1,  refreshable: false, minReputation: { reputationId: ReputationID.laHarpar, tier: ReputationTier.honored } },
+      { itemId: ItemID.wharfRunnersBoots,  tier: ItemTier.rare,     price: 3000, maxStock: 1,  refreshable: false, minReputation: { reputationId: ReputationID.laHarpar, tier: ReputationTier.honored } },
     ],
     // A harbour trader: buys anything, pays best for the sea's catch and cooked food.
     sellMultipliers: {
@@ -64,6 +70,9 @@ const SHOPS_DATA: Record<ShopID, Shop> = {
     items: [
       { itemId: ItemID.mortarAndPestle, tier: ItemTier.uncommon, price: 800, maxStock: 1,  refreshable: false },
       { itemId: ItemID.vialOfWater,     tier: ItemTier.normal,   price: 15,  maxStock: 99, refreshable: true  },
+      { itemId: ItemID.minorManaPotion,         tier: ItemTier.normal,   price: 60,  maxStock: 20, refreshable: true,  minReputation: { reputationId: ReputationID.mawood, tier: ReputationTier.honored } },
+      { itemId: ItemID.greaterManaPotionRecipe, tier: ItemTier.uncommon, price: 300, maxStock: 1,  refreshable: false, minReputation: { reputationId: ReputationID.mawood, tier: ReputationTier.honored } },
+      { itemId: ItemID.glowcapElixirRecipe,     tier: ItemTier.rare,     price: 400, maxStock: 1,  refreshable: false },
     ],
     // Only ingredients and remedies; reagents and potions pay best.
     buys: [ItemType.resource, ItemType.potion, ItemType.food],
@@ -78,6 +87,18 @@ const SHOPS_DATA: Record<ShopID, Shop> = {
         [ItemID.ancientWood]: 1.5,
       },
     },
+  },
+  // Warden Marta: the only seeds ever sold (tiers 1-2) and two recipes; she buys nothing.
+  [ShopID.farmWardenShop]: {
+    id: ShopID.farmWardenShop,
+    nameKey: 'shop:names.farmWardenShop',
+    buys: [],
+    items: [
+      { itemId: ItemID.turnipSeeds,         tier: ItemTier.normal,   price: 20,  maxStock: 20, refreshable: true },
+      { itemId: ItemID.wheatSeeds,          tier: ItemTier.normal,   price: 60,  maxStock: 10, refreshable: true,  minReputation: { reputationId: ReputationID.farmingGuild, tier: ReputationTier.friendly } },
+      { itemId: ItemID.harvestPieRecipe,    tier: ItemTier.uncommon, price: 400, maxStock: 1,  refreshable: false, minReputation: { reputationId: ReputationID.farmingGuild, tier: ReputationTier.honored } },
+      { itemId: ItemID.mushroomStewRecipe,  tier: ItemTier.rare,     price: 600, maxStock: 1,  refreshable: false, minReputation: { reputationId: ReputationID.farmingGuild, tier: ReputationTier.revered } },
+    ],
   },
   [ShopID.explorersGuildStore]: {
     id: ShopID.explorersGuildStore,

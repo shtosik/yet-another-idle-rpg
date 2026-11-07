@@ -1,4 +1,4 @@
-<div class="zone-mastery">
+<div class="zone-mastery" role="group" [attr.aria-label]="'app:battle.mastery' | i18next">
   @for (progress of stars(); track progress.star) {
     <button
       type="button"

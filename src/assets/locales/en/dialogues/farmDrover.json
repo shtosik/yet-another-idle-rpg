@@ -1,0 +1,193 @@
+{
+  "intro1": {
+    "message": "Sorry, you came in so quiet and I thought you were... no, there's nobody it could've been. Is that Pass mud on your boots? Were there goats up there?",
+    "herd": "Plenty, and I killed a few on the way down.",
+    "hello": "I couldn't say, I'm only here to see the Warden."
+  },
+  "introHerd": {
+    "message": "Oh. That's, um, that's fine, people have to get through. Were they thin, though, when you got close? It was a hard winter for the high ones and nobody ever says. I'm Wick, I'm the drover. Those are the stalls. Please don't lean on that rail, it's set the way Bramble likes it.",
+    "opt1": "I didn't look that closely.",
+    "where": "Who's Bramble?"
+  },
+  "default": {
+    "message": "Oh, hello.",
+    "orderTurnIn": "I've got what's on your label.",
+    "orderProgress": "About your label...",
+    "orderOfferFirst": "Marta says the farm's short of things, so what do you need?",
+    "orderOffer": "Have you got a label for me?",
+    "bearShow": "Look at this pelt, flat, hair side in, like you told me.",
+    "names": "What's that paper you keep folding?",
+    "table": "How was the supper, for you?",
+    "aboutWick": "How did you end up here?",
+    "stalls": "Who are the stalls for, Wick?",
+    "warden": "What's the Warden like to work for?",
+    "uses": "What do you do with all of it?",
+    "outThere": "You keep asking me what's out there.",
+    "winter": "Where were you the winter the gate shut?",
+    "idleSwallows": "How are things, Wick?",
+    "idleHare": "What's that hare doing in the new rows?",
+    "bye": "I'll leave you to it."
+  },
+  "aboutWick": {
+    "message": "My dad's a tanner. Hides come in and hides go out and they all have to be kept apart, so that's where the labels are from, I've done labels since I was small. He's good, people say so. You can tell how a cow was kept from her hide, did you know that? Every fence she ever rubbed on.",
+    "hard": "That must have been hard on a boy who likes animals.",
+    "charms": "What's the fang for, on your apron string?",
+    "thanks": "I'll let you get on."
+  },
+  "aboutWickNotes": {
+    "message": "I don't think he knew. I didn't either, until I started writing it down as well as the weight. \"Liked this fence.\" \"Somebody was kind to this one.\" A buyer found them before my dad did, and the buyer laughed and my dad didn't, which was worse.",
+    "opt1": "So you ran away?",
+    "opt2": "I'll let you get on."
+  },
+  "aboutWickBramble": {
+    "message": "No! No, he walked me up here himself. The Guild's drovers came to us for harness every autumn, and he told the head drover I was strong, which I'm not, and good with stock, and I'd never once touched a live one. A big brown cow stood on my foot the first morning. She wasn't even cross, she looked the other way the whole time. Her name's Bramble. She doesn't know she's doing it.",
+    "opt1": "Where is she now?",
+    "opt2": "I'll let you get on."
+  },
+  "aboutWickCharms": {
+    "message": "That's, um, that's for the fence. You tie a wolf's fang on every fourth post, on the outside, and the wolves go round, or the old drovers say they do. I don't know if it's true. I asked the Warden and she said it's never failed, and I said how would you know, and she looked at me. The cows don't mind. Bramble licks the one by the low door, you can see where it's gone shiny.",
+    "opt1": "I'll bring you a fang if I see one."
+  },
+  "aboutStalls": {
+    "message": "The one with the low door's Bramble's, because she leans. She'll lean on anything, and you can't put her next to the grey one, they're both bossy. And she won't drink after anybody, it has to be fresh. That's her harness on the wall. I keep it oiled, it cracks in a week if you don't.",
+    "opt1": "Wick, the herd is gone.",
+    "opt2": "I'll let you get on."
+  },
+  "aboutStallsGone": {
+    "message": "A cow can remember a face for years, you know. Not just, um, people she liked, any face. There was a drover came back after nine years and she walked right across the yard to him. So you'd want it all where it was, wouldn't you? You wouldn't want her coming in and finding somebody had moved the...",
+    "opt1": "Has anyone actually told you they're coming back?",
+    "opt2": "No, you wouldn't."
+  },
+  "aboutStallsLabels": {
+    "message": "The labels are still right. I check. It says Bramble and it says low door, and that's all a label has to do, is be right. You can go and look if you don't believe me.",
+    "opt1": "Where did they go, Wick?",
+    "opt2": "I believe you."
+  },
+  "aboutLowPasture": {
+    "message": "Down. They go down after the last cutting, there's no grass up here past the first frost, and it's the low pasture below the bend until the thaw. Thirty-one head. Thirty-two with the... no, thirty-one, she wasn't counted till spring. Perrin takes them. He's slow, that's all, he's always been slow on a road, he'll stop for a stone in one hoof, and there was a lot of snow. They can smell water from miles off, cows can. I don't know how many miles. Somebody should measure.",
+    "opt1": "I didn't know that."
+  },
+  "aboutWarden": {
+    "message": "She's, um. She told me my knots were wrong, my first week, and she retied them herself and didn't say anything, so I don't know if that was... she's good with a knot. She used to cook for everyone, you wouldn't know that. The whole Guild, at the long table, and you had to wash first. She doesn't now. She eats standing up, on her way somewhere, like a horse, only a horse shuts its eyes.",
+    "opt1": "Why did she stop?",
+    "opt2": "Does she know you notice?"
+  },
+  "aboutWardenWhy": {
+    "message": "I don't know. You could ask her. I wouldn't. The grey one comes to the kitchen door at supper, she can get her whole head in, and the Warden hits her on the nose with a spoon and feeds her anyway. She pretends it's to get her out. It's a good spoon, it's got a burn on the handle.",
+    "opt1": "I'll ask her."
+  },
+  "aboutWinter": {
+    "message": "In the seed store, mostly, doing labels. She put me in the back there when it started, there was all the new jars and she wanted every one written out again, and I said I could do it after the stalls, and she said now. Three days, and the nights too, she brought the food to the door herself. You could hear the gate from in there, when the wind got up. It had a bad hinge, she said. It's got a new one now. Have you seen how a hare sits when there's weather? It goes flat with its ears down and just stays there until it's over.",
+    "opt1": "That's not what I asked, Wick.",
+    "opt2": "No, I haven't."
+  },
+  "aboutWinterHare": {
+    "message": "They don't eat, either, not while it's on. People think they're frightened but I don't think it's that. I think they've just decided.",
+    "opt1": "All right, Wick."
+  },
+  "orderFirst": {
+    "message": "Yes. Sorry, it's here, I wrote it down. It's not, um, it's whatever's worn through, so it goes on a label, and you have the label so you'd know what to look for. Things off animals, mostly. For the saddle blankets and the fence and the, um, bedding. When that's done I write another one, and it might be something else.",
+    "opt1": "Will any old pelt do?",
+    "opt2": "And what's in it for me?",
+    "opt3": "Give me the label.",
+    "opt4": "Not now."
+  },
+  "orderHide": {
+    "message": "No. Not if it's been hacked. Cut along the belly, not across, get it off while she's warm, and keep it flat with the hair side in. If you fold it wet it goes at the crease and it's worth nothing, and that deer died for nothing as well. Bone and feather the same, clean and dry. Don't drag anything.",
+    "opt1": "And what's in it for me?",
+    "opt2": "Give me the label.",
+    "opt3": "Not now."
+  },
+  "orderPay": {
+    "message": "Oh. Yes. The Guild pays, and the Warden hears about it. She won't say anything, but she hears. Give me a couple of hours after, before the next label. I have to find somewhere to hang them.",
+    "opt1": "Give me the label.",
+    "opt2": "Not now."
+  },
+  "orderOffer": {
+    "message": "Sorry, there's another label, if you're going that way.",
+    "accept": "I'll take it.",
+    "decline": "Not this time."
+  },
+  "orderOfferTrusted": {
+    "message": "There's a label on the peg. I kept it for you.",
+    "opt1": "I'll take it.",
+    "opt2": "Not this time."
+  },
+  "orderProgress": {
+    "message": "It's still on the label. I've cleared a place for it.",
+    "opt1": "I'll bring it."
+  },
+  "orderCompleteFirst": {
+    "message": "Oh, you brought all of it. Hold on, I have to write this. People say they'll bring things. You should see a goose when you've said you're coming back with the corn, she just stands there at the gate and she keeps standing there. Thank you. The money's the Guild's and it's right, I counted it twice.",
+    "opt1": "You can count it once next time."
+  },
+  "orderComplete": {
+    "message": "That's all of it. I'll get it put up.",
+    "opt1": "Take care of it."
+  },
+  "aboutUses": {
+    "message": "Feathers go in the bedding, and crab's for the cats, they earn it. Rat tails are for glue, you boil them down, and, um, you don't want to be here for that. Turtle shell makes a good hoof pick if you cut it right. Silk's for stitching, because it doesn't rot, and the venison's for the table, because people have to eat as well, I forget that. The really big feathers I haven't got a use for. I just like having them. I put \"fletching\" on the label so the Warden wouldn't ask.",
+    "opt1": "Your secret's safe."
+  },
+  "askOutThere": {
+    "message": "Do I? Sorry. It's only that you get to see them. I see what comes in on a cart, and that's just the outside of them. What are the deer like on the Long Path this year, have they got their weight?",
+    "opt1": "Fat enough, and quick.",
+    "opt2": "Some of what I've seen near the Elderwood looks wrong, with black at the mouth.",
+    "opt3": "I don't look at them much before I swing."
+  },
+  "askGood": {
+    "message": "Good. That's good, a doe with her weight on in autumn gets a fawn through, you wouldn't know that to look at her. You didn't see any cows? Brown ones, I mean. With a lean to them.",
+    "opt1": "No, should I have?",
+    "opt2": "No cows, Wick."
+  },
+  "askSick": {
+    "message": "Did you touch the mouth? Show me your hands. No, the other side. You don't skin that one and you don't bring it here, not the hide, not anything, you burn it where it drops. Wash to the elbow, with lye, because water just moves it about, and your boots stay out of my yard until you have. Why are you smiling? I've seen what one sick ewe does to a yard.",
+    "opt1": "Yes, Wick."
+  },
+  "askSickAfter": {
+    "message": "Sorry. I didn't mean, um. You can keep your boots.",
+    "opt1": "I'll wash."
+  },
+  "bearPelt": {
+    "message": "You remembered the hair side! Nobody... look at that cut, you did that cut on a bear. I know what a bear is, you know, I'm not stupid, it's not like doing a deer. Hang on. Can I show you something? I haven't shown the Warden.",
+    "opt1": "Go on, what is it?",
+    "opt2": "Another time."
+  },
+  "aboutNames": {
+    "message": "It's names. For when there's a new lot, because they'll need them ready, you can't have a calf standing around with no name while you think. They'd have to go in with Bramble at first. She'll say she minds. The first one's Turnip, because of you, because you grew the... no, that's a stupid reason, isn't it? You could pick one. There's room on the label.",
+    "opt1": "Leave it Turnip.",
+    "opt2": "Call one Marta.",
+    "opt3": "It's your label, so you pick."
+  },
+  "namesTurnip": {
+    "message": "Turnip. Right. I'll do it in ink.",
+    "opt1": "Do that."
+  },
+  "namesMarta": {
+    "message": "I couldn't! She'd... what colour would a Marta be, though? Brown, I think, with a bad temper and good milk. I'll write it very small.",
+    "opt1": "Very small."
+  },
+  "namesYours": {
+    "message": "Oh. I'll leave the gap, then. You might think of one, out there.",
+    "opt1": "I might."
+  },
+  "aboutTable": {
+    "message": "I had two bowls and a bit of pie and I sat where she said, and she asked me had I washed, and I had! She looked at my hands. It was how it was, nearly, except there's a lot of table. I took a bowl down to the low door, after. I know. Cows don't eat stew, I do know that. It had gone cold so I ate it.",
+    "opt1": "Was it good?",
+    "opt2": "I saw you go."
+  },
+  "idleSwallows": {
+    "message": "Good. I think good? The Warden said two words to me yesterday and neither of them was about the bucket. There's a swallow's nest over the third stall now. You're meant to knock those down because of the mess, but nobody's told me to, and there's four in there, and when a shadow goes over they all go quiet at once. All four together. You can hear it stop.",
+    "opt1": "You sound pleased about that.",
+    "opt2": "Don't let the Warden see."
+  },
+  "idleSwallowsHawk": {
+    "message": "Do I? What do you think a swallow does about a hawk, if she's got eggs? I've been trying to work it out. She can't exactly move them.",
+    "opt1": "I don't know, Wick."
+  },
+  "idleHare": {
+    "message": "You saw him? He went off when the old trees burned, and he came back the week the new ones went in, and I don't know who told him. I put a label on the post where he sits. It says \"Hare\", I couldn't think what else. The Warden says she'll put him in a pie, but she's been saying that since before I came, and he sits on her boot.",
+    "opt1": "On her boot?",
+    "opt2": "I'll keep an eye out."
+  }
+}

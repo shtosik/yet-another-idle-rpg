@@ -11,6 +11,7 @@ import { DurationPipe } from '../../../../pipes/duration.pipe'
 import { I18nextPipe } from '../../../../pipes/i18next.pipe'
 import { ItemID } from '../../../../../enums/ids/item-id.enum'
 import { CONSUMABLE_SLOTS } from '../../../../../interfaces/consumable.interface'
+import { PlayerStore } from '../../../../store/player/player.store'
 
 const SPELL_SLOT_COUNT = 5
 const MS_PER_SECOND = 1000
@@ -32,6 +33,13 @@ const PALETTE_DROP_ID = 'spellbook-palette'
 })
 export class BattleFooterComponent {
   private battleStore = inject(BattleStore)
+  readonly playerStats = inject(PlayerStore).stats
+  readonly manaPercent = computed(() => {
+    const { mana, maxMana } = this.playerStats()
+    if (maxMana <= 0) return 0
+    return Math.max(0, Math.min(100, mana / maxMana * 100))
+  })
+  protected readonly SpellID = SpellID
 
   equippedSpells = this.battleStore.equippedSpells
   activeBuffs = computed(() =>

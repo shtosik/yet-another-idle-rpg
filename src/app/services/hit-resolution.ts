@@ -12,7 +12,6 @@ export interface HitInput {
   stats: Record<PlayerStat, number>
   /** Base magic damage of the spell; 0 means a physical hit (auto-attack or melee spell). */
   magicDamage: number
-  isDoubleAttack: boolean
   /** A melee hit: an auto-attack with a melee weapon (or none), or a melee spell. Uses `meleeDamageMultiplier`. */
   isMelee: boolean
   damageType: DamageElement
@@ -31,7 +30,7 @@ const capitalize = (name: string) => name.charAt(0).toUpperCase() + name.slice(1
  * Damage stays fractional through every multiplier and is rounded once at the end (minimum 1).
  */
 export function resolveHit(input: HitInput, rng: () => number = Math.random): Hit {
-  const { stats, magicDamage, isDoubleAttack, damageType, enemyWeakness, enemyTypes } = input
+  const { stats, magicDamage, damageType, enemyWeakness, enemyTypes } = input
 
   const isMagic = magicDamage > 0
   let damage = isMagic
@@ -41,8 +40,6 @@ export function resolveHit(input: HitInput, rng: () => number = Math.random): Hi
   const canCrit = stats.critChance > 0 && (!isMagic || input.hasSpellCritSkill)
   const isCrit = !!input.forceCrit || (canCrit && rng() * 100 <= stats.critChance)
   if (isCrit) damage *= stats.critMulti
-
-  if (isDoubleAttack) damage *= 2
 
   const isWeaknessHit = input.hasWeaknessSkill && enemyWeakness === damageType
   if (isWeaknessHit) {

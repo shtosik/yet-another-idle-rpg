@@ -20,9 +20,10 @@ import { isPreferredBy, sellPrice } from '../../../../store/shop/shop-prices'
 import { ShopCurrency } from '../../../../../types/shop/shop.type'
 import { tabOf } from '../../../../store/player/inventory'
 import { tabName } from '../../inventory/tab-text'
+import { reputationLockText, tierName } from '../../quests/reputation/reputation-text'
 
 /** `currency`: the player has too little of the shop's currency. */
-type BuyBlockReason = 'stock' | 'rank' | 'currency' | 'inventory' | 'station' | null
+type BuyBlockReason = 'stock' | 'rank' | 'reputation' | 'currency' | 'inventory' | 'station' | null
 type ShopTab = 'buy' | 'sell'
 
 /** Icon and price text per currency; a new `ShopCurrency` won't compile until it has an entry here. */
@@ -73,6 +74,7 @@ export class ShopComponent implements OnInit {
   /** Shops with rank-gated stock (the guild store) show the player's Guild rank. */
   showsGuildRank = computed(() => SHOPS_DATA[this.shopId()].items.some(item => item.minRank !== undefined))
   guildRank = this.playerStore.guildRank
+  protected readonly tierName = tierName
   balance = computed(() => this.balanceOf(this.currency()))
 
   /** Inventory stacks this shop buys, at its price. */
@@ -80,7 +82,7 @@ export class ShopComponent implements OnInit {
     const shopId = this.shopId()
     return Object.values(this.playerStore.inventory()).flat().flatMap(slot => {
       if (!slot) return []
-      const price = sellPrice(shopId, slot.id)
+      const price = sellPrice(shopId, slot.id, slot.upgradeLevel)
       return price > 0 ? [{ slot, itemData: ITEM_DATA[slot.id], price, preferred: isPreferredBy(shopId, slot.id) }] : []
     })
   })
@@ -102,6 +104,9 @@ export class ShopComponent implements OnInit {
     if (entry.runtime.currentStock <= 0) return 'stock'
 
     if ((entry.staticItem.minRank ?? 0) > this.guildRank()) return 'rank'
+
+    const minReputation = entry.staticItem.minReputation
+    if (minReputation && this.playerStore.reputationTierOf(minReputation.reputationId) < minReputation.tier) return 'reputation'
 
     if (this.balance() < entry.staticItem.price) return 'currency'
 
@@ -144,6 +149,8 @@ export class ShopComponent implements OnInit {
       }
       case 'rank':
         return `${name}: ${i18next.t('shop:ui.needsRank', { rank: minRank })}`
+      case 'reputation':
+        return `${name}: ${this.reputationLock(index)}`
       case 'station':
         return `${name}: ${i18next.t('shop:ui.needsStation', { level: this.requiredStationLevel(index) })}`
       case 'currency':
@@ -155,9 +162,19 @@ export class ShopComponent implements OnInit {
     }
   }
 
+  /** "Requires Mawood Honored — 140/200"; empty for items without a tier lock. */
+  reputationLock(index: number): string {
+    const minReputation = this.items()[index].staticItem.minReputation
+    if (!minReputation) return ''
+    const { reputationId, tier } = minReputation
+    return reputationLockText(reputationId, tier, this.playerStore.reputation()[reputationId] ?? 0)
+  }
+
   /** Shops always pay gold for what they buy. */
-  sellLabel(itemId: ItemID, price: number, preferred: boolean): string {
-    const label = `${i18next.t(`items:names.${ItemID[itemId]}`)}: ${this.priceLabel('gold', price)}`
+  sellLabel(itemId: ItemID, price: number, preferred: boolean, upgradeLevel = 0): string {
+    let name = i18next.t(`items:names.${ItemID[itemId]}`)
+    if (upgradeLevel > 0) name = i18next.t('items:upgradedName', { name, level: upgradeLevel })
+    const label = `${name}: ${this.priceLabel('gold', price)}`
     if (!preferred) return label
     return `${label}, ${i18next.t('shop:ui.preferred')}`
   }

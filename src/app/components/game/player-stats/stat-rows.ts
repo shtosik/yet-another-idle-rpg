@@ -51,12 +51,26 @@ export const STAT_GROUPS: StatGroup[] = [
     rows: [
       { stat: 'xpMultiplier', format: 'multiplier', always: true },
       { stat: 'goldCoinsMultiplier', format: 'multiplier', always: true },
+      { stat: 'foodEffectMultiplier', format: 'multiplier' },
       { stat: 'offlineProgressRate', format: 'fraction', always: true },
       { stat: 'shinyChance', format: 'percent' },
+      { stat: 'upgradedDropChance', format: 'percent' },
       { stat: 'inventorySlots', format: 'number' },
       { stat: 'maxTaskSlots', format: 'number' },
       { stat: 'taskDoubleKillChance', format: 'percent' },
       { stat: 'shopRefreshCooldown', format: 'minutes' },
+      { stat: 'turnInCooldownReduction', format: 'bonus' },
+    ],
+  },
+  {
+    key: 'farming',
+    rows: [
+      { stat: 'seedGrowthTimeReduction', format: 'bonus' },
+      { stat: 'farmDoubleHarvestChance', format: 'bonus' },
+      { stat: 'farmSeedSaveChance', format: 'bonus' },
+      { stat: 'farmBonusCropChance', format: 'bonus' },
+      { stat: 'farmXpMultiplier', format: 'bonus' },
+      { stat: 'seedDropChance', format: 'bonus' },
     ],
   },
   {

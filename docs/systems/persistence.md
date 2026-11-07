@@ -9,9 +9,9 @@ Saves game state to `localStorage` (at most once a second per store) and restore
 
 | Key | Store | Holds |
 |---|---|---|
-| `playerStore` (v2) | `src/app/store/player/player.store.ts:PlayerStore` | resources, permanent bonuses, inventory (per tab), equipment, unlocked nodes, stations, recipes, tasks, unlocked content, seen bestiary entries and spells, shiny kills per zone, claimed zone mastery stars |
+| `playerStore` (v2) | `src/app/store/player/player.store.ts:PlayerStore` | resources, permanent bonuses, inventory (per tab), equipment, unlocked nodes, stations, recipes, tasks, unlocked content, seen bestiary entries and spells, shiny kills per zone, claimed zone mastery stars, professions, the farm (`farm`: plots and seed counts; a key added after v2, so old saves take its default, no version bump) |
 | `battleStore` (v2) | `src/app/store/battle/battle.store.ts:BattleStore` | current zone/wave, enemy id + shiny + HP, spells, buffs, consumable slots |
-| `questsStore` | `src/app/store/quests/quests.store.ts:QuestsStore` | quest step progression (completion is step 9999), dialogue flags, pinned quests |
+| `questsStore` | `src/app/store/quests/quests.store.ts:QuestsStore` | quest step progression (completion is step 9999), dialogue flags, pinned quests, `lastTurnInAt`, started repeatable `orders` (the rolled pick, saved at start) and `questCompletions` |
 | `townsStore` (v2) | `src/app/store/towns/towns.store.ts:TownsStore` | selected town and building id, `npcShops` (NPC → shop opened through their dialogue; the open shop isn't saved) |
 | `shopStore` | `src/app/store/shop/shop.store.ts:ShopStore` | stock and refresh timers |
 | `campStore` | `src/app/store/camp/camp.store.ts:CampStore` | Camp tab UI selection |
@@ -20,7 +20,7 @@ Saves game state to `localStorage` (at most once a second per store) and restore
 
 ## Data flow
 1. Store `onInit`: read `localStorage[key]`, decode it if it starts with `z:` (see Save format), `JSON.parse` the envelope `{ v, state }`. If `v` matches the store's save version, keep only top-level keys that exist in `initialState`, drop `transientKeys`, then `merge({}, initialState, state)` (lodash deep merge) and `patchState`. An **older** version is migrated: the store's `migrations` table (`withGameStateSync(KEY, initialState, { version, migrations })`; entry N turns a version N state into version N + 1) runs step by step up to the current version, then the state loads as above. Without a full path the save is ignored, the store starts from `initialState` (`console.info`) and the next save overwrites it. A migration that throws makes the save unreadable (see Known issues), so it is never overwritten. A **newer** version (written by a newer build, for example another worktree on the same localhost port): the store starts from `initialState` but doesn't save this session, so the newer save survives (`console.warn`). The parsing is `readSave` (pure, covered by `with-game-state-sync.hook.spec.ts`).
-2. An `effect` marks the store dirty when a saved key changes (transient keys don't count); a 1 s interval writes `JSON.stringify({ v, state })` with the state minus `transientKeys`, inside `try/catch`. Up to 1 s of progress is lost on close. `saveGameStateNow()` writes every store at once, skipping the interval (used by the offline claim and before the update banner's reload); it returns false if a write failed, and a failed store stays dirty so the interval retries it. The update banner doesn't reload after a failed save.
+2. An `effect` marks the store dirty when a saved key changes (transient keys don't count); a 1 s interval writes `JSON.stringify({ v, state })` with the state minus `transientKeys`, inside `try/catch`. Up to 1 s of progress is lost on close. `saveGameStateNow()` writes every store at once, skipping the interval (used by the offline claim and before the update notification's reload); it returns false if a write failed, and a failed store stays dirty so the interval retries it. The update notification doesn't reload after a failed save.
 3. `GameComponent.resetState` calls `resetState()` on every store, which patches `initialState` back in.
 
 ## Export and import
@@ -44,10 +44,12 @@ Settings → Save (`src/app/services/save-transfer.service.ts:SaveTransferServic
 - **Save ids, not data.** Store the id of an enemy, building or item and look the data up in a computed; a saved copy of static data goes stale after a data edit (`BattleStore.enemy`, `TownsStore.selectedTownBuilding`).
 - **A saved id can stop resolving.** Renumbering or removing an enum value leaves old saves pointing at nothing. The lookup computed returns `null` for an unknown id, and the store repairs what depends on it on load: `BattleStore` ends a fight whose `enemyId` no longer exists (combat would otherwise stall) and clamps `currentEnemyHp` to the rebuilt max HP. A new id-based lookup needs the same guard.
 - **Removed top-level keys are dropped on load.** Renamed or removed keys nested deeper (inside an object in state) still linger, because the merge keeps them.
+- **Item upgrade levels are optional.** Inventory and equipment entries without `upgradeLevel` mean +0. This addition keeps player save version 2 and needs no migration; upgraded entries retain their level through saving and loading.
 - **New keys pick up defaults.** A key added to `initialState` appears in old saves with its initial value, because of the merge.
+- **Pathfinder's Seal registration** reuses `playerStore.permanentBonuses.upgradedDropChance` (absent means 0). Consuming the Seal and saving its permanent bonus happen in one player state update, saved immediately. This positive bonus is the registration marker; no new store version or duplicate dialogue flag is needed. A pending chest's bonus Seal roll is saved as part of its existing `rolledChests` contents.
 - **Arrays merge by index**, not replace. If `initialState` has a non-empty array and the save has a shorter one, the tail of the initial array survives. Keep initial arrays empty (or accept the effect).
 - **Enum values are what get saved**, never enum names. Renumbering an enum quietly points saved data at different entities.
-- **Transient state**: pass per-tick timers and UI state a reload shouldn't restore as `transientKeys` (`{ transientKeys: ['manaRegenTimer'] }`, `activeShopId`), or keep them outside stores (the attack and respawn timers live on `GameIntervalService`). A transient key changing doesn't trigger a save.
+- **Transient state**: pass per-tick timers and UI state a reload shouldn't restore as `transientKeys` (`{ transientKeys: ['manaRegenTimer'] }`, `activeShopId`, `activeShopStage`, `forgeOpen`), or keep them outside stores (the attack and respawn timers live on `GameIntervalService`). A transient key changing doesn't trigger a save.
 - Clearing `localStorage` by hand: reload within a second, or the next save writes the old state back.
 
 ## Known issues

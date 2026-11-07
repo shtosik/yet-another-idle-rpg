@@ -1,0 +1,42 @@
+# Farming
+
+## Purpose
+The farm's pure rules and seed storage. Design: `docs/ideas/farm-and-husbandry.md` (player behaviour, wins on conflict) and `docs/ideas/seed-storage.md`. Farming only: husbandry (animals) is a later expansion. Built: seed storage, the plot rules, the farm home screen (`SiteComponent`, see `towns-shops-guild.md`), the plots panel, the Farming Guild NPCs, the quest chain and the Guild orders (`quests.md`, `dialogue.md`).
+
+## Key files
+- `src/app/store/player/farm.ts` — `FarmState`, `takeSeeds`, `plotCount`, `syncPlots`, `isReady`, `plant`, `plantAll`, `harvest`, `harvestAll`, `stageOf`, `isFarmUnlocked`. Pure, with `farm.spec.ts` and `seed-routing.spec.ts`.
+- `src/data/farming-data.ts` — `FARM_SEEDS`: seed id → crop, tier, grow time, yield range `[min, max]`, required expertise, XP per harvest. `FARM_ART`: the soil pair and the crop → stage sprites for the plot cells.
+- `src/data/items/farm-items.data.ts` — the seed and crop items. All seven seeds, six crops (Apple is the existing item) and the Guild Letter, each icon `items/<ItemID>.png`.
+- `src/app/components/game/farm-plots/` — the plots panel (`GameTab.farmPlots`, class `.farm`, the only farm view on the map footprint, 2 columns x 2 rows, no inventory): header (Farming Guild reputation bar and Farming expertise bar, both the navbar XP bar in green with current / needed numbers via the `xp-bar` mixin, the expertise bonus so far under the bar, close button back to the farm home), seed list, Plant all and Harvest all above the 3x3 grid of fixed 8 rem cells. A cell is a soil layer (CSS background image) under a plant sprite chosen by `stageOf(progressMs / growMs)`; a growing cell shows a small timer and a thin bar, a ready cell a yellow Harvest label. A 1 s display tick redraws the timers; growth itself runs on the clock. The farm home itself is one grid row high like a Town view, with the inventory below it.
+- `src/app/services/farm.service.ts` — `plotLimit` (`plotCount` from the Guild tier and `PLOT_GRANT_QUEST_IDS`, `anOrchardAgain` and `theGrowersTable`), the active seed (cleared when it runs out or its expertise is missing), and the plot actions with their harvest popups (`toasts`, one per harvest action listing each crop with icon and amount plus the Farming XP, no background; each floats up and fades beside the cursor where the player clicked, Harvest all and keyboard clicks from the clicked element's centre, cleared after 1.6 s).
+- `src/app/components/game/game-menu/notification-bar/` — the notification bar under the HUD, one chip per kind of thing to claim or act on, each with its own colour. Its height is reserved when empty, so the game below never shifts. The green harvest chip is `readyPlotCount` of the usable plots on a 1 s tick ("3 plots ready to harvest"); a click opens the plots panel (`GameNavigationService.openFarmPlots`). The other chip is the update notification (`docs/deployment.md`). A new kind is one more entry in `notifications` and a `.notification--<kind>` colour.
+- `src/app/store/player/player.store.ts` — `PlayerState.farm`, `syncFarm`, `plantSeed`, `harvestPlots`, `growAllPlots` (cheat) and the seed split in `addItems`, `processBattleEnd`, `applyKillBatch`.
+
+## Data flow
+- **Seeds** are `ITEM_DATA` entries of `ItemType.seed` counted in `farm.seeds`; see `player-stats-inventory-equipment.md`.
+- **Seed drop bonus** (`seedDropChance`): monster seed drops online and offline hit at `(1 + rank bonus) × (1 + seedDropChance) / chance` (`dropOddsMultiplier`, also used for the bestiary odds). `rollChest` multiplies seed entry weights by `1 + seedDropChance`, so a seed pick's share rises slightly less than that factor; a kept chest roll stays as rolled. Shops are not affected.
+- **Plots** are `farm.plots`: a fixed array of 9 (`null` = empty or locked). `plotCount(reputationTierIndex, grantQuestsDone)` (3 + tier + quests, max 9) says how many are usable; it is derived, never saved.
+- **Growth is time spent growing, at the rate in force.** Each plot stores `progressMs` (in base grow-time ms) and `syncedAt`. `syncPlots(plots, now, seedGrowthTimeReduction)` adds `max(0, now − syncedAt) / (1 − reduction)`, capped at the seed's `growMs`, and sets `syncedAt = now`. `PlayerStore.syncFarm` runs it on load and before anything that changes the reduction (`equipItem`, `unequipItem`, `applyProfessionXp`), so a new rate only covers the time after the change, offline time counts at the saved rate, a clock set backwards counts as no time, and a ready crop stays ready.
+- **Planting** (`plant`) uses one seed; the seed-save roll (`farmSeedSaveChance`) happens once per successful planting. A blocked planting (no seed, expertise too low, locked or busy plot) rolls nothing and returns null.
+- **Harvest** (`harvest`): yield = base (rolled uniformly from the seed's min-max), ×2 on the double roll (`farmDoubleHarvestChance`), +1 on an independent bonus roll (`farmBonusCropChance`); XP = seed XP × (1 + `farmXpMultiplier`), once per plot. If the crops do not fit (`fits`), the plot stays, pays no XP and keeps its roll in `rolledYield`, which every retry reuses. `harvestAll` stops at the first blocked plot and checks fit against everything harvested so far.
+- **Plots panel actions:** `PlayerStore.plantSeed` and `harvestPlots` call `syncFarm` first and persist the returned `FarmState`, also after a blocked harvest (it saved the roll). The crops go through `addItems`; `FarmService.harvest` pays the XP through `ProfessionService.gainXp` (so a level-up toasts). A blocked harvest pays nothing, keeps the plot and shows "Harvest blocked: 1 Materials slot needed"; a ready plot also carries that tag whenever its crops would not fit.
+- **Convenience buttons:** Harvest all needs Farming Guild Friendly, Plant all needs Honored; locked, the button is disabled and a hover or focus tooltip on its wrapper says "Requires Honored reputation" (the tier only, no progress numbers). Planting uses the active seed (click a seed in the list; again to deselect). A seed above the player's Farming expertise is listed locked.
+- **Found-seed toast:** `BattleManagerService` shows "Found: Turnip Seeds x1" under the drops-lost toast for the `foundSeeds` that `processBattleEnd` returns (empty before the farm unlocks).
+- **Cheats:** `dev.plantAll(seed?)` fills every plot (grants the seeds and the profession), `dev.growAll()` makes planted plots ready.
+
+## Invariants & gotchas
+- Seeds are never in the inventory, never in `lostDrops`, and counted silently before the farm unlocks. `isFarmUnlocked` reads `unlockedContent.sites` (an optional list; the Site unlock effect arrives with C6).
+- No quest `item` step or recipe may need a seed (validate).
+- `harvest` and `plant` do not sync: call `syncPlots` first.
+
+## Plot art
+- Convention: `src/assets/img/farm/plants/<cropKey>-<seedling|growing|ready>.png` (96x96, transparent) per crop (`ItemID` key, e.g. `turnip`, `canopyBlossom`), and the soil-empty and soil-planted PNGs directly under src/assets/img/farm (128x128). `stageOf`: seedling below 40% progress, growing from 40%, ready at 100%.
+- `FARM_ART` in `farming-data.ts` is the table the panel reads. It points at the soil pair and the 21 plant sprites (bottom-centre aligned in the 128 px cell, pixelated); the CSS soil colour only shows behind locked cells.
+
+## How to extend
+- A seed: an `ItemType.seed` item (value -1), a `FARM_SEEDS` entry, a crop item and a drop or shop source; `npm run validate` checks the mapping.
+
+## Content (C9)
+- Seeds and tiers follow `docs/ideas/farm-and-husbandry.md` §7: Turnip 15 min, Wheat 45 min, Silverleaf 2 h, Apple 4 h, Glowcap 8 h, Heartroot 12 h, Canopy Blossom 24 h; expertise 1, 2, 5, 8, 12, 17, 22.
+- Sources: enemy drops (`enemies-data.ts`, listed in `enemies-shiny-pets-bestiary.md`), the Arena Chest (`arena.md`) and Marta's shop (`towns-shops-guild.md`). Recipes: `consumables-camp-crafting.md`.
+- `NpcID.farmWarden` (Marta) and `farmDrover` (Wick) have full dialogue trees; portraits in `avatars/farm/`. The farm home uses `backgrounds/farm.png`, the plots panel `backgrounds/farm-plots.png` (both exported 960x536, 256-colour palette); the Gate, labelled "To the fields", is a CSS wooden button, no sprite.

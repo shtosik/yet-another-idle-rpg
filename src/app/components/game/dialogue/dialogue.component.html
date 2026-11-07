@@ -1,7 +1,7 @@
 @let npc = activeNpc();
 @let currentNode = activeNode();
 
-<section class="dialogue-modal">
+<section #scroller class="dialogue-modal">
   <app-close-button (onClose)="dialogueService.closeDialogue()"/>
 
   @if (npc && currentNode) {
@@ -69,6 +69,7 @@
                       [class.effect-stat]="eff.type === 'stat'"
                       [class.effect-item]="eff.type === 'item'"
                       [class.effect-guild]="eff.type === 'guild'"
+                      [class.effect-reputation]="eff.type === 'reputationTurnIn'"
                     >[{{ label }}]</span>
                   }
                 }

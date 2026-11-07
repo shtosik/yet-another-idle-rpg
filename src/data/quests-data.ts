@@ -4,14 +4,40 @@ import { ItemID } from '../enums/ids/item-id.enum'
 import { ZoneID } from '../enums/ids/zone-id.enum'
 import { EnemyID } from '../enums/ids/enemy-id.enum'
 import { NpcID } from '../enums/map/npc-id.enum'
+import { ReputationID } from '../enums/reputation-id.enum'
+import { ReputationTier } from '../enums/reputation-tier.enum'
+import { ProfessionID } from '../enums/ids/profession-id.enum'
 
 export const QUEST_STEP_AFTER_COMPLETED = 9999
 
 export interface QuestProps {
   questId: QuestID
-  rewards: Array<StatReward | ItemReward>
+  rewards: QuestReward[]
   startRequirements: RequirementProps[]
   steps: QuestStepProps[]
+  /** A repeatable order: after completion it can start again with a new pick, once its own turn-in cooldown is over. */
+  repeat?: RepeatProps
+}
+
+/** What a repeatable order may ask for. Its quest `rewards` stay empty: the pick's rewards are saved in `QuestsStore.orders`. */
+export interface RepeatProps {
+  reputationId: ReputationID
+  professionId: ProfessionID
+  /** How many distinct entries one order picks. */
+  picks: number
+  pool: OrderEntry[]
+}
+
+/** One item an order can ask for, and what 10 of it pay; the amount is rolled 10 to 20. */
+export interface OrderEntry {
+  itemId: ItemID
+  /** The order's `reputationId` tier needed before this entry is picked. */
+  minTier: ReputationTier
+  reputationPer10: number
+  goldPerItem: number
+  xpPerItem: number
+  /** Only picked while one of these zones is unlocked. */
+  sourceZones?: ZoneID[]
 }
 
 export type QuestStepProps = {
@@ -26,7 +52,29 @@ export type RequirementProps =
   | WaveKillCountRequirement
   | EnemyKillCountRequirement
   | QuestRequirement
-  | StatRequirement;
+  | StatRequirement
+  | ReputationRequirement
+  | ProfessionLevelRequirement
+  | PickedItemsRequirement;
+
+/** The items rolled for this quest's order (`QuestsStore.orders`); their amounts differ per start. */
+export interface PickedItemsRequirement {
+  type: 'pickedItems'
+}
+
+/** At least `level` in `professionId` (0 while it is locked). Also a dialogue condition. */
+export interface ProfessionLevelRequirement {
+  type: 'professionLevel'
+  professionId: ProfessionID
+  level: number
+}
+
+/** At least `tier` with `reputationId`. Also a dialogue condition and a shop item's `minReputation`. */
+export interface ReputationRequirement {
+  type: 'reputation'
+  reputationId: ReputationID
+  tier: ReputationTier
+}
 
 export interface StatRequirement {
   type: 'stat'
@@ -71,6 +119,22 @@ interface ItemReward {
   amount: number
 }
 
+/** Credits a reputation (`REPUTATION_IDS`), not always the giver's. */
+interface ReputationReward {
+  type: 'reputation'
+  reputationId: ReputationID
+  amount: number
+}
+
+/** Adds profession XP (Farming expertise); ignored while that profession is locked. */
+interface ProfessionXpReward {
+  type: 'professionXp'
+  professionId: ProfessionID
+  amount: number
+}
+
+export type QuestReward = StatReward | ItemReward | ReputationReward | ProfessionXpReward
+
 // interface SkillReward {
 //     type: 'skill'
 //     name: SkillNames
@@ -90,6 +154,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', reputationId: ReputationID.laHarpar, amount: 20 },
       { type: 'stat', key: 'unspentSkillPoints', amount: 1 },
       { type: 'stat', key: 'experience', amount: 1000 },
       { type: 'stat', key: 'goldCoins', amount: 200 },
@@ -106,6 +171,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', reputationId: ReputationID.laHarpar, amount: 20 },
       { type: 'stat', key: 'experience', amount: 1500 },
       { type: 'stat', key: 'goldCoins', amount: 250 },
       { type: 'item', itemId: ItemID.joshsHeirloom, amount: 1 },
@@ -122,6 +188,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', reputationId: ReputationID.laHarpar, amount: 20 },
       { type: 'stat', key: 'unspentSkillPoints', amount: 1 },
       { type: 'stat', key: 'experience', amount: 1500 },
       { type: 'stat', key: 'goldCoins', amount: 300 },
@@ -154,6 +221,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', reputationId: ReputationID.mawood, amount: 25 },
       { type: 'stat', key: 'experience', amount: 1000 },
       { type: 'stat', key: 'goldCoins', amount: 200 },
     ],
@@ -171,6 +239,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', reputationId: ReputationID.mawood, amount: 20 },
       { type: 'stat', key: 'experience', amount: 2500 },
       { type: 'stat', key: 'goldCoins', amount: 500 },
     ],
@@ -189,6 +258,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', reputationId: ReputationID.mawood, amount: 35 },
       { type: 'stat', key: 'experience', amount: 3000 },
       { type: 'stat', key: 'goldCoins', amount: 600 },
     ],
@@ -206,6 +276,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', reputationId: ReputationID.mawood, amount: 100 },
       { type: 'stat', key: 'experience', amount: 5000 },
       { type: 'stat', key: 'goldCoins', amount: 1000 },
       { type: 'stat', key: 'unspentSkillPoints', amount: 1 },
@@ -227,6 +298,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', reputationId: ReputationID.mawood, amount: 25 },
       { type: 'stat', key: 'experience', amount: 800 },
       { type: 'stat', key: 'goldCoins', amount: 150 },
       { type: 'item', itemId: ItemID.skillPointBook, amount: 1 },
@@ -246,6 +318,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', reputationId: ReputationID.mawood, amount: 35 },
       { type: 'stat', key: 'experience', amount: 2000 },
       { type: 'stat', key: 'goldCoins', amount: 400 },
     ],
@@ -264,6 +337,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', reputationId: ReputationID.mawood, amount: 45 },
       { type: 'stat', key: 'experience', amount: 1200 },
       { type: 'stat', key: 'goldCoins', amount: 300 },
     ],
@@ -282,6 +356,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', reputationId: ReputationID.mawood, amount: 45 },
       { type: 'stat', key: 'experience', amount: 3500 },
       { type: 'stat', key: 'goldCoins', amount: 700 },
       { type: 'stat', key: 'unspentSkillPoints', amount: 1 },
@@ -303,6 +378,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', reputationId: ReputationID.mawood, amount: 45 },
       { type: 'stat', key: 'experience', amount: 2500 },
       { type: 'stat', key: 'goldCoins', amount: 500 },
       { type: 'item', itemId: ItemID.silverwoodChestplate, amount: 1 },
@@ -321,6 +397,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', reputationId: ReputationID.mawood, amount: 50 },
       { type: 'stat', key: 'experience', amount: 4000 },
       { type: 'stat', key: 'goldCoins', amount: 800 },
       { type: 'item', itemId: ItemID.skillPointBook, amount: 1 },
@@ -340,6 +417,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', reputationId: ReputationID.mawood, amount: 25 },
       { type: 'stat', key: 'experience', amount: 1000 },
       { type: 'stat', key: 'goldCoins', amount: 200 },
       { type: 'item', itemId: ItemID.eagleTalon, amount: 1 },
@@ -359,12 +437,306 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       },
     ],
     rewards: [
+      { type: 'reputation', reputationId: ReputationID.mawood, amount: 75 },
       { type: 'stat', key: 'experience', amount: 5000 },
       { type: 'stat', key: 'goldCoins', amount: 1000 },
       { type: 'stat', key: 'unspentSkillPoints', amount: 1 },
       { type: 'item', itemId: ItemID.skillPointBook, amount: 1 },
       { type: 'item', itemId: ItemID.harpyCrown, amount: 1 },
     ],
+  },
+  // ── Revered (town reputation) ─────────────────────────────────────────────
+  [QuestID.safePassage]: {
+    questId: QuestID.safePassage,
+    startRequirements: [{ type: 'reputation', reputationId: ReputationID.laHarpar, tier: ReputationTier.revered }, { type: 'quest', questId: QuestID.silkAndWater, step: QUEST_STEP_AFTER_COMPLETED }],
+    steps: [
+      {
+        description: 'La Harpar\'s trader wants the Mountain Pass safe for his carts. I need to kill the Troll 3 times and 40 goblin scavengers.',
+        turnInNpc: NpcID.laHarparTrader,
+        requirements: [
+          { type: 'enemy', enemyId: EnemyID.troll, amount: 3 },
+          { type: 'enemy', enemyId: EnemyID.goblinScavenger, amount: 40 },
+        ],
+      },
+      {
+        description: 'The road over the Pass is clear. The trader asked me to tell Sylvie in Mawood that La Harpar is open for business.',
+        turnInNpc: NpcID.mawoodSylvie,
+        requirements: [],
+      },
+    ],
+    rewards: [
+      { type: 'reputation', reputationId: ReputationID.laHarpar, amount: 100 },
+      { type: 'reputation', reputationId: ReputationID.mawood, amount: 25 },
+      { type: 'stat', key: 'experience', amount: 4000 },
+      { type: 'stat', key: 'goldCoins', amount: 800 },
+    ],
+  },
+  [QuestID.lastOrders]: {
+    questId: QuestID.lastOrders,
+    startRequirements: [{ type: 'reputation', reputationId: ReputationID.laHarpar, tier: ReputationTier.revered }],
+    steps: [
+      {
+        description: 'Bartender in La Harpar tavern asked me to bring her 10 venison roasts and 10 fish & apple pies for the buyers from Lirold.',
+        turnInNpc: NpcID.laHarparBartender,
+        requirements: [
+          { type: 'item', itemId: ItemID.venisonRoast, amount: 10 },
+          { type: 'item', itemId: ItemID.fishApplePie, amount: 10 },
+        ],
+      },
+    ],
+    rewards: [
+      { type: 'reputation', reputationId: ReputationID.laHarpar, amount: 75 },
+      { type: 'stat', key: 'experience', amount: 4000 },
+      { type: 'stat', key: 'goldCoins', amount: 800 },
+      { type: 'item', itemId: ItemID.skillPointBook, amount: 1 },
+    ],
+  },
+  [QuestID.aCleanCure]: {
+    questId: QuestID.aCleanCure,
+    startRequirements: [{ type: 'reputation', reputationId: ReputationID.mawood, tier: ReputationTier.revered }, { type: 'quest', questId: QuestID.theInfestation, step: QUEST_STEP_AFTER_COMPLETED }],
+    steps: [
+      {
+        description: 'Sylvie is close to an antidote. She needs 10 elder silk and 5 spider fangs from the Deepwood.',
+        turnInNpc: NpcID.mawoodSylvie,
+        requirements: [
+          { type: 'item', itemId: ItemID.elderSilk, amount: 10 },
+          { type: 'item', itemId: ItemID.spiderFang, amount: 5 },
+        ],
+      },
+      {
+        description: 'Sylvie gave me a tincture to test. I need to kill 30 corrupted saplings in the Elderwood Wilds.',
+        turnInNpc: NpcID.mawoodSylvie,
+        requirements: [{ type: 'enemy', enemyId: EnemyID.corruptedSapling, amount: 30 }],
+      },
+    ],
+    rewards: [
+      { type: 'reputation', reputationId: ReputationID.mawood, amount: 100 },
+      { type: 'stat', key: 'experience', amount: 4000 },
+      { type: 'stat', key: 'goldCoins', amount: 800 },
+      { type: 'item', itemId: ItemID.skillPointBook, amount: 1 },
+    ],
+  },
+  [QuestID.rootsAndRafters]: {
+    questId: QuestID.rootsAndRafters,
+    // The Blighted Heart too: Corwin's turn-in leads into his "first silver shoot" line.
+    startRequirements: [{ type: 'reputation', reputationId: ReputationID.mawood, tier: ReputationTier.revered }, { type: 'quest', questId: QuestID.warTrophies, step: QUEST_STEP_AFTER_COMPLETED }, { type: 'quest', questId: QuestID.theBlightedHeart, step: QUEST_STEP_AFTER_COMPLETED }],
+    steps: [
+      {
+        description: 'Brenna is rebuilding Mawood\'s blighted walkways. She needs 30 ancient wood and 20 spider silk.',
+        turnInNpc: NpcID.mawoodBrenn,
+        requirements: [
+          { type: 'item', itemId: ItemID.ancientWood, amount: 30 },
+          { type: 'item', itemId: ItemID.spiderSilk, amount: 20 },
+        ],
+      },
+      {
+        description: 'The first walkway is up. Brenna asked me to fetch Corwin from the Elder\'s Tree to bless it.',
+        turnInNpc: NpcID.mawoodCorwin,
+        requirements: [],
+      },
+    ],
+    rewards: [
+      { type: 'reputation', reputationId: ReputationID.mawood, amount: 100 },
+      { type: 'stat', key: 'experience', amount: 5000 },
+      { type: 'stat', key: 'goldCoins', amount: 1000 },
+      { type: 'stat', key: 'unspentSkillPoints', amount: 1 },
+    ],
+  },
+  [QuestID.theColdForge]: {
+    questId: QuestID.theColdForge,
+    startRequirements: [{ type: 'stat', key: 'level', amount: 1 }],
+    steps: [
+      {
+        description: "Ask Ludo Crane at Lirold's Arena what happened to Phurgo's delivery cart.",
+        turnInNpc: NpcID.liroldArenaMaster,
+        requirements: [],
+      },
+      {
+        description: "Recover Phurgo's Forge Tongs from Goblin Scavengers in the Mountain Pass and return them to Phurgo.",
+        turnInNpc: NpcID.liroldPhurgo,
+        requirements: [{ type: 'item', itemId: ItemID.phurgosForgeTongs, amount: 1 }],
+      },
+      {
+        description: "Ask Marvin at the Exploration Guild in La Harpar to check Phurgo's old delivery record.",
+        turnInNpc: NpcID.laHarparMarvin,
+        requirements: [],
+      },
+      {
+        description: "Bring Phurgo one Fish & Apple Pie at Lirold's Forge.",
+        turnInNpc: NpcID.liroldPhurgo,
+        requirements: [{ type: 'item', itemId: ItemID.fishApplePie, amount: 1 }],
+      },
+      {
+        description: "Bring Phurgo 10 Ancient Wood for charcoal at Lirold's Forge.",
+        turnInNpc: NpcID.liroldPhurgo,
+        requirements: [{ type: 'item', itemId: ItemID.ancientWood, amount: 10 }],
+      },
+    ],
+    rewards: [
+      { type: 'stat', key: 'experience', amount: 2000 },
+      { type: 'stat', key: 'goldCoins', amount: 400 },
+    ],
+  },
+  // ── Farming Guild ─────────────────────────────────────────────────────────
+  [QuestID.seedsFromTheTerrace]: {
+    questId: QuestID.seedsFromTheTerrace,
+    startRequirements: [{ type: 'quest', questId: QuestID.silkAndWater, step: QUEST_STEP_AFTER_COMPLETED }],
+    steps: [
+      {
+        description: 'Sylvie gave me a letter for the Farming Guild north of the Pass. Warden Marta is waiting at the farm.',
+        turnInNpc: NpcID.farmWarden,
+        requirements: [],
+      },
+    ],
+    rewards: [
+      { type: 'stat', key: 'experience', amount: 600 },
+      { type: 'stat', key: 'goldCoins', amount: 100 },
+      { type: 'reputation', reputationId: ReputationID.farmingGuild, amount: 10 },
+      { type: 'item', itemId: ItemID.turnipSeeds, amount: 5 },
+    ],
+  },
+  [QuestID.theFirstFurrow]: {
+    questId: QuestID.theFirstFurrow,
+    startRequirements: [{ type: 'quest', questId: QuestID.seedsFromTheTerrace, step: QUEST_STEP_AFTER_COMPLETED }],
+    steps: [
+      {
+        description: 'Marta wants four turnips from my first plot.',
+        turnInNpc: NpcID.farmWarden,
+        requirements: [{ type: 'item', itemId: ItemID.turnip, amount: 4 }],
+      },
+    ],
+    rewards: [
+      { type: 'stat', key: 'experience', amount: 800 },
+      { type: 'stat', key: 'goldCoins', amount: 150 },
+      { type: 'reputation', reputationId: ReputationID.farmingGuild, amount: 15 },
+      { type: 'professionXp', professionId: ProfessionID.farming, amount: 30 },
+      { type: 'item', itemId: ItemID.wheatSeeds, amount: 5 },
+      { type: 'item', itemId: ItemID.turnipStewRecipe, amount: 1 },
+    ],
+  },
+  [QuestID.wheatForTheGuild]: {
+    questId: QuestID.wheatForTheGuild,
+    startRequirements: [{ type: 'quest', questId: QuestID.theFirstFurrow, step: QUEST_STEP_AFTER_COMPLETED }],
+    steps: [
+      {
+        description: 'The Guild needs ten wheat.',
+        turnInNpc: NpcID.farmWarden,
+        requirements: [{ type: 'item', itemId: ItemID.wheat, amount: 10 }],
+      },
+    ],
+    rewards: [
+      { type: 'stat', key: 'experience', amount: 800 },
+      { type: 'stat', key: 'goldCoins', amount: 150 },
+      { type: 'reputation', reputationId: ReputationID.farmingGuild, amount: 25 },
+      { type: 'professionXp', professionId: ProfessionID.farming, amount: 100 },
+      { type: 'item', itemId: ItemID.farmersBreadRecipe, amount: 1 },
+    ],
+  },
+  [QuestID.silverleafForSylvie]: {
+    questId: QuestID.silverleafForSylvie,
+    startRequirements: [{ type: 'quest', questId: QuestID.wheatForTheGuild, step: QUEST_STEP_AFTER_COMPLETED }, { type: 'professionLevel', professionId: ProfessionID.farming, level: 5 }],
+    steps: [
+      {
+        description: 'Sylvie\'s herb shelf is thin. She wants six silverleaf.',
+        turnInNpc: NpcID.mawoodSylvie,
+        requirements: [{ type: 'item', itemId: ItemID.silverleaf, amount: 6 }],
+      },
+    ],
+    rewards: [
+      { type: 'stat', key: 'experience', amount: 1000 },
+      { type: 'stat', key: 'goldCoins', amount: 200 },
+      { type: 'reputation', reputationId: ReputationID.mawood, amount: 25 },
+      { type: 'reputation', reputationId: ReputationID.farmingGuild, amount: 15 },
+      { type: 'professionXp', professionId: ProfessionID.farming, amount: 400 },
+      { type: 'item', itemId: ItemID.silverleafTonicRecipe, amount: 1 },
+    ],
+  },
+  [QuestID.anOrchardAgain]: {
+    questId: QuestID.anOrchardAgain,
+    startRequirements: [{ type: 'quest', questId: QuestID.silverleafForSylvie, step: QUEST_STEP_AFTER_COMPLETED }, { type: 'professionLevel', professionId: ProfessionID.farming, level: 8 }],
+    steps: [
+      {
+        description: 'Marta wants twelve apples from the Guild\'s own trees.',
+        turnInNpc: NpcID.farmWarden,
+        requirements: [{ type: 'item', itemId: ItemID.apple, amount: 12 }],
+      },
+    ],
+    rewards: [
+      { type: 'stat', key: 'experience', amount: 1200 },
+      { type: 'stat', key: 'goldCoins', amount: 250 },
+      { type: 'reputation', reputationId: ReputationID.farmingGuild, amount: 40 },
+      { type: 'professionXp', professionId: ProfessionID.farming, amount: 1500 },
+    ],
+  },
+  [QuestID.theGrowersTable]: {
+    questId: QuestID.theGrowersTable,
+    startRequirements: [{ type: 'quest', questId: QuestID.anOrchardAgain, step: QUEST_STEP_AFTER_COMPLETED }, { type: 'reputation', reputationId: ReputationID.farmingGuild, tier: ReputationTier.honored }],
+    steps: [
+      {
+        description: 'Marta will cook again if I bring five turnip stew and five harvest pie.',
+        turnInNpc: NpcID.farmWarden,
+        requirements: [{ type: 'item', itemId: ItemID.turnipStew, amount: 5 }, { type: 'item', itemId: ItemID.harvestPie, amount: 5 }],
+      },
+    ],
+    rewards: [
+      { type: 'stat', key: 'experience', amount: 2500 },
+      { type: 'stat', key: 'goldCoins', amount: 500 },
+      { type: 'item', itemId: ItemID.skillPointBook, amount: 1 },
+      { type: 'reputation', reputationId: ReputationID.farmingGuild, amount: 60 },
+      { type: 'professionXp', professionId: ProfessionID.farming, amount: 3000 },
+    ],
+  },
+  [QuestID.marthasOrder]: {
+    questId: QuestID.marthasOrder,
+    startRequirements: [{ type: 'quest', questId: QuestID.theFirstFurrow, step: QUEST_STEP_AFTER_COMPLETED }],
+    steps: [
+      {
+        description: 'Marta needs crops for the Guild larder.',
+        turnInNpc: NpcID.farmWarden,
+        requirements: [{ type: 'pickedItems' }],
+      },
+    ],
+    rewards: [],
+    repeat: {
+      reputationId: ReputationID.farmingGuild,
+      professionId: ProfessionID.farming,
+      picks: 1,
+      pool: [
+        { itemId: ItemID.turnip, minTier: ReputationTier.neutral, reputationPer10: 4, goldPerItem: 3, xpPerItem: 1.5 },
+        { itemId: ItemID.wheat, minTier: ReputationTier.friendly, reputationPer10: 7, goldPerItem: 6, xpPerItem: 3 },
+      ],
+    },
+  },
+  [QuestID.wicksOrder]: {
+    questId: QuestID.wicksOrder,
+    startRequirements: [{ type: 'quest', questId: QuestID.wheatForTheGuild, step: QUEST_STEP_AFTER_COMPLETED }],
+    steps: [
+      {
+        description: 'Wick needs animal materials for tack and charms.',
+        turnInNpc: NpcID.farmDrover,
+        requirements: [{ type: 'pickedItems' }],
+      },
+    ],
+    rewards: [],
+    repeat: {
+      reputationId: ReputationID.farmingGuild,
+      professionId: ProfessionID.farming,
+      picks: 1,
+      pool: [
+        { itemId: ItemID.feather, minTier: ReputationTier.neutral, reputationPer10: 4, goldPerItem: 3, xpPerItem: 1.5, sourceZones: [ZoneID.horseshoeBeach] },
+        { itemId: ItemID.crabMeat, minTier: ReputationTier.neutral, reputationPer10: 4, goldPerItem: 3, xpPerItem: 1.5, sourceZones: [ZoneID.horseshoeBeach] },
+        { itemId: ItemID.ratTail, minTier: ReputationTier.neutral, reputationPer10: 4, goldPerItem: 3, xpPerItem: 1.5, sourceZones: [ZoneID.tradersBasement] },
+        { itemId: ItemID.turtleShell, minTier: ReputationTier.friendly, reputationPer10: 7, goldPerItem: 6, xpPerItem: 3, sourceZones: [ZoneID.horseshoeBeach] },
+        { itemId: ItemID.wolfFangs, minTier: ReputationTier.friendly, reputationPer10: 7, goldPerItem: 6, xpPerItem: 3, sourceZones: [ZoneID.theLongPath] },
+        { itemId: ItemID.deerPelt, minTier: ReputationTier.friendly, reputationPer10: 7, goldPerItem: 6, xpPerItem: 3, sourceZones: [ZoneID.theLongPath, ZoneID.mountainPass] },
+        { itemId: ItemID.venison, minTier: ReputationTier.friendly, reputationPer10: 7, goldPerItem: 6, xpPerItem: 3, sourceZones: [ZoneID.theLongPath, ZoneID.mountainPass] },
+        { itemId: ItemID.spiderSilk, minTier: ReputationTier.honored, reputationPer10: 10, goldPerItem: 10, xpPerItem: 6, sourceZones: [ZoneID.elderwoodWilds] },
+        { itemId: ItemID.bearPelt, minTier: ReputationTier.revered, reputationPer10: 14, goldPerItem: 20, xpPerItem: 10, sourceZones: [ZoneID.deepwood] },
+        { itemId: ItemID.boneFragment, minTier: ReputationTier.revered, reputationPer10: 14, goldPerItem: 20, xpPerItem: 10, sourceZones: [ZoneID.deepwood] },
+        { itemId: ItemID.elderSilk, minTier: ReputationTier.revered, reputationPer10: 14, goldPerItem: 20, xpPerItem: 10, sourceZones: [ZoneID.deepwood] },
+        { itemId: ItemID.harpyFeather, minTier: ReputationTier.exalted, reputationPer10: 0, goldPerItem: 25, xpPerItem: 16, sourceZones: [ZoneID.upperCanopy] },
+      ],
+    },
   },
 }
 

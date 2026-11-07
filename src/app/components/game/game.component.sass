@@ -1,3 +1,8 @@
+@use 'palette'
+
+// Fits the five-row paper doll; the quests panel takes the rest of the column.
+$equipment-height: 26rem
+
 .game
   display: grid
   gap: 0.5rem
@@ -33,8 +38,16 @@
   .inventory
     grid-row: 2 / 2
 
+  // Column 4 splits by $equipment-height, not the shared rows, so the middle panels keep their sizes.
+  .equipment
+    grid-row: 1 / span 2
+    align-self: start
+    height: $equipment-height
+
   .quests
-    grid-row: 2 / 2
+    grid-row: 1 / span 2
+    align-self: end
+    height: calc(100% - #{$equipment-height} - 0.5rem)
 
   .spells
     grid-row: 2 / 2
@@ -44,9 +57,18 @@
     grid-column: 2 / span 3
     grid-row: 1 / span 2
 
-  .map
+  .map,
+  .farm
     grid-column: 2 / span 2
     grid-row: 1 / span 2
+
+  .map
+    padding: 0
+
+  // The farm home is one row high like a town; only the plots panel takes the map footprint.
+  .farm-home
+    grid-column: 2 / span 2
+    grid-row: 1 / 2
     padding: 0
 
   .bestiary
@@ -61,3 +83,29 @@
   .settings
     grid-column: 4 / 4
     grid-row: 1 / span 2
+
+// Above the Material overlay (z-index 1000), so the quest completed modal doesn't hide it.
+// Transparent rather than display: none when empty, so the live region stays in the accessibility tree.
+.tier-up-toast
+  opacity: 0
+  position: fixed
+  top: 1rem
+  left: 50%
+  z-index: 1100
+  transform: translateX(-50%)
+  padding: 0.5rem 1rem
+  border: 1px solid palette.$yellow
+  border-radius: 4px
+  background: #0a0a0a
+  color: palette.$yellow
+  white-space: pre-line
+  text-align: center
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6)
+  pointer-events: none
+
+  // The level-up toast sits under the tier-up one, since a quest can give both at once.
+  &--below
+    top: 4.5rem
+
+  &--shown
+    opacity: 1

@@ -3,4 +3,5 @@ export enum ShopID {
     mawoodMagicShop = 1,
     mawoodApothecary = 2,
     explorersGuildStore = 3,
+    farmWardenShop = 4,
 }

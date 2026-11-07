@@ -9,7 +9,7 @@ reviews:
   auto_review:
     enabled: true
     drafts: false
-    # main (default branch) is always reviewed; most PRs target staging.
+    # main (default branch) is always reviewed; other PRs target staging.
     base_branches:
       - staging
   path_filters:

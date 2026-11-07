@@ -18,8 +18,9 @@ export class StatToPercentagePipe implements PipeTransform {
 
         // Data amounts are "positive = better", so a lower-is-better stat goes down by the amount.
         const row = STAT_ROWS.find(r => r.stat === stat)
-        if (isInvertedStat(stat)) return `-${row ? formatStat(row.format, amount) : amount}`
+        const value = row ? formatStat(row.format, amount) : amount
+        if (isInvertedStat(stat)) return `-${value}`
 
-        return `+${amount}`
+        return `+${value}`
     }
 }

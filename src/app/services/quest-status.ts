@@ -3,9 +3,11 @@ import QUEST_DATA, {
   RequirementProps,
 } from '../../data/quests-data'
 import { QuestID } from '../../enums/ids/quest-id.enum'
+import { ItemID } from '../../enums/ids/item-id.enum'
 import { QuestState } from '../../enums/quest-state.enum'
 import { QuestProgression, QuestStep } from '../../types/quests/quest-progression.type'
 import { ItemStack } from '../store/player/inventory'
+import { Orders } from '../store/quests/orders'
 
 export type QuestStatus =
   | { state: QuestState.notStarted | QuestState.completed }
@@ -72,10 +74,13 @@ export function matchesQuestState(
   }
 }
 
-/** Item requirements of a quest step (1-based); turn-ins consume these. */
-export function getStepItems(questId: QuestID, step: QuestStep): ItemStack[] {
-  return (QUEST_DATA[questId].steps[step - 1]?.requirements ?? [])
-    .flatMap(r => r.type === 'item' ? [{ id: r.itemId, amount: r.amount }] : [])
+/** Item requirements of a quest step (1-based), picked ones from `orders`; turn-ins consume these. */
+export function getStepItems(questId: QuestID, step: QuestStep, orders: Orders = {}): ItemStack[] {
+  return (QUEST_DATA[questId].steps[step - 1]?.requirements ?? []).flatMap((r) => {
+    if (r.type === 'item') return [{ id: r.itemId, amount: r.amount }]
+    if (r.type === 'pickedItems') return (orders[questId]?.requirements ?? []).map(p => ({ id: p.itemId, amount: p.amount }))
+    return []
+  })
 }
 
 export function getActiveQuestIds(progression: QuestProgression): Set<QuestID> {
@@ -85,4 +90,21 @@ export function getActiveQuestIds(progression: QuestProgression): Set<QuestID> {
     if (getQuestStatus(progression, questId).state === QuestState.active) active.add(questId)
   }
   return active
+}
+
+/** Missing amounts at the start of a kill or offline claim, by quest and current-step item. */
+export type QuestDropLimits = ReadonlyMap<QuestID, ReadonlyMap<ItemID, number>>
+
+export function getQuestDropLimits(progression: QuestProgression, itemCount: (id: ItemID) => number): QuestDropLimits {
+  const limits = new Map<QuestID, Map<ItemID, number>>()
+  for (const questId of getActiveQuestIds(progression)) {
+    const status = getQuestStatus(progression, questId)
+    if (status.state !== QuestState.active) continue
+    const items = new Map<ItemID, number>()
+    for (const { id, amount } of getStepItems(questId, status.step)) {
+      items.set(id, Math.max(0, amount - itemCount(id)))
+    }
+    limits.set(questId, items)
+  }
+  return limits
 }

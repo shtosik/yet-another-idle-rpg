@@ -23,13 +23,15 @@ Timeline relative to the present (the player's arrival). Source shorthand as in 
 | "Months" | Gnolls plant root-bundles at camp edges. Spiders reach Mawood's lower platforms. | `Finn#aboutCorruption`, `Sylvie#questInfestationComplete` |
 | This month | Gnolls raid Brenna's lumber three times. | `Brenna#questWarTrophies` |
 | A few days ago | Marvin returns to La Harpar from an expedition. | `Elara#marvinInfo`, `Trader#aboutPeople` |
+| Before the player arrives | Ludo Crane holds eleven unbeaten seasons on the Arena sand; a cart wheel takes his knee and the castle gives him the gate. | `src/assets/locales/en/dialogues/liroldArenaMaster.json` `intro1`, `aboutLudo` |
+| Last spring | Trappers deliver Yad in a crate without naming its origin; "Yad" is chalked on the lid. | `src/assets/locales/en/dialogues/liroldArenaMaster.json` `yadOrigin` |
 
 ## Player-driven events (in quest order)
 
 | Quest (`quests.json`) | Outcome | Source |
 |---|---|---|
 | Meat shortage | Bartender gets 30 Crab Meat. | `quests-data.ts`, `Bartender#anyWorkForMe1` |
-| Clearing out the beach | Beach cleared; Josh gives Josh's Heirloom. | `Josh#workInfo`, `Josh#missionCheck`, `quests-data.ts` |
+| Clearing out the beach | Beach cleared; Josh gives Josh's Heirloom. He had kept the ring for someone who went up the mountain and never came back for it (who is unsaid; see T-05). | `Josh#workInfo`, `Josh#missionCheck`, `Josh#aboutHeirloom`, `quests-data.ts` |
 | Rats, We are rats | Trader's Basement cleared. | `Trader#default.opt1`, `Trader#questCompleted` |
 | A tale of a captain | Started; cannot finish (Captain's Letter has no source). | `quests-data.ts`, `docs/systems/quests.md` |
 | Signs of Rot | Resin shows the blight is "more virulent than two years ago"; gnolls implicated. | `Corwin#questSignsOfRotComplete` |
@@ -37,6 +39,7 @@ Timeline relative to the present (the player's arrival). Source shorthand as in 
 | The Sap That Burns | Corwin brews the sap to stop the Treant's regeneration. | `Corwin#questTheSapComplete` |
 | The Blighted Heart | Gnarled Treant killed; the Spires go quiet; Deepwood to recover over "years, perhaps decades"; gnolls to scatter. | `Corwin#questBlightedHeartComplete`, `Corwin#postQuestLore` |
 | Silk and Water / The Infestation | Sylvie resupplied; spiders pushed back. | `Sylvie#questSilkWaterComplete`, `Sylvie#questInfestationComplete` |
+| Seeds from the Terrace to The Growers' Table | The Farming Guild opens its gate to the player on Sylvie's word; the orchard is replanted; the player brings the stew and pies, Marta bakes bread for the first time in two years and sets thirty places, and Corwin smells the bread on a Mawood wind and calls the sap containable. | `farmWarden.json` `questOrchardComplete`, `questTableComplete`; `mawoodCorwin.json` `farmFinaleLine` |
 | Prove Your Aim / Big Game | Finn's trust; old one-eared bear spared; Ashwood Bow. | `Finn#questProveYourAimComplete`, `Finn#questBigGameComplete` |
 | Raw Materials / War Trophies | Silverwood Chestplate; Warchief killed three times. | `Brenna#questRawMaterialsComplete`, `Brenna#questWarTrophiesComplete` |
 | Feathers for a Kite / What Lurks at the Top | Harpy Matriarch killed; Milo reaches the nest, finds the Harpy Crown and a door in the tallest Spire. | `Milo#questWhatLurksComplete`, `Milo#questWhatLurksPostQuest` |
@@ -46,12 +49,16 @@ Timeline relative to the present (the player's arrival). Source shorthand as in 
 - Bandits sold a captain's coat in Lirold four years ago. **(proposed, `docs/ideas/la-harpar-quests.md`)**
 - Josh's brother went up the mountain years ago and never returned. **(proposed, `docs/ideas/la-harpar-quests.md`)**
 - Marvin's last expedition was sent by Guildmaster Odile Varrow; he came home to La Harpar (his birthplace) and stays there, in the Tavern, handling contracts and a few Guild supplies until the player meets Varrow, and writing her letters about the player. **(proposed, `docs/ideas/north-lirold-and-exploration-guild.md` §2, §5)**
-- Long ago: the Lirold Arena opens under a castle charter. Later, Ludo Crane holds its sand eleven seasons unbeaten, loses a knee to a cart wheel and becomes its master. **(proposed, `docs/ideas/lirold-arena-master.md`)**
-- Last spring: trappers deliver Yad to the Arena in a crate, origin unsaid; no challenger beats it until the player. **(proposed, same doc; T-28)**
+- Long ago: the Lirold Arena opens under its castle charter; its founding date is not established by shipped dialogue. **(proposed dating, `docs/ideas/lirold-arena-master.md`)** Ludo's career and Yad's arrival are now shipped (timeline above; Yad's origin stays T-28).
 - Player-driven: the player clears the Arena (Yad killed), any number of times. **(proposed, `docs/ideas/combat-arena.md`)**
 - Unknown, before the mine: someone cuts stone stairs deep under the Slatefall hillside; the Stone Warden stands in them. **(proposed, `docs/ideas/slatefall-and-the-deeper-mines.md`)**
 - Long ago: Slatefall quarries slate for Lirold's roofs and mines iron for its walls; the castle owns the mine. **(proposed, `docs/ideas/slatefall-and-the-deeper-mines.md`)**
 - Two winters ago, the week before the collapse: Tobin hears the stone "sing". **(proposed, same doc)**
 - Two winters ago (the same winter the black sap first appears; hinted, never confirmed, T-27): foreman Oswin Brask's crew of six (Bram, Nell, the Corrie twins, Dace) breaks into the old stairs in the Lower Shafts and is lost; the rock starts moving; the castle shuts the mine and bars its road at the Pass end. Goblins from the Pass take the upper levels; a Troll moves onto the road. Corwin's Spires "flinched" that winter; Sylvie's platform-three spring went bad. **(proposed, `docs/ideas/slatefall-and-the-deeper-mines.md` §2, §7)**
 - Player-driven: *The Guild Trial* (after the Harpy Matriarch). Sixty Canopy Bandits, outlaws who fled the capital's law, are killed, then the Troll on the mine road; the player gets Guild steel and the writ for the castle's east gate. **(proposed, `docs/ideas/north-lirold-and-exploration-guild.md` §6)**
+- Player-driven, at Revered reputation: *Safe Passage* (the Troll and goblins cleared off the Mountain Pass; the La Harpar Trader opens a trade road to Mawood, and Sylvie places a standing order); *Last Orders* (the Bartender feasts Lirold buyers renewing the fish contract); *A Clean Cure* (Sylvie's antidote slows the rot in young saplings but doesn't undo it); *Roots and Rafters* (after The Blighted Heart, Brenna rebuilds the lower walkways the blight made brittle; Corwin blesses them and reports the first silver shoot in two years, with recovery still years away). **(proposed, `docs/ideas/town-reputation-tier-rewards.md`)**
 - Player-driven: *Lamps in the Dark*, *What the Deep Keeps*, *The Last Shift*, *Charting the Deep*. Goblins cleared from the Deeper Mines; Oswin's badge and helm found; the lost crew laid to rest; the stairs found; the Stone Warden killed; the stairs stay sealed; Pell copies the Warden's marks for Varrow. **(proposed, `docs/ideas/slatefall-and-the-deeper-mines.md`)**
+- Before the mine's closure two winters ago, exact year unspecified: Phurgo voluntarily leaves Bramhold in Keldrath to run his own workshop and learn surface repair work. Traders' accounts of Lirold's customers and Slatefall iron bring him to the capital; no exile or homeland disaster is established. **(proposed, [dwarves.md](dwarves.md), owner's 2026-11-01 foundation request; `docs/ideas/gear-upgrading-cold-forge.md` `aboutLeaving`)**
+- Two winters ago onward: Slatefall's closure stops Phurgo's regular iron deliveries; he keeps his Lirold Forge open for cold repairs while the hearth waits. At an unspecified later time, Goblin Scavengers take his heavy tongs from a stranded cart on the Mountain Pass. **(proposed, `docs/ideas/gear-upgrading-cold-forge.md`, building on the closure in `docs/ideas/slatefall-and-the-deeper-mines.md`)**
+- Player-driven, after Lirold opens, independent of the mine Quests: *The Cold Forge*. Ludo identifies the scavengers, the player returns Phurgo's tongs, Marvin checks an old delivery record, and Fish & Apple Pie followed by Ancient Wood brings Phurgo back to hot work with salvage. No mine reopening, Iron Ore, survey or free upgraded gear. **(proposed, `docs/ideas/gear-upgrading-cold-forge.md`)**
+- Player-driven, independent of *The Cold Forge*: an Arena Chest yields a Pathfinder's Seal; Marvin registers it in La Harpar and teaches the bearer to identify better recovered gear. The lesson permanently makes 10% of eligible gear drops arrive at +1 (never unique gear or pets). No date is assigned to the Exploration Guild's proposed salvage tradition. **(proposed, `docs/ideas/gear-upgrading.md`, `docs/ideas/gear-upgrading-cold-forge.md`)**

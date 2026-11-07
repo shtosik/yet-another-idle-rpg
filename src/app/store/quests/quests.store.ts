@@ -2,7 +2,7 @@ import { QuestProgression, QuestStep } from '../../../types/quests/quest-progres
 import { patchState, signalStore, withHooks, withMethods, withState } from '@ngrx/signals'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { withDevtools } from '../helpers/devtools'
-import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
+import { saveGameStateNow, withGameStateSync } from '../helpers/with-game-state-sync.hook'
 import QUEST_DATA, { QUEST_STEP_AFTER_COMPLETED, QuestProps, RequirementProps } from '../../../data/quests-data'
 import { inject } from '@angular/core'
 import { ModalService } from '../../services/modal.service'
@@ -11,8 +11,16 @@ import { ItemStack } from '../player/inventory'
 import { ENTRANCE_ZONES_BY_QUEST } from '../../../data/helpers/entrance-zones'
 import { EnemyID } from '../../../enums/ids/enemy-id.enum'
 import { ZoneID } from '../../../enums/ids/zone-id.enum'
+import { ProfessionID } from '../../../enums/ids/profession-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
-import { getQuestStatus, getStepItems } from '../../services/quest-status'
+import { canAdvanceQuest, getQuestStatus, getStepItems } from '../../services/quest-status'
+import { ReputationService } from '../../services/reputation.service'
+import { ProfessionService } from '../../services/profession.service'
+import { REPUTATION_THRESHOLDS, ReputationGain } from '../player/reputation'
+import { orderKey, TurnInKey, turnInRemainingMs } from './turn-in-cooldown'
+import { Orders, rollOrder } from './orders'
+
+export { orderKey }
 
 /** Lifetime kill counters at the moment the quest reached its current step. */
 export interface KillBaseline {
@@ -26,6 +34,12 @@ export interface QuestsState {
   dialogueFlags: Record<string, boolean>
   /** Active quests pinned to the top of the quest panel, in pin order. Dropped on completion. */
   pinnedQuests: QuestID[]
+  /** When each turn-in last ran (epoch ms); its cooldown is computed from this (`turnInRemainingMs`). */
+  lastTurnInAt: Partial<Record<TurnInKey, number>>
+  /** Started repeatable orders: the rolled requirements and rewards, saved at start so a reload never re-rolls. */
+  orders: Orders
+  /** How often each repeatable order was completed. */
+  questCompletions: Partial<Record<QuestID, number>>
 }
 
 export const initialState: QuestsState = {
@@ -33,6 +47,9 @@ export const initialState: QuestsState = {
   stepKillBaselines: {},
   dialogueFlags: {},
   pinnedQuests: [],
+  lastTurnInAt: {},
+  orders: {},
+  questCompletions: {},
 }
 
 const STORE_KEY = 'questsStore'
@@ -48,10 +65,14 @@ export const QuestsStore = signalStore(
     store,
     modalService = inject(ModalService),
     playerStore = inject(PlayerStore),
+    reputationService = inject(ReputationService),
+    professionService = inject(ProfessionService),
   ) => ({
     handleQuestCompleted(data: QuestProps) {
       const statsToUpdate = []
       const itemsToUpdate: ItemStack[] = []
+      const reputationGains: ReputationGain[] = []
+      const professionRewards: { professionId: ProfessionID, amount: number }[] = []
 
       data.rewards.forEach((reward) => {
         switch (reward.type) {
@@ -59,8 +80,13 @@ export const QuestsStore = signalStore(
             statsToUpdate.push({ stat: reward.key, amount: reward.amount })
             break
           case 'item':
-
             itemsToUpdate.push({ id: reward.itemId, amount: reward.amount })
+            break
+          case 'reputation':
+            reputationGains.push({ reputationId: reward.reputationId, amount: reward.amount })
+            break
+          case 'professionXp':
+            professionRewards.push({ professionId: reward.professionId, amount: reward.amount })
             break
         }
       })
@@ -69,6 +95,8 @@ export const QuestsStore = signalStore(
       modalService.openQuestCompleted(data)
       playerStore.updatePlayerStats(statsToUpdate)
       playerStore.addItems(itemsToUpdate)
+      reputationService.gain(reputationGains)
+      professionRewards.forEach(({ professionId, amount }) => professionService.gainXp(professionId, amount))
     },
 
     /** Zones entered from a town building open when that building's quest starts. */
@@ -78,7 +106,7 @@ export const QuestsStore = signalStore(
 
     /** A turn-in consumes the step's item requirements, so dialogue never restates them. */
     takeStepItems(questId: QuestID, step: QuestStep) {
-      const items = getStepItems(questId, step)
+      const items = getStepItems(questId, step, store.orders())
       if (items.length > 0) playerStore.removeItems(items)
     },
 
@@ -130,22 +158,110 @@ export const QuestsStore = signalStore(
             const met = !!step && (req.step === undefined || step === req.step)
             return { current: met ? 1 : 0, target: 1 }
           }
+          case 'professionLevel':
+            return { current: playerStore.professionLevel(req.professionId), target: req.level }
+          case 'pickedItems': {
+            // Items held, capped per pick, against the total asked: met only when every pick is.
+            const picks = store.orders()[questId]?.requirements ?? []
+            if (picks.length === 0) return { current: 0, target: 1 }
+            return {
+              current: picks.reduce((sum, p) => sum + Math.min(playerStore.itemCount(p.itemId), p.amount), 0),
+              target: picks.reduce((sum, p) => sum + p.amount, 0),
+            }
+          }
+          case 'reputation':
+            return { current: playerStore.reputation()[req.reputationId] ?? 0, target: REPUTATION_THRESHOLDS[req.tier] }
           default:
             return { current: 0, target: 1 }
         }
       },
+    }),
+  ),
+  withMethods((store) => ({
+      /** The quest is active and its current step's requirements are met now. */
+      isStepReady(questId: QuestID): boolean {
+        return canAdvanceQuest(store.questStepProgression(), questId, req => {
+          const { current, target } = store.requirementProgress(questId, req)
+          return current >= target
+        })
+      },
+    }),
+  ),
+  withMethods((store, playerStore = inject(PlayerStore)) => ({
+      /** Milliseconds until the order's own turn-in cooldown is over; 0 when ready. */
+      orderRemainingMs(questId: QuestID, now: number): number {
+        return turnInRemainingMs(store.lastTurnInAt()[orderKey(questId)], playerStore.stats().turnInCooldownReduction, now)
+      },
+    }),
+  ),
+  withMethods((store, playerStore = inject(PlayerStore)) => ({
+      /**
+       * The only place a repeatable order ends, whichever dialogue route got here. Rejected (false) when the order
+       * isn't active, the player lacks the saved items or its cooldown is running: then nothing changes. Otherwise
+       * it takes the items, pays the saved rewards, starts the cooldown and frees the quest for its next pick.
+       */
+      completeOrder(questId: QuestID, now: number): boolean {
+        const data = QUEST_DATA[questId]
+        const order = store.orders()[questId]
+        if (!data.repeat || !order) return false
+        if (getQuestStatus(store.questStepProgression(), questId).state !== QuestState.active) return false
+        if (!order.requirements.every(r => playerStore.itemCount(r.itemId) >= r.amount)) return false
+        if (store.orderRemainingMs(questId, now) > 0) return false
 
+        playerStore.removeItems(order.requirements.map(r => ({ id: r.itemId, amount: r.amount })))
+        patchState(store, (state) => {
+          const { [questId]: _step, ...progression } = state.questStepProgression
+          const { [questId]: _order, ...orders } = state.orders
+          return {
+            questStepProgression: progression,
+            orders,
+            lastTurnInAt: { ...state.lastTurnInAt, [orderKey(questId)]: now },
+            questCompletions: { ...state.questCompletions, [questId]: (state.questCompletions[questId] ?? 0) + 1 },
+          }
+        })
+        store.setStepKillBaseline(questId, null)
+
+        const { reputation, gold, farmingXp } = order.rewards
+        const xp = Math.round(farmingXp * (1 + playerStore.stats().farmXpMultiplier))
+        store.handleQuestCompleted({
+          ...data,
+          rewards: [
+            { type: 'reputation' as const, reputationId: data.repeat.reputationId, amount: reputation },
+            { type: 'stat' as const, key: 'goldCoins' as const, amount: gold },
+            { type: 'professionXp' as const, professionId: data.repeat.professionId, amount: xp },
+          ].filter(reward => reward.amount > 0),
+        })
+        return true
+      },
+    }),
+  ),
+  withMethods((store, playerStore = inject(PlayerStore)) => ({
       resetState(): void {
         patchState(store, initialState)
       },
 
-      /** No-op once started. Dialogue gates offers on `QuestState.available` for `startRequirements`. */
+      /**
+       * No-op once started. Dialogue gates offers on `QuestState.available` for `startRequirements`. A repeatable order
+       * also needs its cooldown over and an eligible pick; it rolls the pick and saves it at once so a reload can't re-roll.
+       */
       startQuest(questId: QuestID) {
         if (store.questStepProgression()[questId] !== undefined) return
+
+        const repeat = QUEST_DATA[questId].repeat
+        if (repeat) {
+          if (store.orderRemainingMs(questId, Date.now()) > 0) return
+          const eligible = repeat.pool.filter(entry =>
+            playerStore.reputationTierOf(repeat.reputationId) >= entry.minTier
+            && (!entry.sourceZones || entry.sourceZones.some(zone => playerStore.isZoneUnlocked(zone))))
+          const order = rollOrder(repeat, eligible)
+          if (!order) return
+          patchState(store, (state) => ({ orders: { ...state.orders, [questId]: order } }))
+        }
 
         patchState(store, (state) => ({
           questStepProgression: { ...state.questStepProgression, [questId]: 1 },
         }))
+        if (repeat) saveGameStateNow()
         store.setStepKillBaseline(questId, 1)
         store.unlockEntranceZones(questId)
       },
@@ -162,18 +278,29 @@ export const QuestsStore = signalStore(
         }))
       },
 
+      /** Starts the turn-in's cooldown. */
+      recordTurnIn(key: TurnInKey, now: number) {
+        patchState(store, (state) => ({ lastTurnInAt: { ...state.lastTurnInAt, [key]: now } }))
+      },
+
       setDialogueFlag(flag: string) {
         patchState(store, (state) => ({
           dialogueFlags: { ...state.dialogueFlags, [flag]: true },
         }))
       },
 
-      /** Takes the current step's items, then moves to the next step or completes. No-op unless active. */
+      /** Takes the current step's items, then moves to the next step or completes. No-op unless the step is still ready. */
       advanceQuest(questId: QuestID) {
+        // Rechecked here: items can be used up between opening a turn-in node and confirming it.
+        if (!store.isStepReady(questId)) return
         const status = getQuestStatus(store.questStepProgression(), questId)
         if (status.state !== QuestState.active) return
 
         const questData = QUEST_DATA[questId]
+        if (questData.repeat) {
+          store.completeOrder(questId, Date.now())
+          return
+        }
         const completes = status.step >= questData.steps.length
         const nextStep = completes ? QUEST_STEP_AFTER_COMPLETED : status.step + 1
 
@@ -189,6 +316,10 @@ export const QuestsStore = signalStore(
       endQuest(questId: QuestID) {
         const status = getQuestStatus(store.questStepProgression(), questId)
         if (status.state !== QuestState.active) return
+        if (QUEST_DATA[questId].repeat) {
+          store.completeOrder(questId, Date.now())
+          return
+        }
 
         store.takeStepItems(questId, status.step)
         patchState(store, (state) => ({

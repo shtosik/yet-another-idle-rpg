@@ -3,6 +3,19 @@
 // Bundles the TS data modules with esbuild, imports the bundle, and prints
 // one `file: problem` line per finding. Errors exit 1; warnings only print.
 //
+// Checks, in order (search for `// N.` to jump to one; add a new check as the next number):
+//   1. Enum <-> data coverage: every enum id has data and every data key is an enum id
+//   2. Cross-entity references: ids inside data point at existing entities
+//   3. Dialogue graphs: node links resolve, no unreachable nodes
+//   4. i18n: keys used by data and templates exist in src/assets/locales/en
+//   5. Asset URLs: image paths in data exist
+//   6. Doc references: backticked paths in agent-facing docs exist
+//   7. Version and changelog format
+//   8. Component styles and templates: no inline <svg>, no unused BEM classes
+//   9. Codex skills mirror .claude/skills
+//  10. Agent and skill frontmatter parses (description quoting)
+//  11. docs/ideas/README.md statuses match each idea file's Status line
+//
 // Usage: npm run validate
 
 import { build } from 'esbuild'
@@ -10,6 +23,7 @@ import { existsSync, mkdirSync, readFileSync, readdirSync, statSync } from 'node
 import { dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { changelogSections, compareVersions, NOTE_RE, NOTE_TYPES, parseVersion } from './release.mjs'
+import { staleCodexSkills } from './sync-skills.mjs'
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const SRC = join(ROOT, 'src')
@@ -37,6 +51,11 @@ export { SkillBranch } from 'enums/ids/skill-branch.enum'
 export { SkillNodeType } from 'enums/skill-node-type.enum'
 export { NpcID } from 'enums/map/npc-id.enum'
 export { TownID } from 'enums/map/town-id.enum'
+export { ReputationID } from 'enums/reputation-id.enum'
+export { ProfessionID } from 'enums/ids/profession-id.enum'
+export { default as PROFESSIONS_DATA } from 'data/professions-data'
+export { FARM_SEEDS } from 'data/farming-data'
+export { initialFarm, BASE_PLOTS, PLOT_REPUTATION_TIERS, PLOT_GRANT_QUESTS } from 'app/store/player/farm'
 export { TownBuildingID } from 'enums/map/town-building-id.enum'
 export { DamageElement } from 'enums/damage-element.enum'
 export { ItemTier } from 'enums/items/item-tier.enum'
@@ -51,10 +70,15 @@ export { default as SPELLS_DATA } from 'data/spells-data'
 export { default as STATIONS_DATA } from 'data/stations-data'
 export { default as NPC_DATA } from 'data/npc-data'
 export { default as TOWNS_DATA } from 'data/towns-data'
+export { SITES_DATA } from 'data/sites-data'
 export { ALL_SKILLS } from 'data/skill-tree-data'
 export { UNLOCK_RULES, ZONE_UNLOCK_NOTIFICATIONS } from 'data/unlock-conditions'
 export { WORLD_MAP_DATA } from 'data/world-map-data'
 export { sellPrice } from 'app/store/shop/shop-prices'
+export { REPUTATION_IDS, REPUTATION_TOWN } from 'app/store/player/reputation'
+export { REPUTATION_TURN_INS } from 'data/reputation-turn-ins'
+export { bundleKey } from 'app/store/quests/turn-in-cooldown'
+export { TitleID } from 'enums/ids/title-id.enum'
 export { CHANGELOG_NOTE_TYPES } from 'app/components/modals/changelog/changelog'
 `
 
@@ -91,6 +115,7 @@ const COVERAGE = [
   ['SkillNodeID', D.SkillNodeID, D.ALL_SKILLS, 'src/data/skill-tree-data.ts', 'id'],
   ['NpcID', D.NpcID, D.NPC_DATA, 'src/data/npc-data.ts', 'id'],
   ['TownID', D.TownID, D.TOWNS_DATA, 'src/data/towns-data.ts', 'id'],
+  ['ProfessionID', D.ProfessionID, D.PROFESSIONS_DATA, 'src/data/professions-data.ts', 'id'],
 ]
 
 for (const [name, e, data, file, idField] of COVERAGE) {
@@ -112,6 +137,7 @@ for (const [name, e, data, file, idField] of COVERAGE) {
 // 2. Cross-entity references
 
 const has = (data, id) => id !== undefined && data[id] !== undefined
+const REPUTATION_ID_KEYS = Object.fromEntries(enumValues(D.ReputationID).map(v => [v, true]))
 const REF_KEYS = {
   itemId: ['ItemID', D.ITEM_DATA],
   enemyId: ['EnemyID', D.ENEMIES_DATA],
@@ -127,6 +153,8 @@ const REF_KEYS = {
   stationId: ['StationID', D.STATIONS_DATA],
   spellId: ['SpellID', D.SPELLS_DATA],
   townId: ['TownID', D.TOWNS_DATA],
+  reputationId: ['ReputationID', REPUTATION_ID_KEYS],
+  professionId: ['ProfessionID', D.PROFESSIONS_DATA],
 }
 
 // Walks any data structure and checks every field whose name implies a reference.
@@ -185,11 +213,36 @@ for (const shop of shops) {
     }
   }
 }
-const UNSELLABLE_TYPES = new Set([D.ItemType.book, D.ItemType.stationUpgrade, D.ItemType.quest, D.ItemType.chest])
+const UNSELLABLE_TYPES = new Set([D.ItemType.book, D.ItemType.stationUpgrade, D.ItemType.quest, D.ItemType.chest, D.ItemType.seed])
 for (const item of Object.values(D.ITEM_DATA)) {
   const name = idName(D.ItemID, item.id)
   if (item.value > 0 && UNSELLABLE_TYPES.has(item.type)) {
     error('src/data/items', `${name} must be unsellable (value <= 0)`)
+  }
+}
+
+// Unique gear: quest rewards and equipment whose only acquisition source is a chest.
+const questGear = new Set(Object.values(D.QUEST_DATA).flatMap(quest => quest.rewards
+  .filter(reward => reward.type === 'item').map(reward => reward.itemId)))
+const outsideChests = new Set([
+  ...questGear,
+  ...shops.flatMap(shop => shop.items.map(item => item.itemId)),
+  ...Object.values(D.ENEMIES_DATA).flatMap(enemy => [...enemy.drops, ...(enemy.shinyDrops ?? [])].map(drop => drop.id)),
+  ...Object.values(D.RECIPES_DATA).map(recipe => recipe.itemId),
+  ...Object.values(D.ZONES_DATA).flatMap(zone => zone.masteryReward.items.map(item => item.id)),
+])
+for (const npc of Object.values(D.NPC_DATA)) {
+  for (const node of Object.values(npc.dialogue)) {
+    const effects = (node.options ?? []).flatMap(option => (option.results ?? []).flatMap(result => result.effects ?? []))
+    for (const effect of effects) if (effect.type === 'item' && effect.action === 'give') for (const item of effect.items) outsideChests.add(item.itemId)
+  }
+}
+const chestOnly = new Set(Object.values(D.ITEM_DATA).filter(item => item.type === D.ItemType.chest)
+  .flatMap(chest => chest.loot.filter(entry => 'itemId' in entry && !outsideChests.has(entry.itemId)).map(entry => entry.itemId)))
+for (const item of Object.values(D.ITEM_DATA)) {
+  if (item.type !== D.ItemType.equipment || item.unique) continue
+  if (questGear.has(item.id) || chestOnly.has(item.id)) {
+    warn('src/data/items', `${idName(D.ItemID, item.id)} is quest-reward or chest-only equipment; add unique: true`)
   }
 }
 
@@ -208,6 +261,29 @@ for (const recipe of Object.values(D.RECIPES_DATA)) {
     error('src/data/recipes-data.ts', `${idName(D.RecipeID, recipe.id)} needs ${idName(D.StationID, recipe.stationId)} level ${recipe.stationLevel} > maxLevel ${station.maxLevel}`)
   }
 }
+// Seeds live in the farming state, never in the inventory: each maps to a crop, and nothing may require holding one.
+const seedItems = Object.values(D.ITEM_DATA).filter(item => item.type === D.ItemType.seed)
+for (const item of seedItems) {
+  const farmSeed = D.FARM_SEEDS[item.id]
+  if (!farmSeed) error('src/data/farming-data.ts', `seed ${idName(D.ItemID, item.id)} has no FARM_SEEDS entry`)
+  else if (D.ITEM_DATA[farmSeed.cropId]?.type === D.ItemType.seed || !has(D.ITEM_DATA, farmSeed.cropId)) error('src/data/farming-data.ts', `${idName(D.ItemID, item.id)} maps to a crop that is not an item or is a seed`)
+}
+for (const id of Object.keys(D.FARM_SEEDS)) {
+  if (D.ITEM_DATA[id]?.type !== D.ItemType.seed) error('src/data/farming-data.ts', `FARM_SEEDS key ${idName(D.ItemID, Number(id))} is not a seed item`)
+}
+const isSeedId = id => D.ITEM_DATA[id]?.type === D.ItemType.seed
+for (const recipe of Object.values(D.RECIPES_DATA)) {
+  for (const cost of recipe.itemsNeeded) if (isSeedId(cost.id)) error('src/data/recipes-data.ts', `${idName(D.RecipeID, recipe.id)} needs seed ${idName(D.ItemID, cost.id)}; seeds are not in the inventory`)
+}
+for (const quest of Object.values(D.QUEST_DATA)) {
+  for (const step of quest.steps) {
+    for (const req of step.requirements ?? []) if (req.type === 'item' && isSeedId(req.itemId)) error('src/data/quests-data.ts', `${idName(D.QuestID, quest.questId)} has an item step that needs seed ${idName(D.ItemID, req.itemId)}; seeds are not in the inventory`)
+  }
+}
+if (D.BASE_PLOTS + D.PLOT_REPUTATION_TIERS + D.PLOT_GRANT_QUESTS > D.initialFarm.plots.length) {
+  error('src/app/store/player/farm.ts', `the plot count can reach ${D.BASE_PLOTS + D.PLOT_REPUTATION_TIERS + D.PLOT_GRANT_QUESTS}, more than the ${D.initialFarm.plots.length} plot slots`)
+}
+
 for (const town of Object.values(D.TOWNS_DATA)) {
   for (const b of town.buildings) {
     if (!enumValues(D.TownBuildingID).includes(b.buildingId)) error('src/data/towns-data.ts', `${idName(D.TownID, town.id)} has unknown TownBuildingID ${b.buildingId}`)
@@ -221,8 +297,11 @@ for (const town of Object.values(D.TOWNS_DATA)) {
   }
 }
 // A step's turnInNpc backs the quest panel's "Talk to" link: the NPC must stand in a town
-// and their dialogue must start, advance or end that quest.
-const placedNpcs = new Set(Object.values(D.TOWNS_DATA).flatMap(t => t.buildings.flatMap(b => b.npcs.map(n => n.id))))
+// or on a Site and their dialogue must start, advance or end that quest.
+const placedNpcs = new Set([
+  ...Object.values(D.TOWNS_DATA).flatMap(t => t.buildings.flatMap(b => b.npcs.map(n => n.id))),
+  ...Object.values(D.SITES_DATA).flatMap(site => site.npcs.map(n => n.id)),
+])
 const questsInDialogue = npcId => new Set(Object.values(D.NPC_DATA[npcId]?.dialogue ?? {})
   .flatMap(node => node.options ?? [])
   .flatMap(option => option.results ?? [])
@@ -234,9 +313,37 @@ for (const quest of Object.values(D.QUEST_DATA)) {
     const where = `${idName(D.QuestID, quest.questId)} step ${i + 1}`
     const npc = idName(D.NpcID, step.turnInNpc)
     if (!has(D.NPC_DATA, step.turnInNpc)) error('src/data/quests-data.ts', `${where} has unknown turnInNpc ${step.turnInNpc}`)
-    else if (!placedNpcs.has(step.turnInNpc)) error('src/data/quests-data.ts', `${where}: turnInNpc ${npc} isn't in any town building`)
+    else if (!placedNpcs.has(step.turnInNpc)) error('src/data/quests-data.ts', `${where}: turnInNpc ${npc} isn't in any town building or Site`)
     else if (!questsInDialogue(step.turnInNpc).has(quest.questId)) error('src/data/quests-data.ts', `${where}: turnInNpc ${npc}'s dialogue never starts, advances or ends this quest`)
   })
+  for (const reward of quest.rewards.filter(r => r.type === 'reputation')) {
+    if (!D.REPUTATION_IDS.includes(reward.reputationId)) error('src/data/quests-data.ts', `${idName(D.QuestID, quest.questId)} gives reputation in ${idName(D.ReputationID, reward.reputationId)}, which isn't in REPUTATION_IDS`)
+    if (!(reward.amount > 0)) error('src/data/quests-data.ts', `${idName(D.QuestID, quest.questId)} gives ${reward.amount} reputation; it must be positive`)
+  }
+}
+
+// A reputation turn-in giver stands in the town they credit, and their dialogue uses the turn-in.
+const townOfNpc = npcId => Object.values(D.TOWNS_DATA).find(t => t.buildings.some(b => b.npcs.some(n => n.id === npcId)))?.id
+const effectsOf = npcId => Object.values(D.NPC_DATA[npcId]?.dialogue ?? {})
+  .flatMap(node => node.options ?? []).flatMap(option => option.results ?? []).flatMap(result => result.effects ?? [])
+for (const turnIn of D.REPUTATION_TURN_INS) {
+  const npc = idName(D.NpcID, turnIn.npcId)
+  const file = 'src/data/reputation-turn-ins.ts'
+  if (!D.REPUTATION_IDS.includes(turnIn.reputationId)) error(file, `${npc}'s turn-in credits ${idName(D.ReputationID, turnIn.reputationId)}, which isn't in REPUTATION_IDS`)
+  if (townOfNpc(turnIn.npcId) !== D.REPUTATION_TOWN[turnIn.reputationId]) error(file, `${npc}'s turn-in credits ${idName(D.ReputationID, turnIn.reputationId)}, but ${npc} doesn't stand there`)
+  if (!has(D.ITEM_DATA, turnIn.itemId)) error(file, `${npc}'s turn-in has unknown ItemID ${turnIn.itemId}`)
+  if (!(turnIn.bundleSize > 0 && turnIn.reputation > 0)) error(file, `${npc}'s turn-in needs a positive bundleSize and reputation`)
+  if (!effectsOf(turnIn.npcId).some(e => e.type === 'reputationTurnIn')) error(file, `${npc}'s dialogue never uses their turn-in`)
+  const cooldownKeys = Object.values(D.NPC_DATA[turnIn.npcId]?.dialogue ?? {})
+    .flatMap(node => node.options ?? []).flatMap(option => option.results ?? []).flatMap(result => result.requirementsNeeded ?? [])
+    .filter(c => c.type === 'turnInCooldown').map(c => c.key)
+  if (!cooldownKeys.includes(D.bundleKey(turnIn.npcId, turnIn.itemId))) error(file, `${npc}'s turn-in option has no turnInCooldown requirement for its bundle key`)
+}
+for (const npc of Object.values(D.NPC_DATA)) {
+  for (const effect of effectsOf(npc.id).filter(e => e.type === 'reputationTurnIn')) {
+    if (effect.npcId !== npc.id) error(`src/data/dialogues (${idName(D.NpcID, npc.id)})`, `turn-in effect names ${idName(D.NpcID, effect.npcId)}, not this NPC`)
+    if (!D.REPUTATION_TURN_INS.some(t => t.npcId === effect.npcId)) error(`src/data/dialogues (${idName(D.NpcID, npc.id)})`, 'turn-in effect has no REPUTATION_TURN_INS entry')
+  }
 }
 for (const skill of Object.values(D.ALL_SKILLS)) {
   const reqs = []
@@ -354,7 +461,7 @@ function walkKeys(node, file) {
   if (typeof node === 'string') {
     const m = node.match(KEY_RE)
     if (m && namespaces.has(m[1])) requireKey(file, node)
-    else if (m && /^[a-z]/i.test(m[1])) error(file, `i18n key '${node}' uses unknown namespace '${m[1]}'`)
+    else if (m && /^[a-z]/i.test(m[1]) && m[1] !== 'order') // a TurnInKey, not an i18n key error(file, `i18n key '${node}' uses unknown namespace '${m[1]}'`)
     return
   }
   if (Array.isArray(node)) { node.forEach(n => walkKeys(n, file)); return }
@@ -377,7 +484,10 @@ const ENTITY_KEYS = [
   [D.SkillBranch, k => [`skill-tree:branches.${k}`], 'src/assets/locales/en/skill-tree.json'],
   [D.SkillNodeID, k => [`skill-tree:nodes.${k}.name`, `skill-tree:nodes.${k}.desc`], 'src/assets/locales/en/skill-tree.json'],
   [D.TownID, k => [`map:towns.${k}`], 'src/assets/locales/en/map.json'],
+  [D.ReputationID, k => [`map:reputations.${k}`], 'src/assets/locales/en/map.json'],
   [D.TownBuildingID, k => [`map:buildings.${k}`], 'src/assets/locales/en/map.json'],
+  [D.ProfessionID, k => [`app:professions.${k}`], 'src/assets/locales/en/app.json'],
+  [D.TitleID, k => [`app:titles.${k}`], 'src/assets/locales/en/app.json'],
   [D.DamageElement, k => [`app:elements.${k}`], 'src/assets/locales/en/app.json'],
   [D.ItemTier, k => [`items:tiers.${k}`], 'src/assets/locales/en/items.json'],
 ]
@@ -444,6 +554,7 @@ for (const f of [...walkFiles(join(SRC, 'app'), '.ts'), ...walkFiles(join(SRC, '
 // 6. Doc references: backticked paths in agent-facing docs must exist.
 
 const DOC_FILES = [
+  join(ROOT, 'AGENTS.md'),
   join(ROOT, 'CLAUDE.md'),
   join(ROOT, 'CODING_STANDARDS.md'),
   join(ROOT, 'docs', 'git-workflow.md'),
@@ -467,6 +578,8 @@ const allDirs = new Set(allFiles.flatMap(f => f.split('/').slice(0, -1).map((_, 
 
 // A file name with a known extension, or a multi-segment path rooted at a top-level repo dir.
 const PATH_RE = /^[\w.][\w./-]*\.(ts|mjs|js|json|md|html|scss|png)$|^(src|docs|scripts|\.claude|public)(\/[\w.-]+)+\/?$/
+/** Per-machine files docs may name; they are never in git. */
+const LOCAL_ONLY_PATHS = new Set(['.claude/launch.json'])
 function resolveDocPath(p) {
   const clean = p.replace(/\/$/, '')
   if (existsSync(join(ROOT, clean))) return join(ROOT, clean)
@@ -485,7 +598,7 @@ for (const doc of DOC_FILES) {
   for (const [, token] of text.matchAll(/`([^`\s]+)`/g)) {
     if (/[*<>{}$]|^https?:|^\.\.?\/|^\/|^~/.test(token)) continue
     const [path, symbol] = token.split(/:(?=[A-Za-z_])/)
-    if (!PATH_RE.test(path)) continue
+    if (!PATH_RE.test(path) || LOCAL_ONLY_PATHS.has(path)) continue
     const resolved = resolveDocPath(path)
     if (!resolved) { error(rel, `references missing path '${path}'`); continue }
     if (symbol && statSync(resolved).isFile()) {
@@ -572,6 +685,63 @@ for (const f of walkFiles(APP, '.ts')) {
       const prefix = escapeRegExp(name.slice(0, modifierAt + 2))
       if (modifierAt > 0 && new RegExp(`(^|[^\\w-])${prefix}(?=['"\`]|\\$\\{|\\{\\{)`).test(source)) continue
       error(repoPath(styleFile), `.${name} is styled but neither the template nor the component code uses it`)
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 9. Codex skills: .agents/skills mirrors the shared skills in .claude/skills.
+
+for (const p of staleCodexSkills()) error(p, 'out of sync with .claude/skills: run `npm run sync-skills`')
+
+// ---------------------------------------------------------------------------
+// 10. Agent and skill frontmatter: an unquoted YAML value can't contain ': ' or ' #'. Claude Code drops a file
+//     whose frontmatter doesn't parse without any error, so the agent or skill silently goes missing.
+
+for (const f of [...walkFiles(join(ROOT, '.claude', 'agents'), '.md'), ...walkFiles(join(ROOT, '.claude', 'skills'), 'SKILL.md')]) {
+  const frontmatter = /^---\r?\n([\s\S]*?)\r?\n---/.exec(readFileSync(f, 'utf8'))?.[1] ?? ''
+  // A plain value may wrap onto indented lines; they are part of the same value.
+  for (const [, key, value] of frontmatter.matchAll(/^([\w-]+):[ \t]+(.+(?:\r?\n[ \t]+(?!- ).+)*)/gm)) {
+    if (/^["'[{>|]/.test(value)) continue
+    if (/: | #/.test(value)) error(repoPath(f), `frontmatter '${key}' has ': ' or ' #' unquoted, so it doesn't parse: wrap the value in double quotes`)
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 11. Idea statuses: docs/ideas/README.md lists one status word per idea; the idea file's **Status:** line starts with it.
+
+{
+  const IDEAS = join(ROOT, 'docs', 'ideas')
+  const STATUSES = ['Proposed', 'Accepted', 'In progress', 'Done', 'Noted', 'Open']
+  const readme = 'docs/ideas/README.md'
+  for (const [, file, status] of readFileSync(join(IDEAS, 'README.md'), 'utf8').matchAll(/^\|[^|]*\]\((?:\.\/)?([\w.-]+\.md)\)[^|]*\|[^|]*\|\s*([^|]*?)\s*\|/gm)) {
+    const validStatus = STATUSES.includes(status)
+    if (!validStatus) error(readme, `${file}: status '${status}' is not one of ${STATUSES.join(', ')}`)
+    if (!existsSync(join(IDEAS, file))) { error(readme, `links missing file ${file}`); continue }
+    const line = /\*\*Status:\*\*[ \t]*([^\r\n]*)/.exec(readFileSync(join(IDEAS, file), 'utf8'))?.[1]
+    if (line === undefined) error(`docs/ideas/${file}`, `no '**Status:** ${validStatus ? status : '<status>'}' line`)
+    else if (validStatus && !line.startsWith(status)) error(`docs/ideas/${file}`, `Status line '${line.slice(0, 40)}…' doesn't start with '${status}', the README status`)
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 12. Docs: relative .md links point at a file, everywhere but the archive; lore, character and system docs name real IDs.
+
+{
+  const SHIPPED_NAMES = /^docs\/(lore|character|systems)\//
+  // Characters with a doc but no data yet; remove an ID when it ships.
+  const PLANNED_IDS = new Set(['NpcID.liroldVarrow'])
+  const ENUMS = { ItemID: D.ItemID, NpcID: D.NpcID }
+  for (const doc of walkFiles(join(ROOT, 'docs'), '.md')) {
+    const rel = relative(ROOT, doc).replace(/\\/g, '/')
+    if (rel.startsWith('docs/archive/')) continue
+    const text = readFileSync(doc, 'utf8')
+    for (const [, target] of text.replace(/```[\s\S]*?```/g, '').matchAll(/\]\((?!https?:)([^)\s#]+\.md)(?:#[^)\s]*)?(?:\s+["'][^"']*["'])?\)/g)) {
+      if (!existsSync(resolve(dirname(doc), target))) error(rel, `links missing file '${target}'`)
+    }
+    if (!SHIPPED_NAMES.test(rel)) continue
+    for (const [, name, member] of text.matchAll(/\b(ItemID|NpcID)\.(\w+)/g)) {
+      if (ENUMS[name][member] === undefined && !PLANNED_IDS.has(`${name}.${member}`)) error(rel, `names unknown ${name}.${member}`)
     }
   }
 }

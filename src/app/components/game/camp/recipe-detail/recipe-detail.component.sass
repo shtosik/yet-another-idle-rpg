@@ -2,7 +2,7 @@
 @use 'variables' as vars
 @use 'palette' as palette
 
-$muted: #a3a3a3
+$muted: #c2bfb8
 $ready: #4ade80
 $short: #f87171
 $locked: #fb923c
@@ -16,7 +16,7 @@ $locked: #fb923c
   border: vars.$panelBorder
   border-radius: vars.$panelBorderRadius
   background: #1f1f1f
-  font-size: 0.8125rem
+  font-size: 0.9rem
 
 .detail
   &__info
@@ -51,7 +51,8 @@ $locked: #fb923c
       image-rendering: pixelated
       object-fit: contain
 
-  &__title
+  // Not __title: the global Cinzel rule would turn the type line into capitals.
+  &__text
     display: flex
     flex-direction: column
     gap: 2px
@@ -59,7 +60,7 @@ $locked: #fb923c
 
   &__name
     overflow: hidden
-    font-size: 0.9375rem
+    font-size: 1.05rem
     font-weight: 400
     text-overflow: ellipsis
     white-space: nowrap
@@ -71,7 +72,7 @@ $locked: #fb923c
   &__type,
   &__sub
     color: $muted
-    font-size: 0.7625rem
+    font-size: 0.85rem
 
   &__effects
     display: flex
@@ -88,11 +89,11 @@ $locked: #fb923c
     gap: 1px
 
     ::ng-deep .stat
-      font-size: 0.8125rem
+      font-size: 0.9rem
 
     ::ng-deep .timing
       color: $muted
-      font-size: 0.7625rem
+      font-size: 0.85rem
       opacity: 1
 
   &__ingredients
@@ -137,7 +138,7 @@ $locked: #fb923c
     border-radius: 3px
     background: #2c2c2c
     color: #dddada
-    font-size: 0.8125rem
+    font-size: 0.9rem
     cursor: pointer
 
     &--active
@@ -151,7 +152,7 @@ $locked: #fb923c
     border-radius: 4px
     background: palette.$yellow
     color: #0a0a0a
-    font-size: 0.8625rem
+    font-size: 0.95rem
     cursor: pointer
 
     &:disabled
@@ -162,7 +163,7 @@ $locked: #fb923c
   &__reason
     min-height: 0.95rem
     color: $muted
-    font-size: 0.7625rem
+    font-size: 0.85rem
 
     &--blocked
       color: $short

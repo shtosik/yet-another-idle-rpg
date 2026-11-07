@@ -2,7 +2,7 @@
 
 **Scope:** M-L · **Status:** Proposed (revision 2, 2026-10-27; roster accepted: Hedda, Tobin, Pell)
 
-> `la-harpar-quests.md` (the Tidecaller questline) is a separate draft, not in `docs/ideas/` yet. Lines below that cite it are conditional on it shipping.
+> `la-harpar-quests.md` (the Tidecaller questline) is a proposed draft in `docs/ideas/`. Lines below that cite it are conditional on it shipping.
 
 A miners' village on the castle's mine road between Lirold and the Mountain Pass, with two combat Zones under it: the **Deeper Mines** and the **Lower Shafts**. It comes after Lirold in the climb. Companion to [`north-lirold-and-exploration-guild.md`](north-lirold-and-exploration-guild.md), which has the road, the map brief and *The Guild Trial* that opens Slatefall.
 

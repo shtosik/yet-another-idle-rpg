@@ -15,7 +15,8 @@
     "opt2": "Who are you?",
     "opt3": "What can you tell me about this place?",
     "opt4": "Do you have any work for me?",
-    "opt5": "I don't have any more questions. Enjoy your drink."
+    "opt5": "I don't have any more questions. Enjoy your drink.",
+    "opt6": "About that heirloom you gave me..."
   },
   "intro": {
     "message": "My name is Josh. I'm a local fisherman, and my hobby is drinking free beer.",
@@ -66,5 +67,18 @@
   "missionCheck": {
     "message": "No. For now, the coast is clear.",
     "opt1": "Good."
+  },
+  "talkFree": {
+    "message": "You again? Sit down. Half the beach owes you a drink, so I reckon I can talk for free. Once.",
+    "opt1": "Once is all I need."
+  },
+  "aboutHeirloom": {
+    "message": "That ring? I kept it for someone who went up the mountain and never came back for it. I've waited long enough. Better on a hand that goes places.",
+    "opt1": "I'll take care of it.",
+    "opt2": "Who was it?"
+  },
+  "aboutHeirloomWho": {
+    "message": "Buy me a beer some other year and maybe I'll tell you.",
+    "opt1": "Fair enough."
   }
 }

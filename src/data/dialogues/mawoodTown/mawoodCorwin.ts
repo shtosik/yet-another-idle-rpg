@@ -1,7 +1,10 @@
 import { DialogueNode } from '../../../interfaces/dialogues/dialogue-node.interface'
 import { NpcID } from '../../../enums/map/npc-id.enum'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
+import { ItemID } from '../../../enums/ids/item-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
+import { ReputationID } from '../../../enums/reputation-id.enum'
+import { ReputationTier } from '../../../enums/reputation-tier.enum'
 
 export enum CorwinDialogue {
   default = 0,
@@ -21,11 +24,18 @@ export enum CorwinDialogue {
   questBlightedHeartComplete,
   postQuestLore,
   waitingForFinn,
+  reveredFirstShoot,
+  rootsAndRaftersComplete,
+  rootglowMoth,
+  rootglowMothGiven,
+  farmFinaleLine,
 }
 
 export type MawoodCorwinDialogueType = Record<CorwinDialogue, DialogueNode<CorwinDialogue>>
 
 const NS = 'dialogues/mawoodCorwin'
+/** Mawood's Exalted pet, given once. */
+const GAVE_PET_FLAG = 'corwin_gave_pet'
 
 const MAWOOD_CORWIN: MawoodCorwinDialogueType = {
   [CorwinDialogue.intro1]: {
@@ -75,6 +85,20 @@ const MAWOOD_CORWIN: MawoodCorwinDialogueType = {
       {
         responseKey: `${NS}:default.corruption`,
         results: [{ next: CorwinDialogue.corruptionLore }],
+      },
+      {
+        responseKey: `${NS}:default.rootsAndRafters`,
+        results: [{ visibilityConditions: [{ type: 'quest', questId: QuestID.rootsAndRafters, questState: QuestState.readyToAdvance, step: 2 }], next: CorwinDialogue.rootsAndRaftersComplete }],
+      },
+      {
+        responseKey: `${NS}:default.farmFinale`,
+        results: [{
+          visibilityConditions: [
+            { type: 'quest', questId: QuestID.theGrowersTable, questState: QuestState.completed },
+            { type: 'flag', name: 'corwin_heard_table', isSet: false },
+          ],
+          next: CorwinDialogue.farmFinaleLine,
+        }],
       },
       {
         responseKey: `${NS}:default.work`,
@@ -136,8 +160,41 @@ const MAWOOD_CORWIN: MawoodCorwinDialogueType = {
         ],
       },
       {
+        responseKey: `${NS}:default.recovery`,
+        results: [
+          {
+            visibilityConditions: [
+              { type: 'reputation', reputationId: ReputationID.mawood, tier: ReputationTier.revered, hidden: true },
+              { type: 'quest', questId: QuestID.theBlightedHeart, questState: QuestState.completed },
+            ],
+            next: CorwinDialogue.reveredFirstShoot,
+          },
+        ],
+      },
+      {
+        responseKey: `${NS}:default.rootglowMoth`,
+        results: [{
+          visibilityConditions: [
+            { type: 'reputation', reputationId: ReputationID.mawood, tier: ReputationTier.exalted, hidden: true },
+            { type: 'flag', name: GAVE_PET_FLAG, isSet: false, hidden: true },
+          ],
+          next: CorwinDialogue.rootglowMoth,
+        }],
+      },
+      {
         responseKey: `${NS}:default.goodbye`,
         results: [{ next: CorwinDialogue.default, closeDialogue: true }],
+      },
+    ],
+  },
+
+  [CorwinDialogue.reveredFirstShoot]: {
+    id: CorwinDialogue.reveredFirstShoot,
+    messageKey: `${NS}:reveredFirstShoot.message`,
+    options: [
+      {
+        responseKey: `${NS}:reveredFirstShoot.opt1`,
+        results: [{ next: CorwinDialogue.default }],
       },
     ],
   },
@@ -360,6 +417,44 @@ const MAWOOD_CORWIN: MawoodCorwinDialogueType = {
         responseKey: `${NS}:waitingForFinn.opt1`,
         results: [{ next: CorwinDialogue.default, closeDialogue: true }],
       },
+    ],
+  },
+  [CorwinDialogue.rootsAndRaftersComplete]: {
+    id: CorwinDialogue.rootsAndRaftersComplete,
+    messageKey: `${NS}:rootsAndRaftersComplete.message`,
+    options: [
+      { responseKey: `${NS}:rootsAndRaftersComplete.opt1`, results: [{ next: CorwinDialogue.reveredFirstShoot, effects: [{ type: 'quest', action: 'advance', questId: QuestID.rootsAndRafters }] }] },
+    ],
+  },
+  [CorwinDialogue.rootglowMoth]: {
+    id: CorwinDialogue.rootglowMoth,
+    messageKey: `${NS}:rootglowMoth.message`,
+    options: [
+      {
+        responseKey: `${NS}:rootglowMoth.opt1`,
+        results: [{
+          next: CorwinDialogue.rootglowMothGiven,
+          effects: [
+            { type: 'item', action: 'give', items: [{ itemId: ItemID.petMawoodMoth, amount: 1 }] },
+            { type: 'flag', name: GAVE_PET_FLAG },
+          ],
+        }],
+      },
+      { responseKey: `${NS}:rootglowMoth.opt2`, results: [{ next: CorwinDialogue.default }] },
+    ],
+  },
+  [CorwinDialogue.rootglowMothGiven]: {
+    id: CorwinDialogue.rootglowMothGiven,
+    messageKey: `${NS}:rootglowMothGiven.message`,
+    options: [
+      { responseKey: `${NS}:rootglowMothGiven.opt1`, results: [{ next: CorwinDialogue.default }] },
+    ],
+  },
+  [CorwinDialogue.farmFinaleLine]: {
+    id: CorwinDialogue.farmFinaleLine,
+    messageKey: `${NS}:farmFinaleLine.message`,
+    options: [
+      { responseKey: `${NS}:farmFinaleLine.opt1`, results: [{ next: CorwinDialogue.default, effects: [{ type: 'flag', name: 'corwin_heard_table' }] }] },
     ],
   },
 }

@@ -19,7 +19,7 @@ Each domain is a separate origin, so saves in `localStorage` never mix between e
 
 Feature branch from `origin/staging` → PR into `staging` → merge (deploys staging).
 
-A sub-feature branches from its parent feature branch and merges back into it. That merge deploys nothing and runs no CI (CI covers PRs into `main` and `staging` only), so run `npm run validate`, `npm run lint`, `npm run test:ci` and `npx ng build` before merging. The parent then opens its own PR into `staging`, which runs CI and deploys staging on merge. When a release is decided: `release/x.y.z` branch from `staging` → version bump → PR into `main` → merge (deploys production, tags `vx.y.z`, publishes a GitHub release) → merge `main` back into `staging`.
+A feature ships as one PR into `staging`, which runs CI and deploys staging on merge. When a release is decided: `release/x.y.z` branch from `staging` → version bump → PR into `main` → merge (deploys production, tags `vx.y.z`, publishes a GitHub release) → merge `main` back into `staging`.
 
 To put any branch on testing: GitHub → Actions → **Deploy** → **Run workflow** → pick the branch. The branch must contain `.github/workflows/deploy.yml`. Testing holds one build at a time; the next run replaces it.
 
@@ -40,7 +40,7 @@ The version is `version` in `package.json`, `MAJOR.MINOR.PATCH` ([semver](https:
 ### What the player sees
 
 - `npm run build` and `npm run build:testing` end with `scripts/write-version.mjs`, which writes `version.json` (`version`, `commit`, `builtAt`) next to the build.
-- `src/app/services/version-check.service.ts` fetches it on load, every 5 minutes and when the tab becomes visible. A different `commit` (any new deploy, also staging without a bump) or a `version` other than the bundle's shows a banner with a Reload button; the reload saves first. `npm start` has no `version.json`, so no banner in dev.
+- `src/app/services/version-check.service.ts` fetches it on load, every 5 minutes and when the tab becomes visible. A different `commit` (any new deploy, also staging without a bump) or a `version` other than the bundle's shows a yellow chip with Reload in the notification bar under the HUD (`NotificationBarComponent`); the reload saves first, and a failed save turns the chip red and keeps the game running. `npm start` has no `version.json`, so no chip in dev.
 - Settings shows the running version (`src/app/version.ts`, read from `package.json`).
 
 ## Workflows

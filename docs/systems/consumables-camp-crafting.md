@@ -22,13 +22,13 @@ The **Camp** tab is the player's crafting base. It holds **stations** (Workbench
 
 **Crafting** (`craftItem(recipeId, times)`): `evaluateRecipe` decides:
 - visible: station owned, recipe unlocked if `requiresUnlock` (by using its recipe scroll), and gear not already installed;
-- blocked: `stationLevel` too low, `stationOrder` (gear out of sequence), `missingItems`, or `inventoryFull` (checked after paying, since paying can free a slot; the reason names the result's tab, e.g. "Gear tab full").
+- blocked: `stationLevel` too low, `stationOrder` (gear out of sequence), `missingItems` (no reason line: the red ingredient counters show what is short), or `inventoryFull` (checked after paying, since paying can free a slot; the reason names the result's tab, e.g. "Gear tab full").
 Then ingredients are removed and the result added (×`createsAmount` × count). Batch size comes from `CampStore.batchSize` (number or `'max'`).
 
 **Consumables** (`useConsumable(itemId)`):
-1. Refused while the slot is locked, or when it's a pure mana potion at full mana.
+1. Refused while the slot is locked, or when it's a pure mana potion at full mana (Minor restores 5, Greater 15; the Greater Mana Potion is crafted at Alchemy level 1 from 1 Vial of Water and 3 Spider Silk once its recipe scroll, sold by Sylvie at Mawood Honored, is used).
 2. Locks the slot for `cooldown` seconds with an effect lasting `min(duration, cooldown)` seconds, and restores mana.
-3. Each second `tickConsumables` counts down the effect and the lock. While the effect runs, the item's `effect.stats` are part of the derived player stats; they disappear when it ends.
+3. Each second `tickConsumables` counts down the effect and the lock. While the effect runs, the item's `effect.stats` are part of the derived player stats; they disappear when it ends. Food stats (not potions) are multiplied by `foodEffectMultiplier` (base 1; only gear raises it, read from equipment first by `foodMultiplierOf`), e.g. ×1.5 with the Tavern Cat (`npm run sim -- --food` lists every food alone and with it).
 4. **Auto-eat** (needs the `autoEat` node and the toggle): when the food slot's lock ends, eats the same food again if any is left.
 5. **While away**: the effect and the lock count down by the whole gap (`tickConsumables(seconds)`) and auto-eat doesn't run, so food that expires offline stays expired (`offline-progress.md`).
 
@@ -45,4 +45,6 @@ Then ingredients are removed and the result added (×`createsAmount` × count). 
 - Buying the Spellbook is blocked on a full inventory, although it never enters the inventory.
 
 ## How to extend
+Farm recipes (`farming.md`): Turnip Stew (Cooking 1; 3 Turnip, 1 Vial of Water), Farmer's Bread (Cooking 1; 4 Wheat), Harvest Pie (Cooking 2; 2 Apple, 3 Wheat, 1 Cheese), Mushroom Stew (Cooking 2; 3 Glowcap, 2 Turnip), Silverleaf Tonic (Alchemy 1; 2 Silverleaf, 1 Vial of Water, 10 mana), Glowcap Elixir (Alchemy 1; 2 Glowcap, 1 Vial of Water, 25 mana). All need their scroll: Harvest Pie and Mushroom Stew from Warden Marta at Farming Guild Honored and Revered, Glowcap Elixir from Sylvie, the other three as quest rewards (C10). Feast of the Wood, Heartroot Elixir and Blossom Draught are deferred until Cooking 3 / Alchemy 2 gear exists.
+
 New recipe, food or potion: the `add-recipe-or-consumable` skill. New station gear: a `stationUpgrade` item with the next `level`, a recipe or shop entry that produces it, and `unlocks:stations.<ItemID key>.title`/`.body` keys for the install notification.

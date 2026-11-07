@@ -1,14 +1,14 @@
 #!/usr/bin/env node
-// Prints a PR's CodeRabbit findings without their HTML wrapping: inline comments (file:line, severity, title,
-// suggested fix) and the nitpicks folded into review bodies.
+// Prints a PR's CodeRabbit findings without their HTML wrapping: open inline threads (file:line, severity, title,
+// suggested fix) and the nitpicks folded into review bodies. --all adds resolved threads.
 //
-// Usage: node scripts/pr-comments.mjs <PR number>
+// Usage: node scripts/pr-comments.mjs <PR number> [--all]
 
 import { execFileSync } from 'node:child_process'
 
 const pr = process.argv[2]
 if (!/^\d+$/.test(pr ?? '')) {
-  console.error('Usage: node scripts/pr-comments.mjs <PR number>')
+  console.error('Usage: node scripts/pr-comments.mjs <PR number> [--all]')
   process.exit(1)
 }
 
@@ -26,11 +26,24 @@ const promptOf = body => body.match(/Prompt for AI Agents[\s\S]*?```[a-z]*\n([\s
   .replace(/\n\nAfter applying the fix[\s\S]*$/, '')
   .trim()
 
-const comments = gh(`repos/${repo}/pulls/${pr}/comments`)
-console.log(`Inline comments (${comments.length})`)
-for (const c of comments) {
-  console.log(`\n- ${c.path}:${c.line ?? c.original_line} · ${severityOf(c.body)} · ${titleOf(c.body)}`)
-  const prompt = promptOf(c.body)
+const THREADS = `query($owner: String!, $name: String!, $pr: Int!, $endCursor: String) {
+  repository(owner: $owner, name: $name) { pullRequest(number: $pr) { reviewThreads(first: 100, after: $endCursor) {
+    pageInfo { hasNextPage endCursor }
+    nodes { isResolved isOutdated path line originalLine comments(first: 1) { nodes { body } } }
+  } } }
+}`
+const [owner, name] = repo.split('/')
+const threads = JSON.parse(execFileSync('gh', [
+  'api', 'graphql', '--paginate', '--slurp', '-f', `query=${THREADS}`, '-F', `owner=${owner}`, '-F', `name=${name}`, '-F', `pr=${pr}`,
+], { encoding: 'utf8', maxBuffer: 32 * 1024 * 1024 })).flatMap(page => page.data.repository.pullRequest.reviewThreads.nodes)
+const showAll = process.argv.includes('--all')
+const shown = threads.filter(t => showAll || !t.isResolved)
+console.log(`Inline threads (${shown.length} shown of ${threads.length})`)
+for (const t of shown) {
+  const { body } = t.comments.nodes[0]
+  const state = [t.isResolved && 'resolved', t.isOutdated && 'outdated'].filter(Boolean).join(', ')
+  console.log(`\n- ${t.path}:${t.line ?? t.originalLine} · ${severityOf(body)} · ${titleOf(body)}${state ? ` (${state})` : ''}`)
+  const prompt = promptOf(body)
   if (prompt) console.log(prompt.split('\n').map(l => `    ${l}`).join('\n'))
 }
 

@@ -1,7 +1,10 @@
-import { buffModifiers, deriveStats, equipmentModifiers, initialResources, statContributions } from './stats'
+import { buffModifiers, consumableModifiers, deriveStats, equipmentModifiers, expertiseModifiers, foodMultiplierOf, initialResources, statContributions } from './stats'
 import { initialEquipmentState, statsInitialState } from './player'
 import { ItemID } from '../../../enums/ids/item-id.enum'
+import ITEM_DATA from '../../../data/items-data'
+import { ConsumableItem } from '../../../interfaces/item.interface'
 import { ItemTier } from '../../../enums/items/item-tier.enum'
+import { ProfessionID } from '../../../enums/ids/profession-id.enum'
 import { SpellID } from '../../../enums/ids/spell-id.enum'
 
 describe('deriveStats', () => {
@@ -42,7 +45,7 @@ describe('deriveStats', () => {
 })
 
 describe('statContributions', () => {
-  const none = { equipment: [], skills: [], buffs: [], consumables: [], bonuses: [], mastery: [] }
+  const none = { equipment: [], skills: [], buffs: [], consumables: [], bonuses: [], mastery: [], expertise: [] }
 
   it('sums flat and percent amounts per source and skips sources without the stat', () => {
     const contributions = statContributions('attackPower', {
@@ -64,5 +67,31 @@ describe('statContributions', () => {
     })
 
     expect(contributions).toEqual([{ source: 'buffs', flat: 0.3, percent: 0 }])
+  })
+
+  it('scales food stats by the food effect multiplier from gear, not potions', () => {
+    // No potion gives stats yet, so lend one a stat for this test.
+    const potion = ITEM_DATA[ItemID.minorManaPotion] as ConsumableItem
+    const original = potion.effect.stats
+    potion.effect.stats = [{ stat: 'critChance', amount: 4 }]
+    try {
+      const food = foodMultiplierOf([{ stat: 'foodEffectMultiplier', amount: 0.5 }])
+      const stats = deriveStats(initialResources(), consumableModifiers([ItemID.grilledFish, ItemID.minorManaPotion], food))
+      expect(food).toBe(1.5)
+      expect(stats.attackPower).toBe(statsInitialState.attackPower + 3)
+      expect(stats.critChance).toBe(statsInitialState.critChance + 4)
+    } finally {
+      potion.effect.stats = original
+    }
+  })
+
+  it('derives expertise stats on top of other sources and drops them with the level', () => {
+    const expertise = expertiseModifiers({ [ProfessionID.farming]: 10 })
+    const gear = [{ stat: 'farmDoubleHarvestChance' as const, amount: 0.1 }]
+
+    const stats = deriveStats(initialResources(), [...expertise, ...gear])
+    expect(stats.farmDoubleHarvestChance).toBe(0.15)
+    expect(stats.farmSeedSaveChance).toBe(0.1)
+    expect(deriveStats(initialResources(), expertiseModifiers({ [ProfessionID.farming]: 1 })).farmSeedSaveChance).toBe(0)
   })
 })

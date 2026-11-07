@@ -3,8 +3,12 @@ import { deriveStats, initialResources } from '../store/player/stats'
 import ZONES_DATA from '../../data/zones-data'
 import { ZoneID } from '../../enums/ids/zone-id.enum'
 import { DamageElement } from '../../enums/damage-element.enum'
+import ENEMIES_DATA from '../../data/enemies-data'
 import { EnemyID } from '../../enums/ids/enemy-id.enum'
 import { ItemID } from '../../enums/ids/item-id.enum'
+import ITEM_DATA from '../../data/items-data'
+import { ItemType } from '../../enums/items/item-type.enum'
+import { EquipmentSlot } from '../../enums/equipment-slot.enum'
 
 const HOUR_IN_MS = 60 * 60 * 1000
 
@@ -17,7 +21,7 @@ describe('simulateOfflineKills', () => {
     damageType: DamageElement.physical,
     isMeleeWeapon: true,
     hasWeaknessSkill: false,
-    activeQuestIds: new Set(),
+    questDropLimits: new Map(),
     taskEnemyIds: new Set(),
     enemyKillCounts: {},
     rollingKillMs: null,
@@ -36,6 +40,24 @@ describe('simulateOfflineKills', () => {
 
   it('replays the same result for the same seed', () => {
     expect(simulateOfflineKills(input())).toEqual(simulateOfflineKills(input()))
+  })
+
+  it('uses the seeded RNG for +1 gear drops after registration, leaving unique gear and pets at +0', () => {
+    const strong = { ...stats, attackPower: 100_000, upgradedDropChance: 10 }
+    const run = (upgradedDropChance: number) => simulateOfflineKills(input({
+      wave: ZONES_DATA[ZoneID.horseshoeBeach].maxWave,
+      segments: [{ durationMs: HOUR_IN_MS, stats: { ...strong, upgradedDropChance } }],
+    }))
+    spyOn(Math, 'random').and.throwError('Offline rolls must use the seeded RNG')
+    const registered = run(10)
+    expect(registered).toEqual(run(10))
+    expect(registered.items.some(item => item.id === ItemID.knife && item.upgradeLevel === 1)).toBeTrue()
+    expect(registered.items.some(item => item.id === ItemID.knife && !item.upgradeLevel)).toBeTrue()
+    expect(registered.items.filter(item => item.upgradeLevel === 1).every(item => {
+      const data = ITEM_DATA[item.id]
+      return data.type === ItemType.equipment && data.slot !== EquipmentSlot.pet && !data.unique
+    })).toBeTrue()
+    expect(run(0).items.every(item => !item.upgradeLevel)).toBeTrue()
   })
 
   it('kills at offlineProgressRate times the theoretical rate', () => {
@@ -85,6 +107,24 @@ describe('simulateOfflineKills', () => {
 
     expect(sticks({})).toBe(0)
     expect(sticks({ [EnemyID.turtle]: 10_000 })).toBe(1)
+  })
+
+  it('rolls seed drops with seedDropChance', () => {
+    // As above, on a 1-in-4 seed drop: misses at no bonus (hit above 3), hits at +25% (above 2.75).
+    const turtle = ENEMIES_DATA[EnemyID.turtle]
+    const originalDrops = turtle.drops
+    turtle.drops = [...originalDrops, { id: ItemID.turnipSeeds, minAmount: 1, maxAmount: 1, chance: 4 }]
+    const seeds = (seedDropChance: number) => simulateOfflineKills(input({
+      rng: () => 0.74,
+      segments: [{ durationMs: HOUR_IN_MS, stats: { ...stats, seedDropChance } }],
+    })).items.filter(item => item.id === ItemID.turnipSeeds).length
+
+    try {
+      expect(seeds(0)).toBe(0)
+      expect(seeds(0.25)).toBe(1)
+    } finally {
+      turtle.drops = originalDrops
+    }
   })
 
   it('sums XP and gold per kill', () => {

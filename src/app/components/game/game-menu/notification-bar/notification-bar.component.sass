@@ -1,0 +1,62 @@
+@use 'variables' as vars
+
+// Fixed, also when empty, so the game below doesn't jump as notifications come and go.
+:host
+  display: block
+  height: 1.75rem
+
+.notifications
+  height: 100%
+  display: flex
+  align-items: center
+  gap: 0.5rem
+
+.notification
+  // Set per kind below, so each kind of claim has its own colour.
+  --accent: 255, 255, 255
+  height: 1.5rem
+  display: flex
+  align-items: center
+  gap: 0.35rem
+  padding: 0 0.6rem 0 0.35rem
+  border: 1px solid rgba(var(--accent), 0.7)
+  border-left-width: 3px
+  border-radius: vars.$panelBorderRadius
+  background: rgba(var(--accent), 0.14)
+  color: rgb(var(--accent))
+  font-size: 0.85rem
+  white-space: nowrap
+  cursor: pointer
+  transition: background-color 0.2s ease
+
+  &:hover
+    background: rgba(var(--accent), 0.28)
+
+  &:focus-visible
+    outline: 2px solid rgb(var(--accent))
+    outline-offset: 1px
+
+  &--harvest
+    --accent: 74, 222, 128
+
+  &--update
+    --accent: 234, 179, 8
+
+  &--updateSaveFailed
+    --accent: 248, 113, 113
+
+  &__icon
+    image-rendering: pixelated
+
+  &__action
+    margin-left: 0.25rem
+    font-weight: 600
+    text-decoration: underline
+
+  @media (prefers-reduced-motion: no-preference)
+    animation: notification-in 0.25s ease-out
+
+@keyframes notification-in
+  from
+    opacity: 0
+    transform: translateY(-0.25rem)

@@ -16,6 +16,12 @@
       "body": "From the Matriarch’s nest you can see past the mountains: a road winding south off the Pass, and at its end stone walls and a castle under the mountains. Lirold, the capital of Port Stocksmar. Travel there from the Map; its Arena takes any challenger who can pay the gate."
     }
   },
+  "sites": {
+    "farm": {
+      "title": "The Farm Opens!",
+      "body": "North of the Mountain Pass, a terraced valley that the blight never reached lies behind a Guild gate. It is now marked on the Map, and in the Sites list. Open it there to meet the Farming Guild."
+    }
+  },
   "zones": {
     "plains": {
       "title": "New Area: The Plains",

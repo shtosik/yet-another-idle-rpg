@@ -25,4 +25,4 @@ The hit's element: auto-attacks and the melee spell use the weapon's `damageType
 3. Add an entry to `WEAKNESS_ICONS` in `src/app/components/game/battle/enemy/monster-debuff-bar/monster-debuff-bar.component.ts` and generate the icon `src/assets/img/icons/<element>Weakness.png` with `/generate-2d-asset`.
 4. Add `app:elements.<element>` and `app:playerStats.extra<Element>DamageMultiplier` to `src/assets/locales/en/app.json`.
 
-Done when `npm run validate` and `npx ng build` pass, and in the dev server (with the `weaknesses` node) a matching hit shows the "(strong)" popup and a non-matching hit doesn't.
+Done when `npm run check` passes, and in the dev server (with the `weaknesses` node) a matching hit shows the "(strong)" popup and a non-matching hit doesn't.

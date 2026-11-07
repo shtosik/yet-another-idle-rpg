@@ -33,4 +33,4 @@ Background: `docs/systems/dialogue.md` (engine rules, `QuestState` meanings, kno
 **Costs**
 - A `stat` `deduct` of `goldCoins` has a matching `requirementsNeeded` gold check, and a repeated fallback doesn't charge on every click.
 
-Done when every node's options have been checked against every rule above, and `npm run validate` and `npx ng build` pass.
+Done when every node's options have been checked against every rule above, and `npm run check` passes.

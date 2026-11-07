@@ -10,6 +10,7 @@ export type PlayerStat =
     | 'level'
     | 'unspentSkillPoints'
     | 'goldCoinsMultiplier'
+    | 'foodEffectMultiplier'
     | 'manaRegenRate'
     | 'magicDamage'
     | 'spellCooldownReduction'
@@ -52,12 +53,21 @@ export type PlayerStat =
     | 'inventorySlots'
     | 'maxTaskSlots'
     | 'taskDoubleKillChance'
+    | 'upgradedDropChance'
     | 'offlineProgressRate'
+    | 'seedGrowthTimeReduction'
+    | 'farmDoubleHarvestChance'
+    | 'farmSeedSaveChance'
+    | 'farmBonusCropChance'
+    | 'turnInCooldownReduction'
+    | 'farmXpMultiplier'
+    | 'seedDropChance'
 
 export const multiplierStats: PlayerStat[] = [
     'critMulti',
     'xpMultiplier',
     'goldCoinsMultiplier',
+    'foodEffectMultiplier',
     'extraFireDamageMultiplier',
     'extraAirDamageMultiplier',
     'extraWaterDamageMultiplier',
@@ -71,6 +81,7 @@ export const multiplierStats: PlayerStat[] = [
 
 export const percentageStats: PlayerStat[] = [
     'critChance',
+    'upgradedDropChance',
 ]
 
 export const additivePercentStats: PlayerStat[] = [

@@ -8,6 +8,8 @@ import { BattleStore } from 'app/store/battle/battle.store'
 import { PlayerStore } from 'app/store/player/player.store'
 import { ZoneStarProgress } from 'app/store/player/zone-mastery'
 import { TownMarker, WORLD_MAP_DATA, WorldMapMarker } from 'data/world-map-data'
+import { SITES_DATA } from 'data/sites-data'
+import { SiteID } from 'enums/ids/site-id.enum'
 import { ZoneID } from 'enums/ids/zone-id.enum'
 import { TownID } from 'enums/map/town-id.enum'
 import TOWNS_DATA from 'data/towns-data'
@@ -35,6 +37,8 @@ function starModifier(progress: ZoneStarProgress): string {
 })
 export class WorldMapComponent {
   @Output() changeTab = new EventEmitter<GameTab>()
+  /** A Site was chosen on the map or in the Sites list; the farm view (GameTab.farm) listens for it once it exists. */
+  @Output() siteSelected = new EventEmitter<SiteID>()
 
   private readonly townsStore = inject(TownsStore)
   private readonly battleStore = inject(BattleStore)
@@ -44,9 +48,15 @@ export class WorldMapComponent {
   private activeMarkers: { marker: L.Marker; minZoom: number }[] = []
   private zoneMarkerMap = new Map<ZoneID, L.Marker>()
   private townMarkerMap = new Map<TownID, L.Marker>()
+  private siteMarkerMap = new Map<SiteID, L.Marker>()
 
   protected readonly TownID = TownID
+  protected readonly SiteID = SiteID
   showTowns = signal(false)
+  showSites = signal(false)
+  /** Cursor position in map image pixels (same coords as marker data); null while the cursor is off the map. */
+  readonly cursor = signal<{ x: number; y: number } | null>(null)
+  private cursorPoint: L.Point | null = null
   /**
    * Unlocked towns: map-marker towns in marker order, then towns with Buildings but no marker yet. Stub towns and stale saved IDs have neither.
    */
@@ -59,6 +69,12 @@ export class WorldMapComponent {
     return [...markerTowns, ...offMapTowns].filter(townId => unlocked.includes(townId))
   })
 
+  /** Unlocked Sites in data order; a Site is listed even without a marker, like a Town. */
+  readonly unlockedSites = computed(() => {
+    const unlocked = this.playerStore.unlockedContent().sites ?? []
+    return Object.values(SITES_DATA).map(site => site.id).filter(siteId => unlocked.includes(siteId))
+  })
+
   constructor() {
     effect(() => {
       const unlockedZones = this.playerStore.unlockedContent().zones
@@ -69,6 +85,11 @@ export class WorldMapComponent {
       const unlockedTowns = this.playerStore.unlockedContent().towns
       if (!this.map) return
       this.syncTownMarkers(unlockedTowns)
+    })
+    effect(() => {
+      const unlockedSites = this.playerStore.unlockedContent().sites ?? []
+      if (!this.map) return
+      this.syncSiteMarkers(unlockedSites)
     })
     effect(() => {
       const currentZoneId = this.battleStore.currentZoneId()
@@ -103,6 +124,10 @@ export class WorldMapComponent {
   onMapReady(map: L.Map): void {
     this.map = map
     map.on('zoomend', () => this.syncMarkerVisibility())
+    // Tracked as a container point so panning or zooming under a still cursor keeps the readout current.
+    map.on('mousemove', e => this.showCursor(e.containerPoint))
+    map.on('mouseout', () => this.showCursor(null))
+    map.on('move zoom', () => this.showCursor(this.cursorPoint))
 
     setTimeout(() => {
       map.invalidateSize()
@@ -128,8 +153,22 @@ export class WorldMapComponent {
     })
   }
 
+  private showCursor(point: L.Point | null): void {
+    this.cursorPoint = point
+    const latLng = point && this.map.containerPointToLatLng(point)
+    this.cursor.set(latLng ? { x: Math.round(latLng.lng), y: Math.round(-latLng.lat) } : null)
+  }
+
   toggleTowns(): void {
     this.showTowns.update(show => !show)
+  }
+
+  toggleSites(): void {
+    this.showSites.update(show => !show)
+  }
+
+  openSite(siteId: SiteID): void {
+    this.siteSelected.emit(siteId)
   }
 
   openTown(townId: TownID): void {
@@ -148,13 +187,14 @@ export class WorldMapComponent {
   private placeMarkers(): void {
     for (const data of WORLD_MAP_DATA.markers) {
       if (data.type === 'zone') continue
-      if (data.type === 'town') continue
+      if (data.type === 'town' || data.type === 'site') continue
       const marker = this.buildMarker(data)
       marker.addTo(this.map)
       this.activeMarkers.push({ marker, minZoom: data.minZoom ?? 0 })
     }
     this.syncZoneMarkers(this.playerStore.unlockedContent().zones)
     this.syncTownMarkers(this.playerStore.unlockedContent().towns)
+    this.syncSiteMarkers(this.playerStore.unlockedContent().sites ?? [])
   }
 
   /** Marks the zone the player is fighting in; a marker's element exists only once it's on the map. */
@@ -215,6 +255,24 @@ export class WorldMapComponent {
     this.syncMarkerVisibility()
   }
 
+  private syncSiteMarkers(unlockedSites: SiteID[]): void {
+    for (const data of WORLD_MAP_DATA.markers) {
+      if (data.type !== 'site') continue
+      const existing = this.siteMarkerMap.get(data.siteId)
+      if (unlockedSites.includes(data.siteId) && !existing) {
+        const marker = this.buildMarker(data)
+        marker.addTo(this.map)
+        this.siteMarkerMap.set(data.siteId, marker)
+        this.activeMarkers.push({ marker, minZoom: data.minZoom ?? 0 })
+      } else if (!unlockedSites.includes(data.siteId) && existing) {
+        existing.remove()
+        this.siteMarkerMap.delete(data.siteId)
+        this.activeMarkers = this.activeMarkers.filter(m => m.marker !== existing)
+      }
+    }
+    this.syncMarkerVisibility()
+  }
+
   private buildMarker(data: WorldMapMarker): L.Marker {
     const latLng = L.latLng(-data.position.y, data.position.x)
     const icon = L.divIcon({
@@ -229,6 +287,8 @@ export class WorldMapComponent {
 
     if (data.type === 'town') {
       marker.on('click', () => this.openTown(data.townId))
+    } else if (data.type === 'site') {
+      marker.on('click', () => this.openSite(data.siteId))
     } else if (data.type === 'zone') {
       marker.on('click', () => {
         this.battleStore.setZone(data.zoneId)

@@ -18,6 +18,11 @@
             loading="lazy"
         >
     </button>
+    <!-- All of this NPC's turn-ins are cooling: the soonest ready time. -->
+    @let wait = cooldowns.npcWaitMs(npc.id);
+    @if (wait !== null) {
+        <span class="npc__cooldown">{{ 'app:turnInReadyIn' | i18next: { time: formatCooldown(wait) } }}</span>
+    }
     <!-- Shown once the player has opened this NPC's shop through dialogue. -->
     @if (shopId !== undefined) {
         <button type="button" class="npc__shop" (click)="openShop.emit(shopId)">{{ 'shop:ui.openShop' | i18next }}</button>

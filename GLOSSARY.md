@@ -24,6 +24,10 @@ _Avoid_: Elite, champion
 A non-combat hub made of buildings.
 _Avoid_: City, location
 
+**Site**:
+A non-combat place outside the towns with one purpose, reached from the world map or the Sites list (the farm).
+_Avoid_: Location, area
+
 **Building**:
 One place inside a town, holding NPCs and objects such as zone entrances.
 _Avoid_: Tab, room
@@ -35,7 +39,7 @@ A rare variant of an enemy with a recolored sprite and better drops.
 _Avoid_: Rare, elite, variant
 
 **Pet**:
-An equippable companion item; both normal and shiny enemies can drop one.
+An equippable companion item, dropped by normal and shiny enemies or given by a town at the Exalted reputation tier.
 _Avoid_: Companion, familiar
 
 ## Combat
@@ -64,6 +68,10 @@ _Avoid_: Auto-use, auto-consume
 **Inventory tab**:
 One of the inventory's five sections (Gear, Consumables, Materials, Pets, Quest), each with its own slots; an item's tab follows from its type.
 _Avoid_: Bag, category
+
+**Upgrade level**:
+A piece of gear's enhancement level, stored as `upgradeLevel` and shown as `+N`; missing means +0. Separate from its rarity (`ItemTier`).
+_Avoid_: tier, rank
 
 ## Skill tree
 
@@ -114,6 +122,50 @@ _Avoid_: Guild token, exploration token
 **Task**:
 A repeatable Exploration Guild contract to kill a set number of one monster, separate from quests.
 _Avoid_: Quest, bounty, mission
+
+**Guild rank**:
+The player's Exploration Guild level, earned by completing tasks; separate from reputation.
+_Avoid_: Rank (alone), guild level
+
+**Reputation**:
+The points a player has earned with one town or guild (a `ReputationID`); never spent and never lost.
+_Avoid_: Rep, standing, fame, town rank
+
+**Farming Guild**:
+The growers' guild that runs the farm Site (`ReputationID.farmingGuild`); its reputation tiers open Plots and the Plant all / Harvest all buttons. Warden Marta and Wick are its givers.
+_Avoid_: Farmers' guild, Farm guild
+
+**Order**:
+A repeatable Farming Guild quest (`repeat` in quest data): the NPC asks for a rolled amount of crops or animal materials, then pays reputation, gold and Farming XP, and a turn-in cooldown applies before the next one. Not a Task (Exploration Guild) and not a reputation turn-in bundle.
+_Avoid_: Contract, bounty, delivery
+
+**Reputation turn-in**:
+Handing a town NPC full **bundles** (a fixed amount, e.g. 20 Crab Meat) of one drop for that town's reputation, repeatable until the town is Exalted. The NPC is its **giver**. Not a quest turn-in, which hands in a quest step.
+_Avoid_: Donation, trade-in, delivery
+
+**Reputation tier**:
+A named step of reputation reached at a threshold, the same five for every town: Neutral, Friendly, Honored, Revered, Exalted.
+_Avoid_: Rank, level, reputation level
+
+**Profession**:
+A non-combat trade with its own XP and level (`ProfessionID`, saved in `professions`), earned by using it and separate from the character level. Farming is the first. Player-facing text says **expertise**.
+_Avoid_: Skill (that is the skill tree), gathering skill
+
+**Expertise**:
+A profession's level as the player sees it: 'Farming expertise 7'. Each level gives 1 skill point and a stat reward; every 5th level gives a milestone stat instead of the growth bonus.
+_Avoid_: Farming level, profession level (in player-facing text)
+
+**Seed**:
+A farm item that never enters the inventory: counted per type in the farming state (`PlayerState.farm.seeds`), with no cap and no slots. Monsters, chests and shops add to the count even before the farm unlocks.
+_Avoid_: Seed item, packet, seed stack
+
+**Plot**:
+One of up to nine farm squares that grows one planted seed on a timer and is harvested for crops. The count follows Farming Guild reputation and quests.
+_Avoid_: Field, patch, slot (that is an inventory slot)
+
+**Title**:
+A display-only name the player earns from content such as reputation tiers and picks to show in the stats panel; it gives no stats.
+_Avoid_: Badge, honorific, rank
 
 **Zone unlock**:
 A zone opens when the boss of the zone before it is defeated, or, for a zone entered from a town building, when that building's quest has started.

@@ -28,15 +28,20 @@ export interface ItemStack {
   id: ItemID
   amount: number
   tier?: ItemTier
+  upgradeLevel?: number
 }
 
-/** The tab an item is stored in. */
+/** Seeds live in the farming state, never in a tab (`farm.ts`). */
+export const isSeed = (id: ItemID): boolean => ITEM_DATA[id]?.type === ItemType.seed
+
+/** The tab an item is stored in. Seeds have none: `byTab` and `lostItems` skip them. */
 export function tabOf(id: ItemID): InventoryTab {
   const item = ITEM_DATA[id]
   switch (item.type) {
     case ItemType.equipment:
       return (item as EquipmentItem).slot === EquipmentSlot.pet ? 'pets' : 'gear'
     case ItemType.resource:
+    case ItemType.seed: // unreachable for stored items; the switch has to cover it
       return 'materials'
     case ItemType.quest:
       return 'quest'
@@ -109,10 +114,10 @@ export function resizeInventory(inventories: Inventories, capacity: TabCapacity)
   return result
 }
 
-/** Items grouped by their tab, in the order given. */
+/** Items grouped by their tab, in the order given. Seeds are left out, so add, remove and fit checks ignore them. */
 function byTab<T extends ItemStack>(items: T[]): Partial<Record<InventoryTab, T[]>> {
   const groups: Partial<Record<InventoryTab, T[]>> = {}
-  for (const item of items) (groups[tabOf(item.id)] ??= []).push(item)
+  for (const item of items) if (!isSeed(item.id)) (groups[tabOf(item.id)] ??= []).push(item)
   return groups
 }
 
@@ -128,28 +133,34 @@ export function splitInventory(flat: Inventory): Inventories {
   return result
 }
 
-const findStackIndex = (inventory: Inventory, id: ItemID, tier: ItemTier): number =>
-  inventory.findIndex(slot => slot?.id === id && slot.tier === tier)
+/** Identity of a stack, including the implicit +0 used by old saves and new drops. */
+export const stackKey = ({ id, tier = ITEM_DATA[id].tier, upgradeLevel = 0 }: Pick<ItemStack, 'id' | 'tier' | 'upgradeLevel'>): string =>
+  `${id}:${tier}:${upgradeLevel}`
 
-export const countItem = (inventories: Inventories, id: ItemID): number =>
-  inventories[tabOf(id)].reduce((sum, slot) => (slot?.id === id ? sum + slot.amount : sum), 0)
+const findStackIndex = (inventory: Inventory, item: ItemStack): number =>
+  inventory.findIndex(slot => slot !== null && stackKey(slot) === stackKey(item))
+
+/** Without a tier, counts every rarity, as before. An omitted upgrade level means +0. */
+export const countItem = (inventories: Inventories, id: ItemID, tier?: ItemTier, upgradeLevel = 0): number =>
+  inventories[tabOf(id)].reduce((sum, slot) =>
+    slot?.id === id && (tier === undefined || slot.tier === tier) && (slot.upgradeLevel ?? 0) === upgradeLevel ? sum + slot.amount : sum, 0)
 
 export const hasItems = (inventories: Inventories, items: ItemStack[]): boolean =>
-  items.every(({ id, amount }) => countItem(inventories, id) >= amount)
+  items.every(({ id, amount, tier, upgradeLevel }) => countItem(inventories, id, tier, upgradeLevel) >= amount)
 
 /** How many times `items` can be paid in full from the inventory. */
 export const maxAffordable = (inventories: Inventories, items: ItemStack[]): number =>
-  Math.min(...items.map(({ id, amount }) => Math.floor(countItem(inventories, id) / amount)))
+  Math.min(...items.map(({ id, amount, tier, upgradeLevel }) => Math.floor(countItem(inventories, id, tier, upgradeLevel) / amount)))
 
 function addToTab(inventory: Inventory, capacity: number, items: ItemStack[]): Inventory {
   const result = resizeTab([...inventory], capacity)
 
-  for (const { id, amount, tier } of items) {
+  for (const { id, amount, tier, upgradeLevel } of items) {
     const itemData = ITEM_DATA[id]
     const itemTier = tier ?? itemData.tier
     // The array never shrinks, so slots past `capacity` are locked and must stay untouched.
     const usable = result.slice(0, capacity)
-    const stackIndex = findStackIndex(usable, id, itemTier)
+    const stackIndex = findStackIndex(usable, { id, amount, tier: itemTier, upgradeLevel })
 
     if (stackIndex !== -1) {
       const stack = result[stackIndex]!
@@ -157,7 +168,7 @@ function addToTab(inventory: Inventory, capacity: number, items: ItemStack[]): I
       continue
     }
 
-    const newStack = { id, type: itemData.type, tier: itemTier, amount }
+    const newStack = { id, type: itemData.type, tier: itemTier, amount, ...(upgradeLevel === undefined ? {} : { upgradeLevel }) }
     const emptyIndex = usable.findIndex(slot => slot === null)
     if (emptyIndex !== -1) result[emptyIndex] = newStack
     else if (result.length < capacity) result.push(newStack)
@@ -166,7 +177,7 @@ function addToTab(inventory: Inventory, capacity: number, items: ItemStack[]): I
   return result
 }
 
-/** Stacks per id + tier, each in its own tab. Only a tab's first `capacity` slots are used; items that do not fit are discarded. */
+/** Stacks per id + tier + upgradeLevel, each in its own tab. Only usable slots are filled; overflow is discarded. */
 export function addItems(inventories: Inventories, capacity: TabCapacity, items: ItemStack[]): Inventories {
   const result = { ...inventories }
   for (const [tab, stacks] of tabEntries(byTab(items))) result[tab] = addToTab(result[tab], capacity[tab], stacks)
@@ -176,12 +187,12 @@ export function addItems(inventories: Inventories, capacity: TabCapacity, items:
 function removeFromTab(inventory: Inventory, items: ItemStack[]): Inventory {
   const result = [...inventory]
 
-  for (const { id, amount, tier } of items) {
+  for (const { id, amount, tier, upgradeLevel = 0 } of items) {
     let remaining = amount
 
     for (let i = 0; i < result.length && remaining > 0; i++) {
       const stack = result[i]
-      if (!stack || stack.id !== id || (tier !== undefined && stack.tier !== tier)) continue
+      if (!stack || stack.id !== id || (tier !== undefined && stack.tier !== tier) || (stack.upgradeLevel ?? 0) !== upgradeLevel) continue
 
       const taken = Math.min(stack.amount, remaining)
       remaining -= taken
@@ -192,7 +203,7 @@ function removeFromTab(inventory: Inventory, items: ItemStack[]): Inventory {
   return result
 }
 
-/** Takes across every stack of an id (any tier); stops at what is owned. */
+/** Takes the requested upgrade level (+0 when omitted), across rarities when tier is omitted; stops at what is owned. */
 export function removeItems(inventories: Inventories, items: ItemStack[]): Inventories {
   const result = { ...inventories }
   for (const [tab, stacks] of tabEntries(byTab(items))) result[tab] = removeFromTab(result[tab], stacks)
@@ -216,9 +227,8 @@ export function missingSlotsByTab(inventories: Inventories, capacity: TabCapacit
   for (const [tab, stacks] of tabEntries(byTab(adding))) {
     const usable = after[tab].slice(0, capacity[tab])
     const newStacks = new Set<string>()
-    for (const { id, tier } of stacks) {
-      const itemTier = tier ?? ITEM_DATA[id].tier
-      if (findStackIndex(usable, id, itemTier) === -1) newStacks.add(`${id}:${itemTier}`)
+    for (const stack of stacks) {
+      if (findStackIndex(usable, stack) === -1) newStacks.add(stackKey(stack))
     }
     const short = newStacks.size - countFreeSlots(after[tab], capacity[tab])
     if (short > 0) missing[tab] = short
@@ -251,13 +261,11 @@ export const INVENTORY_PAGE_SIZE = 40
 
 export const pageCount = (slots: number): number => Math.max(1, Math.ceil(slots / INVENTORY_PAGE_SIZE))
 
-/** What of `items` would not fit when added, per id + tier (one entry each, as rolled drops are). Tab per `tabOf`. */
+/** What of `items` would not fit when added, per stack key (one entry each, as rolled drops are). Tab per `tabOf`. */
 export function lostItems(inventories: Inventories, capacity: TabCapacity, items: ItemStack[]): ItemStack[] {
   const after = addItems(inventories, capacity, items)
-  const owned = (inventory: Inventories, id: ItemID, tier: ItemTier) =>
-    inventory[tabOf(id)].reduce((sum, slot) => slot?.id === id && slot.tier === tier ? sum + slot.amount : sum, 0)
-  return items.flatMap(({ id, amount, tier = ITEM_DATA[id].tier }) => {
-    const lost = amount - (owned(after, id, tier) - owned(inventories, id, tier))
-    return lost > 0 ? [{ id, tier, amount: lost }] : []
+  return items.filter(({ id }) => !isSeed(id)).flatMap(({ id, amount, tier = ITEM_DATA[id].tier, upgradeLevel }) => {
+    const lost = amount - (countItem(after, id, tier, upgradeLevel) - countItem(inventories, id, tier, upgradeLevel))
+    return lost > 0 ? [{ id, tier, amount: lost, ...(upgradeLevel === undefined ? {} : { upgradeLevel }) }] : []
   })
 }

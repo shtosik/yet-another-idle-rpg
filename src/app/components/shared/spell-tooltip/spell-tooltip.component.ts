@@ -3,6 +3,7 @@ import { I18nextPipe } from '../../../pipes/i18next.pipe'
 import { PlayerStore } from '../../../store/player/player.store'
 import { BattleManagerService } from '../../../services/battle-manager.service'
 import { SpellID } from '../../../../enums/ids/spell-id.enum'
+import { WeaponCategory } from '../../../../enums/weapon-category.enum'
 import { SpellType } from '../../../../enums/spell-type.enum'
 import SPELLS_DATA from '../../../../data/spells-data'
 
@@ -21,6 +22,8 @@ export class SpellTooltipComponent {
   spellId = input.required<SpellID>()
 
   spell = computed(() => SPELLS_DATA[this.spellId()])
+  hasRequiredWeapon = computed(() => this.battleManagerService.hasRequiredWeapon(this.spellId()))
+  protected readonly WeaponCategory = WeaponCategory
   manaCost = computed(() => this.battleManagerService.manaCost(this.spellId()))
   cooldown = computed(() => this.battleManagerService.spellCooldown(this.spellId()))
   increasedSpellDuration = computed(() => this.playerStore.stats().increasedSpellDuration)
