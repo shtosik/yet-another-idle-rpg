@@ -1,0 +1,135 @@
+@let guildInfo = guild();
+@let expertiseInfo = expertise();
+<header class="header">
+  <h2 class="header__title">{{ 'map:sites.farm' | i18next }}</h2>
+  <div class="header__bars">
+    <div class="meter">
+      <span class="meter__label">{{ guildInfo.label }}</span>
+      <div class="meter__bar" role="progressbar" aria-valuemin="0" [attr.aria-label]="'map:reputations.farmingGuild' | i18next" [attr.aria-valuenow]="guildInfo.current" [attr.aria-valuemax]="guildInfo.needed">
+        <div class="meter__bar-fill" [style.width.%]="guildInfo.percent"></div>
+        <span class="meter__bar-text">{{ guildInfo.current | number: '1.0-0' }} / {{ guildInfo.needed | number: '1.0-0' }}</span>
+      </div>
+    </div>
+    <div class="meter">
+      <span class="meter__label">{{ 'app:expertise.label' | i18next: { profession: 'app:professions.farming' | i18next, level: expertiseInfo.level } }}</span>
+      <div class="meter__bar" role="progressbar" aria-valuemin="0" [attr.aria-label]="'map:farm.progressLabel' | i18next" [attr.aria-valuenow]="expertiseInfo.current" [attr.aria-valuemax]="expertiseInfo.needed">
+        <div class="meter__bar-fill" [style.width.%]="expertiseInfo.percent"></div>
+        <span class="meter__bar-text">{{ expertiseInfo.current | number: '1.0-0' }} / {{ expertiseInfo.needed | number: '1.0-0' }}</span>
+      </div>
+      @if (expertiseInfo.bonus) {
+        <span class="meter__detail">{{ expertiseInfo.bonus }}</span>
+      }
+    </div>
+  </div>
+  <app-close-button (onClose)="closed.emit()"/>
+</header>
+
+<div class="body">
+  <section class="seeds" [attr.aria-label]="'map:farm.seeds' | i18next">
+    @for (seed of seeds(); track seed.id) {
+      <button
+        type="button"
+        class="seed"
+        [class.seed--active]="activeSeed() === seed.id"
+        [class.seed--locked]="seed.locked"
+        [attr.aria-pressed]="activeSeed() === seed.id"
+        [disabled]="seed.locked"
+        (click)="farmService.toggleSeed(seed.id)"
+      >
+        <img alt="" class="seed__icon" height="30" width="30" [ngSrc]="seed.url">
+        <span class="seed__name">{{ seed.name | i18next }} <span class="seed__count">x{{ seed.count }}</span></span>
+        <span class="seed__stats">{{ seed.locked ?? ('map:farm.seedStats' | i18next: { time: seed.time, min: seed.min, max: seed.max }) }}</span>
+      </button>
+    } @empty {
+      <p class="seeds__empty">{{ 'map:farm.noSeeds' | i18next }}</p>
+    }
+  </section>
+
+  <div class="field">
+    <div class="actions">
+      <!-- The wrapper holds the tooltip: a disabled button fires no hover or focus events. -->
+      <span
+        class="actions__item"
+        role="group"
+        placement="top"
+        tooltipClass="tooltip-override"
+        #plantAllTip="tooltipStr"
+        [tooltipStr]="plantAllLock() ?? ''"
+        [attr.aria-label]="plantAllLock()"
+        [attr.tabindex]="plantAllLock() ? 0 : null"
+        (focus)="plantAllTip.show(false)"
+        (blur)="plantAllTip.hide(false)"
+      >
+        <button type="button" class="actions__button" [disabled]="plantAllLock() !== null || activeSeed() === null || !hasEmptyPlot()" (click)="farmService.plantAll()">
+          {{ 'map:farm.plantAll' | i18next }}
+        </button>
+      </span>
+      <span
+        class="actions__item"
+        role="group"
+        placement="top"
+        tooltipClass="tooltip-override"
+        #harvestAllTip="tooltipStr"
+        [tooltipStr]="harvestAllLock() ?? ''"
+        [attr.aria-label]="harvestAllLock()"
+        [attr.tabindex]="harvestAllLock() ? 0 : null"
+        (focus)="harvestAllTip.show(false)"
+        (blur)="harvestAllTip.hide(false)"
+      >
+        <button type="button" class="actions__button" [disabled]="harvestAllLock() !== null || !hasReadyPlot()" (click)="harvestAll($event)">
+          {{ 'map:farm.harvestAll' | i18next }}
+        </button>
+      </span>
+    </div>
+
+    <div class="grid" role="group" [attr.aria-label]="'map:farm.plots' | i18next: { count: plotLimit(), max: PLOT_SLOTS }">
+      @for (plot of plots(); track plot.index) {
+        @switch (plot.state) {
+          @case ('locked') {
+            <div class="plot plot--locked">{{ 'map:farm.locked' | i18next }}</div>
+          }
+          @case ('empty') {
+            <button type="button" class="plot plot--empty" [style.background-image]="soilImage(plot.soil)" [disabled]="activeSeed() === null" (click)="farmService.plant(plot.index)">
+              <span class="plot__hint">{{ 'map:farm.plant' | i18next }}</span>
+            </button>
+          }
+          @case ('growing') {
+            <div class="plot plot--growing" [style.background-image]="soilImage(plot.soil)">
+              <img [class]="'plot__plant plot__plant--' + plot.stage" [alt]="plot.name | i18next" height="96" width="96" [ngSrc]="plot.url">
+              <span class="plot__time">{{ plot.time }}</span>
+              <progress class="plot__bar" [max]="plot.max" [value]="plot.progress" [attr.aria-label]="plot.name | i18next"></progress>
+            </div>
+          }
+          @case ('ready') {
+            <button type="button" class="plot plot--ready" [style.background-image]="soilImage(plot.soil)" (click)="harvestPlot(plot.index, $event)">
+              <img [class]="'plot__plant plot__plant--' + plot.stage" [alt]="plot.name | i18next" height="96" width="96" [ngSrc]="plot.url">
+              <span class="plot__action">{{ 'map:farm.harvest' | i18next }}</span>
+              @if (plot.missing) {
+                <span class="plot__missing">{{ 'app:inventory.slotsNeeded' | i18next: { slots: plot.missing } }}</span>
+              }
+            </button>
+          }
+        }
+      }
+    </div>
+  </div>
+</div>
+
+<div class="toasts" role="status">
+  @for (toast of toasts(); track toast.id) {
+    <div class="toast" [style.left.px]="toast.at.x" [style.top.px]="toast.at.y">
+      @for (crop of toast.crops; track crop.id) {
+        <span class="toast__crop">
+          <img alt="" height="24" width="24" [ngSrc]="crop.url">
+          +{{ crop.amount }} {{ crop.name | i18next }}
+        </span>
+      }
+      @if (toast.xp > 0) {
+        <span class="toast__xp">{{ 'map:farm.xpGain' | i18next: { xp: toast.xp } }}</span>
+      }
+      @if (toast.blocked) {
+        <span class="toast__blocked">{{ toast.blocked }}</span>
+      }
+    </div>
+  }
+</div>

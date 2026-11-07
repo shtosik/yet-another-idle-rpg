@@ -16,7 +16,12 @@
     "work": "Do you have any work for me?",
     "goodbye": "Take care of yourself.",
     "browseWares": "Could I see your remedies and tools?",
-    "safePassage": "The La Harpar trader sends his regards. And salt fish."
+    "safePassage": "The La Harpar trader sends his regards. And salt fish.",
+    "silverleafTurnIn": "I have the silverleaf.",
+    "silverleafProgress": "About the silverleaf...",
+    "terraceProgress": "About the Farming Guild...",
+    "silverleafOffer": "Is something wrong with the herb shelf?",
+    "terraceOffer": "Does anyone else around here need a hand?"
   },
   "aboutSylvie": {
     "message": "I studied herbal medicine in the coastal settlements — La Harpar, mostly. Apprenticed under an old herbalist who smelled permanently of pine resin and had opinions about everything. When I heard about the Elderwood, I had to come. The plants here are extraordinary. Or they were, before the blight started.",
@@ -99,5 +104,31 @@
   "questCleanCureComplete": {
     "message": "It slows it! It doesn't undo it, and the trees that have fully turned are beyond saving, but it slows it. That's years we didn't have, so take this. I mean it.",
     "opt1": "Years is a start."
+  },
+  "questTerrace": {
+    "message": "Funny you should ask! You've been so good to me, and I keep thinking about the Farming Guild, north of the Pass. They're growers, and I've been writing to them for years, so I may have told them about you. I hope you don't mind.",
+    "opt1": "What do they want?"
+  },
+  "questTerraceAsk": {
+    "message": "Hands, mostly! Their seed lines went black in the sap winter and they shut the gate on everyone, but I think they'd open it for someone who's out there fighting anyway. Would you take my letter to the Warden? And keep anything that looks like seed, because the Warden will want to see it.",
+    "accept": "I'll take the letter.",
+    "decline": "Not right now."
+  },
+  "questTerraceProgress": {
+    "message": "Just take the road north, past the Pass. The Warden is called Marta, and she's blunt, so please don't take it personally. I talk a lot, as Finn keeps reminding me, and she... doesn't.",
+    "opt1": "I'll find her."
+  },
+  "questSilverleaf": {
+    "message": "Is it that obvious? It's so thin, and the black-bark lines all had to be burned. Silverleaf, though... the Guild could grow that, which means you could grow it, and six leaves would restock me nicely.",
+    "accept": "I'll bring silverleaf.",
+    "decline": "Later, Sylvie."
+  },
+  "questSilverleafProgress": {
+    "message": "Six silverleaf, please! The seeds drop from deer on The Long Path, and once you have some, the terraces do the rest. There's no rush. Well, a little rush.",
+    "opt1": "Working on it."
+  },
+  "questSilverleafComplete": {
+    "message": "Oh, look at the colour on these! I never thought I'd see fresh silverleaf in Mawood again. Here's the tonic recipe, with the thanks of a woman whose shelf is finally full.",
+    "opt1": "Glad to help."
   }
 }

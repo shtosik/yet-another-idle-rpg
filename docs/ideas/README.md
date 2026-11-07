@@ -49,6 +49,10 @@ Owner decisions in force:
 | [The Cold Forge: Phurgo, Quest and dialogue](gear-upgrading-cold-forge.md) | M | In progress |
 | [Item sets](item-sets.md) | S-M | Proposed |
 | [Gathering skills (professions)](gathering-skills.md) | M-L | Proposed |
+| [The Farm & Farming Guild](farm-and-husbandry.md) | M-L | In progress |
+| [Seed storage (farming seed store)](seed-storage.md) | S-M | Done |
+| [Farm implementation plan](farm-implementation-plan.md) | L | In progress |
+| [Farm dialogue and quest scripts](farm-dialogue-scripts.md) | M | Done |
 | [Enemy affixes](enemy-affixes.md) | S-M | Noted |
 | [Battle UI redesign review](battle-ui-redesign.md) | M | Proposed |
 | [Known issues](known-issues.md) | — | Open |

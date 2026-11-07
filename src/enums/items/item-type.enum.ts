@@ -9,5 +9,7 @@ export enum ItemType {
     stationUpgrade = 7,
     spellScroll = 8,
     chest = 9,
+    /** Never in the inventory: counted per type in the farming state (`store/player/farm.ts`). */
+    seed = 10,
     quest = 999,
 }

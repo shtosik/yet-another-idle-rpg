@@ -5,7 +5,7 @@ import { QuestsStore } from '../../../../store/quests/quests.store'
 import { PlayerStore } from '../../../../store/player/player.store'
 import { GameNavigationService } from '../../../../services/game-navigation.service'
 import QUEST_DATA, { RequirementProps } from '../../../../../data/quests-data'
-import { npcPlace, NpcPlace } from '../../../../../data/helpers/npc-places'
+import { isNpcPlaceUnlocked, npcPlace, NpcPlace } from '../../../../../data/helpers/npc-places'
 import { ZONES_BY_ENEMY } from '../../../../../data/helpers/enemy-zones'
 import { QuestID } from '../../../../../enums/ids/quest-id.enum'
 import { QuestState } from '../../../../../enums/quest-state.enum'
@@ -15,6 +15,7 @@ import { ItemType } from '../../../../../enums/items/item-type.enum'
 import { EnemyID } from '../../../../../enums/ids/enemy-id.enum'
 import { ZoneID } from '../../../../../enums/ids/zone-id.enum'
 import { NpcID } from '../../../../../enums/map/npc-id.enum'
+import { ProfessionID } from '../../../../../enums/ids/profession-id.enum'
 import { getQuestStatus } from '../../../../services/quest-status'
 import { I18nextPipe } from '../../../../pipes/i18next.pipe'
 import { reputationTierLabel } from '../reputation/reputation-text'
@@ -86,7 +87,7 @@ export class QuestListComponent {
   }
 
   talkTo(giver: NpcPlace): void {
-    this.navigation.talkTo(giver.townId, giver.buildingId, giver.npcId)
+    this.navigation.talkTo(giver)
   }
 
   fightIn(zoneId: ZoneID): void {
@@ -101,11 +102,7 @@ export class QuestListComponent {
     const step = QUEST_DATA[id]?.steps[status.step - 1] // saved steps start from 1
     if (!step) return []
 
-    const requirements = step.requirements.map(req => ({
-      label: this.requirementLabel(req),
-      zoneId: this.requirementZone(req),
-      ...this.questsStore.requirementProgress(id, req),
-    }))
+    const requirements = step.requirements.flatMap(req => this.requirementRows(id, req))
     return [{
       id,
       description: i18next.t(`quests:steps.${QuestID[id]}.${status.step}`, { defaultValue: step.description }),
@@ -127,8 +124,25 @@ export class QuestListComponent {
   private reachableGiver(npcId: NpcID): NpcPlace | null {
     const giver = npcPlace(npcId)
     if (!giver || !this.playerStore.mapUnlocked()) return null
-    if (!this.playerStore.isTownUnlocked(giver.townId)) return null
+    if (!isNpcPlaceUnlocked(giver, this.playerStore)) return null
     return giver
+  }
+
+  /** One row per requirement; a `pickedItems` one is a row per rolled item ("Turnip 3 / 14"). */
+  private requirementRows(id: QuestID, req: RequirementProps): RequirementRow[] {
+    if (req.type === 'pickedItems') {
+      return (this.questsStore.orders()[id]?.requirements ?? []).map(({ itemId, amount }) => ({
+        label: i18next.t(`items:names.${ItemID[itemId]}`),
+        zoneId: null,
+        current: this.playerStore.itemCount(itemId),
+        target: amount,
+      }))
+    }
+    return [{
+      label: this.requirementLabel(req),
+      zoneId: this.requirementZone(req),
+      ...this.questsStore.requirementProgress(id, req),
+    }]
   }
 
   private requirementZone(req: RequirementProps): ZoneID | null {
@@ -155,8 +169,12 @@ export class QuestListComponent {
         return i18next.t(`app:playerStats.${req.key}`)
       case 'quest':
         return i18next.t(`quests:names.${QuestID[req.questId]}`)
+      case 'professionLevel':
+        return i18next.t('quests:requirements.professionLevel', { profession: i18next.t(`app:professions.${ProfessionID[req.professionId]}`) })
       case 'reputation':
-        return reputationTierLabel(req.townId, req.tier)
+        return reputationTierLabel(req.reputationId, req.tier)
+      case 'pickedItems':
+        return '' // shown per item by `requirementRows`
     }
   }
 }

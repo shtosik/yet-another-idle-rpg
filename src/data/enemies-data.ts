@@ -25,6 +25,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     drops: [
       drop(ItemID.slimeResidue, 1, 2, 3),
       drop(ItemID.waterRune, 1, 1, 5),
+      drop(ItemID.wheatSeeds, 1, 2, 25),
       petDrop(EnemyID.greenSlime),
     ],
     shinyDrops: shinyPetDrops(EnemyID.greenSlime),
@@ -40,6 +41,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     drops: [
       drop(ItemID.slimeResidue, 1, 2, 3),
       drop(ItemID.waterRune, 1, 1, 5),
+      drop(ItemID.wheatSeeds, 1, 2, 25),
       petDrop(EnemyID.redSlime),
     ],
     shinyDrops: shinyPetDrops(EnemyID.redSlime),
@@ -56,6 +58,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
       drop(ItemID.slimeResidue, 1, 2, 3),
       drop(ItemID.waterRune, 1, 1, 5),
       drop(ItemID.slimeWand, 1, 1, 60),
+      drop(ItemID.wheatSeeds, 1, 2, 25),
       petDrop(EnemyID.blueSlime),
     ],
     shinyDrops: shinyPetDrops(EnemyID.blueSlime),
@@ -104,6 +107,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
       drop(ItemID.stick, 1, 1, 4),
       drop(ItemID.stone, 1, 1, 4),
       drop(ItemID.airRune, 1, 1, 5),
+      drop(ItemID.turnipSeeds, 1, 2, 20),
       petDrop(EnemyID.seagull),
     ],
     shinyDrops: shinyPetDrops(EnemyID.seagull),
@@ -196,6 +200,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     drops: [
       drop(ItemID.deerPelt, 1, 1, 4),
       drop(ItemID.venison, 1, 1, 3),
+      drop(ItemID.silverleafSeeds, 1, 2, 30),
       petDrop(EnemyID.deer),
     ],
     shinyDrops: shinyPetDrops(EnemyID.deer),
@@ -252,6 +257,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     gold: 27,
     drops: [
       drop(ItemID.deerPelt, 1, 1, 4),
+      drop(ItemID.appleSeeds, 1, 2, 30),
       petDrop(EnemyID.goat),
       drop(ItemID.venison, 1, 1, 3),
       drop(ItemID.venisonRoastRecipe, 1, 1, 12),
@@ -298,6 +304,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     drops: [
       drop(ItemID.spiderSilk, 1, 2, 3),
       drop(ItemID.vialOfWater, 1, 1, 8),
+      drop(ItemID.glowcapSpores, 1, 2, 35),
       petDrop(EnemyID.forestSpider),
     ],
     shinyDrops: shinyPetDrops(EnemyID.forestSpider),
@@ -413,6 +420,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
       drop(ItemID.ancientWood, 1, 1, 3),
       drop(ItemID.earthRune, 1, 1, 5),
       { id: ItemID.cursedSap, minAmount: 1, maxAmount: 1, chance: 3, requiredActiveQuestId: QuestID.theSapThatBurns },
+      drop(ItemID.heartrootSeeds, 1, 2, 40),
       petDrop(EnemyID.treantSprout),
     ],
     shinyDrops: shinyPetDrops(EnemyID.treantSprout),
@@ -446,6 +454,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     drops: [
       drop(ItemID.harpyFeather, 1, 2, 3),
       drop(ItemID.airRune, 1, 1, 5),
+      drop(ItemID.canopyBlossomSeeds, 1, 2, 40),
       petDrop(EnemyID.harpy),
     ],
     shinyDrops: shinyPetDrops(EnemyID.harpy),

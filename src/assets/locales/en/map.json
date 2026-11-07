@@ -11,6 +11,35 @@
     "lirold": "Lirold",
     "mawood": "Mawood"
   },
+  "sitesLabel": "Sites",
+  "sites": {
+    "farm": "Farm",
+    "farmGate": "To the fields"
+  },
+  "farm": {
+    "plots": "Plots {{count}} / {{max}}",
+    "seeds": "Seeds",
+    "noSeeds": "No seeds yet. Monsters and the Arena Chest drop them, and Warden Marta sells some.",
+    "seedStats": "{{time}}, {{min}}-{{max}} crops",
+    "seedLocked": "Requires Farming expertise {{level}}",
+    "plant": "Plant",
+    "harvest": "Harvest",
+    "locked": "Locked",
+    "plantAll": "Plant all",
+    "harvestAll": "Harvest all",
+    "reputationLock": "Requires {{tier}} reputation",
+    "growthBonus": "{{bonus}} faster growth time",
+    "xpGain": "+{{xp}} Farming XP",
+    "harvestBlocked": "Harvest blocked: {{slots}} needed",
+    "seedFound": "Found: {{seeds}}",
+    "progressLabel": "Farming expertise progress"
+  },
+  "reputations": {
+    "laHarpar": "La Harpar",
+    "lirold": "Lirold",
+    "mawood": "Mawood",
+    "farmingGuild": "Farming Guild"
+  },
   "buildings": {
     "main": "Elder's Tree",
     "tavern": "Tavern",

@@ -47,6 +47,14 @@ export const statsInitialState: PlayerStatsType = {
     upgradedDropChance: 0, // percent: chance non-unique gear (excluding pets) drops at +1
     // Offline progress: fraction of the online kill rate earned while away
     offlineProgressRate: 0.5,
+    // farming (additive fractions: 0.1 = 10%); sources are Farming expertise and the Exalted pet
+    seedGrowthTimeReduction: 0,
+    farmDoubleHarvestChance: 0,
+    farmSeedSaveChance: 0,
+    farmBonusCropChance: 0,
+    turnInCooldownReduction: 0,
+    farmXpMultiplier: 0,
+    seedDropChance: 0,
     // damage vs enemy type (additive, fraction: 0.2 = +20% of total damage)
     damageVsCrab: 0,
     damageVsBird: 0,

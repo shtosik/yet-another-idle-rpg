@@ -59,6 +59,18 @@ export const STAT_GROUPS: StatGroup[] = [
       { stat: 'maxTaskSlots', format: 'number' },
       { stat: 'taskDoubleKillChance', format: 'percent' },
       { stat: 'shopRefreshCooldown', format: 'minutes' },
+      { stat: 'turnInCooldownReduction', format: 'bonus' },
+    ],
+  },
+  {
+    key: 'farming',
+    rows: [
+      { stat: 'seedGrowthTimeReduction', format: 'bonus' },
+      { stat: 'farmDoubleHarvestChance', format: 'bonus' },
+      { stat: 'farmSeedSaveChance', format: 'bonus' },
+      { stat: 'farmBonusCropChance', format: 'bonus' },
+      { stat: 'farmXpMultiplier', format: 'bonus' },
+      { stat: 'seedDropChance', format: 'bonus' },
     ],
   },
   {

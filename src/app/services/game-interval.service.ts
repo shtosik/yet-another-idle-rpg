@@ -6,6 +6,7 @@ import { BattleManagerService } from './battle-manager.service'
 import { ShopStore } from '../store/shop/shop.store'
 import { OfflineProgressService } from './offline-progress.service'
 import { ArenaService } from './arena.service'
+import { TurnInCooldownService } from './turn-in-cooldown.service'
 import { ARENA } from '../../data/arena-data'
 import { MS_PER_SECOND, RESPAWN_DELAY_IN_MS, TICK_DURATION_IN_MS, timePerAttackMs } from './combat-timing'
 
@@ -24,6 +25,7 @@ export class GameIntervalService {
     shopStore = inject(ShopStore)
     offlineProgress = inject(OfflineProgressService)
     arenaService = inject(ArenaService)
+    turnInCooldowns = inject(TurnInCooldownService)
 
     private timePerAttack = computed(() => timePerAttackMs(this.playerStore.stats()))
 
@@ -67,6 +69,7 @@ export class GameIntervalService {
             this.secondTimer -= MS_PER_SECOND
             this.battleManagerService.tickConsumables()
             this.shopStore.tickCooldowns(MS_PER_SECOND)
+            this.turnInCooldowns.tick(wallNow)
             this.offlineProgress.markSeen()
         }
     }

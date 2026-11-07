@@ -70,7 +70,7 @@ No arena tokens or arena shop. The Explorer Token shop already exists, and the g
 
 Every clear:
 - **Molten Cape** (see above).
-- **Arena Chest**: a few rolls (e.g. 3) on a weighted table:
+- **Arena Chest**: a few rolls (e.g. 3) on a weighted table (shipped: 4 rolls; the farm adds six seed entries and raises gold to 8,000-14,000, see `docs/systems/arena.md`):
   - Common: gold, tier resources (materials from zones around the arena's unlock tier), food and potions.
   - Uncommon: recipe scrolls, more resources.
   - Rare: an arena-only recipe scroll.

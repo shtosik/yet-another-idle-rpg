@@ -1,6 +1,7 @@
 import { ItemID } from 'enums/ids/item-id.enum'
 import { QuestID } from 'enums/ids/quest-id.enum'
 import { ZoneID } from 'enums/ids/zone-id.enum'
+import { SiteID } from 'enums/ids/site-id.enum'
 import { TownID } from 'enums/map/town-id.enum'
 
 export interface WaveReachedCondition {
@@ -32,6 +33,11 @@ export interface TownUnlockTarget {
   townId: TownID
 }
 
+export interface SiteUnlockTarget {
+  type: 'site'
+  siteId: SiteID
+}
+
 export type UnlockableFeature = 'camp' | 'skillTree'
 
 export interface FeatureUnlockTarget {
@@ -39,7 +45,7 @@ export interface FeatureUnlockTarget {
   feature: UnlockableFeature
 }
 
-export type UnlockTarget = TownUnlockTarget | FeatureUnlockTarget
+export type UnlockTarget = TownUnlockTarget | SiteUnlockTarget | FeatureUnlockTarget
 
 export interface UnlockNotification {
   titleKey: string

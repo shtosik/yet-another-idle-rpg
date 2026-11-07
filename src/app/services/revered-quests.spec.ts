@@ -10,7 +10,7 @@ import { QUEST_STEP_AFTER_COMPLETED } from '../../data/quests-data'
 import { QuestID } from '../../enums/ids/quest-id.enum'
 import { EnemyID } from '../../enums/ids/enemy-id.enum'
 import { ItemID } from '../../enums/ids/item-id.enum'
-import { TownID } from '../../enums/map/town-id.enum'
+import { ReputationID } from '../../enums/reputation-id.enum'
 import LA_HARPAR_TRADER, { TraderDialogue } from '../../data/dialogues/laHarparTown/laHarparTrader'
 import LA_HARPAR_BARTENDER, { BartenderDialogue } from '../../data/dialogues/laHarparTown/laHarparBartender'
 import MAWOOD_SYLVIE, { SylvieDialogue } from '../../data/dialogues/mawoodTown/mawoodSylvie'
@@ -30,7 +30,7 @@ describe('Revered quests in dialogue', () => {
     dialogue = TestBed.inject(DialogueManagerService)
     playerStore = TestBed.inject(PlayerStore)
     questsStore = TestBed.inject(QuestsStore)
-    playerStore.addReputation([{ townId: TownID.laHarpar, amount: 600 }])
+    playerStore.addReputation([{ reputationId: ReputationID.laHarpar, amount: 600 }])
   })
 
   afterEach(() => localStorage.clear())
@@ -38,7 +38,7 @@ describe('Revered quests in dialogue', () => {
   it('plays Safe Passage from the Trader to Sylvie and credits both towns', () => {
     questsStore.startQuest(QuestID.silkAndWater)
     questsStore.endQuest(QuestID.silkAndWater)
-    const mawood = playerStore.reputation()[TownID.mawood] ?? 0
+    const mawood = playerStore.reputation()[ReputationID.mawood] ?? 0
     const askTrader = option(LA_HARPAR_TRADER[TraderDialogue.default], 'default.opt6')
 
     expect(dialogue.getActiveResult(askTrader)?.next).toBe(TraderDialogue.questSafePassage)
@@ -56,15 +56,15 @@ describe('Revered quests in dialogue', () => {
     dialogue.selectOption(option(MAWOOD_SYLVIE[SylvieDialogue.safePassageComplete], 'safePassageComplete.opt1'))
 
     expect(questsStore.getQuestStep(QuestID.safePassage)).toBe(QUEST_STEP_AFTER_COMPLETED)
-    expect(playerStore.reputation()[TownID.laHarpar]).toBe(700)
-    expect(playerStore.reputation()[TownID.mawood]).toBe(mawood + 25)
+    expect(playerStore.reputation()[ReputationID.laHarpar]).toBe(700)
+    expect(playerStore.reputation()[ReputationID.mawood]).toBe(mawood + 25)
   })
 
   it('gives the town pet once at Exalted', () => {
     const askCat = option(LA_HARPAR_BARTENDER[BartenderDialogue.default], 'default.tavernCat')
     expect(dialogue.getActiveResult(askCat)).toBeUndefined()
 
-    playerStore.addReputation([{ townId: TownID.laHarpar, amount: 900 }])
+    playerStore.addReputation([{ reputationId: ReputationID.laHarpar, amount: 900 }])
     expect(dialogue.getActiveResult(askCat)?.next).toBe(BartenderDialogue.tavernCat)
     dialogue.selectOption(option(LA_HARPAR_BARTENDER[BartenderDialogue.tavernCat], 'tavernCat.opt1'))
 

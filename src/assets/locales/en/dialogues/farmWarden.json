@@ -1,0 +1,138 @@
+{
+  "intro1": {
+    "message": "The gate's open because Sylvie vouches for you, walker, so don't make her regret it.",
+    "teach": "Sylvie said you could teach me to farm.",
+    "letter": "Here's her letter."
+  },
+  "introLetter": {
+    "message": "Hm, that's her hand all right, and as many pages as usual. She says you carry silk through the Elderwood, which counts for something around here.",
+    "opt1": "She talks about you a lot."
+  },
+  "introSeeds": {
+    "message": "You've made a start already, walker, whether you meant to or not. Monsters carry wild seed, a few in every dozen, and everything that's stuck to you since the beach has gone into the Guild's tally, so it won't weigh down your pack.",
+    "why": "I never noticed any seeds.",
+    "show": "Show me.",
+    "guild": "Tell me about the Guild."
+  },
+  "introSeedsWhy": {
+    "message": "You wouldn't, because a seed's small and a fight's loud. Your tally is the list on the left of the plots, and it fills up as you go, since slimes, gulls, deer and goats all carry some.",
+    "opt1": "Show me."
+  },
+  "introNoSeeds": {
+    "message": "Your tally's thin, walker, but it'll fill. Monsters carry wild seed, a few in every dozen, and it all comes to you as you fight. Until then I sell turnip seed at twenty gold, and turnip is what you should plant first anyway.",
+    "shop": "I'll take some.",
+    "later": "I'll go find some."
+  },
+  "introGate": {
+    "message": "Through the gate with you, then. The first plot is yours, so choose a seed from your tally, choose the plot to put it in, and after that all it needs is time.",
+    "opt1": "Thanks."
+  },
+  "default": {
+    "message": "Say what you need, walker. The daylight won't wait for either of us.",
+    "letter": "I've brought Sylvie's letter.",
+    "furrowTurnIn": "I've got the turnips.",
+    "wheatTurnIn": "I've got the wheat.",
+    "orchardTurnIn": "I've got the apples.",
+    "tableTurnIn": "The stew and the pie are ready.",
+    "orderTurnIn": "About my order...",
+    "furrowProgress": "About the first furrow...",
+    "wheatProgress": "About the wheat...",
+    "orchardProgress": "About the orchard...",
+    "tableProgress": "About the Growers' Table...",
+    "orderProgress": "About my order...",
+    "furrowOffer": "Where do I begin?",
+    "wheatOffer": "The Guild needs more wheat?",
+    "orchardOffer": "What happened to the orchard?",
+    "tableOffer": "Honored folk get something...",
+    "orderOffer": "Any order for me?",
+    "shop": "Let me see your seeds.",
+    "petGift": "Is something on your mind, Warden?",
+    "aboutGuild": "Tell me about the Guild.",
+    "aboutGate": "Why did you close the gate?",
+    "bye": "Goodbye."
+  },
+  "aboutGuild": {
+    "message": "We're growers. We keep our seed lines pure and pass them from hand to hand, or we did, until half the vaults sprouted black two winters ago. So we shut the gate, and now we're short of hands.",
+    "hands": "I'll be those hands.",
+    "blight": "What about the blight?"
+  },
+  "aboutGate": {
+    "message": "I closed it, and I'm not sorry. The sap came through the Spires and took half of what we had, and any stranger could have carried in more of it on their boots.",
+    "now": "Fair enough. There was something else.",
+    "bye": "Understood."
+  },
+  "questFurrow": {
+    "message": "You begin with turnips, and I want four of them. Pick the seed, put it in plot one and give it fifteen minutes, and in the meantime go and hit something, because dirt doesn't care how brave you are.",
+    "accept": "I'll plant it.",
+    "decline": "Later."
+  },
+  "questFurrowProgress": {
+    "message": "Four turnips, walker, from plot one through the gate. They only ask for fifteen minutes, and standing over them won't make it fourteen.",
+    "opt1": "On it."
+  },
+  "questFurrowComplete": {
+    "message": "Not bad for a first crop. The first one you pull is yours to eat, and the Guild pays for the rest in coin and seed. I've an order for you now as well, if you want the work.",
+    "opt1": "Thank you."
+  },
+  "questWheat": {
+    "message": "It always does. Bring me ten, and use more than one plot, since they all grow side by side and there's no sense waiting on them one at a time. Slimes carry the seed, and I'll sell it to you myself once you're Friendly with us.",
+    "accept": "Ten wheat.",
+    "decline": "Later."
+  },
+  "questWheatProgress": {
+    "message": "Ten wheat, walker. Each plot takes forty-five minutes, so put two of them to work and you'll save yourself the wait.",
+    "opt1": "On it."
+  },
+  "questWheatComplete": {
+    "message": "Ten, and sooner than I'd have bet. Here's the Guild's bread recipe, with my thanks. You'd better go and see Wick as well, because he has something for you and he'll never work up the nerve to come and find you.",
+    "opt1": "I'll find Wick."
+  },
+  "questOrchard": {
+    "message": "It burned in the sap winter. Twelve apples from our own trees would say the Guild is open again, and I'd like that said. Goats on the Mountain Pass carry the seed, and the trees take four hours, so don't plant them and stand about.",
+    "accept": "Twelve apples.",
+    "decline": "Later."
+  },
+  "questOrchardProgress": {
+    "message": "Twelve apples, walker. The goats on the Mountain Pass carry the seed, and after that each tree wants four hours of your patience.",
+    "opt1": "On it."
+  },
+  "questOrchardComplete": {
+    "message": "Apples, and off our own ground at that. ... There's a new plot by the south wall, and I want you to take it. It's yours.",
+    "opt1": "Thank you, Warden."
+  },
+  "questTable": {
+    "message": "They get my pie recipe, walker, and you'll find it in the shop now that you're one of them. Cook me five turnip stew and five harvest pie, because I haven't cooked in two years and I'd like to remember what a full table looks like.",
+    "accept": "Five and five.",
+    "decline": "Later."
+  },
+  "questTableProgress": {
+    "message": "Five stew and five pie. The stew goes on the Fire Pit and the pie in the Cooking Pot, and the pie wants cheese, which you can buy or take off a Giant Rat. Rats don't make cheese, walker. They steal it.",
+    "opt1": "Working on it."
+  },
+  "questTableComplete": {
+    "message": "... It's still warm, and the salt's right. Sit down, walker, though I'm eating first, and the next pot is mine to cook. The new plot is yours, and you can tell Corwin the Guild has bread.",
+    "opt1": "I will."
+  },
+  "orderOffer": {
+    "message": "The larder's low, so I need crops, and the Guild pays for them. What I need changes from one order to the next, so take the job and your quest panel will tell you what to bring.",
+    "accept": "I'll bring it.",
+    "decline": "Not now."
+  },
+  "orderProgress": {
+    "message": "Your quest panel has what I asked for, walker. The plots won't hurry for you, so don't leave it to the last minute.",
+    "opt1": "On it."
+  },
+  "orderComplete": {
+    "message": "That'll do, and the larder's glad of it. Come back in two hours, walker, and I'll have another for you.",
+    "opt1": "See you then."
+  },
+  "petGift": {
+    "message": "There's a hare on the terraces that nobody keeps, because it keeps itself. Feed it and it'll find the ripe row before you do. It seems to like you, walker, which is more than it's ever done for me.",
+    "accept": "I'll take care of it.",
+    "decline": "Not now."
+  },
+  "petGiftDone": {
+    "message": "The Guild calls you Hand of the Terraces now, and I didn't argue when they did. Wear it well, walker.",
+    "opt1": "Thank you."
+  }
+}

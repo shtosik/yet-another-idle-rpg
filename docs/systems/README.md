@@ -19,6 +19,7 @@ Current behavior of each game system. Read the doc before changing its system, a
 | enemies, shinies, pets, bestiary | `docs/systems/enemies-shiny-pets-bestiary.md` |
 | world map, map tiles | `docs/systems/world-map.md` |
 | translations | `docs/systems/localization.md` |
+| farm, plots, seeds, harvest, farming expertise, Guild orders | `docs/systems/farming.md` |
 | generated art | `docs/systems/asset-pipeline.md` |
 
 Fixing a bug: check `docs/ideas/known-issues.md` for open bugs and tech debt first.

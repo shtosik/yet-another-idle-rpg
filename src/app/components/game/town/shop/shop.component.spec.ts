@@ -5,7 +5,7 @@ import { ShopStore } from '../../../../store/shop/shop.store'
 import { PlayerStore } from '../../../../store/player/player.store'
 import { ShopID } from '../../../../../enums/ids/shop-id.enum'
 import { ItemID } from '../../../../../enums/ids/item-id.enum'
-import { TownID } from '../../../../../enums/map/town-id.enum'
+import { ReputationID } from '../../../../../enums/reputation-id.enum'
 import SHOPS_DATA from '../../../../../data/shops-data'
 
 describe('ShopComponent reputation lock', () => {
@@ -28,7 +28,7 @@ describe('ShopComponent reputation lock', () => {
   it('shows the lock before the price, and lifts it at Honored', () => {
     expect(shop.buyBlockReason(boots)).toBe('reputation')
 
-    playerStore.addReputation([{ townId: TownID.laHarpar, amount: 200 }])
+    playerStore.addReputation([{ reputationId: ReputationID.laHarpar, amount: 200 }])
     expect(shop.buyBlockReason(boots)).toBe('currency')
 
     playerStore.updatePlayerStats([{ stat: 'goldCoins', amount: 3000 }])

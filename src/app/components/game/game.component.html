@@ -7,7 +7,7 @@
     <app-player-stats class="stats"/>
   }
 
-  @if (tab === GameTab.main || tab === GameTab.camp || tab === GameTab.towns || tab === GameTab.bestiary || tab === GameTab.map || tab === GameTab.spellbook) {
+  @if (tab === GameTab.main || tab === GameTab.camp || tab === GameTab.towns || tab === GameTab.bestiary || tab === GameTab.map || tab === GameTab.spellbook || tab === GameTab.farm || tab === GameTab.farmPlots) {
     @switch (tab) {
       @case (GameTab.camp) {
         @defer {
@@ -24,8 +24,8 @@
 
     <app-equipment class="equipment"/>
 
-    <!-- The Bestiary takes both rows instead. -->
-    @if (tab !== GameTab.bestiary) {
+    <!-- The Bestiary and the plots panel take both rows instead. -->
+    @if (tab !== GameTab.bestiary && tab !== GameTab.farmPlots) {
       <app-inventory class="inventory"/>
     }
     <app-quests class="quests"/>
@@ -39,7 +39,21 @@
     <app-world-map
       class="map"
       (changeTab)="changeTab($event)"
+      (siteSelected)="openSite($event)"
     />
+  }
+
+  @if (tab === GameTab.farm) {
+    <app-site
+      class="farm-home"
+      [siteId]="siteId()"
+      (closed)="changeTab(GameTab.map)"
+      (gate)="changeTab(GameTab.farmPlots)"
+    />
+  }
+
+  @if (tab === GameTab.farmPlots) {
+    <app-farm-plots class="farm" (closed)="changeTab(GameTab.farm)"/>
   }
 
   @if (tab === GameTab.bestiary) {
@@ -59,6 +73,7 @@
 <!-- Fixed above dialogs: a tier-up usually lands while the quest completed modal is open.
      Always rendered, so screen readers announce the text when it changes. -->
 <div class="tier-up-toast" role="status" [class.tier-up-toast--shown]="tierUpToast()">{{ tierUpToast() }}</div>
+<div class="tier-up-toast tier-up-toast--below" role="status" [class.tier-up-toast--shown]="levelUpToast()">{{ levelUpToast() }}</div>
 @if (cheats) {
   <!-- Deferred so the cheat code lands in its own chunk that production never loads. -->
   @defer {

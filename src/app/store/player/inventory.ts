@@ -31,13 +31,17 @@ export interface ItemStack {
   upgradeLevel?: number
 }
 
-/** The tab an item is stored in. */
+/** Seeds live in the farming state, never in a tab (`farm.ts`). */
+export const isSeed = (id: ItemID): boolean => ITEM_DATA[id]?.type === ItemType.seed
+
+/** The tab an item is stored in. Seeds have none: `byTab` and `lostItems` skip them. */
 export function tabOf(id: ItemID): InventoryTab {
   const item = ITEM_DATA[id]
   switch (item.type) {
     case ItemType.equipment:
       return (item as EquipmentItem).slot === EquipmentSlot.pet ? 'pets' : 'gear'
     case ItemType.resource:
+    case ItemType.seed: // unreachable for stored items; the switch has to cover it
       return 'materials'
     case ItemType.quest:
       return 'quest'
@@ -110,10 +114,10 @@ export function resizeInventory(inventories: Inventories, capacity: TabCapacity)
   return result
 }
 
-/** Items grouped by their tab, in the order given. */
+/** Items grouped by their tab, in the order given. Seeds are left out, so add, remove and fit checks ignore them. */
 function byTab<T extends ItemStack>(items: T[]): Partial<Record<InventoryTab, T[]>> {
   const groups: Partial<Record<InventoryTab, T[]>> = {}
-  for (const item of items) (groups[tabOf(item.id)] ??= []).push(item)
+  for (const item of items) if (!isSeed(item.id)) (groups[tabOf(item.id)] ??= []).push(item)
   return groups
 }
 
@@ -260,7 +264,7 @@ export const pageCount = (slots: number): number => Math.max(1, Math.ceil(slots 
 /** What of `items` would not fit when added, per stack key (one entry each, as rolled drops are). Tab per `tabOf`. */
 export function lostItems(inventories: Inventories, capacity: TabCapacity, items: ItemStack[]): ItemStack[] {
   const after = addItems(inventories, capacity, items)
-  return items.flatMap(({ id, amount, tier = ITEM_DATA[id].tier, upgradeLevel }) => {
+  return items.filter(({ id }) => !isSeed(id)).flatMap(({ id, amount, tier = ITEM_DATA[id].tier, upgradeLevel }) => {
     const lost = amount - (countItem(after, id, tier, upgradeLevel) - countItem(inventories, id, tier, upgradeLevel))
     return lost > 0 ? [{ id, tier, amount: lost, ...(upgradeLevel === undefined ? {} : { upgradeLevel }) }] : []
   })

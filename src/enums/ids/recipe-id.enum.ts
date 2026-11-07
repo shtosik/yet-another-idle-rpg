@@ -32,4 +32,10 @@ export enum RecipeID {
     silkweaveLegs = 31,
     gladiatorHelm = 32,
     greaterManaPotion = 33,
+    turnipStew = 34,
+    farmersBread = 35,
+    harvestPie = 36,
+    mushroomStew = 37,
+    silverleafTonic = 38,
+    glowcapElixir = 39,
 }

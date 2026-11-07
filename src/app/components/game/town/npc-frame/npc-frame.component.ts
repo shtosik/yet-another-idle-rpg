@@ -1,4 +1,6 @@
-import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core'
+import { ChangeDetectionStrategy, Component, EventEmitter, inject, Input, Output } from '@angular/core'
+import { TurnInCooldownService } from '../../../../services/turn-in-cooldown.service'
+import { formatCooldown } from '../../../../store/quests/turn-in-cooldown'
 import { TownBuildingNpc } from '../../../../../interfaces/town.interface'
 import NPC_Data from '../../../../../data/npc-data'
 import { NgOptimizedImage } from '@angular/common'
@@ -24,6 +26,8 @@ export class NpcFrameComponent {
     @Output() openDialogue = new EventEmitter<NpcID>()
     @Output() openShop = new EventEmitter<ShopID>()
 
+    protected readonly cooldowns = inject(TurnInCooldownService)
+    protected readonly formatCooldown = formatCooldown
     protected readonly NPC_Data = NPC_Data
     protected readonly NpcID = NpcID
 }

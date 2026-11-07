@@ -57,9 +57,18 @@ $equipment-height: 26rem
     grid-column: 2 / span 3
     grid-row: 1 / span 2
 
-  .map
+  .map,
+  .farm
     grid-column: 2 / span 2
     grid-row: 1 / span 2
+
+  .map
+    padding: 0
+
+  // The farm home is one row high like a town; only the plots panel takes the map footprint.
+  .farm-home
+    grid-column: 2 / span 2
+    grid-row: 1 / 2
     padding: 0
 
   .bestiary
@@ -93,6 +102,10 @@ $equipment-height: 26rem
   text-align: center
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6)
   pointer-events: none
+
+  // The level-up toast sits under the tier-up one, since a quest can give both at once.
+  &--below
+    top: 4.5rem
 
   &--shown
     opacity: 1

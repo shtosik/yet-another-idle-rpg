@@ -106,7 +106,13 @@ export interface StationUpgradeItem extends ItemData {
 export const isStationUpgradeItem = (item: Item): item is StationUpgradeItem =>
     item.type === ItemType.stationUpgrade
 
-export type Item = EquipmentItem | ResourceItem | RewardsStatsItem | QuestItem | FoodItem | BookItem | PotionItem | RecipeItem | StationUpgradeItem | SpellScrollItem | ChestItem
+/** Counted in `PlayerState.farm.seeds`, never in the inventory; has no sell price (`value` is -1). */
+export interface SeedItem extends ItemData {
+    type: ItemType.seed
+    value: -1
+}
+
+export type Item = EquipmentItem | ResourceItem | RewardsStatsItem | QuestItem | FoodItem | BookItem | PotionItem | RecipeItem | StationUpgradeItem | SpellScrollItem | ChestItem | SeedItem
 
 export type UseItemProps = UseItemStatProps
 
