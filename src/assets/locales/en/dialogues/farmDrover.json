@@ -1,15 +1,15 @@
 {
   "intro1": {
-    "message": "Oh. Um. You're the one Sylvie... the walker. I'm Wick. I do the, um, animals. Well. There aren't any now.",
+    "message": "Oh! Um, you must be the one Sylvie wrote about. I'm Wick, and I look after the animals here. Well... there aren't any now, but that's still what I do.",
     "herd": "What happened to the herd?",
     "hello": "Nice to meet you, Wick."
   },
   "introHerd": {
-    "message": "The sap. Winter before last. I keep the tack oiled anyway. Somebody should. In case.",
+    "message": "The sap got them, the winter before last. I still keep the tack oiled, though, because somebody should, and... well, just in case.",
     "opt1": "That's kind of you."
   },
   "default": {
-    "message": "Um... yes? Hello. Do you need something?",
+    "message": "Um, did you need something? I'm only sorting labels, so it's no trouble.",
     "orderTurnIn": "About your order...",
     "orderProgress": "About your order...",
     "orderOffer": "Any order for me?",
@@ -17,25 +17,25 @@
     "bye": "Goodbye."
   },
   "aboutWick": {
-    "message": "I'm the drover. And the tanner's boy. Pelts for the, um, saddle blankets. And fangs. For the fence. Charms, I mean.",
+    "message": "I'm the drover, and the tanner's boy as well. The pelts go into, um, saddle blankets, and the fangs go on the fence. As charms, I mean.",
     "charms": "Fence charms?",
     "thanks": "Thanks."
   },
   "aboutWickCharms": {
-    "message": "Fangs keep things off. Maybe. I label them so I know which ones I tried.",
+    "message": "The fangs keep things away from the fence, or at least I think they do. I put a label on each one, so I know which ones I've already tried.",
     "opt1": "Good idea."
   },
   "orderOffer": {
-    "message": "Um. I need some things. For the... things. If you have some. Please? It is in your quest panel.",
+    "message": "Um, I could use a few things, if you can get them. They're for the tack and the charms, mostly. If you say yes, it'll all be in your quest panel, so you don't have to remember it.",
     "accept": "I'll bring them.",
     "decline": "Not now."
   },
   "orderProgress": {
-    "message": "What the panel says. No rush. ... well, a little.",
+    "message": "It's all in your quest panel, what I asked for. There's no rush. Well... maybe a little.",
     "opt1": "On it."
   },
   "orderComplete": {
-    "message": "Oh! That's... perfect. Thank you. Come back in two hours? If that's all right.",
+    "message": "Oh! That's... that's exactly right, thank you. I'll get these labelled straight away. Could you come back in two hours, if that's all right?",
     "opt1": "See you then."
   }
 }
