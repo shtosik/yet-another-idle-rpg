@@ -7,7 +7,10 @@
         (click)="notification.open()"
       >
         <img alt="" class="notification__icon" height="18" width="18" [ngSrc]="notification.icon">
-        {{ ('hud.notifications.' + notification.kind) | i18next: { count: notification.count } }}
+        {{ notification.text | i18next: notification.params }}
+        @if (notification.action) {
+          <span class="notification__action">{{ notification.action | i18next }}</span>
+        }
       </button>
     </li>
   }
