@@ -33,6 +33,12 @@ export class GameNavigationService {
     this.tab.set(GameTab.farm)
   }
 
+  /** Opens the farm's plots panel; its close button goes back to the farm home. */
+  openFarmPlots(): void {
+    this.openSite(SiteID.farm)
+    this.tab.set(GameTab.farmPlots)
+  }
+
   /** Opens the town building or Site home screen `place` is in and starts a conversation with its NPC. */
   talkTo(place: NpcPlace): void {
     if (place.kind === 'site') {
