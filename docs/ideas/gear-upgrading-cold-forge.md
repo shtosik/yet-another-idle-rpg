@@ -2,6 +2,8 @@
 
 **Status:** In progress
 
+Superseded text: the shipped dialogue was rewritten on 2026-11-07, so the locale JSON and `docs/character/` win over the script below.
+
 Implemented 2026-11-04 (proposed 2026-11-01). Lore companion to [Gear upgrading](gear-upgrading.md); its Owner decisions and mechanics remain authoritative. This file was the script for implementation; the shipped text is in `liroldPhurgo.json`, `laHarparMarvin.json` and `liroldArenaMaster.json`, and wins where they differ.
 
 ## Lore already in the game

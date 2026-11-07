@@ -78,4 +78,41 @@ describe('Marta dialogue', () => {
     expect(dialogue.getActiveResult(option(hub, 'default.furrowProgress'))).toBeUndefined()
     expect(dialogue.getActiveResult(option(hub, 'default.furrowTurnIn'))?.next).toBe(WardenDialogue.questFurrowComplete)
   })
+
+  it('pays The First Furrow with the Turnip Stew Recipe, which The Growers\' Table needs', () => {
+    questsStore.startQuest(QuestID.theFirstFurrow)
+    playerStore.addItems([{ id: ItemID.turnip, amount: 4 }])
+    dialogue.startDialogue(NpcID.farmWarden)
+
+    dialogue.selectOption(option(FARM_WARDEN[WardenDialogue.default], 'default.furrowTurnIn'))
+    expect(dialogue.activeNode()?.id).toBe(WardenDialogue.questFurrowComplete)
+    dialogue.selectOption(option(FARM_WARDEN[WardenDialogue.questFurrowComplete], 'questFurrowComplete.opt1'))
+
+    expect(dialogue.activeNode()?.id).toBe(WardenDialogue.questFurrowAfter)
+    expect(playerStore.itemCount(ItemID.turnipStewRecipe)).toBe(1)
+  })
+
+  it('goes back to the hub without ending the quest if the items were spent during the turn-in', () => {
+    questsStore.startQuest(QuestID.theFirstFurrow)
+    dialogue.startDialogue(NpcID.farmWarden)
+
+    dialogue.selectOption(option(FARM_WARDEN[WardenDialogue.questFurrowComplete], 'questFurrowComplete.opt1'))
+
+    expect(dialogue.activeNode()?.id).toBe(WardenDialogue.default)
+    expect(questsStore.getQuestStep(QuestID.theFirstFurrow)).toBe(1)
+    expect(playerStore.itemCount(ItemID.turnipStewRecipe)).toBe(0)
+  })
+
+  it('explains the seed stall once, then opens it straight away', () => {
+    questsStore.startQuest(QuestID.theFirstFurrow)
+    const shop = option(FARM_WARDEN[WardenDialogue.default], 'default.shop')
+    expect(dialogue.getActiveResult(shop)?.next).toBe(WardenDialogue.shopFirst)
+
+    const explained = option(FARM_WARDEN[WardenDialogue.shopFirst], 'shopFirst.opt1')
+    expect(dialogue.getActiveResult(explained)?.effects?.some(e => e.type === 'shop')).toBeTrue()
+    dialogue.startDialogue(NpcID.farmWarden)
+    dialogue.selectOption(explained)
+
+    expect(dialogue.getActiveResult(shop)?.effects?.some(e => e.type === 'shop')).toBeTrue()
+  })
 })

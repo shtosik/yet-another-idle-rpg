@@ -6,6 +6,7 @@ Versions follow [Semantic Versioning](https://semver.org/). Each note is `- [typ
 New notes go under `[Unreleased]`; `npm run release -- <major|minor|patch>` moves them into a version (docs/deployment.md).
 
 ## [Unreleased]
+- [feature] Marta, Wick, Ludo Crane and Phurgo have all-new dialogue: each sounds like their own person, with new stories, idle talk and scenes that change as they come to trust you. Ask them about themselves, and listen closely to what they won't say.
 - [feature] The Farming Guild: Sylvie in Mawood sends you to a farm north of the Pass. Plant seeds that monsters and the Arena Chest drop, wait for them to grow (even while you are away), and harvest crops for new cooking and alchemy recipes. Farming has its own expertise level that gives skill points and bonuses, and Warden Marta and Wick give a quest chain and repeatable orders for crops and animal materials.
 - [nerf] Reputation turn-ins hand over one bundle per 2 hours.
 - [feature] The world map shows the cursor coordinates in its bottom left corner.

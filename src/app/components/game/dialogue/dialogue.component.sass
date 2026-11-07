@@ -5,15 +5,16 @@
 :host
   @include mixins.panel
 
-// Fills the town panel; the options list takes the leftover height and scrolls.
+// Fills the town panel and scrolls as one column, so a long message never squeezes out its options.
+// Not positioned: the close button anchors to the host and stays put while this scrolls.
 .dialogue-modal
-  position: relative
   display: flex
   flex-direction: column
   gap: 0.75rem
   padding: 0.5rem
   width: 100%
   min-height: 0
+  overflow-y: auto
 
   &__wrapper
     display: flex
@@ -30,6 +31,7 @@
     margin-top: 0.5rem
     font-size: 1.125rem
     line-height: 1.4
+    white-space: pre-line
 
   &__npc-image
     object-fit: contain
@@ -38,9 +40,7 @@
     display: flex
     gap: 0.2rem
     flex-direction: column
-    flex: 1 1 auto
-    min-height: 0
-    overflow-y: auto
+    flex: none
 
 app-close-button
   position: absolute

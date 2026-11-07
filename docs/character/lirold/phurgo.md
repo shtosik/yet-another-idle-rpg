@@ -31,6 +31,17 @@ He left voluntarily to run his own workshop and learn unfamiliar work. Surface t
 
 Sample: "A blade can have life left in it after its owner gives up. People, too, if you give them a chair."
 
+## Voice sheet
+Tendencies, not laws: the habits above come and go.
+
+- Usually short, concrete statements, often dropping the subject ("Needs a rivet"). Looks at gear before faces.
+- Pie, the table at home and a well-made joint pull him into long, careful, happy sentences.
+- Funny rarely and very dry. Asks what's been done to a tool, who did it, whether you've eaten.
+- Will not say plainly: he is afraid two cold winters have cost him the eye for the colour of hot steel. Near it he finds something of yours to mend.
+
+## Backstory (owner-approved 2026-11-07, shipped in `liroldPhurgo.json`)
+His tongs were lent to Slatefall's smith and were coming home on the last cart. His first Fish & Apple Pie was half-payment from a woman off the coast road. After the hearth is lit he builds a table with iron legs and a door for a top, and bakes an apple on the hood. He doesn't work pets ("Someone asked").
+
 ## Portrait brief
 
 Broad, compact dwarf with large working hands, a square face and a dark beard streaked with iron-grey, tied back clear of the hearth. Calm brown eyes under heavy brows; a small, almost reluctant smile. A smoke-dark leather apron over a rolled-sleeve slate-blue shirt, copper apron rivets, an old burn scar on one forearm. No royal regalia or warrior armour.
