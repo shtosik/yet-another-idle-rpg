@@ -1,5 +1,6 @@
 import { ItemID } from '../../../enums/ids/item-id.enum'
 import { SiteID } from '../../../enums/ids/site-id.enum'
+import { ReputationTier } from '../../../enums/reputation-tier.enum'
 import { FARM_SEEDS, FarmSeed, GrowthStage } from '../../../data/farming-data'
 import { UnlockedContent } from '../../../types/player/unlocked-content.type'
 import { isSeed, ItemStack } from './inventory'
@@ -9,6 +10,10 @@ export const PLOT_SLOTS = 9
 export const BASE_PLOTS = 3
 export const PLOT_REPUTATION_TIERS = 4
 export const PLOT_GRANT_QUESTS = 2
+
+/** Plant all and Harvest all open at these Farming Guild tiers (farm doc §5). */
+export const PLANT_ALL_TIER = ReputationTier.honored
+export const HARVEST_ALL_TIER = ReputationTier.friendly
 
 export interface Plot {
   seedId: ItemID
@@ -61,7 +66,7 @@ export const plotCount = (reputationTierIndex: number, grantQuestsDone: number):
 
 /**
  * Accrues growth: time since `syncedAt` counts at the rate in force (`reduction` = `seedGrowthTimeReduction`).
- * Run it before anything changes the reduction (equipping, a level-up) so the old rate only covers the old time.
+ * `PlayerStore` runs it with the old rate whenever the reduction changes, so the old rate only covers the old time.
  * A clock set backwards counts as no time passed; progress is capped at full and never shrinks.
  */
 export function syncPlots(plots: (Plot | null)[], now: number, reduction: number): (Plot | null)[] {

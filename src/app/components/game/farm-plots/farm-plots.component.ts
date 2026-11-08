@@ -6,7 +6,7 @@ import { I18nextPipe } from '../../../pipes/i18next.pipe'
 import { CloseButtonComponent } from '../../shared/close-button/close-button.component'
 import { FarmService } from '../../../services/farm.service'
 import { PlayerStore } from '../../../store/player/player.store'
-import { isReady, PLOT_SLOTS, stageOf, syncPlots } from '../../../store/player/farm'
+import { isReady, PLOT_SLOTS, stageOf } from '../../../store/player/farm'
 import { reputationProgress } from '../../../store/player/reputation'
 import { xpForLevel, xpToNextLevel } from '../../../store/player/professions'
 import { expertiseGain } from '../../../store/player/stats'
@@ -20,10 +20,6 @@ import { ItemID } from '../../../../enums/ids/item-id.enum'
 import { ProfessionID } from '../../../../enums/ids/profession-id.enum'
 import { ReputationID } from '../../../../enums/reputation-id.enum'
 import { ReputationTier } from '../../../../enums/reputation-tier.enum'
-
-/** Harvest all needs this Farming Guild tier; Plant all needs `PLANT_ALL_TIER` (farm doc section 5). */
-const HARVEST_ALL_TIER = ReputationTier.friendly
-const PLANT_ALL_TIER = ReputationTier.honored
 
 const percentOf = (current: number, needed: number): number => needed > 0 ? current / needed * 100 : 0
 
@@ -90,17 +86,15 @@ export class FarmPlotsComponent {
       name: `items:names.${ItemID[seed.seedId]}`,
       url: ITEM_DATA[seed.seedId].url,
       count: this.playerStore.farm().seeds[seed.seedId] ?? 0,
-      time: formatDuration(seed.growMs * (1 - this.playerStore.stats().seedGrowthTimeReduction)),
+      time: formatDuration(this.farmService.realTimeMs(seed.growMs)),
       min: seed.yield[0],
       max: seed.yield[1],
       locked: this.farmService.level() < seed.requiredLevel ? i18next.t('map:farm.seedLocked', { level: seed.requiredLevel }) : null,
     })))
 
   plots = computed(() => {
-    const now = this.now()
-    const reduction = this.playerStore.stats().seedGrowthTimeReduction
     const limit = this.plotLimit()
-    return syncPlots(this.playerStore.farm().plots, now, reduction).map((plot, index) => {
+    return this.farmService.plotsAt(this.now()).map((plot, index) => {
       const seed = plot && FARM_SEEDS[plot.seedId]
       if (index >= limit) return { index, state: 'locked' as const }
       if (!plot || !seed) return { index, state: 'empty' as const, soil: FARM_ART.soil.empty }
@@ -108,7 +102,7 @@ export class FarmPlotsComponent {
       const stage = stageOf(plot.progressMs / seed.growMs)
       const crop = { name: `items:names.${ItemID[seed.cropId]}`, url: FARM_ART.plants[seed.cropId]?.[stage] ?? ITEM_DATA[seed.cropId].url, soil: FARM_ART.soil.planted }
       if (!isReady(plot, seed.growMs)) {
-        const remaining = (seed.growMs - plot.progressMs) * (1 - reduction)
+        const remaining = this.farmService.realTimeMs(seed.growMs - plot.progressMs)
         return { index, state: 'growing' as const, stage, ...crop, progress: plot.progressMs, max: seed.growMs, time: formatDuration(remaining) }
       }
       const missing = this.playerStore.missingSlotsByTab([{ id: seed.cropId, amount: plot.rolledYield ?? seed.yield[1] }])
@@ -123,8 +117,8 @@ export class FarmPlotsComponent {
   hasEmptyPlot = computed(() => this.plots().some(plot => plot.state === 'empty'))
 
   /** Tooltip saying why Plant all / Harvest all are locked; null once the Guild tier is reached. */
-  plantAllLock = computed(() => this.lockText(PLANT_ALL_TIER))
-  harvestAllLock = computed(() => this.lockText(HARVEST_ALL_TIER))
+  plantAllLock = computed(() => this.lockText(this.farmService.plantAllLock()))
+  harvestAllLock = computed(() => this.lockText(this.farmService.harvestAllLock()))
 
   constructor() {
     const timer = setInterval(() => this.now.set(Date.now()), 1000)
@@ -159,8 +153,7 @@ export class FarmPlotsComponent {
     return [growth, ...milestones].join(', ')
   }
 
-  private lockText(tier: ReputationTier): string | null {
-    if (this.farmService.guildTier() >= tier) return null
-    return i18next.t('map:farm.reputationLock', { tier: tierName(tier) })
+  private lockText(tier: ReputationTier | null): string | null {
+    return tier === null ? null : i18next.t('map:farm.reputationLock', { tier: tierName(tier) })
   }
 }
