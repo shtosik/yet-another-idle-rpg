@@ -19,7 +19,7 @@ Background: `docs/systems/dialogue.md` (engine rules, `QuestState` meanings, kno
 ## Checks
 
 **Quest hubs** — for each option with several results, results are tried top to bottom and the first visible one wins:
-- Order must be turn-in (`readyToAdvance`) → in progress (`active`) → offer (`available`) → fallback. A broader result above a narrower one shadows it.
+- Order must be turn-in (`readyToAdvance`) → in progress (`active`) → offer (`available`) → fallback. A broader result above a narrower one shadows it. `npm run validate` (check 14) catches a result shown for a quest state alone above a narrower one, and a turn-in on an NPC other than the step's `turnInNpc`; check by hand the cases it can't see (results narrowed by flags or other conditions).
 - A result meant for "quest in progress" must use `QuestState.active`; `readyToAdvance` only fires when the step's requirements are met.
 - Every route to an offer node sits behind an `available` condition, including lore links (which also need a fallback result).
 - A quest `start` never shares a result with the `end` that unlocks it (the start is hidden until the quest is available, which hides the whole result).

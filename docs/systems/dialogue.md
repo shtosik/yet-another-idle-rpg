@@ -39,6 +39,8 @@ Phurgo's completed-Quest hub also offers "How does your Forge work?" immediately
 - `active` — started (optionally at `step`).
 - `readyToAdvance` — active (optionally at `step`) **and** the current step's requirements are met. Use this for turn-in branches.
 
+**Quest hubs** list a quest's results as turn-in (`readyToAdvance`), in progress (`active`), offer (`available`), so the first visible one is the right one; `npm run validate` (check 14) fails a result shown for a quest state alone above a narrower one, and a turn-in (`quest` `advance`/`end`) on an NPC other than the step's `turnInNpc`.
+
 Kill-count requirements inside quest conditions count kills since the quest reached its current step (see `quests.md`). Quest requirements are checked by `QuestsStore.requirementProgress`, the same check the quest panel uses for its progress and Ready tag.
 
 Any condition takes `not: true` to pass when it would fail. Use it to keep an in-progress reminder (`active` + not `readyToAdvance`) from showing beside the same quest's turn-in option.

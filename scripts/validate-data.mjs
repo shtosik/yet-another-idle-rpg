@@ -17,6 +17,7 @@
 //  11. docs/ideas/README.md statuses match each idea file's Status line
 //  12. Docs: relative .md links resolve; lore, character and system docs name real IDs
 //  13. NPC voice: lines stay in the world, no repeated phrases, no "Then…" narration
+//  14. Quest hubs: per quest, turn-in before in progress before offer; a turn-in sits with the step's turnInNpc
 //
 // Usage: npm run validate
 
@@ -55,6 +56,7 @@ export { NpcID } from 'enums/map/npc-id.enum'
 export { TownID } from 'enums/map/town-id.enum'
 export { ReputationID } from 'enums/reputation-id.enum'
 export { ProfessionID } from 'enums/ids/profession-id.enum'
+export { QuestState } from 'enums/quest-state.enum'
 export { default as PROFESSIONS_DATA } from 'data/professions-data'
 export { FARM_SEEDS } from 'data/farming-data'
 export { initialFarm, BASE_PLOTS, PLOT_REPUTATION_TIERS, PLOT_GRANT_QUESTS } from 'app/store/player/farm'
@@ -790,6 +792,42 @@ for (const f of [...walkFiles(join(ROOT, '.claude', 'agents'), '.md'), ...walkFi
     }
     const thens = messages.flatMap(([, text]) => text.match(/(?:^|[.!?…—]\s+)(?:and )?then\b/gi) ?? []).length
     if (thens > (THEN_BASELINE[npc] ?? MAX_THEN_OPENERS)) error(file, `${thens} sentences open with "Then": at most ${MAX_THEN_OPENERS} per NPC, people don't narrate in sequence; skip the connector or jump to what mattered`)
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 14. Quest hubs. An option's results are tried top to bottom and the first visible one wins, so a result shown for a
+//     quest state alone (say `active`) hides that quest's narrower results below it (its `readyToAdvance` turn-in).
+//     Order: readyToAdvance, active, available. A turn-in (quest advance or end) must sit on the NPC the quest data
+//     names as that step's turnInNpc.
+
+{
+  const RANK = { [D.QuestState.readyToAdvance]: 0, [D.QuestState.active]: 1, [D.QuestState.available]: 2 }
+  for (const npc of Object.values(D.NPC_DATA)) {
+    const name = idName(D.NpcID, npc.id)
+    const file = `src/data/dialogues (${name})`
+    for (const [key, node] of Object.entries(npc.dialogue)) {
+      for (const [i, option] of (node.options ?? []).entries()) {
+        // Results above that show for a quest state alone, with nothing else narrowing them.
+        const broad = []
+        for (const result of option.results ?? []) {
+          const conditions = result.visibilityConditions ?? []
+          for (const c of conditions.filter(c => c.type === 'quest' && c.questState in RANK)) {
+            const shadow = broad.find(b => b.questId === c.questId && RANK[b.questState] > RANK[c.questState] && (b.step === undefined || b.step === c.step))
+            if (shadow) error(file, `node ${key} option ${i}: ${idName(D.QuestID, c.questId)} ${idName(D.QuestState, c.questState)} sits below ${idName(D.QuestState, shadow.questState)}, which shows first; order turn-in, in progress, offer`)
+          }
+          if (conditions.length === 1 && conditions[0].type === 'quest' && conditions[0].questState in RANK) broad.push(conditions[0])
+
+          for (const effect of (result.effects ?? []).filter(e => e.type === 'quest' && e.action !== 'start')) {
+            const steps = D.QUEST_DATA[effect.questId]?.steps ?? []
+            const ready = conditions.find(c => c.type === 'quest' && c.questId === effect.questId && c.questState === D.QuestState.readyToAdvance)
+            const step = ready?.step ?? (effect.action === 'end' ? steps.length : undefined)
+            const npcs = step === undefined ? steps.map(s => s.turnInNpc) : [steps[step - 1]?.turnInNpc]
+            if (!npcs.includes(npc.id)) error(file, `node ${key} option ${i}: turns in ${idName(D.QuestID, effect.questId)}${step === undefined ? '' : ` step ${step}`}, whose turnInNpc is ${npcs.map(n => idName(D.NpcID, n)).join(' or ')}`)
+          }
+        }
+      }
+    }
   }
 }
 
