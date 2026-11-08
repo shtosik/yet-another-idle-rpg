@@ -3,6 +3,7 @@ import { PATHFINDERS_SEAL_UPGRADED_DROP_CHANCE } from '../../../data/upgrade-dat
 import { evaluateMerge, MergeResult, MergeSource, rollMerge } from './merge'
 import { WeaponCategory } from '../../../enums/weapon-category.enum'
 import { computed, effect, inject, untracked } from '@angular/core'
+import { ModalService } from '../../services/modal.service'
 import { patchState, signalStore, withComputed, withHooks, withMethods, withProps, withState } from '@ngrx/signals'
 import { PlayerStat } from '../../../types/player/player-stat.type'
 import { calculateXp } from './experience'
@@ -359,7 +360,7 @@ export const PlayerStore = signalStore(
   // The growth rate plots accrue at: `syncFarm` keeps it until the watcher in `onInit` sees the rate change.
   withProps(() => ({ _farmRate: { current: null as number | null } })),
   // Basic writes: stats, zone progress, kill counts, inventory and capacity, skill nodes, spell levels, guild tasks, tokens.
-  withMethods((store) => ({
+  withMethods((store, modalService = inject(ModalService)) => ({
     resetState() {
       patchState(store, initialState)
     },
@@ -410,7 +411,10 @@ export const PlayerStore = signalStore(
       }))
     },
 
-    /** Station upgrades install and seeds are counted instead of entering the inventory. Returns the upgrades installed. */
+    /**
+     * Station upgrades install (each shows its notice, whoever gave it) and seeds are counted instead of entering the
+     * inventory. Returns the upgrades installed.
+     */
     addItems(items: ItemStack[]): ItemID[] {
       const { seeds, rest: stored } = takeSeeds(items)
       const { stations, rest, installed } = installStations(store.stations(), stored)
@@ -419,6 +423,7 @@ export const PlayerStore = signalStore(
         inventory: addItems(state.inventory, store.inventoryCapacity(), rest),
         farm: { ...state.farm, seeds: addSeeds(state.farm.seeds, seeds) },
       }))
+      installed.forEach(itemId => modalService.openStationInstalled(itemId))
       return installed
     },
 
@@ -589,7 +594,7 @@ export const PlayerStore = signalStore(
     },
   })),
   // Game actions: kills and drops, zone stars, selling, equipping, using items and chests, mana regen, crafting.
-  withMethods((store) => ({
+  withMethods((store, modalService = inject(ModalService)) => ({
     /** `stats` as it would be with only these buffs and consumable effects running (offline buff segments). */
     statsFor(buffSpellIds: SpellID[], consumableItemIds: ItemID[]): PlayerStatsType {
       return deriveStats(store.resources(), Object.values(sourcedModifiersOf(store, buffSpellIds, consumableItemIds)).flat())
@@ -651,6 +656,7 @@ export const PlayerStore = signalStore(
         }
       })
 
+      installed.forEach(itemId => modalService.openStationInstalled(itemId))
       return { levelsGained: store.resources().level - startLevel, receivedItems, lost, lostDrops, installedStations: installed }
     },
 
@@ -918,7 +924,7 @@ export const PlayerStore = signalStore(
         if (!ok) notFitting = crops
         return ok
       }
-      const ctx = { doubleChance: stats.farmDoubleHarvestChance, bonusChance: stats.farmBonusCropChance, xpMultiplier: stats.farmXpMultiplier, fits }
+      const ctx = { doubleChance: stats.farmDoubleHarvestChance, bonusChance: stats.farmBonusCropChance, xpMultiplier: stats[PROFESSIONS_DATA[ProfessionID.farming].xpMultiplier], fits }
       const farm = store.farm()
       const result = plotIndex === undefined ? harvestEveryPlot(farm, ctx) : harvestPlot(farm, plotIndex, ctx)
       const blocked = 'blocked' in result ? result.blocked : result.status === 'blocked'

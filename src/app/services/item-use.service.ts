@@ -39,7 +39,7 @@ export class ItemUseService {
     const itemData = ITEM_DATA[item.id]
     switch (itemData.type) {
       case ItemType.stationUpgrade:
-        if (this.playerStore.installStationItem(item)) this.modalService.openStationInstalled(item.id)
+        this.playerStore.installStationItem(item) // shows its notice
         return
       case ItemType.food:
       case ItemType.potion:

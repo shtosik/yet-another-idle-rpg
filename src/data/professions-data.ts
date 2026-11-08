@@ -17,6 +17,8 @@ export interface Profession {
   perLevelTotalCap: number
   /** Given instead of `perLevel` at exactly this level; levels above `maxLevel` have none. */
   milestones: Record<number, ExpertiseReward>
+  /** XP this profession earns from its own work and its orders is multiplied by 1 + this stat. */
+  xpMultiplier: PlayerStat
 }
 
 const PROFESSIONS_DATA: Record<ProfessionID, Profession> = {
@@ -25,6 +27,7 @@ const PROFESSIONS_DATA: Record<ProfessionID, Profession> = {
     maxLevel: 30,
     perLevel: { stat: 'seedGrowthTimeReduction', amount: 0.005 },
     perLevelTotalCap: 0.5,
+    xpMultiplier: 'farmXpMultiplier',
     milestones: {
       5: { stat: 'farmSeedSaveChance', amount: 0.1 },
       10: { stat: 'farmDoubleHarvestChance', amount: 0.05 },

@@ -10,7 +10,7 @@ The **Camp** tab is the player's crafting base. It holds **stations** (Workbench
 - `src/data/items/consumables-items.data.ts` — food and potions (`effect: ConsumableEffect`) and recipe scrolls (`ItemType.recipe`, `recipeId`).
 - `src/interfaces/consumable.interface.ts` — `ConsumableSlot` (`food` / `potion`), `ConsumableEffect`, `ActiveConsumable`.
 - `src/app/store/player/camp.ts` — pure rules: `stationLevel`, `canInstall`, `installStations`, `evaluateRecipe` (visibility, max craftable, block reason).
-- `src/app/store/player/player.store.ts` — `stations` and `unlockedRecipes` state, `craftItem`, `addItems` (installs gear), `useItem` (recipe scrolls), `unlockCamp`.
+- `src/app/store/player/player.store.ts` — `stations` and `unlockedRecipes` state, `craftItem`, `addItems` and `applyKillBatch` (install gear and show its notice, `ModalService.openStationInstalled`, whatever gave it: craft, shop, chest, quest, kill or the inventory's use action), `useItem` (recipe scrolls), `unlockCamp`.
 - `src/app/store/camp/camp.store.ts:CampStore` — Camp tab UI selection only (station, recipe per station, batch size, Craftable filter).
 - `src/app/services/battle-manager.service.ts:useConsumable`, `autoEat`; `src/app/store/battle/battle.store.ts` — `consumableSlots`, `tickConsumables`.
 - `src/app/components/game/camp/` — Camp tab, `recipe-detail/`, `recipe-view.ts`. Recipes show as an icon grid (name in the tooltip; lock + level when the station is too low, dimmed when ingredients are missing); the detail panel does all crafting. The **Craftable** filter (`maxCraftable > 0`) hides the rest. The selected recipe stays in the detail even when a filter hides it.

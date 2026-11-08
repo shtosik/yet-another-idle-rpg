@@ -19,6 +19,7 @@ import { ReputationGain } from '../player/reputation'
 import { orderKey, TurnInKey, turnInRemainingMs } from './turn-in-cooldown'
 import { Orders, rollOrder } from './orders'
 import { PlayerStat } from '../../../types/player/player-stat.type'
+import PROFESSIONS_DATA from '../../../data/professions-data'
 import { KillBaseline, killBaseline, Progress, RequirementContext, requirementProgress, RequirementRow, requirementRows, waveKey } from './requirement-handlers'
 
 export { orderKey }
@@ -208,7 +209,7 @@ export const QuestsStore = signalStore(
         store.setStepKillBaseline(questId, null)
 
         const { reputation, gold, farmingXp } = order.rewards
-        const xp = Math.round(farmingXp * (1 + playerStore.stats().farmXpMultiplier))
+        const xp = Math.round(farmingXp * (1 + playerStore.stats()[PROFESSIONS_DATA[data.repeat.professionId].xpMultiplier]))
         store.handleQuestCompleted({
           ...data,
           rewards: [

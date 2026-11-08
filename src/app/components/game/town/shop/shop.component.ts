@@ -13,7 +13,6 @@ import { I18nextPipe } from '../../../../pipes/i18next.pipe'
 import { SlotComponent } from '../../../shared/slot/slot.component'
 import { InventoryItemComponent } from '../../inventory/inventory-slot/inventory-slot.component'
 import { CloseButtonComponent } from '../../../shared/close-button/close-button.component'
-import { ModalService } from '../../../../services/modal.service'
 import { CurrencyFeedService } from '../../../../services/currency-feed.service'
 import { isInstalled, stationUpgradeOf } from '../../../../store/player/camp'
 import { isPreferredBy, sellPrice } from '../../../../store/shop/shop-prices'
@@ -40,7 +39,6 @@ const CURRENCY_UI: Record<ShopCurrency, { icon: string; priceKey: string }> = {
 export class ShopComponent implements OnInit {
   private shopStore = inject(ShopStore)
   private playerStore = inject(PlayerStore)
-  private modalService = inject(ModalService)
   private currencyFeed = inject(CurrencyFeedService)
 
   shopId = input.required<ShopID>()
@@ -103,7 +101,6 @@ export class ShopComponent implements OnInit {
     const result = this.shopStore.purchase(this.shopId(), index, event.shiftKey ? 5 : 1)
     if (typeof result === 'string') return
     this.currencyFeed.show(this.currency(), -result.spent)
-    result.installed.forEach(id => this.modalService.openStationInstalled(id))
   }
 
   /** Name plus what blocks the purchase, for screen readers (sighted players get the slot's border, lock or fade). */

@@ -76,18 +76,13 @@ export class SkillTreeService {
     const check = this.previewRefund(id, levels)
     if (!check.ok) return false
 
-    const goldCost = this.refundGoldCost(check.levelsRefunded)
-    const stats = this.playerStore.stats()
-    if (stats.goldCoins < goldCost) return false
+    if (!this.playerStore.spend('gold', this.refundGoldCost(check.levelsRefunded))) return false
 
     const refundedLevels = check.levelsRefunded
     const currentLevel = this.playerStore.unlockedNodes()[id] || 0
     const newLevel = currentLevel - refundedLevels
 
-    this.playerStore.updatePlayerStats([
-      { stat: 'unspentSkillPoints', amount: refundedLevels * skillData.skillPointCost },
-      { stat: 'goldCoins', amount: -goldCost },
-    ])
+    this.playerStore.updatePlayerStats([{ stat: 'unspentSkillPoints', amount: refundedLevels * skillData.skillPointCost }])
 
     this.playerStore.updateUnlockedNodes(id, -refundedLevels)
 
@@ -108,20 +103,27 @@ export class SkillTreeService {
     /** The tab that would strand items without the tree's slots; null when respec is fine. */
     inventoryBlockedTab: InventoryTab | null
   } {
-    const unlocked = this.playerStore.unlockedNodes()
+    const { allocatedLevels, skillPointsToReturn, goldCost } = this.respecTotals()
+    const canAfford = this.playerStore.stats().goldCoins >= goldCost
+    const inventoryBlockedTab = this.allSlotNodesBlockedTab()
+    return { allocatedLevels, skillPointsToReturn, goldCost, canAfford, inventoryBlockedTab }
+  }
+
+  /** What a full respec returns and costs, and the spells it rolls back. */
+  private respecTotals() {
     let allocatedLevels = 0
     let skillPointsToReturn = 0
-    for (const [idStr, level] of Object.entries(unlocked)) {
+    const spellRollbacks: { spellId: SpellID; levels: number }[] = []
+    for (const [idStr, level] of Object.entries(this.playerStore.unlockedNodes())) {
       if (!level) continue
       const node = ALL_SKILLS[Number(idStr) as SkillNodeID]
       if (!node) continue
       allocatedLevels += level
       skillPointsToReturn += level * node.skillPointCost
+      if (node.type === SkillNodeType.spell && node.spellId !== undefined) spellRollbacks.push({ spellId: node.spellId, levels: level })
     }
-    const goldCost = SKILL_TREE_DATA.respec.fullResetGoldCost({ allocatedLevels: allocatedLevels })
-    const canAfford = this.playerStore.stats().goldCoins >= goldCost
-    const inventoryBlockedTab = this.allSlotNodesBlockedTab()
-    return { allocatedLevels, skillPointsToReturn, goldCost, canAfford, inventoryBlockedTab }
+    const goldCost = SKILL_TREE_DATA.respec.fullResetGoldCost({ allocatedLevels })
+    return { allocatedLevels, skillPointsToReturn, goldCost, spellRollbacks }
   }
 
   /** The first tab that can't hold its items without the slots the skill tree grants; null when every tab can. */
@@ -132,31 +134,11 @@ export class SkillTreeService {
   respecEntireTree(): boolean {
     if (this.allSlotNodesBlockedTab()) return false
 
-    const unlocked = this.playerStore.unlockedNodes()
-    let allocatedLevels = 0
-    let skillPointsToReturn = 0
-    const spellRollbacks: Array<{ spellId: SpellID; levels: number }> = []
-
-    for (const [idStr, level] of Object.entries(unlocked)) {
-      if (!level) continue
-      const node = ALL_SKILLS[Number(idStr) as SkillNodeID]
-      if (!node) continue
-      allocatedLevels += level
-      skillPointsToReturn += level * node.skillPointCost
-      if (node.type === SkillNodeType.spell && node.spellId !== undefined) {
-        spellRollbacks.push({ spellId: node.spellId, levels: level })
-      }
-    }
-
+    const { allocatedLevels, skillPointsToReturn, goldCost, spellRollbacks } = this.respecTotals()
     if (allocatedLevels === 0) return false
+    if (!this.playerStore.spend('gold', goldCost)) return false
 
-    const goldCost = SKILL_TREE_DATA.respec.fullResetGoldCost({ allocatedLevels: allocatedLevels })
-    if (this.playerStore.stats().goldCoins < goldCost) return false
-
-    this.playerStore.updatePlayerStats([
-      { stat: 'unspentSkillPoints', amount: skillPointsToReturn },
-      { stat: 'goldCoins', amount: -goldCost },
-    ])
+    this.playerStore.updatePlayerStats([{ stat: 'unspentSkillPoints', amount: skillPointsToReturn }])
 
     for (const { spellId, levels } of spellRollbacks) {
       this.playerStore.levelDownSpell(spellId, levels)

@@ -108,7 +108,7 @@ const wave: RequirementHandler<WaveKillCountRequirement> = {
 }
 
 const stat: RequirementHandler<StatRequirement> = {
-  progress: (req, ctx) => ({ current: ctx.stats[req.key] as number, target: req.amount }),
+  progress: (req, ctx) => ({ current: ctx.stats[req.key], target: req.amount }),
   rows: (req, ctx) => row(i18next.t(`app:playerStats.${req.key}`), stat.progress(req, ctx)),
 }
 
