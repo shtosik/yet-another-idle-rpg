@@ -25,7 +25,7 @@ function decodeSave(saved: string): string {
 /** Each returns false when its write failed (storage full or blocked). */
 const immediateSavers = new Set<() => boolean>()
 
-/** Save version and migrations of every synced store by `localStorage` key; all of them are created with `GameComponent`. */
+/** Save version and migrations of every synced store by `localStorage` key; each store is created through `SAVED_STORES` (store/saved-stores.ts). */
 const syncedVersions = new Map<string, { version: number, migrations: SaveMigrations }>()
 
 /** Set once saves are replaced by an import: no store may write its old state back before the reload. */

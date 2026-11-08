@@ -10,24 +10,18 @@ import { TownsComponent } from './town/towns.component'
 import { InventoryWindow } from './inventory/inventory.component'
 import { EquipmentComponent } from './equipment/equipment.component'
 import { CampComponent } from './camp/camp.component'
+import { injectSavedStores } from '../../store/saved-stores'
 import { PlayerStore } from '../../store/player/player.store'
 import { PlayerStatsComponent } from './player-stats/player-stats.component'
 import { GameMenuComponent } from './game-menu/game-menu.component'
 import { BattleComponent } from './battle/battle.component'
 import { SkillTreeComponent } from './skill-tree/skill-tree.component'
-import { BattleStore } from '../../store/battle/battle.store'
-import { QuestsStore } from '../../store/quests/quests.store'
-import { TownsStore } from '../../store/towns/towns.store'
 import { QuestsComponent } from './quests/quests.component'
 import { WorldMapComponent } from './world-map/world-map.component'
 import { SiteComponent } from './site/site.component'
 import { FarmPlotsComponent } from './farm-plots/farm-plots.component'
 import { SiteID } from 'enums/ids/site-id.enum'
 import { BestiaryComponent } from './bestiary/bestiary.component'
-import { ShopStore } from '../../store/shop/shop.store'
-import { CampStore } from '../../store/camp/camp.store'
-import { OfflineStore } from '../../store/offline/offline.store'
-import { SettingsStore } from '../../store/settings/settings.store'
 import { SpellbookComponent } from './spellbook/spellbook.component'
 import { DevCheatsComponent } from './dev-cheats/dev-cheats.component'
 import { SettingsComponent } from './settings/settings.component'
@@ -66,14 +60,8 @@ const imports = [
 
 export class GameComponent {
   playerStore = inject(PlayerStore)
-  battleStore = inject(BattleStore)
-  questsStore = inject(QuestsStore)
-  townsStore = inject(TownsStore)
-  shopStore = inject(ShopStore)
-  campStore = inject(CampStore)
-  offlineStore = inject(OfflineStore)
-  // Created here so its saves are registered for export and import (persistence.md).
-  settingsStore = inject(SettingsStore)
+  // Creates every saved store so its save is registered for export and import (persistence.md).
+  private savedStores = injectSavedStores()
   // Created here so unlock rules start watching as soon as the game is on screen.
   private unlockService = inject(UnlockService)
   private navigation = inject(GameNavigationService)

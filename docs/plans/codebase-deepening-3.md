@@ -49,7 +49,7 @@ One module decides how items reach the player. Seeds go to the seed store, stati
 - Specs, seeded: roll, accept with a full slot refused, claim, abandon, progress with the Bounty Mark double kill, rank.
 - Docs: `towns-shops-guild.md`.
 
-### 6. Saved stores and the slot guard (S-M, Sonnet)
+### 6. Saved stores and the slot guard (S-M, Sonnet) ✅
 - A declared `SAVED_STORES` list in `with-game-state-sync.hook.ts` replaces the registry that fills as stores are created (`:29`). Export, import and reset read it; `dev-cheats.component.ts:307-316` stops listing stores by hand, and `GameComponent` (`:68-76`) stops injecting stores only so they register.
 - Spec: a store that uses the sync hook but is missing from `SAVED_STORES` fails.
 - Spec pinning the total `inventorySlots` bonus (base `player.ts:43`, `rewards-items.data.ts:98`, `skill-tree-data.ts:112-170`), so lowering it fails a check. Add a row to the Enforced rules table in `AGENTS.md`.

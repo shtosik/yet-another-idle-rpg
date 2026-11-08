@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject } from '@angular/core'
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, Injector } from '@angular/core'
 import { getState } from '@ngrx/signals'
 import { SkillTreeService } from '../../../services/skill-tree.service'
 import { GameNavigationService } from '../../../services/game-navigation.service'
@@ -20,6 +20,7 @@ import { ALL_SKILLS } from '../../../../data/skill-tree-data'
 import { NodeRequirement } from '../../../../interfaces/skill-tree/skill-node.interface'
 import ITEM_DATA from '../../../../data/items-data'
 import TOWNS_DATA from '../../../../data/towns-data'
+import { resetAllStores } from '../../../store/saved-stores'
 import { PlayerStore } from '../../../store/player/player.store'
 import { BattleStore } from '../../../store/battle/battle.store'
 import { QuestsStore } from '../../../store/quests/quests.store'
@@ -82,6 +83,7 @@ export function allItemStacks(amount: number): { id: ItemID; tier: ItemTier; amo
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DevCheatsComponent {
+  private injector = inject(Injector)
   private playerStore = inject(PlayerStore)
   private battleStore = inject(BattleStore)
   private questsStore = inject(QuestsStore)
@@ -305,14 +307,7 @@ export class DevCheatsComponent {
   }
 
   resetState() {
-    this.playerStore.resetState()
-    this.battleStore.resetState()
-    this.questsStore.resetState()
-    this.townsStore.resetState()
-    this.shopStore.resetState()
-    this.campStore.resetState()
-    this.offlineStore.resetState()
-    this.settingsStore.resetState()
+    resetAllStores(this.injector)
   }
 
   resetQuests() {

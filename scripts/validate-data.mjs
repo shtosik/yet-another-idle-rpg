@@ -19,6 +19,8 @@
 //  13. NPC voice: lines stay in the world, no repeated phrases, no "Then…" narration
 //  14. Quest hubs: per quest, turn-in before in progress before offer; a turn-in sits with the step's turnInNpc
 //
+//  15. Saved stores: every store using withGameStateSync is listed in SAVED_STORES
+//
 // Usage: npm run validate
 
 import { build } from 'esbuild'
@@ -827,6 +829,22 @@ for (const f of [...walkFiles(join(ROOT, '.claude', 'agents'), '.md'), ...walkFi
           }
         }
       }
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 15. Saved stores: a store using withGameStateSync but missing from SAVED_STORES would be left out of export, import and reset.
+
+{
+  const storeDir = join(SRC, 'app', 'store')
+  const list = readFileSync(join(storeDir, 'saved-stores.ts'), 'utf8')
+  const walk = dir => readdirSync(dir).flatMap(f => statSync(join(dir, f)).isDirectory() ? walk(join(dir, f)) : [join(dir, f)])
+  for (const file of walk(storeDir).filter(f => f.endsWith('.ts') && !f.endsWith('.spec.ts') && !f.includes('helpers'))) {
+    const text = readFileSync(file, 'utf8')
+    const name = /export const (\w+) = signalStore/.exec(text)?.[1]
+    if (text.includes('withGameStateSync(') && !(name && new RegExp(`\\b${name}\\b`).test(list))) {
+      error(relative(ROOT, file), 'uses withGameStateSync but is not in SAVED_STORES (src/app/store/saved-stores.ts)')
     }
   }
 }
