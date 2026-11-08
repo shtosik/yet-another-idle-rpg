@@ -24,7 +24,7 @@ Every tick (`TICK_DURATION_IN_MS` = 100) measures the real time since the last t
 
 The attack, respawn and second timers are plain fields on `GameIntervalService`, not saved; a reload costs at most one attack interval or respawn.
 
-Spawning (`startBattle(shinyChance)`): a random enemy from `zone.enemies`, or `zone.bossEnemyId` on the last wave. A shiny roll uses `stats.shinyChance` (percent).
+Spawning (`startBattle(shinyChance)`, through `rollSpawn` in `store/battle/waves.ts`, which the offline claim also uses): a random enemy from `zone.enemies`, or `zone.bossEnemyId` on the last wave. A shiny roll uses `stats.shinyChance` (percent).
 
 Enemy death (`handleEnemyDeath`):
 1. `endBattle`, record the kill interval for the offline rate, then `KillResolutionService.resolveKills` with one kill (rewards from `kill-rewards.ts`): XP `ceil(experience × xpMultiplier × waveReward)` and gold `ceil(gold × goldCoinsMultiplier × waveReward)` (a shiny uses ×5 XP / ×10 gold instead of `waveReward`, see `zones-waves-unlocks.md`), drop rolls (10 if shiny), wave kill count, enemy kill count, task progress (Bounty Mark rolled with the same rng), and on the boss wave the next zone (`UnlockService.grant`).

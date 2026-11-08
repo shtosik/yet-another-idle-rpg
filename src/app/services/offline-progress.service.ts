@@ -157,7 +157,6 @@ export class OfflineProgressService {
 
     // The same rng pays the kills; a boss kill opens the next zone. Town and feature unlocks follow on their own.
     const result = this.killResolution.resolveKills(zone.id, wave, kills, rng)
-    result.installedStations.forEach(itemId => this.modalService.openStationInstalled(itemId))
 
     return {
       elapsedMs,

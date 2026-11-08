@@ -134,7 +134,7 @@ describe('Battle panel presentation', () => {
   })
 
   it('distinguishes boss and shiny fights while keeping the HP and controls apart', () => {
-    for (let wave = 1; wave < battle.currentZoneData().maxWave; wave++) battle.changeWave(true)
+    battle.goToWave({ zoneId: battle.currentZoneId(), wave: battle.currentZoneData().maxWave })
     battle.startBattle(100)
     fixture.detectChanges()
     expect(element('.enemy__tag--boss').textContent).toContain('Boss')

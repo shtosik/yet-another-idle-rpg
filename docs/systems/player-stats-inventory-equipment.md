@@ -7,12 +7,13 @@ Phurgo's Forge Tongs (`ItemID.phurgosForgeTongs`) use the existing quest item ru
 
 ## Key files
 - `src/app/store/player/player.store.ts:PlayerStore` — state, the derived `stats`, `updatePlayerStats`, `addItems`/`removeItems`, `equipItem`/`unequipItem`, `useItem`, `applyKillBatch` (the only writer of kill rewards), unlock flags.
+- `src/app/services/item-use.service.ts:ItemUseService` — the inventory's use action (right-click): `canUse` (per `ItemType`, a `Record` so a new type must decide) and `use` (stations install with their notice, food and potions go to `BattleManagerService.useConsumable`, chests open with their modal, spell scrolls teach through `PlayerStore.useItem` and go onto the spell bar, recipes and stat rewards through `PlayerStore.useItem`).
 - `src/app/store/player/stats.ts` — `deriveStats`, the modifier sources (`equipmentModifiers`, `skillNodeModifiers`, `buffModifiers`, `consumableModifiers`, `bonusModifiers`; zone mastery's `masteryModifiers` lives in `zone-mastery.ts`; `expertiseModifiers` and `expertiseGain` for profession expertise), `SourcedModifiers` and `statContributions` (per-source breakdown), `RESOURCE_STATS`, inverted stats.
 - `src/app/components/game/player-stats/` — the stats panel: groups and rows from `stat-rows.ts:STAT_GROUPS`, each row's tooltip breaks the stat down by source.
 - `src/app/store/player/player.ts:statsInitialState` — every stat's base value (and its unit, in comments).
 - `docs/adr/0002-player-stats-derived-from-sources.md` — why stats are derived.
 - `src/app/store/player/inventory.ts` — inventory tabs (`INVENTORY_TABS`, `tabOf`), tab capacity (`inventoryCapacity`, `slotDeltas`), the save migration split (`splitInventory`) and pure helpers over all tabs: `addItems`, `removeItems`, `canFit`, `missingSlots`, `missingSlotsByTab`, `blockedTab`, `countItem`, `maxAffordable`, `resizeInventory`.
-- `src/app/store/player/merge.ts` — merge sources, pure eligibility preview (`evaluateMerge`), gold cost (`mergeCost`) and injectable chance roll (`rollMerge`).
+- `src/app/store/player/merge.ts` — merge sources, pure eligibility preview (`evaluateMerge`), the one-copy rule (`sharesOneCopy`), the next attempt's cost, chance and +1 gear (`upgradeQuote`, from `mergeCost`) and injectable chance roll (`rollMerge`).
 - `src/types/player/player-stat.type.ts:PlayerStat` — the stat union, plus `multiplierStats`, `percentageStats`, `additivePercentStats` (display format, used by `stat-to-percentage.pipe.ts`).
 - `src/interfaces/item.interface.ts:Item` — item union by `ItemType`.
 - `src/enums/equipment-slot.enum.ts:EquipmentSlot` — 11 slots; `EquipmentSlotKey` is the string key used in `PlayerState.equipment`.

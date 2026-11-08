@@ -3,14 +3,14 @@ import { ChangeDetectionStrategy, Component, computed, ElementRef, inject, linke
 import { TownsStore } from '../../../store/towns/towns.store'
 import { SlotComponent } from 'app/components/shared/slot/slot.component'
 import ITEM_DATA from 'data/items-data'
-import { InventoryItem, isConsumableItem } from 'interfaces/item.interface'
+import { InventoryItem } from 'interfaces/item.interface'
 import { InventoryItemComponent } from './inventory-slot/inventory-slot.component'
 import { PlayerStore } from '../../../store/player/player.store'
 import { ItemType } from '../../../../enums/items/item-type.enum'
-import { BattleManagerService } from '../../../services/battle-manager.service'
+import { ItemUseService } from '../../../services/item-use.service'
 import { ModalService } from '../../../services/modal.service'
 import { countFreeSlots, INVENTORY_PAGE_SIZE, INVENTORY_TABS, InventoryTab, pageCount, SLOT_TABS } from '../../../store/player/inventory'
-import { missingSlotsText, tabName } from './tab-text'
+import { tabName } from './tab-text'
 import i18next from 'i18next'
 import { firstValueFrom } from 'rxjs'
 import { needsDestroyConfirm, SettingsStore } from '../../../store/settings/settings.store'
@@ -28,7 +28,7 @@ const isSlotTab = (tab: InventoryTab): boolean => (SLOT_TABS as readonly Invento
 
 export class InventoryWindow {
   playerStore = inject(PlayerStore)
-  private battleManagerService = inject(BattleManagerService)
+  private itemUse = inject(ItemUseService)
   private modalService = inject(ModalService)
   private settingsStore = inject(SettingsStore)
   readonly forgeOpen = inject(TownsStore).forgeOpen
@@ -136,31 +136,6 @@ export class InventoryWindow {
   }
 
   useItem(item: InventoryItem) {
-    if (item.type === ItemType.stationUpgrade) {
-      if (this.playerStore.installStationItem(item)) this.modalService.openStationInstalled(item.id)
-      return
-    }
-
-    if (isConsumableItem(ITEM_DATA[item.id])) {
-      this.battleManagerService.useConsumable(item.id)
-      return
-    }
-
-    const itemData = ITEM_DATA[item.id]
-    if (itemData.type === ItemType.chest) {
-      const { contents, missing } = this.playerStore.openChest(item)
-      this.modalService.openChestOpened({ contents, slotsNeeded: missingSlotsText(missing) })
-      return
-    }
-
-    if (itemData.type === ItemType.spellScroll) {
-      if (this.playerStore.knownSpellIds().includes(itemData.spellId)) return
-      this.playerStore.useItem(item)
-      // Like learning it from the skill tree: onto the spell bar if there's a free slot.
-      this.battleManagerService.equipSpell(itemData.spellId)
-      return
-    }
-
-    this.playerStore.useItem(item)
+    this.itemUse.use(item)
   }
 }

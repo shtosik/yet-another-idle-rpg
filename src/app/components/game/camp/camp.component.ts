@@ -3,7 +3,6 @@ import { NgOptimizedImage } from '@angular/common'
 import i18next from 'i18next'
 import { PlayerStore } from '../../../store/player/player.store'
 import { CampStore } from '../../../store/camp/camp.store'
-import { ModalService } from '../../../services/modal.service'
 import { I18nextPipe } from '../../../pipes/i18next.pipe'
 import STATIONS_DATA from '../../../../data/stations-data'
 import RECIPES_DATA from '../../../../data/recipes-data'
@@ -31,7 +30,6 @@ const TOAST_MS = 1800
 export class CampComponent {
   private playerStore = inject(PlayerStore)
   private campStore = inject(CampStore)
-  private modalService = inject(ModalService)
 
   /** Owned stations in data order. Unowned ones are hidden. */
   stations = computed(() => {
@@ -108,10 +106,7 @@ export class CampComponent {
     const { crafted, installed } = this.playerStore.craftItem(view.recipe.id, times)
     if (!crafted) return
 
-    if (installed.length) {
-      installed.forEach(itemId => this.modalService.openStationInstalled(itemId))
-      return
-    }
+    if (installed.length) return // the store shows the installed notice
 
     const item = i18next.t(`items:names.${ItemID[view.recipe.itemId]}`)
     this.showToast(i18next.t('camp:crafted', { count: crafted * view.recipe.createsAmount, item }))

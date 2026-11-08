@@ -1,6 +1,7 @@
 import { NgOptimizedImage, NgTemplateOutlet } from '@angular/common'
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output, ViewChild, inject, input } from '@angular/core'
 import { ForgeSelection } from '../../../../services/forge-selection'
+import { ItemUseService } from '../../../../services/item-use.service'
 import { ForgeDrag } from '../../../../directives/forge-drag'
 import { ItemTier } from 'enums/items/item-tier.enum'
 import { Item } from 'interfaces/item.interface'
@@ -29,6 +30,7 @@ import { upgradedStatAmount } from '../../../../store/player/stats'
 
 export class InventoryItemComponent {
   protected readonly forge = inject(ForgeSelection)
+  private readonly itemUse = inject(ItemUseService)
   /** Only inventory-owned slots participate; shop and reward slots remain passive. */
   readonly forgeSelectable = input(false)
   @Input() item: Item
@@ -67,14 +69,7 @@ export class InventoryItemComponent {
   protected readonly SpellID = SpellID
 
   get isUsable(): boolean {
-    return this.item.type === ItemType.rewardsStats
-      || this.item.type === ItemType.food
-      || this.item.type === ItemType.potion
-      || this.item.type === ItemType.book
-      || this.item.type === ItemType.recipe
-      || this.item.type === ItemType.stationUpgrade
-      || this.item.type === ItemType.spellScroll
-      || this.item.type === ItemType.chest
+    return this.itemUse.canUse(this.item.id)
   }
 
   handleDestroy(event: MouseEvent) {

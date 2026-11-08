@@ -1,8 +1,7 @@
 import { Enemy } from '../../interfaces/enemy.interface'
 import { Zone } from '../../interfaces/zone.interface'
 import { DamageElement } from '../../enums/damage-element.enum'
-import ENEMIES_DATA from '../../data/enemies-data'
-import { waveMultipliers } from '../store/battle/wave-scaling'
+import { rollSpawn, scaledHp, waveEnemies } from '../store/battle/waves'
 import { Kill, Rng } from '../store/player/kill-rewards'
 import type { PlayerStatsType } from '../store/player/stats'
 import { HitInput, resolveHit } from './hit-resolution'
@@ -45,13 +44,6 @@ export function seededRng(seed: number): Rng {
   }
 }
 
-/** The enemies the wave spawns, each equally likely (the boss wave only spawns its boss). */
-export const waveEnemies = (zone: Zone, wave: number): Enemy[] =>
-  wave === zone.maxWave ? [ENEMIES_DATA[zone.bossEnemyId]] : zone.enemies.map(id => ENEMIES_DATA[id])
-
-const scaledHp = (enemy: Enemy, zone: Zone, wave: number): number =>
-  Math.round(enemy.maxHp * waveMultipliers(zone, wave).hp)
-
 /** Auto-attacks only: no spells are cast offline. */
 const autoAttackInput = (stats: PlayerStatsType, enemy: Enemy, input: OfflineSimulationInput): HitInput => ({
   stats,
@@ -92,7 +84,6 @@ export function simulateOfflineKills(input: OfflineSimulationInput): OfflineSimu
   if (!input.segments.length) return result
 
   const { zone, wave, rng } = input
-  const enemies = waveEnemies(zone, wave)
   const theoretical = theoreticalKillMs(input.segments[0].stats, input)
   const slowdown = input.rollingKillMs ? Math.max(1, input.rollingKillMs / theoretical) : 1
   const totalMs = input.segments.reduce((sum, s) => sum + s.durationMs, 0)
@@ -117,11 +108,10 @@ export function simulateOfflineKills(input: OfflineSimulationInput): OfflineSimu
     // Real ms per simulated ms: a 0.5 rate makes every kill take twice as long.
     const timeScale = slowdown / stats.offlineProgressRate
     const attackMs = timePerAttackMs(stats) * timeScale
-    const enemy = enemies[Math.floor(rng() * enemies.length)]
-    const isShiny = stats.shinyChance > 0 && rng() * 100 < stats.shinyChance
+    const { enemy, isShiny, maxHp } = rollSpawn(zone, wave, stats.shinyChance, rng)
 
     let killMs = RESPAWN_DELAY_IN_MS * timeScale
-    let hp = scaledHp(enemy, zone, wave)
+    let hp = maxHp
     const hit = autoAttackInput(stats, enemy, input)
     while (hp > 0 && elapsedMs + killMs <= totalMs) {
       killMs += attackMs

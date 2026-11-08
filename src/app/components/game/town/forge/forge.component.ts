@@ -3,14 +3,13 @@ import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, outpu
 import { TooltipTemplateDirective } from 'ngx-tooltip-directives'
 import i18next from 'i18next'
 import ITEM_DATA from '../../../../../data/items-data'
-import { UPGRADE_CHANCES, UPGRADE_LEVEL_CAP, UPGRADE_MILESTONE_LEVEL } from '../../../../../data/upgrade-data'
+import { UPGRADE_LEVEL_CAP, UPGRADE_MILESTONE_LEVEL } from '../../../../../data/upgrade-data'
 import { ItemID } from '../../../../../enums/ids/item-id.enum'
 import { ItemTier } from '../../../../../enums/items/item-tier.enum'
 import { EquipmentItem } from '../../../../../interfaces/player/equipment.type'
 import { I18nextPipe } from '../../../../pipes/i18next.pipe'
 import { StatToPercentagePipe } from '../../../../pipes/stat-to-percentage.pipe'
 import { ForgeInput, ForgeSelection } from '../../../../services/forge-selection'
-import { evaluateMerge, mergeCost, MergeSource } from '../../../../store/player/merge'
 import { PlayerStore } from '../../../../store/player/player.store'
 import { gearModifiers } from '../../../../store/player/stats'
 import { tabName } from '../../inventory/tab-text'
@@ -36,34 +35,22 @@ export class ForgeComponent {
   protected readonly inputs: readonly ForgeInput[] = ['base', 'sacrifice']
   readonly base = this.selection.base
   readonly sacrifice = this.selection.sacrifice
-  readonly item = computed(() => this.resolve(this.base()))
-  readonly sacrificeItem = computed(() => this.resolve(this.sacrifice()))
-  readonly evaluation = computed(() => {
-    const base = this.base()
-    const sacrifice = this.sacrifice()
-    if (!base || !sacrifice) return null
-    return evaluateMerge({
-      base, sacrifice, inventory: this.playerStore.inventory(), equipment: this.playerStore.equipment(),
-      capacity: this.playerStore.inventoryCapacity(), goldCoins: this.playerStore.resources.goldCoins(),
-    })
-  })
+  readonly item = this.selection.item
+  readonly sacrificeItem = this.selection.sacrificeItem
+  readonly evaluation = this.selection.evaluation
   readonly mismatch = computed(() => {
     const evaluation = this.evaluation()
     return evaluation?.status === 'refused' && evaluation.reason === 'mismatch'
   })
-  readonly cost = computed(() => {
-    const item = this.item()
-    if (!item) return 0
-    return mergeCost(ITEM_DATA[item.id].value, item.upgradeLevel)
-  })
+  readonly cost = computed(() => this.selection.quote()?.cost ?? 0)
   readonly goldShort = computed(() => !!this.item() && this.playerStore.resources.goldCoins() < this.cost())
-  readonly chance = computed(() => UPGRADE_CHANCES[(this.item()?.upgradeLevel ?? 0) + 1] ?? 0)
+  readonly chance = computed(() => this.selection.quote()?.chance ?? 0)
+  /** The +1 gear, unless the pair itself is wrong (gold and room only block the attempt). */
   readonly preview = computed(() => {
-    const item = this.item()
     const evaluation = this.evaluation()
-    if (!item || !evaluation) return null
+    if (!evaluation) return null
     if (evaluation.status === 'refused' && evaluation.reason !== 'notEnoughGold' && evaluation.reason !== 'inventoryFull') return null
-    return { ...item, upgradeLevel: (item.upgradeLevel ?? 0) + 1 }
+    return this.selection.quote()?.next ?? null
   })
   readonly statPreview = computed(() => {
     const item = this.item()
@@ -81,12 +68,6 @@ export class ForgeComponent {
       clearTimeout(this.toastTimer)
       this.selection.clear()
     })
-  }
-
-  private resolve(source: MergeSource | null): EquipmentItem | null {
-    if (!source) return null
-    if (source.from === 'equipped') return this.playerStore.equipment()[source.slot]
-    return source.item
   }
 
   inputItem(slot: ForgeInput): EquipmentItem | null {
@@ -143,20 +124,10 @@ export class ForgeComponent {
   }
 
   merge(): void {
-    const item = this.item()
-    const base = this.base()
-    const sacrifice = this.sacrifice()
-    if (!item || !base || !sacrifice || this.evaluation()?.status !== 'ready') return
-    const result = this.playerStore.mergeItem(base, sacrifice)
-    if (result.status === 'refused') return
-    const upgraded = { ...item, upgradeLevel: (item.upgradeLevel ?? 0) + 1 }
-    this.selection.setSlot('sacrifice', null)
-    if (result.status === 'success' && base.from === 'inventory') {
-      this.selection.setSlot('base', { from: 'inventory', item: upgraded })
-    }
-    const name = this.itemName(result.status === 'success' ? upgraded : item)
+    const merged = this.selection.merge()
+    if (!merged) return
     clearTimeout(this.toastTimer)
-    this.toast.set(i18next.t(`forge:${result.status}`, { item: name }))
+    this.toast.set(i18next.t(`forge:${merged.result.status}`, { item: this.itemName(merged.after) }))
     this.toastTimer = setTimeout(() => this.toast.set(null), TOAST_MS)
   }
 }

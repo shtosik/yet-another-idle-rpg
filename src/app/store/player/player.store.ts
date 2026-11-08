@@ -2,8 +2,9 @@ import { ChestContents, rollChest } from './chest'
 import { PATHFINDERS_SEAL_UPGRADED_DROP_CHANCE } from '../../../data/upgrade-data'
 import { evaluateMerge, MergeResult, MergeSource, rollMerge } from './merge'
 import { WeaponCategory } from '../../../enums/weapon-category.enum'
-import { computed, effect, inject } from '@angular/core'
-import { patchState, signalStore, withComputed, withHooks, withMethods, withState } from '@ngrx/signals'
+import { computed, effect, inject, untracked } from '@angular/core'
+import { ModalService } from '../../services/modal.service'
+import { patchState, signalStore, withComputed, withHooks, withMethods, withProps, withState } from '@ngrx/signals'
 import { PlayerStat } from '../../../types/player/player-stat.type'
 import { calculateXp } from './experience'
 import { initialEquipmentState, statsInitialState } from './player'
@@ -356,8 +357,10 @@ export const PlayerStore = signalStore(
       ) as Record<ZoneID, ZoneStarProgress[]>
     }),
   })),
+  // The growth rate plots accrue at: `syncFarm` keeps it until the watcher in `onInit` sees the rate change.
+  withProps(() => ({ _farmRate: { current: null as number | null } })),
   // Basic writes: stats, zone progress, kill counts, inventory and capacity, skill nodes, spell levels, guild tasks, tokens.
-  withMethods((store) => ({
+  withMethods((store, modalService = inject(ModalService)) => ({
     resetState() {
       patchState(store, initialState)
     },
@@ -408,7 +411,10 @@ export const PlayerStore = signalStore(
       }))
     },
 
-    /** Station upgrades install and seeds are counted instead of entering the inventory. Returns the upgrades installed. */
+    /**
+     * Station upgrades install (each shows its notice, whoever gave it) and seeds are counted instead of entering the
+     * inventory. Returns the upgrades installed.
+     */
     addItems(items: ItemStack[]): ItemID[] {
       const { seeds, rest: stored } = takeSeeds(items)
       const { stations, rest, installed } = installStations(store.stations(), stored)
@@ -417,15 +423,14 @@ export const PlayerStore = signalStore(
         inventory: addItems(state.inventory, store.inventoryCapacity(), rest),
         farm: { ...state.farm, seeds: addSeeds(state.farm.seeds, seeds) },
       }))
+      installed.forEach(itemId => modalService.openStationInstalled(itemId))
       return installed
     },
 
-    /**
-     * Accrues plot growth up to `now` at the current rate. Call it before anything changes `seedGrowthTimeReduction`
-     * (equipping, a level-up) and on load, so the old rate only covers the old time.
-     */
+    /** Accrues plot growth up to `now` at the rate in force since the last change of `seedGrowthTimeReduction`. */
     syncFarm(now = Date.now()) {
-      patchState(store, (state) => ({ farm: { ...state.farm, plots: syncPlots(state.farm.plots, now, store.stats().seedGrowthTimeReduction) } }))
+      const rate = store._farmRate.current ?? store.stats().seedGrowthTimeReduction
+      patchState(store, (state) => ({ farm: { ...state.farm, plots: syncPlots(state.farm.plots, now, rate) } }))
     },
 
     removeItems(items: ItemStack[]) {
@@ -589,7 +594,7 @@ export const PlayerStore = signalStore(
     },
   })),
   // Game actions: kills and drops, zone stars, selling, equipping, using items and chests, mana regen, crafting.
-  withMethods((store) => ({
+  withMethods((store, modalService = inject(ModalService)) => ({
     /** `stats` as it would be with only these buffs and consumable effects running (offline buff segments). */
     statsFor(buffSpellIds: SpellID[], consumableItemIds: ItemID[]): PlayerStatsType {
       return deriveStats(store.resources(), Object.values(sourcedModifiersOf(store, buffSpellIds, consumableItemIds)).flat())
@@ -651,6 +656,7 @@ export const PlayerStore = signalStore(
         }
       })
 
+      installed.forEach(itemId => modalService.openStationInstalled(itemId))
       return { levelsGained: store.resources().level - startLevel, receivedItems, lost, lostDrops, installedStations: installed }
     },
 
@@ -697,7 +703,6 @@ export const PlayerStore = signalStore(
 
     equipItem(item: InventoryItem) {
       if (!store.canEquip(item)) return
-      store.syncFarm() // gear can change the growth rate (Terrace Hare): the old rate covers only the time so far
 
       const itemData = ITEM_DATA[item.id] as EquipmentItem
       const slotKey = EquipmentSlot[itemData.slot] as EquipmentSlotKey
@@ -719,7 +724,6 @@ export const PlayerStore = signalStore(
       const equippedItem = store.equipment()[slot]
 
       if (!equippedItem || !store.canUnequip(slot)) return
-      store.syncFarm()
 
       store.addItems([{ id: equippedItem.id, tier: equippedItem.tier, upgradeLevel: equippedItem.upgradeLevel, amount: 1 }])
 
@@ -738,29 +742,24 @@ export const PlayerStore = signalStore(
       return true
     },
 
-    useItem(item: InventoryItem) {
+    /** Learns a recipe or spell scroll, or pays a stat reward item; false (nothing taken) when already known or not one of those. */
+    useItem(item: InventoryItem): boolean {
       const itemData = ITEM_DATA[item.id]
 
       if (itemData.type === ItemType.recipe) {
         const recipeData = itemData as RecipeItem
-        if (store.unlockedRecipes().includes(recipeData.recipeId)) return
+        if (store.unlockedRecipes().includes(recipeData.recipeId)) return false
         patchState(store, state => ({ unlockedRecipes: [...state.unlockedRecipes, recipeData.recipeId] }))
-        store.removeItems([{ id: item.id, tier: item.tier, upgradeLevel: item.upgradeLevel, amount: 1 }])
-        return
-      }
-
-      if (itemData.type === ItemType.spellScroll) {
-        if (store.knownSpellIds().includes(itemData.spellId)) return
+      } else if (itemData.type === ItemType.spellScroll) {
+        if (store.knownSpellIds().includes(itemData.spellId)) return false
         store.levelUpSpell(itemData.spellId)
-        store.removeItems([{ id: item.id, tier: item.tier, upgradeLevel: item.upgradeLevel, amount: 1 }])
-        return
+      } else if (itemData.type === ItemType.rewardsStats) {
+        store.updatePlayerStats(itemData.stats.map(s => ({ stat: s.id, amount: s.amount })))
+      } else {
+        return false
       }
-
-      if (itemData.type !== ItemType.rewardsStats) return
-
-      const statsToUpdate = itemData.stats.map(s => ({ stat: s.id, amount: s.amount }))
-      store.updatePlayerStats(statsToUpdate)
       store.removeItems([{ id: item.id, tier: item.tier, upgradeLevel: item.upgradeLevel, amount: 1 }])
+      return true
     },
 
     /**
@@ -925,7 +924,7 @@ export const PlayerStore = signalStore(
         if (!ok) notFitting = crops
         return ok
       }
-      const ctx = { doubleChance: stats.farmDoubleHarvestChance, bonusChance: stats.farmBonusCropChance, xpMultiplier: stats.farmXpMultiplier, fits }
+      const ctx = { doubleChance: stats.farmDoubleHarvestChance, bonusChance: stats.farmBonusCropChance, xpMultiplier: stats[PROFESSIONS_DATA[ProfessionID.farming].xpMultiplier], fits }
       const farm = store.farm()
       const result = plotIndex === undefined ? harvestEveryPlot(farm, ctx) : harvestPlot(farm, plotIndex, ctx)
       const blocked = 'blocked' in result ? result.blocked : result.status === 'blocked'
@@ -952,7 +951,6 @@ export const PlayerStore = signalStore(
     applyProfessionXp(id: ProfessionID, amount: number): ProfessionGain | null {
       const current = store.professions()[id]
       if (!current) return null
-      store.syncFarm() // a level-up changes the growth rate
       const { maxLevel } = PROFESSIONS_DATA[id]
       const from = professionLevel(store.professions(), id)
       const { progress, skillPoints } = settleProfession({ ...current, experience: Math.max(0, current.experience + amount) }, maxLevel)
@@ -1045,8 +1043,16 @@ export const PlayerStore = signalStore(
         patchState(store, (state) => ({ inventory: resizeInventory(state.inventory, capacity) }))
       })
 
-      // Offline time counts at the rate the save was made with.
+      // Offline time counts at the rate the save was made with. After that, whenever any source (gear, a level-up, a
+      // buff) changes the rate, the old rate covers the time so far.
       store.syncFarm()
+      store._farmRate.current = store.stats().seedGrowthTimeReduction
+      effect(() => {
+        const rate = store.stats().seedGrowthTimeReduction
+        if (rate === store._farmRate.current) return
+        untracked(() => store.syncFarm())
+        store._farmRate.current = rate
+      })
 
       // Pays skill points a save has not been paid for yet (older saves, edited XP, a raised level cap), once.
       for (const [key, progress] of Object.entries(store.professions())) {

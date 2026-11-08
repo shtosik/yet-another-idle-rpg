@@ -15,18 +15,15 @@ import { QuestState } from '../../../enums/quest-state.enum'
 import { canAdvanceQuest, getQuestStatus, getStepItems } from '../../services/quest-status'
 import { ReputationService } from '../../services/reputation.service'
 import { ProfessionService } from '../../services/profession.service'
-import { REPUTATION_THRESHOLDS, ReputationGain } from '../player/reputation'
+import { ReputationGain } from '../player/reputation'
 import { orderKey, TurnInKey, turnInRemainingMs } from './turn-in-cooldown'
 import { Orders, rollOrder } from './orders'
 import { PlayerStat } from '../../../types/player/player-stat.type'
+import PROFESSIONS_DATA from '../../../data/professions-data'
+import { KillBaseline, killBaseline, Progress, RequirementContext, requirementProgress, RequirementRow, requirementRows, waveKey } from './requirement-handlers'
 
 export { orderKey }
-
-/** Lifetime kill counters at the moment the quest reached its current step. */
-export interface KillBaseline {
-  enemies: Partial<Record<EnemyID, number>>
-  waves: Record<string, number> // key: waveKey(zoneId, wave)
-}
+export type { KillBaseline }
 
 export interface QuestsState {
   questStepProgression: QuestProgression
@@ -53,8 +50,6 @@ export const initialState: QuestsState = {
 }
 
 const STORE_KEY = 'questsStore'
-
-const waveKey = (zoneId: ZoneID, wave: number) => `${zoneId}-${wave}`
 
 /** What completing a quest pays, split by where it goes. The dialogue slot check reads `items` from here too. */
 export function questPayout(data: QuestProps): QuestPayout {
@@ -116,16 +111,11 @@ export const QuestsStore = signalStore(
 
     /** Kill requirements count from the moment the quest reaches a step; `null` drops the baseline. */
     setStepKillBaseline(questId: QuestID, step: QuestStep | null) {
-      const baseline: KillBaseline = { enemies: {}, waves: {} }
       const requirements = step === null ? [] : QUEST_DATA[questId].steps[step - 1].requirements
-
-      for (const req of requirements) {
-        if (req.type === 'enemy') {
-          baseline.enemies[req.enemyId] = playerStore.enemyKillCounts()[req.enemyId] ?? 0
-        } else if (req.type === 'wave') {
-          baseline.waves[waveKey(req.zoneId, req.wave)] = playerStore.getKillCountByZoneAndWave(req.zoneId, req.wave)
-        }
-      }
+      const baseline = killBaseline(requirements, {
+        enemy: enemyId => playerStore.enemyKillCounts()[enemyId] ?? 0,
+        wave: (zoneId, wave) => playerStore.getKillCountByZoneAndWave(zoneId, wave),
+      })
 
       patchState(store, (state) => {
         const { [questId]: _, ...rest } = state.stepKillBaselines
@@ -146,38 +136,31 @@ export const QuestsStore = signalStore(
     },
   })),
   withMethods((store, playerStore = inject(PlayerStore)) => ({
-      /** How far a requirement is; kill requirements count since `questId` reached its current step. Met when `current >= target`. */
-      requirementProgress(questId: QuestID, req: RequirementProps): { current: number, target: number } {
-        switch (req.type) {
-          case 'stat':
-            return { current: playerStore.stats()[req.key] as number, target: req.amount }
-          case 'item':
-            return { current: playerStore.itemCount(req.itemId), target: req.amount }
-          case 'enemy':
-            return { current: store.questEnemyKills(questId, req.enemyId), target: req.amount }
-          case 'wave':
-            return { current: store.questWaveKills(questId, req.zoneId, req.wave), target: req.amount }
-          case 'quest': {
-            const step = store.questStepProgression()[req.questId]
-            const met = !!step && (req.step === undefined || step === req.step)
-            return { current: met ? 1 : 0, target: 1 }
-          }
-          case 'professionLevel':
-            return { current: playerStore.professionLevel(req.professionId), target: req.level }
-          case 'pickedItems': {
-            // Items held, capped per pick, against the total asked: met only when every pick is.
-            const picks = store.orders()[questId]?.requirements ?? []
-            if (picks.length === 0) return { current: 0, target: 1 }
-            return {
-              current: picks.reduce((sum, p) => sum + Math.min(playerStore.itemCount(p.itemId), p.amount), 0),
-              target: picks.reduce((sum, p) => sum + p.amount, 0),
-            }
-          }
-          case 'reputation':
-            return { current: playerStore.reputation()[req.reputationId] ?? 0, target: REPUTATION_THRESHOLDS[req.tier] }
-          default:
-            return { current: 0, target: 1 }
+      /** What `questId`'s requirements read; kill counts are since it reached its current step. */
+      requirementContext(questId: QuestID): RequirementContext {
+        return {
+          stats: playerStore.stats(),
+          progression: store.questStepProgression(),
+          picks: store.orders()[questId]?.requirements ?? [],
+          itemCount: id => playerStore.itemCount(id),
+          enemyKills: enemyId => store.questEnemyKills(questId, enemyId),
+          waveKills: (zoneId, wave) => store.questWaveKills(questId, zoneId, wave),
+          professionLevel: id => playerStore.professionLevel(id),
+          reputation: id => playerStore.reputation()[id] ?? 0,
+          isZoneUnlocked: id => playerStore.isZoneUnlocked(id),
         }
+      },
+    }),
+  ),
+  withMethods((store) => ({
+      /** How far a requirement is (`requirement-handlers.ts`). Met when `current >= target`. */
+      requirementProgress(questId: QuestID, req: RequirementProps): Progress {
+        return requirementProgress(req, store.requirementContext(questId))
+      },
+
+      /** The quest panel's lines for a requirement. */
+      requirementRows(questId: QuestID, req: RequirementProps): RequirementRow[] {
+        return requirementRows(req, store.requirementContext(questId))
       },
     }),
   ),
@@ -226,7 +209,7 @@ export const QuestsStore = signalStore(
         store.setStepKillBaseline(questId, null)
 
         const { reputation, gold, farmingXp } = order.rewards
-        const xp = Math.round(farmingXp * (1 + playerStore.stats().farmXpMultiplier))
+        const xp = Math.round(farmingXp * (1 + playerStore.stats()[PROFESSIONS_DATA[data.repeat.professionId].xpMultiplier]))
         store.handleQuestCompleted({
           ...data,
           rewards: [

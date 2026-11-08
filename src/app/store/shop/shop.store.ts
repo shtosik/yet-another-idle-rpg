@@ -16,7 +16,7 @@ export interface PurchaseResult {
   bought: number
   /** Total paid, in the shop's currency. */
   spent: number
-  /** Station gear installed by the purchase (the caller shows the modal). */
+  /** Station gear installed by the purchase (`PlayerStore.addItems` shows its notice). */
   installed: ItemID[]
 }
 

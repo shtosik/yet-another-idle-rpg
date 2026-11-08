@@ -36,11 +36,11 @@ export class BattleSideButtonsComponent {
   )
 
   onNextWave() {
-    this.battleStore.changeWave(true)
+    this.battleManagerService.changeWave(true)
   }
 
   onPreviousWave() {
-    this.battleStore.changeWave(false)
+    this.battleManagerService.changeWave(false)
   }
 
   enableAutoWaveProgressionAction(checked: boolean) {
