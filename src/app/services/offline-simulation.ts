@@ -5,7 +5,7 @@ import { rollSpawn, scaledHp, waveEnemies } from '../store/battle/waves'
 import { Kill, Rng } from '../store/player/kill-rewards'
 import type { PlayerStatsType } from '../store/player/stats'
 import { HitInput, resolveHit } from './hit-resolution'
-import { RESPAWN_DELAY_IN_MS, timePerAttackMs } from './combat-timing'
+import { RESPAWN_DELAY_IN_MS, timePerAttackMs } from './combat-step'
 
 /** A stretch of offline time with one set of stats (buffs running or expired). */
 export interface OfflineSegment {

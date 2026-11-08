@@ -11,6 +11,11 @@ import { ItemID } from '../../enums/ids/item-id.enum'
 import { ZoneID } from '../../enums/ids/zone-id.enum'
 import { OfflineProgressService } from './offline-progress.service'
 import { OfflineStore } from '../store/offline/offline.store'
+import ITEM_DATA from '../../data/items-data'
+import { tabOf } from '../store/player/inventory'
+import { GameClock } from './game-clock.service'
+
+const HOUR = 60 * 60 * 1000
 
 describe('ArenaService', () => {
   let arena: ArenaService
@@ -71,6 +76,19 @@ describe('ArenaService', () => {
     expect(countOf(ItemID.skillPointBook)).toBe(2)
   })
 
+  it('refuses the claim, changing nothing, while a reward does not fit', () => {
+    arena.enter(0)
+    killThrough(totalKills)
+    playerStore.grant((Object.keys(ITEM_DATA).map(Number) as ItemID[])
+      .filter(id => tabOf(id) === 'gear' && id !== ItemID.moltenCape)
+      .slice(0, playerStore.inventoryCapacity().gear)
+      .map(id => ({ id, amount: 1 })), 'atomic')
+    const before = { inventory: playerStore.inventory(), rewards: battleStore.arenaRewards() }
+
+    expect(arena.claimRewards()).toBeFalse()
+    expect({ inventory: playerStore.inventory(), rewards: battleStore.arenaRewards() }).toEqual(before)
+  })
+
   it('time running out ends the run with no rewards waiting', () => {
     arena.enter(0)
     killThrough(4)
@@ -107,18 +125,28 @@ describe('ArenaService', () => {
     const away = 60 * 60 * 1000
     spyOn(window, 'fetch').and.resolveTo(new Response(null, { headers: { Date: new Date(away).toUTCString() } }))
     const welcomeBack = spyOn(TestBed.inject(ModalService), 'openWelcomeBack')
-    TestBed.inject(OfflineStore).setLastSeen(0)
+    TestBed.inject(OfflineStore).setLastSeen(0, 0)
     arena.enter(0)
 
-    const claiming = TestBed.inject(OfflineProgressService).claim()
-    // The game loop's first tick ends the run before the server time arrives.
-    arena.tick(away)
-    await claiming
+    await TestBed.inject(OfflineProgressService).claim()
 
     expect(arena.run()).toBeNull()
     expect(openResult).toHaveBeenCalledWith(jasmine.objectContaining({ outcome: 'timeout', timeMs: ARENA.timeLimitMs }))
     // The claim ends where the wait began, so a few ms of test time drift off the gap.
     expect(welcomeBack.calls.mostRecent().args[0].elapsedMs).toBeCloseTo(away - ARENA.timeLimitMs, -2)
     expect(playerStore.zonesProgression()[ZoneID.horseshoeBeach]).toBeDefined()
+  })
+
+  it('a run with 1 min left ends at its end time; kills cover the rest of the capped gap', async () => {
+    spyOn(window, 'fetch').and.resolveTo(new Response(null, { headers: { Date: new Date(ARENA.timeLimitMs - 60_000 + 48 * HOUR).toUTCString() } }))
+    const welcomeBack = spyOn(TestBed.inject(ModalService), 'openWelcomeBack')
+    arena.enter(0)
+    TestBed.inject(GameClock).advance(ARENA.timeLimitMs - 60_000)
+    TestBed.inject(OfflineStore).setLastSeen(ARENA.timeLimitMs - 60_000, ARENA.timeLimitMs - 60_000)
+
+    await TestBed.inject(OfflineProgressService).claim()
+
+    expect(openResult).toHaveBeenCalledWith(jasmine.objectContaining({ outcome: 'timeout', timeMs: ARENA.timeLimitMs }))
+    expect(welcomeBack.calls.mostRecent().args[0].elapsedMs).toBe(24 * HOUR - 60_000)
   })
 })

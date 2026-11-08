@@ -99,7 +99,7 @@ describe('quest-only drops', () => {
 
   const roll = (step: number | undefined, held = 0, rolls = 1) => {
     const progression = step === undefined ? {} : { [questId]: step }
-    const limits = getQuestDropLimits(progression, () => held)
+    const limits = getQuestDropLimits(progression, {}, () => held)
     rollDropList([drop], rolls, 0, accumulator, limits, () => 0.999)
     return [...accumulator.values()].reduce((sum, item) => sum + item.amount, 0)
   }

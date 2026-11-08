@@ -10,7 +10,7 @@ The **Camp** tab is the player's crafting base. It holds **stations** (Workbench
 - `src/data/items/consumables-items.data.ts` — food and potions (`effect: ConsumableEffect`) and recipe scrolls (`ItemType.recipe`, `recipeId`).
 - `src/interfaces/consumable.interface.ts` — `ConsumableSlot` (`food` / `potion`), `ConsumableEffect`, `ActiveConsumable`.
 - `src/app/store/player/camp.ts` — pure rules: `stationLevel`, `canInstall`, `installStations`, `evaluateRecipe` (visibility, max craftable, block reason).
-- `src/app/store/player/player.store.ts` — `stations` and `unlockedRecipes` state, `craftItem`, `addItems` and `applyKillBatch` (install gear and show its notice, `ModalService.openStationInstalled`, whatever gave it: craft, shop, chest, quest, kill or the inventory's use action), `useItem` (recipe scrolls), `unlockCamp`.
+- `src/app/store/player/player.store.ts` — `stations` and `unlockedRecipes` state, `craftItem`, `grant` (the Item grant, also behind `applyKillBatch`: install gear and show its notice, `ModalService.openStationInstalled`, whatever gave it: craft, shop, chest, quest, kill or the inventory's use action), `useItem` (recipe scrolls), `unlockCamp`.
 - `src/app/store/camp/camp.store.ts:CampStore` — Camp tab UI selection only (station, recipe per station, batch size, Craftable filter).
 - `src/app/services/battle-manager.service.ts:useConsumable`, `autoEat`; `src/app/store/battle/battle.store.ts` — `consumableSlots`, `tickConsumables`.
 - `src/app/components/game/camp/` — Camp tab, `recipe-detail/`, `recipe-view.ts`. Recipes show as an icon grid (name in the tooltip; lock + level when the station is too low, dimmed when ingredients are missing); the detail panel does all crafting. The **Craftable** filter (`maxCraftable > 0`) hides the rest. The selected recipe stays in the detail even when a filter hides it.
@@ -18,7 +18,7 @@ The **Camp** tab is the player's crafting base. It holds **stations** (Workbench
 ## Data flow
 **Camp unlock**: `UNLOCK_RULES` (holding a Turtle Shell) calls `unlockCamp`, which grants the Workbench at level 1.
 
-**Stations**: station gear never enters the inventory. Whenever `PlayerStore.addItems` receives gear (drop, shop, craft, quest), it installs it if the station is at `level − 1`. Gear that arrives out of order stays in the inventory until it can be installed (`installStationItem`). A station level of 0 (missing key) means not owned.
+**Stations**: station gear never enters the inventory. Whenever the Item grant (`PlayerStore.grant`) receives gear (drop, shop, craft, quest), it installs it if the station is at `level − 1`. Gear that arrives out of order stays in the inventory until it can be installed (`installStationItem`). A station level of 0 (missing key) means not owned.
 
 **Crafting** (`craftItem(recipeId, times)`): `evaluateRecipe` decides:
 - visible: station owned, recipe unlocked if `requiresUnlock` (by using its recipe scroll), and gear not already installed;

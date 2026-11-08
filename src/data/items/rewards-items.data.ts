@@ -12,6 +12,7 @@ export const RewardsItemsData: Partial<Record<ItemID, Item>> = {
     url: './assets/img/items/spellbook.png',
     value: -1,
     type: ItemType.book,
+    unlocks: 'spellbook',
   },
   [ItemID.skillPointBook]: {
     id: ItemID.skillPointBook,

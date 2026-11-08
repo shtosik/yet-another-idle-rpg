@@ -182,23 +182,6 @@ export class BattleManagerService {
     }
   }
 
-  /** A slot holding a spell on cooldown can't be emptied or given another spell. */
-  isSpellSlotLocked(spellId: SpellID): boolean {
-    return this.battleStore.equippedSpells().some(s => s?.spellId === spellId && s.cooldownRemainingMs > 0)
-  }
-
-  equipSpell(spellId: SpellID) {
-    if (this.battleStore.equippedSpells().some(s => s?.spellId === spellId)) return
-    this.battleStore.addSpell({ spellId, cooldownRemainingMs: 0 })
-  }
-
-  /** Skips a spell on cooldown unless `force` (refund and respec remove the spell itself). */
-  unequipSpell(spellId: SpellID, force = false) {
-    if (!force && this.isSpellSlotLocked(spellId)) return
-    const remaining = this.battleStore.equippedSpells().map(s => s?.spellId === spellId ? null : s)
-    this.battleStore.setAllEquippedSpells(remaining)
-  }
-
   tickSpells(deltaMs: number): void {
     this.battleStore.tickSpellTimers(deltaMs)
   }

@@ -74,7 +74,7 @@ describe('Revered quests in dialogue', () => {
 
   it('does not complete a hand-in when an item is gone before confirming', () => {
     questsStore.startQuest(QuestID.lastOrders)
-    playerStore.addItems([{ id: ItemID.venisonRoast, amount: 10 }, { id: ItemID.fishApplePie, amount: 10 }])
+    playerStore.grant([{ id: ItemID.venisonRoast, amount: 10 }, { id: ItemID.fishApplePie, amount: 10 }], 'lossy')
     const askWork = option(LA_HARPAR_BARTENDER[BartenderDialogue.default], 'default.anyWork')
     expect(dialogue.getActiveResult(askWork)?.next).toBe(BartenderDialogue.questLastOrdersComplete)
 
@@ -87,7 +87,7 @@ describe('Revered quests in dialogue', () => {
 
   it('does not end a quest from dialogue when an item is gone before confirming', () => {
     questsStore.startQuest(QuestID.silkAndWater)
-    playerStore.addItems([{ id: ItemID.spiderSilk, amount: 14 }, { id: ItemID.vialOfWater, amount: 10 }])
+    playerStore.grant([{ id: ItemID.spiderSilk, amount: 14 }, { id: ItemID.vialOfWater, amount: 10 }], 'lossy')
     dialogue.selectOption(option(MAWOOD_SYLVIE[SylvieDialogue.questSilkWaterComplete], 'questSilkWaterComplete.opt1'))
 
     expect(questsStore.getQuestStep(QuestID.silkAndWater)).toBe(1)

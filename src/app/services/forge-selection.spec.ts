@@ -26,7 +26,7 @@ describe('ForgeSelection (Forge session)', () => {
   afterEach(() => localStorage.clear())
 
   it('quotes cost, chance and the +1 gear while the merge is refused for gold', () => {
-    player.addItems([{ id, tier, amount: 2 }])
+    player.grant([{ id, tier, amount: 2 }], 'lossy')
     session.select(bow())
     session.select(bow())
 
@@ -36,14 +36,14 @@ describe('ForgeSelection (Forge session)', () => {
   })
 
   it('never puts one copy in both inputs', () => {
-    player.addItems([{ id, tier, amount: 1 }])
+    player.grant([{ id, tier, amount: 1 }], 'lossy')
     session.select(bow())
     session.select(bow())
     expect(session.sacrifice()).toBeNull()
   })
 
   it('uses up the sacrifice and keeps an upgraded inventory base selected', () => {
-    player.addItems([{ id, tier, amount: 2 }])
+    player.grant([{ id, tier, amount: 2 }], 'lossy')
     player.updatePlayerStats([{ stat: 'goldCoins', amount: 1_000_000 }])
     session.select(bow())
     session.select(bow())

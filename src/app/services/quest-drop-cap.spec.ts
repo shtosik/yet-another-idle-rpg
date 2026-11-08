@@ -27,7 +27,7 @@ describe('quest drop caps online and offline', () => {
     battle.setZone(ZoneID.elderwoodWilds)
     quests.startQuest(QuestID.signsOfRot)
     // Held counts include every tier, not just the tier of the enemy drop.
-    player.addItems([{ id: ItemID.corruptedResin, amount: 2, tier: ItemTier.legendary }])
+    player.grant([{ id: ItemID.corruptedResin, amount: 2, tier: ItemTier.legendary }], 'lossy')
     player.updatePlayerStats([{ stat: 'attackPower', amount: 1000 }])
   })
 
@@ -48,7 +48,7 @@ describe('quest drop caps online and offline', () => {
     const away = 60 * 60 * 1000
     spyOn(window, 'fetch').and.resolveTo(new Response(null, { headers: { Date: new Date(away).toUTCString() } }))
     const welcomeBack = spyOn(TestBed.inject(ModalService), 'openWelcomeBack')
-    TestBed.inject(OfflineStore).setLastSeen(0)
+    TestBed.inject(OfflineStore).setLastSeen(0, 0)
 
     await TestBed.inject(OfflineProgressService).claim()
 

@@ -6,16 +6,14 @@ import { BattleManagerService } from './battle-manager.service'
 import { ShopStore } from '../store/shop/shop.store'
 import { OfflineProgressService } from './offline-progress.service'
 import { ArenaService } from './arena.service'
-import { TurnInCooldownService } from './turn-in-cooldown.service'
+import { GameClock } from './game-clock.service'
 import { ARENA } from '../../data/arena-data'
-import { MS_PER_SECOND, RESPAWN_DELAY_IN_MS, TICK_DURATION_IN_MS, timePerAttackMs } from './combat-timing'
+import { MS_PER_SECOND, RESPAWN_DELAY_IN_MS, stepCombat, TICK_DURATION_IN_MS, timePerAttackMs } from './combat-step'
 
 /** Longest real-time gap one tick simulates; a longer one is clamped to this. */
 const MAX_TICK_DELTA_IN_MS = 1000
 /** A gap this long (sleeping device) isn't simulated by the tick: it goes to an offline claim instead. */
 const SLEEP_GAP_IN_MS = 60 * 1000
-/** Caps catch-up attacks in one tick, so a near-zero attack speed can't stall the loop. */
-const MAX_ATTACKS_PER_TICK = 10
 
 @Injectable({ providedIn: 'root' })
 export class GameIntervalService {
@@ -25,7 +23,7 @@ export class GameIntervalService {
     shopStore = inject(ShopStore)
     offlineProgress = inject(OfflineProgressService)
     arenaService = inject(ArenaService)
-    turnInCooldowns = inject(TurnInCooldownService)
+    gameClock = inject(GameClock)
 
     private timePerAttack = computed(() => timePerAttackMs(this.playerStore.stats()))
 
@@ -58,8 +56,10 @@ export class GameIntervalService {
         }
 
         const deltaMs = Math.min(rawDeltaMs, MAX_TICK_DELTA_IN_MS)
-        this.arenaService.tick(wallNow)
-        this.advanceCombat(deltaMs)
+        this.gameClock.advance(deltaMs)
+        this.arenaService.tick(this.gameClock.nowMs())
+        // An arena run waits for a pending claim: it may have run out while away, and the claim decides that.
+        if (!this.battleStore.arenaRun() || this.gameClock.isSettled()) this.advanceCombat(deltaMs)
         this.playerStore.regenMana(deltaMs)
         this.battleManagerService.tickSpells(deltaMs)
         this.battleManagerService.tickDamageOverTime(deltaMs)
@@ -69,42 +69,22 @@ export class GameIntervalService {
             this.secondTimer -= MS_PER_SECOND
             this.battleManagerService.tickConsumables()
             this.shopStore.tickCooldowns(MS_PER_SECOND)
-            this.turnInCooldowns.tick(wallNow)
             this.offlineProgress.markSeen()
         }
     }
 
-    /** Respawn after `RESPAWN_DELAY_IN_MS`, then attack once per `attackSpeed`, carrying leftover time. */
     private advanceCombat(deltaMs: number) {
-        let remainingMs = deltaMs
-
-        if (!this.battleStore.isInCombat()) {
-            const respawnDelay = this.battleStore.arenaRun() ? ARENA.respawnDelayMs : RESPAWN_DELAY_IN_MS
-            this.respawnTimer += remainingMs
-            if (this.respawnTimer < respawnDelay) return
-
-            remainingMs = this.respawnTimer - respawnDelay
-            this.respawnTimer = 0
-            this.attackTimer = 0
-            this.battleStore.startBattle(this.playerStore.stats().shinyChance)
-        }
-
-        this.attackTimer += remainingMs
-        const timePerAttack = this.timePerAttack()
-        for (let attacks = 0; this.attackTimer >= timePerAttack; attacks++) {
-            if (attacks === MAX_ATTACKS_PER_TICK) {
-                this.attackTimer = timePerAttack
-                return
-            }
-
-            this.attackTimer -= timePerAttack
-            this.battleManagerService.doDamage()
-
-            // Killed: leftover attack time is lost, the respawn delay starts now.
-            if (!this.battleStore.isInCombat()) {
-                this.attackTimer = 0
-                return
-            }
-        }
+        const timers = stepCombat({ attackTimer: this.attackTimer, respawnTimer: this.respawnTimer }, deltaMs, {
+            inCombat: this.battleStore.isInCombat(),
+            respawnDelayMs: this.battleStore.arenaRun() ? ARENA.respawnDelayMs : RESPAWN_DELAY_IN_MS,
+            timePerAttackMs: this.timePerAttack(),
+            spawn: () => this.battleStore.startBattle(this.playerStore.stats().shinyChance),
+            attack: () => {
+                this.battleManagerService.doDamage()
+                return !this.battleStore.isInCombat()
+            },
+        })
+        this.attackTimer = timers.attackTimer
+        this.respawnTimer = timers.respawnTimer
     }
 }

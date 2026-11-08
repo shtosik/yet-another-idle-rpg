@@ -39,7 +39,7 @@ Pathfinder's Seal is a separate **1-in-10 bonus roll per Arena Chest**, after it
 The header groups wave kills and wave number above a progress strip, then time remaining and Leave. The clock changes color at 60 seconds; the Arcanist's time loss stays separately visible. Single-enemy arena waves show the Boss badge. Weak-point and mound buttons keep their existing hit targets and mechanics; damage popups do not intercept them, and shield/stun/bonus labels remain visible above the sprite.
 
 ## Invariants & gotchas
-- **The clock is wall time** (`Date.now()`), saved as `startedAt`/`endsAt`, so it runs while the game is closed and a run that expired offline ends on the first tick back (owner decision). A changed system clock moves it too.
+- **The clock is Game time** (`GameClock`, `offline-progress.md`), saved as `startedAt`/`endsAt`/`arenaReadyAt`. It runs while the game is closed only through the offline claim, which moves it by the capped gap (24 h); a run that ran out in that time ends at its `endsAt` (owner decision). A changed system clock moves nothing.
 - **Offline**: a run that ran out while away ends as a timeout at its `endsAt`, and the rest of the absence is claimed as normal offline progress in the Zone the player entered from (`currentZoneId`/`currentWave` stay on it during a run; owner decision: no lost progress). A claim while the run is still going earns nothing. Spell and buff timers still run out.
 - `currentZoneId`/`currentWave` stay the Zone the player came from during a run; code that reads them for rewards must check `arenaRun` first.
 - A Leave or timeout keeps the XP and gold already paid per kill; the fee is never refunded.

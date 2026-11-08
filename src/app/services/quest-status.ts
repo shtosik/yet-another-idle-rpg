@@ -37,7 +37,9 @@ export function canAdvanceQuest(
   if (status.state !== QuestState.active) return false
   if (atStep !== undefined && status.step !== atStep) return false
 
-  const requirements = QUEST_DATA[questId].steps[status.step - 1].requirements // saved steps start from 1
+  const step = QUEST_DATA[questId].steps[status.step - 1] // saved steps start from 1
+  if (!step) return false // a saved step past the last one
+  const requirements = step.requirements
   return !requirements || requirements.every(isRequirementMet)
 }
 
@@ -76,7 +78,7 @@ export function matchesQuestState(
 }
 
 /** Item requirements of a quest step (1-based), picked ones from `orders`; turn-ins consume these. */
-export function getStepItems(questId: QuestID, step: QuestStep, orders: Orders = {}): ItemStack[] {
+export function getStepItems(questId: QuestID, step: QuestStep, orders: Orders): ItemStack[] {
   return consumedItems(QUEST_DATA[questId].steps[step - 1]?.requirements ?? [], orders[questId]?.requirements ?? [])
 }
 
@@ -92,13 +94,13 @@ export function getActiveQuestIds(progression: QuestProgression): Set<QuestID> {
 /** Missing amounts at the start of a kill or offline claim, by quest and current-step item. */
 export type QuestDropLimits = ReadonlyMap<QuestID, ReadonlyMap<ItemID, number>>
 
-export function getQuestDropLimits(progression: QuestProgression, itemCount: (id: ItemID) => number): QuestDropLimits {
+export function getQuestDropLimits(progression: QuestProgression, orders: Orders, itemCount: (id: ItemID) => number): QuestDropLimits {
   const limits = new Map<QuestID, Map<ItemID, number>>()
   for (const questId of getActiveQuestIds(progression)) {
     const status = getQuestStatus(progression, questId)
     if (status.state !== QuestState.active) continue
     const items = new Map<ItemID, number>()
-    for (const { id, amount } of getStepItems(questId, status.step)) {
+    for (const { id, amount } of getStepItems(questId, status.step, orders)) {
       items.set(id, Math.max(0, amount - itemCount(id)))
     }
     limits.set(questId, items)

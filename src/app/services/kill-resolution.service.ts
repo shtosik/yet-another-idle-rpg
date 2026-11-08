@@ -2,7 +2,8 @@ import { inject, Injectable } from '@angular/core'
 import ZONES_DATA from '../../data/zones-data'
 import { ZoneID } from '../../enums/ids/zone-id.enum'
 import { Kill, KillBatch, Rng, rollKills } from '../store/player/kill-rewards'
-import { isTaskDone, KillBatchResult, PlayerStore } from '../store/player/player.store'
+import { KillBatchResult, PlayerStore } from '../store/player/player.store'
+import { isTaskDone } from '../store/player/tasks'
 import { QuestsStore } from '../store/quests/quests.store'
 import { getQuestDropLimits } from './quest-status'
 import { UnlockService } from './unlock.service'
@@ -23,7 +24,7 @@ export class KillResolutionService {
   resolveKills(zoneId: ZoneID, wave: number, kills: Kill[], rng: Rng): KillResolution {
     const zone = ZONES_DATA[zoneId]
     const batch = rollKills(zone, wave, kills, {
-      questDropLimits: getQuestDropLimits(this.questsStore.questStepProgression(), this.playerStore.itemCount),
+      questDropLimits: getQuestDropLimits(this.questsStore.questStepProgression(), this.questsStore.orders(), this.playerStore.itemCount),
       enemyKillCounts: this.playerStore.enemyKillCounts(),
       taskEnemyIds: new Set(this.playerStore.activeTasks().filter(task => !isTaskDone(task)).map(task => task.monsterId)),
     }, rng)

@@ -7,6 +7,7 @@ import { DialogueEffect, QuestEffect, ReputationTurnInEffect } from '../../types
 import { turnInFor } from '../../data/reputation-turn-ins'
 import { ReputationService } from './reputation.service'
 import { TurnInCooldownService } from './turn-in-cooldown.service'
+import { GameClock } from './game-clock.service'
 import { orderKey, QuestsStore } from '../store/quests/quests.store'
 import { DialogueOption, DialogueResult } from '../../interfaces/dialogues/dialogue-option.type'
 import { DialogueCondition } from '../../types/dialogues/dialogue-condition.type'
@@ -41,6 +42,7 @@ export class DialogueManagerService {
     currencyFeed: inject(CurrencyFeedService),
     reputation: inject(ReputationService),
     cooldowns: this.cooldowns,
+    clock: inject(GameClock),
     unlocks: inject(UnlockService),
     activeNpc: () => this.activeNpc(),
   }
@@ -120,6 +122,12 @@ export class DialogueManagerService {
     return adding.length === 0 ? {} : this.playerStore.missingSlotsByTab(adding, costs.flatMap(cost => cost.removes ?? []))
   }
 
+  /** True when the option's shown branch can run now: its requirements are met and its cost and effects apply. */
+  canSelect(option: DialogueOption<any>): boolean {
+    const result = this.getActiveResult(option)
+    return !!result && this.checkConditions(result.requirementsNeeded) && this.canApplyResult(result)
+  }
+
   selectOption(option: DialogueOption<any>) {
     const validResult = this.getActiveResult(option)
 
@@ -128,9 +136,7 @@ export class DialogueManagerService {
       return
     }
 
-    if (!this.checkConditions(validResult.requirementsNeeded) || !this.canApplyResult(validResult)) {
-      return
-    }
+    if (!this.canSelect(option)) return
 
     if (validResult.effects) {
       this.applyEffects(validResult.effects)

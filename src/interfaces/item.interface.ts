@@ -59,8 +59,10 @@ export interface FoodItem extends ItemData {
     effect: ConsumableEffect
 }
 
+/** Unlocks a feature when granted and never enters the inventory (`grantItems`). */
 export interface BookItem extends ItemData {
     type: ItemType.book
+    unlocks: 'spellbook'
 }
 
 export interface PotionItem extends ItemData {

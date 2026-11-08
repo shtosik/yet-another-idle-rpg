@@ -33,7 +33,7 @@ describe('ItemUseService', () => {
 
   const give = (id: ItemID): InventoryItem => {
     const { tier, type } = ITEM_DATA[id]
-    player.addItems([{ id, tier, amount: 1 }])
+    player.grant([{ id, tier, amount: 1 }], 'lossy')
     return { id, tier, type, amount: 1 }
   }
   const onBar = (spellId: SpellID) => battle.equippedSpells().filter(slot => slot?.spellId === spellId).length
@@ -50,7 +50,7 @@ describe('ItemUseService', () => {
     expect(player.knownSpellIds()).toContain(SpellID.ambush)
     expect(onBar(SpellID.ambush)).toBe(1)
 
-    battle.setAllEquippedSpells(battle.equippedSpells().map(() => null))
+    battle.removeSpell(SpellID.ambush)
     itemUse.use(give(ItemID.ambushScroll))
     expect(onBar(SpellID.ambush)).toBe(0)
     expect(player.itemCount(ItemID.ambushScroll)).toBe(1)

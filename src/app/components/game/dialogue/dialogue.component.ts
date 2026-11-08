@@ -83,11 +83,7 @@ export class DialogueComponent {
   }
 
   isOptionDisabled(option: DialogueOption<any>): boolean {
-    const result = this.dialogueService.getActiveResult(option)
-    if (!result) return false
-    if (!this.dialogueService.canApplyResult(result)) return true
-    if (!result.requirementsNeeded) return false
-    return !result.requirementsNeeded.every(req => this.dialogueService.checkCondition(req))
+    return this.isOptionVisible(option) && !this.dialogueService.canSelect(option)
   }
 
   /** "1 Materials slot" etc.; empty when the rewards fit. */

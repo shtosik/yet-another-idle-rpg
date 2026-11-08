@@ -49,9 +49,9 @@ describe('Battle panel presentation', () => {
     return result
   }
 
-  function equipSpell(spellId: SpellID): void {
-    player.levelUpSpell(spellId)
-    battle.addSpell({ spellId, cooldownRemainingMs: 0 })
+  function equipSpell(spellId: SpellID, node: SkillNodeID): void {
+    player.updateUnlockedNodes(node, 1)
+    battle.placeSpell(spellId)
     player.updatePlayerStats([{ stat: 'maxMana', amount: 50 }, { stat: 'mana', amount: 50 }])
   }
 
@@ -72,7 +72,7 @@ describe('Battle panel presentation', () => {
   })
 
   it('matches spell readiness to actual cast eligibility through combat, cooldown and mana changes', () => {
-    equipSpell(SpellID.fireStrike)
+    equipSpell(SpellID.fireStrike, SkillNodeID.fireStrike)
     fixture.detectChanges()
     expect(element('.spell').getAttribute('aria-disabled')).toBe('true')
 
@@ -94,7 +94,7 @@ describe('Battle panel presentation', () => {
   })
 
   it('casts through a native button and keeps running effects distinct from ready spells', () => {
-    equipSpell(SpellID.haste)
+    equipSpell(SpellID.haste, SkillNodeID.haste)
     fixture.detectChanges()
     expect(element('.spell').tagName).toBe('BUTTON')
     element('.spell').click()

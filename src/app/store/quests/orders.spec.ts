@@ -5,7 +5,8 @@ import { orderKey, QuestsStore } from './quests.store'
 import { saveGameStateNow } from '../helpers/with-game-state-sync.hook'
 import { ModalService } from '../../services/modal.service'
 import { DialogueManagerService } from '../../services/dialogue-manager.service'
-import { TurnInCooldownService } from '../../services/turn-in-cooldown.service'
+import { GameClock } from '../../services/game-clock.service'
+import { OfflineStore } from '../offline/offline.store'
 import QUEST_DATA, { QuestProps } from '../../../data/quests-data'
 import { DialogueOption } from '../../../interfaces/dialogues/dialogue-option.type'
 import { ItemID } from '../../../enums/ids/item-id.enum'
@@ -42,7 +43,6 @@ describe('repeatable orders', () => {
   let quests: InstanceType<typeof QuestsStore>
   let player: InstanceType<typeof PlayerStore>
   let dialogue: DialogueManagerService
-  let cooldowns: TurnInCooldownService
   let clock: number
 
   const option = (action: 'advance' | 'end'): DialogueOption<number> => ({
@@ -62,10 +62,11 @@ describe('repeatable orders', () => {
 
   function setUp() {
     TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] })
+    // Game time starts at the saved lastSeenAt, before any store reads the clock.
+    TestBed.inject(OfflineStore).setLastSeen(clock, clock)
     quests = TestBed.inject(QuestsStore)
     player = TestBed.inject(PlayerStore)
     dialogue = TestBed.inject(DialogueManagerService)
-    cooldowns = TestBed.inject(TurnInCooldownService)
     spyOn(TestBed.inject(ModalService), 'openQuestCompleted')
   }
 
@@ -73,7 +74,6 @@ describe('repeatable orders', () => {
     localStorage.clear()
     QUEST_DATA[ORDER] = FIXTURE
     clock = 1_000_000
-    spyOn(Date, 'now').and.callFake(() => clock)
     spyOn(Math, 'random').and.returnValue(0)
     setUp()
     player.unlockProfession(ProfessionID.farming)
@@ -109,14 +109,14 @@ describe('repeatable orders', () => {
 
   it('changes nothing when the completion is rejected', () => {
     quests.startQuest(ORDER)
-    player.addItems([{ id: ItemID.crabMeat, amount: 9 }])
+    player.grant([{ id: ItemID.crabMeat, amount: 9 }], 'lossy')
     const before = snapshot()
 
     expect(quests.completeOrder(ORDER, clock)).toBeFalse()
     expect(snapshot()).toEqual(before)
     expect(TestBed.inject(ModalService).openQuestCompleted).not.toHaveBeenCalled()
 
-    player.addItems([{ id: ItemID.crabMeat, amount: 1 }])
+    player.grant([{ id: ItemID.crabMeat, amount: 1 }], 'lossy')
     quests.recordTurnIn(KEY, clock) // a cooling cheat or loaded save still rejects
     const cooling = snapshot()
     expect(quests.completeOrder(ORDER, clock)).toBeFalse()
@@ -125,7 +125,7 @@ describe('repeatable orders', () => {
 
   it('completes atomically: items, rewards, cooldown, history, and the next start is free', () => {
     quests.startQuest(ORDER)
-    player.addItems([{ id: ItemID.crabMeat, amount: 12 }])
+    player.grant([{ id: ItemID.crabMeat, amount: 12 }], 'lossy')
     const before = snapshot()
 
     expect(quests.completeOrder(ORDER, clock)).toBeTrue()
@@ -147,10 +147,10 @@ describe('repeatable orders', () => {
     const bundle = { type: 'reputationTurnIn', npcId: NpcID.laHarparBartender } as const
     quests.startQuest(ORDER) // reserves 10 Crab Meat; a bundle is 20
 
-    player.addItems([{ id: ItemID.crabMeat, amount: 25 }])
+    player.grant([{ id: ItemID.crabMeat, amount: 25 }], 'lossy')
     expect(dialogue.turnIn(bundle)).toEqual(jasmine.objectContaining({ kept: 10, bundles: 0 }))
 
-    player.addItems([{ id: ItemID.crabMeat, amount: 5 }])
+    player.grant([{ id: ItemID.crabMeat, amount: 5 }], 'lossy')
     expect(dialogue.turnIn(bundle).bundles).toBe(1)
   })
 
@@ -158,7 +158,7 @@ describe('repeatable orders', () => {
     describe(`through the dialogue ${action} route`, () => {
       it('completes the same way', () => {
         quests.startQuest(ORDER)
-        player.addItems([{ id: ItemID.crabMeat, amount: 10 }])
+        player.grant([{ id: ItemID.crabMeat, amount: 10 }], 'lossy')
 
         dialogue.selectOption(option(action))
 
@@ -167,7 +167,7 @@ describe('repeatable orders', () => {
 
       it('rejects the same way', () => {
         quests.startQuest(ORDER)
-        player.addItems([{ id: ItemID.crabMeat, amount: 9 }])
+        player.grant([{ id: ItemID.crabMeat, amount: 9 }], 'lossy')
         const before = snapshot()
 
         dialogue.selectOption(option(action))
@@ -179,9 +179,8 @@ describe('repeatable orders', () => {
 
   it('has its own cooldown, per turn-in', () => {
     quests.startQuest(ORDER)
-    player.addItems([{ id: ItemID.crabMeat, amount: 10 }])
+    player.grant([{ id: ItemID.crabMeat, amount: 10 }], 'lossy')
     quests.completeOrder(ORDER, clock)
-    cooldowns.tick(clock)
 
     expect(dialogue.checkCondition({ type: 'turnInCooldown', key: KEY, state: 'cooling' })).toBeTrue()
     expect(dialogue.checkCondition({ type: 'turnInCooldown', key: bundleKey(NpcID.laHarparBartender, ItemID.crabMeat), state: 'ready' })).toBeTrue()
@@ -195,7 +194,7 @@ describe('repeatable orders', () => {
     expect(quests.getQuestStep(ORDER)).toBeUndefined()
 
     clock += 2 * HOUR + 1000
-    cooldowns.tick(clock)
+    TestBed.inject(GameClock).advance(2 * HOUR + 1000)
     expect(dialogue.getActiveResult(offer)).toBeDefined()
     quests.startQuest(ORDER)
     expect(quests.getQuestStep(ORDER)).toBe(1)

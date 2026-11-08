@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, DestroyRef, inject } from '@angular/core'
+import { ChangeDetectionStrategy, Component, DestroyRef, inject, Injector } from '@angular/core'
 import { getState } from '@ngrx/signals'
 import { SkillTreeService } from '../../../services/skill-tree.service'
 import { GameNavigationService } from '../../../services/game-navigation.service'
@@ -20,6 +20,7 @@ import { ALL_SKILLS } from '../../../../data/skill-tree-data'
 import { NodeRequirement } from '../../../../interfaces/skill-tree/skill-node.interface'
 import ITEM_DATA from '../../../../data/items-data'
 import TOWNS_DATA from '../../../../data/towns-data'
+import { resetAllStores } from '../../../store/saved-stores'
 import { PlayerStore } from '../../../store/player/player.store'
 import { BattleStore } from '../../../store/battle/battle.store'
 import { QuestsStore } from '../../../store/quests/quests.store'
@@ -82,6 +83,7 @@ export function allItemStacks(amount: number): { id: ItemID; tier: ItemTier; amo
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DevCheatsComponent {
+  private injector = inject(Injector)
   private playerStore = inject(PlayerStore)
   private battleStore = inject(BattleStore)
   private questsStore = inject(QuestsStore)
@@ -116,11 +118,11 @@ export class DevCheatsComponent {
     equip: (itemRef: Ref<typeof ItemID>, tier?: Ref<typeof ItemTier>, upgradeLevel = 0): boolean => {
       const itemId = fromName(ItemID, 'ItemID', itemRef)
       const stack = { id: itemId, tier: this.tierOf(itemId, tier), amount: 1, upgradeLevel }
-      if (!this.playerStore.canFitItems([stack])) {
+      if (!this.playerStore.canGrant([stack])) {
         console.warn('dev.equip: no inventory space for the item')
         return false
       }
-      this.playerStore.addItems([stack])
+      this.playerStore.grant([stack], 'atomic')
       const item = { ...stack, type: ITEM_DATA[itemId].type }
       if (!this.playerStore.canEquip(item)) {
         this.playerStore.removeItems([stack])
@@ -204,7 +206,7 @@ export class DevCheatsComponent {
     /** Fills every plot with the seed (default Turnip Seeds), granting the seeds and the Farming profession; false when its expertise is too low. */
     plantAll: (seed: Ref<typeof ItemID> = ItemID.turnipSeeds): boolean => {
       this.playerStore.unlockProfession(ProfessionID.farming)
-      this.playerStore.addItems([{ id: fromName(ItemID, 'ItemID', seed), amount: PLOT_SLOTS }])
+      this.playerStore.grant([{ id: fromName(ItemID, 'ItemID', seed), amount: PLOT_SLOTS }], 'lossy')
       const planted = this.playerStore.plantSeed(fromName(ItemID, 'ItemID', seed), PLOT_SLOTS)
       if (!planted) console.warn('dev.plantAll: nothing planted (not a seed, expertise too low, or every plot busy)')
       return planted
@@ -256,16 +258,16 @@ export class DevCheatsComponent {
 
   private addItem(item: Ref<typeof ItemID>, amount: number, tier: Ref<typeof ItemTier> | undefined, upgradeLevel: number): void {
     const id = fromName(ItemID, 'ItemID', item)
-    this.playerStore.addItems([{ id, tier: this.tierOf(id, tier), amount, upgradeLevel }])
+    this.playerStore.grant([{ id, tier: this.tierOf(id, tier), amount, upgradeLevel }], 'lossy')
   }
 
   private unlockFeature(feature: DevFeature): void {
     switch (feature) {
-      case 'camp': return this.playerStore.unlockCamp()
-      case 'skillTree': return this.playerStore.unlockSkillTree()
+      case 'camp': return this.playerStore.applyUnlockTarget({ type: 'feature', feature: 'camp' })
+      case 'skillTree': return this.playerStore.applyUnlockTarget({ type: 'feature', feature: 'skillTree' })
       case 'map': return this.playerStore.unlockMap()
       case 'spellbook': return this.playerStore.unlockSpellbook()
-      case 'towns': return Object.keys(TOWNS_DATA).forEach(id => this.playerStore.unlockTown(Number(id) as TownID))
+      case 'towns': return Object.keys(TOWNS_DATA).forEach(id => this.playerStore.applyUnlockTarget({ type: 'town', townId: Number(id) as TownID }))
     }
   }
 
@@ -305,14 +307,7 @@ export class DevCheatsComponent {
   }
 
   resetState() {
-    this.playerStore.resetState()
-    this.battleStore.resetState()
-    this.questsStore.resetState()
-    this.townsStore.resetState()
-    this.shopStore.resetState()
-    this.campStore.resetState()
-    this.offlineStore.resetState()
-    this.settingsStore.resetState()
+    resetAllStores(this.injector)
   }
 
   resetQuests() {
@@ -342,8 +337,8 @@ export class DevCheatsComponent {
   giveAllItems() {
     const stacks = allItemStacks(100)
     // Capacity is derived, so each round of slots counts at once. The cap only stops a bug from looping forever.
-    for (let rounds = 0; !this.playerStore.canFitItems(stacks) && rounds < 20; rounds++) this.giveSlots()
-    this.playerStore.addItems(stacks)
+    for (let rounds = 0; !this.playerStore.canGrant(stacks) && rounds < 20; rounds++) this.giveSlots()
+    this.playerStore.grant(stacks, 'lossy')
   }
 
   boostStats() {
@@ -351,6 +346,6 @@ export class DevCheatsComponent {
   }
 
   giveMachete() {
-    this.playerStore.addItems([{ id: ItemID.machete, tier: ItemTier.uncommon, amount: 1 }])
+    this.playerStore.grant([{ id: ItemID.machete, tier: ItemTier.uncommon, amount: 1 }], 'lossy')
   }
 }

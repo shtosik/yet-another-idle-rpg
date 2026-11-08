@@ -9,6 +9,7 @@ import { ExplorationGuildService } from './exploration-guild.service'
 import { CurrencyFeedService } from './currency-feed.service'
 import { ReputationService } from './reputation.service'
 import { TurnInCooldownService } from './turn-in-cooldown.service'
+import { GameClock } from './game-clock.service'
 import { UnlockService } from './unlock.service'
 import { NPCProps } from '../../data/npc-data'
 import { ItemStack } from '../store/player/inventory'
@@ -33,6 +34,7 @@ export interface DialogueContext {
   currencyFeed: CurrencyFeedService
   reputation: ReputationService
   cooldowns: TurnInCooldownService
+  clock: GameClock
   unlocks: UnlockService
   activeNpc: () => NPCProps | null
 }
@@ -122,6 +124,8 @@ export const EFFECT_HANDLERS: EffectHandlers = {
           break
       }
     },
+    // An Order turn-in starts a cooldown: refused while an offline claim is pending (`GameClock.isSettled`).
+    canApply: (effect, ctx) => effect.action === 'start' || !QUEST_DATA[effect.questId].repeat || ctx.clock.isSettled(),
     // A turn-in takes the step's items; the step that completes the quest also pays its item rewards.
     cost: (effect, ctx) => {
       if (effect.action === 'start') return {}
@@ -139,7 +143,7 @@ export const EFFECT_HANDLERS: EffectHandlers = {
   item: {
     apply: (effect, ctx) => {
       if (effect.action === 'take') ctx.player.removeItems(stacks(effect.items))
-      else ctx.player.addItems(stacks(effect.items))
+      else ctx.player.grant(stacks(effect.items), 'atomic')
     },
     cost: effect => effect.action === 'give' ? { adds: stacks(effect.items) } : { removes: stacks(effect.items) },
     label: effect => effect.silent ? [] : effect.items.map(i => ({
@@ -209,9 +213,10 @@ export const EFFECT_HANDLERS: EffectHandlers = {
       if (bundles === 0) return
       ctx.player.removeItems([{ id: turnIn.itemId, amount: bundles * turnIn.bundleSize }])
       ctx.reputation.gain([{ reputationId: turnIn.reputationId, amount: bundles * turnIn.reputation }])
-      ctx.quests.recordTurnIn(bundleKey(turnIn.npcId, turnIn.itemId), Date.now())
+      ctx.quests.recordTurnIn(bundleKey(turnIn.npcId, turnIn.itemId), ctx.clock.nowMs())
     },
-    canApply: (effect, ctx) => turnInState(effect, ctx).bundles > 0,
+    // Refused while an offline claim is pending, so the cooldown doesn't start inside the absence.
+    canApply: (effect, ctx) => ctx.clock.isSettled() && turnInState(effect, ctx).bundles > 0,
     label: (effect, ctx) => {
       const { turnIn, bundles } = turnInState(effect, ctx)
       return [{

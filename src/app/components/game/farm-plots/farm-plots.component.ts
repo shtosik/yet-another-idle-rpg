@@ -1,10 +1,11 @@
 import { DecimalPipe, NgOptimizedImage } from '@angular/common'
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, ElementRef, inject, output, signal } from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, ElementRef, inject, output } from '@angular/core'
 import i18next from 'i18next'
 import { TooltipStrDirective } from 'ngx-tooltip-directives'
 import { I18nextPipe } from '../../../pipes/i18next.pipe'
 import { CloseButtonComponent } from '../../shared/close-button/close-button.component'
 import { FarmService } from '../../../services/farm.service'
+import { GameClock } from '../../../services/game-clock.service'
 import { PlayerStore } from '../../../store/player/player.store'
 import { isReady, PLOT_SLOTS, stageOf } from '../../../store/player/farm'
 import { reputationProgress } from '../../../store/player/reputation'
@@ -54,8 +55,8 @@ export class FarmPlotsComponent {
   plotLimit = this.farmService.plotLimit
   activeSeed = this.farmService.activeSeed
 
-  /** Display tick: plots grow on the clock, this only redraws the timers. */
-  private now = signal(Date.now())
+  /** Plots grow on Game time with no store change to react to; its second redraws the timers. */
+  private second = inject(GameClock).second
 
   private points = computed(() => this.playerStore.reputation()[ReputationID.farmingGuild] ?? 0)
   guild = computed(() => {
@@ -94,7 +95,7 @@ export class FarmPlotsComponent {
 
   plots = computed(() => {
     const limit = this.plotLimit()
-    return this.farmService.plotsAt(this.now()).map((plot, index) => {
+    return this.farmService.plotsAt(this.second() * 1000).map((plot, index) => {
       const seed = plot && FARM_SEEDS[plot.seedId]
       if (index >= limit) return { index, state: 'locked' as const }
       if (!plot || !seed) return { index, state: 'empty' as const, soil: FARM_ART.soil.empty }
@@ -119,11 +120,6 @@ export class FarmPlotsComponent {
   /** Tooltip saying why Plant all / Harvest all are locked; null once the Guild tier is reached. */
   plantAllLock = computed(() => this.lockText(this.farmService.plantAllLock()))
   harvestAllLock = computed(() => this.lockText(this.farmService.harvestAllLock()))
-
-  constructor() {
-    const timer = setInterval(() => this.now.set(Date.now()), 1000)
-    inject(DestroyRef).onDestroy(() => clearInterval(timer))
-  }
 
   harvestPlot(index: number, event: MouseEvent): void {
     this.farmService.harvest(this.popupPoint(event, true), index)

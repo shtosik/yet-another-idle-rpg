@@ -21,11 +21,14 @@ export interface KillWindow {
 export interface OfflineState {
   /** Host time (ms) the game was last seen running. High-water mark: it never moves back. */
   lastSeenAt: number | null
+  /** Game time (`GameClock`) at `lastSeenAt`, written with it. `null` on older saves: the clock then starts at `lastSeenAt`. */
+  gameMs: number | null
   killWindow: KillWindow | null
 }
 
 const initialState: OfflineState = {
   lastSeenAt: null,
+  gameMs: null,
   killWindow: null,
 }
 
@@ -44,9 +47,10 @@ export const OfflineStore = signalStore(
     let lastKillAt: number | null = null
 
     return {
-      setLastSeen(at: number): void {
+      /** Host time and game time together, in one patch, so a reload never reads one without the other. */
+      setLastSeen(at: number, gameMs: number): void {
         const lastSeenAt = Math.max(store.lastSeenAt() ?? 0, at)
-        if (lastSeenAt !== store.lastSeenAt()) patchState(store, { lastSeenAt })
+        if (lastSeenAt !== store.lastSeenAt() || gameMs !== store.gameMs()) patchState(store, { lastSeenAt, gameMs })
       },
 
       /** Called on every online kill with `performance.now()` and the wave it happened on. */

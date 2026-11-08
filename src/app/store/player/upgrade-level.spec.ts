@@ -94,7 +94,7 @@ describe('PlayerStore upgrade level', () => {
   afterEach(() => localStorage.clear())
 
   it('preserves levels through equip, swaps and unequip', () => {
-    store.addItems([stack(), stack(1, 2), stack(5)])
+    store.grant([stack(), stack(1, 2), stack(5)], 'lossy')
     store.equipItem(stack(1))
     expect(store.equipment().weapon).toEqual({ id, tier, upgradeLevel: 1 })
     expect(store.itemCount(id, tier, 1)).toBe(1)
@@ -108,10 +108,10 @@ describe('PlayerStore upgrade level', () => {
   })
 
   it('does not unequip into another level in a full inventory', () => {
-    store.addItems([stack(5)])
+    store.grant([stack(5)], 'lossy')
     store.equipItem(stack(5))
     const filling = Object.values(ITEM_DATA).filter(item => tabOf(item.id) === 'gear').slice(0, 20)
-    store.addItems(filling.map(item => ({ id: item.id, amount: 1 })))
+    store.grant(filling.map(item => ({ id: item.id, amount: 1 })), 'lossy')
     expect(store.canUnequip('weapon')).toBeFalse()
     store.unequipItem('weapon')
     expect(store.equipment().weapon?.upgradeLevel).toBe(5)
@@ -120,7 +120,7 @@ describe('PlayerStore upgrade level', () => {
   })
 
   it('sells only the selected level and caps the sale to its owned amount', () => {
-    store.addItems([stack(undefined, 4), stack(2, 3), stack(5, 2)])
+    store.grant([stack(undefined, 4), stack(2, 3), stack(5, 2)], 'lossy')
     store.sellItem(stack(2), ShopID.laHarparShop, 99)
     expect(store.stats().goldCoins).toBe(sellPrice(ShopID.laHarparShop, id) * 4 * 3)
     expect(store.itemCount(id, tier, 2)).toBe(0)
@@ -131,7 +131,7 @@ describe('PlayerStore upgrade level', () => {
   })
 
   it('destroys only the selected level', () => {
-    store.addItems([stack(undefined, 4), stack(2, 3)])
+    store.grant([stack(undefined, 4), stack(2, 3)], 'lossy')
     store.destroyItem(stack(2, 3))
     expect(store.itemCount(id, tier, 2)).toBe(0)
     expect(store.itemCount(id)).toBe(4)
@@ -170,13 +170,13 @@ describe('PlayerStore upgrade level', () => {
     expect(store.inventory().gear[0]).toEqual(stack(undefined, 3))
     expect(store.equipment().ring).toEqual(equipment.ring)
     expect(store.stats().attackSpeed).toBe(2.9)
-    store.addItems([stack(0, 2)])
+    store.grant([stack(0, 2)], 'lossy')
     expect(store.inventory().gear.filter(Boolean)).toEqual([stack(undefined, 5)])
     expect(store.stats().attackPower).toBe(statsInitialState.attackPower + 1)
   })
 
   it('persists and reloads upgraded inventory and equipment without a version bump', () => {
-    store.addItems([stack(2, 3), stack(5)])
+    store.grant([stack(2, 3), stack(5)], 'lossy')
     store.equipItem(stack(5))
     saveGameStateNow()
     TestBed.resetTestingModule()

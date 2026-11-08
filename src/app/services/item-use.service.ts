@@ -4,6 +4,7 @@ import { ItemType } from '../../enums/items/item-type.enum'
 import { ItemID } from '../../enums/ids/item-id.enum'
 import { InventoryItem } from '../../interfaces/item.interface'
 import { PlayerStore } from '../store/player/player.store'
+import { BattleStore } from '../store/battle/battle.store'
 import { missingSlotsText } from '../components/game/inventory/tab-text'
 import { BattleManagerService } from './battle-manager.service'
 import { ModalService } from './modal.service'
@@ -29,6 +30,7 @@ const USABLE: Record<ItemType, boolean> = {
 export class ItemUseService {
   private playerStore = inject(PlayerStore)
   private battleManager = inject(BattleManagerService)
+  private battleStore = inject(BattleStore)
   private modalService = inject(ModalService)
 
   canUse(itemId: ItemID): boolean {
@@ -52,7 +54,7 @@ export class ItemUseService {
       }
       case ItemType.spellScroll:
         // Like learning it from the skill tree: onto the spell bar if there's a free slot.
-        if (this.playerStore.useItem(item)) this.battleManager.equipSpell(itemData.spellId)
+        if (this.playerStore.useItem(item)) this.battleStore.placeSpell(itemData.spellId)
         return
       case ItemType.recipe:
       case ItemType.rewardsStats:

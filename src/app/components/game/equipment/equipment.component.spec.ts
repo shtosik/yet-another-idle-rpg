@@ -34,7 +34,7 @@ describe('EquipmentComponent', () => {
     const rightClick = (button: HTMLElement) => button.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true }))
     const equip = (id: ItemID) => {
         const item = ITEM_DATA[id]
-        store.addItems([{ id, tier: item.tier, amount: 1 }])
+        store.grant([{ id, tier: item.tier, amount: 1 }], 'lossy')
         store.equipItem({ id, type: item.type, tier: item.tier, amount: 1 })
     }
 
@@ -76,7 +76,7 @@ describe('EquipmentComponent', () => {
 
     it('shows the upgrade level and milestone mark on equipped gear', async () => {
         const item = ITEM_DATA[ItemID.knife]
-        store.addItems([{ id: item.id, amount: 1, upgradeLevel: 5 }])
+        store.grant([{ id: item.id, amount: 1, upgradeLevel: 5 }], 'lossy')
         store.equipItem({ id: item.id, type: item.type, tier: item.tier, amount: 1, upgradeLevel: 5 })
         await fixture.whenStable()
         const button = weaponButton()
@@ -116,7 +116,7 @@ describe('EquipmentComponent', () => {
         const gear = Object.values(ITEM_DATA)
             .filter(item => item.type === ItemType.equipment && item.slot !== EquipmentSlot.pet && item.id !== ItemID.knife)
             .slice(0, store.inventoryCapacity().gear)
-        store.addItems(gear.map(item => ({ id: item.id, tier: item.tier, amount: 1 })))
+        store.grant(gear.map(item => ({ id: item.id, tier: item.tier, amount: 1 })), 'lossy')
         await fixture.whenStable()
         expect(store.canUnequip('weapon')).toBeFalse()
         expect(weaponButton().disabled).toBeFalse()

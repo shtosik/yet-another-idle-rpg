@@ -49,7 +49,7 @@ describe('PlayerStore zone mastery', () => {
       .filter(id => !rewardIds.has(id) && ITEM_DATA[id]?.type === ItemType.resource)
     const tiers = Object.values(ItemTier).filter(v => typeof v === 'number') as ItemTier[]
     const fillers = resources.flatMap(id => tiers.map(tier => ({ id, tier, amount: 1 }))).slice(0, store.inventoryCapacity().materials)
-    store.addItems(fillers)
+    store.grant(fillers, 'lossy')
     expect(store.inventory().materials.every(slot => slot !== null)).toBeTrue()
     store.updateEnemyKillCount(EnemyID.gangsterCrab, 10)
 
@@ -61,7 +61,7 @@ describe('PlayerStore zone mastery', () => {
   it('claims into Materials while the Gear tab is full', () => {
     const gear = (Object.values(ItemID).filter(v => typeof v === 'number') as ItemID[])
       .filter(id => tabOf(id) === 'gear').slice(0, store.inventoryCapacity().gear)
-    store.addItems(gear.map(id => ({ id, amount: 1 })))
+    store.grant(gear.map(id => ({ id, amount: 1 })), 'lossy')
     expect(store.inventory().gear.every(slot => slot !== null)).toBeTrue()
     store.updateEnemyKillCount(EnemyID.gangsterCrab, 10)
 

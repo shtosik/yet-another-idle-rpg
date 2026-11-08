@@ -27,7 +27,7 @@ describe('PlayerStore inventory tabs', () => {
   /** Fills a tab to capacity with items other than `except`. */
   const fill = (tab: InventoryTab, except: ItemID[] = []) => {
     const ids = idsIn(tab).filter(id => !except.includes(id)).slice(0, store.inventoryCapacity()[tab])
-    store.addItems(ids.map(id => ({ id, amount: 1 })))
+    store.grant(ids.map(id => ({ id, amount: 1 })), 'lossy')
     expect(store.inventory()[tab].every(s => s !== null)).toBeTrue()
   }
 
@@ -63,8 +63,8 @@ describe('PlayerStore inventory tabs', () => {
     it('fits in one tab while another is full', () => {
       fill('materials', [ItemID.stone])
 
-      expect(store.canFitItems([{ id: ItemID.woodenBow, amount: 1 }])).toBeTrue()
-      expect(store.canFitItems([{ id: ItemID.stone, amount: 1 }])).toBeFalse()
+      expect(store.canGrant([{ id: ItemID.woodenBow, amount: 1 }])).toBeTrue()
+      expect(store.canGrant([{ id: ItemID.stone, amount: 1 }])).toBeFalse()
       expect(store.missingSlotsByTab([{ id: ItemID.stone, amount: 1 }, { id: ItemID.woodenBow, amount: 1 }])).toEqual({ materials: 1 })
     })
 
@@ -80,7 +80,7 @@ describe('PlayerStore inventory tabs', () => {
     })
 
     it('counts an item in its tab (item count, which the has-item unlock rule reads)', () => {
-      store.addItems([{ id: ItemID.stone, amount: 3 }, { id: ItemID.stone, tier: ItemTier.rare, amount: 2 }])
+      store.grant([{ id: ItemID.stone, amount: 3 }, { id: ItemID.stone, tier: ItemTier.rare, amount: 2 }], 'lossy')
 
       expect(store.itemCount(ItemID.stone)).toBe(5)
       expect(store.itemCount(ItemID.woodenBow)).toBe(0)
@@ -162,7 +162,7 @@ describe('PlayerStore inventory tabs', () => {
     beforeEach(create)
 
     it('unequips while another tab is full, not while Gear is', () => {
-      store.addItems([{ id: ItemID.woodenBow, amount: 1 }])
+      store.grant([{ id: ItemID.woodenBow, amount: 1 }], 'lossy')
       store.equipItem(store.inventory().gear[0]!)
       fill('materials')
       expect(store.canUnequip('weapon')).toBeTrue()
@@ -173,7 +173,7 @@ describe('PlayerStore inventory tabs', () => {
 
     it('swaps gear from a full Gear tab', () => {
       const weapons = idsIn('gear').filter(id => (ITEM_DATA[id] as EquipmentItem).slot === EquipmentSlot.weapon).slice(0, 2)
-      store.addItems(weapons.map(id => ({ id, amount: 1 })))
+      store.grant(weapons.map(id => ({ id, amount: 1 })), 'lossy')
       store.equipItem(store.inventory().gear[0]!)
       fill('gear', weapons)
       const second = store.inventory().gear.find(s => s?.id === weapons[1])!
@@ -190,7 +190,7 @@ describe('PlayerStore inventory tabs', () => {
 
     it('sells from the item\'s tab', () => {
       const shop = Object.values(ShopID).find(id => typeof id === 'number' && sellPrice(id, ItemID.stone) > 0) as ShopID
-      store.addItems([{ id: ItemID.stone, amount: 3 }])
+      store.grant([{ id: ItemID.stone, amount: 3 }], 'lossy')
       store.sellItem(slot(ItemID.stone, 3), shop, 2)
 
       expect(store.itemCount(ItemID.stone)).toBe(1)

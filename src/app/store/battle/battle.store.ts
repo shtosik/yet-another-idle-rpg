@@ -16,10 +16,9 @@ import SPELLS_DATA from '../../../data/spells-data'
 import { SpellDamageOverTimeEffectProps } from '../../../interfaces/spell.interface'
 import { ARENA } from '../../../data/arena-data'
 import { ItemStack } from '../player/inventory'
+import { place, prune, remove, SPELL_BAR_SLOTS } from './spell-bar'
 
 const MS_PER_SECOND = 1000
-/** Spells the bar holds. */
-export const SPELL_BAR_SLOTS = 5
 
 /** A Combat Arena run in progress (`ArenaService`). Times are wall-clock ms, so the clock runs while the game is closed. */
 export interface ArenaRun {
@@ -145,15 +144,24 @@ export const BattleStore = signalStore(
       patchState(store, { autoWaveProgressionEnabled: enabled })
     },
 
-    addSpell(spell: EquippedSpell): void {
-      patchState(store, (state) => {
-        const arr = [...state.equippedSpells]
-        while (arr.length < SPELL_BAR_SLOTS) arr.push(null)
-        const free = arr.findIndex(s => !s)
-        if (free === -1) return {}
-        arr[free] = spell
-        return { equippedSpells: arr }
-      })
+    /** Spell bar rules: `spell-bar.ts`. A no-op patches nothing. */
+    placeSpell(spellId: SpellID, slot?: number): void {
+      const bar = store.equippedSpells()
+      const next = place(bar, spellId, slot)
+      if (next !== bar) patchState(store, { equippedSpells: next })
+    },
+
+    removeSpell(spellId: SpellID): void {
+      const bar = store.equippedSpells()
+      const next = remove(bar, spellId)
+      if (next !== bar) patchState(store, { equippedSpells: next })
+    },
+
+    /** Reads the bar tracked, so an effect calling it re-prunes when a cooldown ends. */
+    pruneSpells(known: SpellID[]): void {
+      const bar = store.equippedSpells()
+      const next = prune(bar, known)
+      if (next !== bar) patchState(store, { equippedSpells: next })
     },
 
     setSpellCooldown(spellId: SpellID, cooldownMs: number): void {
@@ -162,10 +170,6 @@ export const BattleStore = signalStore(
           s && s.spellId === spellId ? { ...s, cooldownRemainingMs: cooldownMs } : s,
         ),
       }))
-    },
-
-    setAllEquippedSpells(equippedSpells: (EquippedSpell | null)[]): void {
-      patchState(store, { equippedSpells })
     },
 
     addActiveBuff(buff: ActiveBuff): void {

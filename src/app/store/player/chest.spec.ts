@@ -39,7 +39,7 @@ describe('chests', () => {
       const playerStore = TestBed.inject(PlayerStore)
       playerStore.unlockProfession(ProfessionID.farming)
       playerStore.applyProfessionXp(ProfessionID.farming, 1_000_000)
-      playerStore.addItems([{ id: ItemID.arenaChest, amount: 1 }])
+      playerStore.grant([{ id: ItemID.arenaChest, amount: 1 }], 'lossy')
       const slot = { ...playerStore.inventory().consumables.find(s => s?.id === ItemID.arenaChest)!, type: ItemType.chest }
       const originalLoot = chest.loot
       const originalRolls = chest.rolls
@@ -59,10 +59,10 @@ describe('chests', () => {
     let playerStore: InstanceType<typeof PlayerStore>
     const chestSlot = () => ({ ...playerStore.inventory().consumables.find(s => s?.id === ItemID.arenaChest)!, type: ItemType.chest })
     const lootIds = chest.loot.flatMap(entry => ('itemId' in entry ? [entry.itemId] : []))
-    const fill = (tab: string) => playerStore.addItems(Object.values(ITEM_DATA)
+    const fill = (tab: string) => playerStore.grant(Object.values(ITEM_DATA)
       .filter(item => tabOf(item.id) === tab && !lootIds.includes(item.id))
       .slice(0, playerStore.inventoryCapacity()[tab as 'materials'])
-      .map(item => ({ id: item.id, amount: 1 })))
+      .map(item => ({ id: item.id, amount: 1 })), 'lossy')
     // Weighted picks use 0 (gold); the separate Seal roll uses 0.5 (miss).
     const goldRoll = () => {
       let calls = 0
@@ -74,7 +74,7 @@ describe('chests', () => {
       localStorage.clear()
       TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] })
       playerStore = TestBed.inject(PlayerStore)
-      playerStore.addItems([{ id: ItemID.arenaChest, amount: 3 }])
+      playerStore.grant([{ id: ItemID.arenaChest, amount: 3 }], 'lossy')
     })
     afterEach(() => localStorage.clear())
 

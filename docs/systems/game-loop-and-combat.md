@@ -5,7 +5,7 @@ The idle core: a 100 ms tick that advances the game by the real time elapsed, au
 
 ## Key files
 - `src/app/services/game-interval.service.ts:GameIntervalService` — the tick, attack and respawn timers. Uses `worker-timers` so the loop keeps running in background tabs.
-- `src/app/services/combat-timing.ts` — `TICK_DURATION_IN_MS`, `RESPAWN_DELAY_IN_MS`, `timePerAttackMs` (shared with the offline simulation).
+- `src/app/services/combat-step.ts` — `stepCombat` (pure online timer math: respawn, attack carry, kill drops leftover, `MAX_ATTACKS_PER_TICK`; `spawn` and `attack` callbacks are the seam to the stores) plus `TICK_DURATION_IN_MS`, `RESPAWN_DELAY_IN_MS`, `timePerAttackMs` (shared with the offline simulation, which keeps its own whole-kill loop).
 - `src/app/services/battle-manager.service.ts:BattleManagerService` — `doDamage`, `castSpell`, `useConsumable`, `tickSpells`, `tickConsumables`, enemy death, zone and feature unlock checks.
 - `src/app/services/hit-resolution.ts:resolveHit` — pure damage formula (crit, weakness, damage-vs-type). Takes an `rng` for testing.
 - `src/app/store/battle/battle.store.ts:BattleStore` — current zone, wave, enemy, HP, spells, buffs, consumable slots.
@@ -13,7 +13,7 @@ The idle core: a 100 ms tick that advances the game by the real time elapsed, au
 
 ## Data flow
 Every tick (`TICK_DURATION_IN_MS` = 100) measures the real time since the last tick with `performance.now()`, capped at `MAX_TICK_DELTA_IN_MS` (1 s), and advances everything by that delta. A gap over `SLEEP_GAP_IN_MS` (60 s, on `performance.now()` or `Date.now()`) is a sleeping device: the tick skips it and starts an offline claim instead (`offline-progress.md`).
-1. **Combat** (`advanceCombat`):
+1. **Combat** (`stepCombat`, applied by `GameIntervalService.advanceCombat`):
    - No enemy: the respawn timer runs. After `RESPAWN_DELAY_IN_MS` (2 s) an enemy **spawns** (`BattleStore.startBattle`); leftover time goes to the attack timer.
    - Enemy alive: the attack timer runs. Each time it passes `stats.attackSpeed × 1000` the player **attacks** (`doDamage`) and the overshoot carries over. At most `MAX_ATTACKS_PER_TICK` (10) attacks per tick.
    - A kill drops leftover attack time; the respawn delay starts at the kill.

@@ -1,7 +1,8 @@
 import { provideZonelessChangeDetection } from '@angular/core'
 import { TestBed } from '@angular/core/testing'
 import { patchState, WritableStateSource } from '@ngrx/signals'
-import { PlayerStore, TASKS_PER_GUILD_RANK } from '../player/player.store'
+import { PlayerStore } from '../player/player.store'
+import { TASKS_PER_GUILD_RANK } from '../player/tasks'
 import { tabOf } from '../player/inventory'
 import { PurchaseResult, ShopStore } from './shop.store'
 import { ShopID } from '../../../enums/ids/shop-id.enum'
@@ -63,7 +64,7 @@ describe('ShopStore purchase', () => {
     const filler = (Object.keys(ITEM_DATA).map(Number) as ItemID[])
       .filter(id => tabOf(id) === tab && id !== ItemID.earthRune)
       .slice(0, player.inventoryCapacity()[tab])
-    player.addItems(filler.map(id => ({ id, amount: 1 })))
+    player.grant(filler.map(id => ({ id, amount: 1 })), 'lossy')
     expect(shop.blockReason(ShopID.mawoodMagicShop, runes)).toBe('inventory')
 
     // Altar installs without a slot; once installed, a restocked copy fails the station order.

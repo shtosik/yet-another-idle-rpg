@@ -4,7 +4,8 @@ import { StationID } from '../../../enums/ids/station-id.enum'
 import { RecipeID } from '../../../enums/ids/recipe-id.enum'
 import { CraftingRecipe } from '../../../data/recipes-data'
 import ITEM_DATA from '../../../data/items-data'
-import { canFit, Inventories, ItemStack, maxAffordable, TabCapacity } from './inventory'
+import { canGrant } from './grant'
+import { Inventories, ItemStack, maxAffordable, TabCapacity } from './inventory'
 
 /** Installed level per station; a missing key means the station is not owned. */
 export type Stations = Partial<Record<StationID, number>>
@@ -79,8 +80,8 @@ export function evaluateRecipe(
   if (recipe.stationLevel > level) blockReason = 'stationLevel'
   else if (upgrade && !canInstall(stations, upgrade)) blockReason = 'stationOrder'
   else if (maxCraftable < 1) blockReason = 'missingItems'
-  // Station gear never takes a slot. Paying for one craft can free a slot (in the paid items' tab), so check after paying.
-  else if (!upgrade && !canFit(inventory, capacity, [{ id: recipe.itemId, amount: 1 }], recipe.itemsNeeded)) blockReason = 'inventoryFull'
+  // Item grant routing: station gear never takes a slot. Paying for one craft can free a slot, so check after paying.
+  else if (!canGrant({ inventory, stations }, capacity, [{ id: recipe.itemId, amount: 1 }], recipe.itemsNeeded)) blockReason = 'inventoryFull'
 
   return { visible, maxCraftable: blockReason ? 0 : maxCraftable, blockReason }
 }
