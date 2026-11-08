@@ -6,8 +6,6 @@ import { TownsStore } from '../store/towns/towns.store'
 import { BattleStore } from '../store/battle/battle.store'
 import { ArenaService } from './arena.service'
 import { ExplorationGuildService } from './exploration-guild.service'
-import { CurrencyFeedService } from './currency-feed.service'
-import { ReputationService } from './reputation.service'
 import { TurnInCooldownService } from './turn-in-cooldown.service'
 import { GameClock } from './game-clock.service'
 import { UnlockService } from './unlock.service'
@@ -31,8 +29,6 @@ export interface DialogueContext {
   battle: InstanceType<typeof BattleStore>
   arena: ArenaService
   guild: ExplorationGuildService
-  currencyFeed: CurrencyFeedService
-  reputation: ReputationService
   cooldowns: TurnInCooldownService
   clock: GameClock
   unlocks: UnlockService
@@ -181,12 +177,9 @@ export const EFFECT_HANDLERS: EffectHandlers = {
         case 'abandonTask':
           ctx.player.abandonTask(effect.taskIndex ?? 0)
           break
-        case 'claimTask': {
-          const tokensBefore = ctx.player.explorerTokens()
+        case 'claimTask':
           ctx.player.claimCompletedTasks()
-          ctx.currencyFeed.show('explorerTokens', ctx.player.explorerTokens() - tokensBefore)
           break
-        }
       }
     },
     label: effect => [{ key: `app:dialogueTags.guild.${effect.action}`, params: { length: effect.taskLength ?? '' } }],
@@ -212,7 +205,7 @@ export const EFFECT_HANDLERS: EffectHandlers = {
       const { turnIn, bundles } = turnInState(effect, ctx)
       if (bundles === 0) return
       ctx.player.removeItems([{ id: turnIn.itemId, amount: bundles * turnIn.bundleSize }])
-      ctx.reputation.gain([{ reputationId: turnIn.reputationId, amount: bundles * turnIn.reputation }])
+      ctx.player.addReputation([{ reputationId: turnIn.reputationId, amount: bundles * turnIn.reputation }])
       ctx.quests.recordTurnIn(bundleKey(turnIn.npcId, turnIn.itemId), ctx.clock.nowMs())
     },
     // Refused while an offline claim is pending, so the cooldown doesn't start inside the absence.

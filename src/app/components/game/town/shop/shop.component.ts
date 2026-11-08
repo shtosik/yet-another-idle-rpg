@@ -13,7 +13,6 @@ import { I18nextPipe } from '../../../../pipes/i18next.pipe'
 import { SlotComponent } from '../../../shared/slot/slot.component'
 import { InventoryItemComponent } from '../../inventory/inventory-slot/inventory-slot.component'
 import { CloseButtonComponent } from '../../../shared/close-button/close-button.component'
-import { CurrencyFeedService } from '../../../../services/currency-feed.service'
 import { isInstalled, stationUpgradeOf } from '../../../../store/player/camp'
 import { isPreferredBy, sellPrice } from '../../../../store/shop/shop-prices'
 import { ShopCurrency } from '../../../../../types/shop/shop.type'
@@ -39,7 +38,6 @@ const CURRENCY_UI: Record<ShopCurrency, { icon: string; priceKey: string }> = {
 export class ShopComponent implements OnInit {
   private shopStore = inject(ShopStore)
   private playerStore = inject(PlayerStore)
-  private currencyFeed = inject(CurrencyFeedService)
 
   shopId = input.required<ShopID>()
   /** Stock stage the shop was opened at; items with a higher `minStage` are hidden. */
@@ -98,9 +96,7 @@ export class ShopComponent implements OnInit {
 
   /** Click buys one; Shift-click buys up to 5, stopping at the first block (stock, currency, space). */
   buyItem(index: number, event: MouseEvent): void {
-    const result = this.shopStore.purchase(this.shopId(), index, event.shiftKey ? 5 : 1)
-    if (typeof result === 'string') return
-    this.currencyFeed.show(this.currency(), -result.spent)
+    this.shopStore.purchase(this.shopId(), index, event.shiftKey ? 5 : 1)
   }
 
   /** Name plus what blocks the purchase, for screen readers (sighted players get the slot's border, lock or fade). */
@@ -150,9 +146,7 @@ export class ShopComponent implements OnInit {
 
   /** Click sells one; Ctrl/Cmd-click sells the whole stack. */
   sellItem(item: InventoryItem, event: MouseEvent): void {
-    const goldBefore = this.playerStore.resources.goldCoins()
     this.playerStore.sellItem(item, this.shopId(), event.ctrlKey || event.metaKey ? item.amount : 1)
-    this.currencyFeed.show('gold', this.playerStore.resources.goldCoins() - goldBefore)
   }
 
   /** Station gear the player already owns is hidden from shops. */

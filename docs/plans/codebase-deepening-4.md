@@ -19,15 +19,14 @@ One pure module owns how saved **resources** (`experience`, `level`, `unspentSki
 - Specs (`resources.spec.ts`, no TestBed): XP across several levels in one change, skill points per level, mana clamped when stored mana is above `maxMana`, a spend that would go below zero refused and unchanged, merge spending gold by the same rule as `spend`.
 - Docs: `player-stats-inventory-equipment.md`.
 
-### 2. Notices (L, Opus, plan mode)
-Store actions return what happened; one **Notices** module turns events into toasts, modals and currency feed lines. Stores stop injecting `ModalService`.
-- Event union in `services/notices.ts`: station installed, reputation tier up, expertise up, currency change (gold, tokens), quest completed, drops lost, seed found, harvest, camp and forge results. A `NoticesService` with `push(event)` holds one queue and one timer policy per channel (toast, modal, feed) and builds the text and i18n keys now spread over the senders.
-- Replace the eight timer copies: `camp.component.ts:81-118`, `forge.component.ts:63-131`, `battle-manager.service.ts:29-48,274,288` (`seedFoundToast`, `dropsLostToast`), `profession.service.ts:17-26`, `reputation.service.ts:17-29`, `farm.service.ts:42,115`, and `CurrencyFeedService.show` (`currency-feed.service.ts:37`). One toast outlet replaces the hand-rendered ones in `game.component.html:75-76` and `battle.component.html:18,21`.
-- `PlayerStore.grant` (`:384,440`) returns `report.installed` and stops calling `openStationInstalled`; `QuestsStore` (`:91,110`) returns a quest-completed event and stops opening the modal. The caller that ran the action pushes the events.
-- Delete `ProfessionService` and `ReputationService` if they keep nothing but the toast; callers call the store and push its event. This removes the store → service → store loop from `QuestsStore`.
-- Currency feed from Step 1's change records, not caller snapshots: delete `goldBefore` (`shop.component.ts:153-155`) and `tokensBefore` (`dialogue-effect-handlers.ts:185-187`). New floats: mastery chests, zone stars, quest gold and tokens, merge cost, arena claim. Kill gold stays silent.
-- Specs: `notices.service.spec.ts` with fake timers (an event shows for its time, the next replaces it, modals queue, feed lines merge per currency); `PlayerStore.grant` and quest completion specs without `ModalService` mocks; one spec per new float source.
-- Changelog: `[feature] Gold and explorer tokens from chests, zone stars, quests, merging and the arena now show next to your purse.`
+### 2. Notices (L, Opus, plan mode) ✅
+One **Notices** module turns reported events into toasts, modals and currency feed lines. Stores report to it and stop injecting `ModalService`. (Owner-approved change from "callers push returned events": `grant` has ~15 callers, and each would have to forward `installed` or lose the modal.)
+- `services/notices.service.ts`: a `Notice` union (tier up, expertise up, drops lost, seeds found, crafted, merged, station installed, quest completed, currency) and `NoticesService.push`. Toast lanes keep today's places and times (`hud`, `hudBelow`, `battle`, `battleBelow`, `camp`, `forge`), one timer per lane; the text building moves in from the senders.
+- Replaced timer copies: camp, forge, `BattleManagerService` (drops lost, seeds found), `ProfessionService`, `ReputationService` (both deleted; callers call `PlayerStore.applyProfessionXp` / `addReputation`). Kept: the farm's harvest popups (positional, panel-local) and `CurrencyFeedService` as the feed channel.
+- `PlayerStore.grant`, `addReputation`, `applyProfessionXp` and every resource writer from Step 1 push; `applyKillBatch` and `changeResources(…, { silent: true })` (arena kills) don't. `QuestsStore.handleQuestCompleted` pushes `questCompleted`.
+- Caller snapshots deleted (`shop.component.ts` buy and sell, `dialogue-effect-handlers.ts` guild claim); `currencyFeed` and `reputation` leave the dialogue context.
+- Specs: `notices.service.spec.ts` (lane time, replace, lanes apart, empty reports, modals, feed); `currency-notices.spec.ts` (earn, spend, refused spend, silent kills online and offline, tier up, expertise). Existing `ModalService` spies keep working through Notices.
+- Changelog: `[feature] Gold and explorer tokens from chests, zone stars, quests, merging and fees now show next to your purse.`
 - Docs: `player-stats-inventory-equipment.md`, `quests.md`, `towns-shops-guild.md`, `farming.md`, `consumables-camp-crafting.md`, `zones-waves-unlocks.md`.
 
 ### 3. Quest transition (M, Opus)

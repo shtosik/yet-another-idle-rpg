@@ -1,9 +1,8 @@
 import { ArenaBossesService } from './arena-bosses.service'
 import { ArenaService } from './arena.service'
 import { WeaponCategory } from '../../enums/weapon-category.enum'
-import { computed, inject, Injectable, signal } from '@angular/core'
-import i18next from 'i18next'
-import { InventoryTab, ItemStack, tabOf } from '../store/player/inventory'
+import { computed, inject, Injectable } from '@angular/core'
+import { NoticesService } from './notices.service'
 import { BattleStore } from '../store/battle/battle.store'
 import { PlayerStore } from '../store/player/player.store'
 import { manaGain } from '../store/player/resources'
@@ -27,8 +26,6 @@ import { nextWave, previousWave } from '../store/battle/waves'
 /** Cooldown reduction can't push a spell below this. */
 const MIN_SPELL_COOLDOWN_IN_SECONDS = 1
 const MS_PER_SECOND = 1000
-const DROPS_LOST_TOAST_MS = 3000
-const SEED_FOUND_TOAST_MS = 3000
 
 @Injectable({ providedIn: 'root' })
 export class BattleManagerService {
@@ -39,14 +36,7 @@ export class BattleManagerService {
   private animations = inject(AnimationsService)
   private offlineStore = inject(OfflineStore)
   private killResolution = inject(KillResolutionService)
-
-  /** Drops a full tab lost on the last kill, one line per tab; clears itself after `DROPS_LOST_TOAST_MS`. */
-  dropsLostToast = signal<string | null>(null)
-  private dropsLostTimer?: ReturnType<typeof setTimeout>
-
-  /** "Found: Turnip Seeds x1" for seeds a kill dropped once the farm is unlocked; clears itself. */
-  seedFoundToast = signal<string | null>(null)
-  private seedFoundTimer?: ReturnType<typeof setTimeout>
+  private notices = inject(NoticesService)
 
   currentWaveKillCount = computed(() => this.playerStore.getKillCountByZoneAndWave(this.battleStore.currentZoneId(), this.battleStore.currentWave()))
 
@@ -258,34 +248,13 @@ export class BattleManagerService {
     const { lost, receivedItems } = this.killResolution.resolveKills(zoneId, wave, [kill], Math.random)
     // Seeds are listed only once the farm is unlocked.
     const foundSeeds = receivedItems.filter(item => item.type === ItemType.seed)
-    if (lost.length) this.showDropsLost(lost)
-    if (foundSeeds.length) this.showSeedsFound(foundSeeds)
+    this.notices.push({ type: 'dropsLost', lost })
+    this.notices.push({ type: 'seedsFound', seeds: foundSeeds })
 
     // The toggle alone isn't enough: the node may have been refunded since it was switched on.
     const isAutoEnabled = this.battleStore.autoWaveProgressionEnabled()
       && this.playerStore.hasSkillUnlocked(SkillNodeID.autoWaveProgression)
     // A boss kill has just unlocked the next zone (Kill resolution), so the move from the boss wave is allowed.
     if (isAutoEnabled) this.changeWave(true)
-  }
-
-  private showSeedsFound(seeds: ItemStack[]): void {
-    const names = seeds.map(({ id, amount }) => `${i18next.t(`items:names.${ItemID[id]}`)} x${amount}`)
-    clearTimeout(this.seedFoundTimer)
-    this.seedFoundToast.set(i18next.t('map:farm.seedFound', { seeds: names.join(', ') }))
-    this.seedFoundTimer = setTimeout(() => this.seedFoundToast.set(null), SEED_FOUND_TOAST_MS)
-  }
-
-  private showDropsLost(lost: ItemStack[]): void {
-    const byTab = new Map<InventoryTab, string[]>()
-    for (const { id, amount } of lost) {
-      const tab = tabOf(id)
-      const name = i18next.t(`items:names.${ItemID[id]}`)
-      byTab.set(tab, [...(byTab.get(tab) ?? []), amount > 1 ? `${name} x${amount}` : name])
-    }
-    const lines = [...byTab].map(([tab, names]) =>
-      i18next.t('app:inventory.dropsLost', { tab: i18next.t(`app:inventory.tabs.${tab}`), items: names.join(', ') }))
-    clearTimeout(this.dropsLostTimer)
-    this.dropsLostToast.set(lines.join('\n'))
-    this.dropsLostTimer = setTimeout(() => this.dropsLostToast.set(null), DROPS_LOST_TOAST_MS)
   }
 }

@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal } from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core'
 import { NgOptimizedImage } from '@angular/common'
-import i18next from 'i18next'
 import { PlayerStore } from '../../../store/player/player.store'
+import { NoticesService } from '../../../services/notices.service'
 import { CampStore } from '../../../store/camp/camp.store'
 import { I18nextPipe } from '../../../pipes/i18next.pipe'
 import STATIONS_DATA from '../../../../data/stations-data'
@@ -14,7 +14,6 @@ import { ItemTier } from '../../../../enums/items/item-tier.enum'
 import { RecipeDetailComponent } from './recipe-detail/recipe-detail.component'
 import { RecipeView } from './recipe-view'
 
-const TOAST_MS = 1800
 
 @Component({
   selector: 'app-camp',
@@ -77,16 +76,12 @@ export class CampComponent {
     return recipes.find(view => view.recipe.id === selectedId) ?? this.filteredRecipes()[0] ?? recipes[0] ?? null
   })
 
-  toast = signal<string | null>(null)
-  private toastTimer?: ReturnType<typeof setTimeout>
+  private notices = inject(NoticesService)
+  toast = this.notices.toast('camp')
 
   protected readonly StationID = StationID
   protected readonly ItemID = ItemID
   protected readonly ItemTier = ItemTier
-
-  constructor() {
-    inject(DestroyRef).onDestroy(() => clearTimeout(this.toastTimer))
-  }
 
   selectStation(stationId: StationID): void {
     this.campStore.selectStation(stationId)
@@ -108,13 +103,6 @@ export class CampComponent {
 
     if (installed.length) return // the store shows the installed notice
 
-    const item = i18next.t(`items:names.${ItemID[view.recipe.itemId]}`)
-    this.showToast(i18next.t('camp:crafted', { count: crafted * view.recipe.createsAmount, item }))
-  }
-
-  private showToast(message: string): void {
-    clearTimeout(this.toastTimer)
-    this.toast.set(message)
-    this.toastTimer = setTimeout(() => this.toast.set(null), TOAST_MS)
+    this.notices.push({ type: 'crafted', itemId: view.recipe.itemId, count: crafted * view.recipe.createsAmount })
   }
 }

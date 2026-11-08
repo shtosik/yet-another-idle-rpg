@@ -2,7 +2,6 @@ import { computed, inject, Injectable, signal } from '@angular/core'
 import i18next from 'i18next'
 import { PlayerStore } from '../store/player/player.store'
 import { QuestsStore } from '../store/quests/quests.store'
-import { ProfessionService } from './profession.service'
 import { getQuestStatus } from './quest-status'
 import { QuestState } from '../../enums/quest-state.enum'
 import { HARVEST_ALL_TIER, PLANT_ALL_TIER, Plot, plotCount, readyPlotCount, syncPlots } from '../store/player/farm'
@@ -35,7 +34,6 @@ export interface HarvestToast {
 export class FarmService {
   private playerStore = inject(PlayerStore)
   private questsStore = inject(QuestsStore)
-  private professionService = inject(ProfessionService)
   private nextToastId = 0
 
   /** One popup per harvest action, newest last; each clears itself after `TOAST_MS`. */
@@ -101,7 +99,7 @@ export class FarmService {
   harvest(at: { x: number, y: number }, plotIndex?: number): void {
     if (plotIndex === undefined && this.harvestAllLock() !== null) return
     const { crops, xp, blocked, missing } = this.playerStore.harvestPlots(plotIndex)
-    if (xp > 0) this.professionService.gainXp(ProfessionID.farming, xp)
+    if (xp > 0) this.playerStore.applyProfessionXp(ProfessionID.farming, xp)
     if (crops.length === 0 && !blocked) return
 
     const id = this.nextToastId++

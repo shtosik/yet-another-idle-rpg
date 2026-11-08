@@ -3,7 +3,7 @@ import { PATHFINDERS_SEAL_UPGRADED_DROP_CHANCE } from '../../../data/upgrade-dat
 import { evaluateMerge, MergeResult, MergeSource, rollMerge } from './merge'
 import { WeaponCategory } from '../../../enums/weapon-category.enum'
 import { computed, effect, inject, untracked } from '@angular/core'
-import { ModalService } from '../../services/modal.service'
+import { NoticesService } from '../../services/notices.service'
 import { patchState, signalStore, withComputed, withHooks, withMethods, withProps, withState } from '@ngrx/signals'
 import { PlayerStat } from '../../../types/player/player-stat.type'
 import { addResources, gainOf, Held, manaRegen, NO_GAIN, ResourceChange, ResourceGain, spendResource } from './resources'
@@ -377,9 +377,9 @@ export const PlayerStore = signalStore(
     }),
   })),
   // The growth rate plots accrue at, and the Game time they accrue on: `syncFarm` keeps it until the watcher in `onInit` sees the rate change.
-  withProps(() => ({ _farmRate: { current: null as number | null }, _gameClock: inject(GameClock) })),
+  withProps(() => ({ _farmRate: { current: null as number | null }, _gameClock: inject(GameClock), _notices: inject(NoticesService) })),
   // Basic writes: stats, zone progress, kill counts, inventory and capacity, skill nodes, spell levels, guild tasks, tokens.
-  withMethods((store, modalService = inject(ModalService)) => ({
+  withMethods((store) => ({
     resetState() {
       patchState(store, initialState)
     },
@@ -405,13 +405,15 @@ export const PlayerStore = signalStore(
         gain = gainOf(before, held, maxMana)
         return { ...sliceOf(held), permanentBonuses }
       })
+      store._notices.push({ type: 'currency', gain })
       return gain
     },
 
-    /** Adds gold, tokens, XP (with level-ups) or mana; spends go through `spend`. */
-    changeResources(change: ResourceChange): ResourceGain {
+    /** Adds gold, tokens, XP (with level-ups) or mana; spends go through `spend`. Kills pass `silent`: kill gold doesn't float. */
+    changeResources(change: ResourceChange, { silent = false } = {}): ResourceGain {
       const { held, gain } = addResources(heldNow(store), change, store.stats().maxMana)
       patchState(store, sliceOf(held))
+      if (!silent) store._notices.push({ type: 'currency', gain })
       return gain
     },
 
@@ -441,7 +443,7 @@ export const PlayerStore = signalStore(
           spellbookUnlocked: state.spellbookUnlocked,
         }))
       }
-      report.installed.forEach(itemId => modalService.openStationInstalled(itemId))
+      report.installed.forEach(itemId => store._notices.push({ type: 'stationInstalled', itemId }))
       return report
     },
 
@@ -525,6 +527,7 @@ export const PlayerStore = signalStore(
       if (slice.totalTasksCompleted === store.totalTasksCompleted()) return NO_GAIN
       const { held, gain } = addResources(heldNow(store), { explorerTokens: tokens }, store.stats().maxMana)
       patchState(store, { ...slice, ...sliceOf(held) })
+      store._notices.push({ type: 'currency', gain })
       return gain
     },
 
@@ -550,6 +553,7 @@ export const PlayerStore = signalStore(
       const spent = spendResource(heldNow(store), currency, amount)
       if (!spent) return null
       patchState(store, sliceOf(spent.held))
+      store._notices.push({ type: 'currency', gain: spent.gain })
       return spent.gain
     },
 
@@ -667,6 +671,7 @@ export const PlayerStore = signalStore(
         equipment: state.equipment,
         ...sliceOf(paid.held),
       })
+      store._notices.push({ type: 'currency', gain: paid.gain })
       return result
     },
 
@@ -841,9 +846,11 @@ export const PlayerStore = signalStore(
       const after = { ...before }
       gains.forEach(({ reputationId, amount }) => after[reputationId] = (after[reputationId] ?? 0) + amount)
       patchState(store, { reputation: after })
-      return [...new Set(gains.map(gain => gain.reputationId))]
+      const tierUps = [...new Set(gains.map(gain => gain.reputationId))]
         .map(reputationId => ({ reputationId, tier: reputationTier(after[reputationId] ?? 0) }))
         .filter(({ reputationId, tier }) => tier > reputationTier(before[reputationId] ?? 0))
+      store._notices.push({ type: 'tierUp', tierUps })
+      return tierUps
     },
 
     /** Cheat: every planted plot is fully grown. */
@@ -914,7 +921,9 @@ export const PlayerStore = signalStore(
         professions: { ...state.professions, [id]: progress },
         resources: { ...state.resources, unspentSkillPoints: state.resources.unspentSkillPoints + skillPoints },
       }))
-      return { professionId: id, from, to: professionLevel(store.professions(), id), skillPoints }
+      const gain = { professionId: id, from, to: professionLevel(store.professions(), id), skillPoints }
+      store._notices.push({ type: 'expertiseUp', gain })
+      return gain
     },
 
     isTownUnlocked(id: TownID): boolean {

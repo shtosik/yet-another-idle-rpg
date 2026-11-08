@@ -5,7 +5,7 @@ import { withDevtools } from '../helpers/devtools'
 import { saveGameStateNow, withGameStateSync } from '../helpers/with-game-state-sync.hook'
 import QUEST_DATA, { QUEST_STEP_AFTER_COMPLETED, QuestProps, RequirementProps } from '../../../data/quests-data'
 import { inject } from '@angular/core'
-import { ModalService } from '../../services/modal.service'
+import { NoticesService } from '../../services/notices.service'
 import { PlayerStore } from '../player/player.store'
 import { ItemStack } from '../player/inventory'
 import { EnemyID } from '../../../enums/ids/enemy-id.enum'
@@ -13,9 +13,7 @@ import { ZoneID } from '../../../enums/ids/zone-id.enum'
 import { ProfessionID } from '../../../enums/ids/profession-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
 import { canAdvanceQuest, getQuestStatus, getStepItems } from '../../services/quest-status'
-import { ReputationService } from '../../services/reputation.service'
 import { GameClock } from '../../services/game-clock.service'
-import { ProfessionService } from '../../services/profession.service'
 import { ReputationGain } from '../player/reputation'
 import { orderKey, TurnInKey, turnInRemainingMs } from './turn-in-cooldown'
 import { Orders, rollOrder } from './orders'
@@ -88,10 +86,8 @@ export const QuestsStore = signalStore(
   withDevtools(STORE_KEY),
   withMethods((
     store,
-    modalService = inject(ModalService),
+    notices = inject(NoticesService),
     playerStore = inject(PlayerStore),
-    reputationService = inject(ReputationService),
-    professionService = inject(ProfessionService),
   ) => ({
     /** Whether the quest's item rewards fit once the turn-in at `step` has taken its items (atomic Item grant). */
     canPayQuest(questId: QuestID, step: QuestStep): boolean {
@@ -107,10 +103,10 @@ export const QuestsStore = signalStore(
       if (Object.keys(playerStore.grant(items, 'atomic').missing).length > 0) return false
 
       patchState(store, (state) => ({ pinnedQuests: state.pinnedQuests.filter(id => id !== data.questId) }))
-      modalService.openQuestCompleted(data)
+      notices.push({ type: 'questCompleted', quest: data })
       playerStore.updatePlayerStats(stats)
-      reputationService.gain(reputation)
-      professionXp.forEach(({ professionId, amount }) => professionService.gainXp(professionId, amount))
+      playerStore.addReputation(reputation)
+      professionXp.forEach(({ professionId, amount }) => playerStore.applyProfessionXp(professionId, amount))
       return true
     },
 

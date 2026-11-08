@@ -2,8 +2,6 @@ import { ChangeDetectionStrategy, Component, DestroyRef, inject, Injector } from
 import { getState } from '@ngrx/signals'
 import { SkillTreeService } from '../../../services/skill-tree.service'
 import { GameNavigationService } from '../../../services/game-navigation.service'
-import { ReputationService } from '../../../services/reputation.service'
-import { ProfessionService } from '../../../services/profession.service'
 import ZONES_DATA from '../../../../data/zones-data'
 import { KillResolutionService } from '../../../services/kill-resolution.service'
 import { ProfessionID } from 'enums/ids/profession-id.enum'
@@ -94,8 +92,6 @@ export class DevCheatsComponent {
   private offlineStore = inject(OfflineStore)
   private skillTree = inject(SkillTreeService)
   private navigation = inject(GameNavigationService)
-  private reputationService = inject(ReputationService)
-  private professionService = inject(ProfessionService)
   private killResolution = inject(KillResolutionService)
 
   /**
@@ -194,14 +190,14 @@ export class DevCheatsComponent {
     },
     /** Adds reputation the way a quest reward does, tier-up toast included. */
     addReputation: (reputation: Ref<typeof ReputationID>, amount: number) =>
-      this.reputationService.gain([{ reputationId: fromName(ReputationID, 'ReputationID', reputation), amount }]),
+      this.playerStore.addReputation([{ reputationId: fromName(ReputationID, 'ReputationID', reputation), amount }]),
     /** Unlocks the profession and sets its expertise to `level` (skill points are paid once, never refunded on a lower level). */
     setExpertise: (profession: Ref<typeof ProfessionID>, level: number) => {
       const professionId = fromName(ProfessionID, 'ProfessionID', profession)
       const target = Math.min(Math.max(1, Math.floor(level)), PROFESSIONS_DATA[professionId].maxLevel)
       this.playerStore.unlockProfession(professionId)
       const current = this.playerStore.professions()[professionId]?.experience ?? 0
-      this.professionService.gainXp(professionId, xpForLevel(target) - current)
+      this.playerStore.applyProfessionXp(professionId, xpForLevel(target) - current)
     },
     /** Fills every plot with the seed (default Turnip Seeds), granting the seeds and the Farming profession; false when its expertise is too low. */
     plantAll: (seed: Ref<typeof ItemID> = ItemID.turnipSeeds): boolean => {

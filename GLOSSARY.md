@@ -124,7 +124,7 @@ Code: `store/player/resources.ts`
 _Avoid_: Stat (that is derived), currency (for XP or mana)
 
 **Notice**:
-A message the game shows after something happened (a toast, a modal or a currency feed line), built from an event a store action returned. Stores never show notices themselves.
+A message the game shows after something happened (a toast, a modal or a currency feed line), built from an event the store or service that did the thing reports. Stores report events to Notices; they never open a modal or run a toast timer.
 Code: `NoticesService`
 _Avoid_: Toast, popup, alert (for the whole idea)
 

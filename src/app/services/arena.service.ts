@@ -58,10 +58,7 @@ export class ArenaService {
     const stats = this.playerStore.stats()
     const experience = Math.ceil(enemy.experience * stats.xpMultiplier)
     const gold = Math.ceil(enemy.gold * stats.goldCoinsMultiplier)
-    this.playerStore.updatePlayerStats([
-      { stat: 'experience', amount: experience },
-      { stat: 'goldCoins', amount: gold },
-    ])
+    this.playerStore.changeResources({ experience, goldCoins: gold }, { silent: true })
     this.battleStore.recordArenaKill(experience, gold)
 
     if (this.run()!.wave > ARENA.waves.length) this.finish('cleared', now)

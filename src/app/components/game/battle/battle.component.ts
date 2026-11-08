@@ -8,7 +8,7 @@ import { EnemyComponent } from './enemy/enemy.component'
 import { DamagePopupComponent } from '../damage-popup/damage-popup.component'
 import { BattleFooterComponent } from './battle-footer/battle-footer.component'
 import { BattleSideButtonsComponent } from './battle-side-buttons/battle-side-buttons.component'
-import { BattleManagerService } from '../../../services/battle-manager.service'
+import { NoticesService } from '../../../services/notices.service'
 import { ARENA } from '../../../../data/arena-data'
 
 @Component({
@@ -25,8 +25,8 @@ import { ARENA } from '../../../../data/arena-data'
 export class BattleComponent {
   battleStore = inject(BattleStore)
 
-  dropsLostToast = inject(BattleManagerService).dropsLostToast
-  seedFoundToast = inject(BattleManagerService).seedFoundToast
+  dropsLostToast = inject(NoticesService).toast('battle')
+  seedFoundToast = inject(NoticesService).toast('battleBelow')
   isInCombat = this.battleStore.isInCombat
   currentZoneData = this.battleStore.currentZoneData
 

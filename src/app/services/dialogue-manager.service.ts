@@ -5,7 +5,6 @@ import { computed, inject, Injectable, signal } from '@angular/core'
 import { PlayerStore } from '../store/player/player.store'
 import { DialogueEffect, QuestEffect, ReputationTurnInEffect } from '../../types/dialogues/dialogue-effect.type'
 import { turnInFor } from '../../data/reputation-turn-ins'
-import { ReputationService } from './reputation.service'
 import { TurnInCooldownService } from './turn-in-cooldown.service'
 import { GameClock } from './game-clock.service'
 import { orderKey, QuestsStore } from '../store/quests/quests.store'
@@ -22,7 +21,6 @@ import { QuestState } from '../../enums/quest-state.enum'
 import { MissingSlots } from '../store/player/inventory'
 import { ExplorationGuildService } from './exploration-guild.service'
 import { TownsStore } from '../store/towns/towns.store'
-import { CurrencyFeedService } from './currency-feed.service'
 import { UnlockService } from './unlock.service'
 import { DialogueContext, DialogueLabel, EffectCost, effectHandler, turnInState } from './dialogue-effect-handlers'
 import { conditionHandler, requirementMet } from './dialogue-condition-handlers'
@@ -39,8 +37,6 @@ export class DialogueManagerService {
     battle: inject(BattleStore),
     arena: inject(ArenaService),
     guild: inject(ExplorationGuildService),
-    currencyFeed: inject(CurrencyFeedService),
-    reputation: inject(ReputationService),
     cooldowns: this.cooldowns,
     clock: inject(GameClock),
     unlocks: inject(UnlockService),
