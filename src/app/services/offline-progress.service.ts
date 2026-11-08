@@ -15,6 +15,7 @@ import { MS_PER_SECOND } from './combat-step'
 import { OfflineSegment, seededRng, simulateOfflineKills } from './offline-simulation'
 import { InventoryItem } from '../../interfaces/item.interface'
 import { GameClock } from './game-clock.service'
+import { planClaim } from './offline-claim-plan'
 
 /** Most offline time one claim pays for. */
 export const OFFLINE_CAP_IN_MS = 24 * 60 * 60 * 1000
@@ -112,21 +113,17 @@ export class OfflineProgressService {
       this.anchor = { hostMs: hostNow, perfMs: performance.now() }
 
       const lastSeen = this.offlineStore.lastSeenAt()
-      // A clock moved back gives a negative gap: it claims nothing. Game time moves by the capped gap only.
-      const gapMs = lastSeen === null ? 0 : Math.max(0, claimEnd - lastSeen)
-      const advanceMs = Math.min(OFFLINE_CAP_IN_MS, gapMs)
-
       // An arena run that ran out while away ends at its own end time; the rest of the absence is claimed in the
       // zone the player entered it from (kept as `currentZoneId`). A run still going claims nothing.
       const run = this.pendingArenaRun
       this.pendingArenaRun = null
-      let arenaMs = 0
-      const arenaRemainingMs = this.pendingArenaRemainingMs
-      if (run && advanceMs >= arenaRemainingMs) {
-        arenaMs = Math.max(0, arenaRemainingMs)
-        this.arenaService.tick(run.endsAt)
-      }
-      const elapsedMs = advanceMs - arenaMs
+      const { advanceMs, arenaEnded, paidMs: elapsedMs } = planClaim({
+        lastSeen,
+        claimEnd,
+        arenaRemaining: run ? this.pendingArenaRemainingMs : null,
+        cap: OFFLINE_CAP_IN_MS,
+      })
+      if (run && arenaEnded) this.arenaService.tick(run.endsAt)
       this.gameClock.advance(advanceMs)
       this.offlineStore.setLastSeen(hostNow, this.gameClock.nowMs())
       this.gameClock.setClaimPending(false)

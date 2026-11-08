@@ -45,7 +45,7 @@ One rule moves a quest forward and pays it.
 - Specs (`equipment.spec.ts`): swap into a full tab, unequip blocked when the slot bonus would leave items without a slot, two-handed and off-hand swaps if they exist; unlock defaults.
 - Docs: `player-stats-inventory-equipment.md`, `zones-waves-unlocks.md`.
 
-### 5. Claim plan (S, Sonnet)
+### 5. Claim plan (S, Sonnet) ✅
 - Pure `planClaim({ lastSeen, claimEnd, arenaRemaining, cap })` in `services/offline-claim-plan.ts` returning `{ advanceMs, arenaMs, paidMs }`: `gapMs = max(0, claimEnd − lastSeen)`, `advanceMs = min(cap, gapMs)`, `arenaMs` only when `advanceMs ≥ arenaRemaining`, `paidMs = advanceMs − arenaMs`. `OfflineProgressService.claim` (`offline-progress.service.ts:85-145`) applies it.
 - Specs (`offline-claim-plan.spec.ts`): clock moved back (gap 0), gap over the cap, arena run that ended during the absence, arena run still going, gap under `MIN_OFFLINE_CLAIM_IN_MS`.
 - Docs: `offline-progress.md`.
