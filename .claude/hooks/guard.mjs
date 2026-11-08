@@ -69,9 +69,12 @@ if (/^(Bash|PowerShell)$/.test(tool)) {
   }
 }
 
-// From inside a worktree, EnterWorktree only reaches worktrees under .claude/worktrees; for a sibling yari-* one it fails
-// with ".claude\worktrees does not exist", which agents retried up to 19 times. One worktree per session: branch inside it.
+// One worktree per session: hopping between worktrees strands work and once failed 19 times in a row.
+// Worktrees live in .claude/worktrees, since the app asks the owner to approve entering any path outside it.
 const target = String(input.tool_input?.path ?? '')
-if (tool === 'EnterWorktree' && target && !inMainCheckout(cwd) && !/[\\/]\.claude[\\/]worktrees[\\/]/.test(resolve(cwd, target))) {
-  block('Blocked: this session is already in a worktree, and EnterWorktree can\'t switch to another one outside .claude/worktrees. Keep one worktree per session (docs/git-workflow.md): commit here, then start the next branch in this worktree with git fetch origin staging && git switch -c <type/name> origin/staging.')
+if (tool === 'EnterWorktree' && target && !inMainCheckout(cwd)) {
+  block('Blocked: this session is already in a worktree. Keep one worktree per session (docs/git-workflow.md): commit here, then start the next branch in this worktree with git fetch origin staging && git switch -c <type/name> origin/staging.')
+}
+if (tool === 'EnterWorktree' && target && !/[\\/]\.claude[\\/]worktrees[\\/]/.test(resolve(cwd, target))) {
+  block('Blocked: worktrees outside .claude/worktrees make the app ask the owner to approve entering them. Create one with node scripts/worktree.mjs <type/name>, which puts it in .claude/worktrees, and enter the path it prints.')
 }

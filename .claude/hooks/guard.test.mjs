@@ -72,9 +72,14 @@ test('allows PRs into staging or main and PR edits without a base', () => {
     assert.equal(run('PowerShell', { command }), 0, command)
 })
 
-test('blocks EnterWorktree from a worktree into a sibling worktree', () => {
+test('blocks EnterWorktree from a worktree into another worktree', () => {
   assert.equal(run('EnterWorktree', { path: '../yari-other' }), 2)
-  assert.equal(run('EnterWorktree', { path: '../yari-feature' }, MAIN), 0)
-  assert.equal(run('EnterWorktree', { path: '.claude/worktrees/x' }), 0)
+  assert.equal(run('EnterWorktree', { path: join(MAIN, '.claude', 'worktrees', 'yari-other') }), 2)
   assert.equal(run('EnterWorktree', { name: 'scratch' }), 0)
+})
+
+test('EnterWorktree from the main checkout only into .claude/worktrees', () => {
+  assert.equal(run('EnterWorktree', { path: '../yari-feature' }, MAIN), 2)
+  assert.equal(run('EnterWorktree', { path: '.claude/worktrees/yari-feature' }, MAIN), 0)
+  assert.equal(run('EnterWorktree', { path: join(MAIN, '.claude', 'worktrees', 'yari-feature') }, MAIN), 0)
 })
