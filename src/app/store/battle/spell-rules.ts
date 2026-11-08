@@ -57,7 +57,9 @@ export function canCast(spell: SpellProps, ctx: CastContext): boolean {
     // Like a buff: castable between fights, not again while its crits are left.
     case SpellType.empower:
       return ctx.empowered !== spell.id
-    default:
+    case SpellType.melee:
+    case SpellType.ranged:
+    case SpellType.magic:
       return ctx.isInCombat
   }
 }
