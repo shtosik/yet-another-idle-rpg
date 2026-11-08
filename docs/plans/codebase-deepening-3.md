@@ -42,7 +42,7 @@ One module decides how items reach the player. Seeds go to the seed store, stati
 - Specs (first for the online loop): respawn, carried time, kill drops leftover, the cap, arena delay.
 - Docs: `game-loop-and-combat.md`.
 
-### 5. Task module (M, Sonnet)
+### 5. Task module (M, Sonnet) ✅
 - Pure `store/player/tasks.ts`: `rollTask(ctx, rng)`, `acceptTask` (checks for a free slot, today only `ExplorationGuildService` does), `claimTasks`, `abandonTask`, `progressTasks(kills)`, guild rank and slot count. Move the type, `isTaskDone` and `TASKS_PER_GUILD_RANK` out of `player.store.ts:100-119`.
 - State stays in the `PlayerStore` slice; the save shape doesn't change. `ExplorationGuildService` passes the rng; Kill resolution, dialogue handlers and `shop.store.ts:109` call the module.
 - A kill counts for a task in any zone, as documented; `Task.zoneId` only sets the reward tier.

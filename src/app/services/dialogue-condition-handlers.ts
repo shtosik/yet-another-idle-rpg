@@ -1,7 +1,7 @@
 import i18next from 'i18next'
 import { DialogueCondition } from '../../types/dialogues/dialogue-condition.type'
 import { DialogueContext, DialogueLabel } from './dialogue-effect-handlers'
-import { isTaskDone } from '../store/player/player.store'
+import { isTaskDone } from '../store/player/tasks'
 import { matchesQuestState } from './quest-status'
 import { RequirementProps } from '../../data/quests-data'
 import { QuestID } from '../../enums/ids/quest-id.enum'

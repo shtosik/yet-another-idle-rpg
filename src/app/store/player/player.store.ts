@@ -71,6 +71,7 @@ import { StationID } from '../../../enums/ids/station-id.enum'
 import { UnlockTarget } from '../../../data/unlock-conditions'
 import { BattleStore } from '../battle/battle.store'
 import { ALL_SKILLS } from '../../../data/skill-tree-data'
+import { abandonTask, acceptTask, claimTasks, guildRank, hasFreeTaskSlot, isTaskDone, progressTasks, Task, TaskSlice } from './tasks'
 import { SkillNodeType } from '../../../enums/skill-node-type.enum'
 import {
   activeBuffSpellIds,
@@ -94,17 +95,6 @@ import {
 
 export type { PlayerStatsType } from './stats'
 
-export interface Task {
-  id: string
-  monsterId: EnemyID
-  targetCount: number
-  currentCount: number
-  rewardTokens: number
-  zoneId: ZoneID
-}
-
-export const TASKS_PER_GUILD_RANK = 5
-
 /** What one XP change did to a profession; `skillPoints` were paid for the levels in between. */
 export interface ProfessionGain {
   professionId: ProfessionID
@@ -112,8 +102,6 @@ export interface ProfessionGain {
   to: number
   skillPoints: number
 }
-
-export const isTaskDone = (task: Task): boolean => task.currentCount >= task.targetCount
 
 interface PlayerState {
   resources: Resources;
@@ -260,6 +248,11 @@ const handleExperience = (resources: Resources) => {
 /** Takes `items` out; a kept chest roll goes with the last chest of its id at any upgrade level (sold, destroyed), so a later one rolls fresh. */
 type StateSignals<K extends keyof PlayerState> = { [P in K]: () => PlayerState[P] }
 
+const taskSlice = (store: StateSignals<'activeTasks' | 'totalTasksCompleted'>): TaskSlice => ({
+  activeTasks: store.activeTasks(),
+  totalTasksCompleted: store.totalTasksCompleted(),
+})
+
 const grantStateOf = (store: StateSignals<'inventory' | 'stations' | 'farm' | 'spellbookUnlocked'>): GrantState => ({
   inventory: store.inventory(),
   stations: store.stations(),
@@ -352,14 +345,13 @@ export const PlayerStore = signalStore(
   withComputed((store) => ({
     canRegisterPathfindersSeal: computed(() => (store.permanentBonuses().upgradedDropChance ?? 0) === 0
       && countItem(store.inventory(), ItemID.pathfindersSeal) > 0),
-    /** One rank per `TASKS_PER_GUILD_RANK` completed tasks, no cap. Each rank adds a zone tier to the task pool. */
-    guildRank: () => Math.floor(store.totalTasksCompleted() / TASKS_PER_GUILD_RANK),
+    guildRank: () => guildRank(store.totalTasksCompleted()),
     /** Titles whose source is met, in `TitleID` order. */
     earnedTitles: computed(() => (Object.keys(TITLES_DATA).map(Number) as TitleID[]).filter(id => {
       const source = TITLES_DATA[id]
       return reputationTier(store.reputation()[source.reputationId] ?? 0) >= source.tier
     })),
-    hasAvailableTaskSlot: () => store.activeTasks().length < store.stats().maxTaskSlots,
+    hasAvailableTaskSlot: () => hasFreeTaskSlot(store.activeTasks(), store.stats().maxTaskSlots),
     hasCompletedTask: () => store.activeTasks().some(isTaskDone),
     hasTaskInProgress: () => store.activeTasks().some(task => !isTaskDone(task)),
     unseenEnemyCount: () => unseen(revealedEnemies(store.enemyKillCounts()), store.seenEnemies()).length,
@@ -514,32 +506,24 @@ export const PlayerStore = signalStore(
       patchState(store, { unlockedNodes: {} })
     },
 
-    acceptTask(task: Task) {
-      patchState(store, (state) => ({
-        activeTasks: [...state.activeTasks, task],
-      }))
+    /** Refused (false) when every task slot is taken. */
+    acceptTask(task: Task): boolean {
+      const next = acceptTask(taskSlice(store), task, store.stats().maxTaskSlots)
+      if (!next) return false
+      patchState(store, { activeTasks: next.activeTasks })
+      return true
     },
 
     /** Claims every finished task at once. */
     claimCompletedTasks() {
-      const done = store.activeTasks().filter(isTaskDone)
-      if (!done.length) return
-
-      patchState(store, (state) => ({
-        activeTasks: state.activeTasks.filter(task => !isTaskDone(task)),
-        totalTasksCompleted: state.totalTasksCompleted + done.length,
-        explorerTokens: state.explorerTokens + done.reduce((sum, task) => sum + task.rewardTokens, 0),
-      }))
+      const { slice, tokens } = claimTasks(taskSlice(store))
+      if (slice.totalTasksCompleted === store.totalTasksCompleted()) return
+      patchState(store, (state) => ({ ...slice, explorerTokens: state.explorerTokens + tokens }))
     },
 
     /** Cancels the task at `index` in `activeTasks`. Finished tasks can only be claimed. */
     abandonTask(index: number) {
-      const task = store.activeTasks()[index]
-      if (!task || isTaskDone(task)) return
-
-      patchState(store, (state) => ({
-        activeTasks: state.activeTasks.filter(t => t.id !== task.id),
-      }))
+      patchState(store, abandonTask(taskSlice(store), index))
     },
   })),
   // Equip and zone-star checks.
@@ -637,11 +621,7 @@ export const PlayerStore = signalStore(
             ...state.zonesProgression,
             [batch.zoneId]: { ...zoneProgression, [batch.wave]: (zoneProgression?.[batch.wave] ?? 0) + batch.kills },
           },
-          activeTasks: state.activeTasks.map(task => {
-            const counts = batch.taskCountsByEnemy[task.monsterId]
-            if (!counts || isTaskDone(task)) return task
-            return { ...task, currentCount: Math.min(task.targetCount, task.currentCount + counts) }
-          }),
+          activeTasks: progressTasks(state.activeTasks, batch.taskCountsByEnemy),
         }
       })
 
