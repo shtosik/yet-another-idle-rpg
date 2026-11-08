@@ -22,7 +22,6 @@ import { addShinyKills, masteryModifiers, ZoneStar, zoneStarProgress, ZoneStarPr
 import { sellPrice } from '../shop/shop-prices'
 import { ShopID } from '../../../enums/ids/shop-id.enum'
 import { ShopCurrency } from '../../../types/shop/shop.type'
-import ENEMIES_DATA from '../../../data/enemies-data'
 import { EquipmentSlot, EquipmentSlotKey } from '../../../enums/equipment-slot.enum'
 import { ItemType } from '../../../enums/items/item-type.enum'
 import RECIPES_DATA from '../../../data/recipes-data'
@@ -549,12 +548,14 @@ export const PlayerStore = signalStore(
 
     /** Takes `amount` of `currency`; false (and nothing changes) when the player holds less, so a balance never goes below 0. */
     spend(currency: ShopCurrency, amount: number): boolean {
-      if (amount < 0 || (currency === 'gold' ? store.stats().goldCoins : store.explorerTokens()) < amount) return false
+      if (amount < 0) return false
       switch (currency) {
         case 'gold':
+          if (store.stats().goldCoins < amount) return false
           store.updatePlayerStats([{ stat: 'goldCoins', amount: -amount }])
           return true
         case 'explorerTokens':
+          if (store.explorerTokens() < amount) return false
           patchState(store, (state) => ({ explorerTokens: state.explorerTokens - amount }))
           return true
       }

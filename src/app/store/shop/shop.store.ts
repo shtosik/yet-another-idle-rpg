@@ -149,6 +149,7 @@ export const ShopStore = signalStore(
     /** Buys up to `count` of item `index`, stopping at the first block. Refused outright (nothing bought) returns the reason. */
     purchase(shopId: ShopID, index: number, count = 1): PurchaseResult | BuyBlockReason {
       const shop = SHOPS_DATA[shopId]
+      if (!shop.items[index]) return 'stock'
       const { itemId, tier, price } = shop.items[index]
       const result: PurchaseResult = { bought: 0, spent: 0, installed: [] }
 

@@ -32,6 +32,28 @@ describe('dialogue effect handlers', () => {
       expect(cost({ type: 'stat', action: 'deduct', stats: [{ stat: 'goldCoins', amount: 30 }, { stat: 'experience', amount: 5 }] }, ctx).gold).toBe(30)
       expect(cost({ type: 'stat', action: 'award', stats: [{ stat: 'goldCoins', amount: 30 }] }, ctx).gold).toBe(0)
     })
+
+    describe('apply', () => {
+      const run = (gold: number) => {
+        const player = jasmine.createSpyObj('PlayerStore', ['spend', 'updatePlayerStats'])
+        player.spend.and.callFake((_: string, amount: number) => gold >= amount)
+        EFFECT_HANDLERS.stat.apply(
+          { type: 'stat', action: 'deduct', stats: [{ stat: 'goldCoins', amount: 20 }, { stat: 'experience', amount: 5 }] },
+          { player } as unknown as DialogueContext,
+        )
+        return player
+      }
+
+      it('pays a gold fee once through spend and deducts the other stats', () => {
+        const player = run(100)
+        expect(player.spend).toHaveBeenCalledOnceWith('gold', 20)
+        expect(player.updatePlayerStats).toHaveBeenCalledOnceWith([{ stat: 'experience', amount: -5 }])
+      })
+
+      it('applies nothing when the fee is refused', () => {
+        expect(run(10).updatePlayerStats).not.toHaveBeenCalled()
+      })
+    })
   })
 
   describe('item', () => {

@@ -73,7 +73,7 @@ export class ShopComponent implements OnInit {
   showsGuildRank = computed(() => SHOPS_DATA[this.shopId()].items.some(item => item.minRank !== undefined))
   guildRank = this.playerStore.guildRank
   protected readonly tierName = tierName
-  
+
   /** Inventory stacks this shop buys, at its price. */
   sellable = computed(() => {
     const shopId = this.shopId()

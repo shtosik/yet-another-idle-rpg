@@ -87,12 +87,13 @@ export const EFFECT_HANDLERS: EffectHandlers = {
   stat: {
     apply: (effect, ctx) => {
       const deduct = effect.action === 'deduct'
-      // A gold deduct goes through `spend` so gold can't go negative; the option is gated by `missingGold` first.
-      const stats = effect.stats.filter(s => {
-        if (!deduct || s.stat !== 'goldCoins') return true
-        ctx.player.spend('gold', s.amount)
-        return false
-      })
+      // A gold deduct goes through `spend` so gold can't go negative; `missingGold` gates the option first, so a
+      // refusal here means the state changed in between, and nothing of the effect is applied.
+      if (deduct) {
+        const fee = effect.stats.filter(s => s.stat === 'goldCoins').reduce((sum, s) => sum + s.amount, 0)
+        if (fee > 0 && !ctx.player.spend('gold', fee)) return
+      }
+      const stats = effect.stats.filter(s => !deduct || s.stat !== 'goldCoins')
       ctx.player.updatePlayerStats(stats.map(s => ({ stat: s.stat, amount: deduct ? -s.amount : s.amount })))
     },
     // Owner decision: gold never goes negative, so a gold deduct is a cost the player must cover.

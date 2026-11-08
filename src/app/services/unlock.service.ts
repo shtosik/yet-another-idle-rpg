@@ -89,5 +89,15 @@ export class UnlockService {
   }
 }
 
-// Targets are flat literals with the same field order, so their JSON compares them.
-const isSameTarget = (a: UnlockTarget, b: UnlockTarget): boolean => JSON.stringify(a) === JSON.stringify(b)
+function isSameTarget(a: UnlockTarget, b: UnlockTarget): boolean {
+  switch (a.type) {
+    case 'town':
+      return b.type === 'town' && b.townId === a.townId
+    case 'site':
+      return b.type === 'site' && b.siteId === a.siteId
+    case 'feature':
+      return b.type === 'feature' && b.feature === a.feature
+    case 'zone':
+      return b.type === 'zone' && b.zoneId === a.zoneId
+  }
+}

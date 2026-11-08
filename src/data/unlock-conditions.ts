@@ -59,7 +59,8 @@ export interface UnlockNotification {
 
 export interface UnlockRule {
   condition: UnlockCondition
-  target: UnlockTarget
+  /** Zones open by the boss chain and town entrances only (GLOSSARY: Zone unlock). */
+  target: Exclude<UnlockTarget, ZoneUnlockTarget>
   notification?: UnlockNotification
 }
 
