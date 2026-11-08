@@ -31,7 +31,6 @@ export class SkillTreeService {
     const skillData = ALL_SKILLS[id]
     const stats = this.playerStore.stats()
     const unlocked = this.playerStore.unlockedNodes()
-    const currentEquippedSpells = this.battleStore.equippedSpells()
 
     if (!canBuyNode(skillData, unlocked, stats.unspentSkillPoints).ok) return
 
@@ -51,11 +50,8 @@ export class SkillTreeService {
 
     if (skillData.type === SkillNodeType.spell) {
       this.playerStore.levelUpSpell(skillData.spellId)
-
-      const alreadyEquipped = currentEquippedSpells.some(s => s?.spellId === skillData.spellId)
-      if (!alreadyEquipped && currentEquippedSpells.filter(Boolean).length < 5) {
-        this.battleManagerService.equipSpell(skillData.spellId)
-      }
+      // Onto the spell bar if there's a free slot, like a spell scroll.
+      this.battleManagerService.equipSpell(skillData.spellId)
     }
   }
 

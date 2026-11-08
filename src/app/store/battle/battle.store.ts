@@ -18,6 +18,8 @@ import { ARENA } from '../../../data/arena-data'
 import { ItemStack } from '../player/inventory'
 
 const MS_PER_SECOND = 1000
+/** Spells the bar holds. */
+export const SPELL_BAR_SLOTS = 5
 
 /** A Combat Arena run in progress (`ArenaService`). Times are wall-clock ms, so the clock runs while the game is closed. */
 export interface ArenaRun {
@@ -64,7 +66,7 @@ export const initialState: BattleState = {
   currentZoneId: ZoneID.horseshoeBeach,
   currentWave: 1,
   autoWaveProgressionEnabled: false,
-  equippedSpells: [null, null, null, null, null],
+  equippedSpells: new Array<EquippedSpell | null>(SPELL_BAR_SLOTS).fill(null),
   activeBuffs: [],
   activeDamageOverTime: [],
   empowered: null,
@@ -146,7 +148,7 @@ export const BattleStore = signalStore(
     addSpell(spell: EquippedSpell): void {
       patchState(store, (state) => {
         const arr = [...state.equippedSpells]
-        while (arr.length < 5) arr.push(null)
+        while (arr.length < SPELL_BAR_SLOTS) arr.push(null)
         const free = arr.findIndex(s => !s)
         if (free === -1) return {}
         arr[free] = spell

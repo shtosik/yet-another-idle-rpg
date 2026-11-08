@@ -736,29 +736,24 @@ export const PlayerStore = signalStore(
       return true
     },
 
-    useItem(item: InventoryItem) {
+    /** Learns a recipe or spell scroll, or pays a stat reward item; false (nothing taken) when already known or not one of those. */
+    useItem(item: InventoryItem): boolean {
       const itemData = ITEM_DATA[item.id]
 
       if (itemData.type === ItemType.recipe) {
         const recipeData = itemData as RecipeItem
-        if (store.unlockedRecipes().includes(recipeData.recipeId)) return
+        if (store.unlockedRecipes().includes(recipeData.recipeId)) return false
         patchState(store, state => ({ unlockedRecipes: [...state.unlockedRecipes, recipeData.recipeId] }))
-        store.removeItems([{ id: item.id, tier: item.tier, upgradeLevel: item.upgradeLevel, amount: 1 }])
-        return
-      }
-
-      if (itemData.type === ItemType.spellScroll) {
-        if (store.knownSpellIds().includes(itemData.spellId)) return
+      } else if (itemData.type === ItemType.spellScroll) {
+        if (store.knownSpellIds().includes(itemData.spellId)) return false
         store.levelUpSpell(itemData.spellId)
-        store.removeItems([{ id: item.id, tier: item.tier, upgradeLevel: item.upgradeLevel, amount: 1 }])
-        return
+      } else if (itemData.type === ItemType.rewardsStats) {
+        store.updatePlayerStats(itemData.stats.map(s => ({ stat: s.id, amount: s.amount })))
+      } else {
+        return false
       }
-
-      if (itemData.type !== ItemType.rewardsStats) return
-
-      const statsToUpdate = itemData.stats.map(s => ({ stat: s.id, amount: s.amount }))
-      store.updatePlayerStats(statsToUpdate)
       store.removeItems([{ id: item.id, tier: item.tier, upgradeLevel: item.upgradeLevel, amount: 1 }])
+      return true
     },
 
     /**
