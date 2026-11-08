@@ -7,6 +7,7 @@ import { ItemID } from '../../enums/ids/item-id.enum'
 import { QuestState } from '../../enums/quest-state.enum'
 import { QuestProgression, QuestStep } from '../../types/quests/quest-progression.type'
 import { ItemStack } from '../store/player/inventory'
+import { consumedItems } from '../store/quests/requirement-handlers'
 import { Orders } from '../store/quests/orders'
 
 export type QuestStatus =
@@ -76,11 +77,7 @@ export function matchesQuestState(
 
 /** Item requirements of a quest step (1-based), picked ones from `orders`; turn-ins consume these. */
 export function getStepItems(questId: QuestID, step: QuestStep, orders: Orders = {}): ItemStack[] {
-  return (QUEST_DATA[questId].steps[step - 1]?.requirements ?? []).flatMap((r) => {
-    if (r.type === 'item') return [{ id: r.itemId, amount: r.amount }]
-    if (r.type === 'pickedItems') return (orders[questId]?.requirements ?? []).map(p => ({ id: p.itemId, amount: p.amount }))
-    return []
-  })
+  return consumedItems(QUEST_DATA[questId].steps[step - 1]?.requirements ?? [], orders[questId]?.requirements ?? [])
 }
 
 export function getActiveQuestIds(progression: QuestProgression): Set<QuestID> {
