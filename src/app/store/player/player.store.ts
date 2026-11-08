@@ -21,6 +21,7 @@ import type { KillBatch } from './kill-rewards'
 import { addShinyKills, masteryModifiers, ZoneStar, zoneStarProgress, ZoneStarProgress } from './zone-mastery'
 import { sellPrice } from '../shop/shop-prices'
 import { ShopID } from '../../../enums/ids/shop-id.enum'
+import { ShopCurrency } from '../../../types/shop/shop.type'
 import ENEMIES_DATA from '../../../data/enemies-data'
 import { EquipmentSlot, EquipmentSlotKey } from '../../../enums/equipment-slot.enum'
 import { ItemType } from '../../../enums/items/item-type.enum'
@@ -533,16 +534,32 @@ export const PlayerStore = signalStore(
         activeTasks: state.activeTasks.filter(t => t.id !== task.id),
       }))
     },
-
-    /** Returns whether the tokens were spent; never goes below 0. */
-    spendTokens(amount: number): boolean {
-      if (amount < 0 || store.explorerTokens() < amount) return false
-      patchState(store, (state) => ({ explorerTokens: state.explorerTokens - amount }))
-      return true
-    },
   })),
   // Equip and zone-star checks.
   withMethods((store) => ({
+    /** What the player holds of a shop currency. A new `ShopCurrency` fails to compile until handled here. */
+    balanceOf(currency: ShopCurrency): number {
+      switch (currency) {
+        case 'gold':
+          return store.stats().goldCoins
+        case 'explorerTokens':
+          return store.explorerTokens()
+      }
+    },
+
+    /** Takes `amount` of `currency`; false (and nothing changes) when the player holds less, so a balance never goes below 0. */
+    spend(currency: ShopCurrency, amount: number): boolean {
+      if (amount < 0 || (currency === 'gold' ? store.stats().goldCoins : store.explorerTokens()) < amount) return false
+      switch (currency) {
+        case 'gold':
+          store.updatePlayerStats([{ stat: 'goldCoins', amount: -amount }])
+          return true
+        case 'explorerTokens':
+          patchState(store, (state) => ({ explorerTokens: state.explorerTokens - amount }))
+          return true
+      }
+    },
+
     canUnequip(slot: EquipmentSlotKey): boolean {
       const equipped = store.equipment()[slot]
       if (!equipped) return false

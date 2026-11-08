@@ -44,14 +44,14 @@ Each dialogue effect and condition is known in one place.
 - Update `.claude/skills/add-dialogue-effect` to point at the handler tables, then run `npm run sync-skills`.
 - Docs: `dialogue.md`.
 
-### 5. Shop purchase and guarded spend (M, Sonnet)
+### 5. Shop purchase and guarded spend (M, Sonnet) ✅
 - `PlayerStore.spend(currency, amount): boolean` refuses when the balance is too low and changes nothing in that case. Gold, explorer tokens and the other shop currencies go through it. It replaces the bare `updatePlayerStats([{ goldCoins, -amount }])` in `shop.component.ts:200` and the gold `cost` of the dialogue handlers from Step 4.
 - `ShopStore.purchase(shopId, index, count)` returns `{ bought, spent, installed }` or a `BlockReason`, and `ShopStore.blockReason(shopId, index)`. They move the checks from `buyBlockReason` (`shop.component.ts:100-124`), in the same order (stock, rank, reputation, currency, station, inventory), and the buying from `buyOne` (`:208-223`), including the spellbook case, out of the component.
 - `ShopComponent` keeps the labels, the currency feed and the station-installed modal (shown when `installed` is set). Delete `balanceOf` / `spend` (`:187-205`).
 - Specs: store-level purchase tests without the DOM (each block reason, the spellbook, an installed station, a refused `spend`); `shop.component.spec.ts` keeps only rendering.
 - Docs: `towns-shops-guild.md`.
 
-### 6. Wrap-up (S)
+### 6. Wrap-up (S) ✅
 - Re-read the system doc each step touched against the final code.
 - Run `/blast-radius` on the whole branch (stores, save shape and derived stats are touched).
 - No `verify-yari` unless Step 3 changed what a player sees.

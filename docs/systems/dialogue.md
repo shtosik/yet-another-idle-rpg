@@ -19,7 +19,7 @@ Data-driven NPC conversations. Each NPC has a graph of nodes; options branch on 
 ## Data flow
 1. `startDialogue(npcId)`: if the `met_<npcId>` flag is not set and the NPC has `firstMeetNodeId`, start there; otherwise at `startNodeId ?? 0`. The first-meet node's options must set that flag themselves with a `flag` effect named `met_` + the `NpcID` value.
 2. For each option, the shown branch is `getActiveResult`: the **first** result whose `visibilityConditions` all pass, skipping results that start a quest which isn't `available`. An option with no matching result is hidden.
-3. `requirementsNeeded` on that result are shown as labels; if any fail, the option is disabled. If the result's item gains (`give` effects, quest item rewards) don't fit after its removals, the option is disabled with a tag naming each short tab, e.g. "1 Materials slot needed" (`DialogueManagerService.missingSlots`, per tab, from each effect's `cost`; quest item rewards come from `questPayout` in `quests.store.ts`, the same function that pays them). If its `deduct` gold effects cost more than the player has, it is disabled with an "N more gold needed" tag (`missingGold`): gold never goes negative. The `unlockSite` and `unlockProfession` effects show no tag, and an `item` effect with `silent: true` shows none either (Sylvie's letter: the "New Quest" tag already says it).
+3. `requirementsNeeded` on that result are shown as labels; if any fail, the option is disabled. If the result's item gains (`give` effects, quest item rewards) don't fit after its removals, the option is disabled with a tag naming each short tab, e.g. "1 Materials slot needed" (`DialogueManagerService.missingSlots`, per tab, from each effect's `cost`; quest item rewards come from `questPayout` in `quests.store.ts`, the same function that pays them). If its `deduct` gold effects cost more than the player has, it is disabled with an "N more gold needed" tag (`missingGold`): gold never goes negative (`apply` pays the gold through `PlayerStore.spend`, which refuses a short balance). The `unlockSite` and `unlockProfession` effects show no tag, and an `item` effect with `silent: true` shows none either (Sylvie's letter: the "New Quest" tag already says it).
 4. On click, `selectOption` runs the same `getActiveResult` branch: it applies `effects` in order, then closes (`closeDialogue: true`) or moves to `next`.
 
 ## Effects (Forge)
@@ -77,7 +77,7 @@ Every turn-in has its own cooldown, keyed by a `TurnInKey` (`src/app/store/quest
 - Flags: a `flag` effect sets one; the `flag` condition (`name`, `isSet`) reads it, e.g. to charge a fee only once (the Bartender's three paid answers and Josh's beer: `bartender_paid_for_*`, `josh_paid_beer`), or to give an item once (the Exalted town pets: `bartender_gave_pet`, `corwin_gave_pet`, set by the same result that gives the pet, so a full inventory leaves the offer open). The engine reads `met_<npcId>`.
 
 ## Known issues
-- Gold fees in dialogue (`stat` `deduct` of `goldCoins`, Bartender and Josh) are not gated, so gold can go negative. Owner decision: block spending when the player can't afford it (`player-stats-inventory-equipment.md`).
+- None.
 
 ## How to extend
 New NPC or new branches: the `add-npc-dialogue` skill. New quests: `add-quest`. Check a tree: `audit-dialogue`.

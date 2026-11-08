@@ -85,10 +85,16 @@ export const shownBundles = (bundles: number): number => Math.max(bundles, 1)
 
 export const EFFECT_HANDLERS: EffectHandlers = {
   stat: {
-    apply: (effect, ctx) => ctx.player.updatePlayerStats(effect.stats.map(s => ({
-      stat: s.stat,
-      amount: effect.action === 'deduct' ? -s.amount : s.amount,
-    }))),
+    apply: (effect, ctx) => {
+      const deduct = effect.action === 'deduct'
+      // A gold deduct goes through `spend` so gold can't go negative; the option is gated by `missingGold` first.
+      const stats = effect.stats.filter(s => {
+        if (!deduct || s.stat !== 'goldCoins') return true
+        ctx.player.spend('gold', s.amount)
+        return false
+      })
+      ctx.player.updatePlayerStats(stats.map(s => ({ stat: s.stat, amount: deduct ? -s.amount : s.amount })))
+    },
     // Owner decision: gold never goes negative, so a gold deduct is a cost the player must cover.
     cost: effect => ({
       gold: effect.action === 'deduct'
