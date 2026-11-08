@@ -20,6 +20,7 @@
 //  14. Quest hubs: per quest, turn-in before in progress before offer; a turn-in sits with the step's turnInNpc
 //
 //  15. Saved stores: every store using withGameStateSync is listed in SAVED_STORES
+//  16. Game time: Date.now() only in the allowlisted files; game rules read GameClock
 //
 // Usage: npm run validate
 
@@ -845,6 +846,25 @@ for (const f of [...walkFiles(join(ROOT, '.claude', 'agents'), '.md'), ...walkFi
     const name = /export const (\w+) = signalStore/.exec(text)?.[1]
     if (text.includes('withGameStateSync(') && !(name && new RegExp(`\\b${name}\\b`).test(list))) {
       error(relative(ROOT, file), 'uses withGameStateSync but is not in SAVED_STORES (src/app/store/saved-stores.ts)')
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 16. Game time: rules read GameClock (docs/systems/offline-progress.md), so a moved device clock skips nothing.
+// Date.now() stays only where it is not a game rule.
+
+{
+  const allowed = new Set([
+    'app/services/currency-feed.service.ts', // merge window of the currency float
+    'app/services/exploration-guild.service.ts', // task id
+    'app/components/game/dev-cheats/dev-stub.ts', // load timeout
+    'app/services/game-interval.service.ts', // sleep detector
+  ])
+  for (const file of walkFiles(SRC, '.ts').filter(f => !f.endsWith('.spec.ts'))) {
+    const rel = relative(SRC, file).replace(/\\/g, '/')
+    if (!allowed.has(rel) && readFileSync(file, 'utf8').includes('Date.now(')) {
+      error(relative(ROOT, file), 'reads Date.now(); game rules read GameClock (allowlist in scripts/validate-data.mjs check 16)')
     }
   }
 }

@@ -1,4 +1,4 @@
-import { computed, inject, Injectable, Injector, signal } from '@angular/core'
+import { computed, inject, Injectable, Injector } from '@angular/core'
 import { BattleStore } from '../store/battle/battle.store'
 import { PlayerStore } from '../store/player/player.store'
 import { ModalService } from './modal.service'
@@ -7,6 +7,7 @@ import { ArenaBossesService } from './arena-bosses.service'
 import { ARENA } from '../../data/arena-data'
 import { Enemy } from '../../interfaces/enemy.interface'
 import { GameTab } from '../../enums/ids/game-tab.enum'
+import { GameClock } from './game-clock.service'
 
 export type ArenaOutcome = 'cleared' | 'timeout' | 'left'
 
@@ -26,15 +27,14 @@ export class ArenaService {
   private playerStore = inject(PlayerStore)
   private modalService = inject(ModalService)
   private bosses = inject(ArenaBossesService)
+  private gameClock = inject(GameClock)
   // Looked up on use: GameNavigationService → DialogueManagerService → ArenaService would be a cycle.
   private injector = inject(Injector)
 
   readonly run = this.battleStore.arenaRun
-  /** Wall clock at the last tick, for the countdown. */
-  private readonly now = signal(Date.now())
   readonly remainingSeconds = computed(() => {
     const run = this.run()
-    return run ? Math.max(0, Math.ceil((run.endsAt - this.now()) / 1000)) : 0
+    return run ? Math.max(0, Math.ceil((run.endsAt - this.gameClock.second() * 1000) / 1000)) : 0
   })
   readonly canClaimRewards = computed(() => {
     const rewards = this.battleStore.arenaRewards()
@@ -42,19 +42,19 @@ export class ArenaService {
   })
 
   /** No run going on and the entry cooldown is over. */
-  isReady(now = Date.now()): boolean {
+  isReady(now = this.gameClock.nowMs()): boolean {
     return !this.run() && now >= this.battleStore.arenaReadyAt()
   }
 
   /** Starts a run and shows the fight. The entry fee is the caller's (the Arena Master's `stat` deduct). */
-  enter(now = Date.now()): void {
+  enter(now = this.gameClock.nowMs()): void {
     if (!this.isReady(now)) return
     this.battleStore.startArenaRun(now)
     this.injector.get(GameNavigationService).changeTab(GameTab.main)
   }
 
   /** An arena kill (the enemy is already gone): XP and gold, and the clear after the last wave. */
-  onKill(enemy: Enemy, now = Date.now()): void {
+  onKill(enemy: Enemy, now = this.gameClock.nowMs()): void {
     const stats = this.playerStore.stats()
     const experience = Math.ceil(enemy.experience * stats.xpMultiplier)
     const gold = Math.ceil(enemy.gold * stats.goldCoinsMultiplier)
@@ -67,15 +67,14 @@ export class ArenaService {
     if (this.run()!.wave > ARENA.waves.length) this.finish('cleared', now)
   }
 
-  /** Every game tick: the run fails once its clock runs out, also when that happened while the game was closed. */
+  /** Every game tick, with game time: the run fails once its clock runs out, also when that happened while the game was closed. */
   tick(now: number): void {
-    this.now.set(now)
     const run = this.run()
     if (run && now >= run.endsAt) this.finish('timeout', now)
     else this.bosses.tick(now)
   }
 
-  leave(now = Date.now()): void {
+  leave(now = this.gameClock.nowMs()): void {
     if (this.run()) this.finish('left', now)
   }
 

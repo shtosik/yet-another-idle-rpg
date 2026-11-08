@@ -43,6 +43,7 @@ A rule here fails a check when broken. When the owner corrects the same mistake 
 | Worktrees live in `.claude/worktrees` (outside it the app asks the owner to approve entering) | `scripts/worktree.mjs` puts them there; `.claude/hooks/guard.mjs` blocks `EnterWorktree` elsewhere (Claude) |
 | Never lower inventory slot bonuses without a save migration | `src/data/inventory-slots.spec.ts` |
 | Every `withGameStateSync` store is in `SAVED_STORES` | `npm run validate` (`scripts/validate-data.mjs`) |
+| Game rules read `GameClock`; `Date.now()` only in the allowlisted files | `npm run validate` (`scripts/validate-data.mjs`) |
 | Start a session from current `origin/staging` | `.claude/hooks/session-start.mjs` fast-forwards a `staging` checkout with no tracked changes and no local commits, else reports how far it lags (Claude) |
 | Codex gets the same project skills | `npm run validate` (`scripts/sync-skills.mjs`) |
 | Data references, i18n keys, assets, doc paths, changelog format, agent and skill frontmatter, idea statuses | `npm run validate` (checks listed at the top of `scripts/validate-data.mjs`) |

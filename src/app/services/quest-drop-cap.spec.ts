@@ -48,7 +48,7 @@ describe('quest drop caps online and offline', () => {
     const away = 60 * 60 * 1000
     spyOn(window, 'fetch').and.resolveTo(new Response(null, { headers: { Date: new Date(away).toUTCString() } }))
     const welcomeBack = spyOn(TestBed.inject(ModalService), 'openWelcomeBack')
-    TestBed.inject(OfflineStore).setLastSeen(0)
+    TestBed.inject(OfflineStore).setLastSeen(0, 0)
 
     await TestBed.inject(OfflineProgressService).claim()
 

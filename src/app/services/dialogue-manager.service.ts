@@ -7,6 +7,7 @@ import { DialogueEffect, QuestEffect, ReputationTurnInEffect } from '../../types
 import { turnInFor } from '../../data/reputation-turn-ins'
 import { ReputationService } from './reputation.service'
 import { TurnInCooldownService } from './turn-in-cooldown.service'
+import { GameClock } from './game-clock.service'
 import { orderKey, QuestsStore } from '../store/quests/quests.store'
 import { DialogueOption, DialogueResult } from '../../interfaces/dialogues/dialogue-option.type'
 import { DialogueCondition } from '../../types/dialogues/dialogue-condition.type'
@@ -41,6 +42,7 @@ export class DialogueManagerService {
     currencyFeed: inject(CurrencyFeedService),
     reputation: inject(ReputationService),
     cooldowns: this.cooldowns,
+    clock: inject(GameClock),
     unlocks: inject(UnlockService),
     activeNpc: () => this.activeNpc(),
   }

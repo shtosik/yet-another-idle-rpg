@@ -1,9 +1,10 @@
 import { NgOptimizedImage } from '@angular/common'
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal } from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core'
 import ITEM_DATA from '../../../../../data/items-data'
 import { ItemID } from '../../../../../enums/ids/item-id.enum'
 import { I18nextPipe } from '../../../../pipes/i18next.pipe'
 import { FarmService } from '../../../../services/farm.service'
+import { GameClock } from '../../../../services/game-clock.service'
 import { GameNavigationService } from '../../../../services/game-navigation.service'
 import { VersionCheckService } from '../../../../services/version-check.service'
 import { APP_VERSION } from '../../../../version'
@@ -35,21 +36,16 @@ export class NotificationBarComponent {
   /** The last reload stopped because its save failed; the game keeps running and the save keeps retrying. */
   private saveFailed = signal(false)
 
-  /** Plots ripen on the clock with no store change to react to. */
-  private now = signal(Date.now())
+  /** Plots ripen on Game time with no store change to react to. */
+  private second = inject(GameClock).second
 
-  private readyPlots = computed(() => this.farmService.readyPlotCount(this.now()))
+  private readyPlots = computed(() => this.farmService.readyPlotCount(this.second() * 1000))
 
   protected notifications = computed<BarNotification[]>(() => {
     const harvest = this.harvestNotification()
     const update = this.updateNotification()
     return [...(harvest ? [harvest] : []), ...(update ? [update] : [])]
   })
-
-  constructor() {
-    const timer = setInterval(() => this.now.set(Date.now()), 1000)
-    inject(DestroyRef).onDestroy(() => clearInterval(timer))
-  }
 
   private harvestNotification(): BarNotification | null {
     const count = this.readyPlots()

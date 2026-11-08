@@ -14,6 +14,7 @@ import { ProfessionID } from '../../../enums/ids/profession-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
 import { canAdvanceQuest, getQuestStatus, getStepItems } from '../../services/quest-status'
 import { ReputationService } from '../../services/reputation.service'
+import { GameClock } from '../../services/game-clock.service'
 import { ProfessionService } from '../../services/profession.service'
 import { ReputationGain } from '../player/reputation'
 import { orderKey, TurnInKey, turnInRemainingMs } from './turn-in-cooldown'
@@ -31,7 +32,7 @@ export interface QuestsState {
   dialogueFlags: Record<string, boolean>
   /** Active quests pinned to the top of the quest panel, in pin order. Dropped on completion. */
   pinnedQuests: QuestID[]
-  /** When each turn-in last ran (epoch ms); its cooldown is computed from this (`turnInRemainingMs`). */
+  /** When each turn-in last ran (Game time ms, `GameClock`); its cooldown is computed from this (`turnInRemainingMs`). */
   lastTurnInAt: Partial<Record<TurnInKey, number>>
   /** Started repeatable orders: the rolled requirements and rewards, saved at start so a reload never re-rolls. */
   orders: Orders
@@ -232,7 +233,7 @@ export const QuestsStore = signalStore(
       },
     }),
   ),
-  withMethods((store, playerStore = inject(PlayerStore)) => ({
+  withMethods((store, playerStore = inject(PlayerStore), gameClock = inject(GameClock)) => ({
       resetState(): void {
         patchState(store, initialState)
       },
@@ -246,7 +247,7 @@ export const QuestsStore = signalStore(
 
         const repeat = QUEST_DATA[questId].repeat
         if (repeat) {
-          if (store.orderRemainingMs(questId, Date.now()) > 0) return
+          if (store.orderRemainingMs(questId, gameClock.nowMs()) > 0) return
           const eligible = repeat.pool.filter(entry =>
             playerStore.reputationTierOf(repeat.reputationId) >= entry.minTier
             && (!entry.sourceZones || entry.sourceZones.some(zone => playerStore.isZoneUnlocked(zone))))
@@ -294,7 +295,7 @@ export const QuestsStore = signalStore(
 
         const questData = QUEST_DATA[questId]
         if (questData.repeat) {
-          store.completeOrder(questId, Date.now())
+          store.completeOrder(questId, gameClock.nowMs())
           return
         }
         const completes = status.step >= questData.steps.length
@@ -315,7 +316,7 @@ export const QuestsStore = signalStore(
         const status = getQuestStatus(store.questStepProgression(), questId)
         if (status.state !== QuestState.active) return
         if (QUEST_DATA[questId].repeat) {
-          store.completeOrder(questId, Date.now())
+          store.completeOrder(questId, gameClock.nowMs())
           return
         }
         // Refused, nothing taken, while the rewards don't fit (also for `dev.completeQuest`).

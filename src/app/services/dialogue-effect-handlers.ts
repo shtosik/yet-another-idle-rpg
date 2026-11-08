@@ -9,6 +9,7 @@ import { ExplorationGuildService } from './exploration-guild.service'
 import { CurrencyFeedService } from './currency-feed.service'
 import { ReputationService } from './reputation.service'
 import { TurnInCooldownService } from './turn-in-cooldown.service'
+import { GameClock } from './game-clock.service'
 import { UnlockService } from './unlock.service'
 import { NPCProps } from '../../data/npc-data'
 import { ItemStack } from '../store/player/inventory'
@@ -33,6 +34,7 @@ export interface DialogueContext {
   currencyFeed: CurrencyFeedService
   reputation: ReputationService
   cooldowns: TurnInCooldownService
+  clock: GameClock
   unlocks: UnlockService
   activeNpc: () => NPCProps | null
 }
@@ -209,7 +211,7 @@ export const EFFECT_HANDLERS: EffectHandlers = {
       if (bundles === 0) return
       ctx.player.removeItems([{ id: turnIn.itemId, amount: bundles * turnIn.bundleSize }])
       ctx.reputation.gain([{ reputationId: turnIn.reputationId, amount: bundles * turnIn.reputation }])
-      ctx.quests.recordTurnIn(bundleKey(turnIn.npcId, turnIn.itemId), Date.now())
+      ctx.quests.recordTurnIn(bundleKey(turnIn.npcId, turnIn.itemId), ctx.clock.nowMs())
     },
     canApply: (effect, ctx) => turnInState(effect, ctx).bundles > 0,
     label: (effect, ctx) => {

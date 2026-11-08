@@ -34,6 +34,7 @@ import { TownID } from '../../../enums/map/town-id.enum'
 import { ReputationID } from '../../../enums/reputation-id.enum'
 import { DamageElement } from '../../../enums/damage-element.enum'
 import { withDevtools } from '../helpers/devtools'
+import { GameClock } from '../../services/game-clock.service'
 import { saveGameStateNow, SaveMigrations, withGameStateSync } from '../helpers/with-game-state-sync.hook'
 import {
   stackKey,
@@ -377,8 +378,8 @@ export const PlayerStore = signalStore(
       ) as Record<ZoneID, ZoneStarProgress[]>
     }),
   })),
-  // The growth rate plots accrue at: `syncFarm` keeps it until the watcher in `onInit` sees the rate change.
-  withProps(() => ({ _farmRate: { current: null as number | null } })),
+  // The growth rate plots accrue at, and the Game time they accrue on: `syncFarm` keeps it until the watcher in `onInit` sees the rate change.
+  withProps(() => ({ _farmRate: { current: null as number | null }, _gameClock: inject(GameClock) })),
   // Basic writes: stats, zone progress, kill counts, inventory and capacity, skill nodes, spell levels, guild tasks, tokens.
   withMethods((store, modalService = inject(ModalService)) => ({
     resetState() {
@@ -441,7 +442,7 @@ export const PlayerStore = signalStore(
     },
 
     /** Accrues plot growth up to `now` at the rate in force since the last change of `seedGrowthTimeReduction`. */
-    syncFarm(now = Date.now()) {
+    syncFarm(now = store._gameClock.nowMs()) {
       const rate = store._farmRate.current ?? store.stats().seedGrowthTimeReduction
       patchState(store, (state) => ({ farm: { ...state.farm, plots: syncPlots(state.farm.plots, now, rate) } }))
     },
@@ -867,7 +868,7 @@ export const PlayerStore = signalStore(
     plantSeed(seedId: ItemID, plotLimit: number, plotIndex?: number): boolean {
       store.syncFarm()
       const stats = store.stats()
-      const ctx = { now: Date.now(), level: professionLevel(store.professions(), ProfessionID.farming), plotLimit, seedSaveChance: stats.farmSeedSaveChance }
+      const ctx = { now: store._gameClock.nowMs(), level: professionLevel(store.professions(), ProfessionID.farming), plotLimit, seedSaveChance: stats.farmSeedSaveChance }
       const farm = store.farm()
       const next = plotIndex === undefined ? plantEveryPlot(farm, seedId, ctx) : plantInPlot(farm, plotIndex, seedId, ctx)
       if (!next || next === farm) return false

@@ -110,7 +110,7 @@ _Avoid_: AFK rewards, idle rewards
 
 **Game time**:
 The saved clock that game rules read (crops, cooldowns, the arena). It only moves forward: online with each tick, offline by the claimed time away, up to the offline cap. Never the device clock.
-Code: `GameClockStore`
+Code: `GameClock`
 _Avoid_: Server time, real time, now (for rules)
 
 **Kill resolution**:

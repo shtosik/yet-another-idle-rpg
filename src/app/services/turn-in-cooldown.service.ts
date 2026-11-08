@@ -1,27 +1,22 @@
-import { inject, Injectable, signal } from '@angular/core'
+import { inject, Injectable } from '@angular/core'
 import QUEST_DATA from '../../data/quests-data'
 import { REPUTATION_TURN_INS } from '../../data/reputation-turn-ins'
 import { NpcID } from '../../enums/map/npc-id.enum'
 import { PlayerStore } from '../store/player/player.store'
 import { QuestsStore } from '../store/quests/quests.store'
 import { bundleKey, orderKey, TurnInKey, turnInRemainingMs } from '../store/quests/turn-in-cooldown'
+import { GameClock } from './game-clock.service'
 
-/** Turn-in cooldowns as the UI sees them: one shared 1 s clock, so every tag and badge counts down together. */
+/** Turn-in cooldowns as the UI sees them: on the game clock's whole seconds, so every tag and badge counts down together. */
 @Injectable({ providedIn: 'root' })
 export class TurnInCooldownService {
   private questsStore = inject(QuestsStore)
   private playerStore = inject(PlayerStore)
+  private gameClock = inject(GameClock)
 
-  private readonly now = signal(Date.now())
-
-  /** Every second, from the game loop. The clock can lag the real one by up to a second, which only delays "ready". */
-  tick(now = Date.now()): void {
-    this.now.set(now)
-  }
-
-  /** Milliseconds until the turn-in is ready; 0 when ready. Reads the shared clock, so a template or computed stays live. */
+  /** Milliseconds until the turn-in is ready; 0 when ready. Reads the game clock's second, so a template or computed stays live. */
   remainingMs(key: TurnInKey): number {
-    return turnInRemainingMs(this.questsStore.lastTurnInAt()[key], this.playerStore.stats().turnInCooldownReduction, this.now())
+    return turnInRemainingMs(this.questsStore.lastTurnInAt()[key], this.playerStore.stats().turnInCooldownReduction, this.gameClock.second() * 1000)
   }
 
   /** The turn-in keys an NPC owns: its bundles, and the Orders it takes in. */

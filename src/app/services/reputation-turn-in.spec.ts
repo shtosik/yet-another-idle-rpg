@@ -11,7 +11,7 @@ import { ReputationID } from '../../enums/reputation-id.enum'
 import { ReputationTier } from '../../enums/reputation-tier.enum'
 import { QuestState } from '../../enums/quest-state.enum'
 import { DialogueNode } from '../../interfaces/dialogues/dialogue-node.interface'
-import { TurnInCooldownService } from './turn-in-cooldown.service'
+import { GameClock } from './game-clock.service'
 import { bundleKey } from '../store/quests/turn-in-cooldown'
 import LA_HARPAR_BARTENDER, { BartenderDialogue } from '../../data/dialogues/laHarparTown/laHarparBartender'
 import LA_HARPAR_JOSH, { JoshDialogue } from '../../data/dialogues/laHarparTown/laHarparJosh'
@@ -55,8 +55,7 @@ describe('reputation turn-ins in dialogue', () => {
     dialogue.selectOption(option())
     expect(playerStore.itemCount(ItemID.crabMeat)).toBe(40)
 
-    const cooldowns = TestBed.inject(TurnInCooldownService)
-    cooldowns.tick(Date.now() + 2 * HOUR + 1000)
+    TestBed.inject(GameClock).advance(2 * HOUR + 1000)
     expect(dialogue.checkCondition({ type: 'turnInCooldown', key: bartenderKey, state: 'ready' })).toBeTrue()
     dialogue.selectOption(option())
     expect(playerStore.itemCount(ItemID.crabMeat)).toBe(20)

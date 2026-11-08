@@ -6,7 +6,7 @@ import { BattleManagerService } from './battle-manager.service'
 import { ShopStore } from '../store/shop/shop.store'
 import { OfflineProgressService } from './offline-progress.service'
 import { ArenaService } from './arena.service'
-import { TurnInCooldownService } from './turn-in-cooldown.service'
+import { GameClock } from './game-clock.service'
 import { ARENA } from '../../data/arena-data'
 import { MS_PER_SECOND, RESPAWN_DELAY_IN_MS, stepCombat, TICK_DURATION_IN_MS, timePerAttackMs } from './combat-step'
 
@@ -23,7 +23,7 @@ export class GameIntervalService {
     shopStore = inject(ShopStore)
     offlineProgress = inject(OfflineProgressService)
     arenaService = inject(ArenaService)
-    turnInCooldowns = inject(TurnInCooldownService)
+    gameClock = inject(GameClock)
 
     private timePerAttack = computed(() => timePerAttackMs(this.playerStore.stats()))
 
@@ -56,7 +56,8 @@ export class GameIntervalService {
         }
 
         const deltaMs = Math.min(rawDeltaMs, MAX_TICK_DELTA_IN_MS)
-        this.arenaService.tick(wallNow)
+        this.gameClock.advance(deltaMs)
+        this.arenaService.tick(this.gameClock.nowMs())
         this.advanceCombat(deltaMs)
         this.playerStore.regenMana(deltaMs)
         this.battleManagerService.tickSpells(deltaMs)
@@ -67,7 +68,6 @@ export class GameIntervalService {
             this.secondTimer -= MS_PER_SECOND
             this.battleManagerService.tickConsumables()
             this.shopStore.tickCooldowns(MS_PER_SECOND)
-            this.turnInCooldowns.tick(wallNow)
             this.offlineProgress.markSeen()
         }
     }

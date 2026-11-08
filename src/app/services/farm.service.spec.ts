@@ -2,6 +2,7 @@ import { provideZonelessChangeDetection } from '@angular/core'
 import { TestBed } from '@angular/core/testing'
 import i18next from 'i18next'
 import { FarmService } from './farm.service'
+import { GameClock } from './game-clock.service'
 import { PlayerStore } from '../store/player/player.store'
 import { FARM_SEEDS } from '../../data/farming-data'
 import ITEM_DATA from '../../data/items-data'
@@ -16,6 +17,7 @@ const at = { x: 0, y: 0 }
 describe('FarmService', () => {
   let farm: FarmService
   let player: InstanceType<typeof PlayerStore>
+  let clock: GameClock
 
   beforeAll(async () => {
     await i18next.init({ lng: 'en', resources: {} })
@@ -23,19 +25,15 @@ describe('FarmService', () => {
 
   beforeEach(() => {
     localStorage.clear()
-    jasmine.clock().install()
-    jasmine.clock().mockDate(new Date(1_000_000))
     TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] })
     player = TestBed.inject(PlayerStore)
     farm = TestBed.inject(FarmService)
+    clock = TestBed.inject(GameClock)
     player.unlockProfession(ProfessionID.farming)
     player.grant([{ id: ItemID.turnipSeeds, amount: 5 }], 'lossy')
   })
 
-  afterEach(() => {
-    jasmine.clock().uninstall()
-    localStorage.clear()
-  })
+  afterEach(() => localStorage.clear())
 
   const select = (seedId: ItemID) => farm.toggleSeed(seedId)
   const planted = () => player.farm().plots.filter(plot => plot !== null).length
@@ -65,7 +63,7 @@ describe('FarmService', () => {
     player.addReputation([{ reputationId: ReputationID.farmingGuild, amount: 60 }])
 
     expect(farm.harvestAllLock()).toBeNull()
-    expect(farm.readyPlotCount(Date.now())).toBe(2)
+    expect(farm.readyPlotCount(clock.nowMs())).toBe(2)
     farm.harvest(at)
     expect(planted()).toBe(0)
   })
@@ -73,13 +71,13 @@ describe('FarmService', () => {
   it('counts growth before a rate change at the old rate, whatever changed it', () => {
     select(ItemID.turnipSeeds)
     farm.plant(0)
-    jasmine.clock().tick(5 * MINUTE)
+    clock.advance(5 * MINUTE)
 
     const hare = ITEM_DATA[ItemID.petFarmingGuildHare]
     player.grant([{ id: hare.id, tier: hare.tier, amount: 1 }], 'lossy')
     player.equipItem({ id: hare.id, type: hare.type, tier: hare.tier, amount: 1 })
     TestBed.tick()
-    jasmine.clock().tick(8 * MINUTE)
+    clock.advance(8 * MINUTE)
     player.syncFarm()
 
     // 5 minutes at the base rate, then 8 minutes 10% faster.

@@ -14,6 +14,7 @@ import { KillResolutionService } from './kill-resolution.service'
 import { MS_PER_SECOND } from './combat-step'
 import { OfflineSegment, seededRng, simulateOfflineKills } from './offline-simulation'
 import { InventoryItem } from '../../interfaces/item.interface'
+import { GameClock } from './game-clock.service'
 
 /** Most offline time one claim pays for. */
 export const OFFLINE_CAP_IN_MS = 24 * 60 * 60 * 1000
@@ -62,6 +63,7 @@ export class OfflineProgressService {
   private killResolution = inject(KillResolutionService)
   private modalService = inject(ModalService)
   private arenaService = inject(ArenaService)
+  private gameClock = inject(GameClock)
 
   /** Host time at a `performance.now()` reading; `null` while a claim is pending. */
   private anchor: { hostMs: number, perfMs: number } | null = null
@@ -78,7 +80,7 @@ export class OfflineProgressService {
   /** Once a second while the game runs. Does nothing while a claim is pending, so its time isn't skipped. */
   markSeen(): void {
     const now = this.now()
-    if (now !== null) this.offlineStore.setLastSeen(now)
+    if (now !== null) this.offlineStore.setLastSeen(now, this.gameClock.nowMs())
   }
 
   /** A gap the tick won't simulate (sleeping device): stop marking time and claim it. */
@@ -93,7 +95,7 @@ export class OfflineProgressService {
     // Kept across retries: the claim ends where the wait began, however long the host takes to answer.
     if (this.pendingSincePerf === null) {
       this.pendingSincePerf = performance.now()
-      // Read now: the game loop's first tick ends an expired run before the server time arrives.
+      // Read now: the run's remaining time is measured against game time before the claim moves it.
       this.pendingArenaRun = this.battleStore.arenaRun()
     }
     try {
@@ -107,25 +109,28 @@ export class OfflineProgressService {
       this.anchor = { hostMs: hostNow, perfMs: performance.now() }
 
       const lastSeen = this.offlineStore.lastSeenAt()
-      this.offlineStore.setLastSeen(hostNow)
-      // A clock moved back gives a negative gap: it claims nothing.
+      // A clock moved back gives a negative gap: it claims nothing. Game time moves by the capped gap only.
       const gapMs = lastSeen === null ? 0 : Math.max(0, claimEnd - lastSeen)
+      const advanceMs = Math.min(OFFLINE_CAP_IN_MS, gapMs)
 
       // An arena run that ran out while away ends at its own end time; the rest of the absence is claimed in the
       // zone the player entered it from (kept as `currentZoneId`). A run still going claims nothing.
       const run = this.pendingArenaRun
       this.pendingArenaRun = null
       let arenaMs = 0
-      if (run && lastSeen !== null && claimEnd >= run.endsAt) {
-        arenaMs = Math.max(0, run.endsAt - lastSeen)
+      const arenaRemainingMs = run ? run.endsAt - this.gameClock.nowMs() : 0
+      if (run && advanceMs >= arenaRemainingMs) {
+        arenaMs = Math.max(0, arenaRemainingMs)
         this.arenaService.tick(run.endsAt)
       }
-      const elapsedMs = Math.min(OFFLINE_CAP_IN_MS, gapMs - arenaMs)
+      const elapsedMs = advanceMs - arenaMs
+      this.gameClock.advance(advanceMs)
+      this.offlineStore.setLastSeen(hostNow, this.gameClock.nowMs())
 
       const isClaimable = elapsedMs >= MIN_OFFLINE_CLAIM_IN_MS && !this.battleStore.arenaRun()
       const summary = isClaimable ? this.applyOffline(elapsedMs, lastSeen!) : null
-      // Timers run out in real time even when the gap is too short to claim. After the simulation, which reads them.
-      this.tickTimers(gapMs)
+      // Timers run out with game time even when the gap is too short to claim. After the simulation, which reads them.
+      this.tickTimers(advanceMs)
       if (!summary) return
 
       // No spells run offline, so a storm in progress ends with a claimed absence; a shorter gap (a reload) only pauses it.

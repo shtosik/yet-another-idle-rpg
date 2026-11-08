@@ -6,7 +6,7 @@ Deferred to a later plan: **store actions return events, one notices module show
 
 ## Order
 
-Step 1 first. Steps 2–5 are independent. Step 6 comes before Step 7, because the game clock is a saved store listed in `SAVED_STORES`. Step 8 last.
+Step 1 first. Steps 2–5 are independent. Step 6 comes before Step 7, which saves Game time in a store listed in `SAVED_STORES`. Step 8 last.
 
 ### 1. Small bugs (S, Sonnet) ✅
 - `services/quest-status.ts:101` `getQuestDropLimits` calls `getStepItems(questId, status.step)` without `orders`, so the quest drop cap ignores an Order's rolled items. Make `orders` a required parameter of `getStepItems` and pass it everywhere.
@@ -56,19 +56,19 @@ One module decides how items reach the player. Seeds go to the seed store, stati
 - Fix `persistence.md:63`, which points at a `GameComponent.resetState` that doesn't exist.
 - Docs: `persistence.md`.
 
-### 7. Game time (L, Opus, plan mode)
-Rules stop reading the device clock. **Game time** (`gameMs`) is saved and only moves forward: online by the tick (`performance.now()` deltas, already capped per tick), offline by the claim, `min(OFFLINE_CAP_IN_MS, host gap)`.
-- `GameClockStore`, its own saved slice listed in `SAVED_STORES`. Interface: `nowMs()` (exact, for rules), `second` (a signal that changes once per second, for UI countdowns), `advance(ms)`, called only by `GameIntervalService.tick` and the offline claim.
-- **Everything is bound by the offline cap**: crops, turn-in and Order cooldowns, the arena wait and kills move by the same capped amount. `OfflineProgressService.tickTimers(gapMs)` (`offline-progress.service.ts:127`), which runs timers on the uncapped gap, goes away; advancing `gameMs` moves every deadline at once.
-- Move to game time: turn-in cooldowns (`dialogue-effect-handlers.ts:212`, `quests.store.ts:239, 287, 306`, `turn-in-cooldown.service.ts`), farm (`plantedAt`, `syncedAt`, `player.store.ts:431, 906`), arena (`arenaReadyAt`, the run's `startedAt`/`endsAt`, `arena.service.ts:34-78`). The arena rule stays as it is: a run that ran out while away ends at its own end time and the rest is claimed in the zone it was entered from (`offline-progress.service.ts:113-121`).
-- The four 1 s `now` signals (`farm-plots.component.ts:58`, `notification-bar.component.ts:39`, `arena.service.ts:34`, `turn-in-cooldown.service.ts:14`) read `second`.
-- `gameMs` is written in the same write as `lastSeenAt` (`markSeen`, once per second), so they never disagree after a reload.
-- The host time stays as it is: `lastSeenAt` and the claim gap come from the host's `Date` header (`fetchServerTime`); a pending claim retries until the host answers.
-- **Migration** (saves are released since 0.3.0): each saved wall timestamp converts on load as `gameMs + (saved − lastSeenAt)`, with `gameMs` starting at 0; a deadline in the past becomes negative, which means ready. Version bump and a migration spec in every touched store (quests, battle, player).
-- **Date.now allowlist**: a check in `scripts/validate-data.mjs` fails on `Date.now(` anywhere in `src` outside `currency-feed.service.ts`, `exploration-guild.service.ts` (id string only), `dev-stub.ts` and `game-interval.service.ts` (sleep detector). Add a row to Enforced rules in `AGENTS.md`.
-- Specs: `GameClockStore` (advance, `second`, save together with `lastSeenAt`); cooldown, farm and arena rules driven by `advance`; an offline claim past the cap moves crops and cooldowns by the cap only; moving `Date.now` changes nothing.
+### 7. Game time (L, Opus, plan mode) ✅
+Rules stop reading the device clock. **Game time** only moves forward: online by the tick (its capped delta), offline by the claim, `min(OFFLINE_CAP_IN_MS, host gap)`.
+- `GameClock` (`services/game-clock.service.ts`), a non-saved root service that injects only `OfflineStore`. Interface: `nowMs()` (exact, untracked, for rules), `second` (a signal that changes at most once per game second, for UI countdowns and computeds), `advance(ms)` (ignores `ms <= 0`), called only by `GameIntervalService.tick` (before combat) and the offline claim.
+- **Saved as `gameMs` in `OfflineStore`, next to `lastSeenAt`**: `setLastSeen(at, gameMs)` writes both in one patch (one `localStorage` key), from `markSeen` and the claim, so they never disagree after a reload. The clock starts from `gameMs ?? lastSeenAt ?? 0`.
+- **No migration or version bump.** A save without `gameMs` starts the clock at its `lastSeenAt`, so its device-clock timestamps (`lastTurnInAt`, farm `plantedAt`/`syncedAt`, `arenaReadyAt`, the run's `startedAt`/`endsAt`) are already on the game timeline and load unchanged.
+- **Everything is bound by the offline cap**: the claim advances the clock by `advanceMs = min(cap, gap)`; kills get `advanceMs − arenaMs`, and `tickTimers(advanceMs)` runs buffs and consumables on the capped gap.
+- Moved to game time: turn-in and Order cooldowns (`dialogue-effect-handlers.ts` `recordTurnIn` through a `clock` in the dialogue context, `quests.store.ts` cooldown checks and `completeOrder`), farm (`player.store.ts` `syncFarm` and the planting ctx), arena (`arena.service.ts` defaults and `tick`). The arena rule stays: a run whose remaining game time (`endsAt − nowMs`) is within `advanceMs` ends at its own end time and the rest is claimed in the zone it was entered from.
+- The 1 s `now` signals and their `setInterval`s (`farm-plots.component.ts`, `notification-bar.component.ts`, `arena.service.ts`, `turn-in-cooldown.service.ts` with its `tick`) read `second`.
+- The host time stays as it is: `lastSeenAt` and the claim gap come from the host's `Date` header; `Date.now()` in the tick is only the sleep detector.
+- **Date.now allowlist**: check 16 in `scripts/validate-data.mjs` fails on `Date.now(` in `src` (specs excluded) outside `currency-feed.service.ts`, `exploration-guild.service.ts` (task id), `dev-stub.ts` and `game-interval.service.ts` (sleep detector). Row in Enforced rules in `AGENTS.md`.
+- Specs: `game-clock.service.spec.ts` (start from `gameMs`/`lastSeenAt`/0, advance and `second`, negative advance, `markSeen` writes both; an old save without `gameMs` loads every cooldown and plot unchanged; a 48 h claim moves crops, a cooldown and the arena wait by 24 h only; a `Date.now` moved 3 h changes nothing while `advance` does); `arena.service.spec.ts` (a run with 1 min left ends at its end time, kills cover the rest of the capped gap); specs that relied on `Date.now()` drive `GameClock.advance`.
 - Changelog: `[feature] Changed how the in-game time is calculated.`
-- Docs: `offline-progress.md`, `farming.md`, `arena.md`, `quests.md`, `persistence.md`. **Game time**, **Item grant** and **Spell bar** are already in `GLOSSARY.md`; fix them if the code ends up different.
+- Docs: `offline-progress.md`, `farming.md`, `arena.md`, `quests.md`, `persistence.md`; **Game time** in `GLOSSARY.md` is `GameClock`.
 
 ### 8. Wrap-up (S)
 - Re-read the system doc each step touched against the final code.
