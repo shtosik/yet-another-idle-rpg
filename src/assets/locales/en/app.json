@@ -198,6 +198,30 @@
   "costs": "Costs",
   "goldNeeded": "{{count}} more gold needed",
   "turnInReadyIn": "Ready in {{time}}",
+  "dialogueTags": {
+    "change": "{{sign}}{{amount}} {{name}}",
+    "amount": "{{name}}: {{amount}}",
+    "kill": "Kill {{amount}}x {{enemy}}",
+    "questRequired": "{{quest}} required",
+    "shop": "Open Shop",
+    "quest": {
+      "start": "New Quest: {{quest}}",
+      "advance": "Progress: {{quest}}",
+      "end": "Complete: {{quest}}"
+    },
+    "guild": {
+      "acceptTask": "Take task: {{length}}",
+      "claimTask": "Claim reward",
+      "abandonTask": "Cancel task"
+    },
+    "guildCondition": {
+      "hasActiveTask": "Active task in progress",
+      "taskComplete": "Task complete",
+      "noActiveTask": "No active task",
+      "hasFreeTaskSlot": "Free task slot",
+      "taskInProgressAt": "Task in progress"
+    }
+  },
   "quest": "Quest",
   "completed": "completed!",
   "inventory": {

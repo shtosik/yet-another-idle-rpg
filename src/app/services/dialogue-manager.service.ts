@@ -2,42 +2,48 @@ import { BattleStore } from '../store/battle/battle.store'
 import { ArenaService } from './arena.service'
 import { DialogueNode } from '../../interfaces/dialogues/dialogue-node.interface'
 import { computed, inject, Injectable, signal } from '@angular/core'
-import { isTaskDone, PlayerStore } from '../store/player/player.store'
+import { PlayerStore } from '../store/player/player.store'
 import { DialogueEffect, QuestEffect, ReputationTurnInEffect } from '../../types/dialogues/dialogue-effect.type'
-import { ReputationTurnIn, turnInBundles, turnInFor } from '../../data/reputation-turn-ins'
+import { turnInFor } from '../../data/reputation-turn-ins'
 import { ReputationService } from './reputation.service'
 import { TurnInCooldownService } from './turn-in-cooldown.service'
-import { bundleKey } from '../store/quests/turn-in-cooldown'
 import { orderKey, QuestsStore } from '../store/quests/quests.store'
 import { DialogueOption, DialogueResult } from '../../interfaces/dialogues/dialogue-option.type'
 import { DialogueCondition } from '../../types/dialogues/dialogue-condition.type'
 import { NpcID } from '../../enums/map/npc-id.enum'
 import npcData, { NPCProps } from '../../data/npc-data'
-import QUEST_DATA, { RequirementProps } from '../../data/quests-data'
-import { getActiveQuestIds, getQuestStatus, getStepItems, matchesQuestState } from './quest-status'
+import QUEST_DATA from '../../data/quests-data'
+import { matchesQuestState } from './quest-status'
 import { reputationTier } from '../store/player/reputation'
 import { ReputationTier } from '../../enums/reputation-tier.enum'
 import { QuestID } from '../../enums/ids/quest-id.enum'
 import { QuestState } from '../../enums/quest-state.enum'
-import { QuestStep } from '../../types/quests/quest-progression.type'
-import { ItemStack, MissingSlots } from '../store/player/inventory'
+import { MissingSlots } from '../store/player/inventory'
 import { ExplorationGuildService } from './exploration-guild.service'
 import { TownsStore } from '../store/towns/towns.store'
 import { CurrencyFeedService } from './currency-feed.service'
 import { UnlockService } from './unlock.service'
+import { DialogueContext, DialogueLabel, EffectCost, effectHandler, turnInState } from './dialogue-effect-handlers'
+import { conditionHandler, requirementMet } from './dialogue-condition-handlers'
 
 @Injectable({ providedIn: 'root' })
 export class DialogueManagerService {
   private playerStore = inject(PlayerStore)
   private questStore = inject(QuestsStore)
-  private guildService = inject(ExplorationGuildService)
-  private townsStore = inject(TownsStore)
-  private currencyFeed = inject(CurrencyFeedService)
-  private battleStore = inject(BattleStore)
-  private arenaService = inject(ArenaService)
-  private reputationService = inject(ReputationService)
   private cooldowns = inject(TurnInCooldownService)
-  private unlockService = inject(UnlockService)
+  private ctx: DialogueContext = {
+    player: this.playerStore,
+    quests: this.questStore,
+    towns: inject(TownsStore),
+    battle: inject(BattleStore),
+    arena: inject(ArenaService),
+    guild: inject(ExplorationGuildService),
+    currencyFeed: inject(CurrencyFeedService),
+    reputation: inject(ReputationService),
+    cooldowns: this.cooldowns,
+    unlocks: inject(UnlockService),
+    activeNpc: () => this.activeNpc(),
+  }
 
   private currentConversation = signal<Record<any, DialogueNode<any>> | null>(null)
   private currentNodeId = signal<any>(null)
@@ -76,35 +82,19 @@ export class DialogueManagerService {
       this.questStore.questStepProgression(),
       questId,
       QuestState.available,
-      req => this.checkRequirement(req, questId),
+      req => requirementMet(this.ctx, req, questId),
     )
   }
 
-  /** Rechecks capacity, fees and one-time effects, including Seal registration and reputation bundles. */
+  /** Rechecks capacity, fees and one-time effects (each effect handler's `cost` and `canApply`). */
   canApplyResult(result: DialogueResult<any> | undefined): boolean {
     return Object.keys(this.missingSlots(result)).length === 0 && this.missingGold(result) === 0
-      && (result?.effects ?? []).every(effect => {
-        if (effect.type === 'reputationTurnIn') return this.turnIn(effect).bundles > 0
-        if (effect.type === 'registerPathfindersSeal') return this.playerStore.canRegisterPathfindersSeal()
-        return true
-      })
+      && (result?.effects ?? []).every(effect => effectHandler(effect).canApply?.(effect, this.ctx) ?? true)
   }
 
-  /**
-   * What a turn-in hands over right now: the NPC's turn-in, how many of its item the player holds, how many the
-   * current steps of active quests keep back, and the bundle taken from the rest (0 or 1; 0 while it cools down).
-   */
-  turnIn(effect: ReputationTurnInEffect): { turnIn: ReputationTurnIn, held: number, kept: number, bundles: number } {
-    const turnIn = turnInFor(effect.npcId)
-    if (!turnIn) throw new Error(`No reputation turn-in for NPC ${effect.npcId}`)
-    const progression = this.questStore.questStepProgression()
-    const kept = [...getActiveQuestIds(progression)]
-      .flatMap(questId => getStepItems(questId, progression[questId] as QuestStep, this.questStore.orders()))
-      .filter(stack => stack.id === turnIn.itemId)
-      .reduce((sum, stack) => sum + stack.amount, 0)
-    const held = this.playerStore.itemCount(turnIn.itemId)
-    const cooling = this.cooldowns.remainingMs(bundleKey(turnIn.npcId, turnIn.itemId)) > 0
-    return { turnIn, held, kept: Math.min(held, kept), bundles: cooling ? 0 : turnInBundles(turnIn, Math.max(0, held - kept)) }
+  /** What a turn-in hands over right now (`turnInState`). */
+  turnIn(effect: ReputationTurnInEffect) {
+    return turnInState(effect, this.ctx)
   }
 
   /** Turn-ins stop once their town is Exalted: more reputation would count for nothing. */
@@ -113,47 +103,21 @@ export class DialogueManagerService {
     return reputationId === undefined || reputationTier(this.playerStore.reputation()[reputationId] ?? 0) === ReputationTier.exalted
   }
 
-  /** Gold still needed to pay the result's `deduct` effects (owner decision: gold never goes negative). */
+  private costs(result: DialogueResult<any> | undefined): EffectCost[] {
+    return (result?.effects ?? []).map(effect => effectHandler(effect).cost?.(effect, this.ctx) ?? {})
+  }
+
+  /** Gold still needed to pay the result's gold costs (owner decision: gold never goes negative). */
   missingGold(result: DialogueResult<any> | undefined): number {
-    const fee = (result?.effects ?? []).reduce((sum, effect) =>
-      effect.type === 'stat' && effect.action === 'deduct'
-        ? sum + effect.stats.filter(s => s.stat === 'goldCoins').reduce((s, g) => s + g.amount, 0)
-        : sum, 0)
+    const fee = this.costs(result).reduce((sum, cost) => sum + (cost.gold ?? 0), 0)
     return Math.max(0, fee - this.playerStore.stats().goldCoins)
   }
 
   /** Slots the player must free, per tab, before the result's item or quest-completion rewards fit. */
   missingSlots(result: DialogueResult<any> | undefined): MissingSlots {
-    if (!result?.effects) return {}
-
-    const adding: ItemStack[] = []
-    const removing: ItemStack[] = []
-
-    for (const effect of result.effects) {
-      if (effect.type === 'item') {
-        const stacks = effect.items.map(i => ({ id: i.itemId, amount: i.amount }))
-        if (effect.action === 'give') adding.push(...stacks)
-        else removing.push(...stacks)
-      } else if (effect.type === 'arena' && effect.action === 'claim') {
-        adding.push(...this.battleStore.arenaRewards())
-      } else if (effect.type === 'quest' && effect.action !== 'start') {
-        const status = getQuestStatus(this.questStore.questStepProgression(), effect.questId)
-        if (status.state !== QuestState.active) continue
-
-        removing.push(...getStepItems(effect.questId, status.step, this.questStore.orders()))
-        adding.push(...this.questCompletionRewards(effect, status.step))
-      }
-    }
-
-    return adding.length === 0 ? {} : this.playerStore.missingSlotsByTab(adding, removing)
-  }
-
-  private questCompletionRewards(effect: QuestEffect, step: QuestStep): ItemStack[] {
-    const questData = QUEST_DATA[effect.questId]
-    const completes = effect.action === 'end' || step >= questData.steps.length
-    if (!completes) return []
-
-    return questData.rewards.flatMap(r => r.type === 'item' ? [{ id: r.itemId, amount: r.amount }] : [])
+    const costs = this.costs(result)
+    const adding = costs.flatMap(cost => cost.adds ?? [])
+    return adding.length === 0 ? {} : this.playerStore.missingSlotsByTab(adding, costs.flatMap(cost => cost.removes ?? []))
   }
 
   selectOption(option: DialogueOption<any>) {
@@ -207,179 +171,18 @@ export class DialogueManagerService {
   }
 
   checkCondition(c: DialogueCondition): boolean {
-    return this.evaluateCondition(c) !== !!c.not
+    return conditionHandler(c).evaluate(c, this.ctx) !== !!c.not
   }
 
-  private evaluateCondition(c: DialogueCondition): boolean {
-    switch (c.type) {
-      case 'flag':
-        return !!this.questStore.dialogueFlags()[c.name] === c.isSet
-      case 'stat':
-        return c.comparison === 'gte'
-          ? (this.playerStore.stats()[c.stat] as number) >= c.amount
-          : (this.playerStore.stats()[c.stat] as number) <= c.amount
-      case 'manyStat':
-        return c.statsRequired.every(req =>
-          req.comparison === 'gte'
-            ? (this.playerStore.stats()[req.stat] as number) >= req.amount
-            : (this.playerStore.stats()[req.stat] as number) <= req.amount,
-        )
-      case 'quest':
-        return matchesQuestState(
-          this.questStore.questStepProgression(),
-          c.questId,
-          c.questState,
-          req => this.checkRequirement(req, c.questId),
-          c.step,
-        )
-      case 'item':
-        return this.playerStore.itemCount(c.itemId) >= c.amount
-      case 'manyItems':
-        return c.itemIds.every(itemId => this.playerStore.itemCount(itemId) >= (c.amounts[itemId] ?? 1))
-      case 'killCount':
-        return (this.playerStore.enemyKillCounts()[c.enemyId] ?? 0) >= c.amount
-      case 'manyKillCount':
-        return c.enemiesRequired.every(
-          req => (this.playerStore.enemyKillCounts()[req.enemyId] ?? 0) >= req.amount,
-        )
-      case 'waveKillCount':
-        return this.playerStore.getKillCountByZoneAndWave(c.zoneId, c.waveNumber) >= c.amount
-      case 'manyWaveKillCount':
-        return c.wavesRequired.every(
-          req => this.playerStore.getKillCountByZoneAndWave(req.zoneId, req.waveNumber) >= req.amount,
-        )
-      case 'manyQuestCompleted':
-        return c.questsRequired.every(req =>
-          matchesQuestState(
-            this.questStore.questStepProgression(),
-            req.questId,
-            req.questState,
-            r => this.checkRequirement(r, req.questId),
-            req.step,
-          ),
-        )
-      case 'guild':
-        switch (c.condition) {
-          case 'hasActiveTask':   return this.playerStore.hasTaskInProgress()
-          case 'taskComplete':    return this.playerStore.hasCompletedTask()
-          case 'noActiveTask':    return this.playerStore.activeTasks().length === 0
-          case 'hasFreeTaskSlot': return this.playerStore.hasAvailableTaskSlot()
-          case 'taskInProgressAt': {
-            const task = this.playerStore.activeTasks()[c.taskIndex ?? 0]
-            return !!task && !isTaskDone(task)
-          }
-        }
-        return false
-      case 'reputation':
-        return this.playerStore.reputationTierOf(c.reputationId) >= c.tier
-      case 'professionLevel':
-        return this.playerStore.professionLevel(c.professionId) >= c.level
-      case 'farmSeeds':
-        return Object.values(this.playerStore.farm().seeds).reduce((sum, n) => sum + (n ?? 0), 0) >= c.atLeast
-      case 'turnInCooldown':
-        return (this.cooldowns.remainingMs(c.key) === 0) === (c.state === 'ready')
-      case 'arena':
-        switch (c.state) {
-          case 'ready': return this.arenaService.isReady()
-          case 'running': return !!this.battleStore.arenaRun()
-          case 'rewardsWaiting': return this.battleStore.arenaRewards().length > 0
-        }
-        return false
-      default:
-        return false
-    }
+  conditionLabel(c: DialogueCondition): DialogueLabel[] {
+    return conditionHandler(c).label(c, this.ctx)
   }
 
-  /** Kill requirements of `questId` count kills since its current step started. */
-  private checkRequirement(req: RequirementProps, questId: QuestID): boolean {
-    const { current, target } = this.questStore.requirementProgress(questId, req)
-    return current >= target
+  effectLabel(effect: DialogueEffect): DialogueLabel[] {
+    return effectHandler(effect).label(effect, this.ctx)
   }
 
   private applyEffects(effects: DialogueEffect[]) {
-    effects.forEach(effect => {
-      switch (effect.type) {
-        case 'stat':
-          const signedStats = effect.stats.map(s => ({
-            stat: s.stat,
-            amount: effect.action === 'deduct' ? -s.amount : s.amount,
-          }))
-          this.playerStore.updatePlayerStats(signedStats)
-          break
-        case 'quest':
-          switch (effect.action) {
-            case 'start':
-              this.questStore.startQuest(effect.questId)
-              break
-            case 'advance':
-              this.questStore.advanceQuest(effect.questId)
-              break
-            case 'end':
-              // Dialogue ends are turn-ins, so recheck like `advanceQuest`; `dev.completeQuest` calls `endQuest` directly.
-              if (this.questStore.isStepReady(effect.questId)) this.questStore.endQuest(effect.questId)
-              break
-          }
-          break
-        case 'shop':
-          this.openShop(effect.shopId, effect.stage)
-          break
-        case 'forge':
-          this.townsStore.openForge()
-          break
-        case 'registerPathfindersSeal':
-          this.playerStore.registerPathfindersSeal()
-          break
-        case 'flag':
-          this.questStore.setDialogueFlag(effect.name)
-          break
-        case 'item':
-          if (effect.action === 'take') {
-            this.playerStore.removeItems(effect.items.map(i => ({ id: i.itemId, amount: i.amount })))
-          } else if (effect.action === 'give') {
-            this.playerStore.addItems(effect.items.map(i => ({ id: i.itemId, amount: i.amount })))
-          }
-          break
-        case 'guild':
-          switch (effect.action) {
-            case 'acceptTask':
-              this.guildService.acceptTask(effect.taskLength)
-              break
-            case 'abandonTask':
-              this.playerStore.abandonTask(effect.taskIndex ?? 0)
-              break
-            case 'claimTask': {
-              const tokensBefore = this.playerStore.explorerTokens()
-              this.playerStore.claimCompletedTasks()
-              this.currencyFeed.show('explorerTokens', this.playerStore.explorerTokens() - tokensBefore)
-              break
-            }
-          }
-          break
-        case 'arena':
-          if (effect.action === 'enter') this.arenaService.enter()
-          else this.arenaService.claimRewards()
-          break
-        case 'unlockProfession':
-          this.playerStore.unlockProfession(effect.professionId)
-          break
-        case 'unlockSite':
-          this.unlockService.grant({ type: 'site', siteId: effect.siteId })
-          break
-        case 'reputationTurnIn': {
-          const { turnIn, bundles } = this.turnIn(effect)
-          if (bundles === 0) break
-          this.playerStore.removeItems([{ id: turnIn.itemId, amount: bundles * turnIn.bundleSize }])
-          this.reputationService.gain([{ reputationId: turnIn.reputationId, amount: bundles * turnIn.reputation }])
-          this.questStore.recordTurnIn(bundleKey(turnIn.npcId, turnIn.itemId), Date.now())
-          break
-        }
-      }
-    })
-  }
-
-  private openShop(shopId: number, stage = 0) {
-    const npc = this.activeNpc()
-    if (npc) this.townsStore.rememberNpcShop(npc.id, shopId, stage)
-    this.townsStore.openShop(shopId, stage)
+    effects.forEach(effect => effectHandler(effect).apply(effect, this.ctx))
   }
 }

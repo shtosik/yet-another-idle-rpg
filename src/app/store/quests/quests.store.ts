@@ -18,6 +18,7 @@ import { ProfessionService } from '../../services/profession.service'
 import { REPUTATION_THRESHOLDS, ReputationGain } from '../player/reputation'
 import { orderKey, TurnInKey, turnInRemainingMs } from './turn-in-cooldown'
 import { Orders, rollOrder } from './orders'
+import { PlayerStat } from '../../../types/player/player-stat.type'
 
 export { orderKey }
 
@@ -55,6 +56,35 @@ const STORE_KEY = 'questsStore'
 
 const waveKey = (zoneId: ZoneID, wave: number) => `${zoneId}-${wave}`
 
+/** What completing a quest pays, split by where it goes. The dialogue slot check reads `items` from here too. */
+export function questPayout(data: QuestProps): QuestPayout {
+  const payout: QuestPayout = { stats: [], items: [], reputation: [], professionXp: [] }
+  for (const reward of data.rewards) {
+    switch (reward.type) {
+      case 'stat':
+        payout.stats.push({ stat: reward.key, amount: reward.amount })
+        break
+      case 'item':
+        payout.items.push({ id: reward.itemId, amount: reward.amount })
+        break
+      case 'reputation':
+        payout.reputation.push({ reputationId: reward.reputationId, amount: reward.amount })
+        break
+      case 'professionXp':
+        payout.professionXp.push({ professionId: reward.professionId, amount: reward.amount })
+        break
+    }
+  }
+  return payout
+}
+
+export interface QuestPayout {
+  stats: { stat: PlayerStat, amount: number }[]
+  items: ItemStack[]
+  reputation: ReputationGain[]
+  professionXp: { professionId: ProfessionID, amount: number }[]
+}
+
 export const QuestsStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
@@ -68,34 +98,14 @@ export const QuestsStore = signalStore(
     professionService = inject(ProfessionService),
   ) => ({
     handleQuestCompleted(data: QuestProps) {
-      const statsToUpdate = []
-      const itemsToUpdate: ItemStack[] = []
-      const reputationGains: ReputationGain[] = []
-      const professionRewards: { professionId: ProfessionID, amount: number }[] = []
-
-      data.rewards.forEach((reward) => {
-        switch (reward.type) {
-          case 'stat':
-            statsToUpdate.push({ stat: reward.key, amount: reward.amount })
-            break
-          case 'item':
-            itemsToUpdate.push({ id: reward.itemId, amount: reward.amount })
-            break
-          case 'reputation':
-            reputationGains.push({ reputationId: reward.reputationId, amount: reward.amount })
-            break
-          case 'professionXp':
-            professionRewards.push({ professionId: reward.professionId, amount: reward.amount })
-            break
-        }
-      })
+      const { stats, items, reputation, professionXp } = questPayout(data)
 
       patchState(store, (state) => ({ pinnedQuests: state.pinnedQuests.filter(id => id !== data.questId) }))
       modalService.openQuestCompleted(data)
-      playerStore.updatePlayerStats(statsToUpdate)
-      playerStore.addItems(itemsToUpdate)
-      reputationService.gain(reputationGains)
-      professionRewards.forEach(({ professionId, amount }) => professionService.gainXp(professionId, amount))
+      playerStore.updatePlayerStats(stats)
+      playerStore.addItems(items)
+      reputationService.gain(reputation)
+      professionXp.forEach(({ professionId, amount }) => professionService.gainXp(professionId, amount))
     },
 
     /** A turn-in consumes the step's item requirements, so dialogue never restates them. */

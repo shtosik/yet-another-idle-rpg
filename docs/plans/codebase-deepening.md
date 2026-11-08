@@ -33,7 +33,7 @@ A new `services/kill-resolution.service.ts` with one interface, `resolveKills(ki
 - Online lost drops follow `applyKillBatch`'s rules: a dropped stack lands whole or not at all. If that changes what a player with a full inventory sees, add to the changelog: `[bug] Drops that don't fit a full inventory are now counted the same way online and offline.`
 - Docs: `game-loop-and-combat.md`, `offline-progress.md`, `enemies-shiny-pets-bestiary.md` if it describes drops.
 
-### 4. Dialogue handler tables (M-L, Opus)
+### 4. Dialogue handler tables (M-L, Opus) ✅
 Each dialogue effect and condition is known in one place.
 - `services/dialogue-effect-handlers.ts`: `EFFECT_HANDLERS: { [T in DialogueEffect['type']]: EffectHandler<Extract<DialogueEffect, { type: T }>> }`, so a missing variant fails to compile. An entry holds `apply`, an optional `cost` (gold and slots it needs), an optional `canApply`, and `label` (an i18n key plus params).
 - `services/dialogue-condition-handlers.ts`: `CONDITION_HANDLERS`, built the same way, with `evaluate` and `label`. This replaces `default: return false` (`dialogue-manager.service.ts:289`), which silently hides options.

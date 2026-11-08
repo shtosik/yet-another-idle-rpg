@@ -49,7 +49,7 @@ describe('forge dialogue effect', () => {
 
   it('labels the effect with the registered translation', () => {
     const component = TestBed.createComponent(DialogueComponent).componentInstance
-    expect(component.getEffectLabel({ type: 'forge' })).toBe('Open Forge')
+    expect(component.tag(dialogue.effectLabel({ type: 'forge' }))).toBe('Open Forge')
   })
 
   it('keeps shop and Forge mutually exclusive', () => {

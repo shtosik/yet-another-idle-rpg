@@ -4,21 +4,13 @@ import { DialogueOption } from '../../../../interfaces/dialogues/dialogue-option
 import i18next from 'i18next'
 import { NgOptimizedImage } from '@angular/common'
 import { I18nextPipe } from '../../../pipes/i18next.pipe'
-import { QuestID } from '../../../../enums/ids/quest-id.enum'
 import { NpcID } from '../../../../enums/map/npc-id.enum'
 import { ItemID } from '../../../../enums/ids/item-id.enum'
 import { EnemyID } from '../../../../enums/ids/enemy-id.enum'
-import { DialogueEffect } from '../../../../types/dialogues/dialogue-effect.type'
-import { DialogueCondition } from '../../../../types/dialogues/dialogue-condition.type'
-import { ZoneID } from '../../../../enums/ids/zone-id.enum'
-import { ReputationID } from '../../../../enums/reputation-id.enum'
-import { ProfessionID } from '../../../../enums/ids/profession-id.enum'
-import { reputationLockText } from '../quests/reputation/reputation-text'
 import { CloseButtonComponent } from '../../shared/close-button/close-button.component'
 import { PlayerStore } from '../../../store/player/player.store'
 import { missingSlotsText } from '../inventory/tab-text'
-import { TurnInCooldownService } from '../../../services/turn-in-cooldown.service'
-import { formatCooldown } from '../../../store/quests/turn-in-cooldown'
+import { DialogueLabel, shownBundles } from '../../../services/dialogue-effect-handlers'
 
 @Component({
   selector: 'app-dialogue',
@@ -33,9 +25,7 @@ import { formatCooldown } from '../../../store/quests/turn-in-cooldown'
 export class DialogueComponent {
   protected dialogueService = inject(DialogueManagerService)
   private playerStore = inject(PlayerStore)
-  private cooldowns = inject(TurnInCooldownService)
   protected readonly NpcID = NpcID
-  protected readonly QuestID = QuestID
 
   protected activeNpc = this.dialogueService.activeNpc
   protected activeNode = this.dialogueService.activeNode
@@ -63,7 +53,7 @@ export class DialogueComponent {
     if (turnInEffect?.type === 'reputationTurnIn') {
       const { turnIn, held, kept, bundles } = this.dialogueService.turnIn(turnInEffect)
       return {
-        amount: this.shownBundles(bundles) * turnIn.bundleSize,
+        amount: shownBundles(bundles) * turnIn.bundleSize,
         item: i18next.t(`items:names.${ItemID[turnIn.itemId]}`),
         held,
         kept,
@@ -83,130 +73,9 @@ export class DialogueComponent {
     }
   }
 
-  getConditionLabel(condition: DialogueCondition): string {
-    switch (condition.type) {
-      case 'stat': {
-        const statName = i18next.t(`app:playerStats.${condition.stat}`)
-        return `${statName}: ${condition.amount}`
-      }
-      case 'quest': {
-        const questName = i18next.t(`quests:names.${QuestID[condition.questId]}`)
-        return `${questName} required`
-      }
-      case 'item': {
-        const itemName = i18next.t(`items:names.${ItemID[condition.itemId]}`)
-        return `${itemName}: ${condition.amount}`
-      }
-      case 'killCount': {
-        const enemyName = i18next.t(`enemies:names.${EnemyID[condition.enemyId]}`)
-        return `Kill ${condition.amount}x ${enemyName}`
-      }
-      case 'waveKillCount': {
-        const zone = i18next.t(`zones:names.${ZoneID[condition.zoneId]}`)
-        return i18next.t('quests:requirements.waveKillCount', {
-          amount: condition.amount,
-          wave: condition.waveNumber,
-          zone,
-        })
-      }
-      case 'reputation':
-        return reputationLockText(condition.reputationId, condition.tier, this.playerStore.reputation()[condition.reputationId] ?? 0)
-      case 'professionLevel':
-        return this.expertiseLabel(condition.professionId, condition.level)
-      case 'turnInCooldown': {
-        const remaining = this.cooldowns.remainingMs(condition.key)
-        return remaining > 0 ? i18next.t('app:turnInReadyIn', { time: formatCooldown(remaining) }) : ''
-      }
-      case 'manyStat':
-        return condition.statsRequired
-          .map(req => this.getConditionLabel({ type: 'stat', ...req }))
-          .join(', ')
-      case 'manyItems':
-        return condition.itemIds
-          .map(itemId => this.getConditionLabel({ type: 'item', itemId, amount: condition.amounts[itemId] ?? 1 }))
-          .join(', ')
-      case 'manyKillCount':
-        return condition.enemiesRequired
-          .map(req => this.getConditionLabel({ type: 'killCount', ...req }))
-          .join(', ')
-      case 'manyWaveKillCount':
-        return condition.wavesRequired
-          .map(req => this.getConditionLabel({ type: 'waveKillCount', ...req }))
-          .join(', ')
-      case 'manyQuestCompleted':
-        return condition.questsRequired
-          .map(req => this.getConditionLabel({ type: 'quest', ...req }))
-          .join(', ')
-      case 'guild':
-        switch (condition.condition) {
-          case 'hasActiveTask': return 'Active task in progress'
-          case 'taskComplete':  return 'Task complete'
-          case 'noActiveTask':  return 'No active task'
-          case 'hasFreeTaskSlot': return 'Free task slot'
-          case 'taskInProgressAt': return 'Task in progress'
-        }
-        return ''
-      default:
-        return ''
-    }
-  }
-
-  getEffectLabel(effect: DialogueEffect): string {
-    switch (effect.type) {
-      case 'quest': {
-        const questName = i18next.t(`quests:names.${QuestID[effect.questId]}`)
-        switch (effect.action) {
-          case 'start':   return `New Quest: ${questName}`
-          case 'advance': return `Progress: ${questName}`
-          case 'end':     return `Complete: ${questName}`
-        }
-      }
-      case 'stat':
-        return effect.stats.map(s => {
-          const name = i18next.t(`app:playerStats.${s.stat}`)
-          const sign = effect.action === 'deduct' ? '-' : '+'
-          return `${sign}${s.amount} ${name}`
-        }).join(', ')
-      case 'item':
-        if (effect.silent) return ''
-        return effect.items.map(i => {
-          const name = i18next.t(`items:names.${ItemID[i.itemId]}`)
-          const sign = effect.action === 'give' ? '+' : '-'
-          return `${sign}${i.amount} ${name}`
-        }).join(', ')
-      case 'shop':
-        return 'Open Shop'
-      case 'forge':
-        return i18next.t('forge:open')
-      case 'registerPathfindersSeal':
-        return i18next.t('dialogues/laHarparMarvin:sealEffect')
-      case 'guild':
-        switch (effect.action) {
-          case 'acceptTask': return `Take task: ${effect.taskLength}`
-          case 'claimTask':  return 'Claim reward'
-          case 'abandonTask': return 'Cancel task'
-        }
-      case 'arena':
-        return i18next.t(`app:arena.effects.${effect.action}`)
-      case 'reputationTurnIn': {
-        const { turnIn, bundles } = this.dialogueService.turnIn(effect)
-        return i18next.t('quests:reputation.reward', {
-          amount: this.shownBundles(bundles) * turnIn.reputation,
-          town: i18next.t(`map:reputations.${ReputationID[turnIn.reputationId]}`),
-        })
-      }
-      default:
-        return ''
-    }
-  }
-
-  private expertiseLabel(professionId: ProfessionID, level: number): string {
-    return i18next.t('app:expertise.label', { profession: i18next.t(`app:professions.${ProfessionID[professionId]}`), level })
-  }
-
-  /** A disabled turn-in (no full bundle yet) still shows one bundle's worth, so the player sees the rate. */
-  private shownBundles(bundles: number): number {
-    return Math.max(bundles, 1)
+  /** The tag text from a condition or effect handler's label parts; empty for no tag. */
+  tag(labels: DialogueLabel[]): string {
+    return labels.map(label => i18next.t(label.key, label.params)).join(', ')
   }
 
   isOptionVisible(option: DialogueOption<any>): boolean {
