@@ -49,6 +49,16 @@ describe('Spell rules', () => {
       expect(canCast(SPELLS_DATA[id], ctx(id, { mana: 0 }))).toBe(false)
     })
 
+    it('casts with mana exactly at the cost, not one below', () => {
+      const id = SpellID.fireStrike
+      expect(canCast(SPELLS_DATA[id], ctx(id, { mana: 3, cost: 3 }))).toBe(true)
+      expect(canCast(SPELLS_DATA[id], ctx(id, { mana: 2, cost: 3 }))).toBe(false)
+    })
+
+    it('needs a living enemy for damage over time', () => {
+      expect(canCast(SPELLS_DATA[SpellID.thunderstorm], ctx(SpellID.thunderstorm, { isInCombat: false }))).toBe(false)
+    })
+
     it('needs a living enemy for damage spells', () => {
       expect(canCast(SPELLS_DATA[SpellID.fireStrike], ctx(SpellID.fireStrike, { isInCombat: false }))).toBe(false)
     })

@@ -41,6 +41,13 @@ describe('quest transition', () => {
     expect(questTransition(QUEST, 'end', slice(), ctx({ fits: () => false }))).toBeNull()
   })
 
+  it('checks the reward fit with the turn-in items already taken out', () => {
+    const fits = jasmine.createSpy('fits').and.returnValue(true)
+    const t = questTransition(QuestID.meatShortage, 'end', slice({ questStepProgression: { [QuestID.meatShortage]: 1 } }), ctx({ fits }))!
+    expect(t.take).toEqual([{ id: ItemID.crabMeat, amount: 30 }])
+    expect(fits).toHaveBeenCalledWith(t.payout!.items, t.take)
+  })
+
   it('refuses a quest that is not active', () => {
     expect(questTransition(QUEST, 'end', slice({ questStepProgression: {} }), ctx())).toBeNull()
   })
