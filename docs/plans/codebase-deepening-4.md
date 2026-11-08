@@ -57,7 +57,7 @@ One rule moves a quest forward and pays it.
 - Specs: the upgraded-name rule; one lookup per family.
 - Docs: `localization.md`.
 
-### 7. Spell rules (S-M, Sonnet)
+### 7. Spell rules (S-M, Sonnet) ✅
 - Pure `store/battle/spell-rules.ts` beside `spell-bar.ts`: `manaCost`, `spellCooldown`, `canCast` (per `SpellType`) and a consumable-use plan (mana gained, effect, lock), moved from `BattleManagerService`. The service routes; `handleEnemyDeath` keeps only Kill resolution and events.
 - Specs (`spell-rules.spec.ts`): perk cost floor at 1, cooldown floor at 1 s, empower already active, pure mana potion at full mana does nothing.
 - Docs: `spells-and-buffs.md`, `consumables-camp-crafting.md`.
