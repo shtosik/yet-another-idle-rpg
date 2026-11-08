@@ -11,6 +11,7 @@ import { ItemTier } from '../../../enums/items/item-tier.enum'
 import { EnemyID } from '../../../enums/ids/enemy-id.enum'
 import { ProfessionID } from '../../../enums/ids/profession-id.enum'
 import ENEMIES_DATA from '../../../data/enemies-data'
+import { KillResolutionService } from '../../services/kill-resolution.service'
 
 describe('seed routing', () => {
   const crab = ENEMIES_DATA[EnemyID.crab]
@@ -18,6 +19,8 @@ describe('seed routing', () => {
   const unlock = () => store.unlockSite(SiteID.farm)
   const seeds = [{ id: ItemID.turnipSeeds, amount: 3 }]
   let store: InstanceType<typeof PlayerStore>
+  const killOnline = (enemyId: EnemyID, zoneId: ZoneID, wave: number, isShiny: boolean) =>
+    TestBed.inject(KillResolutionService).resolveKills(zoneId, wave, [{ enemyId, isShiny, stats: store.stats() }], Math.random)
 
   beforeEach(() => {
     localStorage.clear()
@@ -62,10 +65,10 @@ describe('seed routing', () => {
   it('counts online kill seeds silently before the unlock, and never loses them', () => {
     crab.drops = [...crab.drops, seedDrop]
     spyOn(Math, 'random').and.returnValue(0.5)
-    const result = store.processBattleEnd(EnemyID.crab, ZoneID.horseshoeBeach, 1, false)
+    const result = killOnline(EnemyID.crab, ZoneID.horseshoeBeach, 1, false)
 
     expect(store.farm().seeds[ItemID.turnipSeeds]).toBe(1)
-    expect(result.foundSeeds).toEqual([])
+    expect(result.receivedItems).toEqual([])
     expect(result.lost.some(stack => stack.id === ItemID.turnipSeeds)).toBeFalse()
     expect(inventoryHasNoSeeds()).toBeTrue()
   })
@@ -75,20 +78,20 @@ describe('seed routing', () => {
     crab.drops = [...crab.drops, seedDrop]
     spyOn(Math, 'random').and.returnValue(0.5)
 
-    expect(store.processBattleEnd(EnemyID.crab, ZoneID.horseshoeBeach, 1, false).foundSeeds).toEqual([{ id: ItemID.turnipSeeds, amount: 1 }])
+    expect(killOnline(EnemyID.crab, ZoneID.horseshoeBeach, 1, false).receivedItems).toEqual([{ id: ItemID.turnipSeeds, type: ItemType.seed, tier: ItemTier.normal, amount: 1 }])
   })
 
   it('rolls online kill seeds with the expertise seedDropChance', () => {
     crab.drops = [...crab.drops, { ...seedDrop, chance: 4 }]
     // 0.74 x 4 = 2.96 misses at no bonus (hit above 3) and hits at +25% (above 2.75).
     spyOn(Math, 'random').and.returnValue(0.74)
-    store.processBattleEnd(EnemyID.crab, ZoneID.horseshoeBeach, 1, false)
+    killOnline(EnemyID.crab, ZoneID.horseshoeBeach, 1, false)
     expect(store.farm().seeds[ItemID.turnipSeeds] ?? 0).toBe(0)
 
     store.unlockProfession(ProfessionID.farming)
     store.applyProfessionXp(ProfessionID.farming, 1_000_000)
     expect(store.stats().seedDropChance).toBe(0.25)
-    store.processBattleEnd(EnemyID.crab, ZoneID.horseshoeBeach, 1, false)
+    killOnline(EnemyID.crab, ZoneID.horseshoeBeach, 1, false)
     crab.drops = crab.drops.filter(drop => drop.id !== ItemID.turnipSeeds)
 
     expect(store.farm().seeds[ItemID.turnipSeeds]).toBe(1)

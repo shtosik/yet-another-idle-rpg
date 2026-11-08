@@ -10,6 +10,10 @@ import { isSeed, stackKey } from './inventory'
 import { ItemType } from '../../../enums/items/item-type.enum'
 import { EquipmentSlot } from '../../../enums/equipment-slot.enum'
 import { ItemID } from '../../../enums/ids/item-id.enum'
+import { EnemyID } from '../../../enums/ids/enemy-id.enum'
+import { ZoneID } from '../../../enums/ids/zone-id.enum'
+import ENEMIES_DATA from '../../../data/enemies-data'
+import { rankBonus } from './bestiary-rank'
 
 /** Returns a value in [0, 1). Online kills use `Math.random`; offline claims use a seeded one. */
 export type Rng = () => number
@@ -104,4 +108,95 @@ export function rollEnemyDrops(
 ) {
   rollDropList(enemy.drops, rolls, dropChanceBonus, accumulator, questDropLimits, rng, upgradedDropChance, seedDropChance)
   if (isShiny && enemy.shinyDrops?.length) rollDropList(enemy.shinyDrops, 1, dropChanceBonus, accumulator, questDropLimits, rng, upgradedDropChance, seedDropChance)
+}
+
+/** One kill to pay: the enemy, whether it was shiny, and the player's stats at the time. */
+export interface Kill {
+  enemyId: EnemyID
+  isShiny: boolean
+  stats: PlayerStatsType
+}
+
+/** State read once at the start of a batch: bestiary ranks and quest caps stay fixed for the whole batch. */
+export interface KillContext {
+  questDropLimits?: QuestDropLimits
+  enemyKillCounts: Partial<Record<EnemyID, number>>
+  /** Enemies with an unfinished Exploration Guild task. */
+  taskEnemyIds: ReadonlySet<EnemyID>
+}
+
+/** Totals of one or many kills on one zone wave, applied in one store update (`PlayerStore.applyKillBatch`). */
+export interface KillBatch {
+  zoneId: ZoneID
+  wave: number
+  kills: number
+  shinies: number
+  killsByEnemy: Partial<Record<EnemyID, number>>
+  /** Task counts per enemy, Bounty Mark doubles included; capped at each task's target when applied. */
+  taskCountsByEnemy: Partial<Record<EnemyID, number>>
+  experience: number
+  gold: number
+  items: InventoryItem[]
+}
+
+export const emptyKillBatch = (zoneId: ZoneID, wave: number): KillBatch => ({
+  zoneId, wave, kills: 0, shinies: 0, killsByEnemy: {}, taskCountsByEnemy: {}, experience: 0, gold: 0, items: [],
+})
+
+/** One kill: XP, gold, drops (bestiary rank bonus included) and its task count (Bounty Mark may double it). */
+export function rollKill(enemy: Enemy, zone: Zone, wave: number, isShiny: boolean, stats: PlayerStatsType, ctx: KillContext, rng: Rng): KillBatch {
+  const reward = killReward(enemy, zone, wave, isShiny, stats)
+  const drops = new Map<string, InventoryItem>()
+  const { dropChance } = rankBonus(enemy.id, ctx.enemyKillCounts[enemy.id] ?? 0)
+  rollEnemyDrops(enemy, reward.dropRolls, isShiny, dropChance, drops, ctx.questDropLimits, rng, stats.upgradedDropChance, stats.seedDropChance)
+
+  const batch = emptyKillBatch(zone.id, wave)
+  batch.kills = 1
+  batch.shinies = isShiny ? 1 : 0
+  batch.killsByEnemy[enemy.id] = 1
+  batch.experience = reward.experience
+  batch.gold = reward.gold
+  batch.items = [...drops.values()]
+  if (ctx.taskEnemyIds.has(enemy.id)) batch.taskCountsByEnemy[enemy.id] = rng() * 100 < stats.taskDoubleKillChance ? 2 : 1
+  return batch
+}
+
+const addCounts = <K extends number>(into: Partial<Record<K, number>>, from: Partial<Record<K, number>>) => {
+  for (const [key, count] of Object.entries(from) as [string, number][]) {
+    const id = Number(key) as K
+    into[id] = (into[id] ?? 0) + count
+  }
+}
+
+/** Adds `kill` into `into` (mutated), merging drops by id + tier + upgradeLevel. */
+export function mergeKillBatch(into: KillBatch, kill: KillBatch): void {
+  into.kills += kill.kills
+  into.shinies += kill.shinies
+  into.experience += kill.experience
+  into.gold += kill.gold
+  addCounts(into.killsByEnemy, kill.killsByEnemy)
+  addCounts(into.taskCountsByEnemy, kill.taskCountsByEnemy)
+  for (const item of kill.items) {
+    const existing = into.items.find(stack => stackKey(stack) === stackKey(item))
+    if (existing) existing.amount += item.amount
+    else into.items.push({ ...item })
+  }
+}
+
+/** Quest caps minus what the batch has rolled so far, so a batch caps like the same kills one by one. */
+export function remainingDropLimits(limits: QuestDropLimits | undefined, items: InventoryItem[]): QuestDropLimits | undefined {
+  if (!limits?.size || !items.length) return limits
+  const rolled = (id: ItemID) => items.filter(item => item.id === id).reduce((sum, item) => sum + item.amount, 0)
+  return new Map([...limits].map(([questId, perItem]) =>
+    [questId, new Map([...perItem].map(([id, missing]) => [id, Math.max(0, missing - rolled(id))]))]))
+}
+
+/** Rolls every kill in order with one rng and sums them. Same result as rolling and applying them one by one. */
+export function rollKills(zone: Zone, wave: number, kills: Kill[], ctx: KillContext, rng: Rng): KillBatch {
+  const batch = emptyKillBatch(zone.id, wave)
+  for (const { enemyId, isShiny, stats } of kills) {
+    const kill = rollKill(ENEMIES_DATA[enemyId], zone, wave, isShiny, stats, { ...ctx, questDropLimits: remainingDropLimits(ctx.questDropLimits, batch.items) }, rng)
+    mergeKillBatch(batch, kill)
+  }
+  return batch
 }

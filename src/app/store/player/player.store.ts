@@ -17,8 +17,7 @@ import { UnlockedNodes } from '../../../types/player/unlocked-nodes.type'
 import { UnlockedSpellsType } from '../../../types/player/unlocked-spells.type'
 import ITEM_DATA from '../../../data/items-data'
 import ZONES_DATA from '../../../data/zones-data'
-import { killReward, rollEnemyDrops } from './kill-rewards'
-import { rankBonus } from './bestiary-rank'
+import type { KillBatch } from './kill-rewards'
 import { addShinyKills, masteryModifiers, ZoneStar, zoneStarProgress, ZoneStarProgress } from './zone-mastery'
 import { sellPrice } from '../shop/shop-prices'
 import { ShopID } from '../../../enums/ids/shop-id.enum'
@@ -28,7 +27,6 @@ import { ItemType } from '../../../enums/items/item-type.enum'
 import RECIPES_DATA from '../../../data/recipes-data'
 import { RecipeID } from '../../../enums/ids/recipe-id.enum'
 import { EnemyID } from '../../../enums/ids/enemy-id.enum'
-import type { QuestDropLimits } from '../../services/quest-status'
 import { SkillNodeID } from '../../../enums/ids/skill-node-id.enum'
 import { SpellID } from '../../../enums/ids/spell-id.enum'
 import { ZoneID } from '../../../enums/ids/zone-id.enum'
@@ -265,25 +263,13 @@ const sourcedModifiersOf = (store: StatSources, buffSpellIds: SpellID[], consuma
   }
 }
 
-/** Totals of a batch of kills (an offline claim), applied in one store update. */
-export interface KillBatch {
-  zoneId: ZoneID
-  wave: number
-  kills: number
-  shinies: number
-  killsByEnemy: Partial<Record<EnemyID, number>>
-  /** Task counts per enemy, Bounty Mark doubles included; capped at each task's target when applied. */
-  taskCountsByEnemy: Partial<Record<EnemyID, number>>
-  experience: number
-  gold: number
-  items: InventoryItem[]
-}
-
 export interface KillBatchResult {
   levelsGained: number
   /** Drops that landed in the inventory (not the lost ones, not installed station upgrades). */
   receivedItems: InventoryItem[]
-  /** Item amounts that didn't fit in the inventory and were lost. */
+  /** Drops that didn't fit in the inventory and were lost. */
+  lost: ItemStack[]
+  /** Total amount of `lost`. */
   lostDrops: number
   installedStations: ItemID[]
 }
@@ -526,20 +512,6 @@ export const PlayerStore = signalStore(
       }))
     },
 
-    /** Bounty Mark (`taskDoubleKillChance`, percent) can make one kill count twice. */
-    updateTaskProgress(monsterId: EnemyID) {
-      if (!store.activeTasks().some(task => task.monsterId === monsterId && !isTaskDone(task))) return
-
-      const counts = Math.random() * 100 < store.stats().taskDoubleKillChance ? 2 : 1
-      patchState(store, (state) => ({
-        activeTasks: state.activeTasks.map(task =>
-          task.monsterId === monsterId && !isTaskDone(task)
-            ? { ...task, currentCount: Math.min(task.targetCount, task.currentCount + counts) }
-            : task,
-        ),
-      }))
-    },
-
     /** Claims every finished task at once. */
     claimCompletedTasks() {
       const done = store.activeTasks().filter(isTaskDone)
@@ -600,41 +572,14 @@ export const PlayerStore = signalStore(
   })),
   // Game actions: kills and drops, zone stars, selling, equipping, using items and chests, mana regen, crafting.
   withMethods((store) => ({
-    /** `lost`: drops that did not fit. `foundSeeds`: seeds to show a toast for (empty before the farm unlocks). */
-    processBattleEnd(enemyId: EnemyID, zoneId: ZoneID, currentWave: number, isShiny: boolean, questDropLimits?: QuestDropLimits): { lost: ItemStack[], foundSeeds: ItemStack[] } {
-      const enemy = ENEMIES_DATA[enemyId]
-      const { experience, gold, dropRolls } = killReward(enemy, ZONES_DATA[zoneId], currentWave, isShiny, store.stats())
-      const drops = new Map<string, InventoryItem>()
-      const { dropChance } = rankBonus(enemyId, store.enemyKillCounts()[enemyId] ?? 0)
-      rollEnemyDrops(enemy, dropRolls, isShiny, dropChance, drops, questDropLimits, undefined, store.stats().upgradedDropChance, store.stats().seedDropChance)
-      const itemsToUpdate = [...drops.values()]
-
-      store.updatePlayerStats([
-        { stat: 'experience', amount: experience },
-        { stat: 'goldCoins', amount: gold },
-      ])
-
-      store.updateZoneProgression(zoneId, currentWave)
-      store.updateEnemyKillCount(enemyId)
-      store.updateTaskProgress(enemyId)
-      if (isShiny) patchState(store, (state) => ({ shinyKillsByZone: addShinyKills(state.shinyKillsByZone, zoneId, 1) }))
-
-      // Station upgrades install and seeds are counted instead of being stored, so neither ever counts as lost.
-      const { seeds, rest } = takeSeeds(itemsToUpdate)
-      const lost = lostItems(store.inventory(), store.inventoryCapacity(), installStations(store.stations(), rest).rest)
-      if (itemsToUpdate.length) store.addItems(itemsToUpdate)
-      // Seeds are counted before the farm unlocks too, but only reported after it.
-      return { lost, foundSeeds: isFarmUnlocked(store.unlockedContent()) ? seedStacks(seeds) : [] }
-    },
-
     /** `stats` as it would be with only these buffs and consumable effects running (offline buff segments). */
     statsFor(buffSpellIds: SpellID[], consumableItemIds: ItemID[]): PlayerStatsType {
       return deriveStats(store.resources(), Object.values(sourcedModifiersOf(store, buffSpellIds, consumableItemIds)).flat())
     },
 
     /**
-     * Applies many kills in one state update: XP (with level-ups), gold, wave and enemy kill counts, task progress
-     * and drops. Drops that don't fit are lost, as online.
+     * The only writer of kill rewards (`KillResolutionService`): XP (with level-ups), gold, wave and enemy kill counts,
+     * shiny kills, task progress and drops, in one state update. A stack that doesn't fit is lost whole.
      */
     applyKillBatch(batch: KillBatch): KillBatchResult {
       const startLevel = store.resources().level
@@ -649,8 +594,8 @@ export const PlayerStore = signalStore(
         const amount = countItem(inventory, id, tier, upgradeLevel) - countItem(inventoryBefore, id, tier, upgradeLevel)
         return amount > 0 ? [{ id, type: ITEM_DATA[id].type, tier, amount, ...(upgradeLevel === undefined ? {} : { upgradeLevel }) }] : []
       })
-      const received = receivedItems.reduce((sum, item) => sum + item.amount, 0)
-      const lostDrops = rest.reduce((sum, item) => sum + item.amount, 0) - received
+      const lost = lostItems(inventoryBefore, capacity, rest)
+      const lostDrops = lost.reduce((sum, item) => sum + item.amount, 0)
       // Seeds are counted before the farm unlocks too, but only listed after it; they are never lost.
       if (isFarmUnlocked(store.unlockedContent())) {
         receivedItems.push(...seedStacks(seeds).map(({ id, amount }) => ({ id, type: ItemType.seed, tier: ITEM_DATA[id].tier, amount })))
@@ -688,7 +633,7 @@ export const PlayerStore = signalStore(
         }
       })
 
-      return { levelsGained: store.resources().level - startLevel, receivedItems, lostDrops, installedStations: installed }
+      return { levelsGained: store.resources().level - startLevel, receivedItems, lost, lostDrops, installedStations: installed }
     },
 
     /** Pays the zone's mastery chest for a finished, unclaimed star. Refused when the items don't fit (`canClaimZoneStar`). */

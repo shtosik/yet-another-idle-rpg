@@ -5,7 +5,7 @@ import { ModalService } from './modal.service'
 import { PlayerStore } from '../store/player/player.store'
 import { QuestsStore } from '../store/quests/quests.store'
 import { UNLOCK_RULES, ZONE_UNLOCK_NOTIFICATIONS } from '../../data/unlock-conditions'
-import ZONES_DATA from '../../data/zones-data'
+import { emptyKillBatch } from '../store/player/kill-rewards'
 import { QuestID } from '../../enums/ids/quest-id.enum'
 import { SiteID } from '../../enums/ids/site-id.enum'
 import { ZoneID } from '../../enums/ids/zone-id.enum'
@@ -17,7 +17,7 @@ describe('UnlockService', () => {
   let quests: InstanceType<typeof QuestsStore>
 
   const laHarparNotice = UNLOCK_RULES.find(rule => rule.target.type === 'town' && rule.target.townId === TownID.laHarpar)!.notification
-  const killOnBeachWave5 = () => player.processBattleEnd(ZONES_DATA[ZoneID.horseshoeBeach].bossEnemyId, ZoneID.horseshoeBeach, 5, false)
+  const killOnBeachWave5 = () => player.applyKillBatch({ ...emptyKillBatch(ZoneID.horseshoeBeach, 5), kills: 1 })
 
   beforeEach(() => {
     localStorage.clear()

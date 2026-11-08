@@ -9,7 +9,7 @@ The idle core: a 100 ms tick that advances the game by the real time elapsed, au
 - `src/app/services/battle-manager.service.ts:BattleManagerService` — `doDamage`, `castSpell`, `useConsumable`, `tickSpells`, `tickConsumables`, enemy death, zone and feature unlock checks.
 - `src/app/services/hit-resolution.ts:resolveHit` — pure damage formula (crit, weakness, damage-vs-type). Takes an `rng` for testing.
 - `src/app/store/battle/battle.store.ts:BattleStore` — current zone, wave, enemy, HP, spells, buffs, consumable slots.
-- `src/app/store/player/player.store.ts:processBattleEnd` — XP, gold, drops, kill counters, task progress; drops lost to a full inventory tab raise a toast (see `player-stats-inventory-equipment.md`).
+- `src/app/services/kill-resolution.service.ts:resolveKills` — Kill resolution: XP, gold, drops, kill counters, task progress, zone progress and the next-zone unlock, for online kills (a batch of one) and offline claims alike; rolled by `rollKill` / `rollKills` (`store/player/kill-rewards.ts`) and written only by `PlayerStore.applyKillBatch`. Drops lost to a full inventory tab raise a toast (see `player-stats-inventory-equipment.md`). Arena kills are paid separately (ADR 0003).
 
 ## Data flow
 Every tick (`TICK_DURATION_IN_MS` = 100) measures the real time since the last tick with `performance.now()`, capped at `MAX_TICK_DELTA_IN_MS` (1 s), and advances everything by that delta. A gap over `SLEEP_GAP_IN_MS` (60 s, on `performance.now()` or `Date.now()`) is a sleeping device: the tick skips it and starts an offline claim instead (`offline-progress.md`).
@@ -27,7 +27,7 @@ The attack, respawn and second timers are plain fields on `GameIntervalService`,
 Spawning (`startBattle(shinyChance)`): a random enemy from `zone.enemies`, or `zone.bossEnemyId` on the last wave. A shiny roll uses `stats.shinyChance` (percent).
 
 Enemy death (`handleEnemyDeath`):
-1. `endBattle`, record the kill interval for the offline rate, then `processBattleEnd` (rewards from `kill-rewards.ts`): XP `ceil(experience × xpMultiplier × waveReward)` and gold `ceil(gold × goldCoinsMultiplier × waveReward)` (a shiny uses ×5 XP / ×10 gold instead of `waveReward`, see `zones-waves-unlocks.md`), drop rolls (10 if shiny), wave kill count, enemy kill count, task progress.
+1. `endBattle`, record the kill interval for the offline rate, then `KillResolutionService.resolveKills` with one kill (rewards from `kill-rewards.ts`): XP `ceil(experience × xpMultiplier × waveReward)` and gold `ceil(gold × goldCoinsMultiplier × waveReward)` (a shiny uses ×5 XP / ×10 gold instead of `waveReward`, see `zones-waves-unlocks.md`), drop rolls (10 if shiny), wave kill count, enemy kill count, task progress (Bounty Mark rolled with the same rng), and on the boss wave the next zone (`UnlockService.grant`).
 2. Killing the boss on the last wave unlocks `zone.nextZoneId` (+ notification from `ZONE_UNLOCK_NOTIFICATIONS`).
 3. `UNLOCK_RULES` are checked (towns and features, see `zones-waves-unlocks.md`).
 4. With auto wave progression on and the wave's kill count met, move to the next wave.

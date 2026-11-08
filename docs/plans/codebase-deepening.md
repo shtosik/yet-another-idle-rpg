@@ -21,7 +21,7 @@ Step 1 comes first. Step 2 comes before Step 3, because Kill resolution calls th
 - Specs (new, there are none today): a live grant shows one notice; a second grant of the same target shows nothing; the load replay shows nothing; a rule met by kills or by quest completion is granted; entrance zones are granted on quest completion and on load. Use a mock `ModalService`.
 - Docs: `zones-waves-unlocks.md`, `world-map.md` if it describes unlock notices.
 
-### 3. Kill resolution (M-L, Opus, plan mode)
+### 3. Kill resolution (M-L, Opus, plan mode) ✅
 A new `services/kill-resolution.service.ts` with one interface, `resolveKills(kills, rng)`. Online play, the offline claim and dev-cheats all call it. Arena does not (ADR 0003).
 - **Tests come first, in their own commit.** One seeded, table-driven spec: the same kills with the same seed, resolved one by one (online) and as one batch (offline claim), give identical state: XP and level, gold, kill counts, zone progress, shiny kills, task progress (including the Bounty Mark double kill), seeds, installed stations, inventory and lost drops. This spec fails on the current code; it shows the divergences being removed.
 - Add a pure `rollKill(enemy, zone, wave, isShiny, stats, ctx, rng)` that returns a `KillBatch` for one kill, built from `killReward`, `rankBonus` and `rollEnemyDrops` (`store/player/kill-rewards.ts`). The offline simulation loop (`offline-simulation.ts:150-162`) builds its batch with it.

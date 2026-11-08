@@ -6,7 +6,6 @@ import i18next from 'i18next'
 import { InventoryTab, ItemStack, tabOf } from '../store/player/inventory'
 import { BattleStore } from '../store/battle/battle.store'
 import { PlayerStore } from '../store/player/player.store'
-import { QuestsStore } from '../store/quests/quests.store'
 import { AnimationsService } from './animations.service'
 import { SkillNodeID } from '../../enums/ids/skill-node-id.enum'
 import { SpellID } from '../../enums/ids/spell-id.enum'
@@ -15,13 +14,13 @@ import { SpellType } from '../../enums/spell-type.enum'
 import { SpellDamageOverTimeEffectProps } from '../../interfaces/spell.interface'
 import { Enemy } from '../../interfaces/enemy.interface'
 import { DamageElement } from '../../enums/damage-element.enum'
-import { getQuestDropLimits } from './quest-status'
 import { resolveHit } from './hit-resolution'
 import { ItemID } from '../../enums/ids/item-id.enum'
+import { ItemType } from '../../enums/items/item-type.enum'
 import ITEM_DATA from '../../data/items-data'
 import { isConsumableItem } from '../../interfaces/item.interface'
 import { OfflineStore } from '../store/offline/offline.store'
-import { UnlockService } from './unlock.service'
+import { KillResolutionService } from './kill-resolution.service'
 
 /** Cooldown reduction can't push a spell below this. */
 const MIN_SPELL_COOLDOWN_IN_SECONDS = 1
@@ -35,10 +34,9 @@ export class BattleManagerService {
   private arenaService = inject(ArenaService)
   private arenaBosses = inject(ArenaBossesService)
   private playerStore = inject(PlayerStore)
-  private questsStore = inject(QuestsStore)
   private animations = inject(AnimationsService)
   private offlineStore = inject(OfflineStore)
-  private unlockService = inject(UnlockService)
+  private killResolution = inject(KillResolutionService)
 
   /** Drops a full tab lost on the last kill, one line per tab; clears itself after `DROPS_LOST_TOAST_MS`. */
   dropsLostToast = signal<string | null>(null)
@@ -275,12 +273,12 @@ export class BattleManagerService {
     const isShiny = this.battleStore.isShinyEnemy()
     this.battleStore.endBattle()
     this.offlineStore.recordKill(performance.now(), zoneId, wave)
-    const questDropLimits = getQuestDropLimits(this.questsStore.questStepProgression(), this.playerStore.itemCount)
-    const { lost, foundSeeds } = this.playerStore.processBattleEnd(enemy.id, zoneId, wave, isShiny, questDropLimits)
+    const kill = { enemyId: enemy.id, isShiny, stats: this.playerStore.stats() }
+    const { lost, receivedItems } = this.killResolution.resolveKills(zoneId, wave, [kill], Math.random)
+    // Seeds are listed only once the farm is unlocked.
+    const foundSeeds = receivedItems.filter(item => item.type === ItemType.seed)
     if (lost.length) this.showDropsLost(lost)
     if (foundSeeds.length) this.showSeedsFound(foundSeeds)
-
-    this.unlockNextZone(wave)
 
     const currentKillCount = this.currentWaveKillCount()
     // The toggle alone isn't enough: the node may have been refunded since it was switched on.
@@ -313,14 +311,5 @@ export class BattleManagerService {
     clearTimeout(this.dropsLostTimer)
     this.dropsLostToast.set(lines.join('\n'))
     this.dropsLostTimer = setTimeout(() => this.dropsLostToast.set(null), DROPS_LOST_TOAST_MS)
-  }
-
-  /**
-   * A kill on `wave` of the current zone: the boss opens the next zone (online kills and offline claims).
-   * Town and feature unlocks (`UNLOCK_RULES`) follow from the new state on their own (`UnlockService`).
-   */
-  unlockNextZone(wave: number): void {
-    const zoneData = this.battleStore.currentZoneData()
-    if (wave === zoneData.maxWave && zoneData.nextZoneId) this.unlockService.grant({ type: 'zone', zoneId: zoneData.nextZoneId })
   }
 }

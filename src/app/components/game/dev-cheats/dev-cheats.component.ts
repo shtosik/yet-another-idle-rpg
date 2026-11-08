@@ -4,6 +4,8 @@ import { SkillTreeService } from '../../../services/skill-tree.service'
 import { GameNavigationService } from '../../../services/game-navigation.service'
 import { ReputationService } from '../../../services/reputation.service'
 import { ProfessionService } from '../../../services/profession.service'
+import ZONES_DATA from '../../../../data/zones-data'
+import { KillResolutionService } from '../../../services/kill-resolution.service'
 import { ProfessionID } from 'enums/ids/profession-id.enum'
 import { PLOT_SLOTS } from '../../../store/player/farm'
 import { xpForLevel } from '../../../store/player/professions'
@@ -92,6 +94,7 @@ export class DevCheatsComponent {
   private navigation = inject(GameNavigationService)
   private reputationService = inject(ReputationService)
   private professionService = inject(ProfessionService)
+  private killResolution = inject(KillResolutionService)
 
   /**
    * `window.dev` in the browser console: puts the game into a state in one call when checking UI.
@@ -147,10 +150,12 @@ export class DevCheatsComponent {
       const enemyId = fromName(EnemyID, 'EnemyID', enemy)
       this.playerStore.updateEnemyKillCount(enemyId, count - (this.playerStore.enemyKillCounts()[enemyId] ?? 0))
     },
-    /** Adds shiny kills in a zone (zone mastery's Shiny Hunter star). */
-    addShinyKills: (zone: Ref<typeof ZoneID>, count: number) => this.playerStore.applyKillBatch({
-      zoneId: fromName(ZoneID, 'ZoneID', zone), wave: 1, kills: 0, shinies: count, killsByEnemy: {}, taskCountsByEnemy: {}, experience: 0, gold: 0, items: [],
-    }),
+    /** Kills `count` shinies of the zone's first enemy on wave 1, paid like real kills (zone mastery's Shiny Hunter star). */
+    addShinyKills: (zone: Ref<typeof ZoneID>, count: number) => {
+      const zoneId = fromName(ZoneID, 'ZoneID', zone)
+      const kill = { enemyId: ZONES_DATA[zoneId].enemies[0], isShiny: true, stats: this.playerStore.stats() }
+      this.killResolution.resolveKills(zoneId, 1, Array.from({ length: count }, () => kill), Math.random)
+    },
     unlock: (feature: DevFeature) => this.unlockFeature(feature),
     /** Opens a Site and the map; no notification. */
     unlockSite: (site: Ref<typeof SiteID>) => this.playerStore.applyUnlockTarget({ type: 'site', siteId: fromName(SiteID, 'SiteID', site) }),
