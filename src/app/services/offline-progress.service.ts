@@ -11,7 +11,7 @@ import { CONSUMABLE_SLOTS } from '../../interfaces/consumable.interface'
 import { SkillNodeID } from '../../enums/ids/skill-node-id.enum'
 import { ModalService } from './modal.service'
 import { KillResolutionService } from './kill-resolution.service'
-import { MS_PER_SECOND } from './combat-timing'
+import { MS_PER_SECOND } from './combat-step'
 import { OfflineSegment, seededRng, simulateOfflineKills } from './offline-simulation'
 import { InventoryItem } from '../../interfaces/item.interface'
 

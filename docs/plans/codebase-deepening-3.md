@@ -36,7 +36,7 @@ One module decides how items reach the player. Seeds go to the seed store, stati
 - Specs: `spell-bar.spec.ts` (each placement rule, the lock, prune); a spell taught by a scroll and a node survives the node's refund; `equipment-spells.spec.ts`, `weapon-spells.spec.ts` pass.
 - Docs: `spells-and-buffs.md`, `skill-tree.md`.
 
-### 4. Combat step (S, Sonnet)
+### 4. Combat step (S, Sonnet) ✅
 - Lift `GameIntervalService.advanceCombat` (`game-interval.service.ts:84-109`) into a pure `stepCombat(timers, deltaMs, timing) → { timers, spawn, attacks }`: the respawn delay (zone or arena), one attack per `timePerAttack` carrying leftover time, leftover lost on a kill, at most `MAX_ATTACKS_PER_TICK`. The service applies the result. Fold the constants of `combat-timing.ts` into it and delete that file if nothing else stays.
 - The offline simulation keeps its own whole-kill loop: it differs in shape (segments, rate scaling, no ticks).
 - Specs (first for the online loop): respawn, carried time, kill drops leftover, the cap, arena delay.
