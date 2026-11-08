@@ -13,7 +13,7 @@ const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const CLAUDE = join(ROOT, '.claude', 'skills')
 const CODEX = join(ROOT, '.agents', 'skills')
 /** Skills built on Claude Code tools Codex lacks (the built-in browser, subagents, the asset-generator agent). */
-const CLAUDE_ONLY = new Set(['create-verification-skill', 'maintain-verification-skill', 'verify-yari', 'reflect', 'generate-2d-asset'])
+const CLAUDE_ONLY = new Set(['create-verification-skill', 'maintain-verification-skill', 'verify-yari', 'reflect', 'generate-2d-asset', 'run-plan'])
 const VENDORED = new Set(Object.keys(JSON.parse(readFileSync(join(ROOT, 'skills-lock.json'), 'utf8')).skills))
 
 const dirs = dir => existsSync(dir) ? readdirSync(dir, { withFileTypes: true }).filter(d => d.isDirectory()).map(d => d.name) : []
