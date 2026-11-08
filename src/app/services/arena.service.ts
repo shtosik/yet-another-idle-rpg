@@ -43,7 +43,7 @@ export class ArenaService {
 
   /** No run going on and the entry cooldown is over. */
   isReady(now = this.gameClock.nowMs()): boolean {
-    return !this.run() && now >= this.battleStore.arenaReadyAt()
+    return !this.run() && this.gameClock.isSettled() && now >= this.battleStore.arenaReadyAt()
   }
 
   /** Starts a run and shows the fight. The entry fee is the caller's (the Arena Master's `stat` deduct). */

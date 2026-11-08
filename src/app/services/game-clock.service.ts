@@ -17,6 +17,18 @@ export class GameClock {
   /** Whole game seconds; changes at most once a second, for countdowns and computeds. */
   readonly second = this.currentSecond.asReadonly()
 
+  private readonly settled = signal(true)
+  /**
+   * False while an offline claim waits for the host: its time away hasn't been added yet, so anything that stamps a
+   * game time now (planting, a turn-in, entering the arena) would be aged by that whole absence once it lands. Those refuse meanwhile.
+   */
+  readonly isSettled = this.settled.asReadonly()
+
+  /** Only the offline claim calls this. */
+  setClaimPending(pending: boolean): void {
+    this.settled.set(!pending)
+  }
+
   /** Game time in ms, untracked, for rules. */
   nowMs(): number {
     return this.ms

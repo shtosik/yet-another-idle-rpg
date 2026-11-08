@@ -866,6 +866,8 @@ export const PlayerStore = signalStore(
 
     /** Plants the seed in one plot, or in every empty plot when `plotIndex` is omitted; false when nothing was planted. Plots from `plotLimit` on are locked. */
     plantSeed(seedId: ItemID, plotLimit: number, plotIndex?: number): boolean {
+      // A plot planted before a pending claim lands would grow by the whole absence.
+      if (!store._gameClock.isSettled()) return false
       store.syncFarm()
       const stats = store.stats()
       const ctx = { now: store._gameClock.nowMs(), level: professionLevel(store.professions(), ProfessionID.farming), plotLimit, seedSaveChance: stats.farmSeedSaveChance }

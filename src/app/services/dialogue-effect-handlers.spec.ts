@@ -21,6 +21,7 @@ function fakeContext(state: {
     quests: { questStepProgression: () => state.progression ?? {}, orders: () => ({}) },
     battle: { arenaRewards: () => state.arenaRewards ?? [] },
     cooldowns: { remainingMs: () => state.cooling ? 1000 : 0 },
+    clock: { isSettled: () => true, nowMs: () => 0 },
   } as unknown as DialogueContext
 }
 

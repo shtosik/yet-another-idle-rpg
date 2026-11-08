@@ -295,7 +295,8 @@ export const QuestsStore = signalStore(
 
         const questData = QUEST_DATA[questId]
         if (questData.repeat) {
-          store.completeOrder(questId, gameClock.nowMs())
+          // Refused while an offline claim is pending: the cooldown would start inside the absence.
+          if (gameClock.isSettled()) store.completeOrder(questId, gameClock.nowMs())
           return
         }
         const completes = status.step >= questData.steps.length
@@ -316,7 +317,8 @@ export const QuestsStore = signalStore(
         const status = getQuestStatus(store.questStepProgression(), questId)
         if (status.state !== QuestState.active) return
         if (QUEST_DATA[questId].repeat) {
-          store.completeOrder(questId, gameClock.nowMs())
+          // Refused while an offline claim is pending: the cooldown would start inside the absence.
+          if (gameClock.isSettled()) store.completeOrder(questId, gameClock.nowMs())
           return
         }
         // Refused, nothing taken, while the rewards don't fit (also for `dev.completeQuest`).

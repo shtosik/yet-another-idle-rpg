@@ -132,6 +132,33 @@ describe('offline claim on game time', () => {
     expect(arena.isReady()).toBeFalse()
   })
 
+  it('a slow host answer: the arena time is measured where the absence ended, and stamping actions wait for the claim', async () => {
+    const player = TestBed.inject(PlayerStore)
+    const arena = TestBed.inject(ArenaService)
+    const clock = TestBed.inject(GameClock)
+    const progress = TestBed.inject(OfflineProgressService)
+    TestBed.inject(OfflineStore).setLastSeen(0, 0)
+    player.unlockProfession(ProfessionID.farming)
+    player.grant([{ id: ItemID.turnipSeeds, amount: 1 }], 'lossy')
+    arena.enter(0)
+    let answer!: (response: Response) => void
+    spyOn(window, 'fetch').and.returnValue(new Promise<Response>(resolve => (answer = resolve)))
+    const applyOffline = spyOn(progress as never as { applyOffline: (ms: number, seed: number) => unknown }, 'applyOffline').and.callThrough()
+
+    const claim = progress.claim()
+    clock.advance(30_000) // online ticks while the host is slow
+    expect(clock.isSettled()).toBeFalse()
+    expect(player.plantSeed(ItemID.turnipSeeds, 1, 0)).toBeFalse()
+
+    answer(new Response(null, { headers: { Date: new Date(HOUR).toUTCString() } }))
+    await claim
+
+    expect(clock.isSettled()).toBeTrue()
+    // Within real ms the spec takes; measured after the wait it would be 30 s more.
+    expect(applyOffline.calls.mostRecent().args[0]).toBeCloseTo(HOUR - ARENA.timeLimitMs, -2)
+    expect(player.plantSeed(ItemID.turnipSeeds, 1, 0)).toBeTrue()
+  })
+
   it('a device clock moved forward 3 h moves nothing; game time does', () => {
     const key = bundleKey(NpcID.laHarparBartender, ItemID.crabMeat)
     const player = TestBed.inject(PlayerStore)

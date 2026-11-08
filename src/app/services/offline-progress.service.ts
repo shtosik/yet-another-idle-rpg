@@ -70,6 +70,7 @@ export class OfflineProgressService {
   /** `performance.now()` when the pending claim started: time after it is played online, so it isn't claimed. */
   private pendingSincePerf: number | null = null
   private pendingArenaRun: ArenaRun | null = null
+  private pendingArenaRemainingMs = 0
   private isClaiming = false
 
   /** Host time now, or `null` until the host has answered. */
@@ -95,8 +96,10 @@ export class OfflineProgressService {
     // Kept across retries: the claim ends where the wait began, however long the host takes to answer.
     if (this.pendingSincePerf === null) {
       this.pendingSincePerf = performance.now()
-      // Read now: the run's remaining time is measured against game time before the claim moves it.
+      // Read now, where the absence ends: online ticks keep moving game time while the host answers.
       this.pendingArenaRun = this.battleStore.arenaRun()
+      this.pendingArenaRemainingMs = this.pendingArenaRun ? this.pendingArenaRun.endsAt - this.gameClock.nowMs() : 0
+      this.gameClock.setClaimPending(true)
     }
     try {
       const hostNow = await fetchServerTime()
@@ -118,7 +121,7 @@ export class OfflineProgressService {
       const run = this.pendingArenaRun
       this.pendingArenaRun = null
       let arenaMs = 0
-      const arenaRemainingMs = run ? run.endsAt - this.gameClock.nowMs() : 0
+      const arenaRemainingMs = this.pendingArenaRemainingMs
       if (run && advanceMs >= arenaRemainingMs) {
         arenaMs = Math.max(0, arenaRemainingMs)
         this.arenaService.tick(run.endsAt)
@@ -126,6 +129,7 @@ export class OfflineProgressService {
       const elapsedMs = advanceMs - arenaMs
       this.gameClock.advance(advanceMs)
       this.offlineStore.setLastSeen(hostNow, this.gameClock.nowMs())
+      this.gameClock.setClaimPending(false)
 
       const isClaimable = elapsedMs >= MIN_OFFLINE_CLAIM_IN_MS && !this.battleStore.arenaRun()
       const summary = isClaimable ? this.applyOffline(elapsedMs, lastSeen!) : null
