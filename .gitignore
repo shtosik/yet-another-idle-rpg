@@ -6,6 +6,9 @@
 /out-tsc
 /bazel-out
 
+# Worktrees from scripts/worktree.mjs and the app
+/.claude/worktrees/
+
 # Node
 /node_modules
 npm-debug.log

@@ -15,6 +15,8 @@
 //   9. Codex skills mirror .claude/skills
 //  10. Agent and skill frontmatter parses (description quoting)
 //  11. docs/ideas/README.md statuses match each idea file's Status line
+//  12. Docs: relative .md links resolve; lore, character and system docs name real IDs
+//  13. NPC voice: lines stay in the world, no repeated phrases, no "Then…" narration
 //
 // Usage: npm run validate
 
@@ -564,7 +566,8 @@ const DOC_FILES = [
   ...walkFiles(join(ROOT, '.claude', 'agents'), '.md'),
 ].filter(existsSync)
 
-const IGNORED_DIRS = new Set(['node_modules', '.git', '.angular', 'dist', '.cache'])
+// worktrees: .claude/worktrees holds whole checkouts of other branches.
+const IGNORED_DIRS = new Set(['node_modules', '.git', '.angular', 'dist', '.cache', 'worktrees'])
 const allFiles = []
 ;(function collect(dir) {
   for (const f of readdirSync(dir)) {
@@ -579,7 +582,7 @@ const allDirs = new Set(allFiles.flatMap(f => f.split('/').slice(0, -1).map((_, 
 // A file name with a known extension, or a multi-segment path rooted at a top-level repo dir.
 const PATH_RE = /^[\w.][\w./-]*\.(ts|mjs|js|json|md|html|scss|png)$|^(src|docs|scripts|\.claude|public)(\/[\w.-]+)+\/?$/
 /** Per-machine files docs may name; they are never in git. */
-const LOCAL_ONLY_PATHS = new Set(['.claude/launch.json'])
+const LOCAL_ONLY_PATHS = new Set(['.claude/launch.json', '.claude/worktrees'])
 function resolveDocPath(p) {
   const clean = p.replace(/\/$/, '')
   if (existsSync(join(ROOT, clean))) return join(ROOT, clean)
@@ -743,6 +746,50 @@ for (const f of [...walkFiles(join(ROOT, '.claude', 'agents'), '.md'), ...walkFi
     for (const [, name, member] of text.matchAll(/\b(ItemID|NpcID)\.(\w+)/g)) {
       if (ENUMS[name][member] === undefined && !PLANNED_IDS.has(`${name}.${member}`)) error(rel, `names unknown ${name}.${member}`)
     }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 13. NPC voice: lines stay in the world, no NPC repeats a phrase, no NPC narrates with "Then…". The owner kept
+//     correcting these by hand in the Forge and Farm dialogue; the rules are in .claude/agents/lore-keeper.md.
+
+{
+  const OUT_OF_WORLD = /\b(?:buttons?|tabs?|menus?|screens?|click(?:s|ed)?|panels?|tooltips?|inventory|cooldowns?|xp|drop (?:rate|chance)s?|quest log|waves?|(?:from|in|on) (?:the|this|that|your) list|list (?:on the )?(?:left|right|above|below))\b|\d+\s*%|\bpercent\b/gi
+  const REPEAT_WORDS = 5
+  const MAX_THEN_OPENERS = 1
+  // Shipped before this check, each with the one term or `npc: phrase` it may keep; reword a line and drop it here. Add nothing new.
+  const OUT_OF_WORLD_BASELINE = { 'laHarparJosh.workInfo.message': 'wave', 'mawoodMilo.questWhatLurksProgress.message': 'waves', 'mawoodSylvie.questInfestationProgress.message': 'waves' }
+  const REPEAT_BASELINE = new Set([
+    'farmWarden: in a store under your', 'farmWarden: a store under your name', 'farmWarden: up on the top terrace',
+    'laHarparBartender: a tavern are you blind', 'laHarparMarvin: we map the unknown and', 'liroldArenaMaster: last name on the card',
+    'liroldPhurgo: i was going to fix', 'liroldPhurgo: was going to fix that','liroldPhurgo: i want to know what', 'liroldPhurgo: at the end of a', 'liroldPhurgo: the end of a shift',
+    'mawoodCorwin: saplings in the outer wilds', 'mawoodFinn: three pelts from the elder', 'mawoodMilo: the further you can see', 'mawoodMilo: further you can see the',
+    'mawoodSylvie: and ten vials of clean', 'mawoodSylvie: ten vials of clean water',
+  ])
+  const THEN_BASELINE = { mawoodMilo: 2 }
+  const leaves = (value, path) => typeof value === 'string' ? [[path, value]] : Object.entries(value).flatMap(([k, v]) => leaves(v, `${path}.${k}`))
+  for (const f of walkFiles(join(LOCALES, 'dialogues'), '.json')) {
+    const npc = f.replace(/^.*[\\/]|\.json$/g, '')
+    const file = repoPath(f)
+    const strings = leaves(JSON.parse(readFileSync(f, 'utf8')), npc)
+    for (const [path, text] of strings) {
+      const hit = [...text.matchAll(OUT_OF_WORLD)].find(m => m[0].toLowerCase() !== OUT_OF_WORLD_BASELINE[path])
+      if (hit) error(file, `${path} says '${hit[0]}': NPCs are people in the world, so teach it in fiction ("choose a seed and plant it"), not by naming UI or game terms`)
+    }
+    // NPC lines only: player options ("I'll let you get on") may recur.
+    const messages = strings.filter(([path]) => path.endsWith('.message'))
+    const firstSeen = new Map()
+    for (const [path, text] of messages) {
+      const words = text.toLowerCase().replace(/[^\p{L}\p{N}' ]+/gu, ' ').split(/\s+/).filter(Boolean)
+      for (let i = 0; i + REPEAT_WORDS <= words.length; i++) {
+        const phrase = words.slice(i, i + REPEAT_WORDS).join(' ')
+        const first = firstSeen.get(phrase)
+        if (first === undefined) firstSeen.set(phrase, path)
+        else if (!REPEAT_BASELINE.has(`${npc}: ${phrase}`)) { error(file, `'${phrase}' is in ${first === path ? `${path} twice` : `both ${first} and ${path}`}: state a fact or phrase once, in the node that owns it`); break }
+      }
+    }
+    const thens = messages.flatMap(([, text]) => text.match(/(?:^|[.!?…—]\s+)(?:and )?then\b/gi) ?? []).length
+    if (thens > (THEN_BASELINE[npc] ?? MAX_THEN_OPENERS)) error(file, `${thens} sentences open with "Then": at most ${MAX_THEN_OPENERS} per NPC, people don't narrate in sequence; skip the connector or jump to what mattered`)
   }
 }
 
