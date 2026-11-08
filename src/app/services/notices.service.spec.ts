@@ -1,5 +1,6 @@
 import { provideZonelessChangeDetection } from '@angular/core'
 import { TestBed } from '@angular/core/testing'
+import i18next from 'i18next'
 import { NoticesService } from './notices.service'
 import { ModalService } from './modal.service'
 import { CurrencyFeedService } from './currency-feed.service'
@@ -19,6 +20,8 @@ describe('NoticesService', () => {
 
   beforeEach(() => {
     jasmine.clock().install()
+    // Specs run in random order; don't depend on another spec having initialised i18next.
+    spyOn(i18next, 't').and.callFake(((key: string) => key) as never)
     modal = jasmine.createSpyObj<ModalService>('ModalService', ['openStationInstalled', 'openQuestCompleted'])
     feed = jasmine.createSpyObj<CurrencyFeedService>('CurrencyFeedService', ['show'])
     TestBed.configureTestingModule({
