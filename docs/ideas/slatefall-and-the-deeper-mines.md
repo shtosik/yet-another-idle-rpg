@@ -117,7 +117,7 @@ Means: 1536 HP, 2304 XP, 1152 gold.
 
 ## 5. Quests
 
-QuestIDs continue after `guildTrial` (27).
+QuestIDs continue after `guildTrial`, next free 29 today (`wicksOrder` is 28), so the numbers in this table are stale: take the next free ones when building.
 
 | ID | Giver | Zone | Start gate | Steps | Item source | Rewards |
 |---|---|---|---|---|---|---|
@@ -454,6 +454,6 @@ Tobin's `aboutSingingMawood` (§6) is the third side of the hint. If `la-harpar-
 | Dialogue | Corwin `aboutSlatefallSong`, Sylvie `aboutSlatefallSpring` | §7 hints. |
 | Art | Slatefall and Tavern backgrounds, 2 Zone backgrounds, 8 enemy sprites, 4 item icons, 3 portraits | `/generate-2d-asset`; portrait briefs in `docs/character/slatefall/`. |
 
-ItemIDs assume `guildShortsword` = 144; shift if taken.
+These ItemIDs assumed `guildShortsword` = 144, but 144–148 are taken and the next free one is 210 today: take the next free ones when building.
 
 **Docs to update on implementation:** `docs/systems/zones-waves-unlocks.md` (new condition, entrance, Zone chain, Known issue on quest-driven unlocks), `docs/systems/towns-shops-guild.md` (new Town), `docs/lore/` (proposed → shipped).

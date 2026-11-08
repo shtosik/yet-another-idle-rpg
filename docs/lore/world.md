@@ -38,14 +38,14 @@ Regions, Towns, Zones and geography. Source shorthand: `Josh#key` = `src/assets/
 | Market (`market`) | Trader, Elara | `towns-data.ts` |
 | Shop (`shop`) | Trader | "The only shop in town". `Trader#intro1` |
 | Basement (`tradersBasement`) | — | Trader's cellar, rat-infested; Zone Trader's Basement. `Trader#questOffer`, `Trader#questCompleted` |
-| Exploration Guild (`explorationGuild`) | Marvin | Shipped Building; Marvin calls himself its head (`Marvin#introduction1`, `src/data/towns-data.ts`). "Main hub for local adventurers" (`Trader#aboutGuild`). Removal of this Building, a single hall in Lirold and Marvin's move to the Tavern as a member are **proposed, `docs/ideas/north-lirold-and-exploration-guild.md` §5**, not the current placement. |
+| Exploration Guild (`explorationGuild`) | Marvin | Shipped Building; Marvin calls himself its head (`Marvin#introduction1`, `src/data/towns-data.ts`). "Main hub for local adventurers" (`Trader#aboutGuild`). Removal of this Building, a single hall in Lirold and Marvin's move to the Tavern as a member, drilling round the back by the crab pots, are **proposed, `docs/ideas/north-lirold-and-exploration-guild.md` §5, §8a**, not the current placement. |
 
 ### Lirold Buildings
 
 | Building | Who | Notes |
 |---|---|---|
 | Arena (`liroldArena`) | Ludo Crane, Master of the Arena (`NpcID.liroldArenaMaster`) | Shipped: sand floor ringed by stands; castle charter, Ludo keeps the sand, trappers supply Elderwood beasts (`src/assets/locales/en/dialogues/liroldArenaMaster.json` `default`, `aboutArena`). Twenty Waves, ten-minute sandglass, 10,000 gold fee and 30-minute entry cooldown (`src/data/arena-data.ts`, `docs/systems/arena.md`); champions on Waves 5, 10, 15 and 20. |
-| Exploration Guild (`explorationGuild`, moved) | Guildmaster Odile Varrow | **(proposed, `docs/ideas/north-lirold-and-exploration-guild.md` §4)** |
+| Exploration Guild (`explorationGuild`, moved) | Guildmaster Odile Varrow | Map table, ledgers, a wall of charts whose pins stop; a window on two gates; damp, with a slate roof waiting on Slatefall. **(proposed, `docs/ideas/north-lirold-and-exploration-guild.md` §4, §8b)** |
 | Forge (`liroldForge`) | Phurgo, blacksmith (`NpcID.liroldPhurgo`) | After The Cold Forge, strengthens the piece laid in the first place on his bench for gold, consuming the matching spare laid in the second. Both must be the same piece, alike in quality and worked the same number of times, or he will not strike. A worn piece laid first stays worn; a worn spare is consumed. Shows the stronger piece and price before striking; finer and already-worked pieces cost more. Can work a piece five times with his current tools and skill; leaves heirlooms, one-of-a-kind gifts and animals alone. `src/assets/locales/en/dialogues/liroldPhurgo.json` `forgeWork`, `forgeCost`, `forgeLimits` |
 
 ### Mawood Buildings
