@@ -8,6 +8,7 @@ import { ReputationID } from '../../enums/reputation-id.enum'
 import { ReputationTier } from '../../enums/reputation-tier.enum'
 import { NO_GAIN } from '../store/player/resources'
 import QUEST_DATA from '../../data/quests-data'
+import { questPayout } from '../store/quests/quest-transition'
 import { QuestID } from '../../enums/ids/quest-id.enum'
 import { ProfessionID } from '../../enums/ids/profession-id.enum'
 
@@ -80,10 +81,11 @@ describe('NoticesService', () => {
   it('opens the station and quest modals', () => {
     notices.push({ type: 'stationInstalled', itemId: ItemID.firePit })
     const quest = Object.values(QUEST_DATA)[0]
-    notices.push({ type: 'questCompleted', quest })
+    const completed = { questId: quest.questId, payout: questPayout(quest) }
+    notices.push({ type: 'questCompleted', completed })
 
     expect(modal.openStationInstalled).toHaveBeenCalledOnceWith(ItemID.firePit)
-    expect(modal.openQuestCompleted).toHaveBeenCalledOnceWith(quest)
+    expect(modal.openQuestCompleted).toHaveBeenCalledOnceWith(completed)
     expect(QuestID[quest.questId]).toBeDefined()
   })
 

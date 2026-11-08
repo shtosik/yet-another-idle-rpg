@@ -123,6 +123,17 @@ describe('repeatable orders', () => {
     expect(snapshot()).toEqual(cooling)
   })
 
+  it('is refused whole when its rewards do not fit: items kept, no cooldown, nothing paid', () => {
+    quests.startQuest(ORDER)
+    player.grant([{ id: ItemID.crabMeat, amount: 10 }], 'lossy')
+    spyOn(player, 'canGrant').and.returnValue(false)
+    const before = snapshot()
+
+    expect(quests.completeOrder(ORDER, clock)).toBeFalse()
+    expect(snapshot()).toEqual(before)
+    expect(TestBed.inject(ModalService).openQuestCompleted).not.toHaveBeenCalled()
+  })
+
   it('completes atomically: items, rewards, cooldown, history, and the next start is free', () => {
     quests.startQuest(ORDER)
     player.grant([{ id: ItemID.crabMeat, amount: 12 }], 'lossy')

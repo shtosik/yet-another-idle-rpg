@@ -4,6 +4,7 @@ import { ReputationTier } from '../../../enums/reputation-tier.enum'
 import { FARM_SEEDS, FarmSeed, GrowthStage } from '../../../data/farming-data'
 import { UnlockedContent } from '../../../types/player/unlocked-content.type'
 import { isSeed, ItemStack } from './inventory'
+import { professionXp } from './professions'
 
 /** Plot count = base + Guild reputation tiers + plot-granting quests, capped at the array length (farm doc §5). */
 export const PLOT_SLOTS = 9
@@ -164,7 +165,7 @@ export function harvest(farm: FarmState, plotIndex: number, ctx: HarvestContext,
     return { status: 'blocked', farm: { ...farm, plots }, crops: [], xp: 0 }
   }
   plots[plotIndex] = null
-  return { status: 'harvested', farm: { ...farm, plots }, crops, xp: Math.round(seed.xp * (1 + ctx.xpMultiplier)) }
+  return { status: 'harvested', farm: { ...farm, plots }, crops, xp: professionXp(seed.xp, ctx.xpMultiplier) }
 }
 
 /** Harvests every ready plot in order and stops at the first blocked one (its roll is kept). */

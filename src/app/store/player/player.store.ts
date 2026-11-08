@@ -61,7 +61,7 @@ import { canInstall, evaluateRecipe, Stations } from './camp'
 import { FARM_SEEDS } from '../../../data/farming-data'
 import { FarmState, harvest as harvestPlot, harvestAll as harvestEveryPlot, initialFarm, isFarmUnlocked, plant as plantInPlot, plantAll as plantEveryPlot, syncPlots } from './farm'
 import { ReputationGain, reputationTier, TierUp } from './reputation'
-import { newProfession, professionLevel, professionLevels, Professions, settleProfession } from './professions'
+import { newProfession, professionLevel, professionLevels, Professions, professionXpMultiplier, settleProfession } from './professions'
 import { ProfessionID } from '../../../enums/ids/profession-id.enum'
 import { SiteID } from '../../../enums/ids/site-id.enum'
 import PROFESSIONS_DATA from '../../../data/professions-data'
@@ -887,7 +887,7 @@ export const PlayerStore = signalStore(
         if (!ok) notFitting = crops
         return ok
       }
-      const ctx = { doubleChance: stats.farmDoubleHarvestChance, bonusChance: stats.farmBonusCropChance, xpMultiplier: stats[PROFESSIONS_DATA[ProfessionID.farming].xpMultiplier], fits }
+      const ctx = { doubleChance: stats.farmDoubleHarvestChance, bonusChance: stats.farmBonusCropChance, xpMultiplier: professionXpMultiplier(stats, ProfessionID.farming), fits }
       const farm = store.farm()
       const result = plotIndex === undefined ? harvestEveryPlot(farm, ctx) : harvestPlot(farm, plotIndex, ctx)
       const blocked = 'blocked' in result ? result.blocked : result.status === 'blocked'

@@ -1,37 +1,33 @@
 <app-close-button (onClose)="close()"/>
 <div class="modal">
   <h2>
-    <span class="modal__quest-name">{{ 'quests:names.' + QuestID[questData().questId] | i18next }}</span> {{ 'completed' | i18next }}
+    <span class="modal__quest-name">{{ 'quests:names.' + QuestID[data.questId] | i18next }}</span> {{ 'completed' | i18next }}
   </h2>
 
-  @if (statsToDisplay()) {
-    <ul class="modal__stats">
-      @for (stat of statsToDisplay(); track stat.key) {
-        <li>{{ stat.amount }} {{ 'playerStats.' + stat.key | i18next }}</li>
-      }
-      @for (reputation of reputationToDisplay(); track reputation.reputationId) {
-        <li>{{ 'quests:reputation.reward' | i18next: { amount: reputation.amount, town: ('map:reputations.' + ReputationID[reputation.reputationId] | i18next) } }}</li>
-      }
-      @for (xp of professionXpToDisplay(); track xp.professionId) {
-        <li>{{ 'quests:professionXp.reward' | i18next: { amount: xp.amount, profession: ('app:professions.' + ProfessionID[xp.professionId] | i18next) } }}</li>
-      }
-    </ul>
-  }
+  <ul class="modal__stats">
+    @for (stat of data.payout.stats; track stat.stat) {
+      <li>{{ stat.amount }} {{ 'playerStats.' + stat.stat | i18next }}</li>
+    }
+    @for (reputation of data.payout.reputation; track reputation.reputationId) {
+      <li>{{ 'quests:reputation.reward' | i18next: { amount: reputation.amount, town: ('map:reputations.' + ReputationID[reputation.reputationId] | i18next) } }}</li>
+    }
+    @for (xp of data.payout.professionXp; track xp.professionId) {
+      <li>{{ 'quests:professionXp.reward' | i18next: { amount: xp.amount, profession: ('app:professions.' + ProfessionID[xp.professionId] | i18next) } }}</li>
+    }
+  </ul>
 
-  @if (itemsToDisplay()) {
-    <div class="modal__items">
-      @for (item of itemsToDisplay(); track item.itemId) {
-        @let itemData = ITEM_DATA[item.itemId];
-        <app-slot>
-          <app-inventory-slot
-            [item]="itemData"
-            [tier]="itemData.tier"
-            [amount]="item.amount"
-            [clickable]="false"
-          />
-        </app-slot>
-      }
-    </div>
-  }
+  <div class="modal__items">
+    @for (item of data.payout.items; track item.id) {
+      @let itemData = ITEM_DATA[item.id];
+      <app-slot>
+        <app-inventory-slot
+          [item]="itemData"
+          [tier]="itemData.tier"
+          [amount]="item.amount"
+          [clickable]="false"
+        />
+      </app-slot>
+    }
+  </div>
 
 </div>

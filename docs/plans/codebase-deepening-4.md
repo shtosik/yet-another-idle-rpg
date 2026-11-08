@@ -29,7 +29,7 @@ One **Notices** module turns reported events into toasts, modals and currency fe
 - Changelog: `[feature] Gold and explorer tokens from chests, zone stars, quests, merging and fees now show next to your purse.`
 - Docs: `player-stats-inventory-equipment.md`, `quests.md`, `towns-shops-guild.md`, `farming.md`, `consumables-camp-crafting.md`, `zones-waves-unlocks.md`.
 
-### 3. Quest transition (M, Opus)
+### 3. Quest transition (M, Opus) ✅
 One rule moves a quest forward and pays it.
 - Pure `store/quests/quest-transition.ts`: given the progression, the Order rolls, the step, whether the clock is settled and whether the rewards fit, it returns the new quest slice and a payout, or a refusal. `advanceQuest` and `endQuest` (`quests.store.ts:290-332`) stop repeating the repeat guard, `canPayQuest`, `takeStepItems`, the progression patch and `setStepKillBaseline`.
 - `completeOrder` (`:201-224`) stops building a synthetic `QuestProps`. It checks the payout before taking items or starting the cooldown; a refusal changes nothing (owner decision).

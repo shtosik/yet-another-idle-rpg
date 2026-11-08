@@ -1,5 +1,6 @@
 import { ProfessionID } from '../../../enums/ids/profession-id.enum'
 import PROFESSIONS_DATA from '../../../data/professions-data'
+import type { PlayerStatsType } from './stats'
 
 /** Saved per unlocked profession; the level is derived from `experience`. */
 export interface ProfessionProgress {
@@ -48,3 +49,9 @@ export function settleProfession(progress: ProfessionProgress, maxLevel: number)
     skillPoints: unpaid * SKILL_POINTS_PER_EXPERTISE_LEVEL,
   }
 }
+
+/** The stat that multiplies the profession's XP (`farmXpMultiplier` for farming). */
+export const professionXpMultiplier = (stats: PlayerStatsType, id: ProfessionID): number => stats[PROFESSIONS_DATA[id].xpMultiplier]
+
+/** XP the profession's own work (a harvest) or its Order pays: `base` × (1 + its `xpMultiplier` stat), rounded. */
+export const professionXp = (base: number, xpMultiplier: number): number => Math.round(base * (1 + xpMultiplier))

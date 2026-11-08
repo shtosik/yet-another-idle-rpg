@@ -1,6 +1,5 @@
-import { Component, computed, inject, signal } from '@angular/core'
+import { Component, inject } from '@angular/core'
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
-import { QuestProps } from '../../../../data/quests-data'
 import { QuestID } from '../../../../enums/ids/quest-id.enum'
 import { ReputationID } from '../../../../enums/reputation-id.enum'
 import { ProfessionID } from '../../../../enums/ids/profession-id.enum'
@@ -9,6 +8,7 @@ import { InventoryItemComponent } from '../../game/inventory/inventory-slot/inve
 import ITEM_DATA from '../../../../data/items-data'
 import { SlotComponent } from '../../shared/slot/slot.component'
 import { CloseButtonComponent } from '../../shared/close-button/close-button.component'
+import { QuestCompleted } from '../../../store/quests/quest-transition'
 
 @Component({
   selector: 'app-quest-complete-component',
@@ -23,24 +23,7 @@ import { CloseButtonComponent } from '../../shared/close-button/close-button.com
 })
 export class QuestCompletedComponent {
   modalRef = inject(MatDialogRef)
-  data = inject<QuestProps>(MAT_DIALOG_DATA)
-  questData = signal(this.data)
-
-  itemsToDisplay = computed(() => {
-    return this.questData().rewards.filter(i => i.type === 'item')
-  })
-
-  statsToDisplay = computed(() => {
-    return this.questData().rewards.filter(i => i.type === 'stat')
-  })
-
-  reputationToDisplay = computed(() => {
-    return this.questData().rewards.filter(i => i.type === 'reputation')
-  })
-
-  professionXpToDisplay = computed(() => {
-    return this.questData().rewards.filter(i => i.type === 'professionXp')
-  })
+  data = inject<QuestCompleted>(MAT_DIALOG_DATA)
 
   protected readonly ProfessionID = ProfessionID
   protected readonly QuestID = QuestID

@@ -1,6 +1,5 @@
 import { inject, Injectable, Signal, signal } from '@angular/core'
 import i18next from 'i18next'
-import { QuestProps } from '../../data/quests-data'
 import { ItemID } from '../../enums/ids/item-id.enum'
 import { ProfessionID } from '../../enums/ids/profession-id.enum'
 import { ReputationID } from '../../enums/reputation-id.enum'
@@ -11,6 +10,7 @@ import { InventoryTab, ItemStack, tabOf } from '../store/player/inventory'
 import type { ProfessionGain } from '../store/player/player.store'
 import { TierUp } from '../store/player/reputation'
 import { ResourceGain } from '../store/player/resources'
+import type { QuestCompleted } from '../store/quests/quest-transition'
 import { expertiseGain } from '../store/player/stats'
 import { CurrencyFeedService } from './currency-feed.service'
 import { ModalService } from './modal.service'
@@ -24,7 +24,7 @@ export type Notice =
   | { type: 'crafted', itemId: ItemID, count: number }
   | { type: 'merged', status: 'success' | 'failure', item: EquipmentItem }
   | { type: 'stationInstalled', itemId: ItemID }
-  | { type: 'questCompleted', quest: QuestProps }
+  | { type: 'questCompleted', completed: QuestCompleted }
   | { type: 'currency', gain: ResourceGain }
 
 /** Where a toast shows; each lane holds one message at a time. */
@@ -75,7 +75,7 @@ export class NoticesService {
         this.modal.openStationInstalled(notice.itemId)
         return
       case 'questCompleted':
-        this.modal.openQuestCompleted(notice.quest)
+        this.modal.openQuestCompleted(notice.completed)
         return
       case 'currency':
         this.feed.show('gold', notice.gain.gold)
