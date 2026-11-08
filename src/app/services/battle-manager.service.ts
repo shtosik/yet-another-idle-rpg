@@ -1,11 +1,11 @@
 import { ArenaBossesService } from './arena-bosses.service'
 import { ArenaService } from './arena.service'
 import { WeaponCategory } from '../../enums/weapon-category.enum'
-import { computed, inject, Injectable, signal } from '@angular/core'
-import i18next from 'i18next'
-import { InventoryTab, ItemStack, tabOf } from '../store/player/inventory'
+import { computed, inject, Injectable } from '@angular/core'
+import { NoticesService } from './notices.service'
 import { BattleStore } from '../store/battle/battle.store'
 import { PlayerStore } from '../store/player/player.store'
+import * as rules from '../store/battle/spell-rules'
 import { AnimationsService } from './animations.service'
 import { SkillNodeID } from '../../enums/ids/skill-node-id.enum'
 import { SpellID } from '../../enums/ids/spell-id.enum'
@@ -23,11 +23,7 @@ import { OfflineStore } from '../store/offline/offline.store'
 import { KillResolutionService } from './kill-resolution.service'
 import { nextWave, previousWave } from '../store/battle/waves'
 
-/** Cooldown reduction can't push a spell below this. */
-const MIN_SPELL_COOLDOWN_IN_SECONDS = 1
 const MS_PER_SECOND = 1000
-const DROPS_LOST_TOAST_MS = 3000
-const SEED_FOUND_TOAST_MS = 3000
 
 @Injectable({ providedIn: 'root' })
 export class BattleManagerService {
@@ -38,14 +34,7 @@ export class BattleManagerService {
   private animations = inject(AnimationsService)
   private offlineStore = inject(OfflineStore)
   private killResolution = inject(KillResolutionService)
-
-  /** Drops a full tab lost on the last kill, one line per tab; clears itself after `DROPS_LOST_TOAST_MS`. */
-  dropsLostToast = signal<string | null>(null)
-  private dropsLostTimer?: ReturnType<typeof setTimeout>
-
-  /** "Found: Turnip Seeds x1" for seeds a kill dropped once the farm is unlocked; clears itself. */
-  seedFoundToast = signal<string | null>(null)
-  private seedFoundTimer?: ReturnType<typeof setTimeout>
+  private notices = inject(NoticesService)
 
   currentWaveKillCount = computed(() => this.playerStore.getKillCountByZoneAndWave(this.battleStore.currentZoneId(), this.battleStore.currentWave()))
 
@@ -110,44 +99,26 @@ export class BattleManagerService {
     return this.playerStore.stats().mana >= this.manaCost(spellId)
   }
 
-  /** Levels of the spell's perk node (`SpellProps.perk`); 0 without one. */
-  private perkLevel(spellId: SpellID): number {
-    const perk = SPELLS_DATA[spellId].perk
-    return perk ? this.playerStore.unlockedNodes()[perk.nodeId] ?? 0 : 0
-  }
-
-  /** `baseManaCost` minus the perk's mana per level, never below 1. */
   manaCost(spellId: SpellID): number {
-    const { baseManaCost, perk } = SPELLS_DATA[spellId]
-    return Math.max(1, baseManaCost - (perk?.manaPerLevel ?? 0) * this.perkLevel(spellId))
+    return rules.manaCost(SPELLS_DATA[spellId], this.playerStore.unlockedNodes())
   }
 
-  /** Seconds, after `spellCooldownReduction` and the spell's perk, never below `MIN_SPELL_COOLDOWN_IN_SECONDS`. */
   spellCooldown(spellId: SpellID): number {
-    const { baseCooldown, perk } = SPELLS_DATA[spellId]
-    const perkReduction = (perk?.cooldownPerLevel ?? 0) * this.perkLevel(spellId)
-    const reduced = baseCooldown - this.playerStore.stats().spellCooldownReduction - perkReduction
-    return Math.max(MIN_SPELL_COOLDOWN_IN_SECONDS, reduced)
+    return rules.spellCooldown(SPELLS_DATA[spellId], this.playerStore.unlockedNodes(), this.playerStore.stats().spellCooldownReduction)
   }
 
-  /**
-   * Equipped, off cooldown, known (a gear spell: its gear is on) and affordable. Damage spells need a living enemy; buffs and
-   * empower spells (Ambush) can be cast between fights but not while already active.
-   */
   canCast(spellId: SpellID): boolean {
-    const slot = this.battleStore.equippedSpells().find(s => s?.spellId === spellId)
-    if (!slot || slot.cooldownRemainingMs > 0 || !this.canAffordSpell(spellId)) return false
-    // A gear spell waiting out its cooldown after the gear came off.
-    if (!this.playerStore.knownSpellIds().includes(spellId) || !this.hasRequiredWeapon(spellId)) return false
-
-    if (SPELLS_DATA[spellId].effect.type === SpellType.buff) {
-      return !this.battleStore.activeBuffs().some(b => b.spellId === spellId)
-    }
-    if (SPELLS_DATA[spellId].effect.type === SpellType.damageOverTime
-      && this.battleStore.activeDamageOverTime().some(d => d.spellId === spellId)) return false
-    // Like a buff: castable between fights, not again while its crits are left.
-    if (SPELLS_DATA[spellId].effect.type === SpellType.empower) return this.battleStore.empowered()?.spellId !== spellId
-    return this.battleStore.isInCombat()
+    return rules.canCast(SPELLS_DATA[spellId], {
+      slot: this.battleStore.equippedSpells().find(s => s?.spellId === spellId) ?? undefined,
+      mana: this.playerStore.stats().mana,
+      cost: this.manaCost(spellId),
+      isKnown: this.playerStore.knownSpellIds().includes(spellId),
+      hasRequiredWeapon: this.hasRequiredWeapon(spellId),
+      isInCombat: this.battleStore.isInCombat(),
+      activeBuffs: this.battleStore.activeBuffs().map(b => b.spellId),
+      activeDamageOverTime: this.battleStore.activeDamageOverTime().map(d => d.spellId),
+      empowered: this.battleStore.empowered()?.spellId ?? null,
+    })
   }
 
   castSpell(spellId: SpellID) {
@@ -210,21 +181,17 @@ export class BattleManagerService {
     const itemData = ITEM_DATA[itemId]
     if (!itemData || !isConsumableItem(itemData)) return
 
-    const { slot, cooldown, duration = 0, stats = [], manaRestore = 0 } = itemData.effect
-    const current = this.battleStore.consumableSlots()[slot]
-    if (current && current.lockRemaining > 0) return
-    if (this.playerStore.itemCount(itemId) < 1) return
-
+    const { slot } = itemData.effect
     const playerStats = this.playerStore.stats()
-    const manaGained = Math.min(manaRestore, playerStats.maxMana - playerStats.mana)
-    // Don't waste a pure mana potion at full mana.
-    if (manaRestore > 0 && !stats.length && manaGained <= 0) return
+    const plan = rules.planConsumable(
+      itemData.effect, this.battleStore.consumableSlots()[slot]?.lockRemaining ?? 0,
+      this.playerStore.itemCount(itemId), playerStats.mana, playerStats.maxMana,
+    )
+    if (!plan) return
 
-    // The effect can never outlast the slot lock. Its stats are derived from the slot (PlayerStore.stats).
-    const effectRemaining = Math.min(duration, cooldown)
-
-    this.battleStore.setConsumable(slot, { itemId, effectRemaining, lockRemaining: cooldown })
-    if (manaGained > 0) this.playerStore.updatePlayerStats([{ stat: 'mana', amount: manaGained }])
+    // Its stats are derived from the slot (PlayerStore.stats).
+    this.battleStore.setConsumable(slot, { itemId, effectRemaining: plan.effectRemaining, lockRemaining: plan.lockRemaining })
+    if (plan.manaGained > 0) this.playerStore.updatePlayerStats([{ stat: 'mana', amount: plan.manaGained }])
     this.playerStore.removeItems([{ id: itemId, amount: 1 }])
   }
 
@@ -257,34 +224,13 @@ export class BattleManagerService {
     const { lost, receivedItems } = this.killResolution.resolveKills(zoneId, wave, [kill], Math.random)
     // Seeds are listed only once the farm is unlocked.
     const foundSeeds = receivedItems.filter(item => item.type === ItemType.seed)
-    if (lost.length) this.showDropsLost(lost)
-    if (foundSeeds.length) this.showSeedsFound(foundSeeds)
+    this.notices.push({ type: 'dropsLost', lost })
+    this.notices.push({ type: 'seedsFound', seeds: foundSeeds })
 
     // The toggle alone isn't enough: the node may have been refunded since it was switched on.
     const isAutoEnabled = this.battleStore.autoWaveProgressionEnabled()
       && this.playerStore.hasSkillUnlocked(SkillNodeID.autoWaveProgression)
     // A boss kill has just unlocked the next zone (Kill resolution), so the move from the boss wave is allowed.
     if (isAutoEnabled) this.changeWave(true)
-  }
-
-  private showSeedsFound(seeds: ItemStack[]): void {
-    const names = seeds.map(({ id, amount }) => `${i18next.t(`items:names.${ItemID[id]}`)} x${amount}`)
-    clearTimeout(this.seedFoundTimer)
-    this.seedFoundToast.set(i18next.t('map:farm.seedFound', { seeds: names.join(', ') }))
-    this.seedFoundTimer = setTimeout(() => this.seedFoundToast.set(null), SEED_FOUND_TOAST_MS)
-  }
-
-  private showDropsLost(lost: ItemStack[]): void {
-    const byTab = new Map<InventoryTab, string[]>()
-    for (const { id, amount } of lost) {
-      const tab = tabOf(id)
-      const name = i18next.t(`items:names.${ItemID[id]}`)
-      byTab.set(tab, [...(byTab.get(tab) ?? []), amount > 1 ? `${name} x${amount}` : name])
-    }
-    const lines = [...byTab].map(([tab, names]) =>
-      i18next.t('app:inventory.dropsLost', { tab: i18next.t(`app:inventory.tabs.${tab}`), items: names.join(', ') }))
-    clearTimeout(this.dropsLostTimer)
-    this.dropsLostToast.set(lines.join('\n'))
-    this.dropsLostTimer = setTimeout(() => this.dropsLostToast.set(null), DROPS_LOST_TOAST_MS)
   }
 }

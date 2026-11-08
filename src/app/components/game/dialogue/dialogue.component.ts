@@ -11,6 +11,7 @@ import { CloseButtonComponent } from '../../shared/close-button/close-button.com
 import { PlayerStore } from '../../../store/player/player.store'
 import { missingSlotsText } from '../inventory/tab-text'
 import { DialogueLabel, shownBundles } from '../../../services/dialogue-effect-handlers'
+import { enemyName, itemName } from '../../../i18n/names'
 
 @Component({
   selector: 'app-dialogue',
@@ -54,7 +55,7 @@ export class DialogueComponent {
       const { turnIn, held, kept, bundles } = this.dialogueService.turnIn(turnInEffect)
       return {
         amount: shownBundles(bundles) * turnIn.bundleSize,
-        item: i18next.t(`items:names.${ItemID[turnIn.itemId]}`),
+        item: itemName(turnIn.itemId),
         held,
         kept,
         // i18next picks the `_kept` key when quests hold some back.
@@ -68,7 +69,7 @@ export class DialogueComponent {
     const task = this.playerStore.activeTasks()[effect.taskIndex ?? 0]
     if (!task) return undefined
     return {
-      monster: i18next.t(`enemies:names.${EnemyID[task.monsterId]}`),
+      monster: enemyName(task.monsterId),
       left: task.targetCount - task.currentCount,
     }
   }

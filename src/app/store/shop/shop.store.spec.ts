@@ -121,16 +121,16 @@ describe('PlayerStore spend', () => {
   it('refuses when the balance is too low and changes nothing', () => {
     player.updatePlayerStats([{ stat: 'goldCoins', amount: 10 }])
     const before = player.stats().goldCoins
-    expect(player.spend('gold', before + 1)).toBeFalse()
+    expect(player.spend('gold', before + 1)).toBeNull()
     expect(player.stats().goldCoins).toBe(before)
-    expect(player.spend('explorerTokens', 1)).toBeFalse()
+    expect(player.spend('explorerTokens', 1)).toBeNull()
     expect(player.explorerTokens()).toBe(0)
   })
 
   it('takes exactly the amount when affordable', () => {
     player.updatePlayerStats([{ stat: 'goldCoins', amount: 10 }])
     const before = player.stats().goldCoins
-    expect(player.spend('gold', before)).toBeTrue()
+    expect(player.spend('gold', before)?.gold).toBe(-before)
     expect(player.stats().goldCoins).toBe(0)
   })
 })

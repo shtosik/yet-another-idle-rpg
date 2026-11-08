@@ -15,13 +15,14 @@ import { ZoneMasteryComponent } from './zone-mastery/zone-mastery.component'
 import { DurationPipe } from '../../../../pipes/duration.pipe'
 import { ArenaService } from '../../../../services/arena.service'
 import { ARENA } from '../../../../../data/arena-data'
+import { DisplayNamePipe } from '../../../../pipes/display-name.pipe'
 
 @Component({
   selector: 'app-battle-nav-bar',
   templateUrl: 'battle-nav-bar.component.html',
   styleUrls: ['./battle-nav-bar.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, I18nextPipe, NgOptimizedImage, ZoneMasteryComponent, DurationPipe],
+  imports: [DisplayNamePipe, CommonModule, I18nextPipe, NgOptimizedImage, ZoneMasteryComponent, DurationPipe],
 })
 export class BattleNavBarComponent {
   private battleStore = inject(BattleStore)

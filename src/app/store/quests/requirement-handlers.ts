@@ -18,6 +18,7 @@ import { ItemStack } from '../player/inventory'
 import { REPUTATION_THRESHOLDS } from '../player/reputation'
 import type { PlayerStatsType } from '../player/stats'
 import { OrderState } from './orders'
+import { enemyName, itemName, professionName, questName, zoneName } from '../../i18n/names'
 
 /** Lifetime kill counters at the moment the quest reached its current step. */
 export interface KillBaseline {
@@ -70,7 +71,6 @@ interface RequirementHandler<R extends RequirementProps> {
 }
 
 const row = (label: string, progress: Progress, zoneId: ZoneID | null = null): RequirementRow[] => [{ label, zoneId, ...progress }]
-const itemName = (id: ItemID) => i18next.t(`items:names.${ItemID[id]}`)
 const firstUnlocked = (zones: ZoneID[], ctx: RequirementContext) => zones.find(zoneId => ctx.isZoneUnlocked(zoneId)) ?? null
 
 const item: RequirementHandler<ItemRequirement> = {
@@ -93,14 +93,14 @@ const pickedItems: RequirementHandler<PickedItemsRequirement> = {
 
 const enemy: RequirementHandler<EnemyKillCountRequirement> = {
   progress: (req, ctx) => ({ current: ctx.enemyKills(req.enemyId), target: req.amount }),
-  rows: (req, ctx) => row(i18next.t(`enemies:names.${EnemyID[req.enemyId]}`), enemy.progress(req, ctx), firstUnlocked(ZONES_BY_ENEMY[req.enemyId] ?? [], ctx)),
+  rows: (req, ctx) => row(enemyName(req.enemyId), enemy.progress(req, ctx), firstUnlocked(ZONES_BY_ENEMY[req.enemyId] ?? [], ctx)),
   baseline: (req, lifetime, into) => { into.enemies[req.enemyId] = lifetime.enemy(req.enemyId) },
 }
 
 const wave: RequirementHandler<WaveKillCountRequirement> = {
   progress: (req, ctx) => ({ current: ctx.waveKills(req.zoneId, req.wave), target: req.amount }),
   rows: (req, ctx) => row(
-    i18next.t('quests:requirements.wave', { wave: req.wave, zone: i18next.t(`zones:names.${ZoneID[req.zoneId]}`) }),
+    i18next.t('quests:requirements.wave', { wave: req.wave, zone: zoneName(req.zoneId) }),
     wave.progress(req, ctx),
     firstUnlocked([req.zoneId], ctx),
   ),
@@ -117,13 +117,13 @@ const quest: RequirementHandler<QuestRequirement> = {
     const step = ctx.progression[req.questId]
     return { current: step && (req.step === undefined || step === req.step) ? 1 : 0, target: 1 }
   },
-  rows: (req, ctx) => row(i18next.t(`quests:names.${QuestID[req.questId]}`), quest.progress(req, ctx)),
+  rows: (req, ctx) => row(questName(req.questId), quest.progress(req, ctx)),
 }
 
 const professionLevel: RequirementHandler<ProfessionLevelRequirement> = {
   progress: (req, ctx) => ({ current: ctx.professionLevel(req.professionId), target: req.level }),
   rows: (req, ctx) => row(
-    i18next.t('quests:requirements.professionLevel', { profession: i18next.t(`app:professions.${ProfessionID[req.professionId]}`) }),
+    i18next.t('quests:requirements.professionLevel', { profession: professionName(req.professionId) }),
     professionLevel.progress(req, ctx),
   ),
 }

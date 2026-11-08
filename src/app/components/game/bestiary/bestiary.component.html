@@ -18,10 +18,10 @@
           <img
             class="bestiary__sprite"
             [src]="monster.url"
-            [alt]="('enemies:names.' + EnemyID[monster.id]) | i18next"
+            [alt]="monster.id | displayName:'enemy'"
           />
           <span class="bestiary__name">
-            {{ ('enemies:names.' + EnemyID[monster.id]) | i18next }}
+            {{ monster.id | displayName:'enemy' }}
             <span class="bestiary__kills">x{{ monster.killCount }}</span>
           </span>
           <ng-container *ngTemplateOutlet="stars; context: { rank: monster.rank }" />
@@ -40,7 +40,7 @@
   <div class="bestiary__details">
     @if (selectedMonster(); as m) {
       <h2 class="bestiary__title">
-        {{ ('enemies:names.' + EnemyID[m.id]) | i18next }}
+        {{ m.id | displayName:'enemy' }}
         <span class="bestiary__kill-count">x{{ m.killCount }}</span>
       </h2>
       <div class="bestiary__detail-sprite-box">
@@ -110,7 +110,7 @@
         <dd>
           @if (m.zones.length) {
             @for (zone of m.zones; track zone; let last = $last) {
-              {{ ('zones:names.' + ZoneID[zone]) | i18next }}{{ last ? '' : ', ' }}
+              {{ zone | displayName:'zone' }}{{ last ? '' : ', ' }}
             }
           } @else {
             {{ 'bestiary:noZone' | i18next }}
@@ -127,7 +127,7 @@
         <ul class="bestiary__drops">
           @for (drop of m.drops; track drop.id) {
             <li class="bestiary__drop">
-              <span class="bestiary__drop-name" [attr.data-tier]="ItemTier[dropTier(drop.id)]">{{ ('items:names.' + ItemID[drop.id]) | i18next }}</span>
+              <span class="bestiary__drop-name" [attr.data-tier]="ItemTier[dropTier(drop.id)]">{{ drop.id | displayName:'item' }}</span>
               <span>{{ dropOdds(drop, m.rank) }}</span>
             </li>
           }
@@ -143,7 +143,7 @@
         <ul class="bestiary__drops">
           @for (drop of m.shinyDrops; track drop.id) {
             <li class="bestiary__drop bestiary__drop--shiny">
-              <span class="bestiary__drop-name" [attr.data-tier]="ItemTier[dropTier(drop.id)]">{{ ('items:names.' + ItemID[drop.id]) | i18next }}</span>
+              <span class="bestiary__drop-name" [attr.data-tier]="ItemTier[dropTier(drop.id)]">{{ drop.id | displayName:'item' }}</span>
               <span>{{ dropOdds(drop, m.rank) }}</span>
             </li>
           }

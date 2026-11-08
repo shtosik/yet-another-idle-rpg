@@ -1,5 +1,4 @@
-@let name = ('items:names.' + ItemID[item.id]) | i18next;
-@let displayName = upgradeLevel() > 0 ? ('items:upgradedName' | i18next: { name, level: upgradeLevel() }) : name;
+@let displayName = item.id | displayName:'item':upgradeLevel();
 <div
   [attr.data-tier]="ItemTier[tier]"
   [tooltipContext]="{ item, tier, level: upgradeLevel() }"
@@ -64,7 +63,7 @@
     <span
       [attr.data-tier]="ItemTier[tier]"
       class="name"
-    >{{ level > 0 ? ('items:upgradedName' | i18next: { name: ('items:names.' + ItemID[item.id] | i18next), level }) : ('items:names.' + ItemID[item.id] | i18next) }}</span>
+    >{{ item.id | displayName:'item':level }}</span>
     <span class="tier-line">
       <span
         [attr.data-tier]="ItemTier[tier]"
@@ -111,7 +110,7 @@
     @if (item.type === ItemType.chest) {
       <span class="stat">{{ 'items:chestRolls' | i18next:{ count: item.rolls } }}</span>
       @if (item.bonusRoll; as bonus) {
-        <span class="stat">{{ 'items:chestBonus' | i18next:{ chance: bonus.chance, item: ('items:names.' + ItemID[bonus.itemId]) | i18next } }}</span>
+        <span class="stat">{{ 'items:chestBonus' | i18next:{ chance: bonus.chance, item: bonus.itemId | displayName:'item' } }}</span>
       }
     }
     @if (item.type === ItemType.spellScroll) {

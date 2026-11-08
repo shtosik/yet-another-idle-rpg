@@ -4,6 +4,7 @@ import { EquipmentSlot, EquipmentSlotKey } from '../../../enums/equipment-slot.e
 import { ItemType } from '../../../enums/items/item-type.enum'
 import { EquipmentItem, EquipmentType } from '../../../interfaces/player/equipment.type'
 import { addItems, blockedTab, countItem, Inventories, InventoryTab, ItemStack, removeItems, slotDeltas, stackKey, TabCapacity, withSlotDeltas } from './inventory'
+import { canAfford } from './resources'
 import { equipmentModifiers } from './stats'
 
 export type MergeSource =
@@ -75,7 +76,7 @@ export function evaluateMerge(context: MergeContext, levelCap: number = UPGRADE_
   const level = base.upgradeLevel ?? 0
   if (level >= levelCap) return { status: 'refused', reason: 'atCap' }
   const { cost, chance, next: upgraded } = upgradeQuote(base)
-  if (context.goldCoins < cost) return { status: 'refused', reason: 'notEnoughGold' }
+  if (!canAfford(context.goldCoins, cost)) return { status: 'refused', reason: 'notEnoughGold' }
 
   const successEquipment = { ...context.equipment }
   const failureEquipment = { ...context.equipment }

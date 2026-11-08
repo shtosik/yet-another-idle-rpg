@@ -7,7 +7,8 @@ Active abilities on a 5-slot spell bar under the battle view. Spells cost mana a
 - `src/data/spells-data.ts:SPELLS_DATA` — per spell: `baseManaCost`, `baseCooldown` (seconds), icon `url`, `effect`, optional `perk` (skill node that cuts the spell's cooldown or mana per level). Strike spells: Fire Strike (fire), Tidal Lash (water, 1 mana), Gale Cut (air, 35 s), Stone Spike (earth, 26 damage, 90 s); plus Haste and Double Attack.
 - `src/interfaces/spell.interface.ts:SpellProps` — `effect` is `SpellWeaponEffectProps` (`hits`, melee or ranged), `SpellMagicEffectProps` (`baseDamage`, `damageType`) or `SpellBuffEffectProps` (`stat`, `amount`, `duration` in seconds).
 - `src/enums/ids/spell-id.enum.ts:SpellID`, `src/enums/spell-type.enum.ts:SpellType`.
-- `src/app/services/battle-manager.service.ts` — `canCast`, `castSpell`, `manaCost`, `spellCooldown`, `tickSpells`.
+- `src/app/services/battle-manager.service.ts` — `castSpell`, `tickSpells`, and thin `canCast`, `manaCost`, `spellCooldown` that gather the game state and call `spell-rules.ts`.
+- `src/app/store/battle/spell-rules.ts` — pure spell rules: `manaCost`, `spellCooldown` (`MIN_SPELL_COOLDOWN_IN_SECONDS`), `canCast` (one rule per `SpellType`, fed a `CastContext`) and `planConsumable`. Covered by `spell-rules.spec.ts`.
 - `src/app/store/battle/spell-bar.ts` — pure spell bar rules: `place` (first free slot, a chosen slot, swap, displace), `remove`, `prune`, the cooldown lock (`isLocked`), `SPELL_BAR_SLOTS` (5). Covered by `spell-bar.spec.ts`.
 - `src/app/store/battle/battle.store.ts` — `equippedSpells` (each `{ spellId, cooldownRemainingMs }`), changed only through `placeSpell`, `removeSpell`, `pruneSpells` (they call `spell-bar.ts`); `activeBuffs` (`{ spellId, msRemaining }`), `tickSpellTimers`.
 - `src/app/store/player/player.store.ts` — `knownSpellIds` (derived), `scrollSpellLevels` (saved: spell → levels from used scrolls), `spellbookUnlocked`, mana and `regenMana`; `stats` includes active buffs.

@@ -12,7 +12,7 @@ All player-facing text comes from i18next JSON files, so content can be added an
 ## Data flow
 1. App start: `i18nextInitializer` loads every namespace in `translations`. The app renders after this resolves.
 2. Templates and services ask for `ns:key`. Keys without a namespace fall back to `app`.
-3. Most entity text is looked up by the entity's enum key name, built in code: `'items:names.' + ItemID[id]`.
+3. Entity names go through `src/app/i18n/names.ts` (`itemName`, `zoneName`, `questName`, `enemyName`, `professionName`, `reputationName`, and `upgradedName`/`upgradedItemName`, which own the **Upgrade level** rule: suffix only when the level is above 0). Templates use `{{ id | displayName:'item':level }}` (`src/app/pipes/display-name.pipe.ts`). Do not build `items:names.<key>` strings in new code. `npm run validate` checks every enum member of each family has its key (check 4).
 
 ## Key conventions
 | Text | Key |

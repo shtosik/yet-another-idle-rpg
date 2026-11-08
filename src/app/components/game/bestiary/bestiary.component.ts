@@ -19,6 +19,7 @@ import { SkillNodeID } from 'enums/ids/skill-node-id.enum'
 import { WEAKNESS_ICONS } from '../battle/enemy/monster-debuff-bar/monster-debuff-bar.component'
 import { bestiaryRank, MAX_BESTIARY_RANK, RANK_BONUSES, rankThresholds } from '../../../store/player/bestiary-rank'
 import { dropOddsMultiplier } from '../../../store/player/kill-rewards'
+import { DisplayNamePipe } from '../../../pipes/display-name.pipe'
 
 const LOCKED_SPRITE = './assets/img/enemies/unknown.png'
 
@@ -29,7 +30,7 @@ const byDropRate = (drops: EnemyDrop[]): EnemyDrop[] => [...drops].sort((a, b) =
     selector: 'app-bestiary',
     templateUrl: './bestiary.component.html',
     styleUrls: ['./bestiary.component.sass'],
-    imports: [CommonModule, I18nextPipe, HalfSizeSpriteDirective],
+    imports: [DisplayNamePipe, CommonModule, I18nextPipe, HalfSizeSpriteDirective],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class BestiaryComponent {

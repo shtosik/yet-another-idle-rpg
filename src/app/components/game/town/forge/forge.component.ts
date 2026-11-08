@@ -1,5 +1,5 @@
 import { DOCUMENT, NgOptimizedImage } from '@angular/common'
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, output, signal } from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, output } from '@angular/core'
 import { TooltipTemplateDirective } from 'ngx-tooltip-directives'
 import i18next from 'i18next'
 import ITEM_DATA from '../../../../../data/items-data'
@@ -11,10 +11,11 @@ import { I18nextPipe } from '../../../../pipes/i18next.pipe'
 import { StatToPercentagePipe } from '../../../../pipes/stat-to-percentage.pipe'
 import { ForgeInput, ForgeSelection } from '../../../../services/forge-selection'
 import { PlayerStore } from '../../../../store/player/player.store'
+import { NoticesService } from '../../../../services/notices.service'
 import { gearModifiers } from '../../../../store/player/stats'
 import { tabName } from '../../inventory/tab-text'
+import { upgradedItemName } from '../../../../i18n/names'
 
-const TOAST_MS = 3000
 
 @Component({
   selector: 'app-forge',
@@ -59,15 +60,12 @@ export class ForgeComponent {
     const after = gearModifiers(preview)
     return gearModifiers(item).map((modifier, index) => ({ ...modifier, after: after[index].amount }))
   })
-  readonly toast = signal<string | null>(null)
-  private toastTimer?: ReturnType<typeof setTimeout>
+  private notices = inject(NoticesService)
+  readonly toast = this.notices.toast('forge')
 
   constructor() {
     this.selection.clear()
-    inject(DestroyRef).onDestroy(() => {
-      clearTimeout(this.toastTimer)
-      this.selection.clear()
-    })
+    inject(DestroyRef).onDestroy(() => this.selection.clear())
   }
 
   inputItem(slot: ForgeInput): EquipmentItem | null {
@@ -102,9 +100,7 @@ export class ForgeComponent {
   }
 
   itemName(item: EquipmentItem): string {
-    const name = i18next.t(`items:names.${ItemID[item.id]}`)
-    const level = item.upgradeLevel ?? 0
-    return level > 0 ? i18next.t('items:upgradedName', { name, level }) : name
+    return upgradedItemName(item.id, item.upgradeLevel ?? 0)
   }
 
   mergeLabel(): string {
@@ -125,9 +121,8 @@ export class ForgeComponent {
 
   merge(): void {
     const merged = this.selection.merge()
-    if (!merged) return
-    clearTimeout(this.toastTimer)
-    this.toast.set(i18next.t(`forge:${merged.result.status}`, { item: this.itemName(merged.after) }))
-    this.toastTimer = setTimeout(() => this.toast.set(null), TOAST_MS)
+    // `selection.merge` never returns a refusal; the check narrows the type.
+    if (!merged || merged.result.status === 'refused') return
+    this.notices.push({ type: 'merged', status: merged.result.status, item: merged.after })
   }
 }

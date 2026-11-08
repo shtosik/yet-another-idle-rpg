@@ -5,6 +5,7 @@ import { CloseButtonComponent } from '../../shared/close-button/close-button.com
 import { InventoryItem } from '../../../../interfaces/item.interface'
 import { ItemID } from '../../../../enums/ids/item-id.enum'
 import { ItemTier } from '../../../../enums/items/item-tier.enum'
+import { DisplayNamePipe } from '../../../pipes/display-name.pipe'
 
 /** Asks before an inventory stack is destroyed; closes with true on confirm. */
 @Component({
@@ -12,7 +13,7 @@ import { ItemTier } from '../../../../enums/items/item-tier.enum'
     templateUrl: './destroy-confirm.component.html',
     styleUrl: './destroy-confirm.component.sass',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [I18nextPipe, CloseButtonComponent],
+    imports: [DisplayNamePipe, I18nextPipe, CloseButtonComponent],
 })
 export class DestroyConfirmComponent {
     private readonly modalRef = inject<MatDialogRef<DestroyConfirmComponent, boolean>>(MatDialogRef)

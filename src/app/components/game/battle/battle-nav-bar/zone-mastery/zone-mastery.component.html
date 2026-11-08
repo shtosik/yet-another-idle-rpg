@@ -50,7 +50,7 @@
       <span class="star-tooltip__reward">
         {{ 'zones:mastery.reward' | i18next: { gold: chest.gold, tokens: chest.explorerTokens } }}
         @for (item of chest.items; track item.id; let last = $last) {
-          {{ item.amount }}× {{ 'items:names.' + ItemID[item.id] | i18next }}{{ last ? '' : ', ' }}
+          {{ item.amount }}× {{ item.id | displayName:'item' }}{{ last ? '' : ', ' }}
         }
       </span>
       @if (canClaim(progress.star)) {

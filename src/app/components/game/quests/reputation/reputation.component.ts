@@ -5,6 +5,7 @@ import { REPUTATION_IDS, REPUTATION_TOWN, reputationProgress } from '../../../..
 import { ReputationID } from '../../../../../enums/reputation-id.enum'
 import { SiteID } from '../../../../../enums/ids/site-id.enum'
 import { ReputationTier } from '../../../../../enums/reputation-tier.enum'
+import { DisplayNamePipe } from '../../../../pipes/display-name.pipe'
 
 /** Reputation tab of the quest panel: tier and progress per discovered reputation, no reward lists (docs/ideas/quest-panel.md). */
 @Component({
@@ -12,7 +13,7 @@ import { ReputationTier } from '../../../../../enums/reputation-tier.enum'
   templateUrl: './reputation.component.html',
   styleUrl: './reputation.component.sass',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [I18nextPipe],
+  imports: [DisplayNamePipe, I18nextPipe],
 })
 export class ReputationComponent {
   private playerStore = inject(PlayerStore)

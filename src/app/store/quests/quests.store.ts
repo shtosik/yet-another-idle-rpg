@@ -1,43 +1,27 @@
-import { QuestProgression, QuestStep } from '../../../types/quests/quest-progression.type'
+import { QuestStep } from '../../../types/quests/quest-progression.type'
 import { patchState, signalStore, withMethods, withState } from '@ngrx/signals'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { withDevtools } from '../helpers/devtools'
 import { saveGameStateNow, withGameStateSync } from '../helpers/with-game-state-sync.hook'
-import QUEST_DATA, { QUEST_STEP_AFTER_COMPLETED, QuestProps, RequirementProps } from '../../../data/quests-data'
+import QUEST_DATA, { RequirementProps } from '../../../data/quests-data'
 import { inject } from '@angular/core'
-import { ModalService } from '../../services/modal.service'
+import { NoticesService } from '../../services/notices.service'
 import { PlayerStore } from '../player/player.store'
-import { ItemStack } from '../player/inventory'
 import { EnemyID } from '../../../enums/ids/enemy-id.enum'
 import { ZoneID } from '../../../enums/ids/zone-id.enum'
-import { ProfessionID } from '../../../enums/ids/profession-id.enum'
-import { QuestState } from '../../../enums/quest-state.enum'
-import { canAdvanceQuest, getQuestStatus, getStepItems } from '../../services/quest-status'
-import { ReputationService } from '../../services/reputation.service'
+import { canAdvanceQuest } from '../../services/quest-status'
 import { GameClock } from '../../services/game-clock.service'
-import { ProfessionService } from '../../services/profession.service'
-import { ReputationGain } from '../player/reputation'
 import { orderKey, TurnInKey, turnInRemainingMs } from './turn-in-cooldown'
-import { Orders, rollOrder } from './orders'
-import { PlayerStat } from '../../../types/player/player-stat.type'
-import PROFESSIONS_DATA from '../../../data/professions-data'
+import { rollOrder } from './orders'
 import { KillBaseline, killBaseline, Progress, RequirementContext, requirementProgress, RequirementRow, requirementRows, waveKey } from './requirement-handlers'
+import { QuestCompleted, QuestPayout, QuestSlice, questTransition } from './quest-transition'
 
 export { orderKey }
 export type { KillBaseline }
 
-export interface QuestsState {
-  questStepProgression: QuestProgression
+export interface QuestsState extends QuestSlice {
   stepKillBaselines: Partial<Record<QuestID, KillBaseline>>
   dialogueFlags: Record<string, boolean>
-  /** Active quests pinned to the top of the quest panel, in pin order. Dropped on completion. */
-  pinnedQuests: QuestID[]
-  /** When each turn-in last ran (Game time ms, `GameClock`); its cooldown is computed from this (`turnInRemainingMs`). */
-  lastTurnInAt: Partial<Record<TurnInKey, number>>
-  /** Started repeatable orders: the rolled requirements and rewards, saved at start so a reload never re-rolls. */
-  orders: Orders
-  /** How often each repeatable order was completed. */
-  questCompletions: Partial<Record<QuestID, number>>
 }
 
 export const initialState: QuestsState = {
@@ -52,35 +36,6 @@ export const initialState: QuestsState = {
 
 const STORE_KEY = 'questsStore'
 
-/** What completing a quest pays, split by where it goes. The dialogue slot check reads `items` from here too. */
-export function questPayout(data: QuestProps): QuestPayout {
-  const payout: QuestPayout = { stats: [], items: [], reputation: [], professionXp: [] }
-  for (const reward of data.rewards) {
-    switch (reward.type) {
-      case 'stat':
-        payout.stats.push({ stat: reward.key, amount: reward.amount })
-        break
-      case 'item':
-        payout.items.push({ id: reward.itemId, amount: reward.amount })
-        break
-      case 'reputation':
-        payout.reputation.push({ reputationId: reward.reputationId, amount: reward.amount })
-        break
-      case 'professionXp':
-        payout.professionXp.push({ professionId: reward.professionId, amount: reward.amount })
-        break
-    }
-  }
-  return payout
-}
-
-export interface QuestPayout {
-  stats: { stat: PlayerStat, amount: number }[]
-  items: ItemStack[]
-  reputation: ReputationGain[]
-  professionXp: { professionId: ProfessionID, amount: number }[]
-}
-
 export const QuestsStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
@@ -88,36 +43,22 @@ export const QuestsStore = signalStore(
   withDevtools(STORE_KEY),
   withMethods((
     store,
-    modalService = inject(ModalService),
+    notices = inject(NoticesService),
     playerStore = inject(PlayerStore),
-    reputationService = inject(ReputationService),
-    professionService = inject(ProfessionService),
   ) => ({
-    /** Whether the quest's item rewards fit once the turn-in at `step` has taken its items (atomic Item grant). */
-    canPayQuest(questId: QuestID, step: QuestStep): boolean {
-      return playerStore.canGrant(questPayout(QUEST_DATA[questId]).items, getStepItems(questId, step, store.orders()))
-    },
-
     /**
-     * Pays everything or nothing: refused (false) when the item rewards don't fit. Callers check `canPayQuest` before
-     * taking the step's items, so a refusal never costs the turn-in either.
+     * The one payer of a completed quest or Order. Pays everything or nothing: null when the item rewards don't fit.
+     * `questTransition` checks the fit before anything is taken, so a refusal here never costs the turn-in.
      */
-    handleQuestCompleted(data: QuestProps): boolean {
-      const { stats, items, reputation, professionXp } = questPayout(data)
-      if (Object.keys(playerStore.grant(items, 'atomic').missing).length > 0) return false
+    handleQuestCompleted(questId: QuestID, payout: QuestPayout): QuestCompleted | null {
+      if (Object.keys(playerStore.grant(payout.items, 'atomic').missing).length > 0) return null
 
-      patchState(store, (state) => ({ pinnedQuests: state.pinnedQuests.filter(id => id !== data.questId) }))
-      modalService.openQuestCompleted(data)
-      playerStore.updatePlayerStats(stats)
-      reputationService.gain(reputation)
-      professionXp.forEach(({ professionId, amount }) => professionService.gainXp(professionId, amount))
-      return true
-    },
-
-    /** A turn-in consumes the step's item requirements, so dialogue never restates them. */
-    takeStepItems(questId: QuestID, step: QuestStep) {
-      const items = getStepItems(questId, step, store.orders())
-      if (items.length > 0) playerStore.removeItems(items)
+      const completed = { questId, payout }
+      notices.push({ type: 'questCompleted', completed })
+      playerStore.updatePlayerStats(payout.stats)
+      playerStore.addReputation(payout.reputation)
+      payout.professionXp.forEach(({ professionId, amount }) => playerStore.applyProfessionXp(professionId, amount))
+      return completed
     },
 
     /** Kill requirements count from the moment the quest reaches a step; `null` drops the baseline. */
@@ -192,44 +133,40 @@ export const QuestsStore = signalStore(
       },
     }),
   ),
-  withMethods((store, playerStore = inject(PlayerStore)) => ({
+  withMethods((store, playerStore = inject(PlayerStore), gameClock = inject(GameClock)) => ({
+      /** Runs `questTransition` and applies it: takes the items, writes the quest state and the kill baseline, pays. False when refused (nothing changes). */
+      applyTransition(questId: QuestID, action: 'advance' | 'end', now: number): boolean {
+        const transition = questTransition(questId, action, {
+          questStepProgression: store.questStepProgression(),
+          orders: store.orders(),
+          lastTurnInAt: store.lastTurnInAt(),
+          questCompletions: store.questCompletions(),
+          pinnedQuests: store.pinnedQuests(),
+        }, {
+          now,
+          settled: gameClock.isSettled(),
+          stats: playerStore.stats(),
+          itemCount: id => playerStore.itemCount(id),
+          fits: (adds, removes) => playerStore.canGrant(adds, removes),
+        })
+        if (!transition) return false
+
+        if (transition.take.length > 0) playerStore.removeItems(transition.take)
+        patchState(store, transition.quests)
+        store.setStepKillBaseline(questId, transition.baselineStep)
+        if (transition.payout) store.handleQuestCompleted(questId, transition.payout)
+        return true
+      },
+    }),
+  ),
+  withMethods((store) => ({
       /**
-       * The only place a repeatable order ends, whichever dialogue route got here. Rejected (false) when the order
-       * isn't active, the player lacks the saved items or its cooldown is running: then nothing changes. Otherwise
-       * it takes the items, pays the saved rewards, starts the cooldown and frees the quest for its next pick.
+       * Ends a repeatable order, whichever dialogue route got here. Rejected (false), changing nothing, when the order
+       * isn't active, the clock is unsettled, the player lacks the saved items, its cooldown is running or its rewards
+       * don't fit. Otherwise it takes the items, pays the saved rewards, starts the cooldown and frees the quest for its next pick.
        */
       completeOrder(questId: QuestID, now: number): boolean {
-        const data = QUEST_DATA[questId]
-        const order = store.orders()[questId]
-        if (!data.repeat || !order) return false
-        if (getQuestStatus(store.questStepProgression(), questId).state !== QuestState.active) return false
-        if (!order.requirements.every(r => playerStore.itemCount(r.itemId) >= r.amount)) return false
-        if (store.orderRemainingMs(questId, now) > 0) return false
-
-        playerStore.removeItems(order.requirements.map(r => ({ id: r.itemId, amount: r.amount })))
-        patchState(store, (state) => {
-          const { [questId]: _step, ...progression } = state.questStepProgression
-          const { [questId]: _order, ...orders } = state.orders
-          return {
-            questStepProgression: progression,
-            orders,
-            lastTurnInAt: { ...state.lastTurnInAt, [orderKey(questId)]: now },
-            questCompletions: { ...state.questCompletions, [questId]: (state.questCompletions[questId] ?? 0) + 1 },
-          }
-        })
-        store.setStepKillBaseline(questId, null)
-
-        const { reputation, gold, farmingXp } = order.rewards
-        const xp = Math.round(farmingXp * (1 + playerStore.stats()[PROFESSIONS_DATA[data.repeat.professionId].xpMultiplier]))
-        store.handleQuestCompleted({
-          ...data,
-          rewards: [
-            { type: 'reputation' as const, reputationId: data.repeat.reputationId, amount: reputation },
-            { type: 'stat' as const, key: 'goldCoins' as const, amount: gold },
-            { type: 'professionXp' as const, professionId: data.repeat.professionId, amount: xp },
-          ].filter(reward => reward.amount > 0),
-        })
-        return true
+        return !!QUEST_DATA[questId].repeat && store.applyTransition(questId, 'end', now)
       },
     }),
   ),
@@ -289,47 +226,12 @@ export const QuestsStore = signalStore(
       /** Takes the current step's items, then moves to the next step or completes. No-op unless the step is still ready and, on the last step, its rewards fit. */
       advanceQuest(questId: QuestID) {
         // Rechecked here: items can be used up between opening a turn-in node and confirming it.
-        if (!store.isStepReady(questId)) return
-        const status = getQuestStatus(store.questStepProgression(), questId)
-        if (status.state !== QuestState.active) return
-
-        const questData = QUEST_DATA[questId]
-        if (questData.repeat) {
-          // Refused while an offline claim is pending: the cooldown would start inside the absence.
-          if (gameClock.isSettled()) store.completeOrder(questId, gameClock.nowMs())
-          return
-        }
-        const completes = status.step >= questData.steps.length
-        const nextStep = completes ? QUEST_STEP_AFTER_COMPLETED : status.step + 1
-        // Refused, nothing taken, while the rewards don't fit.
-        if (completes && !store.canPayQuest(questId, status.step)) return
-
-        store.takeStepItems(questId, status.step)
-        patchState(store, (state) => ({
-          questStepProgression: { ...state.questStepProgression, [questId]: nextStep },
-        }))
-        store.setStepKillBaseline(questId, completes ? null : nextStep)
-        if (completes) store.handleQuestCompleted(questData)
+        if (store.isStepReady(questId)) store.applyTransition(questId, 'advance', gameClock.nowMs())
       },
 
-      /** Takes the current step's items and completes the quest from any step. No-op unless active and its rewards fit. */
+      /** Takes the current step's items and completes the quest from any step (`questTransition` refuses when it can't; `dev.completeQuest` skips the ready check). */
       endQuest(questId: QuestID) {
-        const status = getQuestStatus(store.questStepProgression(), questId)
-        if (status.state !== QuestState.active) return
-        if (QUEST_DATA[questId].repeat) {
-          // Refused while an offline claim is pending: the cooldown would start inside the absence.
-          if (gameClock.isSettled()) store.completeOrder(questId, gameClock.nowMs())
-          return
-        }
-        // Refused, nothing taken, while the rewards don't fit (also for `dev.completeQuest`).
-        if (!store.canPayQuest(questId, status.step)) return
-
-        store.takeStepItems(questId, status.step)
-        patchState(store, (state) => ({
-          questStepProgression: { ...state.questStepProgression, [questId]: QUEST_STEP_AFTER_COMPLETED },
-        }))
-        store.setStepKillBaseline(questId, null)
-        store.handleQuestCompleted(QUEST_DATA[questId])
+        store.applyTransition(questId, 'end', gameClock.nowMs())
       },
 
       hasQuestStarted(questId: QuestID) {

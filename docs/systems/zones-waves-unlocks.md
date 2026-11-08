@@ -48,7 +48,7 @@ On load, `UnlockService.replayOnLoad` re-applies every rule already met and ever
 ## Invariants & gotchas
 - `UNLOCK_RULES` only target towns, Sites and features; the `zone` `UnlockTarget` is granted only by the boss chain and town entrances; the farm Site has no rule and opens through the `unlockSite` dialogue effect (`UnlockService.grant`, popup `unlocks:sites.farm`, shown once), or `dev.unlockSite` (silent). Opening a Site also unlocks the Map tab; zones unlock by the boss chain or a town entrance.
 - A zone's boss must not be listed in its `enemies` (`npm run validate` warns).
-- Horseshoe Beach is always unlocked (initial state and the `?? [horseshoeBeach]` fallbacks).
+- Horseshoe Beach is always unlocked: `DEFAULT_ZONES` in `store/player/unlocked-content.ts` is the initial list and the fallback for a save without one. `unlockZone`, `unlockTown` and `unlockSite` share `withUnlocked` there (append once, no-op when present); `isZoneUnlocked`, `isTownUnlocked` and `isSiteUnlocked` share `isUnlocked`.
 - `waveReached` means "killed something on that wave or a later one of the zone" (`zonesProgression`), the same on load and during play. Rules react to any change (kills, loot, quest XP), not only kills.
 
 ## Known issues

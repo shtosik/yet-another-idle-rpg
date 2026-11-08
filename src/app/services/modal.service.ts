@@ -2,7 +2,7 @@ import { ChestOpenedComponent } from '../components/modals/chest-opened/chest-op
 import type { ChestContents } from '../store/player/chest'
 import { inject, Injectable } from '@angular/core'
 import { MatDialog, MatDialogConfig } from '@angular/material/dialog'
-import { QuestProps } from '../../data/quests-data'
+import type { QuestCompleted } from '../store/quests/quest-transition'
 import { QuestCompletedComponent } from '../components/modals/quest-completed/quest-completed.component'
 import { RespecConfirmComponent } from '../components/modals/respec-confirm/respec-confirm.component'
 import { UnlockNotificationComponent } from '../components/modals/unlock-notification/unlock-notification.component'
@@ -19,7 +19,7 @@ import type { ArenaResult } from './arena.service'
 export class ModalService {
   private dialog = inject(MatDialog)
 
-  openQuestCompleted(data: QuestProps) {
+  openQuestCompleted(data: QuestCompleted) {
     const config: MatDialogConfig = {
       enterAnimationDuration: '300ms',
       hasBackdrop: true,

@@ -40,7 +40,7 @@
 
         <ul class="camp__grid">
           @for (view of filteredRecipes(); track view.recipe.id) {
-            @let itemName = ('items:names.' + ItemID[view.recipe.itemId]) | i18next;
+            @let itemName = view.recipe.itemId | displayName:'item';
             @let locked = view.evaluation.blockReason === 'stationLevel';
             @let selected = view.recipe.id === selectedRecipe()?.recipe?.id;
 

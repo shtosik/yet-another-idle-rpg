@@ -18,19 +18,20 @@ import { ItemType } from '../../../../../enums/items/item-type.enum'
 import { StationID } from '../../../../../enums/ids/station-id.enum'
 import { EquipmentSlot, EquipmentSlotKey } from '../../../../../enums/equipment-slot.enum'
 import { RecipeView } from '../recipe-view'
+import { itemName } from '../../../../i18n/names'
+import { DisplayNamePipe } from '../../../../pipes/display-name.pipe'
 
 const BATCH_SIZES: (number | 'max')[] = [1, 5, 10, 'max']
 
 const stationName = (id: StationID) => i18next.t(`camp:stations.${StationID[id]}.name`)
 const gearName = (id: StationID, level: number) => i18next.t(`camp:stations.${StationID[id]}.levels.${level}`)
-const itemName = (id: ItemID) => i18next.t(`items:names.${ItemID[id]}`)
 
 @Component({
   selector: 'app-recipe-detail',
   templateUrl: './recipe-detail.component.html',
   styleUrls: ['./recipe-detail.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [
+  imports: [DisplayNamePipe, 
     NgOptimizedImage,
     I18nextPipe,
     StatToPercentagePipe,

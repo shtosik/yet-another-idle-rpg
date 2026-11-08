@@ -6,7 +6,7 @@
     @if (run) {
       <h2 class="zone">{{ 'app:arena.title' | i18next }}</h2>
     } @else {
-      <h2 class="zone">{{ 'zones:names.' + ZoneID[currentZoneData.id] | i18next }}</h2>
+      <h2 class="zone">{{ currentZoneData.id | displayName:'zone' }}</h2>
       <app-zone-mastery />
     }
   </div>

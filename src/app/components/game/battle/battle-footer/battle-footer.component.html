@@ -17,7 +17,7 @@
       @let readyIn = consumable.lockRemaining | duration;
       <div
         class="consumable"
-        [title]="(('items:names.' + ItemID[consumable.itemId]) | i18next) + ' — ' + (('items:consumable.nextIn.' + consumable.slot) | i18next:{ time: readyIn })"
+        [title]="(consumable.itemId | displayName:'item') + ' — ' + (('items:consumable.nextIn.' + consumable.slot) | i18next:{ time: readyIn })"
       >
         <div
           class="effect-icon"

@@ -3,7 +3,6 @@ import { ComponentFixture, TestBed } from '@angular/core/testing'
 import i18next from 'i18next'
 import { FarmPlotsComponent, formatDuration } from './farm-plots.component'
 import { PlayerStore } from '../../../store/player/player.store'
-import { ProfessionService } from '../../../services/profession.service'
 import { PLOT_SLOTS } from '../../../store/player/farm'
 import { tabOf } from '../../../store/player/inventory'
 import ITEM_DATA from '../../../../data/items-data'
@@ -84,7 +83,7 @@ describe('FarmPlotsComponent', () => {
   it('shows current / needed on both bars and only the bonus expertise gives so far', async () => {
     store.addReputation([{ reputationId: ReputationID.farmingGuild, amount: 60 }])
     store.unlockProfession(ProfessionID.farming)
-    TestBed.inject(ProfessionService).gainXp(ProfessionID.farming, 620)
+    store.applyProfessionXp(ProfessionID.farming, 620)
     await render()
 
     expect([...element.querySelectorAll('.meter__bar-text')].map(text => text.textContent?.trim())).toEqual(['10 / 150', '20 / 500'])

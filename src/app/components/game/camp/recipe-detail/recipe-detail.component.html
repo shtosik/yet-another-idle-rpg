@@ -1,6 +1,6 @@
 @let v = view();
 @let item = v.item;
-@let name = ('items:names.' + ItemID[v.recipe.itemId]) | i18next;
+@let name = v.recipe.itemId | displayName:'item';
 @let upgrade = stationUpgrade();
 
 <!-- Scrolls on its own so the craft controls stay in view. -->
@@ -46,7 +46,7 @@
     @for (ingredient of ingredients(); track ingredient.id) {
       <li class="detail__ingredient">
         <img alt="" disableOptimizedSrcset height="18" width="18" [ngSrc]="ingredient.url">
-        <span class="detail__ingredient-name">{{ ('items:names.' + ItemID[ingredient.id]) | i18next }}</span>
+        <span class="detail__ingredient-name">{{ ingredient.id | displayName:'item' }}</span>
         <span class="detail__count" [class.detail__count--short]="!ingredient.enough">{{ ingredient.owned }} / {{ ingredient.needed }}</span>
       </li>
     }

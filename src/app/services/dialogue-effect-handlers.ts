@@ -1,13 +1,12 @@
 import i18next from 'i18next'
 import { DialogueEffect, ReputationTurnInEffect } from '../../types/dialogues/dialogue-effect.type'
 import { PlayerStore } from '../store/player/player.store'
-import { QuestsStore, questPayout } from '../store/quests/quests.store'
+import { QuestsStore } from '../store/quests/quests.store'
+import { questPayout } from '../store/quests/quest-transition'
 import { TownsStore } from '../store/towns/towns.store'
 import { BattleStore } from '../store/battle/battle.store'
 import { ArenaService } from './arena.service'
 import { ExplorationGuildService } from './exploration-guild.service'
-import { CurrencyFeedService } from './currency-feed.service'
-import { ReputationService } from './reputation.service'
 import { TurnInCooldownService } from './turn-in-cooldown.service'
 import { GameClock } from './game-clock.service'
 import { UnlockService } from './unlock.service'
@@ -22,6 +21,7 @@ import QUEST_DATA from '../../data/quests-data'
 import { QuestID } from '../../enums/ids/quest-id.enum'
 import { ItemID } from '../../enums/ids/item-id.enum'
 import { ReputationID } from '../../enums/reputation-id.enum'
+import { itemName, questName, reputationName } from '../i18n/names'
 
 /** The stores and services dialogue handlers read and write, passed in by `DialogueManagerService`. */
 export interface DialogueContext {
@@ -31,8 +31,6 @@ export interface DialogueContext {
   battle: InstanceType<typeof BattleStore>
   arena: ArenaService
   guild: ExplorationGuildService
-  currencyFeed: CurrencyFeedService
-  reputation: ReputationService
   cooldowns: TurnInCooldownService
   clock: GameClock
   unlocks: UnlockService
@@ -63,7 +61,6 @@ export interface EffectHandler<E extends DialogueEffect> {
 type EffectHandlers = { [T in DialogueEffect['type']]: EffectHandler<Extract<DialogueEffect, { type: T }>> }
 
 const stacks = (items: { itemId: ItemID, amount: number }[]): ItemStack[] => items.map(i => ({ id: i.itemId, amount: i.amount }))
-const questName = (questId: QuestID) => i18next.t(`quests:names.${QuestID[questId]}`)
 
 /**
  * What a turn-in hands over right now: the NPC's turn-in, how many of its item the player holds, how many the
@@ -148,7 +145,7 @@ export const EFFECT_HANDLERS: EffectHandlers = {
     cost: effect => effect.action === 'give' ? { adds: stacks(effect.items) } : { removes: stacks(effect.items) },
     label: effect => effect.silent ? [] : effect.items.map(i => ({
       key: 'app:dialogueTags.change',
-      params: { sign: effect.action === 'give' ? '+' : '-', amount: i.amount, name: i18next.t(`items:names.${ItemID[i.itemId]}`) },
+      params: { sign: effect.action === 'give' ? '+' : '-', amount: i.amount, name: itemName(i.itemId) },
     })),
   },
   shop: {
@@ -181,12 +178,9 @@ export const EFFECT_HANDLERS: EffectHandlers = {
         case 'abandonTask':
           ctx.player.abandonTask(effect.taskIndex ?? 0)
           break
-        case 'claimTask': {
-          const tokensBefore = ctx.player.explorerTokens()
+        case 'claimTask':
           ctx.player.claimCompletedTasks()
-          ctx.currencyFeed.show('explorerTokens', ctx.player.explorerTokens() - tokensBefore)
           break
-        }
       }
     },
     label: effect => [{ key: `app:dialogueTags.guild.${effect.action}`, params: { length: effect.taskLength ?? '' } }],
@@ -212,7 +206,7 @@ export const EFFECT_HANDLERS: EffectHandlers = {
       const { turnIn, bundles } = turnInState(effect, ctx)
       if (bundles === 0) return
       ctx.player.removeItems([{ id: turnIn.itemId, amount: bundles * turnIn.bundleSize }])
-      ctx.reputation.gain([{ reputationId: turnIn.reputationId, amount: bundles * turnIn.reputation }])
+      ctx.player.addReputation([{ reputationId: turnIn.reputationId, amount: bundles * turnIn.reputation }])
       ctx.quests.recordTurnIn(bundleKey(turnIn.npcId, turnIn.itemId), ctx.clock.nowMs())
     },
     // Refused while an offline claim is pending, so the cooldown doesn't start inside the absence.
@@ -223,7 +217,7 @@ export const EFFECT_HANDLERS: EffectHandlers = {
         key: 'quests:reputation.reward',
         params: {
           amount: shownBundles(bundles) * turnIn.reputation,
-          town: i18next.t(`map:reputations.${ReputationID[turnIn.reputationId]}`),
+          town: reputationName(turnIn.reputationId),
         },
       }]
     },

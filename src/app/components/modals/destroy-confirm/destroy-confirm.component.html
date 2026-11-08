@@ -1,7 +1,6 @@
 <app-close-button (onClose)="cancel()"/>
 <div class="destroy">
-    @let name = ('items:names.' + ItemID[item.id]) | i18next;
-    @let displayName = (item.upgradeLevel ?? 0) > 0 ? ('items:upgradedName' | i18next: { name, level: item.upgradeLevel }) : name;
+    @let displayName = item.id | displayName:'item':(item.upgradeLevel ?? 0);
     <h2 class="destroy__title">{{ 'app:inventory.destroy.title' | i18next }}</h2>
     <p>
         {{ 'app:inventory.destroy.question' | i18next: {
