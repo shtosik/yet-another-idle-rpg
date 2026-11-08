@@ -11,6 +11,7 @@ import { sellPrice } from '../shop/shop-prices'
 import { rollChest } from './chest'
 import { tabOf } from './inventory'
 import { PlayerStore } from './player.store'
+import { KillResolutionService } from '../../services/kill-resolution.service'
 
 describe("Pathfinder's Seal", () => {
   let player: InstanceType<typeof PlayerStore>
@@ -106,14 +107,16 @@ describe("Pathfinder's Seal", () => {
   })
 
   it('upgrades online gear drops only after registration', () => {
+    const killOnline = (enemyId: EnemyID, zoneId: ZoneID, wave: number, isShiny: boolean) =>
+      TestBed.inject(KillResolutionService).resolveKills(zoneId, wave, [{ enemyId, isShiny, stats: player.stats() }], Math.random)
     let calls = 0
     spyOn(Math, 'random').and.callFake(() => ++calls === 3 ? 0.01 : 0.99)
-    player.processBattleEnd(EnemyID.gangsterCrab, ZoneID.horseshoeBeach, 1, false)
+    killOnline(EnemyID.gangsterCrab, ZoneID.horseshoeBeach, 1, false)
     expect(player.inventory().gear.some(item => item?.upgradeLevel === 1)).toBeFalse()
     player.addItems([{ id: seal, amount: 1 }])
     player.registerPathfindersSeal()
     calls = 0
-    player.processBattleEnd(EnemyID.gangsterCrab, ZoneID.horseshoeBeach, 1, false)
+    killOnline(EnemyID.gangsterCrab, ZoneID.horseshoeBeach, 1, false)
     expect(player.inventory().gear.find(item => item?.id === ItemID.knife && item.upgradeLevel === 1)?.amount).toBe(1)
   })
 })

@@ -1,15 +1,11 @@
 import { Enemy } from '../../interfaces/enemy.interface'
-import { InventoryItem } from '../../interfaces/item.interface'
 import { Zone } from '../../interfaces/zone.interface'
 import { DamageElement } from '../../enums/damage-element.enum'
-import { EnemyID } from '../../enums/ids/enemy-id.enum'
-import type { QuestDropLimits } from './quest-status'
 import ENEMIES_DATA from '../../data/enemies-data'
 import { waveMultipliers } from '../store/battle/wave-scaling'
-import { killReward, Rng, rollEnemyDrops } from '../store/player/kill-rewards'
+import { Kill, Rng } from '../store/player/kill-rewards'
 import type { PlayerStatsType } from '../store/player/stats'
 import { HitInput, resolveHit } from './hit-resolution'
-import { rankBonus } from '../store/player/bestiary-rank'
 import { RESPAWN_DELAY_IN_MS, timePerAttackMs } from './combat-timing'
 
 /** A stretch of offline time with one set of stats (buffs running or expired). */
@@ -27,24 +23,14 @@ export interface OfflineSimulationInput {
   /** The equipped weapon is melee (or none). */
   isMeleeWeapon: boolean
   hasWeaknessSkill: boolean
-  questDropLimits: QuestDropLimits
-  /** Enemies with an unfinished Exploration Guild task. */
-  taskEnemyIds: Set<EnemyID>
-  /** Kills when the claim starts; bestiary rank bonuses stay at these ranks for the whole claim. */
-  enemyKillCounts: Partial<Record<EnemyID, number>>
   /** Average ms per recent online kill; caps the rate at what the player really managed. `null` if unknown. */
   rollingKillMs: number | null
   rng: Rng
 }
 
 export interface OfflineSimulationResult {
-  kills: number
-  shinies: number
-  killsByEnemy: Partial<Record<EnemyID, number>>
-  taskCountsByEnemy: Partial<Record<EnemyID, number>>
-  experience: number
-  gold: number
-  items: InventoryItem[]
+  /** In order, each with the stats of its segment; paid by Kill resolution. */
+  kills: Kill[]
 }
 
 /** Deterministic PRNG (mulberry32), so a reload replays the same offline rolls. */
@@ -96,15 +82,13 @@ export function theoreticalKillMs(stats: PlayerStatsType, input: OfflineSimulati
 }
 
 /**
- * Kills on the wave the player left on until the claimed time runs out, each rolled like an online kill
- * (enemy, shiny, crits, XP, gold, drops, task double counts). The wave never changes.
+ * Kills on the wave the player left on until the claimed time runs out, each picked like an online kill
+ * (enemy, shiny, crits). The wave never changes. What each kill pays is Kill resolution's job.
  * Kill time = online kill time ÷ `offlineProgressRate`, slowed further when the player's recent online kills
  * were slower than their stats say (so swapping in better gear right before closing pays nothing).
  */
 export function simulateOfflineKills(input: OfflineSimulationInput): OfflineSimulationResult {
-  const result: OfflineSimulationResult = {
-    kills: 0, shinies: 0, killsByEnemy: {}, taskCountsByEnemy: {}, experience: 0, gold: 0, items: [],
-  }
+  const result: OfflineSimulationResult = { kills: [] }
   if (!input.segments.length) return result
 
   const { zone, wave, rng } = input
@@ -112,7 +96,6 @@ export function simulateOfflineKills(input: OfflineSimulationInput): OfflineSimu
   const theoretical = theoreticalKillMs(input.segments[0].stats, input)
   const slowdown = input.rollingKillMs ? Math.max(1, input.rollingKillMs / theoretical) : 1
   const totalMs = input.segments.reduce((sum, s) => sum + s.durationMs, 0)
-  const drops = new Map<string, InventoryItem>()
 
   let elapsedMs = 0
   let segmentIndex = 0
@@ -147,21 +130,8 @@ export function simulateOfflineKills(input: OfflineSimulationInput): OfflineSimu
     if (hp > 0 || elapsedMs + killMs > totalMs) break
     elapsedMs += killMs
 
-    const reward = killReward(enemy, zone, wave, isShiny, stats)
-    result.kills++
-    if (isShiny) result.shinies++
-    result.experience += reward.experience
-    result.gold += reward.gold
-    result.killsByEnemy[enemy.id] = (result.killsByEnemy[enemy.id] ?? 0) + 1
-    const { dropChance } = rankBonus(enemy.id, input.enemyKillCounts[enemy.id] ?? 0)
-    rollEnemyDrops(enemy, reward.dropRolls, isShiny, dropChance, drops, input.questDropLimits, rng, stats.upgradedDropChance, stats.seedDropChance)
-
-    if (input.taskEnemyIds.has(enemy.id)) {
-      const counts = rng() * 100 < stats.taskDoubleKillChance ? 2 : 1
-      result.taskCountsByEnemy[enemy.id] = (result.taskCountsByEnemy[enemy.id] ?? 0) + counts
-    }
+    result.kills.push({ enemyId: enemy.id, isShiny, stats })
   }
 
-  result.items = [...drops.values()]
   return result
 }

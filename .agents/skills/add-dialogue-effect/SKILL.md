@@ -12,15 +12,18 @@ Use the `action` discriminator for related behaviors (one `RecipeEffect` with `a
 ## Effect
 
 1. **Type** — add the interface to `src/types/dialogues/dialogue-effect.type.ts` and append it to `DialogueEffect`.
-2. **Engine** — add a `case` to `applyEffects` in `src/app/services/dialogue-manager.service.ts`. Call a store method; add one to the store if missing (e.g. a recipe unlock goes through `PlayerStore`, which owns `unlockedRecipes`). Inject new dependencies with `inject()`.
-3. **Label** — extend `getEffectLabel` in `src/app/components/game/dialogue/dialogue.component.ts`, using an i18n key (entity names via their namespace, e.g. `items:names.<ItemID key>`, `camp:` for recipes and stations).
+2. **Handler** — add an entry to `EFFECT_HANDLERS` in `src/app/services/dialogue-effect-handlers.ts` (the build fails until it exists):
+   - `apply(effect, ctx)` calls a store method through the `DialogueContext`; add one to the store if missing (e.g. a recipe unlock goes through `PlayerStore`, which owns `unlockedRecipes`). A new store or service goes into `DialogueContext` and is injected where `DialogueManagerService` builds `ctx`.
+   - `cost` (optional) — `gold` it spends, items it `adds` and `removes`; the option is disabled until they fit.
+   - `canApply` (optional) — a one-time or stock check beyond the cost.
+   - `label` — `DialogueLabel[]` (i18n key plus params; `[]` for no tag). New tag text goes under `app:dialogueTags`; entity names come from their namespace, e.g. `items:names.<ItemID key>`, `camp:` for recipes and stations.
+3. **Spec** — a `cost` or `canApply` gets a case in `dialogue-effect-handlers.spec.ts` with a fake context.
 4. **Style** (optional) — add a `[class.effect-<type>]` binding in `dialogue.component.html` next to `effect-quest`/`effect-stat`, and a color in `dialogue.component.sass`.
 
 ## Condition
 
 1. **Type** — add the interface to `src/types/dialogues/dialogue-condition.type.ts` and append it inside the `{ hidden?: boolean } & (…)` union.
-2. **Engine** — add a `case` to `checkCondition` in `dialogue-manager.service.ts`. The `default` returns `false`, so a missing case hides every result using the variant.
-3. **Label** — extend `getConditionLabel` in `dialogue.component.ts` if the condition can appear in `requirementsNeeded`. Routing-only conditions should be authored with `hidden: true`.
+2. **Handler** — add an entry to `CONDITION_HANDLERS` in `src/app/services/dialogue-condition-handlers.ts` (the build fails until it exists): `evaluate(condition, ctx)` and `label` (the requirement tag when it appears in `requirementsNeeded`; `[]` for none). Routing-only conditions should be authored with `hidden: true`.
 
 ## Finish
 

@@ -41,7 +41,7 @@
               @if (result?.requirementsNeeded) {
                 @for (cond of result.requirementsNeeded; track $index) {
                   @if (!cond.hidden) {
-                    @let label = getConditionLabel(cond);
+                    @let label = tag(dialogueService.conditionLabel(cond));
                     @if (label) {
                       <span class="meta-tag requirement">[{{ label }}]</span>
                     }
@@ -61,7 +61,7 @@
 
               @if (result?.effects) {
                 @for (eff of result.effects; track $index) {
-                  @let label = getEffectLabel(eff);
+                  @let label = tag(dialogueService.effectLabel(eff));
                   @if (label) {
                     <span
                       class="meta-tag"

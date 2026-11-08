@@ -1,5 +1,5 @@
 import { QuestProgression, QuestStep } from '../../../types/quests/quest-progression.type'
-import { patchState, signalStore, withHooks, withMethods, withState } from '@ngrx/signals'
+import { patchState, signalStore, withMethods, withState } from '@ngrx/signals'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { withDevtools } from '../helpers/devtools'
 import { saveGameStateNow, withGameStateSync } from '../helpers/with-game-state-sync.hook'
@@ -8,7 +8,6 @@ import { inject } from '@angular/core'
 import { ModalService } from '../../services/modal.service'
 import { PlayerStore } from '../player/player.store'
 import { ItemStack } from '../player/inventory'
-import { ENTRANCE_ZONES_BY_QUEST } from '../../../data/helpers/entrance-zones'
 import { EnemyID } from '../../../enums/ids/enemy-id.enum'
 import { ZoneID } from '../../../enums/ids/zone-id.enum'
 import { ProfessionID } from '../../../enums/ids/profession-id.enum'
@@ -19,6 +18,7 @@ import { ProfessionService } from '../../services/profession.service'
 import { REPUTATION_THRESHOLDS, ReputationGain } from '../player/reputation'
 import { orderKey, TurnInKey, turnInRemainingMs } from './turn-in-cooldown'
 import { Orders, rollOrder } from './orders'
+import { PlayerStat } from '../../../types/player/player-stat.type'
 
 export { orderKey }
 
@@ -56,6 +56,35 @@ const STORE_KEY = 'questsStore'
 
 const waveKey = (zoneId: ZoneID, wave: number) => `${zoneId}-${wave}`
 
+/** What completing a quest pays, split by where it goes. The dialogue slot check reads `items` from here too. */
+export function questPayout(data: QuestProps): QuestPayout {
+  const payout: QuestPayout = { stats: [], items: [], reputation: [], professionXp: [] }
+  for (const reward of data.rewards) {
+    switch (reward.type) {
+      case 'stat':
+        payout.stats.push({ stat: reward.key, amount: reward.amount })
+        break
+      case 'item':
+        payout.items.push({ id: reward.itemId, amount: reward.amount })
+        break
+      case 'reputation':
+        payout.reputation.push({ reputationId: reward.reputationId, amount: reward.amount })
+        break
+      case 'professionXp':
+        payout.professionXp.push({ professionId: reward.professionId, amount: reward.amount })
+        break
+    }
+  }
+  return payout
+}
+
+export interface QuestPayout {
+  stats: { stat: PlayerStat, amount: number }[]
+  items: ItemStack[]
+  reputation: ReputationGain[]
+  professionXp: { professionId: ProfessionID, amount: number }[]
+}
+
 export const QuestsStore = signalStore(
   { providedIn: 'root' },
   withState(initialState),
@@ -69,39 +98,14 @@ export const QuestsStore = signalStore(
     professionService = inject(ProfessionService),
   ) => ({
     handleQuestCompleted(data: QuestProps) {
-      const statsToUpdate = []
-      const itemsToUpdate: ItemStack[] = []
-      const reputationGains: ReputationGain[] = []
-      const professionRewards: { professionId: ProfessionID, amount: number }[] = []
-
-      data.rewards.forEach((reward) => {
-        switch (reward.type) {
-          case 'stat':
-            statsToUpdate.push({ stat: reward.key, amount: reward.amount })
-            break
-          case 'item':
-            itemsToUpdate.push({ id: reward.itemId, amount: reward.amount })
-            break
-          case 'reputation':
-            reputationGains.push({ reputationId: reward.reputationId, amount: reward.amount })
-            break
-          case 'professionXp':
-            professionRewards.push({ professionId: reward.professionId, amount: reward.amount })
-            break
-        }
-      })
+      const { stats, items, reputation, professionXp } = questPayout(data)
 
       patchState(store, (state) => ({ pinnedQuests: state.pinnedQuests.filter(id => id !== data.questId) }))
       modalService.openQuestCompleted(data)
-      playerStore.updatePlayerStats(statsToUpdate)
-      playerStore.addItems(itemsToUpdate)
-      reputationService.gain(reputationGains)
-      professionRewards.forEach(({ professionId, amount }) => professionService.gainXp(professionId, amount))
-    },
-
-    /** Zones entered from a town building open when that building's quest starts. */
-    unlockEntranceZones(questId: QuestID) {
-      ENTRANCE_ZONES_BY_QUEST[questId]?.forEach(zoneId => playerStore.unlockZone(zoneId))
+      playerStore.updatePlayerStats(stats)
+      playerStore.addItems(items)
+      reputationService.gain(reputation)
+      professionXp.forEach(({ professionId, amount }) => professionService.gainXp(professionId, amount))
     },
 
     /** A turn-in consumes the step's item requirements, so dialogue never restates them. */
@@ -263,7 +267,6 @@ export const QuestsStore = signalStore(
         }))
         if (repeat) saveGameStateNow()
         store.setStepKillBaseline(questId, 1)
-        store.unlockEntranceZones(questId)
       },
 
       getQuestStep(questId: QuestID) {
@@ -334,12 +337,4 @@ export const QuestsStore = signalStore(
       },
     }),
   ),
-  withHooks((store) => ({
-    // Re-applies entrance zone unlocks on load, like UNLOCK_RULES in PlayerStore.
-    onInit() {
-      for (const key of Object.keys(store.questStepProgression())) {
-        store.unlockEntranceZones(Number(key) as QuestID)
-      }
-    },
-  })),
 )

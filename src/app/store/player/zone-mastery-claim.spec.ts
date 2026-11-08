@@ -9,6 +9,7 @@ import { ItemTier } from '../../../enums/items/item-tier.enum'
 import ITEM_DATA from '../../../data/items-data'
 import ZONES_DATA from '../../../data/zones-data'
 import { tabOf } from './inventory'
+import { KillResolutionService } from '../../services/kill-resolution.service'
 
 describe('PlayerStore zone mastery', () => {
   let store: InstanceType<typeof PlayerStore>
@@ -68,8 +69,10 @@ describe('PlayerStore zone mastery', () => {
   })
 
   it('counts shiny kills per zone online and offline', () => {
-    store.processBattleEnd(EnemyID.crab, beach, 1, true)
-    store.processBattleEnd(EnemyID.crab, beach, 1, false)
+    const killOnline = (isShiny: boolean) =>
+      TestBed.inject(KillResolutionService).resolveKills(beach, 1, [{ enemyId: EnemyID.crab, isShiny, stats: store.stats() }], Math.random)
+    killOnline(true)
+    killOnline(false)
     store.applyKillBatch({
       zoneId: beach, wave: 1, kills: 2, shinies: 2, killsByEnemy: { [EnemyID.crab]: 2 },
       taskCountsByEnemy: {}, experience: 0, gold: 0, items: [],

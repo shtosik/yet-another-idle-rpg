@@ -4,16 +4,13 @@ import { inject, Injectable } from '@angular/core'
 import { setTimeout } from 'worker-timers'
 import { ArenaRun, BattleStore } from '../store/battle/battle.store'
 import { PlayerStore } from '../store/player/player.store'
-import { QuestsStore } from '../store/quests/quests.store'
 import { OfflineStore } from '../store/offline/offline.store'
 import { saveGameStateNow } from '../store/helpers/with-game-state-sync.hook'
 import { activeBuffSpellIds } from '../store/player/stats'
 import { CONSUMABLE_SLOTS } from '../../interfaces/consumable.interface'
-import { isTaskDone } from '../store/player/player.store'
 import { SkillNodeID } from '../../enums/ids/skill-node-id.enum'
-import { BattleManagerService } from './battle-manager.service'
 import { ModalService } from './modal.service'
-import { getQuestDropLimits } from './quest-status'
+import { KillResolutionService } from './kill-resolution.service'
 import { MS_PER_SECOND } from './combat-timing'
 import { OfflineSegment, seededRng, simulateOfflineKills } from './offline-simulation'
 import { InventoryItem } from '../../interfaces/item.interface'
@@ -61,9 +58,8 @@ async function fetchServerTime(): Promise<number | null> {
 export class OfflineProgressService {
   private playerStore = inject(PlayerStore)
   private battleStore = inject(BattleStore)
-  private questsStore = inject(QuestsStore)
   private offlineStore = inject(OfflineStore)
-  private battleManager = inject(BattleManagerService)
+  private killResolution = inject(KillResolutionService)
   private modalService = inject(ModalService)
   private arenaService = inject(ArenaService)
 
@@ -147,34 +143,31 @@ export class OfflineProgressService {
     const zone = this.battleStore.currentZoneData()
     const wave = this.battleStore.currentWave()
 
-    const result = simulateOfflineKills({
+    const rng = seededRng(seed)
+    const { kills } = simulateOfflineKills({
       zone,
       wave,
       segments: this.segments(elapsedMs),
       damageType: this.playerStore.equippedWeaponDamageType(),
       isMeleeWeapon: this.playerStore.equippedWeaponCategory() === WeaponCategory.melee,
       hasWeaknessSkill: this.playerStore.hasSkillUnlocked(SkillNodeID.weaknesses),
-      questDropLimits: getQuestDropLimits(this.questsStore.questStepProgression(), this.playerStore.itemCount),
-      taskEnemyIds: new Set(this.playerStore.activeTasks().filter(task => !isTaskDone(task)).map(task => task.monsterId)),
-      enemyKillCounts: this.playerStore.enemyKillCounts(),
       rollingKillMs: this.offlineStore.rollingKillMs(zone.id, wave),
-      rng: seededRng(seed),
+      rng,
     })
 
-    const { levelsGained, lostDrops, receivedItems, installedStations } = this.playerStore.applyKillBatch({ ...result, zoneId: zone.id, wave })
-    // Town and feature unlocks follow from the new state on their own (UnlockService).
-    if (result.kills > 0) this.battleManager.unlockNextZone(wave)
-    installedStations.forEach(itemId => this.modalService.openStationInstalled(itemId))
+    // The same rng pays the kills; a boss kill opens the next zone. Town and feature unlocks follow on their own.
+    const result = this.killResolution.resolveKills(zone.id, wave, kills, rng)
+    result.installedStations.forEach(itemId => this.modalService.openStationInstalled(itemId))
 
     return {
       elapsedMs,
       kills: result.kills,
       shinies: result.shinies,
       experience: result.experience,
-      levelsGained,
+      levelsGained: result.levelsGained,
       gold: result.gold,
-      items: receivedItems,
-      lostDrops,
+      items: result.receivedItems,
+      lostDrops: result.lostDrops,
     }
   }
 

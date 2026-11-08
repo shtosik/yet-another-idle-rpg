@@ -20,7 +20,6 @@ export interface LevelReachedCondition {
   level: number
 }
 
-/** Checked by `UnlockService` only: quest progress lives in `QuestsStore`, which `PlayerStore` can't read. */
 export interface QuestCompletedCondition {
   type: 'questCompleted'
   questId: QuestID
@@ -45,7 +44,13 @@ export interface FeatureUnlockTarget {
   feature: UnlockableFeature
 }
 
-export type UnlockTarget = TownUnlockTarget | SiteUnlockTarget | FeatureUnlockTarget
+/** Granted by the boss chain and town entrances, never by an `UnlockRule`. */
+export interface ZoneUnlockTarget {
+  type: 'zone'
+  zoneId: ZoneID
+}
+
+export type UnlockTarget = TownUnlockTarget | SiteUnlockTarget | FeatureUnlockTarget | ZoneUnlockTarget
 
 export interface UnlockNotification {
   titleKey: string
@@ -54,7 +59,8 @@ export interface UnlockNotification {
 
 export interface UnlockRule {
   condition: UnlockCondition
-  target: UnlockTarget
+  /** Zones open by the boss chain and town entrances only (GLOSSARY: Zone unlock). */
+  target: Exclude<UnlockTarget, ZoneUnlockTarget>
   notification?: UnlockNotification
 }
 

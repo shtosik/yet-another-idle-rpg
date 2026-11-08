@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, input, OnInit, ou
 import { NgOptimizedImage } from '@angular/common'
 import i18next from 'i18next'
 import { InventoryItem } from '../../../../../interfaces/item.interface'
-import { ShopStore } from '../../../../store/shop/shop.store'
+import { BuyBlockReason, ShopStore } from '../../../../store/shop/shop.store'
 import { PlayerStore } from '../../../../store/player/player.store'
 import { ShopID } from '../../../../../enums/ids/shop-id.enum'
 import SHOPS_DATA from '../../../../../data/shops-data'
@@ -15,15 +15,13 @@ import { InventoryItemComponent } from '../../inventory/inventory-slot/inventory
 import { CloseButtonComponent } from '../../../shared/close-button/close-button.component'
 import { ModalService } from '../../../../services/modal.service'
 import { CurrencyFeedService } from '../../../../services/currency-feed.service'
-import { canInstall, isInstalled, stationUpgradeOf } from '../../../../store/player/camp'
+import { isInstalled, stationUpgradeOf } from '../../../../store/player/camp'
 import { isPreferredBy, sellPrice } from '../../../../store/shop/shop-prices'
 import { ShopCurrency } from '../../../../../types/shop/shop.type'
 import { tabOf } from '../../../../store/player/inventory'
 import { tabName } from '../../inventory/tab-text'
 import { reputationLockText, tierName } from '../../quests/reputation/reputation-text'
 
-/** `currency`: the player has too little of the shop's currency. */
-type BuyBlockReason = 'stock' | 'rank' | 'reputation' | 'currency' | 'inventory' | 'station' | null
 type ShopTab = 'buy' | 'sell'
 
 /** Icon and price text per currency; a new `ShopCurrency` won't compile until it has an entry here. */
@@ -75,7 +73,6 @@ export class ShopComponent implements OnInit {
   showsGuildRank = computed(() => SHOPS_DATA[this.shopId()].items.some(item => item.minRank !== undefined))
   guildRank = this.playerStore.guildRank
   protected readonly tierName = tierName
-  balance = computed(() => this.balanceOf(this.currency()))
 
   /** Inventory stacks this shop buys, at its price. */
   sellable = computed(() => {
@@ -97,49 +94,20 @@ export class ShopComponent implements OnInit {
     this.shopStore.ensureShop(this.shopId())
   }
 
-  buyBlockReason(index: number): BuyBlockReason {
-    const entry = this.items()[index]
-    if (!entry) return 'stock'
-
-    if (entry.runtime.currentStock <= 0) return 'stock'
-
-    if ((entry.staticItem.minRank ?? 0) > this.guildRank()) return 'rank'
-
-    const minReputation = entry.staticItem.minReputation
-    if (minReputation && this.playerStore.reputationTierOf(minReputation.reputationId) < minReputation.tier) return 'reputation'
-
-    if (this.balance() < entry.staticItem.price) return 'currency'
-
-    // Station gear installs on purchase and never takes a slot, but must follow the previous level.
-    const upgrade = stationUpgradeOf(entry.staticItem.itemId)
-    if (upgrade) return canInstall(this.playerStore.stations(), upgrade) ? null : 'station'
-
-    // The spellbook unlocks a tab and never enters the inventory.
-    const { itemId, tier } = entry.staticItem
-    if (itemId !== ItemID.spellbook && !this.playerStore.canFitItems([{ id: itemId, tier, amount: 1 }])) {
-      return 'inventory'
-    }
-
-    return null
-  }
-
-  canBuy(index: number): boolean {
-    return this.buyBlockReason(index) === null
+  buyBlockReason(index: number): BuyBlockReason | null {
+    return this.shopStore.blockReason(this.shopId(), index)
   }
 
   /** Click buys one; Shift-click buys up to 5, stopping at the first block (stock, currency, space). */
   buyItem(index: number, event: MouseEvent): void {
-    const count = event.shiftKey ? 5 : 1
-    let spent = 0
-    for (let bought = 0; bought < count && this.canBuy(index); bought++) {
-      if (!this.buyOne(index)) break
-      spent += this.items()[index].staticItem.price
-    }
-    if (spent) this.currencyFeed.show(this.currency(), -spent)
+    const result = this.shopStore.purchase(this.shopId(), index, event.shiftKey ? 5 : 1)
+    if (typeof result === 'string') return
+    this.currencyFeed.show(this.currency(), -result.spent)
+    result.installed.forEach(id => this.modalService.openStationInstalled(id))
   }
 
   /** Name plus what blocks the purchase, for screen readers (sighted players get the slot's border, lock or fade). */
-  buyLabel(index: number, reason: BuyBlockReason): string {
+  buyLabel(index: number, reason: BuyBlockReason | null): string {
     const { itemId, price, minRank } = this.items()[index].staticItem
     const name = i18next.t(`items:names.${ItemID[itemId]}`)
     switch (reason) {
@@ -181,45 +149,6 @@ export class ShopComponent implements OnInit {
 
   private priceLabel(currency: ShopCurrency, amount: number): string {
     return i18next.t(CURRENCY_UI[currency].priceKey, { amount })
-  }
-
-  // No default in these switches: with noImplicitReturns a new ShopCurrency fails to compile until it's handled.
-  private balanceOf(currency: ShopCurrency): number {
-    switch (currency) {
-      case 'gold':
-        return this.playerStore.stats().goldCoins
-      case 'explorerTokens':
-        return this.playerStore.explorerTokens()
-    }
-  }
-
-  /** Takes `amount` of `currency`; false when the player can't pay. */
-  private spend(currency: ShopCurrency, amount: number): boolean {
-    switch (currency) {
-      case 'gold':
-        this.playerStore.updatePlayerStats([{ stat: 'goldCoins', amount: -amount }])
-        return true
-      case 'explorerTokens':
-        return this.playerStore.spendTokens(amount)
-    }
-  }
-
-  /** Pays for and hands over one item; false when the payment fails. */
-  private buyOne(index: number): boolean {
-    const { itemId, tier, price } = this.items()[index].staticItem
-
-    if (!this.spend(this.currency(), price)) return false
-    this.shopStore.buyItem(this.shopId(), index)
-
-    // Spellbook unlocks the tab immediately and is not added to inventory
-    if (itemId === ItemID.spellbook) {
-      this.playerStore.unlockSpellbook()
-      return true
-    }
-
-    const installed = this.playerStore.addItems([{ id: itemId, tier, amount: 1 }])
-    installed.forEach(id => this.modalService.openStationInstalled(id))
-    return true
   }
 
   /** Click sells one; Ctrl/Cmd-click sells the whole stack. */

@@ -99,6 +99,11 @@ _Avoid_: Reset, refund
 Kills paid for time the game wasn't running (closed tab, sleeping device), on the wave the player left on, shown in the welcome-back modal.
 _Avoid_: AFK rewards, idle rewards
 
+**Kill resolution**:
+Turning kills into XP, gold, drops, kill counts, task progress and zone progress, by the same rules online and in an offline claim. Arena kills are paid separately (ADR 0003).
+Code: `KillResolutionService.resolveKills`
+_Avoid_: Battle end, kill rewards (for the whole process)
+
 **Quest**:
 A multi-step story objective given by an NPC, with rewards on completion.
 _Avoid_: Mission, task
@@ -174,6 +179,11 @@ _Avoid_: Using unlock rules for zones
 **Unlock rule**:
 A condition (wave reached, item held, level reached) that opens a town or feature.
 _Avoid_: Unlock condition, requirement
+
+**Unlocks**:
+The module that decides what is unlocked (zones, sites, towns, features) and shows each unlock notice once.
+Code: `UnlockService`
+_Avoid_: Unlock manager
 
 ## Crafting
 
