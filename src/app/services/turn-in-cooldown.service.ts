@@ -1,9 +1,10 @@
 import { inject, Injectable, signal } from '@angular/core'
+import QUEST_DATA from '../../data/quests-data'
 import { REPUTATION_TURN_INS } from '../../data/reputation-turn-ins'
 import { NpcID } from '../../enums/map/npc-id.enum'
 import { PlayerStore } from '../store/player/player.store'
 import { QuestsStore } from '../store/quests/quests.store'
-import { bundleKey, TurnInKey, turnInRemainingMs } from '../store/quests/turn-in-cooldown'
+import { bundleKey, orderKey, TurnInKey, turnInRemainingMs } from '../store/quests/turn-in-cooldown'
 
 /** Turn-in cooldowns as the UI sees them: one shared 1 s clock, so every tag and badge counts down together. */
 @Injectable({ providedIn: 'root' })
@@ -23,9 +24,11 @@ export class TurnInCooldownService {
     return turnInRemainingMs(this.questsStore.lastTurnInAt()[key], this.playerStore.stats().turnInCooldownReduction, this.now())
   }
 
-  /** The turn-in keys an NPC owns. Orders join here with the order feature. */
+  /** The turn-in keys an NPC owns: its bundles, and the Orders it takes in. */
   keysOf(npcId: NpcID): TurnInKey[] {
-    return REPUTATION_TURN_INS.filter(turnIn => turnIn.npcId === npcId).map(turnIn => bundleKey(turnIn.npcId, turnIn.itemId))
+    const bundles = REPUTATION_TURN_INS.filter(turnIn => turnIn.npcId === npcId).map(turnIn => bundleKey(turnIn.npcId, turnIn.itemId))
+    const orders = Object.values(QUEST_DATA).filter(quest => quest.repeat && quest.steps[0].turnInNpc === npcId).map(quest => orderKey(quest.questId))
+    return [...bundles, ...orders]
   }
 
   /** The soonest ready time when all of the NPC's turn-ins are cooling; null when it has none or one is ready. */

@@ -8,7 +8,7 @@ Deferred to a later plan: **store actions return events, one notices module show
 
 Step 1 first. Steps 2–5 are independent. Step 6 comes before Step 7, because the game clock is a saved store listed in `SAVED_STORES`. Step 8 last.
 
-### 1. Small bugs (S, Sonnet)
+### 1. Small bugs (S, Sonnet) ✅
 - `services/quest-status.ts:101` `getQuestDropLimits` calls `getStepItems(questId, status.step)` without `orders`, so the quest drop cap ignores an Order's rolled items. Make `orders` a required parameter of `getStepItems` and pass it everywhere.
 - `services/quest-status.ts:40` `isStepReady` reads `steps[status.step - 1].requirements` with no guard; a saved step past the quest's last step throws. Guard it like `getStepItems` does.
 - `services/turn-in-cooldown.service.ts:28` `keysOf` skips Order keys, so an NPC's wait time never counts its Orders.

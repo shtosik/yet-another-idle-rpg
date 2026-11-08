@@ -390,18 +390,6 @@ export const PlayerStore = signalStore(
       })
     },
 
-    updateZoneProgression(zoneId: ZoneID, currentWave: number) {
-      patchState(store, (state) => ({
-        zonesProgression: {
-          ...state.zonesProgression,
-          [zoneId]: {
-            ...state.zonesProgression[zoneId],
-            [currentWave]: ((state.zonesProgression[zoneId]?.[currentWave]) || 0) + 1,
-          },
-        },
-      }))
-    },
-
     updateEnemyKillCount(enemyId: EnemyID, amount = 1) {
       patchState(store, (state) => ({
         enemyKillCounts: {

@@ -23,7 +23,7 @@ export class KillResolutionService {
   resolveKills(zoneId: ZoneID, wave: number, kills: Kill[], rng: Rng): KillResolution {
     const zone = ZONES_DATA[zoneId]
     const batch = rollKills(zone, wave, kills, {
-      questDropLimits: getQuestDropLimits(this.questsStore.questStepProgression(), this.playerStore.itemCount),
+      questDropLimits: getQuestDropLimits(this.questsStore.questStepProgression(), this.questsStore.orders(), this.playerStore.itemCount),
       enemyKillCounts: this.playerStore.enemyKillCounts(),
       taskEnemyIds: new Set(this.playerStore.activeTasks().filter(task => !isTaskDone(task)).map(task => task.monsterId)),
     }, rng)

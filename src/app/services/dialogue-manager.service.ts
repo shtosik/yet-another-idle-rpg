@@ -120,6 +120,12 @@ export class DialogueManagerService {
     return adding.length === 0 ? {} : this.playerStore.missingSlotsByTab(adding, costs.flatMap(cost => cost.removes ?? []))
   }
 
+  /** True when the option's shown branch can run now: its requirements are met and its cost and effects apply. */
+  canSelect(option: DialogueOption<any>): boolean {
+    const result = this.getActiveResult(option)
+    return !!result && this.checkConditions(result.requirementsNeeded) && this.canApplyResult(result)
+  }
+
   selectOption(option: DialogueOption<any>) {
     const validResult = this.getActiveResult(option)
 
@@ -128,9 +134,7 @@ export class DialogueManagerService {
       return
     }
 
-    if (!this.checkConditions(validResult.requirementsNeeded) || !this.canApplyResult(validResult)) {
-      return
-    }
+    if (!this.canSelect(option)) return
 
     if (validResult.effects) {
       this.applyEffects(validResult.effects)

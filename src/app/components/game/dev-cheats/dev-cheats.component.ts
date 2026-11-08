@@ -261,11 +261,11 @@ export class DevCheatsComponent {
 
   private unlockFeature(feature: DevFeature): void {
     switch (feature) {
-      case 'camp': return this.playerStore.unlockCamp()
-      case 'skillTree': return this.playerStore.unlockSkillTree()
+      case 'camp': return this.playerStore.applyUnlockTarget({ type: 'feature', feature: 'camp' })
+      case 'skillTree': return this.playerStore.applyUnlockTarget({ type: 'feature', feature: 'skillTree' })
       case 'map': return this.playerStore.unlockMap()
       case 'spellbook': return this.playerStore.unlockSpellbook()
-      case 'towns': return Object.keys(TOWNS_DATA).forEach(id => this.playerStore.unlockTown(Number(id) as TownID))
+      case 'towns': return Object.keys(TOWNS_DATA).forEach(id => this.playerStore.applyUnlockTarget({ type: 'town', townId: Number(id) as TownID }))
     }
   }
 
