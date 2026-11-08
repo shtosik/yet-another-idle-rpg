@@ -35,10 +35,10 @@ const commands = new Map()
 const bump = (map, key) => map.set(key, (map.get(key) ?? 0) + 1)
 const oneLine = (text, max) => text.replace(/\s+/g, ' ').trim().slice(0, max)
 
-// The main checkout's folder and its `yari-*` worktrees (docs/git-workflow.md names them so), including removed ones
-// whose transcripts remain; other projects under the same parent folder are left out.
+// The main checkout's folder and its worktrees: inside .claude/worktrees, or `yari-*` siblings from before they moved
+// there, including removed ones whose transcripts remain; other projects under the same parent folder are left out.
 const folders = existsSync(PROJECTS)
-  ? readdirSync(PROJECTS).filter(d => d === encode(MAIN) || d.startsWith(PREFIX + 'yari-'))
+  ? readdirSync(PROJECTS).filter(d => d === encode(MAIN) || d.startsWith(encode(MAIN) + '--claude-worktrees-') || d.startsWith(PREFIX + 'yari-'))
   : []
 for (const folder of folders) {
   for (const file of readdirSync(join(PROJECTS, folder)).filter(f => f.endsWith('.jsonl'))) {
@@ -65,7 +65,7 @@ for (const folder of folders) {
 }
 
 const top = (map, n) => [...map].sort((a, b) => b[1] - a[1]).slice(0, n).map(([k, v]) => `${String(v).padStart(5)}  ${k}`).join('\n')
-console.log(`# ${folders.length} transcript folders: ${encode(MAIN)} and ${PREFIX}yari-*\n`)
+console.log(`# ${folders.length} transcript folders: ${encode(MAIN)}, its .claude/worktrees and ${PREFIX}yari-*\n`)
 console.log(`## Owner ${all ? 'messages' : 'corrections'} (${[...new Set(messages)].length})\n${[...new Set(messages)].join('\n')}\n`)
 console.log(`## Refused or failed tool calls\n${top(errors, 40)}\n`)
 console.log(`## Most common commands\n${top(commands, 30)}`)

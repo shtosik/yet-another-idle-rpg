@@ -75,8 +75,10 @@ for (const wt of others) {
   const dir = norm(wt.path)
   const isOurs = dir === norm(ROOT) || cwd === dir || cwd.startsWith(dir + '\\') || cwd.startsWith(dir + '/')
   const merged = wt.branch && (prTips.get(wt.branch)?.has(wt.head) || run('git', ['merge-base', '--is-ancestor', wt.head, 'origin/staging']) !== null)
-  // Only the yari-* siblings made by scripts/worktree.mjs; worktrees another tool placed elsewhere are not ours to remove.
-  const foreign = dirname(dir) !== dirname(norm(main.path)) || !basename(dir).startsWith('yari-')
+  // Only the yari-* worktrees made by scripts/worktree.mjs (in .claude/worktrees, or siblings from before it moved there);
+  // worktrees another tool placed, such as the app's own claude/* ones, are not ours to remove.
+  const ourParents = [dirname(norm(main.path)), norm(join(main.path, '.claude', 'worktrees'))]
+  const foreign = !ourParents.includes(dirname(dir)) || !basename(dir).startsWith('yari-') || !/^(feat|fix|chore|docs|hotfix|release|refactor)\//.test(wt.branch ?? '')
   if (isOurs || foreign || !wt.branch || wt.locked || !merged || idleHours(wt.path) < MIN_IDLE_HOURS || run('git', ['status', '--porcelain'], wt.path) !== '') {
     kept++
     continue

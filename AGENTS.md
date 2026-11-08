@@ -39,8 +39,11 @@ A rule here fails a check when broken. When the owner corrects the same mistake 
 | Set game state through `window.dev`, not `localStorage` | `.claude/hooks/guard.mjs` (Claude) |
 | `window.dev` calls work right after page load | placeholder in `dev-cheats/dev-stub.ts`, tested in `dev-stub.spec.ts` |
 | Keep the main checkout on its branch; new work in a worktree (`node scripts/worktree.mjs <type/name>`) | `.claude/hooks/guard.mjs` (Claude) |
-| One worktree per session: a session already in a worktree branches inside it, no `EnterWorktree` to a sibling | `.claude/hooks/guard.mjs` (Claude) |
+| One worktree per session: a session already in a worktree branches inside it, no `EnterWorktree` to another | `.claude/hooks/guard.mjs` (Claude) |
+| Worktrees live in `.claude/worktrees` (outside it the app asks the owner to approve entering) | `scripts/worktree.mjs` puts them there; `.claude/hooks/guard.mjs` blocks `EnterWorktree` elsewhere (Claude) |
 | Start a session from current `origin/staging` | `.claude/hooks/session-start.mjs` fast-forwards a `staging` checkout with no tracked changes and no local commits, else reports how far it lags (Claude) |
 | Codex gets the same project skills | `npm run validate` (`scripts/sync-skills.mjs`) |
 | Data references, i18n keys, assets, doc paths, changelog format, agent and skill frontmatter, idea statuses | `npm run validate` (checks listed at the top of `scripts/validate-data.mjs`) |
 | PRs into `main` come from `release/*` or `hotfix/*` with a version bump | CI (`.github/workflows/ci.yml`) |
+| One feature, one PR into `staging`: no stacked PRs | CI (`.github/workflows/ci.yml`); `.claude/hooks/guard.mjs` blocks it earlier (Claude) |
+| NPC lines stay in the world (no UI or game terms), no NPC repeats a phrase or narrates with "Then…" | `npm run validate` (check 13) |
