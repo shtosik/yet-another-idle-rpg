@@ -62,7 +62,7 @@ One rule moves a quest forward and pays it.
 - Specs (`spell-rules.spec.ts`): perk cost floor at 1, cooldown floor at 1 s, empower already active, pure mana potion at full mana does nothing.
 - Docs: `spells-and-buffs.md`, `consumables-camp-crafting.md`.
 
-### 8. Wrap-up (S)
+### 8. Wrap-up (S) ✅
 - Re-read the system doc each step touched against the final code.
 - Run `/blast-radius` on the whole branch (stores, notices, quest payouts and offline claims are touched).
 - Run `verify-yari` for Steps 2, 3 and 4 (toasts and modals, the new currency floats, an Order with a full inventory, equip swap into a full tab) and put the evidence path in the PR body.
