@@ -1,6 +1,6 @@
 # Plan: gear upgrading
 
-Implementation plan for `docs/ideas/gear-upgrading.md` (rules and owner decisions) and `docs/ideas/gear-upgrading-cold-forge.md` (Phurgo, *The Cold Forge*, dialogue scripts, Pathfinder's Seal). One PR into `staging` per step, each from its own worktree off `origin/staging`. Code references are from `staging` at `d90cb45` (2026-11-01); re-check line numbers when a step starts.
+Implementation plan for `docs/ideas/gear-upgrading.md` (rules and owner decisions) and `docs/ideas/gear-upgrading-cold-forge.md` (Phurgo, *The Cold Forge*, dialogue scripts, Pathfinder's Seal). One branch and one PR into `staging` for the whole plan, each step a commit on it (`/run-plan`). Code references are from `staging` at `d90cb45` (2026-11-01); re-check line numbers when a step starts.
 
 ## Order
 
