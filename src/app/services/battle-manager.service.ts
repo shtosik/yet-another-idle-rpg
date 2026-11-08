@@ -21,6 +21,7 @@ import ITEM_DATA from '../../data/items-data'
 import { isConsumableItem } from '../../interfaces/item.interface'
 import { OfflineStore } from '../store/offline/offline.store'
 import { KillResolutionService } from './kill-resolution.service'
+import { nextWave, previousWave } from '../store/battle/waves'
 
 /** Cooldown reduction can't push a spell below this. */
 const MIN_SPELL_COOLDOWN_IN_SECONDS = 1
@@ -46,25 +47,21 @@ export class BattleManagerService {
   seedFoundToast = signal<string | null>(null)
   private seedFoundTimer?: ReturnType<typeof setTimeout>
 
-  currentWaveKillCount = computed(() => {
-    const zoneProgression = this.playerStore.zonesProgression()[this.battleStore.currentZoneId()] || {}
-    return zoneProgression[this.battleStore.currentWave()] || 0
-  })
+  currentWaveKillCount = computed(() => this.playerStore.getKillCountByZoneAndWave(this.battleStore.currentZoneId(), this.battleStore.currentWave()))
 
-  canMoveToPreviousWave = computed(() => {
-    return this.battleStore.currentZoneData().previousZoneId || this.battleStore.currentWave() !== 1
-  })
+  private nextPosition = computed(() => nextWave(
+    this.battleStore.currentZoneData(), this.battleStore.currentWave(), this.currentWaveKillCount(), id => this.playerStore.isZoneUnlocked(id),
+  ))
+  private previousPosition = computed(() => previousWave(this.battleStore.currentZoneData(), this.battleStore.currentWave()))
 
-  canMoveToNextWave = computed(() => {
-    const zoneData = this.battleStore.currentZoneData()
-    const isCurrentWaveLast = this.battleStore.currentWave() === zoneData.maxWave
+  canMoveToPreviousWave = computed(() => this.previousPosition() !== null)
+  canMoveToNextWave = computed(() => this.nextPosition() !== null)
 
-    if (isCurrentWaveLast) {
-      return !!(zoneData.nextZoneId && this.playerStore.isZoneUnlocked(zoneData.nextZoneId))
-    }
-
-    return this.currentWaveKillCount() >= zoneData.enemiesPerWave
-  })
+  /** The wave arrows and auto wave progression: moves only where `nextWave` / `previousWave` allow. */
+  changeWave(next: boolean): void {
+    const position = next ? this.nextPosition() : this.previousPosition()
+    if (position) this.battleStore.goToWave(position)
+  }
 
   doDamage(magicDamage = 0, damageType?: DamageElement) {
     const enemyHp = this.battleStore.currentEnemyHp()
@@ -280,16 +277,11 @@ export class BattleManagerService {
     if (lost.length) this.showDropsLost(lost)
     if (foundSeeds.length) this.showSeedsFound(foundSeeds)
 
-    const currentKillCount = this.currentWaveKillCount()
     // The toggle alone isn't enough: the node may have been refunded since it was switched on.
     const isAutoEnabled = this.battleStore.autoWaveProgressionEnabled()
       && this.playerStore.hasSkillUnlocked(SkillNodeID.autoWaveProgression)
-    const requiredKills = this.battleStore.requiredKillCountOnCurrentWave()
-    const isEnoughKillCountToProgress = currentKillCount >= requiredKills
-
-    if (isAutoEnabled && isEnoughKillCountToProgress) {
-      this.battleStore.changeWave(true)
-    }
+    // A boss kill has just unlocked the next zone (Kill resolution), so the move from the boss wave is allowed.
+    if (isAutoEnabled) this.changeWave(true)
   }
 
   private showSeedsFound(seeds: ItemStack[]): void {

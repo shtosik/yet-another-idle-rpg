@@ -10,6 +10,7 @@ import { withDevtools } from '../helpers/devtools'
 import { withGameStateSync } from '../helpers/with-game-state-sync.hook'
 import { toShinyUrl } from 'utils/shiny-url'
 import { waveMultipliers } from './wave-scaling'
+import { requiredKills, rollSpawn, WavePosition } from './waves'
 import { ActiveConsumable, CONSUMABLE_SLOTS, ConsumableSlot } from '../../../interfaces/consumable.interface'
 import SPELLS_DATA from '../../../data/spells-data'
 import { SpellDamageOverTimeEffectProps } from '../../../interfaces/spell.interface'
@@ -102,7 +103,7 @@ export const BattleStore = signalStore(
       const maxHp = Math.round(enemy.maxHp * hpScale)
       return { ...enemy, maxHp, url: store.isShinyEnemy() ? toShinyUrl(enemy.url) : enemy.url }
     },
-    requiredKillCountOnCurrentWave: () => store.currentWave() === store.currentZoneData().maxWave ? 1 : store.currentZoneData().enemiesPerWave,
+    requiredKillCountOnCurrentWave: () => requiredKills(store.currentZoneData(), store.currentWave()),
   })),
   withMethods((store) => ({
     /** `shinyChance` is the player's stat in percent (passed in: PlayerStore derives its stats from this store). */
@@ -115,73 +116,14 @@ export const BattleStore = signalStore(
         return
       }
 
-      patchState(store, (state) => {
-        const zoneData = store.currentZoneData()
-        let enemy: Enemy
-
-        if (state.currentWave !== zoneData.maxWave) {
-          const possibleEnemies = zoneData.enemies
-          const randomIndex = Math.floor(Math.random() * possibleEnemies.length)
-          const enemyId = possibleEnemies[randomIndex]
-          enemy = ENEMIES_DATA[enemyId]
-        } else {
-          enemy = ENEMIES_DATA[zoneData.bossEnemyId]
-        }
-
-        const isShiny = shinyChance > 0 && Math.random() * 100 < shinyChance
-        const maxHp = Math.round(enemy.maxHp * waveMultipliers(zoneData, state.currentWave).hp)
-
-        return {
-          isInCombat: true,
-          enemyId: enemy.id,
-          currentEnemyHp: maxHp,
-          isShinyEnemy: isShiny,
-        }
-      })
+      const { enemy, isShiny, maxHp } = rollSpawn(store.currentZoneData(), store.currentWave(), shinyChance, Math.random)
+      patchState(store, { isInCombat: true, enemyId: enemy.id, currentEnemyHp: maxHp, isShinyEnemy: isShiny })
     },
 
-    changeWave(next: boolean): void {
+    /** Moves to a wave without checking it: `BattleManagerService.changeWave` decides where a move may go. */
+    goToWave({ zoneId, wave }: WavePosition): void {
       if (store.arenaRun()) return
-      patchState(store, (state) => {
-        const zoneData = store.currentZoneData()
-
-        if (next) {
-          const nextZone = zoneData.nextZoneId
-          const isMaxWave = state.currentWave === zoneData.maxWave
-          const shouldGoNextZone = nextZone && isMaxWave
-
-          // Past the last wave: the next zone's first wave, or stay on the last one when there's no next zone.
-          const wave = shouldGoNextZone ? 1 : Math.min(state.currentWave + 1, zoneData.maxWave)
-          const zone = shouldGoNextZone ? nextZone : state.currentZoneId
-
-          return {
-            currentEnemyHp: 0,
-            enemyId: null,
-            isInCombat: false,
-            isShinyEnemy: false,
-            currentWave: wave,
-            currentZoneId: zone,
-          }
-        } else {
-          const previousZoneId = zoneData.previousZoneId
-          const previousZoneData = ZONES_DATA[previousZoneId]
-          const isFirstWave = state.currentWave === 1
-          const shouldGoPreviousZone = !!(previousZoneId && isFirstWave)
-
-          // Before wave 1: the previous zone's last wave, or stay on wave 1 when there's no previous zone.
-          const wave = shouldGoPreviousZone ? previousZoneData.maxWave : Math.max(state.currentWave - 1, 1)
-          const zone = shouldGoPreviousZone ? previousZoneId : state.currentZoneId
-
-          return {
-            currentEnemyHp: 0,
-            enemyId: null,
-            isInCombat: false,
-            isShinyEnemy: false,
-            currentWave: wave,
-            currentZoneId: zone,
-          }
-        }
-      })
+      patchState(store, { currentZoneId: zoneId, currentWave: wave, currentEnemyHp: 0, enemyId: null, isInCombat: false, isShinyEnemy: false })
     },
 
     updateEnemyHp(newHp: number): void {

@@ -42,7 +42,7 @@ describe('ArenaService', () => {
   it('a run holds the fight: zone and wave moves are blocked', () => {
     arena.enter(0)
     battleStore.setZone(ZoneID.plains)
-    battleStore.changeWave(true)
+    battleStore.goToWave({ zoneId: ZoneID.horseshoeBeach, wave: 2 })
 
     expect(battleStore.currentZoneId()).toBe(ZoneID.horseshoeBeach)
     expect(battleStore.currentWave()).toBe(1)
