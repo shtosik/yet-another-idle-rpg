@@ -82,6 +82,11 @@ _Avoid_: Hotbar, action bar, spell slots (for the whole bar)
 A piece of gear's enhancement level, stored as `upgradeLevel` and shown as `+N`; missing means +0. Separate from its rarity (`ItemTier`).
 _Avoid_: tier, rank
 
+**Gear plan**:
+What one equip or unequip does to the inventory: stacks removed, stacks returned and the slot change. The check and the write read the same plan.
+Code: `store/player/equipment.ts`
+_Avoid_: Equip preview, swap result
+
 ## Skill tree
 
 **Branch**:
@@ -107,6 +112,21 @@ _Avoid_: Reset, refund
 **Offline claim**:
 Kills paid for time the game wasn't running (closed tab, sleeping device), on the wave the player left on, shown in the welcome-back modal.
 _Avoid_: AFK rewards, idle rewards
+
+**Claim plan**:
+How an offline claim splits the time away: how far Game time moves (capped), how much goes to a running arena run, and how much is paid as zone kills.
+Code: `planClaim`
+_Avoid_: Offline split, claim math
+
+**Resource**:
+A saved player value that is earned or spent, not derived: XP, level, skill points, gold, mana, explorer tokens. All changes go through one rule that reports what changed (ADR 0002).
+Code: `store/player/resources.ts`
+_Avoid_: Stat (that is derived), currency (for XP or mana)
+
+**Notice**:
+A message the game shows after something happened (a toast, a modal or a currency feed line), built from an event a store action returned. Stores never show notices themselves.
+Code: `NoticesService`
+_Avoid_: Toast, popup, alert (for the whole idea)
 
 **Game time**:
 The saved clock that game rules read (crops, cooldowns, the arena). It only moves forward: online with each tick, offline by the claimed time away, up to the offline cap. Never the device clock.
