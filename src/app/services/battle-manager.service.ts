@@ -14,8 +14,6 @@ import SPELLS_DATA from '../../data/spells-data'
 import { SpellType } from '../../enums/spell-type.enum'
 import { SpellDamageOverTimeEffectProps } from '../../interfaces/spell.interface'
 import { Enemy } from '../../interfaces/enemy.interface'
-import { ZONE_UNLOCK_NOTIFICATIONS } from '../../data/unlock-conditions'
-import { ModalService } from './modal.service'
 import { DamageElement } from '../../enums/damage-element.enum'
 import { getQuestDropLimits } from './quest-status'
 import { resolveHit } from './hit-resolution'
@@ -23,6 +21,7 @@ import { ItemID } from '../../enums/ids/item-id.enum'
 import ITEM_DATA from '../../data/items-data'
 import { isConsumableItem } from '../../interfaces/item.interface'
 import { OfflineStore } from '../store/offline/offline.store'
+import { UnlockService } from './unlock.service'
 
 /** Cooldown reduction can't push a spell below this. */
 const MIN_SPELL_COOLDOWN_IN_SECONDS = 1
@@ -38,8 +37,8 @@ export class BattleManagerService {
   private playerStore = inject(PlayerStore)
   private questsStore = inject(QuestsStore)
   private animations = inject(AnimationsService)
-  private modalService = inject(ModalService)
   private offlineStore = inject(OfflineStore)
+  private unlockService = inject(UnlockService)
 
   /** Drops a full tab lost on the last kill, one line per tab; clears itself after `DROPS_LOST_TOAST_MS`. */
   dropsLostToast = signal<string | null>(null)
@@ -318,16 +317,10 @@ export class BattleManagerService {
 
   /**
    * A kill on `wave` of the current zone: the boss opens the next zone (online kills and offline claims).
-   * Town and feature unlocks (`UNLOCK_RULES`) are `UnlockService`'s job.
+   * Town and feature unlocks (`UNLOCK_RULES`) follow from the new state on their own (`UnlockService`).
    */
   unlockNextZone(wave: number): void {
     const zoneData = this.battleStore.currentZoneData()
-    const isBossWave = wave === zoneData.maxWave
-
-    if (isBossWave && zoneData.nextZoneId && !this.playerStore.isZoneUnlocked(zoneData.nextZoneId)) {
-      this.playerStore.unlockZone(zoneData.nextZoneId)
-      const notification = ZONE_UNLOCK_NOTIFICATIONS[zoneData.nextZoneId]
-      if (notification) this.modalService.openUnlockNotification(notification)
-    }
+    if (wave === zoneData.maxWave && zoneData.nextZoneId) this.unlockService.grant({ type: 'zone', zoneId: zoneData.nextZoneId })
   }
 }

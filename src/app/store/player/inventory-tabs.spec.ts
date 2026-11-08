@@ -79,12 +79,11 @@ describe('PlayerStore inventory tabs', () => {
       expect(store.inventory().gear.length).toBe(after.gear)
     })
 
-    it('counts an item in its tab (item count, has-item unlock condition)', () => {
+    it('counts an item in its tab (item count, which the has-item unlock rule reads)', () => {
       store.addItems([{ id: ItemID.stone, amount: 3 }, { id: ItemID.stone, tier: ItemTier.rare, amount: 2 }])
 
       expect(store.itemCount(ItemID.stone)).toBe(5)
-      expect(store.isUnlockConditionMet({ type: 'hasItem', itemId: ItemID.stone })).toBeTrue()
-      expect(store.isUnlockConditionMet({ type: 'hasItem', itemId: ItemID.woodenBow })).toBeFalse()
+      expect(store.itemCount(ItemID.woodenBow)).toBe(0)
     })
   })
 

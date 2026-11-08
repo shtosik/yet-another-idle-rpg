@@ -73,7 +73,7 @@ import { ReputationTier } from '../../../enums/reputation-tier.enum'
 import { TitleID } from '../../../enums/ids/title-id.enum'
 import TITLES_DATA from '../../../data/titles-data'
 import { StationID } from '../../../enums/ids/station-id.enum'
-import { UNLOCK_RULES, UnlockCondition, UnlockTarget } from '../../../data/unlock-conditions'
+import { UnlockTarget } from '../../../data/unlock-conditions'
 import { BattleStore } from '../battle/battle.store'
 import { EquippedSpell } from '../../../interfaces/spells/equipped-spell.interface'
 import {
@@ -1038,10 +1038,12 @@ export const PlayerStore = signalStore(
       if (fresh.length) patchState(store, { seenSpells: [...store.seenSpells(), ...fresh] })
     },
   })),
-  // Unlock rules (`data/unlock-conditions.ts`).
+  // Unlock targets (`data/unlock-conditions.ts`); `UnlockService` decides when to grant them.
   withMethods((store) => ({
     isUnlockTargetUnlocked(target: UnlockTarget): boolean {
       switch (target.type) {
+        case 'zone':
+          return store.isZoneUnlocked(target.zoneId)
         case 'town':
           return store.isTownUnlocked(target.townId)
         case 'site':
@@ -1051,8 +1053,12 @@ export const PlayerStore = signalStore(
       }
     },
 
+    /** Sets the flag only, with no notice; `UnlockService.grant` is the way in during play. */
     applyUnlockTarget(target: UnlockTarget): void {
       switch (target.type) {
+        case 'zone':
+          store.unlockZone(target.zoneId)
+          break
         case 'town':
           store.unlockTown(target.townId)
           store.unlockMap()
@@ -1067,25 +1073,8 @@ export const PlayerStore = signalStore(
           break
       }
     },
-
-    /** One rule for load and play. `waveReached`: something was killed on that wave or a later one of the zone. */
-    isUnlockConditionMet(condition: UnlockCondition): boolean {
-      switch (condition.type) {
-        case 'hasItem':
-          return countItem(store.inventory(), condition.itemId) > 0
-        case 'levelReached':
-          return store.stats().level >= condition.level
-        case 'waveReached': {
-          const waves = store.zonesProgression()[condition.zoneId] ?? {}
-          return Object.entries(waves).some(([wave, kills]) => Number(wave) >= condition.wave && kills > 0)
-        }
-        case 'questCompleted':
-          return false // UnlockService checks it; the unlocked target itself is saved.
-      }
-    },
   })),
   withHooks((store) => ({
-    // Re-apply unlocks for existing saves silently (no notifications).
     onInit() {
       // Raising a tab's capacity grows that tab; it never shrinks here.
       effect(() => {
@@ -1128,11 +1117,6 @@ export const PlayerStore = signalStore(
           battleStore.setAllEquippedSpells(bar.map(slot => isGone(slot, known) ? null : slot))
         }
       })
-
-      // UnlockService takes over (with notifications) once the game runs.
-      for (const rule of UNLOCK_RULES) {
-        if (store.isUnlockConditionMet(rule.condition)) store.applyUnlockTarget(rule.target)
-      }
     },
   })),
 )

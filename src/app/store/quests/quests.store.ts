@@ -1,5 +1,5 @@
 import { QuestProgression, QuestStep } from '../../../types/quests/quest-progression.type'
-import { patchState, signalStore, withHooks, withMethods, withState } from '@ngrx/signals'
+import { patchState, signalStore, withMethods, withState } from '@ngrx/signals'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
 import { withDevtools } from '../helpers/devtools'
 import { saveGameStateNow, withGameStateSync } from '../helpers/with-game-state-sync.hook'
@@ -8,7 +8,6 @@ import { inject } from '@angular/core'
 import { ModalService } from '../../services/modal.service'
 import { PlayerStore } from '../player/player.store'
 import { ItemStack } from '../player/inventory'
-import { ENTRANCE_ZONES_BY_QUEST } from '../../../data/helpers/entrance-zones'
 import { EnemyID } from '../../../enums/ids/enemy-id.enum'
 import { ZoneID } from '../../../enums/ids/zone-id.enum'
 import { ProfessionID } from '../../../enums/ids/profession-id.enum'
@@ -97,11 +96,6 @@ export const QuestsStore = signalStore(
       playerStore.addItems(itemsToUpdate)
       reputationService.gain(reputationGains)
       professionRewards.forEach(({ professionId, amount }) => professionService.gainXp(professionId, amount))
-    },
-
-    /** Zones entered from a town building open when that building's quest starts. */
-    unlockEntranceZones(questId: QuestID) {
-      ENTRANCE_ZONES_BY_QUEST[questId]?.forEach(zoneId => playerStore.unlockZone(zoneId))
     },
 
     /** A turn-in consumes the step's item requirements, so dialogue never restates them. */
@@ -263,7 +257,6 @@ export const QuestsStore = signalStore(
         }))
         if (repeat) saveGameStateNow()
         store.setStepKillBaseline(questId, 1)
-        store.unlockEntranceZones(questId)
       },
 
       getQuestStep(questId: QuestID) {
@@ -334,12 +327,4 @@ export const QuestsStore = signalStore(
       },
     }),
   ),
-  withHooks((store) => ({
-    // Re-applies entrance zone unlocks on load, like UNLOCK_RULES in PlayerStore.
-    onInit() {
-      for (const key of Object.keys(store.questStepProgression())) {
-        store.unlockEntranceZones(Number(key) as QuestID)
-      }
-    },
-  })),
 )

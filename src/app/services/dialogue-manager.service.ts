@@ -6,8 +6,6 @@ import { isTaskDone, PlayerStore } from '../store/player/player.store'
 import { DialogueEffect, QuestEffect, ReputationTurnInEffect } from '../../types/dialogues/dialogue-effect.type'
 import { ReputationTurnIn, turnInBundles, turnInFor } from '../../data/reputation-turn-ins'
 import { ReputationService } from './reputation.service'
-import { ModalService } from './modal.service'
-import { SiteID } from '../../enums/ids/site-id.enum'
 import { TurnInCooldownService } from './turn-in-cooldown.service'
 import { bundleKey } from '../store/quests/turn-in-cooldown'
 import { orderKey, QuestsStore } from '../store/quests/quests.store'
@@ -26,6 +24,7 @@ import { ItemStack, MissingSlots } from '../store/player/inventory'
 import { ExplorationGuildService } from './exploration-guild.service'
 import { TownsStore } from '../store/towns/towns.store'
 import { CurrencyFeedService } from './currency-feed.service'
+import { UnlockService } from './unlock.service'
 
 @Injectable({ providedIn: 'root' })
 export class DialogueManagerService {
@@ -38,7 +37,7 @@ export class DialogueManagerService {
   private arenaService = inject(ArenaService)
   private reputationService = inject(ReputationService)
   private cooldowns = inject(TurnInCooldownService)
-  private modalService = inject(ModalService)
+  private unlockService = inject(UnlockService)
 
   private currentConversation = signal<Record<any, DialogueNode<any>> | null>(null)
   private currentNodeId = signal<any>(null)
@@ -363,13 +362,9 @@ export class DialogueManagerService {
         case 'unlockProfession':
           this.playerStore.unlockProfession(effect.professionId)
           break
-        case 'unlockSite': {
-          if (this.playerStore.isSiteUnlocked(effect.siteId)) break
-          this.playerStore.applyUnlockTarget({ type: 'site', siteId: effect.siteId })
-          const key = `unlocks:sites.${SiteID[effect.siteId]}`
-          this.modalService.openUnlockNotification({ titleKey: `${key}.title`, bodyKey: `${key}.body` })
+        case 'unlockSite':
+          this.unlockService.grant({ type: 'site', siteId: effect.siteId })
           break
-        }
         case 'reputationTurnIn': {
           const { turnIn, bundles } = this.turnIn(effect)
           if (bundles === 0) break

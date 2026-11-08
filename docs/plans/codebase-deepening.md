@@ -12,7 +12,7 @@ Step 1 comes first. Step 2 comes before Step 3, because Kill resolution calls th
 - `GLOSSARY.md`: add **Kill resolution** (turning kills into XP, gold, drops, kill counts, task progress and zone progress; the same rules online and in an offline claim; arena kills are separate) and **Unlocks** (the module that decides what is unlocked and shows each notice once).
 - `docs/adr/0003-arena-kills-outside-kill-resolution.md`: arena kills keep their own XP/gold formula (`arena.service.ts:57`: no wave scaling, drops, tasks or zone progress). They stay outside Kill resolution, because an "arena mode" flag would widen its interface for one caller. Revisit if a second kind of kill appears.
 
-### 2. Unlocks module (M, Opus)
+### 2. Unlocks module (M, Opus) ✅
 `UnlockService` (`services/unlock.service.ts`) becomes the only owner of what is unlocked and of its notices. Its interface is `grant(target)` and `replayOnLoad()`, with no `notify` option.
 - Move in: the `UNLOCK_RULES` check (`PlayerStore.isUnlockConditionMet`, `player.store.ts:1042-1085`, including the `questCompleted` case it skips today); the load replay in `PlayerStore.onInit` (`:1133`); `QuestsStore.unlockEntranceZones` (`quests.store.ts:103`, caller `:266`) and its replay in `onInit` (`:338`); the zone chain in `BattleManagerService.unlockNextZone` (`battle-manager.service.ts:323`); and the dialogue `unlockSite` case (`dialogue-manager.service.ts:366`).
 - `grant(target)` does nothing when the target is already unlocked. Otherwise it sets the flag and shows the target's notice, if it has one. The module finds the notice itself, from `ZONE_UNLOCK_NOTIFICATIONS`, `rule.notification` or the `unlocks:sites.<Site>` key pattern. Callers stop building notice keys. The data files don't change.
