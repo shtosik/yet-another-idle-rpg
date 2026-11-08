@@ -58,7 +58,8 @@ export class GameIntervalService {
         const deltaMs = Math.min(rawDeltaMs, MAX_TICK_DELTA_IN_MS)
         this.gameClock.advance(deltaMs)
         this.arenaService.tick(this.gameClock.nowMs())
-        this.advanceCombat(deltaMs)
+        // An arena run waits for a pending claim: it may have run out while away, and the claim decides that.
+        if (!this.battleStore.arenaRun() || this.gameClock.isSettled()) this.advanceCombat(deltaMs)
         this.playerStore.regenMana(deltaMs)
         this.battleManagerService.tickSpells(deltaMs)
         this.battleManagerService.tickDamageOverTime(deltaMs)

@@ -839,7 +839,8 @@ for (const f of [...walkFiles(join(ROOT, '.claude', 'agents'), '.md'), ...walkFi
 
 {
   const storeDir = join(SRC, 'app', 'store')
-  const list = readFileSync(join(storeDir, 'saved-stores.ts'), 'utf8')
+  // Only the SAVED_STORES array counts, not an import or a comment naming the store.
+  const list = /SAVED_STORES[^=]*=\s*\[([^\]]*)\]/.exec(readFileSync(join(storeDir, 'saved-stores.ts'), 'utf8'))?.[1] ?? ''
   const walk = dir => readdirSync(dir).flatMap(f => statSync(join(dir, f)).isDirectory() ? walk(join(dir, f)) : [join(dir, f)])
   for (const file of walk(storeDir).filter(f => f.endsWith('.ts') && !f.endsWith('.spec.ts') && !f.includes('helpers'))) {
     const text = readFileSync(file, 'utf8')
@@ -863,7 +864,7 @@ for (const f of [...walkFiles(join(ROOT, '.claude', 'agents'), '.md'), ...walkFi
   ])
   for (const file of walkFiles(SRC, '.ts').filter(f => !f.endsWith('.spec.ts'))) {
     const rel = relative(SRC, file).replace(/\\/g, '/')
-    if (!allowed.has(rel) && readFileSync(file, 'utf8').includes('Date.now(')) {
+    if (!allowed.has(rel) && /Date\.now\s*\(/.test(readFileSync(file, 'utf8'))) {
       error(relative(ROOT, file), 'reads Date.now(); game rules read GameClock (allowlist in scripts/validate-data.mjs check 16)')
     }
   }
