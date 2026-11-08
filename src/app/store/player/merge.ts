@@ -39,35 +39,44 @@ interface MergePlan {
 /** Gold for a single +N -> +N+1 attempt, using the item's base value. */
 export const mergeCost = (value: number, upgradeLevel = 0): number => value * 2 ** upgradeLevel * UPGRADE_COST_FACTOR
 
-function resolveSource(source: MergeSource, context: MergeContext): EquipmentItem | null {
-  if (source.from === 'equipped') return context.equipment[source.slot]
+/** The gear a source names, or null once the player no longer owns it. */
+function resolveSource(source: MergeSource, inventory: Inventories, equipment: EquipmentType): EquipmentItem | null {
+  if (source.from === 'equipped') return equipment[source.slot]
   const { item } = source
-  return countItem(context.inventory, item.id, item.tier, item.upgradeLevel) > 0 ? item : null
+  return countItem(inventory, item.id, item.tier, item.upgradeLevel) > 0 ? item : null
+}
+
+/** Both sources name one copy: the same equipped slot, or the same inventory stack while it holds fewer than two. */
+export function sharesOneCopy(a: MergeSource, b: MergeSource, inventory: Inventories): boolean {
+  if (a.from === 'equipped' && b.from === 'equipped') return a.slot === b.slot
+  if (a.from === 'inventory' && b.from === 'inventory' && stackKey(a.item) === stackKey(b.item)) {
+    return countItem(inventory, a.item.id, a.item.tier, a.item.upgradeLevel) < 2
+  }
+  return false
+}
+
+/** What the next attempt on `item` costs, its chance and the gear it makes on success; shown whether or not it is affordable. */
+export function upgradeQuote(item: EquipmentItem): { cost: number, chance: number, next: EquipmentItem } {
+  const level = item.upgradeLevel ?? 0
+  return { cost: mergeCost(ITEM_DATA[item.id].value, level), chance: UPGRADE_CHANCES[level + 1] ?? 0, next: { ...item, upgradeLevel: level + 1 } }
 }
 
 /** Pure preview shared by the store and Forge panel. Both possible outcomes must be safe before spending or rolling. */
 export function evaluateMerge(context: MergeContext, levelCap: number = UPGRADE_LEVEL_CAP): MergePlan | MergeRefusal {
-  const base = resolveSource(context.base, context)
-  const sacrifice = resolveSource(context.sacrifice, context)
+  const base = resolveSource(context.base, context.inventory, context.equipment)
+  const sacrifice = resolveSource(context.sacrifice, context.inventory, context.equipment)
   if (!base || !sacrifice) return { status: 'refused', reason: 'missingCopy' }
   if (stackKey(base) !== stackKey(sacrifice)) return { status: 'refused', reason: 'mismatch' }
-  if (context.base.from === 'equipped' && context.sacrifice.from === 'equipped' && context.base.slot === context.sacrifice.slot) {
-    return { status: 'refused', reason: 'missingCopy' }
-  }
-  const bothInventory = context.base.from === 'inventory' && context.sacrifice.from === 'inventory'
-  if (bothInventory && countItem(context.inventory, base.id, base.tier, base.upgradeLevel) < 2) {
-    return { status: 'refused', reason: 'missingCopy' }
-  }
+  if (sharesOneCopy(context.base, context.sacrifice, context.inventory)) return { status: 'refused', reason: 'missingCopy' }
   const data = ITEM_DATA[base.id]
   if (data.type !== ItemType.equipment) return { status: 'refused', reason: 'notEquipment' }
   if (data.slot === EquipmentSlot.pet) return { status: 'refused', reason: 'pet' }
   if (data.unique) return { status: 'refused', reason: 'unique' }
   const level = base.upgradeLevel ?? 0
   if (level >= levelCap) return { status: 'refused', reason: 'atCap' }
-  const cost = mergeCost(data.value, level)
+  const { cost, chance, next: upgraded } = upgradeQuote(base)
   if (context.goldCoins < cost) return { status: 'refused', reason: 'notEnoughGold' }
 
-  const upgraded = { ...base, upgradeLevel: level + 1 }
   const successEquipment = { ...context.equipment }
   const failureEquipment = { ...context.equipment }
   const successRemoving: ItemStack[] = []
@@ -93,7 +102,6 @@ export function evaluateMerge(context: MergeContext, levelCap: number = UPGRADE_
   const successCapacity = capacityFor(successEquipment)
   const successBlocked = blockedTab(context.inventory, context.capacity, successCapacity, adding, successRemoving)
   if (successBlocked) return { status: 'refused', reason: 'inventoryFull', tab: successBlocked }
-  const chance = UPGRADE_CHANCES[level + 1] ?? 0
   if (chance < 1) {
     const failureBlocked = blockedTab(context.inventory, context.capacity, capacityFor(failureEquipment), [], failureRemoving)
     if (failureBlocked) return { status: 'refused', reason: 'inventoryFull', tab: failureBlocked }

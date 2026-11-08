@@ -12,7 +12,7 @@ Phurgo's Forge Tongs (`ItemID.phurgosForgeTongs`) use the existing quest item ru
 - `src/app/store/player/player.ts:statsInitialState` — every stat's base value (and its unit, in comments).
 - `docs/adr/0002-player-stats-derived-from-sources.md` — why stats are derived.
 - `src/app/store/player/inventory.ts` — inventory tabs (`INVENTORY_TABS`, `tabOf`), tab capacity (`inventoryCapacity`, `slotDeltas`), the save migration split (`splitInventory`) and pure helpers over all tabs: `addItems`, `removeItems`, `canFit`, `missingSlots`, `missingSlotsByTab`, `blockedTab`, `countItem`, `maxAffordable`, `resizeInventory`.
-- `src/app/store/player/merge.ts` — merge sources, pure eligibility preview (`evaluateMerge`), gold cost (`mergeCost`) and injectable chance roll (`rollMerge`).
+- `src/app/store/player/merge.ts` — merge sources, pure eligibility preview (`evaluateMerge`), the one-copy rule (`sharesOneCopy`), the next attempt's cost, chance and +1 gear (`upgradeQuote`, from `mergeCost`) and injectable chance roll (`rollMerge`).
 - `src/types/player/player-stat.type.ts:PlayerStat` — the stat union, plus `multiplierStats`, `percentageStats`, `additivePercentStats` (display format, used by `stat-to-percentage.pipe.ts`).
 - `src/interfaces/item.interface.ts:Item` — item union by `ItemType`.
 - `src/enums/equipment-slot.enum.ts:EquipmentSlot` — 11 slots; `EquipmentSlotKey` is the string key used in `PlayerState.equipment`.
