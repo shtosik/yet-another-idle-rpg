@@ -68,7 +68,7 @@ test('blocks PRs based on anything but staging or main', () => {
 
 test('allows PRs into staging or main and PR edits without a base', () => {
   for (const command of ['gh pr create --base staging --title "x"', 'gh pr create --title "x; y" --body "z" --base staging', 'gh pr create -B staging', 'gh pr create --base main --head release/0.4.0',
-    'gh pr edit 102 --base staging', 'gh pr edit 102 --title "--base feat/x"', 'gh pr view 102'])
+    'gh pr edit 102 --base staging', 'gh pr edit 102 --title "--base feat/x"', 'gh pr view 102', 'gh pr create --base staging --title "Document gh pr create"'])
     assert.equal(run('PowerShell', { command }), 0, command)
 })
 
@@ -79,7 +79,9 @@ test('blocks EnterWorktree from a worktree into another worktree', () => {
 })
 
 test('EnterWorktree from the main checkout only into .claude/worktrees', () => {
-  assert.equal(run('EnterWorktree', { path: '../yari-feature' }, MAIN), 2)
+  assert.equal(run('EnterWorktree', { path: '../yari-missing' }, MAIN), 2)
+  assert.equal(run('EnterWorktree', { path: '../yari-feature' }, MAIN), 0) // existing sibling from before the move
   assert.equal(run('EnterWorktree', { path: '.claude/worktrees/yari-feature' }, MAIN), 0)
+  assert.equal(run('EnterWorktree', { path: '.CLAUDE/WORKTREES/yari-feature' }, MAIN), 0)
   assert.equal(run('EnterWorktree', { path: join(MAIN, '.claude', 'worktrees', 'yari-feature') }, MAIN), 0)
 })

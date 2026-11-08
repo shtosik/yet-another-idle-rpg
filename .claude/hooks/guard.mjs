@@ -1,7 +1,7 @@
 // PreToolUse hook: blocks agent actions AGENTS.md and docs/git-workflow.md forbid, with the fix in the message.
 // Exit 2 blocks the call and shows stderr to the agent.
 import { existsSync, readFileSync, statSync } from 'node:fs'
-import { dirname, isAbsolute, join, resolve } from 'node:path'
+import { basename, dirname, isAbsolute, join, resolve } from 'node:path'
 
 const input = JSON.parse(readFileSync(0, 'utf8'))
 const tool = input.tool_name ?? ''
@@ -59,7 +59,9 @@ if (/^(Bash|PowerShell)$/.test(tool)) {
 // A PR based on another feature branch is a stack: 31 of the first 101 PRs were, and those got no CI. A `gh pr create`
 // without --base goes to main, the repo default, which only takes release/* and hotfix/*.
 if (/^(Bash|PowerShell)$/.test(tool)) {
-  for (const { index, 1: verb } of text.matchAll(/\bgh\s+pr\s+(create|edit)\b/g)) {
+  // Commands are found with quoted text blanked, so a title like "Document gh pr create" isn't a second command.
+  const unquoted = text.replace(/"[^"]*"|'[^']*'/g, quoted => ' '.repeat(quoted.length))
+  for (const { index, 1: verb } of unquoted.matchAll(/\bgh\s+pr\s+(create|edit)\b/g)) {
     // shortcut: reads flags up to the end of the text, so a later chained command's --base counts; no agent chains these.
     const flags = text.slice(index).replace(/(?<!(?:--base|-B)[= ]\s*)("[^"]*"|'[^']*')/g, '')
     const base = /(?:--base|-B)[= ]\s*["']?([^\s"']+)/.exec(flags)?.[1]
@@ -75,6 +77,8 @@ const target = String(input.tool_input?.path ?? '')
 if (tool === 'EnterWorktree' && target && !inMainCheckout(cwd)) {
   block('Blocked: this session is already in a worktree. Keep one worktree per session (docs/git-workflow.md): commit here, then start the next branch in this worktree with git fetch origin staging && git switch -c <type/name> origin/staging.')
 }
-if (tool === 'EnterWorktree' && target && !/[\\/]\.claude[\\/]worktrees[\\/]/.test(resolve(cwd, target))) {
+// A `yari-*` sibling made before worktrees moved may still be entered (the app asks once) so its work can finish.
+const legacySibling = dir => /^yari-/.test(basename(dir)) && existsSync(join(dir, '.git'))
+if (tool === 'EnterWorktree' && target && !/[\\/]\.claude[\\/]worktrees[\\/]/i.test(resolve(cwd, target)) && !legacySibling(resolve(cwd, target))) {
   block('Blocked: worktrees outside .claude/worktrees make the app ask the owner to approve entering them. Create one with node scripts/worktree.mjs <type/name>, which puts it in .claude/worktrees, and enter the path it prints.')
 }

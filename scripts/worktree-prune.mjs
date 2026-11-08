@@ -78,7 +78,7 @@ for (const wt of others) {
   // Only the yari-* worktrees made by scripts/worktree.mjs (in .claude/worktrees, or siblings from before it moved there);
   // worktrees another tool placed, such as the app's own claude/* ones, are not ours to remove.
   const ourParents = [dirname(norm(main.path)), norm(join(main.path, '.claude', 'worktrees'))]
-  const foreign = !ourParents.includes(dirname(dir)) || !basename(dir).startsWith('yari-')
+  const foreign = !ourParents.includes(dirname(dir)) || !basename(dir).startsWith('yari-') || !/^(feat|fix|chore|docs|hotfix|release|refactor)\//.test(wt.branch ?? '')
   if (isOurs || foreign || !wt.branch || wt.locked || !merged || idleHours(wt.path) < MIN_IDLE_HOURS || run('git', ['status', '--porcelain'], wt.path) !== '') {
     kept++
     continue
