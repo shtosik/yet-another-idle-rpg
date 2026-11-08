@@ -10,7 +10,7 @@ Owner decisions (2026-11-08):
 
 Step 1 before Step 2, which shows the changes Step 1 reports. Step 3 after Step 2, so the quest-completed modal leaves `QuestsStore` through Notices. Steps 4–7 are independent and can follow in any order. Step 8 last.
 
-### 1. Resources (M, Opus)
+### 1. Resources (M, Opus) ✅
 One pure module owns how saved **resources** (`experience`, `level`, `unspentSkillPoints`, `goldCoins`, `mana`, explorer tokens) change. Derived stats stay as ADR 0002 has them.
 - Pure `store/player/resources.ts`, in the style of `tasks.ts` and `farm.ts`: given resources, the derived caps it needs (`maxMana`, XP table) and a change, it returns the new resources and what changed: `{ levelsGained, skillPointsGained, gold, tokens, mana }`.
 - Move in: the XP-to-level loop (`handleExperience`, `player.store.ts:238`, recursive and mutating) and its copy in `applyKillBatch` (`:605-612`); the mana clamp in `updatePlayerStats` (`:391-410`), `regenMana` (`:752`) and `battle-manager.service.ts` `useConsumable` (`min(manaRestore, maxMana - mana)`).

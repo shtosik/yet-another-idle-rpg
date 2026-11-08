@@ -28,18 +28,18 @@ describe('PlayerStore zone mastery', () => {
     store.updateEnemyKillCount(EnemyID.gangsterCrab, 10)
     const gold = store.resources().goldCoins
 
-    expect(store.claimZoneStar(beach, 'conqueror')).toBeTrue()
+    expect(store.claimZoneStar(beach, 'conqueror')).not.toBeNull()
     expect(store.resources().goldCoins).toBe(gold + reward.gold)
     expect(store.explorerTokens()).toBe(reward.explorerTokens)
     expect(store.inventory().materials.find(slot => slot?.id === reward.items[0].id)?.amount).toBe(reward.items[0].amount)
 
-    expect(store.claimZoneStar(beach, 'conqueror')).toBeFalse()
+    expect(store.claimZoneStar(beach, 'conqueror')).toBeNull()
     expect(store.resources().goldCoins).toBe(gold + reward.gold)
   })
 
   it('refuses an unfinished star', () => {
     store.updateEnemyKillCount(EnemyID.gangsterCrab, 9)
-    expect(store.claimZoneStar(beach, 'conqueror')).toBeFalse()
+    expect(store.claimZoneStar(beach, 'conqueror')).toBeNull()
   })
 
   it('refuses the claim while the chest items do not fit', () => {
@@ -54,7 +54,7 @@ describe('PlayerStore zone mastery', () => {
     store.updateEnemyKillCount(EnemyID.gangsterCrab, 10)
 
     expect(store.canClaimZoneStar(beach, 'conqueror')).toBeFalse()
-    expect(store.claimZoneStar(beach, 'conqueror')).toBeFalse()
+    expect(store.claimZoneStar(beach, 'conqueror')).toBeNull()
     expect(store.claimedZoneStars()).toEqual({})
   })
 
@@ -65,7 +65,7 @@ describe('PlayerStore zone mastery', () => {
     expect(store.inventory().gear.every(slot => slot !== null)).toBeTrue()
     store.updateEnemyKillCount(EnemyID.gangsterCrab, 10)
 
-    expect(store.claimZoneStar(beach, 'conqueror')).toBeTrue()
+    expect(store.claimZoneStar(beach, 'conqueror')).not.toBeNull()
   })
 
   it('counts shiny kills per zone online and offline', () => {

@@ -6,6 +6,7 @@ import i18next from 'i18next'
 import { InventoryTab, ItemStack, tabOf } from '../store/player/inventory'
 import { BattleStore } from '../store/battle/battle.store'
 import { PlayerStore } from '../store/player/player.store'
+import { manaGain } from '../store/player/resources'
 import { AnimationsService } from './animations.service'
 import { SkillNodeID } from '../../enums/ids/skill-node-id.enum'
 import { SpellID } from '../../enums/ids/spell-id.enum'
@@ -216,7 +217,7 @@ export class BattleManagerService {
     if (this.playerStore.itemCount(itemId) < 1) return
 
     const playerStats = this.playerStore.stats()
-    const manaGained = Math.min(manaRestore, playerStats.maxMana - playerStats.mana)
+    const manaGained = manaGain(playerStats.mana, playerStats.maxMana, manaRestore)
     // Don't waste a pure mana potion at full mana.
     if (manaRestore > 0 && !stats.length && manaGained <= 0) return
 
