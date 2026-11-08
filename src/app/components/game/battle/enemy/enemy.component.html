@@ -7,7 +7,7 @@
       <span class="enemy__tag enemy__tag--boss">{{ 'app:battle.boss' | i18next }}</span>
     }
   </div>
-  <h2>{{ 'enemies:names.' + EnemyID[currentEnemy().id] | i18next }}</h2>
+  <h2>{{ currentEnemy().id | displayName:'enemy' }}</h2>
   <div
     class="hp-bar"
     role="progressbar"

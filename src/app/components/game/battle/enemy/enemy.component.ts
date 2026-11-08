@@ -10,9 +10,10 @@ import { HalfSizeSpriteDirective } from '../../../shared/half-size-sprite/half-s
 import { MonsterDebuffBarComponent, WEAKNESS_ICONS } from './monster-debuff-bar/monster-debuff-bar.component'
 import { ArenaBossesService } from '../../../../services/arena-bosses.service'
 import { DamageElement } from '../../../../../enums/damage-element.enum'
+import { DisplayNamePipe } from '../../../../pipes/display-name.pipe'
 
 @Component({
-  imports: [I18nextPipe, MonsterDebuffBarComponent, HalfSizeSpriteDirective, NgOptimizedImage],
+  imports: [DisplayNamePipe, I18nextPipe, MonsterDebuffBarComponent, HalfSizeSpriteDirective, NgOptimizedImage],
   selector: 'app-enemy',
   templateUrl: 'enemy.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,

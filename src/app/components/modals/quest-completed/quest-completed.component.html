@@ -1,7 +1,7 @@
 <app-close-button (onClose)="close()"/>
 <div class="modal">
   <h2>
-    <span class="modal__quest-name">{{ 'quests:names.' + QuestID[data.questId] | i18next }}</span> {{ 'completed' | i18next }}
+    <span class="modal__quest-name">{{ data.questId | displayName:'quest' }}</span> {{ 'completed' | i18next }}
   </h2>
 
   <ul class="modal__stats">
@@ -9,10 +9,10 @@
       <li>{{ stat.amount }} {{ 'playerStats.' + stat.stat | i18next }}</li>
     }
     @for (reputation of data.payout.reputation; track reputation.reputationId) {
-      <li>{{ 'quests:reputation.reward' | i18next: { amount: reputation.amount, town: ('map:reputations.' + ReputationID[reputation.reputationId] | i18next) } }}</li>
+      <li>{{ 'quests:reputation.reward' | i18next: { amount: reputation.amount, town: (reputation.reputationId | displayName:'reputation') } }}</li>
     }
     @for (xp of data.payout.professionXp; track xp.professionId) {
-      <li>{{ 'quests:professionXp.reward' | i18next: { amount: xp.amount, profession: ('app:professions.' + ProfessionID[xp.professionId] | i18next) } }}</li>
+      <li>{{ 'quests:professionXp.reward' | i18next: { amount: xp.amount, profession: (xp.professionId | displayName:'profession') } }}</li>
     }
   </ul>
 

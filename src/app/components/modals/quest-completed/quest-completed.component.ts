@@ -9,10 +9,11 @@ import ITEM_DATA from '../../../../data/items-data'
 import { SlotComponent } from '../../shared/slot/slot.component'
 import { CloseButtonComponent } from '../../shared/close-button/close-button.component'
 import { QuestCompleted } from '../../../store/quests/quest-transition'
+import { DisplayNamePipe } from '../../../pipes/display-name.pipe'
 
 @Component({
   selector: 'app-quest-complete-component',
-  imports: [
+  imports: [DisplayNamePipe, 
     I18nextPipe,
     InventoryItemComponent,
     SlotComponent,

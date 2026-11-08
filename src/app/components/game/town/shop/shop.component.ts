@@ -19,6 +19,7 @@ import { ShopCurrency } from '../../../../../types/shop/shop.type'
 import { tabOf } from '../../../../store/player/inventory'
 import { tabName } from '../../inventory/tab-text'
 import { reputationLockText, tierName } from '../../quests/reputation/reputation-text'
+import { itemName, upgradedItemName } from '../../../../i18n/names'
 
 type ShopTab = 'buy' | 'sell'
 
@@ -102,7 +103,7 @@ export class ShopComponent implements OnInit {
   /** Name plus what blocks the purchase, for screen readers (sighted players get the slot's border, lock or fade). */
   buyLabel(index: number, reason: BuyBlockReason | null): string {
     const { itemId, price, minRank } = this.items()[index].staticItem
-    const name = i18next.t(`items:names.${ItemID[itemId]}`)
+    const name = itemName(itemId)
     switch (reason) {
       case 'stock': {
         const key = this.isNonRefreshableSoldOut(index) ? 'shop:ui.soldOut' : 'shop:ui.restocking'
@@ -133,8 +134,7 @@ export class ShopComponent implements OnInit {
 
   /** Shops always pay gold for what they buy. */
   sellLabel(itemId: ItemID, price: number, preferred: boolean, upgradeLevel = 0): string {
-    let name = i18next.t(`items:names.${ItemID[itemId]}`)
-    if (upgradeLevel > 0) name = i18next.t('items:upgradedName', { name, level: upgradeLevel })
+    const name = upgradedItemName(itemId, upgradeLevel)
     const label = `${name}: ${this.priceLabel('gold', price)}`
     if (!preferred) return label
     return `${label}, ${i18next.t('shop:ui.preferred')}`

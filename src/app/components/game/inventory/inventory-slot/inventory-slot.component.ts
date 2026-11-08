@@ -19,13 +19,14 @@ import { ItemType } from '../../../../../enums/items/item-type.enum'
 import { ConsumableEffectComponent } from '../../../shared/consumable-effect/consumable-effect.component'
 import { UPGRADE_MILESTONE_LEVEL } from '../../../../../data/upgrade-data'
 import { upgradedStatAmount } from '../../../../store/player/stats'
+import { DisplayNamePipe } from '../../../../pipes/display-name.pipe'
 
 @Component({
   selector: 'app-inventory-slot',
   templateUrl: 'inventory-slot.component.html',
   styleUrls: ['./inventory-slot.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgOptimizedImage, NgTemplateOutlet, I18nextPipe, TooltipTemplateDirective, StatToPercentagePipe, ConsumableEffectComponent, ForgeDrag],
+  imports: [DisplayNamePipe, NgOptimizedImage, NgTemplateOutlet, I18nextPipe, TooltipTemplateDirective, StatToPercentagePipe, ConsumableEffectComponent, ForgeDrag],
 })
 
 export class InventoryItemComponent {

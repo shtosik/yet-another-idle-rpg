@@ -13,13 +13,14 @@ import { CONSUMABLE_SLOTS } from '../../../../../interfaces/consumable.interface
 import { PlayerStore } from '../../../../store/player/player.store'
 import { EquippedSpell } from '../../../../../interfaces/spells/equipped-spell.interface'
 import { isLocked, SPELL_BAR_SLOTS } from '../../../../store/battle/spell-bar'
+import { DisplayNamePipe } from '../../../../pipes/display-name.pipe'
 
 const MS_PER_SECOND = 1000
 const PALETTE_DROP_ID = 'spellbook-palette'
 
 @Component({
   selector: 'app-battle-footer',
-  imports: [
+  imports: [DisplayNamePipe, 
     UrlPipe,
     SpellSlotComponent,
     CdkDropList,

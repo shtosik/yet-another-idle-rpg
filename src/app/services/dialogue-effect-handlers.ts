@@ -21,6 +21,7 @@ import QUEST_DATA from '../../data/quests-data'
 import { QuestID } from '../../enums/ids/quest-id.enum'
 import { ItemID } from '../../enums/ids/item-id.enum'
 import { ReputationID } from '../../enums/reputation-id.enum'
+import { itemName, questName, reputationName } from '../i18n/names'
 
 /** The stores and services dialogue handlers read and write, passed in by `DialogueManagerService`. */
 export interface DialogueContext {
@@ -60,7 +61,6 @@ export interface EffectHandler<E extends DialogueEffect> {
 type EffectHandlers = { [T in DialogueEffect['type']]: EffectHandler<Extract<DialogueEffect, { type: T }>> }
 
 const stacks = (items: { itemId: ItemID, amount: number }[]): ItemStack[] => items.map(i => ({ id: i.itemId, amount: i.amount }))
-const questName = (questId: QuestID) => i18next.t(`quests:names.${QuestID[questId]}`)
 
 /**
  * What a turn-in hands over right now: the NPC's turn-in, how many of its item the player holds, how many the
@@ -145,7 +145,7 @@ export const EFFECT_HANDLERS: EffectHandlers = {
     cost: effect => effect.action === 'give' ? { adds: stacks(effect.items) } : { removes: stacks(effect.items) },
     label: effect => effect.silent ? [] : effect.items.map(i => ({
       key: 'app:dialogueTags.change',
-      params: { sign: effect.action === 'give' ? '+' : '-', amount: i.amount, name: i18next.t(`items:names.${ItemID[i.itemId]}`) },
+      params: { sign: effect.action === 'give' ? '+' : '-', amount: i.amount, name: itemName(i.itemId) },
     })),
   },
   shop: {
@@ -217,7 +217,7 @@ export const EFFECT_HANDLERS: EffectHandlers = {
         key: 'quests:reputation.reward',
         params: {
           amount: shownBundles(bundles) * turnIn.reputation,
-          town: i18next.t(`map:reputations.${ReputationID[turnIn.reputationId]}`),
+          town: reputationName(turnIn.reputationId),
         },
       }]
     },

@@ -14,13 +14,14 @@ import { SpellID } from '../../../../../enums/ids/spell-id.enum'
 import { StatToPercentagePipe } from '../../../../pipes/stat-to-percentage.pipe'
 import { UPGRADE_MILESTONE_LEVEL } from '../../../../../data/upgrade-data'
 import { upgradedStatAmount } from '../../../../store/player/stats'
+import { DisplayNamePipe } from '../../../../pipes/display-name.pipe'
 
 @Component({
     selector: 'app-equipment-slot',
     templateUrl: 'equipment-slot.component.html',
     styleUrls: ['./equipment-slot.component.sass'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [NgOptimizedImage, CommonModule, I18nextPipe, TooltipTemplateDirective, StatToPercentagePipe, ForgeDrag],
+    imports: [DisplayNamePipe, NgOptimizedImage, CommonModule, I18nextPipe, TooltipTemplateDirective, StatToPercentagePipe, ForgeDrag],
 })
 
 export class EquipmentItemComponent {

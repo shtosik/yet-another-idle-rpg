@@ -14,6 +14,7 @@ import type { QuestCompleted } from '../store/quests/quest-transition'
 import { expertiseGain } from '../store/player/stats'
 import { CurrencyFeedService } from './currency-feed.service'
 import { ModalService } from './modal.service'
+import { itemName, professionName, reputationName, upgradedItemName } from '../i18n/names'
 
 /** Something that happened, reported by the store or service that did it. Notices decides how it is shown. */
 export type Notice =
@@ -32,7 +33,6 @@ export type ToastLane = 'hud' | 'hudBelow' | 'battle' | 'battleBelow' | 'camp' |
 
 const LANE_MS: Record<ToastLane, number> = { hud: 4000, hudBelow: 4000, battle: 3000, battleBelow: 3000, camp: 1800, forge: 3000 }
 
-const itemName = (id: ItemID): string => i18next.t(`items:names.${ItemID[id]}`)
 
 /**
  * The one place that shows what happened: toasts (one timer per lane, a new toast replaces the old one), modals and
@@ -69,7 +69,7 @@ export class NoticesService {
         this.show('camp', i18next.t('camp:crafted', { count: notice.count, item: itemName(notice.itemId) }))
         return
       case 'merged':
-        this.show('forge', i18next.t(`forge:${notice.status}`, { item: upgradedItemName(notice.item) }))
+        this.show('forge', i18next.t(`forge:${notice.status}`, { item: upgradedItemName(notice.item.id, notice.item.upgradeLevel) }))
         return
       case 'stationInstalled':
         this.modal.openStationInstalled(notice.itemId)
@@ -100,7 +100,7 @@ export class NoticesService {
 
 function tierUpLine({ reputationId, tier }: TierUp): string {
   return i18next.t('quests:reputation.tierUp', {
-    town: i18next.t(`map:reputations.${ReputationID[reputationId]}`),
+    town: reputationName(reputationId),
     tier: i18next.t(`quests:reputation.tiers.${ReputationTier[tier]}`),
   })
 }
@@ -111,7 +111,7 @@ function expertiseLine({ professionId, from, to, skillPoints }: ProfessionGain):
     `+${formatStat('bonus', amount)} ${i18next.t(`app:playerStats.${stat}`)}`)
   if (skillPoints > 0) rewards.push(i18next.t('app:expertise.skillPoints', { count: skillPoints }))
   return i18next.t('app:expertise.levelUp', {
-    expertise: i18next.t('app:expertise.label', { profession: i18next.t(`app:professions.${ProfessionID[professionId]}`), level: to }),
+    expertise: i18next.t('app:expertise.label', { profession: professionName(professionId), level: to }),
     rewards: rewards.join(', '),
   })
 }
@@ -128,8 +128,3 @@ function dropsLostText(lost: ItemStack[]): string {
     i18next.t('app:inventory.dropsLost', { tab: i18next.t(`app:inventory.tabs.${tab}`), items: names.join(', ') })).join('\n')
 }
 
-function upgradedItemName(item: EquipmentItem): string {
-  const name = itemName(item.id)
-  const level = item.upgradeLevel ?? 0
-  return level > 0 ? i18next.t('items:upgradedName', { name, level }) : name
-}

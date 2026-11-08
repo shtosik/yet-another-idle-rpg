@@ -13,6 +13,7 @@ import { ItemID } from '../../../../enums/ids/item-id.enum'
 import { ItemTier } from '../../../../enums/items/item-tier.enum'
 import { RecipeDetailComponent } from './recipe-detail/recipe-detail.component'
 import { RecipeView } from './recipe-view'
+import { DisplayNamePipe } from '../../../pipes/display-name.pipe'
 
 
 @Component({
@@ -20,7 +21,7 @@ import { RecipeView } from './recipe-view'
   templateUrl: './camp.component.html',
   styleUrls: ['./camp.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [
+  imports: [DisplayNamePipe, 
     NgOptimizedImage,
     I18nextPipe,
     RecipeDetailComponent,

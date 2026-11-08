@@ -1,7 +1,7 @@
 <ul class="quests">
   @for (quest of activeQuests(); track quest.id) {
     @let expanded = expandedQuest() === quest.id;
-    @let questName = ('quests:names.' + QuestID[quest.id]) | i18next;
+    @let questName = quest.id | displayName:'quest';
     @let pinIcon = quest.pinned ? 'pin-active' : 'pin';
     <li class="quest" [class.quest--ready]="quest.ready">
       <div class="quest__top">
@@ -41,7 +41,7 @@
             <span class="requirement__label">
               <span class="requirement__text">{{ req.label }}</span>
               @if (req.zoneId !== null && !done) {
-                @let zoneName = ('zones:names.' + ZoneID[req.zoneId]) | i18next;
+                @let zoneName = req.zoneId | displayName:'zone';
                 <button
                   class="requirement__zone"
                   type="button"
@@ -87,7 +87,7 @@
   @if (showCompleted()) {
     <ul class="completed">
       @for (id of completedQuests(); track id) {
-        <li class="completed__quest">{{ ('quests:names.' + QuestID[id]) | i18next }}</li>
+        <li class="completed__quest">{{ id | displayName:'quest' }}</li>
       }
     </ul>
   }

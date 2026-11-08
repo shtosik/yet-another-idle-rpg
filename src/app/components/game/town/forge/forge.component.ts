@@ -14,6 +14,7 @@ import { PlayerStore } from '../../../../store/player/player.store'
 import { NoticesService } from '../../../../services/notices.service'
 import { gearModifiers } from '../../../../store/player/stats'
 import { tabName } from '../../inventory/tab-text'
+import { upgradedItemName } from '../../../../i18n/names'
 
 
 @Component({
@@ -99,9 +100,7 @@ export class ForgeComponent {
   }
 
   itemName(item: EquipmentItem): string {
-    const name = i18next.t(`items:names.${ItemID[item.id]}`)
-    const level = item.upgradeLevel ?? 0
-    return level > 0 ? i18next.t('items:upgradedName', { name, level }) : name
+    return upgradedItemName(item.id, item.upgradeLevel ?? 0)
   }
 
   mergeLabel(): string {

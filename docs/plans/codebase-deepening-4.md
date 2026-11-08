@@ -50,7 +50,7 @@ One rule moves a quest forward and pays it.
 - Specs (`offline-claim-plan.spec.ts`): clock moved back (gap 0), gap over the cap, arena run that ended during the absence, arena run still going, gap under `MIN_OFFLINE_CLAIM_IN_MS`.
 - Docs: `offline-progress.md`.
 
-### 6. Display names (M, Sonnet)
+### 6. Display names (M, Sonnet) ✅
 - One names module (`i18n/names.ts` plus a pipe if templates need it) with one lookup per key family: items, zones, quests, enemies, professions, reputations. It owns the **Upgrade level** name rule (`level > 0 ? upgradedName(name, level) : name`).
 - Replace the ~16 `` `items:names.${ItemID[x]}` `` builders and the local `itemName` helpers (`recipe-detail.component.ts:26`, `requirement-handlers.ts:73`, `forge.component.ts:104`), and the seven copies of the upgraded-name rule (`equipment-slot.component.html:3,55`, `inventory-slot.component.html:2,67`, `destroy-confirm.component.html:4`, `forge.component.ts:107`, `shop.component.ts:141`).
 - Validate: a check in `scripts/validate-data.mjs` that every enum member of each family has its key, so dynamic keys are covered.

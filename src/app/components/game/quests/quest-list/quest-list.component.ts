@@ -13,6 +13,7 @@ import { NpcID } from '../../../../../enums/map/npc-id.enum'
 import { getQuestStatus } from '../../../../services/quest-status'
 import { I18nextPipe } from '../../../../pipes/i18next.pipe'
 import { RequirementRow } from '../../../../store/quests/requirement-handlers'
+import { DisplayNamePipe } from '../../../../pipes/display-name.pipe'
 
 interface ActiveQuestRow {
   id: QuestID
@@ -31,7 +32,7 @@ interface ActiveQuestRow {
   templateUrl: './quest-list.component.html',
   styleUrls: ['./quest-list.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NgOptimizedImage, I18nextPipe],
+  imports: [DisplayNamePipe, NgOptimizedImage, I18nextPipe],
 })
 export class QuestListComponent {
   private questsStore = inject(QuestsStore)

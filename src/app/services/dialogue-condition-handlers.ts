@@ -14,6 +14,7 @@ import { PlayerStat } from '../../types/player/player-stat.type'
 import { reputationTierLabel } from '../components/game/quests/reputation/reputation-text'
 import { REPUTATION_THRESHOLDS } from '../store/player/reputation'
 import { formatCooldown } from '../store/quests/turn-in-cooldown'
+import { enemyName, itemName, professionName, questName, zoneName } from '../i18n/names'
 
 export interface ConditionHandler<C extends DialogueCondition> {
   evaluate(condition: C, ctx: DialogueContext): boolean
@@ -47,14 +48,14 @@ const waveMet = (ctx: DialogueContext, req: WaveReq) => ctx.player.getKillCountB
 const statLabel = (req: StatReq): DialogueLabel =>
   ({ key: 'app:dialogueTags.amount', params: { name: i18next.t(`app:playerStats.${req.stat}`), amount: req.amount } })
 const itemLabel = (itemId: ItemID, amount: number): DialogueLabel =>
-  ({ key: 'app:dialogueTags.amount', params: { name: i18next.t(`items:names.${ItemID[itemId]}`), amount } })
+  ({ key: 'app:dialogueTags.amount', params: { name: itemName(itemId), amount } })
 const questLabel = (req: QuestReq): DialogueLabel =>
-  ({ key: 'app:dialogueTags.questRequired', params: { quest: i18next.t(`quests:names.${QuestID[req.questId]}`) } })
+  ({ key: 'app:dialogueTags.questRequired', params: { quest: questName(req.questId) } })
 const killLabel = (req: KillReq): DialogueLabel =>
-  ({ key: 'app:dialogueTags.kill', params: { amount: req.amount, enemy: i18next.t(`enemies:names.${EnemyID[req.enemyId]}`) } })
+  ({ key: 'app:dialogueTags.kill', params: { amount: req.amount, enemy: enemyName(req.enemyId) } })
 const waveLabel = (req: WaveReq): DialogueLabel => ({
   key: 'quests:requirements.waveKillCount',
-  params: { amount: req.amount, wave: req.waveNumber, zone: i18next.t(`zones:names.${ZoneID[req.zoneId]}`) },
+  params: { amount: req.amount, wave: req.waveNumber, zone: zoneName(req.zoneId) },
 })
 
 export const CONDITION_HANDLERS: ConditionHandlers = {
@@ -133,7 +134,7 @@ export const CONDITION_HANDLERS: ConditionHandlers = {
     evaluate: (c, ctx) => ctx.player.professionLevel(c.professionId) >= c.level,
     label: c => [{
       key: 'app:expertise.label',
-      params: { profession: i18next.t(`app:professions.${ProfessionID[c.professionId]}`), level: c.level },
+      params: { profession: professionName(c.professionId), level: c.level },
     }],
   },
   farmSeeds: {

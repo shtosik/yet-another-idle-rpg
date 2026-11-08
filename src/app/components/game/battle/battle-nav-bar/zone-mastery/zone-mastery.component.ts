@@ -8,13 +8,14 @@ import { ItemID } from 'enums/ids/item-id.enum'
 import ZONES_DATA from 'data/zones-data'
 import i18next from 'i18next'
 import { missingSlotsText } from 'app/components/game/inventory/tab-text'
+import { DisplayNamePipe } from '../../../../../pipes/display-name.pipe'
 
 /** The current zone's three mastery stars; a finished star is clicked to claim its chest. */
 @Component({
   selector: 'app-zone-mastery',
   templateUrl: './zone-mastery.component.html',
   styleUrls: ['./zone-mastery.component.sass'],
-  imports: [I18nextPipe, TooltipTemplateDirective],
+  imports: [DisplayNamePipe, I18nextPipe, TooltipTemplateDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ZoneMasteryComponent {
