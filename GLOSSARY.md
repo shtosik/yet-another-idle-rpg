@@ -69,6 +69,15 @@ _Avoid_: Auto-use, auto-consume
 One of the inventory's five sections (Gear, Consumables, Materials, Pets, Quest), each with its own slots; an item's tab follows from its type.
 _Avoid_: Bag, category
 
+**Item grant**:
+Giving the player items by one rule: seeds go to the seed store, station gear installs, everything else must fit its inventory tab. Atomic (all or nothing) everywhere except kills, which are lossy (what fits lands, the rest is lost).
+Code: `PlayerStore.grant`, `grantItems`
+_Avoid_: Add items, give items, reward items (for the process)
+
+**Spell bar**:
+The battle footer's row of equipped spell slots. It holds only spells the player knows; known spells come from skill nodes, used spell scrolls and equipped gear.
+_Avoid_: Hotbar, action bar, spell slots (for the whole bar)
+
 **Upgrade level**:
 A piece of gear's enhancement level, stored as `upgradeLevel` and shown as `+N`; missing means +0. Separate from its rarity (`ItemTier`).
 _Avoid_: tier, rank
@@ -98,6 +107,11 @@ _Avoid_: Reset, refund
 **Offline claim**:
 Kills paid for time the game wasn't running (closed tab, sleeping device), on the wave the player left on, shown in the welcome-back modal.
 _Avoid_: AFK rewards, idle rewards
+
+**Game time**:
+The saved clock that game rules read (crops, cooldowns, the arena). It only moves forward: online with each tick, offline by the claimed time away, up to the offline cap. Never the device clock.
+Code: `GameClockStore`
+_Avoid_: Server time, real time, now (for rules)
 
 **Kill resolution**:
 Turning kills into XP, gold, drops, kill counts, task progress and zone progress, by the same rules online and in an offline claim. Arena kills are paid separately (ADR 0003).
