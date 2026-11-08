@@ -20,7 +20,7 @@ describe('PlayerStore spells from equipment', () => {
   afterEach(() => localStorage.clear())
 
   const equipStormcaller = () => {
-    store.addItems([{ id: ItemID.stormcaller, tier: ItemTier.legendary, amount: 1 }])
+    store.grant([{ id: ItemID.stormcaller, tier: ItemTier.legendary, amount: 1 }], 'lossy')
     store.equipItem(store.inventory().gear.find(slot => slot?.id === ItemID.stormcaller)!)
   }
 

@@ -51,7 +51,7 @@ const CASES: Case[] = [
       const ids = (Object.values(ItemID).filter(v => typeof v === 'number') as ItemID[]).filter(id => !dropped.has(id))
       const capacity = player.inventoryCapacity()
       for (const tab of Object.keys(capacity) as (keyof typeof capacity)[]) {
-        player.addItems(ids.filter(id => tabOf(id) === tab).slice(0, capacity[tab]).map(id => ({ id, amount: 1 })))
+        player.grant(ids.filter(id => tabOf(id) === tab).slice(0, capacity[tab]).map(id => ({ id, amount: 1 })), 'lossy')
       }
     },
   },

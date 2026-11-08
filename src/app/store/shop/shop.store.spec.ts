@@ -63,7 +63,7 @@ describe('ShopStore purchase', () => {
     const filler = (Object.keys(ITEM_DATA).map(Number) as ItemID[])
       .filter(id => tabOf(id) === tab && id !== ItemID.earthRune)
       .slice(0, player.inventoryCapacity()[tab])
-    player.addItems(filler.map(id => ({ id, amount: 1 })))
+    player.grant(filler.map(id => ({ id, amount: 1 })), 'lossy')
     expect(shop.blockReason(ShopID.mawoodMagicShop, runes)).toBe('inventory')
 
     // Altar installs without a slot; once installed, a restocked copy fails the station order.

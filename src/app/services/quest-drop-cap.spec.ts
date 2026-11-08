@@ -27,7 +27,7 @@ describe('quest drop caps online and offline', () => {
     battle.setZone(ZoneID.elderwoodWilds)
     quests.startQuest(QuestID.signsOfRot)
     // Held counts include every tier, not just the tier of the enemy drop.
-    player.addItems([{ id: ItemID.corruptedResin, amount: 2, tier: ItemTier.legendary }])
+    player.grant([{ id: ItemID.corruptedResin, amount: 2, tier: ItemTier.legendary }], 'lossy')
     player.updatePlayerStats([{ stat: 'attackPower', amount: 1000 }])
   })
 

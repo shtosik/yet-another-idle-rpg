@@ -33,7 +33,7 @@ describe('ItemUseService', () => {
 
   const give = (id: ItemID): InventoryItem => {
     const { tier, type } = ITEM_DATA[id]
-    player.addItems([{ id, tier, amount: 1 }])
+    player.grant([{ id, tier, amount: 1 }], 'lossy')
     return { id, tier, type, amount: 1 }
   }
   const onBar = (spellId: SpellID) => battle.equippedSpells().filter(slot => slot?.spellId === spellId).length

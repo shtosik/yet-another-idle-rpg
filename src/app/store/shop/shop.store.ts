@@ -117,9 +117,8 @@ export const ShopStore = signalStore(
       const upgrade = stationUpgradeOf(staticItem.itemId)
       if (upgrade) return canInstall(playerStore.stations(), upgrade) ? null : 'station'
 
-      // The spellbook unlocks a tab and never enters the inventory.
       const { itemId, tier } = staticItem
-      if (itemId !== ItemID.spellbook && !playerStore.canFitItems([{ id: itemId, tier, amount: 1 }])) return 'inventory'
+      if (!playerStore.canGrant([{ id: itemId, tier, amount: 1 }])) return 'inventory'
 
       return null
     },
@@ -159,9 +158,7 @@ export const ShopStore = signalStore(
         if (!playerStore.spend(shop.currency ?? 'gold', price)) break
         store.buyItem(shopId, index)
 
-        // Spellbook unlocks the tab immediately and is not added to inventory
-        if (itemId === ItemID.spellbook) playerStore.unlockSpellbook()
-        else result.installed.push(...playerStore.addItems([{ id: itemId, tier, amount: 1 }]))
+        result.installed.push(...playerStore.grant([{ id: itemId, tier, amount: 1 }], 'atomic').installed)
         result.bought++
         result.spent += price
       }

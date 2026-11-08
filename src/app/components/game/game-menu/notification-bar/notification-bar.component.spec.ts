@@ -25,7 +25,7 @@ describe('NotificationBarComponent', () => {
     TestBed.configureTestingModule({ providers: [provideZonelessChangeDetection()] })
     store = TestBed.inject(PlayerStore)
     store.unlockProfession(ProfessionID.farming)
-    store.addItems([{ id: ItemID.turnipSeeds, amount: 2 }])
+    store.grant([{ id: ItemID.turnipSeeds, amount: 2 }], 'lossy')
     fixture = TestBed.createComponent(NotificationBarComponent)
     element = fixture.nativeElement
     await fixture.whenStable()

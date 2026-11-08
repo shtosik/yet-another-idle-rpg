@@ -139,7 +139,7 @@ export const EFFECT_HANDLERS: EffectHandlers = {
   item: {
     apply: (effect, ctx) => {
       if (effect.action === 'take') ctx.player.removeItems(stacks(effect.items))
-      else ctx.player.addItems(stacks(effect.items))
+      else ctx.player.grant(stacks(effect.items), 'atomic')
     },
     cost: effect => effect.action === 'give' ? { adds: stacks(effect.items) } : { removes: stacks(effect.items) },
     label: effect => effect.silent ? [] : effect.items.map(i => ({

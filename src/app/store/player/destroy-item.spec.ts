@@ -18,11 +18,11 @@ describe('PlayerStore.destroyItem', () => {
   })
 
   it('removes the whole stack and leaves other stacks alone', () => {
-    store.addItems([
+    store.grant([
       { id: ItemID.stone, amount: 7, tier: ItemTier.trash },
       { id: ItemID.stone, amount: 3, tier: ItemTier.rare },
       { id: ItemID.spiderSilk, amount: 2 },
-    ])
+    ], 'lossy')
 
     expect(store.destroyItem(stack(ItemID.stone, ItemTier.trash, 7))).toBeTrue()
 
@@ -31,7 +31,7 @@ describe('PlayerStore.destroyItem', () => {
   })
 
   it('refuses quest items', () => {
-    store.addItems([{ id: ItemID.captainsLetter, amount: 1 }])
+    store.grant([{ id: ItemID.captainsLetter, amount: 1 }], 'lossy')
 
     expect(store.destroyItem(stack(ItemID.captainsLetter, ItemTier.normal, 1))).toBeFalse()
 

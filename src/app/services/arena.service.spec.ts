@@ -11,6 +11,8 @@ import { ItemID } from '../../enums/ids/item-id.enum'
 import { ZoneID } from '../../enums/ids/zone-id.enum'
 import { OfflineProgressService } from './offline-progress.service'
 import { OfflineStore } from '../store/offline/offline.store'
+import ITEM_DATA from '../../data/items-data'
+import { tabOf } from '../store/player/inventory'
 
 describe('ArenaService', () => {
   let arena: ArenaService
@@ -69,6 +71,19 @@ describe('ArenaService', () => {
     arena.claimRewards()
     expect(countOf(ItemID.moltenCape)).toBe(2)
     expect(countOf(ItemID.skillPointBook)).toBe(2)
+  })
+
+  it('refuses the claim, changing nothing, while a reward does not fit', () => {
+    arena.enter(0)
+    killThrough(totalKills)
+    playerStore.grant((Object.keys(ITEM_DATA).map(Number) as ItemID[])
+      .filter(id => tabOf(id) === 'gear' && id !== ItemID.moltenCape)
+      .slice(0, playerStore.inventoryCapacity().gear)
+      .map(id => ({ id, amount: 1 })), 'atomic')
+    const before = { inventory: playerStore.inventory(), rewards: battleStore.arenaRewards() }
+
+    expect(arena.claimRewards()).toBeFalse()
+    expect({ inventory: playerStore.inventory(), rewards: battleStore.arenaRewards() }).toEqual(before)
   })
 
   it('time running out ends the run with no rewards waiting', () => {

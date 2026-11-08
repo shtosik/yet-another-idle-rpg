@@ -18,7 +18,7 @@ Step 1 first. Steps 2–5 are independent. Step 6 comes before Step 7, because t
 - One spec per bug, where it can be tested. Changelog: `[bug]` for the drop cap and the Order wait time.
 - Docs: `quests.md`, `dialogue.md` if they describe these.
 
-### 2. Item grant (M-L, Opus)
+### 2. Item grant (M-L, Opus) ✅
 One module decides how items reach the player. Seeds go to the seed store, station gear installs, everything else must fit its inventory tab.
 - Pure `grantItems(state, items, mode)` in `store/player/inventory.ts`, `mode: 'atomic' | 'lossy'`, returning the new state and `{ received, lost, installed, missing }`. **Atomic** changes nothing when anything doesn't fit and reports `missing`; **lossy** lands what fits and reports `lost`.
 - `canGrant(items)` answers the same question without writing, for UI that greys out options. It replaces every `canFitItems` pre-check: `shop.store.ts:122` (keep the spellbook case as data, not a caller rule), `arena.service.ts:41`, `dialogue-manager.service.ts:117-121` (effect `cost.adds/removes`), zone star (`player.store.ts:593`), chest (`:778`), harvest (`:922-925`), `evaluateRecipe` (craft).

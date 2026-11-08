@@ -38,7 +38,7 @@ export class ArenaService {
   })
   readonly canClaimRewards = computed(() => {
     const rewards = this.battleStore.arenaRewards()
-    return rewards.length > 0 && this.playerStore.canFitItems(rewards)
+    return rewards.length > 0 && this.playerStore.canGrant(rewards)
   })
 
   /** No run going on and the entry cooldown is over. */
@@ -82,7 +82,7 @@ export class ArenaService {
   /** Puts the waiting clear rewards in the inventory; false (nothing moves) while they don't fit. */
   claimRewards(): boolean {
     if (!this.canClaimRewards()) return false
-    this.playerStore.addItems(this.battleStore.arenaRewards())
+    this.playerStore.grant(this.battleStore.arenaRewards(), 'atomic')
     this.battleStore.clearArenaRewards()
     return true
   }

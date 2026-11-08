@@ -23,7 +23,7 @@ describe('Ambush and spell scrolls', () => {
   afterEach(() => localStorage.clear())
 
   const useScroll = () => {
-    playerStore.addItems([{ id: ItemID.ambushScroll, tier: ItemTier.rare, amount: 1 }])
+    playerStore.grant([{ id: ItemID.ambushScroll, tier: ItemTier.rare, amount: 1 }], 'lossy')
     playerStore.useItem(playerStore.inventory().consumables.find(slot => slot?.id === ItemID.ambushScroll)!)
   }
 
@@ -50,7 +50,7 @@ describe('Ambush and spell scrolls', () => {
   })
 
   it('auto-attacks with a bow are not melee, so they keep the crits', () => {
-    playerStore.addItems([{ id: ItemID.woodenBow, amount: 1 }])
+    playerStore.grant([{ id: ItemID.woodenBow, amount: 1 }], 'lossy')
     playerStore.equipItem(playerStore.inventory().gear.find(slot => slot?.id === ItemID.woodenBow)!)
     battleStore.empower(SpellID.ambush, 5)
     battleStore.startBattle(0)

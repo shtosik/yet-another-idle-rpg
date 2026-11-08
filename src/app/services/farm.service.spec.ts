@@ -29,7 +29,7 @@ describe('FarmService', () => {
     player = TestBed.inject(PlayerStore)
     farm = TestBed.inject(FarmService)
     player.unlockProfession(ProfessionID.farming)
-    player.addItems([{ id: ItemID.turnipSeeds, amount: 5 }])
+    player.grant([{ id: ItemID.turnipSeeds, amount: 5 }], 'lossy')
   })
 
   afterEach(() => {
@@ -76,7 +76,7 @@ describe('FarmService', () => {
     jasmine.clock().tick(5 * MINUTE)
 
     const hare = ITEM_DATA[ItemID.petFarmingGuildHare]
-    player.addItems([{ id: hare.id, tier: hare.tier, amount: 1 }])
+    player.grant([{ id: hare.id, tier: hare.tier, amount: 1 }], 'lossy')
     player.equipItem({ id: hare.id, type: hare.type, tier: hare.tier, amount: 1 })
     TestBed.tick()
     jasmine.clock().tick(8 * MINUTE)

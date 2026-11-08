@@ -37,7 +37,7 @@ describe('reputation turn-ins in dialogue', () => {
   afterEach(() => localStorage.clear())
 
   it('takes one bundle and pays reputation only', () => {
-    playerStore.addItems([{ id: ItemID.crabMeat, amount: 59 }])
+    playerStore.grant([{ id: ItemID.crabMeat, amount: 59 }], 'lossy')
     const gold = playerStore.stats().goldCoins
 
     dialogue.selectOption(option())
@@ -48,7 +48,7 @@ describe('reputation turn-ins in dialogue', () => {
   })
 
   it('hands over nothing more until that bundle cools down, then one bundle again', () => {
-    playerStore.addItems([{ id: ItemID.crabMeat, amount: 60 }])
+    playerStore.grant([{ id: ItemID.crabMeat, amount: 60 }], 'lossy')
     dialogue.selectOption(option())
     expect(dialogue.checkCondition({ type: 'turnInCooldown', key: bartenderKey, state: 'cooling' })).toBeTrue()
 
@@ -64,7 +64,7 @@ describe('reputation turn-ins in dialogue', () => {
   })
 
   it("does not cool another NPC's bundle", () => {
-    playerStore.addItems([{ id: ItemID.crabMeat, amount: 20 }])
+    playerStore.grant([{ id: ItemID.crabMeat, amount: 20 }], 'lossy')
     dialogue.selectOption(option())
 
     expect(dialogue.checkCondition({ type: 'turnInCooldown', key: bundleKey(NpcID.laHarparJosh, ItemID.feather), state: 'ready' })).toBeTrue()
@@ -72,11 +72,11 @@ describe('reputation turn-ins in dialogue', () => {
 
   it('keeps what an active quest step needs', () => {
     TestBed.inject(QuestsStore).startQuest(QuestID.meatShortage) // 30 Crab Meat
-    playerStore.addItems([{ id: ItemID.crabMeat, amount: 45 }])
+    playerStore.grant([{ id: ItemID.crabMeat, amount: 45 }], 'lossy')
 
     expect(dialogue.canApplyResult(dialogue.getActiveResult(option()))).toBeFalse()
 
-    playerStore.addItems([{ id: ItemID.crabMeat, amount: 5 }])
+    playerStore.grant([{ id: ItemID.crabMeat, amount: 5 }], 'lossy')
     dialogue.selectOption(option())
 
     expect(playerStore.itemCount(ItemID.crabMeat)).toBe(30)
@@ -114,7 +114,7 @@ describe('reputation turn-ins in dialogue', () => {
   })
 
   it('closes once the town is Exalted', () => {
-    playerStore.addItems([{ id: ItemID.crabMeat, amount: 20 }])
+    playerStore.grant([{ id: ItemID.crabMeat, amount: 20 }], 'lossy')
     playerStore.addReputation([{ reputationId: ReputationID.laHarpar, amount: 1500 }])
 
     expect(dialogue.getActiveResult(option())).toBeUndefined()

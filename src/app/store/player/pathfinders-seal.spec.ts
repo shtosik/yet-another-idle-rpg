@@ -46,7 +46,7 @@ describe("Pathfinder's Seal", () => {
   })
 
   it('never rolls another Seal while one is held or after registration, including after reload', () => {
-    player.addItems([{ id: ItemID.arenaChest, amount: 3 }])
+    player.grant([{ id: ItemID.arenaChest, amount: 3 }], 'lossy')
     player.openChest(heldChest(), () => 0)
     expect(player.itemCount(seal)).toBe(1)
     const heldRng = jasmine.createSpy('held rng').and.returnValue(0)
@@ -66,11 +66,11 @@ describe("Pathfinder's Seal", () => {
   })
 
   it('keeps the Seal hit with a blocked chest roll through retries and reloads', () => {
-    player.addItems([{ id: ItemID.arenaChest, amount: 2 }])
+    player.grant([{ id: ItemID.arenaChest, amount: 2 }], 'lossy')
     const lootIds = arenaChest.loot.flatMap(entry => 'itemId' in entry ? [entry.itemId] : [])
     const filler = Object.values(ITEM_DATA).filter(item => tabOf(item.id) === 'materials' && !lootIds.includes(item.id))
       .slice(0, player.inventoryCapacity().materials).map(item => ({ id: item.id, amount: 1 }))
-    player.addItems(filler)
+    player.grant(filler, 'lossy')
     let calls = 0
     expect(player.openChest(heldChest(), () => ++calls <= 8 ? 0.5 : 0).contents).toBeNull()
     const kept = player.rolledChests()[ItemID.arenaChest]
@@ -93,7 +93,7 @@ describe("Pathfinder's Seal", () => {
   it('is unsellable and indestructible, and registers exactly once without requiring The Cold Forge', () => {
     expect(player.registerPathfindersSeal()).toBeFalse()
     expect(player.stats().upgradedDropChance).toBe(0)
-    player.addItems([{ id: seal, amount: 2 }])
+    player.grant([{ id: seal, amount: 2 }], 'lossy')
     const item = player.inventory().quest.find(slot => slot?.id === seal)
     if (!item) throw new Error('Expected the Seal')
     expect(sellPrice(ShopID.laHarparShop, seal)).toBe(0)
@@ -113,7 +113,7 @@ describe("Pathfinder's Seal", () => {
     spyOn(Math, 'random').and.callFake(() => ++calls === 3 ? 0.01 : 0.99)
     killOnline(EnemyID.gangsterCrab, ZoneID.horseshoeBeach, 1, false)
     expect(player.inventory().gear.some(item => item?.upgradeLevel === 1)).toBeFalse()
-    player.addItems([{ id: seal, amount: 1 }])
+    player.grant([{ id: seal, amount: 1 }], 'lossy')
     player.registerPathfindersSeal()
     calls = 0
     killOnline(EnemyID.gangsterCrab, ZoneID.horseshoeBeach, 1, false)

@@ -42,7 +42,7 @@ describe('FarmPlotsComponent', () => {
   const locks = () => [...element.querySelectorAll('.actions__item[aria-label]')].map(lock => lock.getAttribute('aria-label'))
   const growTurnip = () => {
     store.unlockProfession(ProfessionID.farming)
-    store.addItems([{ id: ItemID.turnipSeeds, amount: 1 }])
+    store.grant([{ id: ItemID.turnipSeeds, amount: 1 }], 'lossy')
     store.plantSeed(ItemID.turnipSeeds, 3, 0)
     store.growAllPlots()
   }
@@ -73,9 +73,9 @@ describe('FarmPlotsComponent', () => {
     expect(element.querySelector('.plot__missing')).toBeNull()
 
     for (const item of Object.values(ITEM_DATA)) {
-      if (tabOf(item.id) === 'materials' && item.id !== ItemID.turnip && store.canFitItems([{ id: item.id, amount: 1 }])) store.addItems([{ id: item.id, amount: 1 }])
+      if (tabOf(item.id) === 'materials' && item.id !== ItemID.turnip && store.canGrant([{ id: item.id, amount: 1 }])) store.grant([{ id: item.id, amount: 1 }], 'lossy')
     }
-    expect(store.canFitItems([{ id: ItemID.turnip, amount: 1 }])).toBeFalse()
+    expect(store.canGrant([{ id: ItemID.turnip, amount: 1 }])).toBeFalse()
     await render()
 
     expect(element.querySelector('.plot__missing')?.textContent?.trim()).toBe('1 Materials slot needed')
@@ -111,7 +111,7 @@ describe('FarmPlotsComponent', () => {
     expect(popup?.textContent).toContain('+3 Farming XP')
 
     store.addReputation([{ reputationId: ReputationID.farmingGuild, amount: 60 }])
-    store.addItems([{ id: ItemID.turnipSeeds, amount: 1 }])
+    store.grant([{ id: ItemID.turnipSeeds, amount: 1 }], 'lossy')
     store.plantSeed(ItemID.turnipSeeds, 3, 0)
     store.growAllPlots()
     await render()

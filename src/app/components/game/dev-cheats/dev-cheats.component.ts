@@ -116,11 +116,11 @@ export class DevCheatsComponent {
     equip: (itemRef: Ref<typeof ItemID>, tier?: Ref<typeof ItemTier>, upgradeLevel = 0): boolean => {
       const itemId = fromName(ItemID, 'ItemID', itemRef)
       const stack = { id: itemId, tier: this.tierOf(itemId, tier), amount: 1, upgradeLevel }
-      if (!this.playerStore.canFitItems([stack])) {
+      if (!this.playerStore.canGrant([stack])) {
         console.warn('dev.equip: no inventory space for the item')
         return false
       }
-      this.playerStore.addItems([stack])
+      this.playerStore.grant([stack], 'atomic')
       const item = { ...stack, type: ITEM_DATA[itemId].type }
       if (!this.playerStore.canEquip(item)) {
         this.playerStore.removeItems([stack])
@@ -204,7 +204,7 @@ export class DevCheatsComponent {
     /** Fills every plot with the seed (default Turnip Seeds), granting the seeds and the Farming profession; false when its expertise is too low. */
     plantAll: (seed: Ref<typeof ItemID> = ItemID.turnipSeeds): boolean => {
       this.playerStore.unlockProfession(ProfessionID.farming)
-      this.playerStore.addItems([{ id: fromName(ItemID, 'ItemID', seed), amount: PLOT_SLOTS }])
+      this.playerStore.grant([{ id: fromName(ItemID, 'ItemID', seed), amount: PLOT_SLOTS }], 'lossy')
       const planted = this.playerStore.plantSeed(fromName(ItemID, 'ItemID', seed), PLOT_SLOTS)
       if (!planted) console.warn('dev.plantAll: nothing planted (not a seed, expertise too low, or every plot busy)')
       return planted
@@ -256,7 +256,7 @@ export class DevCheatsComponent {
 
   private addItem(item: Ref<typeof ItemID>, amount: number, tier: Ref<typeof ItemTier> | undefined, upgradeLevel: number): void {
     const id = fromName(ItemID, 'ItemID', item)
-    this.playerStore.addItems([{ id, tier: this.tierOf(id, tier), amount, upgradeLevel }])
+    this.playerStore.grant([{ id, tier: this.tierOf(id, tier), amount, upgradeLevel }], 'lossy')
   }
 
   private unlockFeature(feature: DevFeature): void {
@@ -342,8 +342,8 @@ export class DevCheatsComponent {
   giveAllItems() {
     const stacks = allItemStacks(100)
     // Capacity is derived, so each round of slots counts at once. The cap only stops a bug from looping forever.
-    for (let rounds = 0; !this.playerStore.canFitItems(stacks) && rounds < 20; rounds++) this.giveSlots()
-    this.playerStore.addItems(stacks)
+    for (let rounds = 0; !this.playerStore.canGrant(stacks) && rounds < 20; rounds++) this.giveSlots()
+    this.playerStore.grant(stacks, 'lossy')
   }
 
   boostStats() {
@@ -351,6 +351,6 @@ export class DevCheatsComponent {
   }
 
   giveMachete() {
-    this.playerStore.addItems([{ id: ItemID.machete, tier: ItemTier.uncommon, amount: 1 }])
+    this.playerStore.grant([{ id: ItemID.machete, tier: ItemTier.uncommon, amount: 1 }], 'lossy')
   }
 }

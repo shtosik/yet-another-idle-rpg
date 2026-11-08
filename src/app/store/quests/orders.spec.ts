@@ -109,14 +109,14 @@ describe('repeatable orders', () => {
 
   it('changes nothing when the completion is rejected', () => {
     quests.startQuest(ORDER)
-    player.addItems([{ id: ItemID.crabMeat, amount: 9 }])
+    player.grant([{ id: ItemID.crabMeat, amount: 9 }], 'lossy')
     const before = snapshot()
 
     expect(quests.completeOrder(ORDER, clock)).toBeFalse()
     expect(snapshot()).toEqual(before)
     expect(TestBed.inject(ModalService).openQuestCompleted).not.toHaveBeenCalled()
 
-    player.addItems([{ id: ItemID.crabMeat, amount: 1 }])
+    player.grant([{ id: ItemID.crabMeat, amount: 1 }], 'lossy')
     quests.recordTurnIn(KEY, clock) // a cooling cheat or loaded save still rejects
     const cooling = snapshot()
     expect(quests.completeOrder(ORDER, clock)).toBeFalse()
@@ -125,7 +125,7 @@ describe('repeatable orders', () => {
 
   it('completes atomically: items, rewards, cooldown, history, and the next start is free', () => {
     quests.startQuest(ORDER)
-    player.addItems([{ id: ItemID.crabMeat, amount: 12 }])
+    player.grant([{ id: ItemID.crabMeat, amount: 12 }], 'lossy')
     const before = snapshot()
 
     expect(quests.completeOrder(ORDER, clock)).toBeTrue()
@@ -147,10 +147,10 @@ describe('repeatable orders', () => {
     const bundle = { type: 'reputationTurnIn', npcId: NpcID.laHarparBartender } as const
     quests.startQuest(ORDER) // reserves 10 Crab Meat; a bundle is 20
 
-    player.addItems([{ id: ItemID.crabMeat, amount: 25 }])
+    player.grant([{ id: ItemID.crabMeat, amount: 25 }], 'lossy')
     expect(dialogue.turnIn(bundle)).toEqual(jasmine.objectContaining({ kept: 10, bundles: 0 }))
 
-    player.addItems([{ id: ItemID.crabMeat, amount: 5 }])
+    player.grant([{ id: ItemID.crabMeat, amount: 5 }], 'lossy')
     expect(dialogue.turnIn(bundle).bundles).toBe(1)
   })
 
@@ -158,7 +158,7 @@ describe('repeatable orders', () => {
     describe(`through the dialogue ${action} route`, () => {
       it('completes the same way', () => {
         quests.startQuest(ORDER)
-        player.addItems([{ id: ItemID.crabMeat, amount: 10 }])
+        player.grant([{ id: ItemID.crabMeat, amount: 10 }], 'lossy')
 
         dialogue.selectOption(option(action))
 
@@ -167,7 +167,7 @@ describe('repeatable orders', () => {
 
       it('rejects the same way', () => {
         quests.startQuest(ORDER)
-        player.addItems([{ id: ItemID.crabMeat, amount: 9 }])
+        player.grant([{ id: ItemID.crabMeat, amount: 9 }], 'lossy')
         const before = snapshot()
 
         dialogue.selectOption(option(action))
@@ -179,7 +179,7 @@ describe('repeatable orders', () => {
 
   it('has its own cooldown, per turn-in', () => {
     quests.startQuest(ORDER)
-    player.addItems([{ id: ItemID.crabMeat, amount: 10 }])
+    player.grant([{ id: ItemID.crabMeat, amount: 10 }], 'lossy')
     quests.completeOrder(ORDER, clock)
     cooldowns.tick(clock)
 

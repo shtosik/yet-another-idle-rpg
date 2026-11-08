@@ -37,10 +37,7 @@ import { DamageElement } from '../../../enums/damage-element.enum'
 import { withDevtools } from '../helpers/devtools'
 import { saveGameStateNow, SaveMigrations, withGameStateSync } from '../helpers/with-game-state-sync.hook'
 import {
-  addItems,
   stackKey,
-  lostItems,
-  canFit,
   countFreeSlots,
   countItem,
   createInventories,
@@ -50,7 +47,6 @@ import {
   InventoryTab,
   ItemStack,
   MissingSlots,
-  missingSlotsByTab,
   removeItems,
   resizeInventory,
   SlotDeltas,
@@ -60,9 +56,10 @@ import {
   tabOf,
   withSlotDeltas,
 } from './inventory'
-import { canInstall, evaluateRecipe, installStations, Stations } from './camp'
+import { canGrant, grantItems, grantMissing, GrantMode, GrantReport, GrantState } from './grant'
+import { canInstall, evaluateRecipe, Stations } from './camp'
 import { FARM_SEEDS } from '../../../data/farming-data'
-import { addSeeds, FarmState, harvest as harvestPlot, harvestAll as harvestEveryPlot, initialFarm, isFarmUnlocked, plant as plantInPlot, plantAll as plantEveryPlot, seedStacks, syncPlots, takeSeeds } from './farm'
+import { FarmState, harvest as harvestPlot, harvestAll as harvestEveryPlot, initialFarm, isFarmUnlocked, plant as plantInPlot, plantAll as plantEveryPlot, syncPlots } from './farm'
 import { ReputationGain, reputationTier, TierUp } from './reputation'
 import { newProfession, professionLevel, professionLevels, Professions, settleProfession } from './professions'
 import { ProfessionID } from '../../../enums/ids/profession-id.enum'
@@ -239,6 +236,15 @@ const handleExperience = (resources: Resources) => {
 }
 
 /** Takes `items` out; a kept chest roll goes with the last chest of its id at any upgrade level (sold, destroyed), so a later one rolls fresh. */
+type StateSignals<K extends keyof PlayerState> = { [P in K]: () => PlayerState[P] }
+
+const grantStateOf = (store: StateSignals<'inventory' | 'stations' | 'farm' | 'spellbookUnlocked'>): GrantState => ({
+  inventory: store.inventory(),
+  stations: store.stations(),
+  seeds: store.farm().seeds,
+  spellbookUnlocked: store.spellbookUnlocked(),
+})
+
 const withoutItems = (state: PlayerState, items: ItemStack[]): Pick<PlayerState, 'inventory' | 'rolledChests'> => {
   const inventory = removeItems(state.inventory, items)
   const rolledChests = Object.fromEntries(Object.entries(state.rolledChests).filter(([key]) => {
@@ -400,19 +406,24 @@ export const PlayerStore = signalStore(
     },
 
     /**
-     * Station upgrades install (each shows its notice, whoever gave it) and seeds are counted instead of entering the
-     * inventory. Returns the upgrades installed.
+     * The only writer of an Item grant (`grantItems`): seeds go to the seed store, books unlock, station gear installs
+     * (each shows its notice, whoever gave it), the rest goes to its tab. `removing` is taken out first. Atomic changes
+     * nothing when anything doesn't fit (see `missing`); lossy is for kills only.
      */
-    addItems(items: ItemStack[]): ItemID[] {
-      const { seeds, rest: stored } = takeSeeds(items)
-      const { stations, rest, installed } = installStations(store.stations(), stored)
-      patchState(store, (state) => ({
-        stations,
-        inventory: addItems(state.inventory, store.inventoryCapacity(), rest),
-        farm: { ...state.farm, seeds: addSeeds(state.farm.seeds, seeds) },
-      }))
-      installed.forEach(itemId => modalService.openStationInstalled(itemId))
-      return installed
+    grant(items: ItemStack[], mode: GrantMode, removing: ItemStack[] = []): GrantReport {
+      const before = grantStateOf(store)
+      const { state, ...report } = grantItems(before, store.inventoryCapacity(), items, mode, removing)
+      // A refused grant hands back `before` itself.
+      if (state !== before) {
+        patchState(store, (current) => ({
+          inventory: state.inventory,
+          stations: state.stations,
+          farm: { ...current.farm, seeds: state.seeds },
+          spellbookUnlocked: state.spellbookUnlocked,
+        }))
+      }
+      report.installed.forEach(itemId => modalService.openStationInstalled(itemId))
+      return report
     },
 
     /** Accrues plot growth up to `now` at the rate in force since the last change of `seedGrowthTimeReduction`. */
@@ -443,14 +454,14 @@ export const PlayerStore = signalStore(
       return true
     },
 
-    /** Whether `adding` fits, each item in its tab, after `removing` is taken out first. */
-    canFitItems(adding: ItemStack[], removing: ItemStack[] = []): boolean {
-      return canFit(store.inventory(), store.inventoryCapacity(), adding, removing)
+    /** Whether `grant(adding, 'atomic', removing)` would go through; the same routing, nothing written. */
+    canGrant(adding: ItemStack[], removing: ItemStack[] = []): boolean {
+      return canGrant(grantStateOf(store), store.inventoryCapacity(), adding, removing)
     },
 
-    /** Slots still to free in each tab before `adding` fits, after `removing` is taken out first. */
+    /** Slots still to free in each tab before `adding` can be granted, after `removing` is taken out first. */
     missingSlotsByTab(adding: ItemStack[], removing: ItemStack[] = []): MissingSlots {
-      return missingSlotsByTab(store.inventory(), store.inventoryCapacity(), adding, removing)
+      return grantMissing(grantStateOf(store), store.inventoryCapacity(), adding, removing)
     },
 
     /**
@@ -578,11 +589,11 @@ export const PlayerStore = signalStore(
     canClaimZoneStar(zoneId: ZoneID, star: ZoneStar): boolean {
       const progress = store.zoneMastery()[zoneId].find(p => p.star === star)
       if (!progress?.done || progress.claimed) return false
-      return store.canFitItems(ZONES_DATA[zoneId].masteryReward.items)
+      return store.canGrant(ZONES_DATA[zoneId].masteryReward.items)
     },
   })),
   // Game actions: kills and drops, zone stars, selling, equipping, using items and chests, mana regen, crafting.
-  withMethods((store, modalService = inject(ModalService)) => ({
+  withMethods((store) => ({
     /** `stats` as it would be with only these buffs and consumable effects running (offline buff segments). */
     statsFor(buffSpellIds: SpellID[], consumableItemIds: ItemID[]): PlayerStatsType {
       return deriveStats(store.resources(), Object.values(sourcedModifiersOf(store, buffSpellIds, consumableItemIds)).flat())
@@ -590,27 +601,16 @@ export const PlayerStore = signalStore(
 
     /**
      * The only writer of kill rewards (`KillResolutionService`): XP (with level-ups), gold, wave and enemy kill counts,
-     * shiny kills, task progress and drops, in one state update. A stack that doesn't fit is lost whole.
+     * shiny kills and task progress in one state update; drops go through a lossy `grant`.
      */
     applyKillBatch(batch: KillBatch): KillBatchResult {
       const startLevel = store.resources().level
-      const capacity = store.inventoryCapacity()
-      const { seeds, rest: stored } = takeSeeds(batch.items)
-      const { stations, rest, installed } = installStations(store.stations(), stored)
-      const inventoryBefore = store.inventory()
-      const inventory = addItems(inventoryBefore, capacity, rest)
-      // Each stack arrives whole or not at all; `rest` holds one entry per id + tier + upgradeLevel (rolled into a map).
-      const receivedItems: InventoryItem[] = rest.flatMap(({ id, tier: requestedTier, upgradeLevel }) => {
-        const tier = requestedTier ?? ITEM_DATA[id].tier
-        const amount = countItem(inventory, id, tier, upgradeLevel) - countItem(inventoryBefore, id, tier, upgradeLevel)
-        return amount > 0 ? [{ id, type: ITEM_DATA[id].type, tier, amount, ...(upgradeLevel === undefined ? {} : { upgradeLevel }) }] : []
-      })
-      const lost = lostItems(inventoryBefore, capacity, rest)
-      const lostDrops = lost.reduce((sum, item) => sum + item.amount, 0)
+      // Each stack arrives whole or not at all (one entry per id + tier + upgradeLevel, rolled into a map).
+      const { received, lost, installed } = store.grant(batch.items, 'lossy')
       // Seeds are counted before the farm unlocks too, but only listed after it; they are never lost.
-      if (isFarmUnlocked(store.unlockedContent())) {
-        receivedItems.push(...seedStacks(seeds).map(({ id, amount }) => ({ id, type: ItemType.seed, tier: ITEM_DATA[id].tier, amount })))
-      }
+      const farmUnlocked = isFarmUnlocked(store.unlockedContent())
+      const receivedItems = received.filter(item => farmUnlocked || item.type !== ItemType.seed)
+      const lostDrops = lost.reduce((sum, item) => sum + item.amount, 0)
 
       patchState(store, (state) => {
         const resources = { ...state.resources }
@@ -629,9 +629,6 @@ export const PlayerStore = signalStore(
           resources,
           enemyKillCounts,
           shinyKillsByZone: addShinyKills(state.shinyKillsByZone, batch.zoneId, batch.shinies),
-          stations,
-          inventory,
-          farm: { ...state.farm, seeds: addSeeds(state.farm.seeds, seeds) },
           zonesProgression: {
             ...state.zonesProgression,
             [batch.zoneId]: { ...zoneProgression, [batch.wave]: (zoneProgression?.[batch.wave] ?? 0) + batch.kills },
@@ -644,7 +641,6 @@ export const PlayerStore = signalStore(
         }
       })
 
-      installed.forEach(itemId => modalService.openStationInstalled(itemId))
       return { levelsGained: store.resources().level - startLevel, receivedItems, lost, lostDrops, installedStations: installed }
     },
 
@@ -653,8 +649,8 @@ export const PlayerStore = signalStore(
       if (!store.canClaimZoneStar(zoneId, star)) return false
       const { gold, explorerTokens, items } = ZONES_DATA[zoneId].masteryReward
 
+      store.grant(items, 'atomic')
       store.updatePlayerStats([{ stat: 'goldCoins', amount: gold }])
-      store.addItems(items)
       patchState(store, (state) => ({
         explorerTokens: state.explorerTokens + explorerTokens,
         claimedZoneStars: { ...state.claimedZoneStars, [zoneId]: [...(state.claimedZoneStars[zoneId] ?? []), star] },
@@ -696,12 +692,10 @@ export const PlayerStore = signalStore(
       const slotKey = EquipmentSlot[itemData.slot] as EquipmentSlotKey
       const currentlyEquipped = store.equipment()[slotKey]
 
-      // Remove first so the swapped-out item always has a free slot to return to.
-      store.removeItems([{ id: item.id, tier: item.tier, upgradeLevel: item.upgradeLevel, amount: 1 }])
-
-      if (currentlyEquipped) {
-        store.addItems([{ id: currentlyEquipped.id, tier: currentlyEquipped.tier, upgradeLevel: currentlyEquipped.upgradeLevel, amount: 1 }])
-      }
+      // Taken out first so the swapped-out item always has a free slot to return to.
+      const swappedOut = currentlyEquipped ? [{ id: currentlyEquipped.id, tier: currentlyEquipped.tier, upgradeLevel: currentlyEquipped.upgradeLevel, amount: 1 }] : []
+      const { missing } = store.grant(swappedOut, 'atomic', [{ id: item.id, tier: item.tier, upgradeLevel: item.upgradeLevel, amount: 1 }])
+      if (Object.keys(missing).length > 0) return
 
       patchState(store, (state) => ({
         equipment: { ...state.equipment, [slotKey]: { id: item.id, tier: item.tier, upgradeLevel: item.upgradeLevel } },
@@ -713,7 +707,8 @@ export const PlayerStore = signalStore(
 
       if (!equippedItem || !store.canUnequip(slot)) return
 
-      store.addItems([{ id: equippedItem.id, tier: equippedItem.tier, upgradeLevel: equippedItem.upgradeLevel, amount: 1 }])
+      const { missing } = store.grant([{ id: equippedItem.id, tier: equippedItem.tier, upgradeLevel: equippedItem.upgradeLevel, amount: 1 }], 'atomic')
+      if (Object.keys(missing).length > 0) return
 
       patchState(store, (state) => ({
         equipment: { ...state.equipment, [slot]: null },
@@ -725,8 +720,7 @@ export const PlayerStore = signalStore(
       const itemData = ITEM_DATA[item.id]
       if (itemData.type !== ItemType.stationUpgrade || !canInstall(store.stations(), itemData)) return false
 
-      store.removeItems([{ id: item.id, tier: item.tier, upgradeLevel: item.upgradeLevel, amount: 1 }])
-      store.addItems([{ id: item.id, amount: 1 }])
+      store.grant([{ id: item.id, amount: 1 }], 'atomic', [{ id: item.id, tier: item.tier, upgradeLevel: item.upgradeLevel, amount: 1 }])
       return true
     },
 
@@ -763,20 +757,17 @@ export const PlayerStore = signalStore(
       const bonusEligible = !!bonus && (store.permanentBonuses()[bonus.registeredStat] ?? 0) === 0
         && countItem(store.inventory(), bonus.itemId) === 0
       const contents = store.rolledChests()[item.id] ?? rollChest(itemData, rng, bonusEligible, store.stats().seedDropChance)
-      const missing = store.missingSlotsByTab(contents.items, [chest])
+      const { missing } = store.grant(contents.items, 'atomic', [chest])
       const rolledChests = { ...store.rolledChests() }
       const blocked = Object.keys(missing).length > 0
 
       if (blocked) {
         rolledChests[item.id] = contents
-        patchState(store, { rolledChests })
       } else {
         delete rolledChests[item.id]
-        patchState(store, { rolledChests })
-        store.removeItems([chest])
         if (contents.gold) store.updatePlayerStats([{ stat: 'goldCoins', amount: contents.gold }])
-        if (contents.items.length) store.addItems(contents.items)
       }
+      patchState(store, { rolledChests })
       saveGameStateNow()
       return { contents: blocked ? null : contents, missing }
     },
@@ -812,9 +803,9 @@ export const PlayerStore = signalStore(
       const count = Math.min(times, maxCraftable)
       if (blockReason || count < 1) return { crafted: 0, installed: [] }
 
-      store.removeItems(recipeData.itemsNeeded.map(({ id, amount }) => ({ id, amount: amount * count })))
-      const installed = store.addItems([{ id: recipeData.itemId, amount: recipeData.createsAmount * count }])
-      return { crafted: count, installed }
+      const ingredients = recipeData.itemsNeeded.map(({ id, amount }) => ({ id, amount: amount * count }))
+      const { installed, missing } = store.grant([{ id: recipeData.itemId, amount: recipeData.createsAmount * count }], 'atomic', ingredients)
+      return { crafted: Object.keys(missing).length > 0 ? 0 : count, installed }
     },
 
     itemCount(id: ItemID, tier?: ItemTier, upgradeLevel = 0): number {
@@ -908,7 +899,7 @@ export const PlayerStore = signalStore(
       const stats = store.stats()
       let notFitting: ItemStack[] = []
       const fits = (crops: ItemStack[]) => {
-        const ok = store.canFitItems(crops)
+        const ok = store.canGrant(crops)
         if (!ok) notFitting = crops
         return ok
       }
@@ -917,7 +908,7 @@ export const PlayerStore = signalStore(
       const result = plotIndex === undefined ? harvestEveryPlot(farm, ctx) : harvestPlot(farm, plotIndex, ctx)
       const blocked = 'blocked' in result ? result.blocked : result.status === 'blocked'
       patchState(store, { farm: result.farm })
-      if (result.crops.length) store.addItems(result.crops)
+      if (result.crops.length) store.grant(result.crops, 'atomic')
       return { crops: result.crops, xp: result.xp, blocked, missing: blocked ? store.missingSlotsByTab(notFitting) : {} }
     },
 

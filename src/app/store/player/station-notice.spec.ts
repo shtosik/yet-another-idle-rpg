@@ -21,10 +21,10 @@ describe('Station installed notice', () => {
   afterEach(() => localStorage.clear())
 
   it('shows once per install, whoever gave the gear', () => {
-    player.addItems([{ id: ItemID.firePit, amount: 1 }])
+    player.grant([{ id: ItemID.firePit, amount: 1 }], 'lossy')
     expect(modal.openStationInstalled).toHaveBeenCalledOnceWith(ItemID.firePit)
 
-    player.addItems([{ id: ItemID.firePit, amount: 1 }])
+    player.grant([{ id: ItemID.firePit, amount: 1 }], 'lossy')
     expect(modal.openStationInstalled).toHaveBeenCalledTimes(1)
   })
 

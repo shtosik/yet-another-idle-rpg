@@ -32,7 +32,7 @@ describe('Weapon spells', () => {
   afterEach(() => localStorage.clear())
 
   function equip(id: ItemID) {
-    player.addItems([{ id, amount: 1 }])
+    player.grant([{ id, amount: 1 }], 'lossy')
     const item = player.inventory().gear.find(slot => slot?.id === id)
     if (!item) throw new Error('Test weapon missing')
     player.equipItem(item)

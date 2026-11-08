@@ -40,7 +40,7 @@ describe('PlayerStore.mergeItem', () => {
   }
 
   it('takes two copies from one stack, treating missing and explicit +0 alike', () => {
-    store.addItems([item(undefined, 4), item(2, 3)])
+    store.grant([item(undefined, 4), item(2, 3)], 'lossy')
     const cost = ITEM_DATA[id].value * UPGRADE_COST_FACTOR
     expect(store.mergeItem(inventorySource(), inventorySource(item(0)), () => 0.999)).toEqual({ status: 'success', cost })
     expect(store.itemCount(id, tier)).toBe(2)
@@ -51,14 +51,14 @@ describe('PlayerStore.mergeItem', () => {
 
   it('requires two owned copies, ignoring the caller-supplied stack amount', () => {
     expectRefusal(inventorySource(), inventorySource(), 'missingCopy')
-    store.addItems([item()])
+    store.grant([item()], 'lossy')
     expectRefusal(inventorySource(item(undefined, 99)), inventorySource(), 'missingCopy')
     store.equipItem(item())
     expectRefusal(equippedSource, equippedSource, 'missingCopy')
   })
 
   it('upgrades an equipped base in place and derives its stats from the new level', () => {
-    store.addItems([item(4, 2)])
+    store.grant([item(4, 2)], 'lossy')
     store.equipItem(item(4))
     expect(store.mergeItem(equippedSource, inventorySource(item(4)), () => 0).status).toBe('success')
     expect(store.equipment().weapon).toEqual({ id, tier, upgradeLevel: 5 })
@@ -68,7 +68,7 @@ describe('PlayerStore.mergeItem', () => {
   })
 
   it('empties an equipped sacrifice slot and returns the upgraded base to the inventory', () => {
-    store.addItems([item(1, 3)])
+    store.grant([item(1, 3)], 'lossy')
     store.equipItem(item(1))
     expect(store.mergeItem(inventorySource(item(1)), equippedSource, () => 0).status).toBe('success')
     expect(store.equipment().weapon).toBeNull()
@@ -78,14 +78,14 @@ describe('PlayerStore.mergeItem', () => {
   })
 
   it('refuses mismatched ids, rarities and upgrade levels', () => {
-    store.addItems([item(), item(1), { ...item(), tier: ItemTier.legendary }, item(0, 1, ItemID.makeshiftClub)])
+    store.grant([item(), item(1), { ...item(), tier: ItemTier.legendary }, item(0, 1, ItemID.makeshiftClub)], 'lossy')
     expectRefusal(inventorySource(), inventorySource(item(1)), 'mismatch')
     expectRefusal(inventorySource(), inventorySource({ ...item(), tier: ItemTier.legendary }), 'mismatch')
     expectRefusal(inventorySource(), inventorySource(item(0, 1, ItemID.makeshiftClub)), 'mismatch')
   })
 
   it('refuses gold shortfalls and allows spending exactly the cost', () => {
-    store.addItems([item(3, 2)])
+    store.grant([item(3, 2)], 'lossy')
     const cost = mergeCost(ITEM_DATA[id].value, 3)
     store.updatePlayerStats([{ stat: 'goldCoins', amount: cost - 1 - store.resources().goldCoins }])
     expectRefusal(inventorySource(item(3)), inventorySource(item(3)), 'notEnoughGold')
@@ -100,20 +100,20 @@ describe('PlayerStore.mergeItem', () => {
       [ItemID.petGreenSlime, 'pet'], [ItemID.stick, 'notEquipment'],
     ] as const) {
       const stack = item(0, 2, itemId)
-      store.addItems([stack])
+      store.grant([stack], 'lossy')
       expectRefusal(inventorySource(stack), inventorySource(stack), reason)
     }
-    store.addItems([item(UPGRADE_LEVEL_CAP, 2)])
+    store.grant([item(UPGRADE_LEVEL_CAP, 2)], 'lossy')
     expectRefusal(inventorySource(item(UPGRADE_LEVEL_CAP)), inventorySource(item(UPGRADE_LEVEL_CAP)), 'atCap')
   })
 
   function fillGear() {
-    store.addItems(Object.values(ITEM_DATA).filter(data => tabOf(data.id) === 'gear' && data.id !== id)
-      .slice(0, store.inventoryCapacity().gear - 1).map(data => ({ id: data.id, amount: 1 })))
+    store.grant(Object.values(ITEM_DATA).filter(data => tabOf(data.id) === 'gear' && data.id !== id)
+      .slice(0, store.inventoryCapacity().gear - 1).map(data => ({ id: data.id, amount: 1 })), 'lossy')
   }
 
   it('refuses a new upgraded stack in a full tab, but can reuse the slot of a consumed stack', () => {
-    store.addItems([item(0, 3)])
+    store.grant([item(0, 3)], 'lossy')
     fillGear()
     const before = store.inventory()
     expect(store.mergeItem(inventorySource(), inventorySource(), () => 0)).toEqual({ status: 'refused', reason: 'inventoryFull', tab: 'gear' })
@@ -125,7 +125,7 @@ describe('PlayerStore.mergeItem', () => {
   })
 
   it('merges into an equipped base with a full Gear tab', () => {
-    store.addItems([item(0, 3)])
+    store.grant([item(0, 3)], 'lossy')
     store.equipItem(item())
     fillGear()
     expect(store.mergeItem(equippedSource, inventorySource(), () => 0).status).toBe('success')

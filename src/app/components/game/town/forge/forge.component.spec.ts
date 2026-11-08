@@ -84,7 +84,7 @@ describe('Forge panel and gear sources', () => {
   })
 
   it('hides the chance and cost until the selection can be merged', async () => {
-    player.addItems([stack()])
+    player.grant([stack()], 'lossy')
     select()
     await fixture.whenStable()
     expect(forge.preview()).toBeNull()
@@ -93,7 +93,7 @@ describe('Forge panel and gear sources', () => {
   })
 
   it('shows a gold refusal in the accessible label while retaining the compact Upgrade text', async () => {
-    player.addItems([stack()])
+    player.grant([stack()], 'lossy')
     selectPair()
     expect(forge.evaluation()).toEqual({ status: 'refused', reason: 'notEnoughGold' })
     expect(forge.preview()?.upgradeLevel).toBe(1)
@@ -105,21 +105,21 @@ describe('Forge panel and gear sources', () => {
   })
 
   it('explains unique gear', async () => {
-    player.addItems([stack(2, 0, ItemID.joshsHeirloom)])
+    player.grant([stack(2, 0, ItemID.joshsHeirloom)], 'lossy')
     selectPair(stack(2, 0, ItemID.joshsHeirloom))
     expect(forge.preview()).toBeNull()
     await expectBlocked('Unique gear cannot be upgraded')
   })
 
   it('explains the cap without previewing an unavailable +6', async () => {
-    player.addItems([stack(2, 5)])
+    player.grant([stack(2, 5)], 'lossy')
     selectPair(stack(2, 5))
     expect(forge.preview()).toBeNull()
     await expectBlocked('Already at +5 cap')
   })
 
   it('ignores a second activation of the same equipped slot', async () => {
-    player.addItems([stack(1)])
+    player.grant([stack(1)], 'lossy')
     player.equipItem(stack(1))
     selection.select({ from: 'equipped', slot: 'weapon' })
     selection.select({ from: 'equipped', slot: 'weapon' })
@@ -135,7 +135,7 @@ describe('Forge panel and gear sources', () => {
     ['upgrade level', stack(1, 1)],
   ] as const) {
     it(`refuses a different ${difference} and marks both inputs`, async () => {
-      player.addItems([stack(1), other])
+      player.grant([stack(1), other], 'lossy')
       select(stack(1))
       select(other)
       expect(forge.evaluation()).toEqual({ status: 'refused', reason: 'mismatch' })
@@ -151,9 +151,9 @@ describe('Forge panel and gear sources', () => {
 
   it('names the full inventory tab from evaluateMerge', async () => {
     player.updatePlayerStats([{ stat: 'goldCoins', amount: 100000 }])
-    player.addItems([stack(3)])
-    player.addItems(Object.values(ITEM_DATA).filter(data => tabOf(data.id) === 'gear' && data.id !== id)
-      .slice(0, player.inventoryCapacity().gear - 1).map(data => ({ id: data.id, amount: 1 })))
+    player.grant([stack(3)], 'lossy')
+    player.grant(Object.values(ITEM_DATA).filter(data => tabOf(data.id) === 'gear' && data.id !== id)
+      .slice(0, player.inventoryCapacity().gear - 1).map(data => ({ id: data.id, amount: 1 })), 'lossy')
     selectPair(stack(3))
     expect(forge.evaluation()).toEqual({ status: 'refused', reason: 'inventoryFull', tab: 'gear' })
     expect(forge.preview()?.upgradeLevel).toBe(1)
@@ -162,7 +162,7 @@ describe('Forge panel and gear sources', () => {
 
   it('drops into explicit inputs, previews milestone stats and upgrades an equipped base in place', async () => {
     player.updatePlayerStats([{ stat: 'goldCoins', amount: 100000 }])
-    player.addItems([stack(2, 4)])
+    player.grant([stack(2, 4)], 'lossy')
     player.equipItem(stack(1, 4))
     const inventory = TestBed.createComponent(InventoryWindow)
     const equipment = TestBed.createComponent(EquipmentComponent)
@@ -199,7 +199,7 @@ describe('Forge panel and gear sources', () => {
 
   it('consumes an equipped copy dropped into the second input and follows the inventory result', async () => {
     player.updatePlayerStats([{ stat: 'goldCoins', amount: 100000 }])
-    player.addItems([stack(3)])
+    player.grant([stack(3)], 'lossy')
     player.equipItem(stack(1))
     const equipment = TestBed.createComponent(EquipmentComponent)
     await equipment.whenStable()
@@ -218,7 +218,7 @@ describe('Forge panel and gear sources', () => {
 
   it('fills both inputs by clicking the same inventory stack twice and follows the upgraded result', async () => {
     player.updatePlayerStats([{ stat: 'goldCoins', amount: 100000 }])
-    player.addItems([stack()])
+    player.grant([stack()], 'lossy')
     const inventory = TestBed.createComponent(InventoryWindow)
     await inventory.whenStable()
     await fixture.whenStable()
@@ -239,7 +239,7 @@ describe('Forge panel and gear sources', () => {
   })
 
   it('does not put a single owned copy into both inputs', async () => {
-    player.addItems([stack(1)])
+    player.grant([stack(1)], 'lossy')
     selectPair(stack(1))
     expect(forge.base()?.from).toBe('inventory')
     expect(forge.sacrifice()).toBeNull()
@@ -249,7 +249,7 @@ describe('Forge panel and gear sources', () => {
 
   it('does not reuse the only upgraded copy as the sacrifice after an upgrade', () => {
     player.updatePlayerStats([{ stat: 'goldCoins', amount: 100000 }])
-    player.addItems([stack()])
+    player.grant([stack()], 'lossy')
     selectPair()
     forge.merge()
     expect(player.itemCount(id, tier, 1)).toBe(1)
@@ -271,7 +271,7 @@ describe('Forge panel and gear sources', () => {
   })
 
   it('ignores a targeted drop of the same equipped slot into the other input', async () => {
-    player.addItems([stack(1)])
+    player.grant([stack(1)], 'lossy')
     player.equipItem(stack(1))
     const equipment = TestBed.createComponent(EquipmentComponent)
     await equipment.whenStable()
@@ -292,7 +292,7 @@ describe('Forge panel and gear sources', () => {
   })
 
   it('uses click and keyboard activation to select inventory gear instead of equipping it', async () => {
-    player.addItems([stack()])
+    player.grant([stack()], 'lossy')
     const inventory = TestBed.createComponent(InventoryWindow)
     await inventory.whenStable()
     const button: HTMLButtonElement = inventory.nativeElement.querySelector('.item__action')
@@ -307,7 +307,7 @@ describe('Forge panel and gear sources', () => {
   })
 
   it('uses click and keyboard activation to select equipment instead of unequipping it', async () => {
-    player.addItems([stack()])
+    player.grant([stack()], 'lossy')
     player.equipItem(stack(1))
     const equipment = TestBed.createComponent(EquipmentComponent)
     await equipment.whenStable()
@@ -324,7 +324,7 @@ describe('Forge panel and gear sources', () => {
 
   it('empties each filled input on mouse or keyboard activation, and focuses Gear from an empty input', async () => {
     const focusGear = spyOn(forge, 'focusGear')
-    player.addItems([stack()])
+    player.grant([stack()], 'lossy')
     await fixture.whenStable()
     for (const detail of [1, 0]) {
       selectPair()
@@ -373,7 +373,7 @@ describe('Forge panel and gear sources', () => {
   })
 
   it('shows the refusal in the output tooltip, keyboard-accessible, and dismisses it with Escape', async () => {
-    player.addItems([stack()])
+    player.grant([stack()], 'lossy')
     selectPair()
     await fixture.whenStable()
     // A headless window never has focus, so `.focus()` fires no focus event; dispatch it directly.
@@ -391,7 +391,7 @@ describe('Forge panel and gear sources', () => {
   for (const source of ['inventory', 'equipped']) {
     it(`clears only the sacrifice after a failure with an ${source} base`, () => {
       player.updatePlayerStats([{ stat: 'goldCoins', amount: 100000 }])
-      player.addItems([stack(3)])
+      player.grant([stack(3)], 'lossy')
       if (source === 'equipped') {
         player.equipItem(stack(1))
         selection.select({ from: 'equipped', slot: 'weapon' })
@@ -411,7 +411,7 @@ describe('Forge panel and gear sources', () => {
 
   it('keeps both inputs if the store refuses an attempt', () => {
     player.updatePlayerStats([{ stat: 'goldCoins', amount: 100000 }])
-    player.addItems([stack()])
+    player.grant([stack()], 'lossy')
     selectPair()
     const base = selection.base()
     const sacrifice = selection.sacrifice()

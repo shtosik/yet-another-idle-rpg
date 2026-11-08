@@ -33,7 +33,7 @@ describe('Marta dialogue', () => {
     questsStore.startQuest(QuestID.silkAndWater)
     questsStore.endQuest(QuestID.silkAndWater)
     questsStore.startQuest(QuestID.seedsFromTheTerrace)
-    playerStore.addItems([{ id: ItemID.guildLetter, amount: 1 }])
+    playerStore.grant([{ id: ItemID.guildLetter, amount: 1 }], 'lossy')
     dialogue.startDialogue(NpcID.farmWarden)
 
     expect(dialogue.activeNode()?.id).toBe(WardenDialogue.intro1)
@@ -49,7 +49,7 @@ describe('Marta dialogue', () => {
     questsStore.startQuest(QuestID.silkAndWater)
     questsStore.endQuest(QuestID.silkAndWater)
     questsStore.startQuest(QuestID.seedsFromTheTerrace)
-    playerStore.addItems([{ id: ItemID.guildLetter, amount: 1 }])
+    playerStore.grant([{ id: ItemID.guildLetter, amount: 1 }], 'lossy')
     dialogue.startDialogue(NpcID.farmWarden)
 
     const intro = FARM_WARDEN[WardenDialogue.intro1]
@@ -74,14 +74,14 @@ describe('Marta dialogue', () => {
     expect(dialogue.getActiveResult(option(hub, 'default.furrowProgress'))?.next).toBe(WardenDialogue.questFurrowProgress)
     expect(dialogue.getActiveResult(option(hub, 'default.furrowTurnIn'))).toBeUndefined()
 
-    playerStore.addItems([{ id: ItemID.turnip, amount: 4 }])
+    playerStore.grant([{ id: ItemID.turnip, amount: 4 }], 'lossy')
     expect(dialogue.getActiveResult(option(hub, 'default.furrowProgress'))).toBeUndefined()
     expect(dialogue.getActiveResult(option(hub, 'default.furrowTurnIn'))?.next).toBe(WardenDialogue.questFurrowComplete)
   })
 
   it('pays The First Furrow with the Turnip Stew Recipe, which The Growers\' Table needs', () => {
     questsStore.startQuest(QuestID.theFirstFurrow)
-    playerStore.addItems([{ id: ItemID.turnip, amount: 4 }])
+    playerStore.grant([{ id: ItemID.turnip, amount: 4 }], 'lossy')
     dialogue.startDialogue(NpcID.farmWarden)
 
     dialogue.selectOption(option(FARM_WARDEN[WardenDialogue.default], 'default.furrowTurnIn'))

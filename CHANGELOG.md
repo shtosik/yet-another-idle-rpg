@@ -8,6 +8,7 @@ New notes go under `[Unreleased]`; `npm run release -- <major|minor|patch>` move
 ## [Unreleased]
 - [bug] Quest item drops now stop at the amount an Order asks for.
 - [bug] An NPC's wait time now counts its Orders' cooldowns.
+- [bug] Quest rewards are never lost to a full inventory.
 
 ## [0.3.0] - 2026-11-07
 - [feature] The new game version notice moved from the bottom of the screen to the notification bar. Click it to save and reload.

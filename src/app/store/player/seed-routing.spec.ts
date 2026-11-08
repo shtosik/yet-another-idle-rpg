@@ -55,8 +55,8 @@ describe('seed routing', () => {
   })
 
   it('counts added seeds in the farm, never in the inventory', () => {
-    store.addItems(seeds)
-    store.addItems(seeds)
+    store.grant(seeds, 'lossy')
+    store.grant(seeds, 'lossy')
 
     expect(store.farm().seeds[ItemID.turnipSeeds]).toBe(6)
     expect(inventoryHasNoSeeds()).toBeTrue()
