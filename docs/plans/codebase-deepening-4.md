@@ -38,7 +38,7 @@ One rule moves a quest forward and pays it.
 - Specs (`quest-transition.spec.ts`): last step with a full inventory changes nothing; an Order with a cooldown running is refused; an Order whose rewards don't fit is refused with items kept and no cooldown; the multiplier is the same for an Order and a harvest. `quest-drop-cap.spec.ts` and the dialogue specs pass unchanged.
 - Docs: `quests.md`, `farming.md`.
 
-### 4. Gear plan and unlocked content (M, Sonnet)
+### 4. Gear plan and unlocked content (M, Sonnet) ✅
 - Pure `store/player/equipment.ts`: a **Gear plan** for equip or unequip (stacks removed, stacks returned, slot change). `canEquip`/`equipItem` (`player.store.ts:553-583`) and `canUnequip`/`unequipItem` (`:667-692`) read the same plan, so a check and its write can't disagree. One helper builds the `{ id, tier, upgradeLevel, amount: 1 }` stack.
 - `unlockZone`, `unlockTown`, `unlockSite` (`:807-830`) share one include-or-append; the default zone list (`[horseshoeBeach]`, `:810` and `:827`) lives once. `UnlockService` keeps the interface from deepening 1.
 - Never lower an inventory slot bonus: the plan only moves slot bonuses that gear already gives; the slot-bonus spec from deepening 3 must pass.

@@ -22,7 +22,7 @@ import { addShinyKills, masteryModifiers, ZoneStar, zoneStarProgress, ZoneStarPr
 import { sellPrice } from '../shop/shop-prices'
 import { ShopID } from '../../../enums/ids/shop-id.enum'
 import { ShopCurrency } from '../../../types/shop/shop.type'
-import { EquipmentSlot, EquipmentSlotKey } from '../../../enums/equipment-slot.enum'
+import { EquipmentSlotKey } from '../../../enums/equipment-slot.enum'
 import { ItemType } from '../../../enums/items/item-type.enum'
 import RECIPES_DATA from '../../../data/recipes-data'
 import { RecipeID } from '../../../enums/ids/recipe-id.enum'
@@ -50,7 +50,6 @@ import {
   removeItems,
   resizeInventory,
   SlotDeltas,
-  slotDeltas,
   splitInventory,
   blockedTab,
   tabOf,
@@ -58,6 +57,8 @@ import {
 } from './inventory'
 import { canGrant, grantItems, grantMissing, GrantMode, GrantReport, GrantState } from './grant'
 import { canInstall, evaluateRecipe, Stations } from './camp'
+import { GearPlan, planEquip, planUnequip } from './equipment'
+import { DEFAULT_ZONES, isUnlocked, withUnlocked } from './unlocked-content'
 import { FARM_SEEDS } from '../../../data/farming-data'
 import { FarmState, harvest as harvestPlot, harvestAll as harvestEveryPlot, initialFarm, isFarmUnlocked, plant as plantInPlot, plantAll as plantEveryPlot, syncPlots } from './farm'
 import { ReputationGain, reputationTier, TierUp } from './reputation'
@@ -83,7 +84,6 @@ import {
   deriveStats,
   equipmentModifiers,
   expertiseModifiers,
-  gearModifiers,
   foodMultiplierOf,
   initialResources,
   isResourceStat,
@@ -167,7 +167,7 @@ export const initialState: PlayerState = {
   professions: {},
   farm: initialFarm,
   unlockedContent: {
-    zones: [ZoneID.horseshoeBeach],
+    zones: DEFAULT_ZONES,
     towns: [],
   },
   campUnlocked: false,
@@ -558,23 +558,21 @@ export const PlayerStore = signalStore(
     },
 
     canUnequip(slot: EquipmentSlotKey): boolean {
-      const equipped = store.equipment()[slot]
-      if (!equipped) return false
-      return store.canChangeInventorySlots(
-        slotDeltas([], gearModifiers(equipped)),
-        [{ id: equipped.id, tier: equipped.tier, upgradeLevel: equipped.upgradeLevel, amount: 1 }],
-      )
+      const plan = planUnequip(slot, store.equipment())
+      return !!plan && store.canChangeInventorySlots(plan.deltas, plan.returning, plan.removing)
     },
 
+    /** Writes a checked Gear plan: the worn gear returns, the slot changes. Refused grants (nothing fits) change nothing. */
+    _wearPlan(plan: GearPlan): void {
+      const { missing } = store.grant(plan.returning, 'atomic', plan.removing)
+      if (Object.keys(missing).length > 0) return
+      patchState(store, (state) => ({ equipment: { ...state.equipment, [plan.slot]: plan.equipped } }))
+    },
+
+    /** False for an item without an equipment slot: anything else would land under an undefined slot key. */
     canEquip(item: InventoryItem): boolean {
-      // Only items with an equipment slot can be equipped; anything else would land under an undefined slot key.
-      const slot = (ITEM_DATA[item.id] as EquipmentItem).slot
-      if (slot === undefined) return false
-      const slotKey = EquipmentSlot[slot] as EquipmentSlotKey
-      const equipped = store.equipment()[slotKey]
-      const deltas = slotDeltas(gearModifiers(item), gearModifiers(equipped))
-      const adding = equipped ? [{ id: equipped.id, tier: equipped.tier, upgradeLevel: equipped.upgradeLevel, amount: 1 }] : []
-      return store.canChangeInventorySlots(deltas, adding, [{ id: item.id, tier: item.tier, upgradeLevel: item.upgradeLevel, amount: 1 }])
+      const plan = planEquip(item, store.equipment())
+      return !!plan && store.canChangeInventorySlots(plan.deltas, plan.returning, plan.removing)
     },
 
     /** Finished, unclaimed, and its chest's items fit in the inventory. */
@@ -676,33 +674,13 @@ export const PlayerStore = signalStore(
     },
 
     equipItem(item: InventoryItem) {
-      if (!store.canEquip(item)) return
-
-      const itemData = ITEM_DATA[item.id] as EquipmentItem
-      const slotKey = EquipmentSlot[itemData.slot] as EquipmentSlotKey
-      const currentlyEquipped = store.equipment()[slotKey]
-
-      // Taken out first so the swapped-out item always has a free slot to return to.
-      const swappedOut = currentlyEquipped ? [{ id: currentlyEquipped.id, tier: currentlyEquipped.tier, upgradeLevel: currentlyEquipped.upgradeLevel, amount: 1 }] : []
-      const { missing } = store.grant(swappedOut, 'atomic', [{ id: item.id, tier: item.tier, upgradeLevel: item.upgradeLevel, amount: 1 }])
-      if (Object.keys(missing).length > 0) return
-
-      patchState(store, (state) => ({
-        equipment: { ...state.equipment, [slotKey]: { id: item.id, tier: item.tier, upgradeLevel: item.upgradeLevel } },
-      }))
+      const plan = planEquip(item, store.equipment())
+      if (plan && store.canEquip(item)) store._wearPlan(plan)
     },
 
     unequipItem(slot: EquipmentSlotKey) {
-      const equippedItem = store.equipment()[slot]
-
-      if (!equippedItem || !store.canUnequip(slot)) return
-
-      const { missing } = store.grant([{ id: equippedItem.id, tier: equippedItem.tier, upgradeLevel: equippedItem.upgradeLevel, amount: 1 }], 'atomic')
-      if (Object.keys(missing).length > 0) return
-
-      patchState(store, (state) => ({
-        equipment: { ...state.equipment, [slot]: null },
-      }))
+      const plan = planUnequip(slot, store.equipment())
+      if (plan && store.canUnequip(slot)) store._wearPlan(plan)
     },
 
     /** Installs station gear that was kept because it arrived out of order. Returns whether it installed. */
@@ -803,32 +781,20 @@ export const PlayerStore = signalStore(
     },
 
     unlockZone(id: ZoneID): void {
-      patchState(store, (state) => {
-        const zones = state.unlockedContent.zones ?? [ZoneID.horseshoeBeach]
-        if (zones.includes(id)) return {}
-        return { unlockedContent: { ...state.unlockedContent, zones: [...zones, id] } }
-      })
+      patchState(store, (state) => ({ unlockedContent: withUnlocked(state.unlockedContent, 'zones', id) }))
     },
 
     isZoneUnlocked(id: ZoneID): boolean {
-      return (store.unlockedContent().zones ?? [ZoneID.horseshoeBeach]).includes(id)
+      return isUnlocked(store.unlockedContent(), 'zones', id)
     },
 
     unlockTown(id: TownID): void {
-      patchState(store, (state) => {
-        const towns = state.unlockedContent.towns ?? []
-        if (towns.includes(id)) return {}
-        return { unlockedContent: { ...state.unlockedContent, towns: [...towns, id] } }
-      })
+      patchState(store, (state) => ({ unlockedContent: withUnlocked(state.unlockedContent, 'towns', id) }))
     },
 
     /** Opens a Site (the `unlockSite` dialogue effect, a `site` unlock target or a cheat). */
     unlockSite(id: SiteID): void {
-      patchState(store, (state) => {
-        const sites = state.unlockedContent.sites ?? []
-        if (sites.includes(id)) return {}
-        return { unlockedContent: { ...state.unlockedContent, sites: [...sites, id] } }
-      })
+      patchState(store, (state) => ({ unlockedContent: withUnlocked(state.unlockedContent, 'sites', id) }))
     },
 
     /** Shows an earned title in the stats panel, or none with `null`; unearned titles are ignored. */
@@ -927,11 +893,11 @@ export const PlayerStore = signalStore(
     },
 
     isTownUnlocked(id: TownID): boolean {
-      return (store.unlockedContent().towns ?? []).includes(id)
+      return isUnlocked(store.unlockedContent(), 'towns', id)
     },
 
     isSiteUnlocked(id: SiteID): boolean {
-      return (store.unlockedContent().sites ?? []).includes(id)
+      return isUnlocked(store.unlockedContent(), 'sites', id)
     },
 
     /** Camp starts with the Workbench. */
