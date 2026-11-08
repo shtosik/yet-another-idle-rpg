@@ -15,7 +15,6 @@ import { EquipmentType } from 'interfaces/player/equipment.type'
 import { ZonesProgression } from '../../../types/player/zones-progression.type'
 import { UnlockedContent } from '../../../types/player/unlocked-content.type'
 import { UnlockedNodes } from '../../../types/player/unlocked-nodes.type'
-import { UnlockedSpellsType } from '../../../types/player/unlocked-spells.type'
 import ITEM_DATA from '../../../data/items-data'
 import ZONES_DATA from '../../../data/zones-data'
 import type { KillBatch } from './kill-rewards'
@@ -71,7 +70,8 @@ import TITLES_DATA from '../../../data/titles-data'
 import { StationID } from '../../../enums/ids/station-id.enum'
 import { UnlockTarget } from '../../../data/unlock-conditions'
 import { BattleStore } from '../battle/battle.store'
-import { EquippedSpell } from '../../../interfaces/spells/equipped-spell.interface'
+import { ALL_SKILLS } from '../../../data/skill-tree-data'
+import { SkillNodeType } from '../../../enums/skill-node-type.enum'
 import {
   activeBuffSpellIds,
   activeConsumableItemIds,
@@ -133,7 +133,8 @@ interface PlayerState {
   rolledChests: Partial<Record<ItemID, ChestContents>>;
   equipment: EquipmentType;
   unlockedNodes: UnlockedNodes;
-  unlockedSpells: UnlockedSpellsType;
+  /** Spell levels from used spell scrolls, the one spell source saved nowhere else; known spells are derived (`knownSpellIds`). */
+  scrollSpellLevels: SpellLevels;
   activeTasks: Task[];
   totalTasksCompleted: number;
   explorerTokens: number;
@@ -166,7 +167,7 @@ export const initialState: PlayerState = {
   rolledChests: {},
   equipment: initialEquipmentState,
   unlockedNodes: {},
-  unlockedSpells: {},
+  scrollSpellLevels: {},
   enemyKillCounts: {},
   shinyKillsByZone: {},
   claimedZoneStars: {},
@@ -194,8 +195,21 @@ export const initialState: PlayerState = {
 const revealedEnemies = (kills: PlayerState['enemyKillCounts']): EnemyID[] =>
   (Object.keys(kills).map(Number) as EnemyID[]).filter(id => (kills[id] ?? 0) > 0)
 
-const knownSpells = (spells: UnlockedSpellsType): SpellID[] =>
-  (Object.keys(spells).map(Number) as SpellID[]).filter(id => (spells[id] ?? 0) > 0)
+type SpellLevels = Partial<Record<SpellID, number>>
+
+/** Spell levels from owned skill nodes: each level of a node that teaches the spell. */
+export const nodeSpellLevels = (nodes: UnlockedNodes): SpellLevels => {
+  const levels: SpellLevels = {}
+  for (const [key, level] of Object.entries(nodes)) {
+    const node = ALL_SKILLS[Number(key) as SkillNodeID]
+    if (node?.type !== SkillNodeType.spell || node.spellId === undefined || !level) continue
+    levels[node.spellId] = (levels[node.spellId] ?? 0) + level
+  }
+  return levels
+}
+
+const learnedSpells = (...sources: SpellLevels[]): SpellID[] =>
+  sources.flatMap(levels => (Object.keys(levels).map(Number) as SpellID[]).filter(id => (levels[id] ?? 0) > 0))
 
 /** Spells granted by equipped gear (`EquipmentItem.spell`). */
 const equipmentSpells = (equipment: EquipmentType): SpellID[] =>
@@ -210,9 +224,9 @@ const unseen = <T>(ids: T[], seen: T[]): T[] => ids.filter(id => !seen.includes(
 const V1_SATCHEL_SLOTS = 5
 const V2_SATCHEL_SLOTS = 2
 
-/** Version 1 saves held one flat inventory; version 2 splits it into tabs. */
-const SAVE_VERSION = 2
-const SAVE_MIGRATIONS: SaveMigrations = {
+/** Version 1 saves held one flat inventory; version 2 splits it into tabs. Version 3 saves scroll spell levels, not every source's. */
+const SAVE_VERSION = 3
+export const SAVE_MIGRATIONS: SaveMigrations = {
   1: ({ inventory, ...state }) => {
     const bonuses = state['permanentBonuses'] as PlayerState['permanentBonuses'] | undefined
     const slots = bonuses?.inventorySlots
@@ -221,6 +235,14 @@ const SAVE_MIGRATIONS: SaveMigrations = {
       ...(Array.isArray(inventory) && { inventory: splitInventory(inventory as Inventory) }),
       ...(slots && { permanentBonuses: { ...bonuses, inventorySlots: Math.round(slots / V1_SATCHEL_SLOTS) * V2_SATCHEL_SLOTS } }),
     }
+  },
+  // `unlockedSpells` summed node and scroll levels; what the owned nodes don't explain came from scrolls.
+  2: ({ unlockedSpells, ...state }) => {
+    const fromNodes = nodeSpellLevels((state['unlockedNodes'] ?? {}) as UnlockedNodes)
+    const scrollSpellLevels = Object.fromEntries(Object.entries((unlockedSpells ?? {}) as Record<string, number>)
+      .map(([id, level]) => [id, level - (fromNodes[Number(id) as SpellID] ?? 0)])
+      .filter(([, level]) => (level as number) > 0))
+    return { ...state, scrollSpellLevels }
   },
 }
 
@@ -309,9 +331,9 @@ export const PlayerStore = signalStore(
   }),
   // Spells: known and unseen.
   withComputed((store, battleStore = inject(BattleStore)) => {
-    /** Spells from the skill tree plus spells from equipped gear. */
+    /** Derived from the sources, like `stats`: skill nodes, used spell scrolls and equipped gear. */
     const knownSpellIds = computed(() => [
-      ...new Set([...knownSpells(store.unlockedSpells()), ...equipmentSpells(store.equipment())]),
+      ...new Set([...learnedSpells(nodeSpellLevels(store.unlockedNodes()), store.scrollSpellLevels()), ...equipmentSpells(store.equipment())]),
     ])
 
     /** Known spells not on the spell bar and not yet viewed: what the Spellbook palette shows as new. */
@@ -490,24 +512,6 @@ export const PlayerStore = signalStore(
 
     resetUnlockedNodes() {
       patchState(store, { unlockedNodes: {} })
-    },
-
-    levelUpSpell(id: SpellID) {
-      patchState(store, (state) => ({
-        unlockedSpells: {
-          ...state.unlockedSpells,
-          [id]: (state.unlockedSpells[id] || 0) + 1,
-        },
-      }))
-    },
-
-    levelDownSpell(id: SpellID, amount: number) {
-      patchState(store, (state) => ({
-        unlockedSpells: {
-          ...state.unlockedSpells,
-          [id]: Math.max(0, (state.unlockedSpells[id] || 0) - amount),
-        },
-      }))
     },
 
     acceptTask(task: Task) {
@@ -733,8 +737,9 @@ export const PlayerStore = signalStore(
         if (store.unlockedRecipes().includes(recipeData.recipeId)) return false
         patchState(store, state => ({ unlockedRecipes: [...state.unlockedRecipes, recipeData.recipeId] }))
       } else if (itemData.type === ItemType.spellScroll) {
-        if (store.knownSpellIds().includes(itemData.spellId)) return false
-        store.levelUpSpell(itemData.spellId)
+        const { spellId } = itemData
+        if (store.knownSpellIds().includes(spellId)) return false
+        patchState(store, state => ({ scrollSpellLevels: { ...state.scrollSpellLevels, [spellId]: (state.scrollSpellLevels[spellId] ?? 0) + 1 } }))
       } else if (itemData.type === ItemType.rewardsStats) {
         store.updatePlayerStats(itemData.stats.map(s => ({ stat: s.id, amount: s.amount })))
       } else {
@@ -1053,18 +1058,10 @@ export const PlayerStore = signalStore(
         }
       })
 
-      // A spell from gear leaves the spell bar with the gear (unequip, swap), but only once its cooldown is over: the
-      // slot stays locked meanwhile (no free slot for another spell), and re-equipping the gear keeps the cooldown.
+      // A spell no source teaches any more (gear off, node refunded) leaves the spell bar once its cooldown is over: the
+      // slot stays locked meanwhile (no free slot for another spell), and getting the spell back keeps the cooldown.
       const battleStore = inject(BattleStore)
-      const isGone = (slot: EquippedSpell | null, known: SpellID[]) =>
-        !!slot && !known.includes(slot.spellId) && slot.cooldownRemainingMs <= 0
-      effect(() => {
-        const known = store.knownSpellIds()
-        const bar = battleStore.equippedSpells()
-        if (bar.some(slot => isGone(slot, known))) {
-          battleStore.setAllEquippedSpells(bar.map(slot => isGone(slot, known) ? null : slot))
-        }
-      })
+      effect(() => battleStore.pruneSpells(store.knownSpellIds()))
     },
   })),
 )

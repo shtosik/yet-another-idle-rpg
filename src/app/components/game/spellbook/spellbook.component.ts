@@ -7,7 +7,7 @@ import { EquippedSpell } from '../../../../interfaces/spells/equipped-spell.inte
 import SPELLS_DATA from '../../../../data/spells-data'
 import { UrlPipe } from '../../../pipes/url.pipe'
 import { I18nextPipe } from '../../../pipes/i18next.pipe'
-import { BattleManagerService } from '../../../services/battle-manager.service'
+import { SPELL_BAR_SLOTS } from '../../../store/battle/spell-bar'
 import { TooltipTemplateDirective } from 'ngx-tooltip-directives'
 import { SpellTooltipComponent } from '../../shared/spell-tooltip/spell-tooltip.component'
 
@@ -21,13 +21,12 @@ import { SpellTooltipComponent } from '../../shared/spell-tooltip/spell-tooltip.
 export class SpellbookComponent {
   private playerStore = inject(PlayerStore)
   private battleStore = inject(BattleStore)
-  private battleManagerService = inject(BattleManagerService)
 
   protected readonly SPELLS_DATA = SPELLS_DATA
   protected readonly SpellID = SpellID
 
   // Connect the palette to every spellbar slot so spells can be equipped onto any position.
-  slotDropIds = Array.from({ length: 5 }, (_, i) => `spell-slot-${i}`)
+  slotDropIds = Array.from({ length: SPELL_BAR_SLOTS }, (_, i) => `spell-slot-${i}`)
 
   availableSpells = computed(() => {
     const equippedIds = new Set(
@@ -47,6 +46,6 @@ export class SpellbookComponent {
     // Only handle drops coming from the spell-bar (unequip).
     if (event.previousContainer === event.container) return
     const spell = event.item.data as EquippedSpell
-    this.battleManagerService.unequipSpell(spell.spellId)
+    this.battleStore.removeSpell(spell.spellId)
   }
 }

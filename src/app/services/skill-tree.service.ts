@@ -4,11 +4,9 @@ import { PlayerStore } from '../store/player/player.store'
 import { SkillNodeType } from '../../enums/skill-node-type.enum'
 import { SkillNodeID } from '../../enums/ids/skill-node-id.enum'
 import { BattleStore } from '../store/battle/battle.store'
-import { BattleManagerService } from './battle-manager.service'
 import { canBuyNode } from '../../utils/skill-tree-requirements'
 import { canRefundNode, CanRefundResult } from '../../utils/skill-tree-refund'
 import { SKILL_TREE_GRAPH } from '../../data/skill-tree-graph'
-import { SpellID } from '../../enums/ids/spell-id.enum'
 import { InventoryTab, slotDeltas } from '../store/player/inventory'
 import { skillNodeModifiers } from '../store/player/stats'
 
@@ -16,8 +14,6 @@ import { skillNodeModifiers } from '../store/player/stats'
 export class SkillTreeService {
   private battleStore = inject(BattleStore)
   private playerStore = inject(PlayerStore)
-
-  private battleManagerService = inject(BattleManagerService)
 
   get playerStats() {
     return this.playerStore.stats
@@ -48,11 +44,8 @@ export class SkillTreeService {
 
     this.playerStore.updateUnlockedNodes(id, pointsToBuy)
 
-    if (skillData.type === SkillNodeType.spell) {
-      this.playerStore.levelUpSpell(skillData.spellId)
-      // Onto the spell bar if there's a free slot, like a spell scroll.
-      this.battleManagerService.equipSpell(skillData.spellId)
-    }
+    // Onto the spell bar if there's a free slot, like a spell scroll. Learning it is the node level itself.
+    if (skillData.type === SkillNodeType.spell && skillData.spellId !== undefined) this.battleStore.placeSpell(skillData.spellId)
   }
 
   previewRefund(id: SkillNodeID, levels: number | 'all'): CanRefundResult {
@@ -79,17 +72,10 @@ export class SkillTreeService {
     if (!this.playerStore.spend('gold', this.refundGoldCost(check.levelsRefunded))) return false
 
     const refundedLevels = check.levelsRefunded
-    const currentLevel = this.playerStore.unlockedNodes()[id] || 0
-    const newLevel = currentLevel - refundedLevels
-
     this.playerStore.updatePlayerStats([{ stat: 'unspentSkillPoints', amount: refundedLevels * skillData.skillPointCost }])
 
+    // A spell no longer taught leaves the bar through PlayerStore's prune effect.
     this.playerStore.updateUnlockedNodes(id, -refundedLevels)
-
-    if (skillData.type === SkillNodeType.spell && newLevel === 0) {
-      this.playerStore.levelDownSpell(skillData.spellId, refundedLevels)
-      this.battleManagerService.unequipSpell(skillData.spellId, true)
-    }
 
     this.switchOffLostToggles()
     return true
@@ -109,21 +95,19 @@ export class SkillTreeService {
     return { allocatedLevels, skillPointsToReturn, goldCost, canAfford, inventoryBlockedTab }
   }
 
-  /** What a full respec returns and costs, and the spells it rolls back. */
+  /** What a full respec returns and costs. */
   private respecTotals() {
     let allocatedLevels = 0
     let skillPointsToReturn = 0
-    const spellRollbacks: { spellId: SpellID; levels: number }[] = []
     for (const [idStr, level] of Object.entries(this.playerStore.unlockedNodes())) {
       if (!level) continue
       const node = ALL_SKILLS[Number(idStr) as SkillNodeID]
       if (!node) continue
       allocatedLevels += level
       skillPointsToReturn += level * node.skillPointCost
-      if (node.type === SkillNodeType.spell && node.spellId !== undefined) spellRollbacks.push({ spellId: node.spellId, levels: level })
     }
     const goldCost = SKILL_TREE_DATA.respec.fullResetGoldCost({ allocatedLevels })
-    return { allocatedLevels, skillPointsToReturn, goldCost, spellRollbacks }
+    return { allocatedLevels, skillPointsToReturn, goldCost }
   }
 
   /** The first tab that can't hold its items without the slots the skill tree grants; null when every tab can. */
@@ -134,16 +118,11 @@ export class SkillTreeService {
   respecEntireTree(): boolean {
     if (this.allSlotNodesBlockedTab()) return false
 
-    const { allocatedLevels, skillPointsToReturn, goldCost, spellRollbacks } = this.respecTotals()
+    const { allocatedLevels, skillPointsToReturn, goldCost } = this.respecTotals()
     if (allocatedLevels === 0) return false
     if (!this.playerStore.spend('gold', goldCost)) return false
 
     this.playerStore.updatePlayerStats([{ stat: 'unspentSkillPoints', amount: skillPointsToReturn }])
-
-    for (const { spellId, levels } of spellRollbacks) {
-      this.playerStore.levelDownSpell(spellId, levels)
-      this.battleManagerService.unequipSpell(spellId, true)
-    }
 
     this.playerStore.resetUnlockedNodes()
     this.switchOffLostToggles()

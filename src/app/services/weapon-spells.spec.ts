@@ -6,6 +6,9 @@ import { BattleStore } from '../store/battle/battle.store'
 import { PlayerStore } from '../store/player/player.store'
 import { SpellID } from '../../enums/ids/spell-id.enum'
 import { ItemID } from '../../enums/ids/item-id.enum'
+import { SkillNodeID } from '../../enums/ids/skill-node-id.enum'
+import { patchState } from '@ngrx/signals'
+import { unprotected } from '@ngrx/signals/testing'
 
 describe('Weapon spells', () => {
   let service: BattleManagerService
@@ -21,9 +24,9 @@ describe('Weapon spells', () => {
     player = TestBed.inject(PlayerStore)
     hits = spyOn(TestBed.inject(AnimationsService), 'showDamage')
     player.updatePlayerStats([{ stat: 'maxMana', amount: 100 }, { stat: 'mana', amount: 100 }])
-    for (const spellId of [SpellID.doubleAttack, SpellID.volley]) {
-      player.levelUpSpell(spellId)
-      service.equipSpell(spellId)
+    for (const [spellId, node] of [[SpellID.doubleAttack, SkillNodeID.doubleAttack], [SpellID.volley, SkillNodeID.volley]] as const) {
+      player.updateUnlockedNodes(node, 1)
+      battle.placeSpell(spellId)
     }
     battle.startBattle(0)
     battle.updateEnemyHp(100000)
@@ -100,8 +103,8 @@ describe('Weapon spells', () => {
 
   it('leaves Ambush and War Cry available without a weapon', () => {
     for (const id of [SpellID.ambush, SpellID.warCry]) {
-      player.levelUpSpell(id)
-      service.equipSpell(id)
+      patchState(unprotected(player), state => ({ scrollSpellLevels: { ...state.scrollSpellLevels, [id]: 1 } }))
+      battle.placeSpell(id)
       expect(service.canCast(id)).toBeTrue()
     }
   })

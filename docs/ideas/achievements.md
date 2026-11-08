@@ -96,7 +96,7 @@ Bosses come from the zone (`Zone.bossEnemyId`) and no boss appears in a regular 
 |---|---|---|---|---|---|
 | 37 | Specialist | any one skill tree branch fully unlocked (every node at `maxLevel`) | — | — | ✅ `unlockedNodes` |
 | 38 | Arcanist | spells cast | 50 / 500 / 5,000 | [S] `maxMana` +5 / +10 / +15 | 🆕 |
-| 39 | Spellbook | all 3 spells unlocked (fire strike, haste, double attack) | — | — | ✅ `unlockedSpells` |
+| 39 | Spellbook | all 3 spells unlocked (fire strike, haste, double attack) | — | — | ✅ `knownSpellIds` |
 
 ### Idle and offline
 
@@ -139,7 +139,7 @@ Stats are derived: add `achievementModifiers(unlocked)` to `deriveStatsWith` nex
 | **Unlocked achievements**: `unlocked` (unlock time of each tier reached, per id; §6), `seen: AchievementID[]` (for the "new" badge) | **New `AchievementsStore`**, key `achievementsStore` | It's its own feature with its own reset. It holds state only and injects nothing, so `PlayerStore` can inject it to derive stats (the same pattern as `BattleStore`: `PlayerStore` → `BattleStore`, never the other way) |
 | **Checks, toasts, unlocking** | **New `AchievementService`** (root), modeled on `UnlockService` | It reads both stores, plus `QuestsStore` for quests, without creating cycles |
 
-`enemyKillCounts`, `zonesProgression`, `unlockedContent`, `unlockedRecipes`, `stations`, `unlockedNodes`, `unlockedSpells`, `equipment`, `totalTasksCompleted`, `resources.level` and `questStepProgression` are read as they are, with nothing copied.
+`enemyKillCounts`, `zonesProgression`, `unlockedContent`, `unlockedRecipes`, `stations`, `unlockedNodes`, `knownSpellIds`, `equipment`, `totalTasksCompleted`, `resources.level` and `questStepProgression` are read as they are, with nothing copied.
 
 Two notes:
 - **Kill counts under prestige.** If prestige (`prestige.md`) resets `enemyKillCounts`, kill achievements must read a counter that survives the reset. Decide before prestige ships: either prestige keeps `enemyKillCounts`, or move lifetime kills into `lifetime`.
@@ -233,7 +233,7 @@ export interface AchievementContext {
   unlockedRecipes: RecipeID[]
   stations: Stations
   unlockedNodes: UnlockedNodes
-  unlockedSpells: UnlockedSpellsType
+  knownSpellIds: SpellID[]
   equipment: EquipmentType
   questStepProgression: QuestProgression
 }

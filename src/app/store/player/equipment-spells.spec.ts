@@ -36,7 +36,7 @@ describe('PlayerStore spells from equipment', () => {
 
   it('takes the spell off the spell bar when the item is unequipped', () => {
     equipStormcaller()
-    battleStore.addSpell({ spellId: SpellID.thunderstorm, cooldownRemainingMs: 0 })
+    battleStore.placeSpell(SpellID.thunderstorm)
     TestBed.tick()
     expect(onBar()).toBeTrue()
 
@@ -47,7 +47,8 @@ describe('PlayerStore spells from equipment', () => {
 
   it('keeps the spell in its slot until its cooldown ends, so the slot cannot take another spell', () => {
     equipStormcaller()
-    battleStore.addSpell({ spellId: SpellID.thunderstorm, cooldownRemainingMs: 5000 })
+    battleStore.placeSpell(SpellID.thunderstorm)
+    battleStore.setSpellCooldown(SpellID.thunderstorm, 5000)
     store.unequipItem('weapon')
     TestBed.tick()
     expect(onBar()).toBeTrue()

@@ -28,7 +28,7 @@ One module decides how items reach the player. Seeds go to the seed store, stati
 - Changelog: `[bug] Quest rewards are never lost to a full inventory.`
 - Docs: `player-stats-inventory-equipment.md`, `quests.md`.
 
-### 3. Spell bar (M, Opus)
+### 3. Spell bar (M, Opus) ✅
 - **Known spells are derived from their sources** (skill nodes, used spell scrolls, equipped gear), like stats in ADR 0002, instead of per-source counts going up and down. A skill refund or respec no longer unequips a spell that a scroll or gear still teaches, and buy-max can't drift from refund.
 - Pure `store/battle/spell-bar.ts`: `place(bar, spell, slot)` (swap, displace, cooldown lock), `remove(bar, spell)`, `prune(bar, known)`. One slot count, `SPELL_BAR_SLOTS`; delete `SPELL_SLOT_COUNT` (`battle-footer.component.ts:16`).
 - `BattleStore` keeps the slots and calls the module. The footer (`:71-98`) keeps only the drag events. `BattleManagerService` (`:103-200`), `spellbook.component.ts:33-36`, `skill-tree.service.ts:51-55, 89-92, 143-146`, `item-use.service.ts:55` call it. The `PlayerStore` hook that removes gear spells (`player.store.ts:1077-1088`) becomes one effect: `prune(bar, knownSpells())`.

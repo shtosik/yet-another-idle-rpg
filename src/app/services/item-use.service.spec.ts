@@ -50,7 +50,7 @@ describe('ItemUseService', () => {
     expect(player.knownSpellIds()).toContain(SpellID.ambush)
     expect(onBar(SpellID.ambush)).toBe(1)
 
-    battle.setAllEquippedSpells(battle.equippedSpells().map(() => null))
+    battle.removeSpell(SpellID.ambush)
     itemUse.use(give(ItemID.ambushScroll))
     expect(onBar(SpellID.ambush)).toBe(0)
     expect(player.itemCount(ItemID.ambushScroll)).toBe(1)
