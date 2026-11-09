@@ -181,6 +181,13 @@
     "seed": 4444,
     "date": "2026-10-18"
   },
+  "src/assets/img/backgrounds/tradersBasement.png": {
+    "family": "zone-pixel",
+    "tier": null,
+    "subject": "a dark underground stone vaulted cellar under a market, completely enclosed, seen from floor level: grey stone arches and pillars, a wide empty flagstone floor in the middle, wooden crates, barrels and burlap sacks of trade goods stacked along the side walls, a dark stone wall at the far end, a lit iron candelabra and hanging iron lanterns casting warm orange light pools, deep black shadows in the corners",
+    "seed": 523632519,
+    "date": "2026-11-09"
+  },
   "src/assets/img/enemies/arenaArcanist.png": {
     "family": "enemy-pixel",
     "tier": "medium",

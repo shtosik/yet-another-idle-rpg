@@ -28,7 +28,7 @@ export const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..
 export const FAMILY_TARGETS = {
     'item-pixel': [48, 48],
     'zone-pixel': [832, 1248],
-    'town-painterly': [1376, 768],
+    'town-painterly': [1376, 566], // building Scene size (docs/systems/scene.md)
     'portrait-pixel': [256, 256],
     'skill-icon': [256, 256],
     'map-painterly': [1344, 752], // a 672×376 map window drawn at 2× (map-window.mjs scales it back)
@@ -146,7 +146,7 @@ FAMILIES['zone-pixel'] = {
 }
 
 FAMILIES['town-painterly'] = {
-    description: '1376×768 opaque inked cartoon illustration (town / building background, laHarpar look)',
+    description: '1376×566 opaque inked cartoon illustration (town / building background, laHarpar look)',
     checkpoint: 'zavychromaxl_v80.safetensors',
     stylePrompt:
         'hand-drawn fantasy town illustration, bold dark ink outlines, flat cel colouring with soft shading, muted earthy palette, ' +
@@ -154,12 +154,12 @@ FAMILIES['town-painterly'] = {
     negative: `${NEGATIVE_BASE}, pixel art, low detail, ui, painterly, photorealistic, dramatic god rays, volumetric light, neon, oversaturated`,
     // frozen copies of the approved backgrounds (laHarpar's inked look, Mawood's dark twilight); never live src/assets files
     references: ['laHarpar', 'mawood'].map((n) => `scripts/asset-gen/refs/background/${n}.png`),
-    gen: [1344, 768],
-    target: [1376, 768],
+    gen: [1536, 640],
+    target: [1376, 566],
     pixel: false,
     alpha: false,
-    // Generate at the nearest SDXL-native size and cover up to the exact asset size (a 32px crop-fill, no distortion).
-    post: [['cover', { width: 1376, height: 768 }], ['shave', { px: 4 }]],
+    // Generate at the nearest SDXL-native size and cover to the exact asset size (a downscale and 7px crop, no distortion).
+    post: [['cover', { width: 1376, height: 566 }], ['shave', { px: 4 }]],
     ipWeight: 0.7,
     sampler: { steps: 8, cfg: 5.5, sampler_name: 'euler', scheduler: 'sgm_uniform' },
 }
