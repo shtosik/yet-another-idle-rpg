@@ -163,7 +163,7 @@ describe('Battle panel presentation', () => {
       document.getAnimations().forEach(animation => animation.finish())
       const scene = element('.scene').getBoundingClientRect()
       const box = element('.enemy__sprite-box').getBoundingClientRect()
-      expect(scene.width / scene.height).toBeCloseTo(2 / 3, 2)
+      expect(scene.width / scene.height).toBeCloseTo(1 / 2, 2)
       expect(box.right).toBeLessThanOrEqual(element('app-battle-side-buttons').getBoundingClientRect().left)
       spots.push([box.left - scene.left, box.top - scene.top, box.width, box.height].map((value, i) => value / (i % 2 ? scene.height : scene.width) * 100))
     }

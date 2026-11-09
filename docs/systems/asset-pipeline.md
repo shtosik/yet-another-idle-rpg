@@ -17,7 +17,7 @@ A family (an entry in `styles.mjs`) is a named art recipe: checkpoint, style pro
 | `item-pixel` | 48×48 | pixel art, like `items/cheese.png` | transparent |
 | `enemy-pixel` | longer side by Size tier, natural aspect | pixel-art sprite, LayerDiffuse transparency | transparent |
 | `portrait-pixel` | 256×256 | pixel-art bust, 2× chunky pixels | transparent |
-| `zone-pixel` | 832×1248 | pixel-art landscape | opaque |
+| `zone-pixel` | 832×1664 | pixel-art landscape | opaque |
 | `town-painterly` | 1376×566 | inked cartoon illustration (laHarpar look) | opaque |
 | `skill-icon` | 256×256 | inked cartoon tile like `skills/attackPower.png`, full-frame scene | opaque, rounded corners cut by `tile` |
 | `map-painterly` | 1344×752 | top-down inked world map: a 672×376 window at 2×, inpainted (`map-window.mjs`) | opaque |

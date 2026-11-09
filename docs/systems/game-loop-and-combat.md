@@ -40,7 +40,7 @@ Damage (`resolveHit`), in order, kept fractional throughout:
 5. Rounded once: `max(1, round(damage))`.
 
 ## Battle panel presentation
-- The panel stays in the left game-grid column across both rows. The zone (or arena) background is a Scene (`docs/systems/scene.md`) spanning the whole panel: shown whole at 2:3, centred, over a blurred Scene fill. The header, fight space and footer lie over it; effects and task lists scroll within their sections when needed.
+- The panel stays in the left game-grid column across both rows. The zone (or arena) background is a Scene (`docs/systems/scene.md`) spanning the whole panel: shown whole at 1:2, centred, over a blurred Scene fill. The header, fight space and footer lie over it; effects and task lists scroll within their sections when needed.
 - The enemy sprite stands in `ENEMY_SPRITE_AREA` on the Scene and scales with it (a half-size sprite at 1536 wide). Above it, at a fixed size, the enemy name sits over a compact HP meter, centred and clear of the right-hand controls, with numeric current/max HP and an accessible progress label. Only the arena buttons on the enemy take clicks. Boss waves and shinies have explicit badges. Enemies have no level field and the player has no HP meter.
 - Spawns fade and rise into place; positive-damage events briefly recoil the sprite. Damage popups stack at a fixed point in the fight space, with separate Crit and Strong labels; they never intercept clicks on arena targets or controls. Reduced motion removes recoil and spawn motion and uses a simple popup fade.
 - Between fights, a pulsing gold marker and “Next enemy incoming…” label represent the existing respawn delay. No attack or respawn timing changes.

@@ -27,7 +27,7 @@ export const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), '..', '..
 /** The agreed final size per family. Registry validation fails if an entry drifts from this table. */
 export const FAMILY_TARGETS = {
     'item-pixel': [48, 48],
-    'zone-pixel': [832, 1248],
+    'zone-pixel': [832, 1664], // zone Scene size (docs/systems/scene.md)
     'town-painterly': [1376, 566], // building Scene size (docs/systems/scene.md)
     'portrait-pixel': [256, 256],
     'skill-icon': [256, 256],
@@ -124,20 +124,20 @@ FAMILIES['enemy-pixel'] = {
 }
 
 FAMILIES['zone-pixel'] = {
-    description: '832×1248 opaque pixel-art zone landscape (vertical battle background)',
+    description: '832×1664 opaque pixel-art zone landscape (vertical battle background)',
     checkpoint: 'zavychromaxl_v80.safetensors',
     stylePrompt:
         'pixel art game background, side-view landscape scene, no characters, no text, detailed environment, ' +
         'limited colour palette, crisp hard pixels, atmospheric depth',
     negative: `${NEGATIVE_BASE}, characters, people, creatures, ui, anti-aliased, smooth gradient, photograph`,
     references: ['plains-vertical', 'horseshoeBeach-vertical', 'the-long-path-vertical'].map((n) => `scripts/asset-gen/refs/zone/${n}.png`),
-    gen: [832, 1216],
-    target: [832, 1248],
+    gen: [704, 1408],
+    target: [832, 1664],
     pixel: true,
     alpha: false,
     // Generate at the nearest SDXL-native size, cover up to the exact asset size, then 4×4 blocks = one art pixel.
     post: [
-        ['cover', { width: 832, height: 1248 }],
+        ['cover', { width: 832, height: 1664 }],
         ['pixelate', { block: 4 }],
         ['quantize', { colors: 48 }],
     ],

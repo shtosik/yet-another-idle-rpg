@@ -18,14 +18,14 @@ The size comes from the kind, never from per-entry data. Every background of a k
 
 | Kind | Used for | Size | Ratio |
 |---|---|---|---|
-| `zone` | Zone and arena backgrounds | 832×1248 | 2:3 |
+| `zone` | Zone and arena backgrounds | 832×1664 | 1:2 |
 | `building` | town, Building and Site backgrounds | 1376×566 | 2.43:1 |
 
 A Scene mask is the same size as its art.
 
 ## Battle Scene
 
-`app-battle` puts the zone or arena Scene behind the whole panel. The nav bar, footer and side buttons lie over it, with the edge gradient under them. In the supported range the panel is narrower than 2:3, so the Scene always spans the panel's width and gets fill above and below: about 370×555 at 1536 wide, 180×270 at 1280.
+`app-battle` puts the zone or arena Scene behind the whole panel. The nav bar, footer and side buttons lie over it, with the edge gradient under them. The 1:2 art matches the panel's shape at 1536 wide (Scene about 364×728, a few px of fill at the sides). Below that the panel gets narrower than 1:2, so the Scene spans its width with fill above and below: about 180×360 at 1280. (The art was 2:3 at first; the owner moved it to 1:2 on 2026-11-09 so it fills the column's height. The extra top and bottom bands sit mostly under the nav bar and footer.)
 
 `<app-enemy>` and the damage popups are projected into the Scene. The sprite box fills `ENEMY_SPRITE_AREA` and the sprite scales with the Scene (`100cqw`; as big as a half-size sprite at 1536). The name, tags and HP bar stack above it at a fixed size with `pointer-events: none`; the arena weak point and mounds keep their clicks.
 
@@ -33,17 +33,17 @@ A Scene mask is the same size as its art.
 
 HUD drawn over a Scene, as rects in % of the art (`BATTLE_HUD_AREAS`, `BUILDING_HUD_AREAS` beside `SCENE_SIZES`). Each rect is the largest it gets across the supported range. A clickable spot painted under one would be hidden or unclickable, so a Scene mask spot must sit outside all of them.
 
-Battle (832×1248 art; left, top, width, height in %):
+Battle (832×1664 art; left, top, width, height in %):
 
 | Area | Rect | Largest at |
 |---|---|---|
-| `navBar` | 0, 0, 100, 23 | 1536, with a full task list |
-| `footer` | 0, 85, 100, 15 | 1536, with an effects row |
-| `sideButtons` | 73, 27, 27, 73 | 1280, four buttons |
-| `enemyInfo` (name, tags, HP) | 27, 0, 46, 50 | 1280 |
-| `enemySprite` | 27, 50, 46, 26 | everywhere |
+| `navBar` | 0, 0, 100, 30 | 1536, with a full task list |
+| `footer` | 0, 78, 100, 22 | 1536, with an effects row |
+| `sideButtons` | 73, 28, 27, 72 | 1280, four buttons and a full task list |
+| `enemyInfo` (name, tags, HP) | 27, 0, 46, 52 | 1280 |
+| `enemySprite` | 27, 52, 46, 20 | everywhere |
 
-Painter template: the free art is the left 27% from 23% to 85% down, and the strip between the sprite and the footer (76–85%).
+Painter template: the free art is the left 27% from 30% to 78% down, and the strip between the sprite and the footer (72–78%).
 
 Town, Building and Site (1376×566 art; the panel is a fixed 776×320, so the Scene fills it and these hold at every width):
 
