@@ -1,0 +1,86 @@
+@use 'palette'
+
+// Placed on the battle Scene by host bindings (ENEMY_SPRITE_AREA). Only the arena buttons take clicks.
+:host
+  position: absolute
+  display: flex
+  align-items: flex-end
+  justify-content: center
+  pointer-events: none
+  animation: enemy-arrive 220ms ease-out
+
+button
+  pointer-events: auto
+
+// Scales with the Scene: as big as a half-size sprite on the 364px-wide Scene at a 1536px window.
+.enemy-sprite__image
+  image-rendering: pixelated
+  object-fit: contain
+  width: calc(var(--sprite-width) * 100cqw / 728)
+  max-width: 100%
+  max-height: 100%
+
+  &--shiny
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.85))
+
+  &--shield-fire
+    filter: drop-shadow(0 0 10px rgba(255, 110, 30, 0.95))
+
+  &--shield-air
+    filter: drop-shadow(0 0 10px rgba(200, 240, 255, 0.95))
+
+  &--shield-water
+    filter: drop-shadow(0 0 10px rgba(40, 130, 255, 0.95))
+
+.weak-point
+  position: absolute
+  width: 1.6rem
+  height: 1.6rem
+  margin: -0.8rem 0 0 -0.8rem
+  border: 2px solid palette.$yellow
+  border-radius: 50%
+  background: radial-gradient(circle, rgba(255, 80, 40, 0.9), rgba(255, 80, 40, 0.2))
+  cursor: pointer
+  animation: weak-point-pulse 0.6s ease-in-out infinite alternate
+
+.mounds
+  display: flex
+  align-items: flex-end
+  gap: 1rem
+
+.mound
+  width: 3rem
+  height: 1.5rem
+  border: none
+  border-radius: 50% 50% 0 0
+  background: #7a5a36
+  box-shadow: inset 0 -4px 0 #5b4127
+  cursor: pointer
+
+  &--shaking
+    animation: mound-shake 0.25s linear infinite
+
+@keyframes enemy-arrive
+  from
+    opacity: 0
+    transform: translateY(8px) scale(0.97)
+  to
+    opacity: 1
+    transform: translateY(0) scale(1)
+
+@keyframes weak-point-pulse
+  to
+    transform: scale(1.25)
+
+@keyframes mound-shake
+  25%
+    transform: translateX(-1px) rotate(-2deg)
+  75%
+    transform: translateX(1px) rotate(2deg)
+
+@media (prefers-reduced-motion: reduce)
+  :host, .weak-point, .mound--shaking
+    animation: none
+
+  .mound--shaking
+    box-shadow: inset 0 -4px 0 #5b4127, 0 0 0 2px palette.$yellow

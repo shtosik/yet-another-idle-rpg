@@ -162,9 +162,12 @@ describe('Battle panel presentation', () => {
       await fixture.whenStable()
       document.getAnimations().forEach(animation => animation.finish())
       const scene = element('.scene').getBoundingClientRect()
-      const box = element('.enemy__sprite-box').getBoundingClientRect()
+      const box = element('app-enemy-sprite').getBoundingClientRect()
       expect(scene.width / scene.height).toBeCloseTo(1 / 2, 2)
       expect(box.right).toBeLessThanOrEqual(element('app-battle-side-buttons').getBoundingClientRect().left)
+      // The name and HP are HUD in the pane, so they stay clear of the nav bar at any width.
+      expect(element('app-enemy').getBoundingClientRect().top)
+        .toBeGreaterThanOrEqual(element('app-battle-nav-bar').getBoundingClientRect().bottom)
       spots.push([box.left - scene.left, box.top - scene.top, box.width, box.height].map((value, i) => value / (i % 2 ? scene.height : scene.width) * 100))
     }
     spots[0].forEach((value, i) => expect(spots[1][i]).toBeCloseTo(value, 1))

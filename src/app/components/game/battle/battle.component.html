@@ -1,13 +1,17 @@
 <div class="battle">
   <app-scene class="battle__scene" kind="zone" [url]="sceneUrl()">
+    <!-- The edge gradient: over the art, under the sprite and popups. -->
+    <div class="battle__shade" aria-hidden="true"></div>
     @if (isInCombat()) {
-      <app-enemy/>
+      <app-enemy-sprite/>
     }
     <app-damage-popup/>
   </app-scene>
   <app-battle-nav-bar/>
   <div class="battle-pane">
-    @if (!isInCombat()) {
+    @if (isInCombat()) {
+      <app-enemy/>
+    } @else {
       <div class="battle-pane__waiting" role="status">
         <span class="battle-pane__waiting-marker" aria-hidden="true"></span>
         <span>{{ 'app:battle.nextEnemy' | i18next }}</span>

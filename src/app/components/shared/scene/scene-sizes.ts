@@ -16,8 +16,8 @@ export interface SceneArea {
 }
 
 /**
- * Where the enemy sprite stands on a battle Scene; the name and HP bar sit above it at a fixed size.
- * Low enough that the name clears the nav bar with a full task list at 1536, narrow enough to clear the side buttons at 1280.
+ * Where the enemy sprite stands on a battle Scene (`app-enemy-sprite`). Low enough that the name and HP bar,
+ * pinned under the nav bar, clear it at 1536 with a full task list; narrow enough to clear the side buttons at 1280.
  */
 export const ENEMY_SPRITE_AREA: SceneArea = { left: 29, top: 52, width: 42, height: 20 }
 
@@ -30,7 +30,8 @@ export const BATTLE_HUD_AREAS: Record<string, SceneArea> = {
   navBar: { left: 0, top: 0, width: 100, height: 30 },
   footer: { left: 0, top: 78, width: 100, height: 22 },
   sideButtons: { left: 71, top: 28, width: 29, height: 72 },
-  enemyInfo: { left: ENEMY_SPRITE_AREA.left, top: 0, width: ENEMY_SPRITE_AREA.width, height: ENEMY_SPRITE_AREA.top },
+  // Name, tags and HP pinned under the nav bar (in the pane, not on the Scene); at 1280 with a full task list it reaches 61%.
+  enemyInfo: { left: 14, top: 0, width: 72, height: 62 },
   enemySprite: ENEMY_SPRITE_AREA,
 }
 

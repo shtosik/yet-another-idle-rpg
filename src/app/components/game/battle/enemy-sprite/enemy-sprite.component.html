@@ -1,0 +1,39 @@
+@let burrow = bosses.burrow();
+@let shield = bosses.shield();
+@if (burrow) {
+  <div class="mounds">
+    @for (index of mounds; track index) {
+      <button
+        type="button"
+        class="mound"
+        [class.mound--shaking]="index === burrow.correct"
+        [attr.aria-label]="'app:arena.bosses.mound' | i18next: { number: index + 1 }"
+        (click)="bosses.pickMound(index)"
+      ></button>
+    }
+  </div>
+} @else if (battleStore.enemy(); as enemy) {
+  <img
+    #sprite
+    [src]="enemy.url"
+    [style.--sprite-width]="spriteWidth()"
+    (load)="spriteWidth.set(sprite.naturalWidth)"
+    [class.enemy-sprite__image--shiny]="battleStore.isShinyEnemy()"
+    [class.enemy-sprite__image--shield-fire]="shield === DamageElement.fire"
+    [class.enemy-sprite__image--shield-air]="shield === DamageElement.air"
+    [class.enemy-sprite__image--shield-water]="shield === DamageElement.water"
+    class="enemy-sprite__image"
+    alt=""
+  >
+}
+@let weakPoint = bosses.weakPoint();
+@if (weakPoint) {
+  <button
+    type="button"
+    class="weak-point"
+    [style.left.%]="weakPoint.x"
+    [style.top.%]="weakPoint.y"
+    [attr.aria-label]="'app:arena.bosses.weakPoint' | i18next"
+    (click)="bosses.hitWeakPoint()"
+  ></button>
+}

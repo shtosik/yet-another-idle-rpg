@@ -5,6 +5,7 @@ import { SceneComponent } from '../../shared/scene/scene.component'
 import { BattleStore } from '../../../store/battle/battle.store'
 import { BattleNavBarComponent } from './battle-nav-bar/battle-nav-bar.component'
 import { EnemyComponent } from './enemy/enemy.component'
+import { EnemySpriteComponent } from './enemy-sprite/enemy-sprite.component'
 import { DamagePopupComponent } from '../damage-popup/damage-popup.component'
 import { BattleFooterComponent } from './battle-footer/battle-footer.component'
 import { BattleSideButtonsComponent } from './battle-side-buttons/battle-side-buttons.component'
@@ -17,7 +18,7 @@ import { ARENA } from '../../../../data/arena-data'
   styleUrls: ['./battle.component.sass'],
   imports: [
     CommonModule, SceneComponent, I18nextPipe,
-    BattleNavBarComponent, EnemyComponent, DamagePopupComponent, BattleFooterComponent, BattleSideButtonsComponent,
+    BattleNavBarComponent, EnemyComponent, EnemySpriteComponent, DamagePopupComponent, BattleFooterComponent, BattleSideButtonsComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
