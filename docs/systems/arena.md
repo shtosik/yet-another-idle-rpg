@@ -36,7 +36,7 @@ Pathfinder's Seal is a separate **1-in-10 bonus roll per Arena Chest**, after it
 - Timers aren't saved: a reload mid-fight restarts the champion's timers (and the Arcanist's per-fight cap).
 
 ## Battle panel presentation
-The header groups wave kills and wave number above a progress strip, then time remaining and Leave. The clock changes color at 60 seconds; the Arcanist's time loss stays separately visible. Single-enemy arena waves show the Boss badge. Weak-point and mound buttons keep their existing hit targets and mechanics; damage popups do not intercept them, and shield/stun/bonus labels remain visible above the sprite.
+The arena background (`liroldArena-vertical.png`) is a zone-kind Scene like a Zone's (`docs/systems/scene.md`), so the sprite, weak point and mounds scale with it. The header groups wave kills and wave number above a progress strip, then time remaining and Leave. The clock changes color at 60 seconds; the Arcanist's time loss stays separately visible. Single-enemy arena waves show the Boss badge. Weak-point and mound buttons keep their existing hit targets and mechanics; damage popups do not intercept them, and shield/stun/bonus labels remain visible above the sprite.
 
 ## Invariants & gotchas
 - **The clock is Game time** (`GameClock`, `offline-progress.md`), saved as `startedAt`/`endsAt`/`arenaReadyAt`. It runs while the game is closed only through the offline claim, which moves it by the capped gap (24 h); a run that ran out in that time ends at its `endsAt` (owner decision). A changed system clock moves nothing.

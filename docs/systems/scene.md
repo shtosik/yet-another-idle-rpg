@@ -23,6 +23,28 @@ The size comes from the kind, never from per-entry data. Every background of a k
 
 A Scene mask is the same size as its art.
 
+## Battle Scene
+
+`app-battle` puts the zone or arena Scene behind the whole panel. The nav bar, footer and side buttons lie over it, with the edge gradient under them. In the supported range the panel is narrower than 2:3, so the Scene always spans the panel's width and gets fill above and below: about 370×555 at 1536 wide, 180×270 at 1280.
+
+`<app-enemy>` and the damage popups are projected into the Scene. The sprite box fills `ENEMY_SPRITE_AREA` and the sprite scales with the Scene (`100cqw`; as big as a half-size sprite at 1536). The name, tags and HP bar stack above it at a fixed size with `pointer-events: none`; the arena weak point and mounds keep their clicks.
+
+## HUD areas
+
+HUD drawn over a Scene, as rects in % of the art (`BATTLE_HUD_AREAS`, `BUILDING_HUD_AREAS` beside `SCENE_SIZES`). Each rect is the largest it gets across the supported range. A clickable spot painted under one would be hidden or unclickable, so a Scene mask spot must sit outside all of them.
+
+Battle (832×1248 art; left, top, width, height in %):
+
+| Area | Rect | Largest at |
+|---|---|---|
+| `navBar` | 0, 0, 100, 23 | 1536, with a full task list |
+| `footer` | 0, 85, 100, 15 | 1536, with an effects row |
+| `sideButtons` | 73, 27, 27, 73 | 1280, four buttons |
+| `enemyInfo` (name, tags, HP) | 27, 0, 46, 50 | 1280 |
+| `enemySprite` | 27, 50, 46, 26 | everywhere |
+
+Painter template: the free art is the left 27% from 23% to 85% down, and the strip between the sprite and the footer (76–85%).
+
 ## Supported window range
 
 1280–1536 CSS px wide (1536 is the `body` cap). Below 1280 isn't supported yet (`docs/ideas/responsive-layout.md`).

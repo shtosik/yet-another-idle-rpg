@@ -11,6 +11,7 @@ import { AnimationsService } from '../../../services/animations.service'
 import { ArenaBossesService } from '../../../services/arena-bosses.service'
 import { DamageElement } from '../../../../enums/damage-element.enum'
 import i18next from 'i18next'
+import { ENEMY_SPRITE_AREA } from '../../shared/scene/scene-sizes'
 
 describe('Battle panel presentation', () => {
   let fixture: ComponentFixture<BattleComponent>
@@ -149,6 +150,27 @@ describe('Battle panel presentation', () => {
     expect(Math.abs((hp.left - pane.left) - (pane.right - hp.right))).toBeLessThan(1)
     expect(element('.enemy').getBoundingClientRect().right)
       .toBeLessThanOrEqual(element('app-battle-side-buttons').getBoundingClientRect().left)
+  })
+
+  it('keeps the sprite box on the same spot of the Scene in a wide and a narrow panel', async () => {
+    battle.startBattle(0)
+    const spots = []
+    // The battle panel at 1536 and at 1280 wide.
+    for (const width of [372, 182]) {
+      host.style.width = `${width}px`
+      fixture.detectChanges()
+      await fixture.whenStable()
+      document.getAnimations().forEach(animation => animation.finish())
+      const scene = element('.scene').getBoundingClientRect()
+      const box = element('.enemy__sprite-box').getBoundingClientRect()
+      expect(scene.width / scene.height).toBeCloseTo(2 / 3, 2)
+      expect(box.right).toBeLessThanOrEqual(element('app-battle-side-buttons').getBoundingClientRect().left)
+      spots.push([box.left - scene.left, box.top - scene.top, box.width, box.height].map((value, i) => value / (i % 2 ? scene.height : scene.width) * 100))
+    }
+    spots[0].forEach((value, i) => expect(spots[1][i]).toBeCloseTo(value, 1))
+    expect(spots[0][0]).toBeCloseTo(ENEMY_SPRITE_AREA.left, 1)
+    expect(spots[0][1]).toBeCloseTo(ENEMY_SPRITE_AREA.top, 1)
+    expect(spots[0][3]).toBeCloseTo(ENEMY_SPRITE_AREA.height, 1)
   })
 
   it('keeps arena weak points clickable under popups and hides wave movement', () => {

@@ -1,12 +1,16 @@
 @use 'variables'
 @use 'palette'
 
+// Position and width come from ENEMY_SPRITE_AREA (host bindings). Only the arena buttons take clicks.
 :host
+  position: absolute
   display: block
   min-width: 0
-  // Equal space on both sides keeps HP centered while clearing the control rail.
-  width: calc(100% - 7rem)
+  pointer-events: none
   animation: enemy-arrive 220ms ease-out
+
+button
+  pointer-events: auto
 
 .enemy
   display: flex
@@ -88,16 +92,17 @@
     display: flex
     align-items: flex-end
     justify-content: center
-    height: 9rem
-    max-width: 100%
+    width: 100%
 
   img
     object-fit: contain
 
+  // Scales with the Scene: as big as a half-size sprite on the 372px-wide Scene at a 1536px window.
   &__sprite
     image-rendering: pixelated
+    width: calc(var(--sprite-width) * 100cqw / 744)
     max-width: 100%
-    max-height: 9rem
+    max-height: 100%
 
     &--shiny
       filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.85))

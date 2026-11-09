@@ -1,7 +1,10 @@
-<div
-  class="battle"
-  [style]="{ 'background-image': (battleStore.arenaRun() ? arenaUrl : currentZoneData()?.url) | url }"
->
+<div class="battle">
+  <app-scene class="battle__scene" kind="zone" [url]="sceneUrl()">
+    @if (isInCombat()) {
+      <app-enemy/>
+    }
+    <app-damage-popup/>
+  </app-scene>
   <app-battle-nav-bar/>
   <div class="battle-pane">
     @if (!isInCombat()) {
@@ -9,11 +12,7 @@
         <span class="battle-pane__waiting-marker" aria-hidden="true"></span>
         <span>{{ 'app:battle.nextEnemy' | i18next }}</span>
       </div>
-    } @else {
-      <app-enemy/>
     }
-
-    <app-damage-popup/>
     <app-battle-side-buttons/>
     @if (dropsLostToast(); as message) {
       <div class="battle-pane__toast" role="status">{{ message }}</div>

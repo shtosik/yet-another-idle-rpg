@@ -14,3 +14,22 @@ export interface SceneArea {
   width: number
   height: number
 }
+
+/**
+ * Where the enemy sprite stands on a battle Scene; the name and HP bar sit above it at a fixed size.
+ * Low enough that the name clears the nav bar with a full task list at 1536, narrow enough to clear the side buttons at 1280.
+ */
+export const ENEMY_SPRITE_AREA: SceneArea = { left: 27, top: 50, width: 46, height: 26 }
+
+/**
+ * Battle HUD over the Scene, each rect the largest it gets at 1280–1536 wide (measured in the app).
+ * The nav bar and footer only reach the Scene at 1536; the side buttons and the name block cover most at 1280.
+ * No Scene mask spot may sit inside one (`npm run validate`).
+ */
+export const BATTLE_HUD_AREAS: Record<string, SceneArea> = {
+  navBar: { left: 0, top: 0, width: 100, height: 23 },
+  footer: { left: 0, top: 85, width: 100, height: 15 },
+  sideButtons: { left: 73, top: 27, width: 27, height: 73 },
+  enemyInfo: { left: ENEMY_SPRITE_AREA.left, top: 0, width: ENEMY_SPRITE_AREA.width, height: ENEMY_SPRITE_AREA.top },
+  enemySprite: ENEMY_SPRITE_AREA,
+}

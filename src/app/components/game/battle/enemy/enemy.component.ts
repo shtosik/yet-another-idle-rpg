@@ -1,23 +1,29 @@
 import { NgOptimizedImage } from '@angular/common'
-import { ChangeDetectionStrategy, Component, computed, DestroyRef, ElementRef, inject, viewChild } from '@angular/core'
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, ElementRef, inject, signal, viewChild } from '@angular/core'
+import { ENEMY_SPRITE_AREA } from '../../../shared/scene/scene-sizes'
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop'
 import { BattleStore } from '../../../../store/battle/battle.store'
 import { ARENA } from '../../../../../data/arena-data'
 import { AnimationsService } from '../../../../services/animations.service'
 import { EnemyID } from '../../../../../enums/ids/enemy-id.enum'
 import { I18nextPipe } from '../../../../pipes/i18next.pipe'
-import { HalfSizeSpriteDirective } from '../../../shared/half-size-sprite/half-size-sprite.directive'
 import { MonsterDebuffBarComponent, WEAKNESS_ICONS } from './monster-debuff-bar/monster-debuff-bar.component'
 import { ArenaBossesService } from '../../../../services/arena-bosses.service'
 import { DamageElement } from '../../../../../enums/damage-element.enum'
 import { DisplayNamePipe } from '../../../../pipes/display-name.pipe'
 
 @Component({
-  imports: [DisplayNamePipe, I18nextPipe, MonsterDebuffBarComponent, HalfSizeSpriteDirective, NgOptimizedImage],
+  imports: [DisplayNamePipe, I18nextPipe, MonsterDebuffBarComponent, NgOptimizedImage],
   selector: 'app-enemy',
   templateUrl: 'enemy.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
   styleUrls: ['./enemy.component.sass'],
+  // Placed on the battle Scene: the sprite box fills ENEMY_SPRITE_AREA, the name and HP bar stack above it.
+  host: {
+    '[style.left.%]': 'spriteArea.left',
+    '[style.width.%]': 'spriteArea.width',
+    '[style.bottom.%]': '100 - spriteArea.top - spriteArea.height',
+  },
 })
 
 export class EnemyComponent {
@@ -34,6 +40,9 @@ export class EnemyComponent {
   })
   readonly hpPercent = computed(() => Math.max(0, Math.min(100, this.currentEnemyHp() / this.currentEnemy().maxHp * 100)))
   private readonly sprite = viewChild<ElementRef<HTMLImageElement>>('sprite')
+  protected readonly spriteArea = ENEMY_SPRITE_AREA
+  /** The sprite file's width in px; the template scales it with the Scene. */
+  protected readonly spriteWidth = signal<number | null>(null)
 
   constructor() {
     let hitAnimation: Animation | undefined

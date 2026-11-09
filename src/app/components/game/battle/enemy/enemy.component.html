@@ -33,7 +33,7 @@
   @if (bosses.isStunned()) {
     <p class="enemy__status">{{ 'app:arena.bosses.stunned' | i18next }}</p>
   }
-  <div class="enemy__sprite-box">
+  <div class="enemy__sprite-box" [style.height]="spriteArea.height + 'cqh'">
     @let burrow = bosses.burrow();
     @if (burrow) {
       <div class="mounds">
@@ -50,8 +50,9 @@
     } @else {
       <img
         #sprite
-        appHalfSizeSprite
         [src]="currentEnemy().url"
+        [style.--sprite-width]="spriteWidth()"
+        (load)="spriteWidth.set(sprite.naturalWidth)"
         [class.enemy__sprite--shiny]="battleStore.isShinyEnemy()"
         [class.enemy__sprite--shield-fire]="shield === DamageElement.fire"
         [class.enemy__sprite--shield-air]="shield === DamageElement.air"

@@ -8,15 +8,23 @@
   padding: 0
   overflow: hidden
 
+// The Scene spans the whole panel; the nav bar, pane and footer lie over it.
 .battle
+  position: relative
   width: 100%
   height: 100%
   display: grid
   grid-template-rows: auto minmax(0, 1fr) auto
-  background-size: cover
-  background-position: center
   isolation: isolate
 
+  &__scene
+    position: absolute
+    inset: 0
+
+  > :not(.battle__scene)
+    z-index: 1
+
+// Lets clicks through to the enemy on the Scene below; the side buttons take their own.
 .battle-pane
   min-height: 0
   position: relative
@@ -24,6 +32,10 @@
   align-items: center
   justify-content: center
   background: linear-gradient(180deg, #0003, transparent 25%, #0002 70%, #171717b3)
+  pointer-events: none
+
+  app-battle-side-buttons
+    pointer-events: auto
 
   &__waiting
     display: flex

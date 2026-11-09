@@ -6,6 +6,7 @@ Versions follow [Semantic Versioning](https://semver.org/). Each note is `- [typ
 New notes go under `[Unreleased]`; `npm run release -- <major|minor|patch>` moves them into a version (docs/deployment.md).
 
 ## [Unreleased]
+- [feature] Battle backgrounds now show whole at any window size instead of being cut off at the sides.
 - [feature] Gold and explorer tokens from chests, zone stars, quests, merging and fees now show next to your purse.
 - [bug] Quest item drops now stop at the amount an Order asks for.
 - [bug] An NPC's wait time now counts its Orders' cooldowns.
