@@ -63,6 +63,7 @@ Notes:
 - *Signs of Rot* is **not** gated on the letter, so players who skip Marvin are not locked out. **Owner call** (§8).
 - *The Same Winter* needs *The Quiet Road*, so the chapter always starts and ends with Marvin. A player who reached Mawood first can still pick it up from Marvin; step 1 then needs a trip back to the Pass.
 - `corwinsSecondLetter` is **not** consumed in Chapter One. Chapter Two's first quest takes it to Varrow.
+- The Finn (`warchiefsToken`) and Elarion (`corwinsRitualNotes`) turn-ins keep their item. Today a turn-in always takes a step's items (`requirement-handlers.ts` `item.consumed`), so `ItemRequirement` gets `keep?: true`, for which `consumed` returns nothing.
 
 ## 4a. Search spots and hidden passages (new quest mechanic)
 
@@ -84,6 +85,14 @@ Owner request (2026-11-09): things in a battle or Town screen the player can cli
 - **Hints come from the world:** an NPC's directions, a letter, a book's text (the item's description, read in the inventory), found text from an earlier spot. Each spot has at least two hints, from different sources, that together describe what it looks like and where it is on the screen ("behind the switchbacks", "worn smooth at shoulder height", "goblin marks beside it").
 
 **Hidden Zones are full Zones (owner decision 2026-11-09):** a hidden Zone is its own entry in Zone data, with its own ID, tier, Waves, Boss, background and mastery reward. Once found, it appears on the world map with a marker. It has the same mechanics as any other Zone: stars or mastery, kill counters, offline progress, Bestiary entries and quest kill requirements. Only how it unlocks differs: by finding the passage, not by a Wave reached. It stays unlocked for good; the passage needs no second click (the map takes the player there).
+
+**Code rules** (review 2026-11-09):
+- A found passage grants its Zone through `UnlockService.grant`: a third Zone unlock path beside the boss chain and town entrances. No `UNLOCK_RULES` entry (rules never target Zones); the Zone is saved in `unlockedContent.zones` like any other. Update `GLOSSARY.md` "Zone unlock" and `zones-waves-unlocks.md`.
+- A spot gives its item through the Item grant (the Quest tab has no cap, so it always fits).
+- An item description used as a hint needs a description line in the item tooltip; no item shows one today (`known-issues.md`).
+- Spot positions must line up with the art at every window size. Backgrounds use `background-size: cover` today and the battle panel's shape changes with window width, so the crop moves. Owner decision (2026-11-09): backgrounds move onto a fixed-ratio stage first ([`../plans/scene-stage.md`](../plans/scene-stage.md)), and spots are found by a scene mask (a same-size PNG, one flat colour per spot), not by coordinates.
+
+Build order: [`../plans/chapter-one-sap-winter.md`](../plans/chapter-one-sap-winter.md).
 
 **Fiction rules** (for dialogue and text that point to them):
 - The NPC says where, as a person would: "the trunk under the stair", "a cleft only goats and runners use". Never "click", "look on the screen" or "highlighted".
@@ -111,7 +120,8 @@ The art for these is new work: the Mountain Pass background needs the post-hut a
 | **Boss** | **Goblin Packrat** (new). |
 | **Lore** | The runners' short-cut round the switchbacks. The goblins found it and made it their store. Hobb's satchel is here; Hobb is not (T-34 stays open). |
 | **Art** | Narrow grey cleft, a strip of sky, goblin junk-piles of packs and cart wheels, a single Guild post-stake with an orange rag. |
-| **Mastery reward** | Matched to the Pass (800 gold, 12 tokens): about 900 gold and 13 Explorer Tokens, plus 5 Viperskin and 5 Pack Leather. |
+| **Mastery reward** | The Zone formula for tier 4 (50 × tier² gold, 3 × tier tokens): 800 gold and 12 Explorer Tokens, plus 5 Viperskin and 5 Pack Leather. |
+| **Shared enemy** | The Goat is in both the Pass and the Cleft. Nothing breaks, but: Goat Tasks roll twice as often (the Task pool lists it once per Zone, `tasks.ts`); Goat kills on the Pass count toward the Cleft's Hunter star (bestiary rank is per enemy); quest kill links go to the first unlocked Zone in `ZONES_DATA` order, so the Cleft's entry goes after the Pass. `zones-waves-unlocks.md` "No enemy is shared between zones" changes to allow it. `npm run sim` doesn't cover the Cleft (its route is hard-coded). |
 | **Why hunt here later** | It is the only source of Viperskin, Viper Venom and Pack Leather, the materials of the **Viperskin set**, the game's first ranged-damage gear, and of the Packrat's two pieces of gear. |
 
 ### New enemies
@@ -150,12 +160,11 @@ Owner decision (2026-11-09): Viperskin crafts a whole set that boosts ranged dam
 Five pieces in the slots the Turtle Shell set uses (`docs/ideas/item-sets.md`). The Packrat's Buckled Harness and Runner's Boots compete with the Jerkin and Boots on purpose: loot or set.
 
 **How it boosts ranged damage:**
-- **Needs a new stat:** ranged damage, a % bonus to weapon damage while a ranged weapon is equipped. Each piece carries a little of it.
-- **Set bonus**, if item sets ship first (`item-sets.md`, Proposed): 2 pieces give more ranged damage, 4 pieces give ranged attack speed, 5 pieces give ranged critical chance. These numbers are placeholders.
-- **Without item sets,** the pieces carry the stat alone and the set is a set in name only until sets ship.
+- **Needs a new stat:** `rangedDamageMultiplier`, mirroring `meleeDamageMultiplier` (`hit-resolution.ts`, `player.ts`, `stat-rows.ts`, `app.json`): it multiplies auto-attacks with a ranged weapon and ranged spells. Each piece carries a little of it. The offline simulation gets the ranged flag too (`offline-simulation.ts` passes only `isMeleeWeapon` today), or offline progress undercounts bow builds.
+- **No set bonus** (owner decision 2026-11-09): item sets don't exist yet, so the pieces carry the stat alone and the set is a set in name only.
 - `item-sets.md` plans a **Hunter's Kit** (Mawood, "bonus vs beasts, attack speed"). The Viperskin set is the ranged-damage one, so keep the two from overlapping.
 
-**How the recipes are learned (proposed):** a carter's pattern book, torn up. The Goblin Hoarders carry the **Viperskin patterns**, one recipe scroll per piece, each about 1 in 40, so the set is a hunt as much as a craft. Recipe scrolls already exist (`docs/systems/consumables-camp-crafting.md`). The alternative is to have Brenna (Hunter's Lodge) teach them once the player brings her Viperskin. Owner call.
+**How the recipes are learned (proposed):** a carter's pattern book, torn up. The Goblin Hoarders carry the **Viperskin patterns**, one recipe scroll per piece, each about 1 in 40, so the set is a hunt as much as a craft (about 90 Hoarder kills for all five). A known recipe's scroll can't be used (`PlayerStore.useItem`), so duplicates get a small sell value. Recipe scrolls already exist (`docs/systems/consumables-camp-crafting.md`). The alternative is to have Brenna (Hunter's Lodge) teach them once the player brings her Viperskin. Owner call.
 
 Lore: the cleft's vipers are why runners wore viperskin on the Pass at all. A runner's kit was always viperskin, and the patterns came down in the carts the goblins robbed.
 
@@ -460,7 +469,7 @@ Optional, one or two lines each. None mentions Theron.
 7. **The Warchief token is reused from step 1 through step 4.** It is a quest item that is never taken. Keep it (`ItemType.quest`, unsellable) as a Chapter Two clue, or have Corwin take it at step 4.
 8. **Theron as the cause of the seal failing** is kept in the bible as a candidate only (§6.3).
 9. **The Goat Cleft is a full Zone** (owner decision): 8 Waves, Pass-level strength, two new enemies, a new Boss, a new background and two repainted backgrounds.
-10. **Viperskin recipes come from Hoarder drops** (patterns, about 1 in 40 each) rather than from Brenna. Ranged-damage numbers, and whether the set waits for item sets, are the main thread's call.
+10. **Viperskin recipes come from Hoarder drops** (patterns, about 1 in 40 each) rather than from Brenna. No set bonus until item sets exist (owner decision); ranged-damage numbers are the main thread's call.
 11. **The Packrat's chest piece is a Buckled Harness** (owner decision: no new weapon). A gold-find stat is suggested.
 12. **Corwin's ritual mark matches the token.** This is the strongest new canon here: the hand's grammar was in the Spires decades before the sap (T-09, T-11). It points Chapter Two at "old" rather than "new" enemies. Cut the match and keep only the notes if that's too much.
 13. **Elarion sends the player through Corwin's trunk.** Corwin forgives it on screen. If taking things from an Elder feels wrong for the game's tone, Corwin can instead say where the notes are, and Elarion's `sameWinterElarionTrunk` goes.
@@ -493,7 +502,8 @@ No new NPCs. Hobb is named but never met.
 - `/add-npc-dialogue` (expand) for Marvin, Corwin, Finn, Elarion, Milo, Sylvie, the Bartender, the Trader and Josh, with the nodes in §7. Then `/audit-dialogue` on each, for hub order.
 - Update `docs/systems/quests.md` with a *Chapter One* section, and add a `CHANGELOG.md` line.
 - Chapter UI is left open by the owner. Don't build it with this.
-- **Search spots and hidden passages need a system design first** (§4a): a spot list per battle background and per Building, shown by quest step, giving an item or unlocking a Zone; a new system doc; tutorial pulse. Run `/review-game-systems` on §4a before coding. Likely touch-points: quest requirements (an item from a spot fits the existing `item` requirement, so no new requirement type is needed), `unlock-conditions.ts` (a new condition for a found passage), battle and Building views (click areas in background coordinates, scaled with the art), and the quest panel (no links for spot steps).
+- **Search spots and hidden passages need a system design first** (§4a): a spot list per battle background and per Building, shown by quest step, giving an item or unlocking a Zone; a new system doc. Touch-points: quest requirements (an item from a spot fits the existing `item` requirement; add `keep?: true`), `UnlockService.grant` for a found passage (not `unlock-conditions.ts`), battle and Building views (spot placement, open in §4a Code rules), the item tooltip (description line), and the quest panel (no change: item rows have no zone link already).
+- `GLOSSARY.md`: add Search spot, Hidden passage, Secret, Side Zone and Found text; change "Zone unlock" for the third path. Chapter waits for the chapter UI decision.
 - The Goat Cleft is a normal `ZONES_DATA` entry with no route links. Check the world map, Zone mastery, offline progress and the Bestiary for any assumption that every Zone sits on the `previousZoneId`/`nextZoneId` chain.
-- `/add-enemy-and-zone` for the Goat Cleft, Rock Viper, Goblin Hoarder and Goblin Packrat; `/add-equipment-item` for the Buckled Harness, Runner's Boots and the five Viperskin pieces; `/add-recipe-or-consumable` for the five Viperskin recipes and their pattern scrolls; a new **ranged damage** stat (stats, battle damage, tooltips) and, for set bonuses, `docs/ideas/item-sets.md` first; `/add-shiny-variant` for the three new pets; Wick's order pool for Viperskin.
+- `/add-enemy-and-zone` for the Goat Cleft, Rock Viper, Goblin Hoarder and Goblin Packrat; `/add-equipment-item` for the Buckled Harness, Runner's Boots and the five Viperskin pieces; `/add-recipe-or-consumable` for the five Viperskin recipes and their pattern scrolls; a new `rangedDamageMultiplier` stat (stats, battle damage, offline simulation, tooltips); `/add-shiny-variant` for the three new pets; Wick's order pool for Viperskin.
 - `/generate-2d-asset` for the Cleft background, three enemy sprites and the item icons, and to repaint the Mountain Pass (post-hut, cleft) and Elder's Tree (trunk) backgrounds with the spots baked in.
