@@ -32,6 +32,18 @@ _Avoid_: Location, area
 One place inside a town, holding NPCs and objects such as zone entrances.
 _Avoid_: Tab, room
 
+**Scene**:
+The background art of a zone, town, building or site, shown whole at a fixed shape and scaled as one piece, so anything placed on it stays on the same spot of the art.
+_Avoid_: Stage, backdrop
+
+**Scene fill**:
+The blurred, darkened copy of a scene's art that fills its panel around the scene when the panel's shape differs.
+_Avoid_: Letterbox, border
+
+**Scene mask**:
+A hidden image the size of a scene's art that marks each clickable thing painted on it.
+_Avoid_: Hitmap, overlay
+
 ## Enemies
 
 **Shiny**:

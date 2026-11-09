@@ -1,6 +1,6 @@
 # Plan: Chapter One, The Sap Winter
 
-Builds [`docs/ideas/chapter-one-sap-winter.md`](../ideas/chapter-one-sap-winter.md): two quests, the side Zone The Goat Cleft, search spots and hidden passages, the Viperskin set and a ranged damage stat. The idea doc holds the story, dialogue scripts, spot hints and item text; this plan holds the build order. Needs [`scene-stage.md`](scene-stage.md) merged first (spots sit on the stage).
+Builds [`docs/ideas/chapter-one-sap-winter.md`](../ideas/chapter-one-sap-winter.md): two quests, the side Zone The Goat Cleft, search spots and hidden passages, the Viperskin set and a ranged damage stat. The idea doc holds the story, dialogue scripts, spot hints and item text; this plan holds the build order. Needs [`scene.md`](scene.md) merged first (spots sit on the Scene).
 
 One branch, `feat/chapter-one-sap-winter`, one PR into `staging`, each step a commit. Code references are from `staging` at `34bbc9a`; re-check them when a step starts.
 
@@ -20,7 +20,7 @@ Carried from the idea doc §8: Signs of Rot stays ungated (1), the token is kept
 
 ## Order
 
-Steps 1, 2 and 3 are independent. Step 4 needs 3 (the Zone) and `scene-stage`. Step 5 needs 3 (its materials). Step 6 needs 2 and 4. Step 7 needs 6. Step 8 last. Art (Step 3, 4) can be generated ahead of the code.
+Steps 1, 2 and 3 are independent. Step 4 needs 3 (the Zone) and `scene`. Step 5 needs 3 (its materials). Step 6 needs 2 and 4. Step 7 needs 6. Step 8 last. Art (Step 3, 4) can be generated ahead of the code.
 
 ### 1. Ranged damage stat (S, Sonnet)
 - `rangedDamageMultiplier` (base 1, `player.ts`), mirroring `meleeDamageMultiplier`: `hit-resolution.ts` multiplies auto-attacks with a ranged weapon and ranged spells by it; the stat row in `stat-rows.ts`; label and description in `app.json`.
@@ -41,18 +41,18 @@ Steps 1, 2 and 3 are independent. Step 4 needs 3 (the Zone) and `scene-stage`. S
 - Items: Viperskin, Viper Venom, Pack Leather (materials), Lost Trade Goods (junk, sellable), Buckled Harness (chest, gold find), Runner's Boots (boots, attack speed), stats matched to the Troll Hide Vest tier via `/add-equipment-item`.
 - World map marker beside the Pass; `ZONE_UNLOCK_NOTIFICATIONS` entry; names in `zones.json`, `enemies.json`, `items.json`.
 - Wick's order pool: Viperskin with `sourceZones: [goatCleft]`.
-- Art (`/generate-2d-asset`): Cleft background (2:3, stage `size` set), three enemy sprites with shiny variants, item icons.
+- Art (`/generate-2d-asset`): Cleft background (832×1248, the Zone scene size), three enemy sprites with shiny variants, item icons.
 - Docs: `zones-waves-unlocks.md` (allow an enemy in more than one Zone; the Goat's Task weight doubles, its bestiary rank counts toward both Hunter stars), `enemies-shiny-pets-bestiary.md`, `farming.md` (Wick's pool).
 
 ### 4. Search spots and hidden passages (L, Opus, plan mode)
 - **Data**: `src/data/scene-spots.ts`, keyed by scene (Zone or Building): the scene's mask url and a list of spots `{ color, kind: 'search' | 'passage', when, gives }`. `when` is `{ questId, step }` for a quest spot (Chapter One has only these); `gives` is `{ itemId }` or `{ zoneId }`, plus `foundTextKey`.
-- **Mask hit test**: the stage's mask layer loads the mask once into an offscreen canvas; a click on the stage reads the pixel at the click's stage coordinates and looks its colour up. No cursor change, no hover state, nothing drawn.
+- **Mask hit test**: the Scene's mask layer loads the mask once into an offscreen canvas; a click on the Scene reads the pixel at the click's scene coordinates and looks its colour up. No cursor change, no hover state, nothing drawn.
 - **When a spot works**: quest active at that step **and** the item not held (search), or the Zone not unlocked (passage). Otherwise the click does nothing.
 - **Search**: Item grant of the item (the Quest tab has no cap), found text as a battle or Building toast through Notices.
 - **Passage**: `UnlockService.grant({ zone })` (a third Zone unlock path beside the boss chain and town entrances; no `UNLOCK_RULES` entry), found text, then `BattleStore.setZone`. Saved in `unlockedContent.zones` like any Zone.
 - Spots in Chapter One: burned Guild post and goat cleft (Mountain Pass), trunk under the stair (Elder's Tree). Repaint those two backgrounds with the objects baked in, and paint their masks (same size as the art).
 - `npm run validate`: every mask exists and matches its art's size; every spot colour appears in its mask; every `gives.itemId` is a quest item.
-- Specs: hit test maps a stage click to the right colour at two stage sizes; a spot inactive before its step, active during, inactive once the item is held; a passage grants the Zone once and moves the player.
+- Specs: hit test maps a Scene click to the right colour at two Scene sizes; a spot inactive before its step, active during, inactive once the item is held; a passage grants the Zone once and moves the player.
 - Docs: new `docs/systems/scene-spots.md` (row in `docs/systems/README.md`); `zones-waves-unlocks.md` and `GLOSSARY.md` "Zone unlock" (third path); `GLOSSARY.md` Search spot, Hidden passage, Secret, Side Zone, Found text.
 
 ### 5. Viperskin set (M, Sonnet, `/add-equipment-item`, `/add-recipe-or-consumable`)
