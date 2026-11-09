@@ -45,6 +45,18 @@ Battle (832×1248 art; left, top, width, height in %):
 
 Painter template: the free art is the left 27% from 23% to 85% down, and the strip between the sprite and the footer (76–85%).
 
+Town, Building and Site (1376×566 art; the panel is a fixed 776×320, so the Scene fills it and these hold at every width):
+
+| Area | Rect | Covers |
+|---|---|---|
+| `title` | 0, 0, 35, 17 | town name with reputation tier, Building title, Site name |
+| `closeButton` | 91, 0, 9, 19 | close button |
+| `npcFrameArea(position)` | 17 wide, 57 tall, centred on the NPC's `position` | portrait, cooldown and shop button |
+
+## Town, Building and Site Scenes
+
+`towns.component` (town view) and `town-building.component` render `<app-scene kind="building">`; the Site home reuses `app-town-building` and projects its gate into it. Building buttons, NPC frames and the gate keep their % `position` data, now of the Scene. The 1376×566 art is the crop the 776×320 panel showed of the old 1376×768 art under `cover`, so the positions still land on the same spot. The farm plots panel (`farm-plots.png`, a darkened texture with nothing placed on it) stays off the Scene.
+
 ## Supported window range
 
 1280–1536 CSS px wide (1536 is the `body` cap). Below 1280 isn't supported yet (`docs/ideas/responsive-layout.md`).

@@ -33,3 +33,19 @@ export const BATTLE_HUD_AREAS: Record<string, SceneArea> = {
   enemyInfo: { left: ENEMY_SPRITE_AREA.left, top: 0, width: ENEMY_SPRITE_AREA.width, height: ENEMY_SPRITE_AREA.top },
   enemySprite: ENEMY_SPRITE_AREA,
 }
+
+/**
+ * Town, Building and Site HUD over the Scene (the panel is a fixed 776×320, so one size). The title covers the
+ * longest town name with its reputation tier; NPC frames move with their data, so they come from `npcFrameArea`.
+ */
+export const BUILDING_HUD_AREAS: Record<string, SceneArea> = {
+  title: { left: 0, top: 0, width: 35, height: 17 },
+  closeButton: { left: 91, top: 0, width: 9, height: 19 },
+}
+
+/** An NPC frame (portrait, cooldown and shop button) centred on its `position`, in % of a building Scene. */
+export function npcFrameArea(position: { x: number, y: number }): SceneArea {
+  const width = 17
+  const height = 57
+  return { left: position.x - width / 2, top: position.y - height / 2, width, height }
+}
