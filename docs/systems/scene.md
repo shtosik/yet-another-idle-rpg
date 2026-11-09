@@ -39,11 +39,11 @@ Battle (832×1664 art; left, top, width, height in %):
 |---|---|---|
 | `navBar` | 0, 0, 100, 30 | 1536, with a full task list |
 | `footer` | 0, 78, 100, 22 | 1536, with an effects row |
-| `sideButtons` | 73, 28, 27, 72 | 1280, four buttons and a full task list |
-| `enemyInfo` (name, tags, HP) | 27, 0, 46, 52 | 1280 |
-| `enemySprite` | 27, 52, 46, 20 | everywhere |
+| `sideButtons` | 71, 28, 29, 72 | 1280, four buttons and a full task list |
+| `enemyInfo` (name, tags, HP) | 29, 0, 42, 52 | 1280 |
+| `enemySprite` | 29, 52, 42, 20 | everywhere |
 
-Painter template: the free art is the left 27% from 30% to 78% down, and the strip between the sprite and the footer (72–78%).
+Painter template: the free art is the left 29% from 30% to 78% down, and the strip between the sprite and the footer (72–78%).
 
 Town, Building and Site (1376×566 art; the panel is a fixed 776×320, so the Scene fills it and these hold at every width):
 
