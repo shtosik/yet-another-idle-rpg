@@ -37,6 +37,7 @@ Owner decision (2026-10-27): Marvin stays in La Harpar for good. The Exploration
 - **Role:** until the player has met Varrow (flag `met_liroldVarrow`) he handles contracts (accept, claim, cancel) and sells the Guild store's stage-0 items, then he redirects to her. Always teaches combat. Always keeps the road book: *The Cold Forge* step 3 and Pathfinder's Seal registration stay with him at every stage.
 - **Letters:** writes to Varrow about the player; she quotes them in the capital (deed lines).
 - **Secret:** won't say where his last expedition went (thread T-17); that is between him and Varrow.
+- **Chapter One lead (owner decision 2026-11-09):** Varrow posted him in La Harpar after the expedition to watch the Pass road and gather word of the corruption. He sends the player after Hobb's satchel and, at the chapter's end, on to Varrow; he admits the posting only then (`aboutPosting`). **(proposed, `docs/ideas/chapter-one-sap-winter.md`)**
 
 ## Avatar concept — DONE
 Existing portrait (`laHarparMarvin.png`): scarred veteran warrior, auburn hair and beard, grey plate pauldrons, orange scarf. Reads as a capable ex-adventurer. No changes needed.

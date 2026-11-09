@@ -41,6 +41,7 @@ Owner decisions in force:
 | [Slatefall & the Deeper Mines](slatefall-and-the-deeper-mines.md) | M-L | Proposed |
 | [Inventory tabs & destroy](inventory-tabs.md) | M-L | Done |
 | [La Harpar quests & Tidecaller questline](la-harpar-quests.md) | M | Proposed |
+| [Chapter One: The Sap Winter](chapter-one-sap-winter.md) | M | Proposed |
 | [Town reputation](town-reputation.md) | M | Done |
 | [Town reputation: tier rewards and titles](town-reputation-tier-rewards.md) | M | Done |
 | [Town reputation: Exalted town pets](town-reputation-pets.md) | S-M | Done |

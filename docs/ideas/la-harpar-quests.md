@@ -2,6 +2,8 @@
 
 **Scope:** M · **Status:** Proposed
 
+**Owner decision (2026-11-09):** the Tidecaller questline is a longer side story, separate from the corruption main plot (Chapter One, [`chapter-one-sap-winter.md`](chapter-one-sap-winter.md)). Where §2 links Theron to the roots, the blight or the Spires (the journal's "singing the storms", T5 at Corwin, the T-08 owner call), rework it so it doesn't touch the corruption; Marvin's S4, S6 and T3 turn-ins still stand.
+
 La Harpar (Horseshoe Beach, Trader's Basement, Plains, The Long Path, Mountain Pass) has 4 quests; Mawood has 12. This doc finishes **A Tale of a Captain** as a five-quest questline and adds 7 side quests across zones 1–5, all with existing zones and enemies. Quest-only drops, new items and keys are listed at the end.
 
 ## 1. Lore already in the game
