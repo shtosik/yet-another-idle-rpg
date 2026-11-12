@@ -14,7 +14,7 @@ Your lens: `<code: CODING_STANDARDS.md, GLOSSARY.md terms and the step text | sy
 
 <step text from the plan, verbatim>
 
-Earlier review rounds of this step, if any: `.claude/jobs/<name>/step-<N>/round-*/`. Don't repeat a finding the builder already fixed.
+Earlier review rounds of this step, if any: `<absolute jobs path>/step-<N>/round-*/`. Don't repeat a finding the builder already fixed.
 
 ## Reply
 

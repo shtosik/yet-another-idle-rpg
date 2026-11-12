@@ -5,7 +5,7 @@ description: Use to review a feature plan or idea doc as a game-systems expert b
 
 # Review game systems
 
-Read-only review of one `docs/plans/*.md` or `docs/ideas/*.md` file against the rest of the game. Output is a text report. Write no file and edit nothing, not even the plan: the main thread applies the answers.
+Read-only review of one plan (`<main checkout>/.claude/jobs/<name>/plan.md`, untracked) or `docs/ideas/*.md` file against the rest of the game. Output is a text report. Write no file and edit nothing, not even the plan: the main thread applies the answers.
 
 Every finding comes from the game as it is, never from your own taste, and cites its source. Opinions you cannot cite go only under **Unsourced judgment**.
 
@@ -16,7 +16,7 @@ Every finding comes from the game as it is, never from your own taste, and cites
 3. **Read the plan fully**, plus every idea or doc it links.
 4. **Find the systems it touches.** Open `docs/systems/README.md`, match every mechanic the plan changes or relies on (also those it does not name) to a system doc, and read each doc. Read `GLOSSARY.md`, and `docs/ideas/known-issues.md` for open bugs in those systems.
 5. **Check claims against sources**, in this order of trust: shipped code and data in `origin/staging`, `docs/systems/*`, `GLOSSARY.md`, accepted ideas, proposed ideas. When a doc and the code disagree, the code wins; report the doc as wrong.
-6. **Scan `docs/ideas/README.md`** for ideas that overlap or collide, and list `docs/plans/` for plans that do; read the ones that do.
+6. **Scan `docs/ideas/README.md`** for ideas that overlap or collide, and list the plans in `<main checkout>/.claude/jobs/*/plan.md` for ones that do; read the ones that do.
 7. **Run `npm run sim`** (`-- --reputation`, `-- --upgrades`; see `docs/ideas/progression-pacing.md`) only when a claim about pacing, cost or rewards needs numbers. It reads the checkout it runs in, so run it only where `src/`, `package.json`, `scripts/sim-economy.mjs` and `tsconfig.json` match `origin/staging` (an empty `git diff origin/staging -- <those paths>`); otherwise report those numbers as unavailable. Quote the output you used.
 8. **Write the report** (format below).
 

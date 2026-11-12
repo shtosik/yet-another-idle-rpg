@@ -4,9 +4,9 @@ Fill the `<…>` parts and pass the rest verbatim as the plan writer's prompt.
 
 ---
 
-Write the implementation plan for the idea `<idea path>` in the YARI repo (Angular idle RPG), as `docs/plans/<name>.md`. Don't write code, commit, push or open a PR.
+Write the implementation plan for the idea `<idea path>` in the YARI repo (Angular idle RPG), as `<absolute jobs path>/plan.md`. That folder is outside the worktree and not tracked. Don't write code, commit, push or open a PR.
 
-Work only in `<absolute worktree path>`. Read first: `AGENTS.md`, `CODING_STANDARDS.md`, `GLOSSARY.md`, `docs/systems/README.md` and the system docs the idea touches, the idea doc and every doc it links. Read `docs/plans/gear-upgrading.md` as the model for the format.
+Work only in `<absolute worktree path>`. Read first: `AGENTS.md`, `CODING_STANDARDS.md`, `GLOSSARY.md`, `docs/systems/README.md` and the system docs the idea touches, the idea doc and every doc it links. Read one sibling plan, `<main checkout>/.claude/jobs/*/plan.md`, as the model for the format, if any exists.
 
 ## Format
 
@@ -29,7 +29,7 @@ Work only in `<absolute worktree path>`. Read first: `AGENTS.md`, `CODING_STANDA
 Reply with exactly:
 
 ```
-plan: docs/plans/<name>.md
+plan: <absolute jobs path>/plan.md
 steps: <count>
 owner questions: <one per line, with the step number; "none">
 assumptions: <what you assumed that the idea doesn't say; "none">

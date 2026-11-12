@@ -90,9 +90,9 @@ Owner request (2026-11-09): things in a battle or Town screen the player can cli
 - A found passage grants its Zone through `UnlockService.grant`: a third Zone unlock path beside the boss chain and town entrances. No `UNLOCK_RULES` entry (rules never target Zones); the Zone is saved in `unlockedContent.zones` like any other. Update `GLOSSARY.md` "Zone unlock" and `zones-waves-unlocks.md`.
 - A spot gives its item through the Item grant (the Quest tab has no cap, so it always fits).
 - An item description used as a hint needs a description line in the item tooltip; no item shows one today (`known-issues.md`).
-- Spot positions must line up with the art at every window size. Backgrounds use `background-size: cover` today and the battle panel's shape changes with window width, so the crop moves. Owner decision (2026-11-09): backgrounds move onto a fixed-ratio Scene first ([`../plans/scene.md`](../plans/scene.md)), and spots are found by a scene mask (a same-size PNG, one flat colour per spot), not by coordinates.
+- Spot positions must line up with the art at every window size. Backgrounds use `background-size: cover` today and the battle panel's shape changes with window width, so the crop moves. Owner decision (2026-11-09): backgrounds move onto a fixed-ratio Scene first (the `scene` plan, run with `/run-plan`), and spots are found by a scene mask (a same-size PNG, one flat colour per spot), not by coordinates.
 
-Build order: [`../plans/chapter-one-sap-winter.md`](../plans/chapter-one-sap-winter.md).
+Build order: the `chapter-one-sap-winter` plan (`/run-plan chapter-one-sap-winter`).
 
 **Fiction rules** (for dialogue and text that point to them):
 - The NPC says where, as a person would: "the trunk under the stair", "a cleft only goats and runners use". Never "click", "look on the screen" or "highlighted".

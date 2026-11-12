@@ -9,8 +9,9 @@
 # Worktrees from scripts/worktree.mjs and the app
 /.claude/worktrees/
 
-# /run-plan job folders (handoff files between agents)
+# /run-plan job folders: plans and handoff files between agents, kept out of git
 /.claude/jobs/
+/docs/plans/
 
 # Node
 /node_modules

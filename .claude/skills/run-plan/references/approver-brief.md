@@ -9,8 +9,8 @@ You decide whether the plan `<plan path>` in the YARI repo (Angular idle RPG) is
 Worktree: `<absolute worktree path>`, branch `<branch>`. Commits: `git log origin/staging..HEAD`.
 
 Read:
-- the plan and the idea doc it builds;
-- `.claude/jobs/<name>/`: each `step-<N>/build.md` (look at `deviations` and `questions`) and every review round;
+- the idea doc the plan builds;
+- the job folder `<absolute jobs path>`: the plan file, each `step-<N>/build.md` (look at `deviations` and `questions`) and every review round;
 - the `verify-yari` evidence: `<path, or "none: not player-facing">`;
 - `CHANGELOG.md` under `## [Unreleased]`.
 
