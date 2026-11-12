@@ -30,6 +30,8 @@ Already done in earlier steps of this plan (build on them, don't redo them):
 
 If the plan is wrong about the code, or a rule above blocks the step, stop and report it instead of working around it.
 
+You may be resumed for another round with review files to read (`.claude/jobs/<name>/step-<N>/round-<K>/`). Fix every `must` line in the `CHANGES` files as a new commit, `fix(<area>): <step title> review`, and reply with the same report.
+
 ## Report
 
 Reply with exactly:

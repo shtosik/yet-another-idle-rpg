@@ -9,6 +9,9 @@
 # Worktrees from scripts/worktree.mjs and the app
 /.claude/worktrees/
 
+# /run-plan job folders (handoff files between agents)
+/.claude/jobs/
+
 # Node
 /node_modules
 npm-debug.log
