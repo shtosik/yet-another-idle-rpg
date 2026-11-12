@@ -21,6 +21,7 @@
 //
 //  15. Saved stores: every store using withGameStateSync is listed in SAVED_STORES
 //  16. Game time: Date.now() only in the allowlisted files; game rules read GameClock
+//  17. Scene art: every Zone, arena, town, Building and Site background is exactly its kind's SCENE_SIZES size
 //
 // Usage: npm run validate
 
@@ -87,6 +88,8 @@ export { REPUTATION_TURN_INS } from 'data/reputation-turn-ins'
 export { bundleKey } from 'app/store/quests/turn-in-cooldown'
 export { TitleID } from 'enums/ids/title-id.enum'
 export { CHANGELOG_NOTE_TYPES } from 'app/components/modals/changelog/changelog'
+export { ARENA } from 'data/arena-data'
+export { SCENE_SIZES } from 'app/components/shared/scene/scene-sizes'
 `
 
 const outDir = join(ROOT, 'node_modules', '.cache', 'validate-data')
@@ -866,6 +869,30 @@ for (const f of [...walkFiles(join(ROOT, '.claude', 'agents'), '.md'), ...walkFi
     const rel = relative(SRC, file).replace(/\\/g, '/')
     if (!allowed.has(rel) && /Date\.now\s*\(/.test(readFileSync(file, 'utf8'))) {
       error(relative(ROOT, file), 'reads Date.now(); game rules read GameClock (allowlist in scripts/validate-data.mjs check 16)')
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 17. Scene art: a Scene places content in % of its art, so every background of a kind has one size (docs/systems/scene.md).
+
+{
+  const scenes = [
+    ...Object.values(D.ZONES_DATA).map(zone => ['zone', zone.url, 'src/data/zones-data.ts']),
+    ['zone', D.ARENA.url, 'src/data/arena-data.ts'],
+    ...Object.values(D.TOWNS_DATA).flatMap(town => [town.url, ...town.buildings.map(building => building.url)])
+      .map(url => ['building', url, 'src/data/towns-data.ts']),
+    ...Object.values(D.SITES_DATA).map(site => ['building', site.url, 'src/data/sites-data.ts']),
+  ]
+  for (const [kind, url, file] of scenes) {
+    if (!url) continue // zone entrances have no art
+    const path = join(SRC, url.replace(/^\.?\//, ''))
+    if (!existsSync(path)) continue // check 5 reports it
+    const png = readFileSync(path)
+    const [width, height] = [png.readUInt32BE(16), png.readUInt32BE(20)] // PNG IHDR
+    const size = D.SCENE_SIZES[kind]
+    if (width !== size.width || height !== size.height) {
+      error(file, `'${url}' is ${width}x${height}; ${kind} Scene art must be ${size.width}x${size.height}`)
     }
   }
 }

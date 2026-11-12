@@ -17,6 +17,7 @@ import { ForgeComponent } from './forge/forge.component'
 import { PlayerStore } from '../../../store/player/player.store'
 import { REPUTATION_IDS, REPUTATION_TOWN, reputationTier } from '../../../store/player/reputation'
 import { ReputationTier } from '../../../../enums/reputation-tier.enum'
+import { SceneComponent } from '../../shared/scene/scene.component'
 
 @Component({
   selector: 'app-towns',
@@ -30,6 +31,7 @@ import { ReputationTier } from '../../../../enums/reputation-tier.enum'
     ShopComponent,
     ForgeComponent,
     DialogueComponent,
+    SceneComponent,
   ],
 })
 export class TownsComponent {

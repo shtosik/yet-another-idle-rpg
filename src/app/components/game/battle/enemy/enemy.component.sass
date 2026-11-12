@@ -1,12 +1,17 @@
 @use 'variables'
 @use 'palette'
 
+// HUD pinned under the nav bar; equal space on both sides keeps HP centred while clearing the control rail.
+// Clicks pass through to the sprite on the Scene below, except the weakness chips with their hints.
 :host
   display: block
   min-width: 0
-  // Equal space on both sides keeps HP centered while clearing the control rail.
   width: calc(100% - 7rem)
+  pointer-events: none
   animation: enemy-arrive 220ms ease-out
+
+app-monster-debuff-bar
+  pointer-events: auto
 
 .enemy
   display: flex
@@ -83,34 +88,6 @@
     color: #fde68a
     text-align: center
 
-  &__sprite-box
-    position: relative
-    display: flex
-    align-items: flex-end
-    justify-content: center
-    height: 9rem
-    max-width: 100%
-
-  img
-    object-fit: contain
-
-  &__sprite
-    image-rendering: pixelated
-    max-width: 100%
-    max-height: 9rem
-
-    &--shiny
-      filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.85))
-
-    &--shield-fire
-      filter: drop-shadow(0 0 10px rgba(255, 110, 30, 0.95))
-
-    &--shield-air
-      filter: drop-shadow(0 0 10px rgba(200, 240, 255, 0.95))
-
-    &--shield-water
-      filter: drop-shadow(0 0 10px rgba(40, 130, 255, 0.95))
-
 @keyframes enemy-arrive
   from
     opacity: 0
@@ -126,47 +103,3 @@
   .enemy .hp-bar__fill
     transition: none
 
-.weak-point
-  position: absolute
-  width: 1.6rem
-  height: 1.6rem
-  margin: -0.8rem 0 0 -0.8rem
-  border: 2px solid palette.$yellow
-  border-radius: 50%
-  background: radial-gradient(circle, rgba(255, 80, 40, 0.9), rgba(255, 80, 40, 0.2))
-  cursor: pointer
-  animation: weak-point-pulse 0.6s ease-in-out infinite alternate
-
-.mounds
-  display: flex
-  align-items: flex-end
-  gap: 1rem
-
-.mound
-  width: 3rem
-  height: 1.5rem
-  border: none
-  border-radius: 50% 50% 0 0
-  background: #7a5a36
-  box-shadow: inset 0 -4px 0 #5b4127
-  cursor: pointer
-
-  &--shaking
-    animation: mound-shake 0.25s linear infinite
-
-@keyframes weak-point-pulse
-  to
-    transform: scale(1.25)
-
-@keyframes mound-shake
-  25%
-    transform: translateX(-1px) rotate(-2deg)
-  75%
-    transform: translateX(1px) rotate(2deg)
-
-@media (prefers-reduced-motion: reduce)
-  .weak-point, .mound--shaking
-    animation: none
-
-  .mound--shaking
-    box-shadow: inset 0 -4px 0 #5b4127, 0 0 0 2px palette.$yellow

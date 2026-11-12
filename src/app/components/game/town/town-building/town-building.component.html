@@ -1,9 +1,6 @@
 @let buildingData = building();
 
-<section
-  class="building"
-  [style.background-image]="buildingData.url ? (buildingData.url | url) : null"
->
+<app-scene class="building" kind="building" [url]="buildingData.url ?? ''">
   @if (buildingData.buildingId !== undefined) {
     <h2 class="building__title">{{ 'map:buildings.' + TownBuildingID[buildingData.buildingId] | i18next }}</h2>
   }
@@ -15,4 +12,6 @@
       (openShop)="openShop(npc.id, $event)"
     />
   }
-</section>
+  <!-- A Site's gate. -->
+  <ng-content/>
+</app-scene>
