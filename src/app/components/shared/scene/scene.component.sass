@@ -1,0 +1,25 @@
+:host
+  position: relative
+  display: block
+  overflow: hidden
+  container-type: size
+
+// The blur reaches past the box edges, so the fill overhangs the host to keep its edges dark.
+.scene-fill
+  position: absolute
+  inset: -1.5rem
+  background-size: cover
+  background-position: center
+  filter: blur(12px) brightness(0.45)
+
+// Largest box of the art's ratio that fits the host; % positions of projected content land on art pixels.
+.scene
+  position: absolute
+  left: 50%
+  top: 50%
+  width: min(100cqw, 100cqh * var(--scene-width) / var(--scene-height))
+  aspect-ratio: var(--scene-width) / var(--scene-height)
+  translate: -50% -50%
+  background-size: 100% 100%
+  // Lets projected content size itself in Scene units (cqw, cqh).
+  container-type: size

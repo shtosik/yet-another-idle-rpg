@@ -4,17 +4,18 @@
   <app-shop [shopId]="activeShopId()" [stage]="activeShopStage()" (closed)="closeShop()"/>
 } @else {
   <div class="site">
-    <app-town-building class="site__view" [building]="siteData"/>
+    <app-town-building class="site__view" [building]="siteData">
+      <button
+        type="button"
+        class="site__gate"
+        [style.left.%]="siteData.gate.position.x"
+        [style.top.%]="siteData.gate.position.y"
+        (click)="gate.emit()"
+      >{{ 'map:sites.' + SiteID[siteData.id] + 'Gate' | i18next }}
+      </button>
+    </app-town-building>
     <h2 class="site__name">{{ 'map:sites.' + SiteID[siteData.id] | i18next }}</h2>
     <app-close-button (onClose)="closed.emit()"/>
-    <button
-      type="button"
-      class="site__gate"
-      [style.left.%]="siteData.gate.position.x"
-      [style.top.%]="siteData.gate.position.y"
-      (click)="gate.emit()"
-    >{{ 'map:sites.' + SiteID[siteData.id] + 'Gate' | i18next }}
-    </button>
     <!-- Over the home screen, not in place of the inventory, so items stay visible during turn-ins. -->
     @if (dialogueActive()) {
       <app-dialogue class="site__dialogue"/>

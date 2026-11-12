@@ -41,7 +41,7 @@ Steps 1, 2 and 3 are independent. Step 4 needs 3 (the Zone) and `scene`. Step 5 
 - Items: Viperskin, Viper Venom, Pack Leather (materials), Lost Trade Goods (junk, sellable), Buckled Harness (chest, gold find), Runner's Boots (boots, attack speed), stats matched to the Troll Hide Vest tier via `/add-equipment-item`.
 - World map marker beside the Pass; `ZONE_UNLOCK_NOTIFICATIONS` entry; names in `zones.json`, `enemies.json`, `items.json`.
 - Wick's order pool: Viperskin with `sourceZones: [goatCleft]`.
-- Art (`/generate-2d-asset`): Cleft background (832×1248, the Zone scene size), three enemy sprites with shiny variants, item icons.
+- Art (`/generate-2d-asset`): Cleft background (832×1664, the Zone scene size), three enemy sprites with shiny variants, item icons.
 - Docs: `zones-waves-unlocks.md` (allow an enemy in more than one Zone; the Goat's Task weight doubles, its bestiary rank counts toward both Hunter stars), `enemies-shiny-pets-bestiary.md`, `farming.md` (Wick's pool).
 
 ### 4. Search spots and hidden passages (L, Opus, plan mode)

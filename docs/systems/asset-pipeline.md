@@ -17,8 +17,8 @@ A family (an entry in `styles.mjs`) is a named art recipe: checkpoint, style pro
 | `item-pixel` | 48×48 | pixel art, like `items/cheese.png` | transparent |
 | `enemy-pixel` | longer side by Size tier, natural aspect | pixel-art sprite, LayerDiffuse transparency | transparent |
 | `portrait-pixel` | 256×256 | pixel-art bust, 2× chunky pixels | transparent |
-| `zone-pixel` | 832×1248 | pixel-art landscape | opaque |
-| `town-painterly` | 1376×768 | inked cartoon illustration (laHarpar look) | opaque |
+| `zone-pixel` | 832×1664 | pixel-art landscape | opaque |
+| `town-painterly` | 1376×566 | inked cartoon illustration (laHarpar look) | opaque |
 | `skill-icon` | 256×256 | inked cartoon tile like `skills/attackPower.png`, full-frame scene | opaque, rounded corners cut by `tile` |
 | `map-painterly` | 1344×752 | top-down inked world map: a 672×376 window at 2×, inpainted (`map-window.mjs`) | opaque |
 
@@ -34,7 +34,7 @@ A family (an entry in `styles.mjs`) is a named art recipe: checkpoint, style pro
 
 The equipment paper doll uses `src/assets/img/icons/equipment-body.svg`, a code-drawn decorative silhouette with baked-in panel colors, loaded with `img ngSrc`. It is a layout guide behind the equipment slots rather than generated character art.
 
-The Forge workbench uses a `town-painterly` backdrop under `src/assets/img/ui/`, shipped as PNG like the town backgrounds. Its accepted 1376×768 candidate is resized with Sharp to 960×536 and compressed with a 256-colour palette (`dither: 0.6`, `effort: 10`), reducing it to about 332 KiB for the desktop panel. These export settings are recorded in its manifest entry; darkening and the vignette are CSS layers on the workbench. The plaque's `item-pixel` anvil stays a native 48×48 transparent PNG, displayed at an integer scale with `image-rendering: pixelated`.
+The Forge workbench uses a `town-painterly` backdrop under `src/assets/img/ui/`, shipped as PNG like the town backgrounds. Its accepted 1376×768 candidate (made before the family moved to the 1376×566 building Scene size; a regeneration needs a 16:9 run) is resized with Sharp to 960×536 and compressed with a 256-colour palette (`dither: 0.6`, `effort: 10`), reducing it to about 332 KiB for the desktop panel. These export settings are recorded in its manifest entry; darkening and the vignette are CSS layers on the workbench. The plaque's `item-pixel` anvil stays a native 48×48 transparent PNG, displayed at an integer scale with `image-rendering: pixelated`.
 
 ## One-time setup
 

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, input } from '@angular/core'
 import { TownBuilding } from '../../../../../interfaces/town.interface'
-import { UrlPipe } from '../../../../pipes/url.pipe'
+import { SceneComponent } from '../../../shared/scene/scene.component'
 import { NpcFrameComponent } from '../npc-frame/npc-frame.component'
 import { CommonModule } from '@angular/common'
 import { I18nextPipe } from '../../../../pipes/i18next.pipe'
@@ -16,7 +16,7 @@ import { ShopID } from '../../../../../enums/ids/shop-id.enum'
   styleUrls: ['./town-building.component.sass'],
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    UrlPipe,
+    SceneComponent,
     NpcFrameComponent,
     CommonModule,
     I18nextPipe,
