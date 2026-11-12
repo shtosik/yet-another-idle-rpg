@@ -14,7 +14,7 @@
         "test:assets": "node --test \"scripts/asset-gen/test/*.test.mjs\"",
         "validate": "node scripts/validate-data.mjs",
         "sync-skills": "node scripts/sync-skills.mjs",
-        "test:tools": "node --test .claude/hooks/guard.test.mjs",
+        "test:tools": "node --test .claude/hooks/guard.test.mjs .claude/hooks/session-start.test.mjs",
         "check:brief": "node scripts/check-brief.mjs",
         "check": "node scripts/staging-lag.mjs && npm run validate && npm run lint && npm run test:tools && npm run test:ci && npm run build",
         "release": "node scripts/release.mjs",

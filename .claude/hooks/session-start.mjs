@@ -1,7 +1,7 @@
 // SessionStart hook: session-wide reminders plus where this checkout stands against origin/staging,
 // so a session doesn't read a stale local branch (AGENTS.md: explore and develop on origin/staging).
-// A clean `staging` checkout with no local commits is fast-forwarded, so the docs, skills and agents
-// sessions load from it stay current.
+// A `staging` checkout with no local commits is fast-forwarded, so the docs, skills, agents, hooks
+// and scripts sessions load from it stay current.
 import { execFileSync, spawn } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 
@@ -21,11 +21,15 @@ const fetched = git('fetch', 'origin', 'staging', '--quiet') !== null
 const branch = git('branch', '--show-current') || 'detached HEAD'
 let counts = git('rev-list', '--left-right', '--count', 'HEAD...origin/staging')
 const [ahead0, behind0] = counts ? counts.split(/\s+/).map(Number) : []
-// Tracked changes block it; an untracked or ignored file the merge would overwrite makes it abort.
-if (fetched && branch === 'staging' && ahead0 === 0 && behind0 > 0 && git('status', '--porcelain', '--untracked-files=no') === ''
-  && git('merge', '--ff-only', '--no-overwrite-ignore', '--quiet', 'origin/staging') !== null) {
-  notes.push(`Fast-forwarded staging by ${behind0} commit(s) to origin/staging.`)
-  counts = git('rev-list', '--left-right', '--count', 'HEAD...origin/staging')
+// Local edits stay: git refuses the merge only when it would overwrite a changed, untracked or ignored file.
+// Requiring a clean tree left the checkout behind for good whenever one unrelated file was edited.
+if (fetched && branch === 'staging' && ahead0 === 0 && behind0 > 0) {
+  if (git('merge', '--ff-only', '--no-overwrite-ignore', '--quiet', 'origin/staging') !== null) {
+    notes.push(`Fast-forwarded staging by ${behind0} commit(s) to origin/staging.`)
+    counts = git('rev-list', '--left-right', '--count', 'HEAD...origin/staging')
+  } else {
+    notes.push(`Fast-forward of staging failed: local changes to files origin/staging also changes. Tell the owner to commit or discard them: ${git('status', '--porcelain') || 'see git status'}.`)
+  }
 }
 if (counts) {
   const [ahead, behind] = counts.split(/\s+/).map(Number)

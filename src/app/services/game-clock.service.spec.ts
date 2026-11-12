@@ -154,8 +154,8 @@ describe('offline claim on game time', () => {
     await claim
 
     expect(clock.isSettled()).toBeTrue()
-    // Within real ms the spec takes; measured after the wait it would be 30 s more.
-    expect(applyOffline.calls.mostRecent().args[0]).toBeCloseTo(HOUR - ARENA.timeLimitMs, -2)
+    // Off only by the real ms the spec takes (over 100 on a slow CI runner); measured after the wait it would be 30 s more.
+    expect(Math.abs(applyOffline.calls.mostRecent().args[0] - (HOUR - ARENA.timeLimitMs))).toBeLessThan(5_000)
     expect(player.plantSeed(ItemID.turnipSeeds, 1, 0)).toBeTrue()
   })
 
