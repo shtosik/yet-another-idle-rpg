@@ -35,10 +35,10 @@ Subagents reply in text; you save each reply verbatim to its file before acting 
 
 ## 1. Worktree (once per plan)
 
-The plan is one branch, `feat/<name>`, in one worktree, `../yari-<name>`, with one PR into `staging`; each step is one commit on it. A plan that says "one PR per step" is wrong here: `docs/git-workflow.md` wins.
+The plan is one branch, `feat/<name>`, in one worktree, `.claude/worktrees/yari-<name>` (as `scripts/worktree.mjs` prints it), with one PR into `staging`; each step is one commit on it. A plan that says "one PR per step" is wrong here: `docs/git-workflow.md` wins.
 
-- Session already in `../yari-<name>`: stay.
-- That folder exists (a resumed plan): `EnterWorktree` with `path: ../yari-<name>`. Don't run `worktree.mjs`; it refuses an existing folder.
+- Session already in that worktree: stay.
+- That folder exists (a resumed plan): `EnterWorktree` with its path. Don't run `worktree.mjs`; it refuses an existing folder.
 - Neither: `node scripts/worktree.mjs feat/<name>`, then `EnterWorktree` with that path.
 - Session in a worktree for other work: stop and ask the owner. One worktree per session, so the plan needs its own session.
 
