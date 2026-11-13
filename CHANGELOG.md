@@ -7,7 +7,7 @@ New notes go under `[Unreleased]`; `npm run release -- <major|minor|patch>` move
 
 ## [Unreleased]
 - [feature] New stat: ranged damage multiplier.
-- [feature] The Bestiary's "Found in" now lists only the zones you have reached.
+- [feature] The Bestiary's "Found in" now lists only the zones you have unlocked.
 - [feature] Battle backgrounds now show whole at any window size instead of being cut off at the sides.
 - [feature] Gold and explorer tokens from chests, zone stars, quests, merging and fees now show next to your purse.
 - [bug] Quest item drops now stop at the amount an Order asks for.

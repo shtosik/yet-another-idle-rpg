@@ -21,7 +21,8 @@ export interface SpotState {
 export function spotActive(spot: SceneSpot, state: SpotState): boolean {
   const status = getQuestStatus(state.progression, spot.when.questId)
   if (status.state !== QuestState.active || status.step !== spot.when.step) return false
-  return 'itemId' in spot.gives ? state.itemCount(spot.gives.itemId) === 0 : !state.isZoneUnlocked(spot.gives.zoneId)
+  if ('itemId' in spot.gives) return state.itemCount(spot.gives.itemId) === 0
+  return !state.isZoneUnlocked(spot.gives.zoneId)
 }
 
 /** Pixel data of a mask, as `CanvasRenderingContext2D.getImageData` gives it. */

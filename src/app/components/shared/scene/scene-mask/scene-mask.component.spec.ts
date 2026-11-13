@@ -20,6 +20,7 @@ describe('scenePoint', () => {
     expect(small).toEqual({ x: 208, y: 1248 })
     expect(maskColorAt(mask, big.x, big.y)).toBe('#ff0000')
     expect(maskColorAt(mask, small.x, small.y)).toBe('#ff0000')
-    expect(maskColorAt(mask, scenePoint(10, 10, { width: 180, height: 360 }, zone).x, 40)).toBeNull()
+    const miss = scenePoint(10, 10, { width: 180, height: 360 }, zone)
+    expect(maskColorAt(mask, miss.x, miss.y)).toBeNull()
   })
 })
