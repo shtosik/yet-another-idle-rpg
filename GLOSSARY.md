@@ -44,6 +44,26 @@ _Avoid_: Letterbox, border
 A hidden image the size of a scene's art that marks each clickable thing painted on it.
 _Avoid_: Hitmap, overlay
 
+**Search spot**:
+Something painted into a scene that gives an item when clicked during its quest step.
+_Avoid_: Hotspot, clickable, interactable
+
+**Hidden passage**:
+Something painted into a battle scene that, clicked during its quest step, unlocks a side zone and moves the player into it.
+_Avoid_: Secret door, portal
+
+**Secret**:
+A search spot or hidden passage: found from a hint, never marked, highlighted or given a cursor.
+_Avoid_: Easter egg
+
+**Side zone**:
+A zone outside the boss chain, opened by a hidden passage; once found it is a zone like any other and stays on the map.
+_Avoid_: Hidden zone (once found it isn't), bonus zone
+
+**Found text**:
+What the player sees or reads when a secret works: an item's found text, or the side zone's unlock notice.
+_Avoid_: Loot text, flavour popup
+
 ## Enemies
 
 **Shiny**:
@@ -219,7 +239,7 @@ A display-only name the player earns from content such as reputation tiers and p
 _Avoid_: Badge, honorific, rank
 
 **Zone unlock**:
-A zone opens when the boss of the zone before it is defeated, or, for a zone entered from a town building, when that building's quest has started.
+A zone opens when the boss of the zone before it is defeated, for a zone entered from a town building when that building's quest has started, or, for a side zone, when its hidden passage is found.
 _Avoid_: Using unlock rules for zones
 
 **Unlock rule**:

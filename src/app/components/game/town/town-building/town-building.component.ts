@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, inject, input } from '@angular/core'
 import { TownBuilding } from '../../../../../interfaces/town.interface'
 import { SceneComponent } from '../../../shared/scene/scene.component'
+import { SceneMaskComponent } from '../../../shared/scene/scene-mask/scene-mask.component'
 import { NpcFrameComponent } from '../npc-frame/npc-frame.component'
 import { CommonModule } from '@angular/common'
 import { I18nextPipe } from '../../../../pipes/i18next.pipe'
@@ -17,6 +18,7 @@ import { ShopID } from '../../../../../enums/ids/shop-id.enum'
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     SceneComponent,
+    SceneMaskComponent,
     NpcFrameComponent,
     CommonModule,
     I18nextPipe,

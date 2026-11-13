@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common'
 import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core'
 import { I18nextPipe } from '../../../pipes/i18next.pipe'
 import { SceneComponent } from '../../shared/scene/scene.component'
+import { SceneMaskComponent } from '../../shared/scene/scene-mask/scene-mask.component'
 import { BattleStore } from '../../../store/battle/battle.store'
 import { BattleNavBarComponent } from './battle-nav-bar/battle-nav-bar.component'
 import { EnemyComponent } from './enemy/enemy.component'
@@ -17,7 +18,7 @@ import { ARENA } from '../../../../data/arena-data'
   templateUrl: 'battle.component.html',
   styleUrls: ['./battle.component.sass'],
   imports: [
-    CommonModule, SceneComponent, I18nextPipe,
+    CommonModule, SceneComponent, SceneMaskComponent, I18nextPipe,
     BattleNavBarComponent, EnemyComponent, EnemySpriteComponent, DamagePopupComponent, BattleFooterComponent, BattleSideButtonsComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,

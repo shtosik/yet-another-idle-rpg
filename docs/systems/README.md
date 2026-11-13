@@ -22,5 +22,6 @@ Current behavior of each game system. Read the doc before changing its system, a
 | farm, plots, seeds, harvest, farming expertise, Guild orders | `docs/systems/farming.md` |
 | generated art | `docs/systems/asset-pipeline.md` |
 | backgrounds of zones, towns, Buildings and Sites; things placed on them | `docs/systems/scene.md` |
+| search spots, hidden passages, Scene masks, side Zones | `docs/systems/scene-spots.md` |
 
 Fixing a bug: check `docs/ideas/known-issues.md` for open bugs and tech debt first.

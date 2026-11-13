@@ -27,6 +27,7 @@ export type Notice =
   | { type: 'stationInstalled', itemId: ItemID }
   | { type: 'questCompleted', completed: QuestCompleted }
   | { type: 'currency', gain: ResourceGain }
+  | { type: 'found', spotId: string }
 
 /** Where a toast shows; each lane holds one message at a time. */
 export type ToastLane = 'hud' | 'hudBelow' | 'battle' | 'battleBelow' | 'camp' | 'forge'
@@ -80,6 +81,9 @@ export class NoticesService {
       case 'currency':
         this.feed.show('gold', notice.gain.gold)
         this.feed.show('explorerTokens', notice.gain.tokens)
+        return
+      case 'found':
+        this.modal.openUnlockNotification({ titleKey: `map:spots.${notice.spotId}.title`, bodyKey: `map:spots.${notice.spotId}.body` })
         return
     }
   }

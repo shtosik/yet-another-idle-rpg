@@ -21,7 +21,7 @@ The size comes from the kind, never from per-entry data. Every background of a k
 | `zone` | Zone and arena backgrounds | 832×1664 | 1:2 |
 | `building` | town, Building and Site backgrounds | 1376×566 | 2.43:1 |
 
-A Scene mask is the same size as its art.
+A Scene mask is the same size as its art; `app-scene-mask` reads it under a click (`docs/systems/scene-spots.md`).
 
 ## Battle Scene
 

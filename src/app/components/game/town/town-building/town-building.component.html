@@ -1,6 +1,7 @@
 @let buildingData = building();
 
 <app-scene class="building" kind="building" [url]="buildingData.url ?? ''">
+  <app-scene-mask kind="building" [artUrl]="buildingData.url ?? ''"/>
   @if (buildingData.buildingId !== undefined) {
     <h2 class="building__title">{{ 'map:buildings.' + TownBuildingID[buildingData.buildingId] | i18next }}</h2>
   }
