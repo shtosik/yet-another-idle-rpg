@@ -6,6 +6,9 @@ Versions follow [Semantic Versioning](https://semver.org/). Each note is `- [typ
 New notes go under `[Unreleased]`; `npm run release -- <major|minor|patch>` moves them into a version (docs/deployment.md).
 
 ## [Unreleased]
+- [feature] Chapter One, The Sap Winter: Marvin has work for you on the Mountain Pass, and the story runs on to Mawood and back.
+- [feature] Look closely at the world: some things in the background can be searched, and one leads somewhere new.
+- [feature] The Goat Cleft, a hidden side area off the Mountain Pass, with new enemies, a new boss and the Viperskin gear for bow users.
 - [feature] New stat: ranged damage multiplier.
 - [feature] The Bestiary's "Found in" now lists only the zones you have unlocked.
 - [feature] Battle backgrounds now show whole at any window size instead of being cut off at the sides.

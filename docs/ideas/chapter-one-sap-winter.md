@@ -1,6 +1,6 @@
 # Chapter One: The Sap Winter
 
-**Scope:** M · **Status:** Proposed: story arc, two new quests (*The Quiet Road*, *The Same Winter*) and dialogue for La Harpar and Mawood NPCs, the side Zone The Goat Cleft, and a new quest mechanic: search spots and hidden passages (§4a). How a chapter shows in the UI (labels, markers, title card) is left open by the owner (2026-11-09).
+**Scope:** M · **Status:** In progress (branch `feat/chapter-one-sap-winter`): story arc, two new quests (*The Quiet Road*, *The Same Winter*) and dialogue for La Harpar and Mawood NPCs, the side Zone The Goat Cleft, and a new quest mechanic: search spots and hidden passages (§4a). How a chapter shows in the UI (labels, markers, title card) is left open by the owner (2026-11-09).
 
 The game's first overarching storyline. It runs from La Harpar to Lirold's unlock and is led by **Marvin**. Its thread is the corruption the Mawood quests already tell. Chapter Two starts in Lirold, with the Exploration Guild and Slatefall.
 
