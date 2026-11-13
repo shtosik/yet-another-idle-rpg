@@ -22,6 +22,7 @@ export enum TraderDialogue {
   questSafePassageProgress,
   questSafePassageStep1Complete,
   questSafePassageStep2,
+  traderMawoodGoods,
 }
 
 export type LaHarparTraderDialogueType = Record<TraderDialogue, DialogueNode<TraderDialogue>>
@@ -95,6 +96,7 @@ const LA_HARPAR_TRADER: LaHarparTraderDialogueType = {
           },
         ],
       },
+      { responseKey: `${NS}:default.traderMawoodGoods`, results: [{ next: TraderDialogue.traderMawoodGoods }] },
       { responseKey: `${NS}:default.opt3`, results: [{ next: TraderDialogue.aboutMe }] },
       { responseKey: `${NS}:default.opt4`, results: [{ next: TraderDialogue.aboutVillage }] },
       { responseKey: `${NS}:default.opt5`, results: [{ next: TraderDialogue.aboutPeople }] },
@@ -247,6 +249,13 @@ const LA_HARPAR_TRADER: LaHarparTraderDialogueType = {
     messageKey: `${NS}:questSafePassageStep2.message`,
     options: [
       { responseKey: `${NS}:questSafePassageStep2.opt1`, results: [{ next: TraderDialogue.default }] },
+    ],
+  },
+  [TraderDialogue.traderMawoodGoods]: {
+    id: TraderDialogue.traderMawoodGoods,
+    messageKey: `${NS}:traderMawoodGoods.message`,
+    options: [
+      { responseKey: `${NS}:traderMawoodGoods.opt1`, results: [{ next: TraderDialogue.default }] },
     ],
   },
 }

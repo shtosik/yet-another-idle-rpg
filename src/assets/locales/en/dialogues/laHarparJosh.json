@@ -16,7 +16,8 @@
     "opt3": "What can you tell me about this place?",
     "opt4": "Do you have any work for me?",
     "opt5": "I don't have any more questions. Enjoy your drink.",
-    "opt6": "About that heirloom you gave me..."
+    "opt6": "About that heirloom you gave me...",
+    "joshCarts": "What's over the Pass?"
   },
   "intro": {
     "message": "My name is Josh. I'm a local fisherman, and my hobby is drinking free beer.",
@@ -80,5 +81,9 @@
   "aboutHeirloomWho": {
     "message": "Buy me a beer some other year and maybe I'll tell you.",
     "opt1": "Fair enough."
+  },
+  "joshCarts": {
+    "message": "Over it? Dunno, mate, never been. The carts used to come down with this mushroom spirit from up there. Green. Tasted like a forest floor, in a good way. Two winters ago the carts stopped, and now I drink this. Life's cruel.",
+    "opt1": "Tragic."
   }
 }

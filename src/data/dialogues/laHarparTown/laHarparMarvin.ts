@@ -17,6 +17,19 @@ export enum MarvinDialogue {
   coldForgeSalvage,
   sealRegistered,
   sealReminder,
+  quietRoadOffer,
+  quietRoadOffer2,
+  quietRoadWhy,
+  quietRoadProgress,
+  quietRoadDaybook,
+  quietRoadHobbMaybe,
+  quietRoadProgress2,
+  quietRoadSatchel,
+  quietRoadWho,
+  sameWinterEnd,
+  sameWinterVarrow,
+  aboutPosting,
+  aboutPostingNow,
 }
 
 export type LaHarparMarvinDialogueType = Record<MarvinDialogue, DialogueNode<MarvinDialogue>>
@@ -73,6 +86,60 @@ const LA_HARPAR_MARVIN: LaHarparMarvinDialogueType = {
           visibilityConditions: [{ type: 'quest', questId: QuestID.theColdForge, questState: QuestState.readyToAdvance, step: 3 }],
           next: MarvinDialogue.coldForgeRecord,
           effects: [{ type: 'quest', questId: QuestID.theColdForge, action: 'advance' }],
+        }],
+      },
+      {
+        responseKey: `${NS}:default.quietRoadSatchel`,
+        results: [{
+          visibilityConditions: [{ type: 'quest', questId: QuestID.theQuietRoad, questState: QuestState.readyToAdvance, step: 2 }],
+          next: MarvinDialogue.quietRoadSatchel,
+          effects: [
+            { type: 'quest', questId: QuestID.theQuietRoad, action: 'advance' },
+            { type: 'item', action: 'give', items: [{ itemId: ItemID.corwinsLetter, amount: 1 }] },
+          ],
+        }],
+      },
+      {
+        responseKey: `${NS}:default.quietRoadDaybook`,
+        results: [{
+          visibilityConditions: [{ type: 'quest', questId: QuestID.theQuietRoad, questState: QuestState.readyToAdvance, step: 1 }],
+          next: MarvinDialogue.quietRoadDaybook,
+          effects: [{ type: 'quest', questId: QuestID.theQuietRoad, action: 'advance' }],
+        }],
+      },
+      {
+        responseKey: `${NS}:default.sameWinterEnd`,
+        results: [{
+          visibilityConditions: [{ type: 'quest', questId: QuestID.theSameWinter, questState: QuestState.readyToAdvance, step: 5 }],
+          next: MarvinDialogue.sameWinterEnd,
+          effects: [{ type: 'quest', questId: QuestID.theSameWinter, action: 'advance' }],
+        }],
+      },
+      {
+        responseKey: `${NS}:default.quietRoadProgress`,
+        results: [
+          {
+            visibilityConditions: [{ type: 'quest', questId: QuestID.theQuietRoad, questState: QuestState.active, step: 1 }, { type: 'quest', questId: QuestID.theQuietRoad, questState: QuestState.readyToAdvance, step: 1, not: true }],
+            next: MarvinDialogue.quietRoadProgress,
+          },
+          {
+            visibilityConditions: [{ type: 'quest', questId: QuestID.theQuietRoad, questState: QuestState.active, step: 2 }, { type: 'quest', questId: QuestID.theQuietRoad, questState: QuestState.readyToAdvance, step: 2, not: true }],
+            next: MarvinDialogue.quietRoadProgress2,
+          },
+        ],
+      },
+      {
+        responseKey: `${NS}:default.quietRoadOffer`,
+        results: [{
+          visibilityConditions: [{ type: 'quest', questId: QuestID.theQuietRoad, questState: QuestState.available }],
+          next: MarvinDialogue.quietRoadOffer,
+        }],
+      },
+      {
+        responseKey: `${NS}:default.aboutPosting`,
+        results: [{
+          visibilityConditions: [{ type: 'quest', questId: QuestID.theSameWinter, questState: QuestState.completed }],
+          next: MarvinDialogue.aboutPosting,
         }],
       },
       {
@@ -259,6 +326,105 @@ const LA_HARPAR_MARVIN: LaHarparMarvinDialogueType = {
     messageKey: `${NS}:sealReminder.message`,
     options: [
       { responseKey: `${NS}:sealReminder.opt1`, results: [{ next: MarvinDialogue.default }] },
+    ],
+  },
+  [MarvinDialogue.quietRoadOffer]: {
+    id: MarvinDialogue.quietRoadOffer,
+    messageKey: `${NS}:quietRoadOffer.message`,
+    options: [
+      { responseKey: `${NS}:quietRoadOffer.opt1`, results: [{ next: MarvinDialogue.quietRoadOffer2 }] },
+      { responseKey: `${NS}:quietRoadOffer.opt2`, results: [{ next: MarvinDialogue.quietRoadOffer2 }] },
+      { responseKey: `${NS}:quietRoadOffer.opt3`, results: [{ next: MarvinDialogue.default }] },
+    ],
+  },
+  [MarvinDialogue.quietRoadOffer2]: {
+    id: MarvinDialogue.quietRoadOffer2,
+    messageKey: `${NS}:quietRoadOffer2.message`,
+    options: [
+      { responseKey: `${NS}:quietRoadOffer2.opt1`, results: [{ next: MarvinDialogue.default, effects: [{ type: 'quest', questId: QuestID.theQuietRoad, action: 'start' }] }] },
+      { responseKey: `${NS}:quietRoadOffer2.opt2`, results: [{ next: MarvinDialogue.quietRoadWhy }] },
+    ],
+  },
+  [MarvinDialogue.quietRoadWhy]: {
+    id: MarvinDialogue.quietRoadWhy,
+    messageKey: `${NS}:quietRoadWhy.message`,
+    options: [
+      { responseKey: `${NS}:quietRoadWhy.opt1`, results: [{ next: MarvinDialogue.default, effects: [{ type: 'quest', questId: QuestID.theQuietRoad, action: 'start' }] }] },
+      { responseKey: `${NS}:quietRoadWhy.opt2`, results: [{ next: MarvinDialogue.default }] },
+    ],
+  },
+  [MarvinDialogue.quietRoadProgress]: {
+    id: MarvinDialogue.quietRoadProgress,
+    messageKey: `${NS}:quietRoadProgress.message`,
+    options: [
+      { responseKey: `${NS}:quietRoadProgress.opt1`, results: [{ next: MarvinDialogue.default }] },
+    ],
+  },
+  [MarvinDialogue.quietRoadDaybook]: {
+    id: MarvinDialogue.quietRoadDaybook,
+    messageKey: `${NS}:quietRoadDaybook.message`,
+    options: [
+      { responseKey: `${NS}:quietRoadDaybook.opt1`, results: [{ next: MarvinDialogue.default }] },
+      { responseKey: `${NS}:quietRoadDaybook.opt2`, results: [{ next: MarvinDialogue.quietRoadHobbMaybe }] },
+    ],
+  },
+  [MarvinDialogue.quietRoadHobbMaybe]: {
+    id: MarvinDialogue.quietRoadHobbMaybe,
+    messageKey: `${NS}:quietRoadHobbMaybe.message`,
+    options: [
+      { responseKey: `${NS}:quietRoadHobbMaybe.opt1`, results: [{ next: MarvinDialogue.default }] },
+    ],
+  },
+  [MarvinDialogue.quietRoadProgress2]: {
+    id: MarvinDialogue.quietRoadProgress2,
+    messageKey: `${NS}:quietRoadProgress2.message`,
+    options: [
+      { responseKey: `${NS}:quietRoadProgress2.opt1`, results: [{ next: MarvinDialogue.default }] },
+    ],
+  },
+  [MarvinDialogue.quietRoadSatchel]: {
+    id: MarvinDialogue.quietRoadSatchel,
+    messageKey: `${NS}:quietRoadSatchel.message`,
+    options: [
+      { responseKey: `${NS}:quietRoadSatchel.opt1`, results: [{ next: MarvinDialogue.default }] },
+      { responseKey: `${NS}:quietRoadSatchel.opt2`, results: [{ next: MarvinDialogue.quietRoadWho }] },
+    ],
+  },
+  [MarvinDialogue.quietRoadWho]: {
+    id: MarvinDialogue.quietRoadWho,
+    messageKey: `${NS}:quietRoadWho.message`,
+    options: [
+      { responseKey: `${NS}:quietRoadWho.opt1`, results: [{ next: MarvinDialogue.default }] },
+    ],
+  },
+  [MarvinDialogue.sameWinterEnd]: {
+    id: MarvinDialogue.sameWinterEnd,
+    messageKey: `${NS}:sameWinterEnd.message`,
+    options: [
+      { responseKey: `${NS}:sameWinterEnd.opt1`, results: [{ next: MarvinDialogue.sameWinterVarrow }] },
+      { responseKey: `${NS}:sameWinterEnd.opt2`, results: [{ next: MarvinDialogue.sameWinterVarrow }] },
+    ],
+  },
+  [MarvinDialogue.sameWinterVarrow]: {
+    id: MarvinDialogue.sameWinterVarrow,
+    messageKey: `${NS}:sameWinterVarrow.message`,
+    options: [
+      { responseKey: `${NS}:sameWinterVarrow.opt1`, results: [{ next: MarvinDialogue.default }] },
+    ],
+  },
+  [MarvinDialogue.aboutPosting]: {
+    id: MarvinDialogue.aboutPosting,
+    messageKey: `${NS}:aboutPosting.message`,
+    options: [
+      { responseKey: `${NS}:aboutPosting.opt1`, results: [{ next: MarvinDialogue.aboutPostingNow }] },
+      { responseKey: `${NS}:aboutPosting.opt2`, results: [{ next: MarvinDialogue.aboutPostingNow }] },
+    ],
+  },
+  [MarvinDialogue.aboutPostingNow]: {
+    id: MarvinDialogue.aboutPostingNow,
+    messageKey: `${NS}:aboutPostingNow.message`,
+    options: [
+      { responseKey: `${NS}:aboutPostingNow.opt1`, results: [{ next: MarvinDialogue.default }] },
     ],
   },
 }

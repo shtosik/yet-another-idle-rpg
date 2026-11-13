@@ -18,7 +18,13 @@
     "goodbye": "See you around, Marvin.",
     "coldForge": "Can you check Phurgo's last Slatefall delivery?",
     "registerSeal": "Register this Pathfinder's Seal.",
-    "sealReminder": "What did the Pathfinder's Seal teach me?"
+    "sealReminder": "What did the Pathfinder's Seal teach me?",
+    "quietRoadSatchel": "That Guild runner's satchel. I've got it.",
+    "quietRoadDaybook": "I found the post's daybook.",
+    "sameWinterEnd": "Corwin sent this down with me.",
+    "quietRoadProgress": "About that runner...",
+    "quietRoadOffer": "Anything the Guild needs doing up the Pass?",
+    "aboutPosting": "Why are you really in La Harpar?"
   },
   "whatIsThisPlace1": {
     "message": "We map the unknown and thin out the dangers. Every monster you hunt under our contract earns you Explorer Tokens. Complete enough tasks and I'll authorize expeditions into deeper, more dangerous territories.",
@@ -58,5 +64,65 @@
   "coldForgeSalvage": {
     "message": "We map the unknown and bring useful things home. A Pathfinder's Seal earns a place in our salvage register and a lesson in spotting sound gear. Lirold's Arena keeps a few among its prizes, and whoever earns one on the sand brings it to me.",
     "opt1": "Understood."
+  },
+  "quietRoadOffer": {
+    "message": "Say you're keeping the books for a road. Every cart, every load, every stamp at every post. One winter a whole post stops stamping. No cart through it, nothing back out. Not one line in two years. What do you do?",
+    "opt1": "Go and look.",
+    "opt2": "Send someone else to look.",
+    "opt3": "Not my road."
+  },
+  "quietRoadOffer2": {
+    "message": "Right, and somebody has to. The Guild kept a post halfway up the Mountain Pass. A runner called Hobb carried the Mawood post down through it, every month for six years. He was never once late. He set out two winters back and that's where my book stops. The post's still up there, what's left of it. Every post keeps a daybook, under the floor stone, where a runner knows to look and a goblin doesn't. Find it and bring it to me.",
+    "opt1": "I'll find it.",
+    "opt2": "Two years is a long time to leave a man on a mountain."
+  },
+  "quietRoadWhy": {
+    "message": "It is. I wasn't here for it. I was out past where anybody has a map, and I came home to a letter telling me to stay put and find out what happened on that road. So I'm finding out. I'd go up myself if…\n\nWell. You're going.",
+    "opt1": "I'm going.",
+    "opt2": "Ask me again later."
+  },
+  "quietRoadProgress": {
+    "message": "The post sits off the road on the Pass, a hut, stone below and timber above. If the timber's gone, the stone's still there. Look under the floor.",
+    "opt1": "I'll find it."
+  },
+  "quietRoadDaybook": {
+    "message": "That's his hand. \"Up from Mawood, bound for the coast. Goblins on the switchbacks. Going round by the cleft.\" And that's the last line anyone wrote in it.\n\nSay you're a runner with a satchel, and there's goblins on the road. You don't fight them. You go the way carts can't. There's a cleft behind the switchbacks; I've never seen it, only read about it in here, runners' business. If the goblins found it too, that's where your satchel is. Higher up the Pass than you'll want to be.",
+    "opt1": "Then I'll go higher.",
+    "opt2": "What if Hobb's in there?"
+  },
+  "quietRoadHobbMaybe": {
+    "message": "Then you tell me, and I'll write it down properly, and I'll be the one to tell the Bartender why she isn't getting paid. Bring the satchel either way.",
+    "opt1": "I will."
+  },
+  "quietRoadProgress2": {
+    "message": "The cleft. Behind the switchbacks, past the halfway mark. Narrow enough that a goat turns sideways. Look for where the rock's worn smooth.",
+    "opt1": "I'll find it."
+  },
+  "quietRoadSatchel": {
+    "message": "That's Guild leather, and that's the Pass stamp. Two winters old. He made the post, then. Somewhere below it…\n\nThere's a letter in here, still sealed. \"To the Exploration Guild.\" From Mawood, past the Pass, by the look of the wax. Not ours to open. Ours to carry. I'll close Hobb's line in the book tonight. You take this where it was going.",
+    "opt1": "To Mawood, then.",
+    "opt2": "Who's it from?"
+  },
+  "quietRoadWho": {
+    "message": "The wax has a leaf pressed in it, and I've only seen that on one man's post: the elder up there, Corwin. If he sealed it, he expected an answer, and for two years he hasn't had one. Go and give him one.",
+    "opt1": "I will."
+  },
+  "sameWinterEnd": {
+    "message": "Another one. Same leaf in the wax. And look at that hand, he's pressed so hard he's nearly gone through the paper. \"To the Exploration Guild, Lirold.\"\n\nNot me, then. Her.",
+    "opt1": "Who's her?",
+    "opt2": "You're the Guild, as far as I've seen."
+  },
+  "sameWinterVarrow": {
+    "message": "Odile Varrow. She runs the Guild from the capital, down the coast road from the beach. She sent me home to watch the Pass road, and I've watched it, and you're what I've got to show her. Take it to her yourself. She'll ask how far it is from the nest to her east gate. Think before you answer.",
+    "opt1": "I'm going to Lirold."
+  },
+  "aboutPosting": {
+    "message": "Because the Guildmaster told me to be. I came home off that last trip wanting a bed and a month of nobody asking me anything, and there was her letter on the table. Stay in La Harpar. Watch the Pass road. Write down every cart that doesn't come down it and every rumour from the north. Say you're her. Three runners gone in two winters, and your traders telling you the trees up there are bleeding. You'd want someone sitting at the bottom of that road with a book. So I sat.",
+    "opt1": "And now?",
+    "opt2": "You could have told me."
+  },
+  "aboutPostingNow": {
+    "message": "Now I've a letter in my book with your name next to it, and Hobb's line is closed. That's more than I had at midsummer.",
+    "opt1": "Fair."
   }
 }

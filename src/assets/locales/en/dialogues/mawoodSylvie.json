@@ -21,7 +21,8 @@
     "silverleafProgress": "About the silverleaf...",
     "terraceProgress": "About the Farming Guild...",
     "silverleafOffer": "Is something wrong with the herb shelf?",
-    "terraceOffer": "Does anyone else around here need a hand?"
+    "terraceOffer": "Does anyone else around here need a hand?",
+    "springStill": "Has the spring cleared?"
   },
   "aboutSylvie": {
     "message": "I studied herbal medicine in the coastal settlements — La Harpar, mostly. Apprenticed under an old herbalist who smelled permanently of pine resin and had opinions about everything. When I heard about the Elderwood, I had to come. The plants here are extraordinary. Or they were, before the blight started.",
@@ -130,5 +131,9 @@
   "questSilverleafComplete": {
     "message": "Oh, look at the colour on these! I never thought I'd see fresh silverleaf in Mawood again. Here's the tonic recipe, with the thanks of a woman whose shelf is finally full.",
     "opt1": "Glad to help."
+  },
+  "springStill": {
+    "message": "No, and I'd like someone to explain that to me. The Treant's dead and the saplings are greening, and platform three still tastes of pennies. I've stopped bottling it. I've started writing down which mornings it's worse. Tuesdays, if you want to know, which is ridiculous.",
+    "opt1": "Keep writing it down."
   }
 }

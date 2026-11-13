@@ -1,5 +1,7 @@
 import { DialogueNode } from '../../../interfaces/dialogues/dialogue-node.interface'
 import { NpcID } from '../../../enums/map/npc-id.enum'
+import { QuestID } from '../../../enums/ids/quest-id.enum'
+import { QuestState } from '../../../enums/quest-state.enum'
 import { ShopID } from '../../../enums/ids/shop-id.enum'
 
 export enum ElarionDialogue {
@@ -9,6 +11,10 @@ export enum ElarionDialogue {
   aboutMagic,
   aboutRunes,
   aboutSpellbook,
+  sameWinterElarion,
+  sameWinterElarionTrunk,
+  sameWinterElarionNotes,
+  sameWinterElarionMilo,
 }
 
 export type MawoodElarionDialogueType = Record<ElarionDialogue, DialogueNode<ElarionDialogue>>
@@ -45,6 +51,21 @@ const MAWOOD_ELARION: MawoodElarionDialogueType = {
     id: ElarionDialogue.default,
     messageKey: `${NS}:default.message`,
     options: [
+      {
+        responseKey: `${NS}:default.sameWinterElarionNotes`,
+        results: [{
+          visibilityConditions: [{ type: 'quest', questId: QuestID.theSameWinter, questState: QuestState.readyToAdvance, step: 2 }],
+          next: ElarionDialogue.sameWinterElarionNotes,
+          effects: [{ type: 'quest', questId: QuestID.theSameWinter, action: 'advance' }],
+        }],
+      },
+      {
+        responseKey: `${NS}:default.sameWinterElarion`,
+        results: [{
+          visibilityConditions: [{ type: 'quest', questId: QuestID.theSameWinter, questState: QuestState.active, step: 2 }, { type: 'quest', questId: QuestID.theSameWinter, questState: QuestState.readyToAdvance, step: 2, not: true }],
+          next: ElarionDialogue.sameWinterElarion,
+        }],
+      },
       {
         responseKey: `${NS}:default.aboutElarion`,
         results: [{ next: ElarionDialogue.aboutElarion }],
@@ -114,6 +135,36 @@ const MAWOOD_ELARION: MawoodElarionDialogueType = {
         responseKey: `${NS}:aboutSpellbook.opt1`,
         results: [{ next: ElarionDialogue.default }],
       },
+    ],
+  },
+  [ElarionDialogue.sameWinterElarion]: {
+    id: ElarionDialogue.sameWinterElarion,
+    messageKey: `${NS}:sameWinterElarion.message`,
+    options: [
+      { responseKey: `${NS}:sameWinterElarion.opt1`, results: [{ next: ElarionDialogue.sameWinterElarionTrunk }] },
+      { responseKey: `${NS}:sameWinterElarion.opt2`, results: [{ next: ElarionDialogue.default }] },
+    ],
+  },
+  [ElarionDialogue.sameWinterElarionTrunk]: {
+    id: ElarionDialogue.sameWinterElarionTrunk,
+    messageKey: `${NS}:sameWinterElarionTrunk.message`,
+    options: [
+      { responseKey: `${NS}:sameWinterElarionTrunk.opt1`, results: [{ next: ElarionDialogue.default }] },
+    ],
+  },
+  [ElarionDialogue.sameWinterElarionNotes]: {
+    id: ElarionDialogue.sameWinterElarionNotes,
+    messageKey: `${NS}:sameWinterElarionNotes.message`,
+    options: [
+      { responseKey: `${NS}:sameWinterElarionNotes.opt1`, results: [{ next: ElarionDialogue.sameWinterElarionMilo }] },
+      { responseKey: `${NS}:sameWinterElarionNotes.opt2`, results: [{ next: ElarionDialogue.default }] },
+    ],
+  },
+  [ElarionDialogue.sameWinterElarionMilo]: {
+    id: ElarionDialogue.sameWinterElarionMilo,
+    messageKey: `${NS}:sameWinterElarionMilo.message`,
+    options: [
+      { responseKey: `${NS}:sameWinterElarionMilo.opt1`, results: [{ next: ElarionDialogue.default }] },
     ],
   },
 }

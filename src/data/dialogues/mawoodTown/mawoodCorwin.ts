@@ -29,6 +29,13 @@ export enum CorwinDialogue {
   rootglowMoth,
   rootglowMothGiven,
   farmFinaleLine,
+  quietRoadLetter,
+  quietRoadHobb,
+  sameWinterOffer,
+  sameWinterTired,
+  sameWinterOffer2,
+  sameWinterProgress,
+  sameWinterLetter,
 }
 
 export type MawoodCorwinDialogueType = Record<CorwinDialogue, DialogueNode<CorwinDialogue>>
@@ -98,6 +105,49 @@ const MAWOOD_CORWIN: MawoodCorwinDialogueType = {
             { type: 'flag', name: 'corwin_heard_table', isSet: false },
           ],
           next: CorwinDialogue.farmFinaleLine,
+        }],
+      },
+      {
+        responseKey: `${NS}:default.quietRoadLetter`,
+        results: [{
+          visibilityConditions: [{ type: 'quest', questId: QuestID.theQuietRoad, questState: QuestState.readyToAdvance, step: 3 }],
+          next: CorwinDialogue.quietRoadLetter,
+          effects: [{ type: 'quest', questId: QuestID.theQuietRoad, action: 'advance' }],
+        }],
+      },
+      {
+        responseKey: `${NS}:default.sameWinterLetter`,
+        results: [{
+          visibilityConditions: [{ type: 'quest', questId: QuestID.theSameWinter, questState: QuestState.readyToAdvance, step: 4 }],
+          next: CorwinDialogue.sameWinterLetter,
+          effects: [
+            { type: 'quest', questId: QuestID.theSameWinter, action: 'advance' },
+            { type: 'item', action: 'give', items: [{ itemId: ItemID.corwinsSecondLetter, amount: 1 }] },
+          ],
+        }],
+      },
+      {
+        responseKey: `${NS}:default.sameWinterProgress`,
+        results: [
+          {
+            visibilityConditions: [{ type: 'quest', questId: QuestID.theSameWinter, questState: QuestState.active, step: 1 }, { type: 'quest', questId: QuestID.theSameWinter, questState: QuestState.readyToAdvance, step: 1, not: true }],
+            next: CorwinDialogue.sameWinterProgress,
+          },
+          {
+            visibilityConditions: [{ type: 'quest', questId: QuestID.theSameWinter, questState: QuestState.active, step: 2 }, { type: 'quest', questId: QuestID.theSameWinter, questState: QuestState.readyToAdvance, step: 2, not: true }],
+            next: CorwinDialogue.sameWinterProgress,
+          },
+          {
+            visibilityConditions: [{ type: 'quest', questId: QuestID.theSameWinter, questState: QuestState.active, step: 3 }, { type: 'quest', questId: QuestID.theSameWinter, questState: QuestState.readyToAdvance, step: 3, not: true }],
+            next: CorwinDialogue.sameWinterProgress,
+          },
+        ],
+      },
+      {
+        responseKey: `${NS}:default.sameWinterOffer`,
+        results: [{
+          visibilityConditions: [{ type: 'quest', questId: QuestID.theSameWinter, questState: QuestState.available }],
+          next: CorwinDialogue.sameWinterOffer,
         }],
       },
       {
@@ -455,6 +505,60 @@ const MAWOOD_CORWIN: MawoodCorwinDialogueType = {
     messageKey: `${NS}:farmFinaleLine.message`,
     options: [
       { responseKey: `${NS}:farmFinaleLine.opt1`, results: [{ next: CorwinDialogue.default, effects: [{ type: 'flag', name: 'corwin_heard_table' }] }] },
+    ],
+  },
+  [CorwinDialogue.quietRoadLetter]: {
+    id: CorwinDialogue.quietRoadLetter,
+    messageKey: `${NS}:quietRoadLetter.message`,
+    options: [
+      { responseKey: `${NS}:quietRoadLetter.opt1`, results: [{ next: CorwinDialogue.quietRoadHobb }] },
+      { responseKey: `${NS}:quietRoadLetter.opt2`, results: [{ next: CorwinDialogue.quietRoadHobb }] },
+    ],
+  },
+  [CorwinDialogue.quietRoadHobb]: {
+    id: CorwinDialogue.quietRoadHobb,
+    messageKey: `${NS}:quietRoadHobb.message`,
+    options: [
+      { responseKey: `${NS}:quietRoadHobb.opt1`, results: [{ next: CorwinDialogue.corruptionLore }] },
+      { responseKey: `${NS}:quietRoadHobb.opt2`, results: [{ next: CorwinDialogue.default }] },
+    ],
+  },
+  [CorwinDialogue.sameWinterOffer]: {
+    id: CorwinDialogue.sameWinterOffer,
+    messageKey: `${NS}:sameWinterOffer.message`,
+    options: [
+      { responseKey: `${NS}:sameWinterOffer.opt1`, results: [{ next: CorwinDialogue.sameWinterOffer2 }] },
+      { responseKey: `${NS}:sameWinterOffer.opt2`, results: [{ next: CorwinDialogue.sameWinterTired }] },
+    ],
+  },
+  [CorwinDialogue.sameWinterTired]: {
+    id: CorwinDialogue.sameWinterTired,
+    messageKey: `${NS}:sameWinterTired.message`,
+    options: [
+      { responseKey: `${NS}:sameWinterTired.opt1`, results: [{ next: CorwinDialogue.sameWinterOffer2 }] },
+      { responseKey: `${NS}:sameWinterTired.opt2`, results: [{ next: CorwinDialogue.default }] },
+    ],
+  },
+  [CorwinDialogue.sameWinterOffer2]: {
+    id: CorwinDialogue.sameWinterOffer2,
+    messageKey: `${NS}:sameWinterOffer2.message`,
+    options: [
+      { responseKey: `${NS}:sameWinterOffer2.opt1`, results: [{ next: CorwinDialogue.default, effects: [{ type: 'quest', questId: QuestID.theSameWinter, action: 'start' }] }] },
+      { responseKey: `${NS}:sameWinterOffer2.opt2`, results: [{ next: CorwinDialogue.default }] },
+    ],
+  },
+  [CorwinDialogue.sameWinterProgress]: {
+    id: CorwinDialogue.sameWinterProgress,
+    messageKey: `${NS}:sameWinterProgress.message`,
+    options: [
+      { responseKey: `${NS}:sameWinterProgress.opt1`, results: [{ next: CorwinDialogue.default }] },
+    ],
+  },
+  [CorwinDialogue.sameWinterLetter]: {
+    id: CorwinDialogue.sameWinterLetter,
+    messageKey: `${NS}:sameWinterLetter.message`,
+    options: [
+      { responseKey: `${NS}:sameWinterLetter.opt1`, results: [{ next: CorwinDialogue.default }] },
     ],
   },
 }

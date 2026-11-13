@@ -22,6 +22,8 @@ export enum FinnDialogue {
   questBigGame,
   questBigGameProgress,
   questBigGameComplete,
+  sameWinterFinnProgress,
+  sameWinterToken,
 }
 
 export type MawoodFinnDialogueType = Record<FinnDialogue, DialogueNode<FinnDialogue>>
@@ -58,6 +60,21 @@ const MAWOOD_FINN: MawoodFinnDialogueType = {
     id: FinnDialogue.default,
     messageKey: `${NS}:default.message`,
     options: [
+      {
+        responseKey: `${NS}:default.sameWinterToken`,
+        results: [{
+          visibilityConditions: [{ type: 'quest', questId: QuestID.theSameWinter, questState: QuestState.readyToAdvance, step: 1 }],
+          next: FinnDialogue.sameWinterToken,
+          effects: [{ type: 'quest', questId: QuestID.theSameWinter, action: 'advance' }],
+        }],
+      },
+      {
+        responseKey: `${NS}:default.sameWinterFinnProgress`,
+        results: [{
+          visibilityConditions: [{ type: 'quest', questId: QuestID.theSameWinter, questState: QuestState.active, step: 1 }, { type: 'quest', questId: QuestID.theSameWinter, questState: QuestState.readyToAdvance, step: 1, not: true }],
+          next: FinnDialogue.sameWinterFinnProgress,
+        }],
+      },
       {
         responseKey: `${NS}:default.aboutFinn`,
         results: [{ next: FinnDialogue.aboutFinn }],
@@ -379,6 +396,20 @@ const MAWOOD_FINN: MawoodFinnDialogueType = {
           },
         ],
       },
+    ],
+  },
+  [FinnDialogue.sameWinterFinnProgress]: {
+    id: FinnDialogue.sameWinterFinnProgress,
+    messageKey: `${NS}:sameWinterFinnProgress.message`,
+    options: [
+      { responseKey: `${NS}:sameWinterFinnProgress.opt1`, results: [{ next: FinnDialogue.default }] },
+    ],
+  },
+  [FinnDialogue.sameWinterToken]: {
+    id: FinnDialogue.sameWinterToken,
+    messageKey: `${NS}:sameWinterToken.message`,
+    options: [
+      { responseKey: `${NS}:sameWinterToken.opt1`, results: [{ next: FinnDialogue.default }] },
     ],
   },
 }

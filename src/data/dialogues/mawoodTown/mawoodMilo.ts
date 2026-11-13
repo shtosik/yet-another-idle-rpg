@@ -22,6 +22,8 @@ export enum MiloDialogue {
   questWhatLurksProgress,
   questWhatLurksComplete,
   questWhatLurksPostQuest,
+  sameWinterMilo,
+  sameWinterMiloDoor,
 }
 
 export type MawoodMiloDialogueType = Record<MiloDialogue, DialogueNode<MiloDialogue>>
@@ -69,6 +71,14 @@ const MAWOOD_MILO: MawoodMiloDialogueType = {
     id: MiloDialogue.default,
     messageKey: `${NS}:default.message`,
     options: [
+      {
+        responseKey: `${NS}:default.sameWinterMilo`,
+        results: [{
+          visibilityConditions: [{ type: 'quest', questId: QuestID.theSameWinter, questState: QuestState.readyToAdvance, step: 3 }],
+          next: MiloDialogue.sameWinterMilo,
+          effects: [{ type: 'quest', questId: QuestID.theSameWinter, action: 'advance' }],
+        }],
+      },
       {
         responseKey: `${NS}:default.aboutMilo`,
         results: [{ next: MiloDialogue.aboutMilo }],
@@ -344,6 +354,21 @@ const MAWOOD_MILO: MawoodMiloDialogueType = {
         responseKey: `${NS}:questWhatLurksPostQuest.opt1`,
         results: [{ next: MiloDialogue.default, closeDialogue: true }],
       },
+    ],
+  },
+  [MiloDialogue.sameWinterMilo]: {
+    id: MiloDialogue.sameWinterMilo,
+    messageKey: `${NS}:sameWinterMilo.message`,
+    options: [
+      { responseKey: `${NS}:sameWinterMilo.opt1`, results: [{ next: MiloDialogue.sameWinterMiloDoor }] },
+      { responseKey: `${NS}:sameWinterMilo.opt2`, results: [{ next: MiloDialogue.sameWinterMiloDoor }] },
+    ],
+  },
+  [MiloDialogue.sameWinterMiloDoor]: {
+    id: MiloDialogue.sameWinterMiloDoor,
+    messageKey: `${NS}:sameWinterMiloDoor.message`,
+    options: [
+      { responseKey: `${NS}:sameWinterMiloDoor.opt1`, results: [{ next: MiloDialogue.default }] },
     ],
   },
 }
