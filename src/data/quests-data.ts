@@ -635,7 +635,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
         requirements: [],
       },
       {
-        description: "Take Corwin's second letter to Marvin in La Harpar.",
+        description: "Talk to Marvin in La Harpar about Corwin's second letter.",
         turnInNpc: NpcID.laHarparMarvin,
         requirements: [],
       },

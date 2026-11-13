@@ -58,7 +58,7 @@ On load, `UnlockService.replayOnLoad` re-applies every rule already met and ever
 - Unlock rules are only evaluated on kills; a level-up from a quest reward unlocks nothing until the next kill.
 - Waves inside a zone have the same enemy pool (no elites or mixed boss waves yet, `docs/ideas/wave-variety.md`).
 - `elderwoodWilds` has no `nextZoneId`; Deepwood and Upper Canopy are reached only through Mawood.
-- The Goat Cleft (`goatCleft`, tier 4, 8 waves, boss Goblin Packrat) has no `previousZoneId`/`nextZoneId` and no unlock path yet: the Mountain Pass hidden passage (*The Quiet Road*) will open it. Its map marker sits beside the Pass and shows once it is unlocked; `ZONE_UNLOCK_NOTIFICATIONS` has its notice. `npm run sim` doesn't route through it.
+- The Goat Cleft (`goatCleft`, tier 4, 8 waves, boss Goblin Packrat) has no `previousZoneId`/`nextZoneId`. Its hidden passage on the Mountain Pass (*The Quiet Road* step 2, `scene-spots.md`) unlocks it. Its map marker sits beside the Pass and shows once it is unlocked; `ZONE_UNLOCK_NOTIFICATIONS` has its notice. `npm run sim` doesn't route through it.
 
 ## How to extend
 New zone or enemy: the `add-enemy-and-zone` skill. New town or feature unlock: add an `UnlockRule` (extend `UnlockCondition`/`UnlockTarget` and the switches in `UnlockService` and `PlayerStore` if needed) and its `unlocks:` i18n keys.

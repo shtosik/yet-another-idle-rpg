@@ -32,10 +32,10 @@ export type LaHarparBartenderDialogueType = Record<BartenderDialogue, DialogueNo
 const NS = 'dialogues/laHarparBartender'
 const PAID_FOR_WORK_FLAG = 'bartender_paid_for_work'
 const PAID_FOR_PLACE_FLAG = 'bartender_paid_for_place'
-/** The Hobb memory is paid for once. */
+/** She charges for the Hobb memory once. */
 const PAID_FOR_HOBB_FLAG = 'bartender_paid_hobb'
 const PAID_FOR_TRAINER_FLAG = 'bartender_paid_for_trainer'
-/** At La Harpar Friendly he answers for free. */
+/** At La Harpar Friendly she answers for free. */
 const LA_HARPAR_FRIENDLY: DialogueCondition = { type: 'reputation', reputationId: ReputationID.laHarpar, tier: ReputationTier.friendly, hidden: true }
 const LA_HARPAR_REVERED: DialogueCondition = { type: 'reputation', reputationId: ReputationID.laHarpar, tier: ReputationTier.revered, hidden: true }
 /** La Harpar's Exalted pet, given once. */
@@ -108,7 +108,7 @@ const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
           { visibilityConditions: [{ type: 'quest', questId: QuestID.lastOrders, questState: QuestState.readyToAdvance, step: 1 }], next: BartenderDialogue.questLastOrdersComplete },
           { visibilityConditions: [{ type: 'quest', questId: QuestID.lastOrders, questState: QuestState.active }], next: BartenderDialogue.questLastOrdersProgress },
           { visibilityConditions: [{ type: 'quest', questId: QuestID.lastOrders, questState: QuestState.available }], next: BartenderDialogue.questLastOrders },
-          // The 40-gold tip is paid once; after that he repeats the offer for free.
+          // The 40-gold tip is paid once; after that she repeats the offer for free.
           {
             visibilityConditions: [
               { type: 'quest', questId: QuestID.meatShortage, questState: QuestState.available },
