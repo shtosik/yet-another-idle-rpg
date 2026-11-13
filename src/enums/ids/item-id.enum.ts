@@ -248,4 +248,10 @@ export enum ItemID {
     viperskinBootsPattern = 229,
     viperskinGloves = 230,
     viperskinGlovesPattern = 231,
+    passPostDaybook = 232,
+    hobbsSatchel = 233,
+    corwinsLetter = 234,
+    warchiefsToken = 235,
+    corwinsRitualNotes = 236,
+    corwinsSecondLetter = 237,
 }

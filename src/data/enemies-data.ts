@@ -334,7 +334,9 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     weakness: DamageElement.water,
     experience: 720,
     gold: 360,
-    drops: [drop(ItemID.buckledHarness, 1, 1, 15), drop(ItemID.switchbackBoots, 1, 1, 15), petDrop(EnemyID.goblinPackrat)],
+    drops: [
+      { id: ItemID.hobbsSatchel, minAmount: 1, maxAmount: 1, chance: 1, requiredActiveQuestId: QuestID.theQuietRoad },
+      drop(ItemID.buckledHarness, 1, 1, 15), drop(ItemID.switchbackBoots, 1, 1, 15), petDrop(EnemyID.goblinPackrat)],
     shinyDrops: shinyPetDrops(EnemyID.goblinPackrat),
     url: './assets/img/enemies/goblinPackrat.png',
     enemyTypes: [EnemyType.goblin, EnemyType.humanoid],
@@ -401,6 +403,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
       drop(ItemID.fireRune, 2, 4, 2),
       drop(ItemID.gnollCleaver, 1, 1, 20),
       { id: ItemID.blightedFetish, minAmount: 1, maxAmount: 1, chance: 1, requiredActiveQuestId: QuestID.fetchesAndFangs },
+      { id: ItemID.warchiefsToken, minAmount: 1, maxAmount: 1, chance: 3, requiredActiveQuestId: QuestID.theSameWinter },
       petDrop(EnemyID.gnollWarchief),
     ],
     shinyDrops: shinyPetDrops(EnemyID.gnollWarchief),

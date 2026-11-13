@@ -35,4 +35,6 @@ export enum QuestID {
     theGrowersTable = 26,
     marthasOrder = 27,
     wicksOrder = 28,
+    theQuietRoad = 29,
+    theSameWinter = 30,
 }

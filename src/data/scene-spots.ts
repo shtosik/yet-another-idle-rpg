@@ -26,10 +26,15 @@ export interface SceneSpots {
 export const SCENE_SPOTS: Record<string, SceneSpots> = {
   './assets/img/backgrounds/mountain-pass.png': {
     maskUrl: './assets/img/backgrounds/mountain-pass-mask.png',
-    spots: [],
+    spots: [
+      { id: 'passGuildPost', color: '#ff0000', when: { questId: QuestID.theQuietRoad, step: 1 }, gives: { itemId: ItemID.passPostDaybook } },
+      { id: 'passGoatCleft', color: '#00ff00', when: { questId: QuestID.theQuietRoad, step: 2 }, gives: { zoneId: ZoneID.goatCleft } },
+    ],
   },
   './assets/img/backgrounds/mawoodElderTree.png': {
     maskUrl: './assets/img/backgrounds/mawoodElderTree-mask.png',
-    spots: [],
+    spots: [
+      { id: 'elderTreeTrunk', color: '#0000ff', when: { questId: QuestID.theSameWinter, step: 2 }, gives: { itemId: ItemID.corwinsRitualNotes } },
+    ],
   },
 }

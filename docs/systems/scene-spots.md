@@ -33,8 +33,8 @@ A spot must sit outside every HUD rect (`BATTLE_HUD_AREAS`; for a Building `BUIL
 
 | Art | Spot | Colour | Rect (left, top, w, h %) | Step |
 |---|---|---|---|---|
-| `mountain-pass.png` | burned Guild post (search) | `#ff0000` | 3, 66, 21, 10 | Chapter One, Step 6 |
-| `mountain-pass.png` | goat cleft (passage to The Goat Cleft) | `#00ff00` | 3, 31, 9, 12 | Chapter One, Step 6 |
-| `mawoodElderTree.png` | trunk under the stair (search) | `#0000ff` | 76, 60, 16, 36 | Chapter One, Step 6 |
+| `mountain-pass.png` | burned Guild post (search) | `#ff0000` | 3, 66, 21, 10 | The Quiet Road, step 1 |
+| `mountain-pass.png` | goat cleft (passage to The Goat Cleft) | `#00ff00` | 3, 31, 9, 12 | The Quiet Road, step 2 |
+| `mawoodElderTree.png` | trunk under the stair (search) | `#0000ff` | 76, 60, 16, 36 | The Same Winter, step 2 |
 
-The masks are in place; the spots join `SCENE_SPOTS` with their quests, and the objects are painted into the art before release.
+All three are live in `SCENE_SPOTS`. A search spot's quest step also requires the item it gives, so the quest can't move past the step without it.
