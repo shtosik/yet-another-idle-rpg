@@ -231,7 +231,7 @@ export enum ItemID {
     packLeather = 212,
     lostTradeGoods = 213,
     buckledHarness = 214,
-    runnersBoots = 215,
+    switchbackBoots = 215,
     petRockViper = 216,
     shinyPetRockViper = 217,
     petGoblinHoarder = 218,

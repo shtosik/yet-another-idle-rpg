@@ -162,7 +162,7 @@ const PETS: PetEntry[] = [
     stats: [{ id: 'damageVsGoblin', amount: 0.2 }],
     shinyStats: [{ id: 'damageVsGoblin', amount: 0.4 }],
   },
-  // La Harpar — The Goat Cleft
+  // Mountain Pass — The Goat Cleft
   {
     enemyId: EnemyID.rockViper,
     petId: ItemID.petRockViper,

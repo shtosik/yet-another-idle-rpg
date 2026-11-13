@@ -30,7 +30,7 @@ Enemy definitions and their loot. A **shiny** is a rare recolored spawn with muc
 - Goblin Scavengers carry Phurgo's Forge Tongs at 1 in 50 while The Cold Forge is active. The separate quest-drop cap work will restrict rolls to the current step's missing amount (`quests.md`).
 - Bosses are defined by the zone (`bossEnemyId`), not by the enemy.
 - An enemy can be in more than one zone (the Goat: Mountain Pass and The Goat Cleft). The bestiary lists every zone from `ZONES_BY_ENEMY`; its rank and kills are per enemy, so they count toward each zone's Hunter star.
-- The Goat Cleft: Rock Viper (reptile, weak to earth; Viperskin 1/4, Viper Venom 1/6), Goblin Hoarder (goblin, humanoid, weak to fire; Pack Leather 1/4, Stick 1/4, Stone 1/3, Lost Trade Goods 1/20, a junk item that only sells), boss Goblin Packrat (goblin, humanoid, weak to water; Buckled Harness and Runner's Boots 1/15 each). All three have pets and shiny pets.
+- The Goat Cleft: Rock Viper (reptile, weak to earth; Viperskin 1/4, Viper Venom 1/6), Goblin Hoarder (goblin, humanoid, weak to fire; Pack Leather 1/4, Stick 1/4, Stone 1/3, Lost Trade Goods 1/20, a junk item that only sells), boss Goblin Packrat (goblin, humanoid, weak to water; Buckled Harness and Switchback Boots 1/15 each). All three have pets and shiny pets.
 
 ## Known issues
 - The harpy matriarch's plume drops on every kill and has no use.

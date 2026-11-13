@@ -98,7 +98,7 @@ export const ChestItemsData: Partial<Record<ItemID, Item>> = {
     slot: EquipmentSlot.chest,
     stats: [
       { id: 'attackPower', amount: 3 },
-      { id: 'goldCoinsMultiplier', amount: 0.1 },
+      { id: 'goldCoinsMultiplier', amount: 0.15 },
     ],
   },
 }

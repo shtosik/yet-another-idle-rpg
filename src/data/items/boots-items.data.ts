@@ -60,10 +60,10 @@ export const BootsItemsData: Partial<Record<ItemID, Item>> = {
     ],
   },
   // Goblin Packrat (The Goat Cleft): matched to the Troll Hide Vest.
-  [ItemID.runnersBoots]: {
-    id: ItemID.runnersBoots,
+  [ItemID.switchbackBoots]: {
+    id: ItemID.switchbackBoots,
     tier: ItemTier.rare,
-    url: './assets/img/items/runnersBoots.png',
+    url: './assets/img/items/switchbackBoots.png',
     value: 2000,
     type: ItemType.equipment,
     slot: EquipmentSlot.boots,

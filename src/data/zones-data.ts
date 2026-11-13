@@ -92,8 +92,8 @@ const ZONES_DATA: Record<ZoneID, Zone> = {
     enemiesPerWave: 8,
     bossEnemyId: EnemyID.harpyMatriarch,
   },
-  // Side Zone off the Mountain Pass, opened by a hidden passage there. Keep it after the Pass:
-  // quest kill rows for the shared Goat link to the first unlocked Zone in this order.
+  // Side Zone off the Mountain Pass, opened by a hidden passage there. Its ZoneID stays above the Pass's:
+  // ZONES_BY_ENEMY lists Zones in ZoneID order, so quest kill rows for the shared Goat link to the Pass first.
   [ZoneID.goatCleft]: {
     id: ZoneID.goatCleft,
     tier: 4,

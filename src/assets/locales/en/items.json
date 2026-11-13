@@ -218,7 +218,7 @@
         "packLeather": "Pack Leather",
         "lostTradeGoods": "Lost Trade Goods",
         "buckledHarness": "Buckled Harness",
-        "runnersBoots": "Runner's Boots",
+        "switchbackBoots": "Switchback Boots",
         "petRockViper": "Pet Rock Viper",
         "shinyPetRockViper": "Shiny Pet Rock Viper",
         "petGoblinHoarder": "Pet Goblin Hoarder",
@@ -240,7 +240,7 @@
         "packLeather": "Straps and patches cut from other people's luggage.",
         "lostTradeGoods": "Something a carter was very sorry to lose.",
         "buckledHarness": "Guild straps and buckles from a dozen stolen packs, riveted into something like armour.",
-        "runnersBoots": "Worn soft by six years of the Pass. Not his size."
+        "switchbackBoots": "Worn soft by six years of the Pass. Not his size."
     },
     "grantsSpell": "Grants the spell {{spell}} while equipped",
     "rightClickToEquip": "Right-click or Enter to equip",

@@ -329,7 +329,7 @@ const ENEMIES_DATA: Partial<Record<EnemyID, Enemy>> = {
     weakness: DamageElement.water,
     experience: 720,
     gold: 360,
-    drops: [drop(ItemID.buckledHarness, 1, 1, 15), drop(ItemID.runnersBoots, 1, 1, 15), petDrop(EnemyID.goblinPackrat)],
+    drops: [drop(ItemID.buckledHarness, 1, 1, 15), drop(ItemID.switchbackBoots, 1, 1, 15), petDrop(EnemyID.goblinPackrat)],
     shinyDrops: shinyPetDrops(EnemyID.goblinPackrat),
     url: './assets/img/enemies/goblinPackrat.png',
     enemyTypes: [EnemyType.goblin, EnemyType.humanoid],
