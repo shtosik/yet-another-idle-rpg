@@ -1082,13 +1082,6 @@
     "seed": 1702929459,
     "date": "2026-10-21"
   },
-  "src/assets/img/items/switchbackBoots.png": {
-    "family": "item-pixel",
-    "tier": null,
-    "subject": "a pair of worn soft brown leather boots with laces",
-    "seed": 2102772139,
-    "date": "2026-11-13"
-  },
   "src/assets/img/items/sageRobe.png": {
     "family": "item-pixel",
     "tier": null,
@@ -1179,6 +1172,13 @@
     "seed": 125528548,
     "date": "2026-10-26"
   },
+  "src/assets/img/items/switchbackBoots.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a pair of worn soft brown leather boots with laces",
+    "seed": 2102772139,
+    "date": "2026-11-13"
+  },
   "src/assets/img/items/talonBlade.png": {
     "family": "item-pixel",
     "tier": null,
@@ -1254,6 +1254,48 @@
     "tier": null,
     "subject": "a flat folded piece of thin grey snake hide with a fine diamond scale pattern",
     "seed": 5524,
+    "date": "2026-11-13"
+  },
+  "src/assets/img/items/viperskinBoots.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "one pair of light low boots made of small overlapping grey snake scales, with thin brown leather straps and soft leather soles",
+    "seed": 789702868,
+    "date": "2026-11-13"
+  },
+  "src/assets/img/items/viperskinGloves.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "one pair of fingerless gloves made of small overlapping grey snake scales, with dark brown leather grip patches on the palms and a leather strap at each wrist",
+    "seed": 2076245081,
+    "date": "2026-11-13"
+  },
+  "src/assets/img/items/viperskinHood.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single empty hood made of small overlapping grey snake scales, lying flat, with brown leather straps and a buckle at the neck, nothing inside it, no person",
+    "seed": 1625612263,
+    "date": "2026-11-13"
+  },
+  "src/assets/img/items/viperskinJerkin.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single sleeveless jerkin covered in small overlapping grey snake scales, held together by worn brown leather straps with brass buckles across the chest, empty",
+    "seed": 1030420333,
+    "date": "2026-11-13"
+  },
+  "src/assets/img/items/viperskinLeggings.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "one pair of leggings covered in small overlapping grey snake scales, with brown leather straps and buckles around the thighs and a leather belt at the waist, empty",
+    "seed": 2018703681,
+    "date": "2026-11-13"
+  },
+  "src/assets/img/items/viperskinPattern.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single torn parchment scroll, partly unrolled, showing an ink sketch of a jerkin pattern, with a small strip of grey snake scale tied to it by a brown leather cord",
+    "seed": 96746914,
     "date": "2026-11-13"
   },
   "src/assets/img/items/wharfRunnersBoots.png": {
