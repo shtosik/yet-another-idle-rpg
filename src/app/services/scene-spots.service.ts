@@ -75,7 +75,11 @@ export class SceneSpotsService {
   mask(url: string): Promise<MaskPixels> {
     let mask = this.masks.get(url)
     if (!mask) {
-      mask = loadMask(url)
+      // A failed load isn't kept, so the next click tries again.
+      mask = loadMask(url).catch(error => {
+        this.masks.delete(url)
+        throw error
+      })
       this.masks.set(url, mask)
     }
     return mask

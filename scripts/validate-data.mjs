@@ -942,6 +942,7 @@ for (const f of [...walkFiles(join(ROOT, '.claude', 'agents'), '.md'), ...walkFi
       const where = `spot '${spot.id}'`
       if (seen.has(spot.id) || seen.has(spot.color)) error(file, `${where}: id or colour used twice in '${artUrl}'`)
       seen.add(spot.id).add(spot.color)
+      if (!/^#[0-9a-f]{6}$/.test(spot.color)) error(file, `${where}: colour '${spot.color}' must be lowercase #rrggbb`)
       const box = boxes.get(spot.color.toLowerCase())
       if (!box) { error(file, `${where}: colour ${spot.color} is not in '${maskUrl}'`); continue }
       const area = {

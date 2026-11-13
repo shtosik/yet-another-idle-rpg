@@ -35,8 +35,13 @@ export class SceneMaskComponent {
   protected async onClick(event: MouseEvent, { maskUrl, spots }: SceneSpots): Promise<void> {
     const box = event.currentTarget as HTMLElement
     const { x, y } = scenePoint(event.offsetX, event.offsetY, { width: box.clientWidth, height: box.clientHeight }, SCENE_SIZES[this.kind()])
-    const color = maskColorAt(await this.sceneSpots.mask(maskUrl), x, y)
-    const spot = spots.find(candidate => candidate.color === color)
+    const mask = await this.sceneSpots.mask(maskUrl).catch((error: unknown) => {
+      console.error(error)
+      return null
+    })
+    if (!mask) return
+    const color = maskColorAt(mask, x, y)
+    const spot = spots.find(candidate => candidate.color.toLowerCase() === color)
     if (spot) this.sceneSpots.use(spot)
   }
 }
