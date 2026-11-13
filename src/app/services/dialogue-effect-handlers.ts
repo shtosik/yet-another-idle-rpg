@@ -14,7 +14,7 @@ import { NPCProps } from '../../data/npc-data'
 import { ItemStack } from '../store/player/inventory'
 import { ReputationTurnIn, turnInBundles, turnInFor } from '../../data/reputation-turn-ins'
 import { bundleKey } from '../store/quests/turn-in-cooldown'
-import { getActiveQuestIds, getQuestStatus, getStepItems } from './quest-status'
+import { getActiveQuestIds, getQuestStatus, getStepItems, getStepTakes } from './quest-status'
 import { QuestStep } from '../../types/quests/quest-progression.type'
 import { QuestState } from '../../enums/quest-state.enum'
 import QUEST_DATA from '../../data/quests-data'
@@ -131,7 +131,7 @@ export const EFFECT_HANDLERS: EffectHandlers = {
       const data = QUEST_DATA[effect.questId]
       const completes = effect.action === 'end' || status.step >= data.steps.length
       return {
-        removes: getStepItems(effect.questId, status.step, ctx.quests.orders()),
+        removes: getStepTakes(effect.questId, status.step, ctx.quests.orders()),
         adds: completes ? questPayout(data).items : [],
       }
     },

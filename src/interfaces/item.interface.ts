@@ -17,7 +17,6 @@ export interface ItemData {
     value: number
     url: string
     type: ItemType
-    description?: string
 }
 
 export interface EquipmentItemPossibleStat {

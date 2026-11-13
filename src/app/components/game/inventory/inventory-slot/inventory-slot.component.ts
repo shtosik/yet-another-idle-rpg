@@ -9,6 +9,7 @@ import { I18nextPipe } from '../../../../pipes/i18next.pipe'
 import { EnemyID } from '../../../../../enums/ids/enemy-id.enum'
 import { SkillNodeID } from '../../../../../enums/ids/skill-node-id.enum'
 import { ItemID } from '../../../../../enums/ids/item-id.enum'
+import i18next from 'i18next'
 import { TooltipTemplateDirective } from 'ngx-tooltip-directives'
 import { StatToPercentagePipe } from '../../../../pipes/stat-to-percentage.pipe'
 import { StationID } from '../../../../../enums/ids/station-id.enum'
@@ -68,6 +69,12 @@ export class InventoryItemComponent {
   protected readonly DamageElement = DamageElement
   protected readonly EquipmentSlot = EquipmentSlot
   protected readonly SpellID = SpellID
+
+  /** The item's flavor text, if `items:descriptions.<ItemID>` exists. */
+  protected description(id: ItemID): string | null {
+    const key = `items:descriptions.${ItemID[id]}`
+    return i18next.exists(key) ? i18next.t(key) : null
+  }
 
   get isUsable(): boolean {
     return this.itemUse.canUse(this.item.id)

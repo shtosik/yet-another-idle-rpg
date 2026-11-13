@@ -5,7 +5,7 @@ import { ItemID } from '../../../enums/ids/item-id.enum'
 import { QuestState } from '../../../enums/quest-state.enum'
 import { QuestProgression, QuestStep } from '../../../types/quests/quest-progression.type'
 import { PlayerStat } from '../../../types/player/player-stat.type'
-import { getQuestStatus, getStepItems } from '../../services/quest-status'
+import { getQuestStatus, getStepTakes } from '../../services/quest-status'
 import { ItemStack } from '../player/inventory'
 import { ReputationGain } from '../player/reputation'
 import { PlayerStatsType } from '../player/stats'
@@ -103,7 +103,7 @@ export function questTransition(questId: QuestID, action: 'advance' | 'end', sta
   if (status.state !== QuestState.active) return null
 
   const data = QUEST_DATA[questId]
-  const take = getStepItems(questId, status.step, state.orders)
+  const take = getStepTakes(questId, status.step, state.orders)
   const pinnedQuests = state.pinnedQuests.filter(id => id !== questId)
 
   if (data.repeat) {

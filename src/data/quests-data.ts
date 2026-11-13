@@ -92,6 +92,8 @@ export interface ItemRequirement {
   type: 'item'
   itemId: ItemID
   amount: number
+  /** The turn-in leaves the item with the player; it still has to be held. */
+  keep?: true
 }
 
 export interface WaveKillCountRequirement {

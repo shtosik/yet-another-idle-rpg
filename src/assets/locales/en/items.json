@@ -222,6 +222,7 @@
         "epic": "Epic",
         "legendary": "Legendary"
     },
+    "descriptions": {},
     "grantsSpell": "Grants the spell {{spell}} while equipped",
     "rightClickToEquip": "Right-click or Enter to equip",
     "rightClickToUnequip": "Right-click to unequip",

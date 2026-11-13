@@ -56,6 +56,7 @@ Phurgo's Forge Tongs (`ItemID.phurgosForgeTongs`) use the existing quest item ru
 - `upgradedStatAmount` in `stats.ts` scales each base gear stat by `1 + 0.1 * upgradeLevel`, adding 0.25 at +5 and above. Each scaled amount uses the existing six-decimal stat precision, retaining fractional stats; +0 leaves base amounts unchanged. `gearModifiers` supplies both derived stats and equipment capacity checks. Tooltip stats use the same calculation.
 - Sell prices multiply the shop's existing rounded price by `2 ** upgradeLevel`; unsellable items stay unsellable.
 - Inventory, equipment and shop slots show `+N` for upgraded items, with a diamond frame mark at +5. Tooltips and accessible names include the level. New labels use `items:upgradeLevel`, `items:upgradedName` and `items:upgradeMilestone`.
+- The item tooltip (shared slot, `inventory-slot.component`) shows `items:descriptions.<ItemID key>` under the tier line when that key exists; `ItemData.description` was removed.
 - Save version stays 2: no migration or rewrite is needed. Existing items without the field load as before; new levels persist with their stacks and equipment.
 - Cheats: `dev.addItem(itemId, amount = 1, tier = defaultTier, upgradeLevel = 0)` (also `giveItem`) and `dev.equip(itemId, tier = defaultTier, upgradeLevel = 0)`.
 
