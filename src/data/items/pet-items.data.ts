@@ -162,6 +162,31 @@ const PETS: PetEntry[] = [
     stats: [{ id: 'damageVsGoblin', amount: 0.2 }],
     shinyStats: [{ id: 'damageVsGoblin', amount: 0.4 }],
   },
+  // La Harpar — The Goat Cleft
+  {
+    enemyId: EnemyID.rockViper,
+    petId: ItemID.petRockViper,
+    shinyId: ItemID.shinyPetRockViper,
+    asset: 'rockViper',
+    stats: [{ id: 'damageVsReptile', amount: 0.2 }],
+    shinyStats: [{ id: 'damageVsReptile', amount: 0.4 }],
+  },
+  {
+    enemyId: EnemyID.goblinHoarder,
+    petId: ItemID.petGoblinHoarder,
+    shinyId: ItemID.shinyPetGoblinHoarder,
+    asset: 'goblinHoarder',
+    stats: [{ id: 'damageVsGoblin', amount: 0.2 }],
+    shinyStats: [{ id: 'damageVsGoblin', amount: 0.4 }],
+  },
+  {
+    enemyId: EnemyID.goblinPackrat,
+    petId: ItemID.petGoblinPackrat,
+    shinyId: ItemID.shinyPetGoblinPackrat,
+    asset: 'goblinPackrat',
+    stats: [{ id: 'damageVsGoblin', amount: 0.2 }],
+    shinyStats: [{ id: 'damageVsGoblin', amount: 0.4 }],
+  },
   // Mawood — Elderwood Wilds
   {
     enemyId: EnemyID.forestSpider,

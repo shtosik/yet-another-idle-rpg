@@ -39,4 +39,5 @@ The farm's pure rules and seed storage. Design: `docs/ideas/farm-and-husbandry.m
 ## Content (C9)
 - Seeds and tiers follow `docs/ideas/farm-and-husbandry.md` §7: Turnip 15 min, Wheat 45 min, Silverleaf 2 h, Apple 4 h, Glowcap 8 h, Heartroot 12 h, Canopy Blossom 24 h; expertise 1, 2, 5, 8, 12, 17, 22.
 - Sources: enemy drops (`enemies-data.ts`, listed in `enemies-shiny-pets-bestiary.md`), the Arena Chest (`arena.md`) and Marta's shop (`towns-shops-guild.md`). Recipes: `consumables-camp-crafting.md`.
+- Wick's order pool (`wicksOrder` in `quests-data.ts`) takes animal drops by Guild tier, each gated by `sourceZones`: Viperskin from Friendly, once The Goat Cleft is unlocked.
 - `NpcID.farmWarden` (Marta) and `farmDrover` (Wick) have full dialogue trees; portraits in `avatars/farm/`. The farm home uses `backgrounds/farm.png` (a building-kind Scene, 1376×566, `docs/systems/scene.md`; the Gate sits in the Scene), the plots panel `backgrounds/farm-plots.png` (960x536, 256-colour palette, a darkened texture off the Scene); the Gate, labelled "To the fields", is a CSS wooden button, no sprite.

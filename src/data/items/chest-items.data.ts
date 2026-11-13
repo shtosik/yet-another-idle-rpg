@@ -88,4 +88,17 @@ export const ChestItemsData: Partial<Record<ItemID, Item>> = {
       { id: 'critMulti', amount: 0.15 },
     ],
   },
+  // Goblin Packrat (The Goat Cleft): a hoarder's gold-find chest piece, a choice against the Troll Hide Vest.
+  [ItemID.buckledHarness]: {
+    id: ItemID.buckledHarness,
+    tier: ItemTier.rare,
+    url: './assets/img/items/buckledHarness.png',
+    value: 2000,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.chest,
+    stats: [
+      { id: 'attackPower', amount: 3 },
+      { id: 'goldCoinsMultiplier', amount: 0.1 },
+    ],
+  },
 }

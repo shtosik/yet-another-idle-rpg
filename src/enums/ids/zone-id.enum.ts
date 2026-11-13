@@ -7,4 +7,5 @@ export enum ZoneID {
   elderwoodWilds = 6,
   deepwood = 7,
   upperCanopy = 8,
+  goatCleft = 9,
 }

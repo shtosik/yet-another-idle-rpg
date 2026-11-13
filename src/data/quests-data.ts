@@ -732,6 +732,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
         { itemId: ItemID.wolfFangs, minTier: ReputationTier.friendly, reputationPer10: 7, goldPerItem: 6, xpPerItem: 3, sourceZones: [ZoneID.theLongPath] },
         { itemId: ItemID.deerPelt, minTier: ReputationTier.friendly, reputationPer10: 7, goldPerItem: 6, xpPerItem: 3, sourceZones: [ZoneID.theLongPath, ZoneID.mountainPass] },
         { itemId: ItemID.venison, minTier: ReputationTier.friendly, reputationPer10: 7, goldPerItem: 6, xpPerItem: 3, sourceZones: [ZoneID.theLongPath, ZoneID.mountainPass] },
+        { itemId: ItemID.viperskin, minTier: ReputationTier.friendly, reputationPer10: 7, goldPerItem: 6, xpPerItem: 3, sourceZones: [ZoneID.goatCleft] },
         { itemId: ItemID.spiderSilk, minTier: ReputationTier.honored, reputationPer10: 10, goldPerItem: 10, xpPerItem: 6, sourceZones: [ZoneID.elderwoodWilds] },
         { itemId: ItemID.bearPelt, minTier: ReputationTier.revered, reputationPer10: 14, goldPerItem: 20, xpPerItem: 10, sourceZones: [ZoneID.deepwood] },
         { itemId: ItemID.boneFragment, minTier: ReputationTier.revered, reputationPer10: 14, goldPerItem: 20, xpPerItem: 10, sourceZones: [ZoneID.deepwood] },

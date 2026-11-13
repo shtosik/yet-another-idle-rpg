@@ -30,6 +30,10 @@
     "elderwoodWilds": {
       "title": "New Area: Elderwood Wilds",
       "body": "Past the Mountain Pass the trees close in and the sky disappears. Forest spiders, gnoll war-bands and blighted saplings prowl the outer rim. Push deeper — the town of Mawood lies just ahead."
+    },
+    "goatCleft": {
+      "title": "New Area: The Goat Cleft",
+      "body": "A crack in the rock behind the switchbacks, too narrow for a cart. Past the goblin marks it opens into the runners' old short-cut, and the goblins have made it their store."
     }
   },
   "camp": {

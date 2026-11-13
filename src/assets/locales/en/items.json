@@ -212,7 +212,19 @@
         "silverleafTonicRecipe": "Silverleaf Tonic Recipe",
         "glowcapElixirRecipe": "Glowcap Elixir Recipe",
         "guildLetter": "Guild Letter",
-        "petFarmingGuildHare": "Pet Terrace Hare"
+        "petFarmingGuildHare": "Pet Terrace Hare",
+        "viperskin": "Viperskin",
+        "viperVenom": "Viper Venom",
+        "packLeather": "Pack Leather",
+        "lostTradeGoods": "Lost Trade Goods",
+        "buckledHarness": "Buckled Harness",
+        "runnersBoots": "Runner's Boots",
+        "petRockViper": "Pet Rock Viper",
+        "shinyPetRockViper": "Shiny Pet Rock Viper",
+        "petGoblinHoarder": "Pet Goblin Hoarder",
+        "shinyPetGoblinHoarder": "Shiny Pet Goblin Hoarder",
+        "petGoblinPackrat": "Pet Goblin Packrat",
+        "shinyPetGoblinPackrat": "Shiny Pet Goblin Packrat"
     },
     "tiers": {
         "trash": "Trash",
@@ -222,7 +234,14 @@
         "epic": "Epic",
         "legendary": "Legendary"
     },
-    "descriptions": {},
+    "descriptions": {
+        "viperskin": "Thin grey scales that bend without cracking.",
+        "viperVenom": "A stoppered drop of venom, cloudy and cold.",
+        "packLeather": "Straps and patches cut from other people's luggage.",
+        "lostTradeGoods": "Something a carter was very sorry to lose.",
+        "buckledHarness": "Guild straps and buckles from a dozen stolen packs, riveted into something like armour.",
+        "runnersBoots": "Worn soft by six years of the Pass. Not his size."
+    },
     "grantsSpell": "Grants the spell {{spell}} while equipped",
     "rightClickToEquip": "Right-click or Enter to equip",
     "rightClickToUnequip": "Right-click to unequip",

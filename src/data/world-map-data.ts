@@ -97,6 +97,13 @@ const portStocksmarMarkers: WorldMapMarker[] = [
     position: { x: 1400, y: 600 },
     minZoom: 2,
   },
+  {
+    type: 'zone',
+    zoneId: ZoneID.goatCleft,
+    label: 'The Goat Cleft',
+    position: { x: 1480, y: 700 },
+    minZoom: 2,
+  },
 ]
 
 const elderreachMarkers: WorldMapMarker[] = [
