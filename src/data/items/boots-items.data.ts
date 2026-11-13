@@ -72,4 +72,13 @@ export const BootsItemsData: Partial<Record<ItemID, Item>> = {
       { id: 'attackSpeed', amount: 0.1 },
     ],
   },
+  [ItemID.viperskinBoots]: {
+    id: ItemID.viperskinBoots,
+    tier: ItemTier.rare,
+    url: './assets/img/items/viperskinBoots.png',
+    value: 54,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.boots,
+    stats: [{ id: 'rangedDamageMultiplier', amount: 0.04 }],
+  },
 }

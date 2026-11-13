@@ -101,4 +101,13 @@ export const ChestItemsData: Partial<Record<ItemID, Item>> = {
       { id: 'goldCoinsMultiplier', amount: 0.15 },
     ],
   },
+  [ItemID.viperskinJerkin]: {
+    id: ItemID.viperskinJerkin,
+    tier: ItemTier.rare,
+    url: './assets/img/items/viperskinJerkin.png',
+    value: 111,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.chest,
+    stats: [{ id: 'rangedDamageMultiplier', amount: 0.09 }],
+  },
 }

@@ -224,7 +224,17 @@
         "petGoblinHoarder": "Pet Goblin Hoarder",
         "shinyPetGoblinHoarder": "Shiny Pet Goblin Hoarder",
         "petGoblinPackrat": "Pet Goblin Packrat",
-        "shinyPetGoblinPackrat": "Shiny Pet Goblin Packrat"
+        "shinyPetGoblinPackrat": "Shiny Pet Goblin Packrat",
+        "viperskinHood": "Viperskin Hood",
+        "viperskinHoodPattern": "Viperskin Hood Pattern",
+        "viperskinJerkin": "Viperskin Jerkin",
+        "viperskinJerkinPattern": "Viperskin Jerkin Pattern",
+        "viperskinLeggings": "Viperskin Leggings",
+        "viperskinLeggingsPattern": "Viperskin Leggings Pattern",
+        "viperskinBoots": "Viperskin Boots",
+        "viperskinBootsPattern": "Viperskin Boots Pattern",
+        "viperskinGloves": "Viperskin Gloves",
+        "viperskinGlovesPattern": "Viperskin Gloves Pattern"
     },
     "tiers": {
         "trash": "Trash",
@@ -240,7 +250,12 @@
         "packLeather": "Straps and patches cut from other people's luggage.",
         "lostTradeGoods": "Something a carter was very sorry to lose.",
         "buckledHarness": "Guild straps and buckles from a dozen stolen packs, riveted into something like armour.",
-        "switchbackBoots": "Worn soft by six years of the Pass. Not his size."
+        "switchbackBoots": "Worn soft by six years of the Pass. Not his size.",
+        "viperskinHood": "Treated so the rain runs off; you hear better in it, somehow.",
+        "viperskinJerkin": "Grey scale over goblin-salvaged straps. Moves when you draw.",
+        "viperskinLeggings": "Quiet on rock.",
+        "viperskinBoots": "Light enough for the cleft, which is the point.",
+        "viperskinGloves": "Venom-cured grips that don't slip on a bowstring."
     },
     "grantsSpell": "Grants the spell {{spell}} while equipped",
     "rightClickToEquip": "Right-click or Enter to equip",

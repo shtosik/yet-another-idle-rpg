@@ -38,4 +38,9 @@ export enum RecipeID {
     mushroomStew = 37,
     silverleafTonic = 38,
     glowcapElixir = 39,
+    viperskinHood = 40,
+    viperskinJerkin = 41,
+    viperskinLeggings = 42,
+    viperskinBoots = 43,
+    viperskinGloves = 44,
 }

@@ -43,4 +43,13 @@ export const LegsItemsData: Partial<Record<ItemID, Item>> = {
       { id: 'attackSpeed', amount: 0.1 },
     ],
   },
+  [ItemID.viperskinLeggings]: {
+    id: ItemID.viperskinLeggings,
+    tier: ItemTier.rare,
+    url: './assets/img/items/viperskinLeggings.png',
+    value: 90,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.legs,
+    stats: [{ id: 'rangedDamageMultiplier', amount: 0.07 }],
+  },
 }

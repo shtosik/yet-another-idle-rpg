@@ -57,4 +57,13 @@ export const GlovesItemsData: Partial<Record<ItemID, Item>> = {
       { id: 'xpMultiplier', amount: 0.1 },
     ],
   },
+  [ItemID.viperskinGloves]: {
+    id: ItemID.viperskinGloves,
+    tier: ItemTier.rare,
+    url: './assets/img/items/viperskinGloves.png',
+    value: 66,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.gloves,
+    stats: [{ id: 'rangedDamageMultiplier', amount: 0.04 }],
+  },
 }

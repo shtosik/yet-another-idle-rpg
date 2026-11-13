@@ -110,4 +110,13 @@ export const HelmetItemsData: Partial<Record<ItemID, Item>> = {
       { id: 'critChance', amount: 2 },
     ],
   },
+  [ItemID.viperskinHood]: {
+    id: ItemID.viperskinHood,
+    tier: ItemTier.rare,
+    url: './assets/img/items/viperskinHood.png',
+    value: 72,
+    type: ItemType.equipment,
+    slot: EquipmentSlot.helmet,
+    stats: [{ id: 'rangedDamageMultiplier', amount: 0.06 }],
+  },
 }
