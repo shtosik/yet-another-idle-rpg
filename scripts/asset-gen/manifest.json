@@ -104,6 +104,13 @@
     "seed": 513426195,
     "date": "2026-10-17"
   },
+  "src/assets/img/backgrounds/goat-cleft.png": {
+    "family": "zone-pixel",
+    "tier": null,
+    "subject": "looking up a narrow gap between two towering grey rock cliffs that nearly touch, a thin strip of blue sky between them at the top, a narrow stony path climbing between the cliffs, the grey rock worn smooth along the path, a large heap of brown leather backpacks, bulging sacks, small wooden crates and a broken wooden cart wheel piled against the left cliff in the foreground, a smaller heap of bags against the right cliff, crude scratched marks on the grey rock, one wooden stake with an orange rag tied to it, nobody there",
+    "seed": 4411,
+    "date": "2026-11-13"
+  },
   "src/assets/img/backgrounds/laHarparExplorationGuild.png": {
     "family": "town-painterly",
     "tier": null,
@@ -372,6 +379,24 @@
     "shinySaturation": 2.5,
     "shinyBrightness": 1.1
   },
+  "src/assets/img/enemies/goblinHoarder.png": {
+    "family": "enemy-pixel",
+    "tier": "small",
+    "subject": "a small green goblin with one head, pointy ears, two arms and two legs, ragged clothes, carrying one huge bulging brown sack bigger than itself on its back, its left hand holding the sack over its shoulder, one plain wooden club in its right hand",
+    "seed": 5522,
+    "date": "2026-11-13",
+    "shinyHue": 288,
+    "shinySaturation": 1.8
+  },
+  "src/assets/img/enemies/goblinPackrat.png": {
+    "family": "enemy-pixel",
+    "tier": "medium",
+    "subject": "a stocky green goblin with one head, pointy ears, two arms and two legs, a tall heap of stolen brown leather backpacks strapped onto its back, brown leather straps with buckles crossing its chest like armour, huge leather boots far too big for its feet, one heavy lumpy cloth sack hanging from its right hand, nothing in the left hand",
+    "seed": 5523,
+    "date": "2026-11-13",
+    "shinyHue": 288,
+    "shinySaturation": 1.8
+  },
   "src/assets/img/enemies/goblinScavenger.png": {
     "shinyHue": 288,
     "family": "enemy-pixel",
@@ -455,6 +480,15 @@
     "date": "2026-10-18",
     "shinySaturation": 1.2,
     "shinyBrightness": 1.1
+  },
+  "src/assets/img/enemies/rockViper.png": {
+    "family": "enemy-pixel",
+    "tier": "small",
+    "subject": "a single viper alone: one long slim snake coiled in loops, the front of its body raised in an S-curve with the head thrust forward, mouth open with two small fangs, dull grey-brown scales with dark brown zigzag bands along its back, one head, no legs",
+    "seed": 5521,
+    "date": "2026-11-13",
+    "shinyHue": 200,
+    "shinySaturation": 2.2
   },
   "src/assets/img/enemies/seagull.png": {
     "shinyHue": 38,
@@ -613,6 +647,13 @@
     "subject": "a broken off piece of yellowed bone with jagged edge, single object",
     "seed": 1199052729,
     "date": "2026-10-17"
+  },
+  "src/assets/img/items/buckledHarness.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a brown leather chest armour made of many overlapping leather straps with brass buckles and rivets",
+    "seed": 1843140370,
+    "date": "2026-11-13"
   },
   "src/assets/img/items/canopyBlossom.png": {
     "family": "item-pixel",
@@ -915,6 +956,13 @@
     "seed": 1446249975,
     "date": "2026-10-26"
   },
+  "src/assets/img/items/lostTradeGoods.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a small wooden crate with a broken lid, a rolled bolt of red cloth and a silver candlestick sticking out of it",
+    "seed": 1163625724,
+    "date": "2026-11-13"
+  },
   "src/assets/img/items/manaRing.png": {
     "family": "item-pixel",
     "tier": null,
@@ -971,6 +1019,13 @@
     "seed": 358365248,
     "date": "2026-10-26"
   },
+  "src/assets/img/items/packLeather.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a rolled-up coil of brown leather straps with one small brass buckle",
+    "seed": 5526,
+    "date": "2026-11-13"
+  },
   "src/assets/img/items/patronGloves.png": {
     "family": "item-pixel",
     "tier": null,
@@ -1026,6 +1081,13 @@
     "subject": "a small stepped stone altar with two square tiers, a glowing blue crystal standing on its flat top, small angular blue runes carved into the stone tiers",
     "seed": 1702929459,
     "date": "2026-10-21"
+  },
+  "src/assets/img/items/runnersBoots.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a pair of worn soft brown leather boots with laces",
+    "seed": 2102772139,
+    "date": "2026-11-13"
   },
   "src/assets/img/items/sageRobe.png": {
     "family": "item-pixel",
@@ -1179,6 +1241,20 @@
     "subject": "one browned roast meat joint with a short white bone sticking out of one end, one red apple beside it, nothing underneath",
     "seed": 1268499607,
     "date": "2026-10-21"
+  },
+  "src/assets/img/items/viperVenom.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a small round glass vial closed with a cork stopper, half full of milky pale green liquid",
+    "seed": 5525,
+    "date": "2026-11-13"
+  },
+  "src/assets/img/items/viperskin.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a flat folded piece of thin grey snake hide with a fine diamond scale pattern",
+    "seed": 5524,
+    "date": "2026-11-13"
   },
   "src/assets/img/items/wharfRunnersBoots.png": {
     "family": "item-pixel",
