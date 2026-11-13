@@ -22,6 +22,7 @@
 //  15. Saved stores: every store using withGameStateSync is listed in SAVED_STORES
 //  16. Game time: Date.now() only in the allowlisted files; game rules read GameClock
 //  17. Scene art: every Zone, arena, town, Building and Site background is exactly its kind's SCENE_SIZES size
+//  18. Scene spots: masks match their art's size, each spot colour is in its mask and clear of the HUD, spots give quest items or a hidden Zone
 //
 // Usage: npm run validate
 
@@ -89,7 +90,8 @@ export { bundleKey } from 'app/store/quests/turn-in-cooldown'
 export { TitleID } from 'enums/ids/title-id.enum'
 export { CHANGELOG_NOTE_TYPES } from 'app/components/modals/changelog/changelog'
 export { ARENA } from 'data/arena-data'
-export { SCENE_SIZES } from 'app/components/shared/scene/scene-sizes'
+export { SCENE_SIZES, BATTLE_HUD_AREAS, BUILDING_HUD_AREAS, npcFrameArea } from 'app/components/shared/scene/scene-sizes'
+export { SCENE_SPOTS } from 'data/scene-spots'
 `
 
 const outDir = join(ROOT, 'node_modules', '.cache', 'validate-data')
@@ -893,6 +895,68 @@ for (const f of [...walkFiles(join(ROOT, '.claude', 'agents'), '.md'), ...walkFi
     const size = D.SCENE_SIZES[kind]
     if (width !== size.width || height !== size.height) {
       error(file, `'${url}' is ${width}x${height}; ${kind} Scene art must be ${size.width}x${size.height}`)
+    }
+  }
+}
+
+// ---------------------------------------------------------------------------
+// 18. Scene spots: a click reads the mask pixel under it, so the mask must line up with its art and each spot
+// must be clickable (outside the HUD drawn over the Scene). docs/systems/scene-spots.md
+{
+  const { default: sharp } = await import('sharp')
+  const file = 'src/data/scene-spots.ts'
+  const zoneUrls = new Set([...Object.values(D.ZONES_DATA).map(zone => zone.url), D.ARENA.url])
+  const buildings = Object.values(D.TOWNS_DATA).flatMap(town => town.buildings)
+  const overlaps = (a, b) => a.left < b.left + b.width && b.left < a.left + a.width && a.top < b.top + b.height && b.top < a.top + a.height
+  walkRefs(D.SCENE_SPOTS, file, 'SCENE_SPOTS')
+
+  for (const [artUrl, { maskUrl, spots }] of Object.entries(D.SCENE_SPOTS)) {
+    const [artPath, maskPath] = [artUrl, maskUrl].map(url => join(SRC, url.replace(/^\.?\//, '')))
+    if (!existsSync(artPath)) { error(file, `art '${artUrl}' does not exist`); continue }
+    if (!existsSync(maskPath)) { error(file, `mask '${maskUrl}' does not exist`); continue }
+    const art = await sharp(artPath).metadata()
+    const { data, info } = await sharp(maskPath).ensureAlpha().raw().toBuffer({ resolveWithObject: true })
+    if (info.width !== art.width || info.height !== art.height) {
+      error(file, `mask '${maskUrl}' is ${info.width}x${info.height}; its art is ${art.width}x${art.height}`)
+      continue
+    }
+
+    // Bounding box of each opaque colour, in % of the art.
+    const boxes = new Map()
+    for (let y = 0; y < info.height; y++) {
+      for (let x = 0; x < info.width; x++) {
+        const i = (y * info.width + x) * 4
+        if (data[i + 3] === 0) continue
+        const color = '#' + [0, 1, 2].map(c => data[i + c].toString(16).padStart(2, '0')).join('')
+        const box = boxes.get(color) ?? { x0: x, y0: y, x1: x, y1: y }
+        boxes.set(color, { x0: Math.min(box.x0, x), y0: Math.min(box.y0, y), x1: Math.max(box.x1, x), y1: Math.max(box.y1, y) })
+      }
+    }
+
+    const building = buildings.find(candidate => candidate.url === artUrl)
+    const hud = zoneUrls.has(artUrl)
+      ? Object.entries(D.BATTLE_HUD_AREAS)
+      : [...Object.entries(D.BUILDING_HUD_AREAS), ...(building?.npcs ?? []).map(npc => [`NPC ${idName(D.NpcID, npc.id)} frame`, D.npcFrameArea(npc.position)])]
+    const seen = new Set()
+    for (const spot of spots) {
+      const where = `spot '${spot.id}'`
+      if (seen.has(spot.id) || seen.has(spot.color)) error(file, `${where}: id or colour used twice in '${artUrl}'`)
+      seen.add(spot.id).add(spot.color)
+      if (!/^#[0-9a-f]{6}$/.test(spot.color)) error(file, `${where}: colour '${spot.color}' must be lowercase #rrggbb`)
+      const box = boxes.get(spot.color.toLowerCase())
+      if (!box) { error(file, `${where}: colour ${spot.color} is not in '${maskUrl}'`); continue }
+      const area = {
+        left: box.x0 / info.width * 100, top: box.y0 / info.height * 100,
+        width: (box.x1 - box.x0 + 1) / info.width * 100, height: (box.y1 - box.y0 + 1) / info.height * 100,
+      }
+      for (const [name, rect] of hud) if (overlaps(area, rect)) error(file, `${where} overlaps the ${name} HUD area, where it can't be clicked`)
+      if ('itemId' in spot.gives) {
+        if (D.ITEM_DATA[spot.gives.itemId]?.type !== D.ItemType.quest) error(file, `${where}: gives ${idName(D.ItemID, spot.gives.itemId)}, not a quest item`)
+        requireKey(file, `map:spots.${spot.id}.title`)
+        requireKey(file, `map:spots.${spot.id}.body`)
+      } else if (D.ZONES_DATA[spot.gives.zoneId]?.previousZoneId !== undefined) {
+        error(file, `${where}: a hidden passage's Zone must not be in the boss chain (has previousZoneId)`)
+      }
     }
   }
 }

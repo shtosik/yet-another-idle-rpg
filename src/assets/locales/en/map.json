@@ -55,5 +55,15 @@
     "upperCanopyEntrance": "Rope-Lift",
     "liroldArena": "Arena",
     "liroldForge": "Forge"
+  },
+  "spots": {
+    "passGuildPost": {
+      "title": "The Burned Guild Post",
+      "body": "A post-hut with its roof burned off. Under the floor stone, where a runner would know to look, a daybook wrapped in oilcloth. Goblin marks are scratched on the stone beside it, pointing up the slope."
+    },
+    "elderTreeTrunk": {
+      "title": "The Trunk Under the Stair",
+      "body": "An old trunk wedged under the stair, its strap stiff with age. Under folded robes, a sheaf of bark-paper covered in a younger man's handwriting, and drawings."
+    }
   }
 }

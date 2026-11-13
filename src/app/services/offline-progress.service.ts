@@ -156,6 +156,7 @@ export class OfflineProgressService {
       segments: this.segments(elapsedMs),
       damageType: this.playerStore.equippedWeaponDamageType(),
       isMeleeWeapon: this.playerStore.equippedWeaponCategory() === WeaponCategory.melee,
+      isRangedWeapon: this.playerStore.equippedWeaponCategory() === WeaponCategory.ranged,
       hasWeaknessSkill: this.playerStore.hasSkillUnlocked(SkillNodeID.weaknesses),
       rollingKillMs: this.offlineStore.rollingKillMs(zone.id, wave),
       rng,

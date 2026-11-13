@@ -28,6 +28,19 @@ describe('InventoryItemComponent', () => {
     await fixture.whenStable()
   })
 
+  it('shows the item description in the tooltip when its key exists', async () => {
+    i18next.addResource('en', 'items', 'descriptions.knife', 'A test blade.')
+    try {
+      fixture.componentInstance.showTooltip()
+      await new Promise(resolve => setTimeout(resolve, 300)) // the tooltip library shows after a short transition
+      expect([...document.querySelectorAll('.tooltip-override.show')].map(tip => tip.textContent).join()).toContain('A test blade.')
+    } finally {
+      fixture.componentInstance.hideTooltip()
+      i18next.removeResourceBundle('en', 'items')
+      i18next.addResourceBundle('en', 'items', itemText)
+    }
+  })
+
   it('ignores a mouse left-click', () => {
     click(1)
     expect(equip).not.toHaveBeenCalled()

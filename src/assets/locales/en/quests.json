@@ -28,7 +28,9 @@
     "anOrchardAgain": "An Orchard Again",
     "theGrowersTable": "The Growers' Table",
     "marthasOrder": "Marta's Order",
-    "wicksOrder": "Wick's Order"
+    "wicksOrder": "Wick's Order",
+    "theQuietRoad": "The Quiet Road",
+    "theSameWinter": "The Same Winter"
   },
   "requirements": {
     "findItem": "Find {{ item }}",

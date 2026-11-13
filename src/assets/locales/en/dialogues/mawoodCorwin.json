@@ -17,7 +17,11 @@
     "recovery": "How is the forest?",
     "rootsAndRafters": "Brenna asks you to bless the new walkway.",
     "rootglowMoth": "There's a moth on your shoulder, Elder.",
-    "farmFinale": "Marta has cooked for the first time in two years."
+    "farmFinale": "Marta has cooked for the first time in two years.",
+    "quietRoadLetter": "A letter from the Guild post. It's yours, I think.",
+    "sameWinterLetter": "I've spoken to Milo.",
+    "sameWinterProgress": "About this winter business...",
+    "sameWinterOffer": "You said the Spires went quiet."
   },
   "aboutMawood": {
     "message": "Mawood has stood for three hundred years. Not on the ground — that would have been foolish. The forest floor belongs to roots and rot and things older than memory. So we built up, in the light. It has always worked. Until two years ago, when the black sap first appeared.",
@@ -100,5 +104,38 @@
   "farmFinaleLine": {
     "message": "Fresh bread on a Mawood wind. I haven't smelled that since the sap came, and for two years I have told anyone who would listen that it could be contained. It seems I was right after all. Well done, traveler.",
     "opt1": "Thank you."
+  },
+  "quietRoadLetter": {
+    "message": "This is my hand. I wrote this the first winter the sap came, when I still believed someone on the coast would read it and come. I asked for anyone.\n\nYou are the anyone. Two years late, and welcome all the same. The runner?",
+    "opt1": "Dead on the Pass, I think.",
+    "opt2": "Nobody knows."
+  },
+  "quietRoadHobb": {
+    "message": "Hobb. He ate at my table the night before he left, and complained about the stairs. I had it in my head, all this while, that the Guild had read it and decided we were not worth the climb. I am glad to be wrong about them, and sorry to be wrong for this reason.",
+    "opt1": "What did the letter ask for?",
+    "opt2": "I'm here now."
+  },
+  "sameWinterOffer": {
+    "message": "I did. I told you it was done, and I meant it, for a day. Then I lay down on the boards that night and felt it. Not in the Spires. Under them. Faint, the way you hear a cart on a far road. The wound in the Deepwood was old. Something reopened it, and that something did not die with the Treant.",
+    "opt1": "Then where is it?",
+    "opt2": "You're tired, Elder. It's over."
+  },
+  "sameWinterTired": {
+    "message": "I am tired. That is not the same as wrong. Come back when you've stopped wanting it to be over. I did, and it took me a night.",
+    "opt1": "All right. Tell me.",
+    "opt2": "Another time."
+  },
+  "sameWinterOffer2": {
+    "message": "I don't know. Finn has been back to the Warchief's camps since you broke them, and he came home quieter than he went. Ask him what the Warchief wore. Bring whatever it is to Elarion before you bring it to me. He will want to set fire to it, and I will want to know what it is first.",
+    "opt1": "I'll see Finn.",
+    "opt2": "Not yet."
+  },
+  "sameWinterProgress": {
+    "message": "Finn, then Elarion, then the boy. Each one of them has felt it from a different side, and none of them has said so to me.",
+    "opt1": "I'm on it."
+  },
+  "sameWinterLetter": {
+    "message": "You've been in my trunk. No, keep them. I would have said no if you'd asked, and I'm glad you didn't. Elarion found his mark in there, I suppose. I drew it the night the Spire took me. I thought it was the Spire's word. I've thought so for forty years.\n\nSouth, Milo says. Over the ridge, toward a castle. My Spires have stood since before there was a castle there to be south of.\n\nGive me a moment.\n\nTo the Exploration Guild, in Lirold, since Hobb's satchel says that's where they keep their table now. I asked for anyone the first time. This time I'm asking for whoever reads charts for a living. Take it down yourself, please. I've trusted the road once already.",
+    "opt1": "It'll get there."
   }
 }

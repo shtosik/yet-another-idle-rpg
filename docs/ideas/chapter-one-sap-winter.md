@@ -1,6 +1,6 @@
 # Chapter One: The Sap Winter
 
-**Scope:** M · **Status:** Proposed: story arc, two new quests (*The Quiet Road*, *The Same Winter*) and dialogue for La Harpar and Mawood NPCs, the side Zone The Goat Cleft, and a new quest mechanic: search spots and hidden passages (§4a). How a chapter shows in the UI (labels, markers, title card) is left open by the owner (2026-11-09).
+**Scope:** M · **Status:** In progress (branch `feat/chapter-one-sap-winter`): story arc, two new quests (*The Quiet Road*, *The Same Winter*) and dialogue for La Harpar and Mawood NPCs, the side Zone The Goat Cleft, and a new quest mechanic: search spots and hidden passages (§4a). How a chapter shows in the UI (labels, markers, title card) is left open by the owner (2026-11-09).
 
 The game's first overarching storyline. It runs from La Harpar to Lirold's unlock and is led by **Marvin**. Its thread is the corruption the Mawood quests already tell. Chapter Two starts in Lirold, with the Exploration Guild and Slatefall.
 
@@ -10,6 +10,11 @@ The game's first overarching storyline. It runs from La Harpar to Lirold's unloc
 - The hidden truth is "both": a failing old seal under the roots, and someone helping it fail (§6). It stays hidden for the whole of Chapter One.
 - Chapter One ends once the Upper Canopy is cleared and Lirold unlocks. Chapter Two starts in Lirold.
 - Chapter as a system (quest panel label, main-quest marker, title card): open.
+
+**Owner decisions (2026-11-13):**
+- The Bestiary's "Found in" lists only unlocked Zones, so it doesn't name The Goat Cleft before the passage is found.
+- The Buckled Harness gives 15% gold find, level with the Bandit Bandana.
+- The Packrat's boots are the **Switchback Boots** (attack speed), so they don't read like the Wharf Runner's Boots.
 
 ## 1. Lore already in the game
 
@@ -130,7 +135,7 @@ The art for these is new work: the Mountain Pass background needs the post-hut a
 |---|---|---|---|---|
 | **Rock Viper** | reptile | earth | A grey-brown snake the colour of the cleft wall. It strikes from cracks at head height. | Viperskin (common, about 1 in 4), Viper Venom (about 1 in 6), pet |
 | **Goblin Hoarder** | goblin, humanoid | fire | A goblin under a sack bigger than it is, swinging whatever it pulled out last. Burns well. | Pack Leather (common, about 1 in 4), Stick and Stone (as the Scavenger), Lost Trade Goods (rare, about 1 in 20, sells for gold), Viperskin patterns (rare, below), pet |
-| **Goblin Packrat** (Boss) | goblin, humanoid | water | A goblin under a heap of stolen packs, strapped on with buckled Guild leather like armour, swinging a sack of stones. It wears a pair of runner's boots far too big for it. | `hobbsSatchel` (1 in 1 while *The Quiet Road* step 2 is active), Buckled Harness (about 1 in 15), Runner's Boots (about 1 in 15), pet |
+| **Goblin Packrat** (Boss) | goblin, humanoid | water | A goblin under a heap of stolen packs, strapped on with buckled Guild leather like armour, swinging a sack of stones. It wears a pair of runner's boots far too big for it. | `hobbsSatchel` (1 in 1 while *The Quiet Road* step 2 is active), Buckled Harness (about 1 in 15), Switchback Boots (about 1 in 15), pet |
 
 Weaknesses: earth and fire are new to this stretch, so they reward carrying a second element. Water on the Packrat matches the Goblin Scavenger. Drop rates copy the Pass (Troll gear 1 in 15, Goat pelts 1 in 4). Stats and balance are the main thread's call (`npm run sim`).
 
@@ -143,7 +148,7 @@ Weaknesses: earth and fire are new to this stretch, so they reward carrying a se
 | **Pack Leather** | material | Goblin Hoarder | Straps and patches cut from other people's luggage. | Straps and backing for the Viperskin set. |
 | **Lost Trade Goods** | junk (sellable) | Goblin Hoarder | Something a carter was very sorry to lose. | Sells to the Trader. |
 | **Buckled Harness** | chest | Goblin Packrat | Guild straps and buckles from a dozen stolen packs, riveted into something like armour. | A Pass-tier chest piece, matched to the Troll Hide Vest. Its stats are the main thread's call; a loot-flavoured stat (gold find) fits a hoarder. |
-| **Runner's Boots** | boots | Goblin Packrat | Worn soft by six years of the Pass. Not his size. | Boots with a speed-type stat, matching a runner. Which stat is the main thread's call. |
+| **Switchback Boots** | boots | Goblin Packrat | Worn soft by six years of the Pass. Not his size. | Boots with a speed-type stat, worn by a runner on the switchbacks: attack speed. |
 
 ### The Viperskin set (ranged gear)
 
@@ -157,7 +162,7 @@ Owner decision (2026-11-09): Viperskin crafts a whole set that boosts ranged dam
 | **Viperskin Boots** | boots | Viperskin, Pack Leather | Light enough for the cleft, which is the point. |
 | **Viperskin Gloves** | gloves | Viperskin, Pack Leather, Viper Venom | Venom-cured grips that don't slip on a bowstring. |
 
-Five pieces in the slots the Turtle Shell set uses (`docs/ideas/item-sets.md`). The Packrat's Buckled Harness and Runner's Boots compete with the Jerkin and Boots on purpose: loot or set.
+Five pieces in the slots the Turtle Shell set uses (`docs/ideas/item-sets.md`). The Packrat's Buckled Harness and Switchback Boots compete with the Jerkin and Boots on purpose: loot or set.
 
 **How it boosts ranged damage:**
 - **Needs a new stat:** `rangedDamageMultiplier`, mirroring `meleeDamageMultiplier` (`hit-resolution.ts`, `player.ts`, `stat-rows.ts`, `app.json`): it multiplies auto-attacks with a ranged weapon and ranged spells. Each piece carries a little of it. The offline simulation gets the ranged flag too (`offline-simulation.ts` passes only `isMeleeWeapon` today), or offline progress undercounts bow builds.
@@ -505,5 +510,5 @@ No new NPCs. Hobb is named but never met.
 - **Search spots and hidden passages need a system design first** (§4a): a spot list per battle background and per Building, shown by quest step, giving an item or unlocking a Zone; a new system doc. Touch-points: quest requirements (an item from a spot fits the existing `item` requirement; add `keep?: true`), `UnlockService.grant` for a found passage (not `unlock-conditions.ts`), battle and Building views (spot placement, open in §4a Code rules), the item tooltip (description line), and the quest panel (no change: item rows have no zone link already).
 - `GLOSSARY.md`: add Search spot, Hidden passage, Secret, Side Zone and Found text; change "Zone unlock" for the third path. Chapter waits for the chapter UI decision.
 - The Goat Cleft is a normal `ZONES_DATA` entry with no route links. Check the world map, Zone mastery, offline progress and the Bestiary for any assumption that every Zone sits on the `previousZoneId`/`nextZoneId` chain.
-- `/add-enemy-and-zone` for the Goat Cleft, Rock Viper, Goblin Hoarder and Goblin Packrat; `/add-equipment-item` for the Buckled Harness, Runner's Boots and the five Viperskin pieces; `/add-recipe-or-consumable` for the five Viperskin recipes and their pattern scrolls; a new `rangedDamageMultiplier` stat (stats, battle damage, offline simulation, tooltips); `/add-shiny-variant` for the three new pets; Wick's order pool for Viperskin.
+- `/add-enemy-and-zone` for the Goat Cleft, Rock Viper, Goblin Hoarder and Goblin Packrat; `/add-equipment-item` for the Buckled Harness, Switchback Boots and the five Viperskin pieces; `/add-recipe-or-consumable` for the five Viperskin recipes and their pattern scrolls; a new `rangedDamageMultiplier` stat (stats, battle damage, offline simulation, tooltips); `/add-shiny-variant` for the three new pets; Wick's order pool for Viperskin.
 - `/generate-2d-asset` for the Cleft background, three enemy sprites and the item icons, and to repaint the Mountain Pass (post-hut, cleft) and Elder's Tree (trunk) backgrounds with the spots baked in.

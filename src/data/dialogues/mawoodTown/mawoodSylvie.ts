@@ -39,6 +39,7 @@ export enum SylvieDialogue {
   questSilverleaf,
   questSilverleafProgress,
   questSilverleafComplete,
+  springStill,
 }
 
 export type MawoodSylvieDialogueType = Record<SylvieDialogue, DialogueNode<SylvieDialogue>>
@@ -101,6 +102,13 @@ const MAWOOD_SYLVIE: MawoodSylvieDialogueType = {
       {
         responseKey: `${NS}:default.safePassage`,
         results: [{ visibilityConditions: [{ type: 'quest', questId: QuestID.safePassage, questState: QuestState.readyToAdvance, step: 2 }], next: SylvieDialogue.safePassageComplete }],
+      },
+      {
+        responseKey: `${NS}:default.springStill`,
+        results: [{
+          visibilityConditions: [{ type: 'quest', questId: QuestID.theBlightedHeart, questState: QuestState.completed }],
+          next: SylvieDialogue.springStill,
+        }],
       },
       {
         responseKey: `${NS}:default.work`,
@@ -495,6 +503,13 @@ const MAWOOD_SYLVIE: MawoodSylvieDialogueType = {
         responseKey: `${NS}:questSilverleafComplete.opt1`,
         results: [{ next: SylvieDialogue.default, effects: [{ type: 'quest', action: 'end', questId: QuestID.silverleafForSylvie }] }],
       },
+    ],
+  },
+  [SylvieDialogue.springStill]: {
+    id: SylvieDialogue.springStill,
+    messageKey: `${NS}:springStill.message`,
+    options: [
+      { responseKey: `${NS}:springStill.opt1`, results: [{ next: SylvieDialogue.default }] },
     ],
   },
 }

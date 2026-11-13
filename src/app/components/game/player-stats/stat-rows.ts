@@ -33,6 +33,7 @@ export const STAT_GROUPS: StatGroup[] = [
       { stat: 'critChance', format: 'percent', always: true },
       { stat: 'critMulti', format: 'multiplier', always: true },
       { stat: 'meleeDamageMultiplier', format: 'multiplier' },
+      { stat: 'rangedDamageMultiplier', format: 'multiplier' },
       { stat: 'magicDamage', format: 'number' },
       { stat: 'magicDamageMultiplier', format: 'multiplier' },
     ],

@@ -26,6 +26,7 @@ export enum JoshDialogue {
   talkFree,
   aboutHeirloom,
   aboutHeirloomWho,
+  joshCarts,
 }
 
 export type LaHarparJoshDialogueType = Record<JoshDialogue, DialogueNode<JoshDialogue>>
@@ -98,6 +99,7 @@ const LA_HARPAR_JOSH: LaHarparJoshDialogueType = {
           },
         ],
       },
+      { responseKey: `${NS}:talkReady.joshCarts`, results: [{ next: JoshDialogue.joshCarts }] },
       { responseKey: `${NS}:talkReady.opt2`, results: [{ next: JoshDialogue.intro }] },
       { responseKey: `${NS}:talkReady.opt3`, results: [{ next: JoshDialogue.placeInfo }] },
       {
@@ -244,6 +246,13 @@ const LA_HARPAR_JOSH: LaHarparJoshDialogueType = {
     messageKey: `${NS}:missionCheck.message`,
     options: [
       { responseKey: `${NS}:missionCheck.opt1`, results: [{ next: JoshDialogue.talkReady }] },
+    ],
+  },
+  [JoshDialogue.joshCarts]: {
+    id: JoshDialogue.joshCarts,
+    messageKey: `${NS}:joshCarts.message`,
+    options: [
+      { responseKey: `${NS}:joshCarts.opt1`, results: [{ next: JoshDialogue.talkReady }] },
     ],
   },
 }

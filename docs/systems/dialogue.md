@@ -45,6 +45,9 @@ Kill-count requirements inside quest conditions count kills since the quest reac
 
 Any condition takes `not: true` to pass when it would fail. Use it to keep an in-progress reminder (`active` + not `readyToAdvance`) from showing beside the same quest's turn-in option.
 
+## Chapter One dialogue
+Marvin, Corwin, Finn, Elarion and Milo carry the quest hubs of The Quiet Road and The Same Winter: turn-in, then in progress (`active` plus `readyToAdvance` with `not: true`, one result per step where the reminder differs), then offer. A turn-in that hands over a quest item puts the `give` beside the `advance` on the hub result (Corwin's Letter at Marvin, Corwin's Second Letter at Corwin), so the item can't be lost between nodes. The Bartender's Hobb memory costs 20 gold once: `deduct` plus the flag `bartender_paid_hobb`, which hides the option; "Put it on mine" pays nothing and leaves it open.
+
 ## Conditions (reputation)
 `{ type: 'reputation', reputationId, tier }` passes when `PlayerStore.reputationTierOf(reputationId) >= tier`. Gate a free or extra branch with it, before the paid one; with `hidden: true` it stays a silent gate. A shown lock label is `reputationLockText` ("Requires Mawood Honored — 140/200"). See `towns-shops-guild.md`.
 

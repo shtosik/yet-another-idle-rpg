@@ -92,6 +92,8 @@ export interface ItemRequirement {
   type: 'item'
   itemId: ItemID
   amount: number
+  /** The turn-in leaves the item with the player; it still has to be held. */
+  keep?: true
 }
 
 export interface WaveKillCountRequirement {
@@ -577,6 +579,74 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
       { type: 'stat', key: 'goldCoins', amount: 400 },
     ],
   },
+  // ── Chapter One ───────────────────────────────────────────────────────────
+  [QuestID.theQuietRoad]: {
+    questId: QuestID.theQuietRoad,
+    startRequirements: [{ type: 'enemy', enemyId: EnemyID.bandit, amount: 1 }],
+    steps: [
+      {
+        description: "Find the Guild post on the Pass and look under its floor stone. Bring its daybook to Marvin.",
+        turnInNpc: NpcID.laHarparMarvin,
+        requirements: [{ type: 'item', itemId: ItemID.passPostDaybook, amount: 1 }],
+      },
+      {
+        description: "Find the cleft behind the switchbacks, where the rock is worn smooth, and bring Hobb's satchel to Marvin.",
+        turnInNpc: NpcID.laHarparMarvin,
+        requirements: [{ type: 'item', itemId: ItemID.hobbsSatchel, amount: 1 }],
+      },
+      {
+        description: "Take Corwin's letter to Mawood, two winters late.",
+        turnInNpc: NpcID.mawoodCorwin,
+        requirements: [{ type: 'item', itemId: ItemID.corwinsLetter, amount: 1 }],
+      },
+    ],
+    rewards: [
+      { type: 'reputation', reputationId: ReputationID.laHarpar, amount: 20 },
+      { type: 'stat', key: 'experience', amount: 3500 },
+      { type: 'stat', key: 'goldCoins', amount: 700 },
+      { type: 'stat', key: 'unspentSkillPoints', amount: 1 },
+    ],
+  },
+  [QuestID.theSameWinter]: {
+    questId: QuestID.theSameWinter,
+    startRequirements: [
+      { type: 'quest', questId: QuestID.theBlightedHeart, step: QUEST_STEP_AFTER_COMPLETED },
+      { type: 'quest', questId: QuestID.theQuietRoad, step: QUEST_STEP_AFTER_COMPLETED },
+    ],
+    steps: [
+      {
+        description: "Get the token the Gnoll Warchief wore and show it to Finn.",
+        turnInNpc: NpcID.mawoodFinn,
+        requirements: [{ type: 'item', itemId: ItemID.warchiefsToken, amount: 1, keep: true }],
+      },
+      {
+        description: "Elarion wants Corwin's old notes: they are in the trunk under the stair at the Elder's Tree.",
+        turnInNpc: NpcID.mawoodElarion,
+        requirements: [{ type: 'item', itemId: ItemID.corwinsRitualNotes, amount: 1, keep: true }],
+      },
+      {
+        description: "Ask Milo what he saw from the nest.",
+        turnInNpc: NpcID.mawoodMilo,
+        requirements: [{ type: 'quest', questId: QuestID.whatLurksAtTheTop, step: QUEST_STEP_AFTER_COMPLETED }],
+      },
+      {
+        description: "Tell Corwin what Milo saw.",
+        turnInNpc: NpcID.mawoodCorwin,
+        requirements: [],
+      },
+      {
+        description: "Talk to Marvin in La Harpar about Corwin's second letter.",
+        turnInNpc: NpcID.laHarparMarvin,
+        requirements: [],
+      },
+    ],
+    rewards: [
+      { type: 'reputation', reputationId: ReputationID.mawood, amount: 50 },
+      { type: 'stat', key: 'experience', amount: 5000 },
+      { type: 'stat', key: 'goldCoins', amount: 1000 },
+      { type: 'stat', key: 'unspentSkillPoints', amount: 1 },
+    ],
+  },
   // ── Farming Guild ─────────────────────────────────────────────────────────
   [QuestID.seedsFromTheTerrace]: {
     questId: QuestID.seedsFromTheTerrace,
@@ -730,6 +800,7 @@ const QUEST_DATA: Record<QuestID, QuestProps> = {
         { itemId: ItemID.wolfFangs, minTier: ReputationTier.friendly, reputationPer10: 7, goldPerItem: 6, xpPerItem: 3, sourceZones: [ZoneID.theLongPath] },
         { itemId: ItemID.deerPelt, minTier: ReputationTier.friendly, reputationPer10: 7, goldPerItem: 6, xpPerItem: 3, sourceZones: [ZoneID.theLongPath, ZoneID.mountainPass] },
         { itemId: ItemID.venison, minTier: ReputationTier.friendly, reputationPer10: 7, goldPerItem: 6, xpPerItem: 3, sourceZones: [ZoneID.theLongPath, ZoneID.mountainPass] },
+        { itemId: ItemID.viperskin, minTier: ReputationTier.friendly, reputationPer10: 7, goldPerItem: 6, xpPerItem: 3, sourceZones: [ZoneID.goatCleft] },
         { itemId: ItemID.spiderSilk, minTier: ReputationTier.honored, reputationPer10: 10, goldPerItem: 10, xpPerItem: 6, sourceZones: [ZoneID.elderwoodWilds] },
         { itemId: ItemID.bearPelt, minTier: ReputationTier.revered, reputationPer10: 14, goldPerItem: 20, xpPerItem: 10, sourceZones: [ZoneID.deepwood] },
         { itemId: ItemID.boneFragment, minTier: ReputationTier.revered, reputationPer10: 14, goldPerItem: 20, xpPerItem: 10, sourceZones: [ZoneID.deepwood] },

@@ -78,6 +78,9 @@
         >{{ ('bestiary:elements.' + element) | i18next }}</span>
       }
     </span>
+    @if (description(item.id); as text) {
+      <span class="description">{{ text }}</span>
+    }
     @if (item.type === ItemType.equipment) {
       @for (stat of $any(item.stats); track stat.id) {
         <span class="stat">{{ stat.id | statToPercentage:upgradedStatAmount(stat.amount, level) }} {{ ('app:playerStats.' + stat.id) | i18next }}</span>

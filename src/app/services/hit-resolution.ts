@@ -14,6 +14,8 @@ export interface HitInput {
   magicDamage: number
   /** A melee hit: an auto-attack with a melee weapon (or none), or a melee spell. Uses `meleeDamageMultiplier`. */
   isMelee: boolean
+  /** A ranged hit: an auto-attack with a ranged weapon, or a ranged spell. Uses `rangedDamageMultiplier`. */
+  isRanged: boolean
   damageType: DamageElement
   enemyWeakness: DamageElement | undefined
   enemyTypes: EnemyType[]
@@ -21,6 +23,11 @@ export interface HitInput {
   hasSpellCritSkill: boolean
   /** A guaranteed crit (Ambush), even at 0 crit chance. */
   forceCrit?: boolean
+}
+
+const physicalMultiplier = (input: HitInput, stats: Record<PlayerStat, number>) => {
+  if (input.isMelee) return stats.meleeDamageMultiplier
+  return input.isRanged ? stats.rangedDamageMultiplier : 1
 }
 
 const capitalize = (name: string) => name.charAt(0).toUpperCase() + name.slice(1)
@@ -35,7 +42,7 @@ export function resolveHit(input: HitInput, rng: () => number = Math.random): Hi
   const isMagic = magicDamage > 0
   let damage = isMagic
     ? (magicDamage + stats.magicDamage) * stats.magicDamageMultiplier
-    : stats.attackPower * (input.isMelee ? stats.meleeDamageMultiplier : 1)
+    : stats.attackPower * physicalMultiplier(input, stats)
 
   const canCrit = stats.critChance > 0 && (!isMagic || input.hasSpellCritSkill)
   const isCrit = !!input.forceCrit || (canCrit && rng() * 100 <= stats.critChance)

@@ -2,6 +2,7 @@
   <app-scene class="battle__scene" kind="zone" [url]="sceneUrl()">
     <!-- The edge gradient: over the art, under the sprite and popups. -->
     <div class="battle__shade" aria-hidden="true"></div>
+    <app-scene-mask kind="zone" [artUrl]="sceneUrl()"/>
     @if (isInCombat()) {
       <app-enemy-sprite/>
     }

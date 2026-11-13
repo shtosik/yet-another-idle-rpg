@@ -110,6 +110,35 @@ export const ResourcesItemsData: Partial<Record<ItemID, Item>> = {
     value: 2,
     type: ItemType.resource,
   },
+  [ItemID.viperskin]: {
+    id: ItemID.viperskin,
+    tier: ItemTier.normal,
+    url: './assets/img/items/viperskin.png',
+    value: 2,
+    type: ItemType.resource,
+  },
+  [ItemID.viperVenom]: {
+    id: ItemID.viperVenom,
+    tier: ItemTier.uncommon,
+    url: './assets/img/items/viperVenom.png',
+    value: 4,
+    type: ItemType.resource,
+  },
+  [ItemID.packLeather]: {
+    id: ItemID.packLeather,
+    tier: ItemTier.normal,
+    url: './assets/img/items/packLeather.png',
+    value: 2,
+    type: ItemType.resource,
+  },
+  // Junk: no recipe or order uses it, it only sells.
+  [ItemID.lostTradeGoods]: {
+    id: ItemID.lostTradeGoods,
+    tier: ItemTier.uncommon,
+    url: './assets/img/items/lostTradeGoods.png',
+    value: 60,
+    type: ItemType.resource,
+  },
   [ItemID.gnollTrophy]: {
     id: ItemID.gnollTrophy,
     tier: ItemTier.uncommon,

@@ -34,6 +34,9 @@
         "arenaBrute": "The Brute",
         "arenaArcanist": "The Arcanist",
         "arenaBurrower": "The Burrower",
-        "arenaYad": "Yad, the Arena Champion"
+        "arenaYad": "Yad, the Arena Champion",
+        "rockViper": "Rock Viper",
+        "goblinHoarder": "Goblin Hoarder",
+        "goblinPackrat": "Goblin Packrat"
     }
 }

@@ -1,5 +1,5 @@
 import i18next from 'i18next'
-import { consumedItems, killBaseline, RequirementContext, requirementProgress, requirementRows } from './requirement-handlers'
+import { consumedItems, killBaseline, neededItems, RequirementContext, requirementProgress, requirementRows } from './requirement-handlers'
 import { statsInitialState } from '../player/player'
 import { EnemyID } from '../../../enums/ids/enemy-id.enum'
 import { ItemID } from '../../../enums/ids/item-id.enum'
@@ -62,5 +62,12 @@ describe('requirement handlers', () => {
 
     expect(consumedItems([{ type: 'item', itemId: ItemID.crabMeat, amount: 30 }, { type: 'pickedItems' }, { type: 'stat', key: 'level', amount: 1 }], ctx().picks))
       .toEqual([{ id: ItemID.crabMeat, amount: 30 }, { id: ItemID.turnip, amount: 14 }, { id: ItemID.wheat, amount: 5 }])
+  })
+
+  it('a kept item is needed but not consumed', () => {
+    const kept = [{ type: 'item', itemId: ItemID.crabMeat, amount: 3, keep: true }] as const
+    expect(consumedItems([...kept], ctx().picks)).toEqual([])
+    expect(neededItems([...kept], ctx().picks)).toEqual([{ id: ItemID.crabMeat, amount: 3 }])
+    expect(requirementProgress(kept[0], ctx())).toEqual({ current: 7, target: 3 })
   })
 })

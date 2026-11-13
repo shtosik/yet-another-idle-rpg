@@ -1,5 +1,5 @@
 import { FARM_SEEDS } from '../../../data/farming-data'
-import { QUEST_STEP_AFTER_COMPLETED } from '../../../data/quests-data'
+import QUEST_DATA, { ItemRequirement, QUEST_STEP_AFTER_COMPLETED } from '../../../data/quests-data'
 import { ItemID } from '../../../enums/ids/item-id.enum'
 import { ProfessionID } from '../../../enums/ids/profession-id.enum'
 import { QuestID } from '../../../enums/ids/quest-id.enum'
@@ -46,6 +46,18 @@ describe('quest transition', () => {
     const t = questTransition(QuestID.meatShortage, 'end', slice({ questStepProgression: { [QuestID.meatShortage]: 1 } }), ctx({ fits }))!
     expect(t.take).toEqual([{ id: ItemID.crabMeat, amount: 30 }])
     expect(fits).toHaveBeenCalledWith(t.payout!.items, t.take)
+  })
+
+  it('takes nothing for a kept item but still advances', () => {
+    const requirement = QUEST_DATA[QuestID.meatShortage].steps[0].requirements![0] as ItemRequirement
+    requirement.keep = true
+    try {
+      const t = questTransition(QuestID.meatShortage, 'end', slice({ questStepProgression: { [QuestID.meatShortage]: 1 } }), ctx())!
+      expect(t.take).toEqual([])
+      expect(t.quests.questStepProgression[QuestID.meatShortage]).toBe(QUEST_STEP_AFTER_COMPLETED)
+    } finally {
+      delete requirement.keep
+    }
   })
 
   it('refuses a quest that is not active', () => {

@@ -57,7 +57,8 @@ export class BestiaryComponent {
                 gold: e.gold,
                 weakness: e.weakness,
                 enemyTypes: e.enemyTypes,
-                zones: ZONES_BY_ENEMY[e.id] ?? [],
+                // Only unlocked Zones, so a hidden Zone stays unnamed until its passage is found.
+                zones: (ZONES_BY_ENEMY[e.id] ?? []).filter(zoneId => this.playerStore.isZoneUnlocked(zoneId)),
                 drops: byDropRate(e.drops),
                 shinyDrops: byDropRate(e.shinyDrops ?? []),
                 killCount,

@@ -119,4 +119,8 @@ export const ZONE_UNLOCK_NOTIFICATIONS: Partial<Record<ZoneID, UnlockNotificatio
     titleKey: 'unlocks:zones.elderwoodWilds.title',
     bodyKey:  'unlocks:zones.elderwoodWilds.body',
   },
+  [ZoneID.goatCleft]: {
+    titleKey: 'unlocks:zones.goatCleft.title',
+    bodyKey:  'unlocks:zones.goatCleft.body',
+  },
 }

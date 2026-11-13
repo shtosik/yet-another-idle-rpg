@@ -9,7 +9,9 @@
     "aboutElarion": "Tell me about yourself.",
     "aboutMagic": "How does magic work here in Mawood?",
     "browseWares": "Let me see your wares.",
-    "goodbye": "I'll leave you to your runes."
+    "goodbye": "I'll leave you to your runes.",
+    "sameWinterElarionNotes": "Here are Corwin's notes.",
+    "sameWinterElarion": "Finn found this on the Warchief."
   },
   "aboutElarion": {
     "message": "I was a court mage in Drenhollow — lovely city, terrible politics. I came to Mawood following reports of ambient magical resonance in the old-growth roots. Turns out corrupted heartwood conducts arcane energy like copper conducts heat. Fascinating and alarming in equal measure. I stayed to study it. Then I ran out of funds and opened the shop.",
@@ -27,5 +29,23 @@
   "aboutSpellbook": {
     "message": "It's a personal grimoire, bound with pages that remember. When you acquire it, it attunes to your magical signature and begins cataloguing your spells automatically. More practically: it gives you a proper place to organise which spells you cast and in what order, rather than relying on reflexes alone. Most adventurers find it invaluable.",
     "opt1": "That does sound useful."
+  },
+  "sameWinterElarion": {
+    "message": "Oh, that's unpleasant. Hold still, don't hand it to me, I'd like to keep my eyebrows.\n\nIt hums. Faintly, but it does, the same note the heartwood had before you went down there and stopped it. And these marks aren't runes, not any I was taught in Drenhollow. It's an older grammar. Someone wrote a word into this bone and the word is still being said.\n\nI need something to hold it against. Corwin kept notes the night his ritual went wrong; he told me so once, when he'd had the elderberry wine, and has denied it ever since. He won't lend them to me. He might to you. Ask him. No, actually, don't ask him, he'll say no. They're in the trunk under the stair at the Elder's Tree.",
+    "opt1": "You want me to go through his things?",
+    "opt2": "Under the stair. Fine."
+  },
+  "sameWinterElarionTrunk": {
+    "message": "I want you to borrow forty-year-old paper from a man who'd hand it over himself if he weren't embarrassed by it. I'll take the blame. I usually do, it's practically my job here.",
+    "opt1": "On your head, then."
+  },
+  "sameWinterElarionNotes": {
+    "message": "Look at this. He was what, twenty? Lovely penmanship, dreadful theory. Pages of it, and here…\n\nThere. Third line down. That's the mark on the token, near enough the same stroke. He drew it from whatever the Spire showed him that night, decades before anyone saw black sap. So either the Spire speaks the same old grammar as whoever carved that bone, or whoever carved that bone has been talking a long time.\n\nI don't like either of those. Show Corwin. And ask Milo what he saw from the nest. He's been describing it at my counter for a week, to anyone holding still, and I've been holding still badly.",
+    "opt1": "Milo?",
+    "opt2": "I'll take it to Corwin."
+  },
+  "sameWinterElarionMilo": {
+    "message": "He climbs. He sees. He comes down and tells the wrong people. Go.",
+    "opt1": "Going."
   }
 }

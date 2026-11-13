@@ -16,7 +16,8 @@
     "anyTrainer": "Do you know anyone who could train me?",
     "goodbye": "That's all for now. Have a good day.",
     "onTheHouse": "The usual, please.",
-    "tavernCat": "Your cat hasn't taken its eyes off me."
+    "tavernCat": "Your cat hasn't taken its eyes off me.",
+    "bartenderHobb": "Did you know a Guild runner called Hobb?"
   },
   "whatIsThisPlace1": {
     "message": "A tavern. Are you blind? That'll be 20 coins for the enlightenment. Money well spent, I'd say.",
@@ -68,5 +69,10 @@
   "tavernCatGiven": {
     "message": "Scraps, not my good fish. And don't come crying when it sleeps on your face.",
     "opt1": "Cheers."
+  },
+  "bartenderHobb": {
+    "message": "Know him? He owes me for four suppers and a bottle of the good stuff. Two winters. Said he'd settle up on the way back down. Twenty coins for the memory, and no, it doesn't go on his slate.",
+    "opt1": "Here.",
+    "opt2": "Put it on mine."
   }
 }

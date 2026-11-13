@@ -66,7 +66,9 @@ interface RequirementHandler<R extends RequirementProps> {
   rows(req: R, ctx: RequirementContext): RequirementRow[]
   /** Kill requirements: records where counting starts. */
   baseline?(req: R, lifetime: LifetimeKills, into: KillBaseline): void
-  /** Items a turn-in takes. */
+  /** Items the step needs held: they gate the turn-in, quest drops and reputation turn-in reservations. */
+  needed?(req: R, picks: OrderState['requirements']): ItemStack[]
+  /** Items a turn-in takes: `needed` minus the kept ones. */
   consumed?(req: R, picks: OrderState['requirements']): ItemStack[]
 }
 
@@ -78,7 +80,8 @@ const item: RequirementHandler<ItemRequirement> = {
   rows: (req, ctx) => row(ITEM_DATA[req.itemId].type === ItemType.quest
     ? i18next.t('quests:requirements.findItem', { item: itemName(req.itemId) })
     : itemName(req.itemId), item.progress(req, ctx)),
-  consumed: req => [{ id: req.itemId, amount: req.amount }],
+  needed: req => [{ id: req.itemId, amount: req.amount }],
+  consumed: req => req.keep ? [] : item.needed!(req, []),
 }
 
 const pickedItems: RequirementHandler<PickedItemsRequirement> = {
@@ -88,7 +91,8 @@ const pickedItems: RequirementHandler<PickedItemsRequirement> = {
     target: ctx.picks.reduce((sum, p) => sum + p.amount, 0),
   },
   rows: (_, ctx) => ctx.picks.flatMap(({ itemId, amount }) => row(itemName(itemId), { current: ctx.itemCount(itemId), target: amount })),
-  consumed: (_, picks) => picks.map(p => ({ id: p.itemId, amount: p.amount })),
+  needed: (_, picks) => picks.map(p => ({ id: p.itemId, amount: p.amount })),
+  consumed: (req, picks) => pickedItems.needed!(req, picks),
 }
 
 const enemy: RequirementHandler<EnemyKillCountRequirement> = {
@@ -149,6 +153,9 @@ export function killBaseline(requirements: RequirementProps[], lifetime: Lifetim
   for (const req of requirements) handlerOf(req).baseline?.(req, lifetime, baseline)
   return baseline
 }
+
+export const neededItems = (requirements: RequirementProps[], picks: OrderState['requirements']): ItemStack[] =>
+  requirements.flatMap(req => handlerOf(req).needed?.(req, picks) ?? [])
 
 export const consumedItems = (requirements: RequirementProps[], picks: OrderState['requirements']): ItemStack[] =>
   requirements.flatMap(req => handlerOf(req).consumed?.(req, picks) ?? [])

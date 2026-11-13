@@ -18,7 +18,8 @@
     "opt3": "Tell me a bit about yourself.",
     "opt4": "What can you tell me about La Harpar?",
     "opt5": "Are there any people here I should meet?",
-    "opt6": "Do you need help with anything?"
+    "opt6": "Do you need help with anything?",
+    "traderMawoodGoods": "Anything new?"
   },
   "aboutMe": {
     "message": "I'm La Harpar's most charismatic trader! Born and raised right here in this village.",
@@ -80,5 +81,9 @@
   "questSafePassageStep2": {
     "message": "Off to Mawood with you. Sylvie, at the apothecary. And don't eat the salt fish on the way.",
     "opt1": "On my way."
+  },
+  "traderMawoodGoods": {
+    "message": "New? Nothing's come down off that Pass in two winters, that's what's new. We used to get Mawood salves with the goat carts, wrapped in leaves, sealed in green wax. Sold them faster than fish. The last crate I had, the wax had gone black right through. Couldn't sell a jar. Aye, I still have it, if you're buying curiosities.",
+    "opt1": "Not today."
   }
 }

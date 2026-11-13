@@ -21,6 +21,7 @@ All player-facing text comes from i18next JSON files, so content can be added an
 | Item name | `items:names.<ItemID key>` |
 | Enemy name | `enemies:names.<EnemyID key>` |
 | Zone name | `zones:names.<ZoneID key>` |
+| Item description (optional) | `items:descriptions.<ItemID key>`; shown in the item tooltip |
 | Quest name | `quests:names.<QuestID key>` |
 | Quest step description (optional) | `quests:steps.<QuestID key>.<1-based step>`; falls back to the data's English description |
 | NPC name | `npc:names.<NpcID key>` |
@@ -54,7 +55,7 @@ Pathfinder's Seal uses `items:names.pathfindersSeal`, `app:playerStats.upgradedD
 - Older quest step descriptions have only hard-coded English fallbacks in `src/data/quests-data.ts` (`steps[].description`); The Cold Forge provides translated journal lines through `quests:steps.*`.
 - World map labels are hard-coded in `src/data/world-map-data.ts` (`label`).
 - Spell and skill descriptions repeat numbers that live in data (haste amount, fireStrike damage), so they drift when balance changes. Use interpolation params instead.
-- `ItemData.description` exists but is never set; there are no item descriptions.
+- Item descriptions are optional `items:descriptions.<ItemID key>` entries; the item tooltip shows one under the tier line when the key exists. Few items have one yet (quest items first).
 
 ## How to extend
 New NPC dialogue: the `add-npc-dialogue` skill (creates the namespace and registers it). Any new entity: add its name key under the convention above, then run `npm run validate`.

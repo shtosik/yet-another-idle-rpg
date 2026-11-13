@@ -50,6 +50,7 @@ export type PlayerStat =
     | 'damageVsHarpy'
     | 'magicDamageMultiplier'
     | 'meleeDamageMultiplier'
+    | 'rangedDamageMultiplier'
     | 'inventorySlots'
     | 'maxTaskSlots'
     | 'taskDoubleKillChance'
@@ -77,6 +78,7 @@ export const multiplierStats: PlayerStat[] = [
     'extraPhysicalDamageMultiplier',
     'magicDamageMultiplier',
     'meleeDamageMultiplier',
+    'rangedDamageMultiplier',
 ]
 
 export const percentageStats: PlayerStat[] = [

@@ -92,6 +92,18 @@ const ZONES_DATA: Record<ZoneID, Zone> = {
     enemiesPerWave: 8,
     bossEnemyId: EnemyID.harpyMatriarch,
   },
+  // Side Zone off the Mountain Pass, opened by a hidden passage there. Its ZoneID stays above the Pass's:
+  // ZONES_BY_ENEMY lists Zones in ZoneID order, so quest kill rows for the shared Goat link to the Pass first.
+  [ZoneID.goatCleft]: {
+    id: ZoneID.goatCleft,
+    tier: 4,
+    masteryReward: { gold: 800, explorerTokens: 12, items: [{ id: ItemID.viperskin, amount: 5 }, { id: ItemID.packLeather, amount: 5 }] },
+    url: './assets/img/backgrounds/goat-cleft.png',
+    enemies: [EnemyID.goat, EnemyID.rockViper, EnemyID.goblinHoarder],
+    maxWave: 8,
+    enemiesPerWave: 10,
+    bossEnemyId: EnemyID.goblinPackrat,
+  },
 }
 
 export default ZONES_DATA

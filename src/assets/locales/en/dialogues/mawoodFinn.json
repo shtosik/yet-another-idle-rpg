@@ -10,7 +10,9 @@
     "aboutLeg": "What happened to your leg?",
     "corruption": "What do you know about the gnolls and the corruption?",
     "work": "Got any work for me?",
-    "goodbye": "I'll leave you to it."
+    "goodbye": "I'll leave you to it.",
+    "sameWinterToken": "The Warchief's token.",
+    "sameWinterFinnProgress": "Corwin says the Warchief wore something."
   },
   "aboutFinn": {
     "message": "Followed game trails north out of the plains when I was seventeen. Found the Elderwood. Stayed. Simple as that. The forest feeds you if you know how to ask. Most people don't know how to ask.",
@@ -82,5 +84,13 @@
   "questBigGameComplete": {
     "message": "Three pelts. And the old bear's still walking — you found your way around him. Good instincts. Here. I carved this myself. Been sitting in my pack for years waiting for someone who might actually use it right.",
     "opt1": "Thank you, Finn."
+  },
+  "sameWinterFinnProgress": {
+    "message": "A disc. Bone. On a cord under his armour. I saw it when you dropped him and I didn't go near it. New Warchief's wearing one too. Get it.",
+    "opt1": "On my way."
+  },
+  "sameWinterToken": {
+    "message": "Look at the knot on the cord. Same as the bundles. I've watched gnolls a long time. They tie a knot like they're strangling something. This one's neat.\n\nSomebody ties these for them. Take it to the wizard. Don't wear it.",
+    "opt1": "Wasn't planning to."
   }
 }

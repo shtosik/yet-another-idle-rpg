@@ -13,7 +13,8 @@
     "aboutMilo": "Tell me about yourself.",
     "aboutCanopy": "What's up in the canopy?",
     "work": "Do you have anything for me?",
-    "goodbye": "See you around."
+    "goodbye": "See you around.",
+    "sameWinterMilo": "Elarion says you saw something from the nest."
   },
   "aboutMilo": {
     "message": "I've lived in Mawood my whole life. Eight years, which is my whole life. My parents were traders who came through and then didn't leave, which happens. Then they left without me, which also happens. Corwin lets me stay on the high platforms because nobody else uses them. Best deal I've ever made.",
@@ -79,5 +80,14 @@
   "questWhatLurksPostQuest": {
     "message": "A door. Set into the bark of the tallest Spire, way up in the canopy. Old wood, old iron. I couldn't open it. Maybe nobody can. Maybe that's the point. I'll keep looking, though. That's what I do.",
     "opt1": "Keep me posted."
+  },
+  "sameWinterMilo": {
+    "message": "Yes! Finally somebody asks. Okay. So from the nest you can see really far, right, farther than anyone, and south there's a line. Of trees. Dead ones, just the tops, grey. Going in a line over the ridge. Not wiggly like a river. Like someone drew it with a stick.\n\nAnd at the end, way way off, there are walls. And a castle! A real one.",
+    "opt1": "Did you tell Corwin?",
+    "opt2": "A line, going south."
+  },
+  "sameWinterMiloDoor": {
+    "message": "No, because he'd tell me to stop climbing. Also, the door's warm now. The one in the Spire. It wasn't before. I put my hand on it and it was like a stove. You tell him. He listens to you.",
+    "opt1": "I'll tell him."
   }
 }

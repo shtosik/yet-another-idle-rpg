@@ -24,6 +24,7 @@ export enum BartenderDialogue {
   questLastOrdersComplete,
   tavernCat,
   tavernCatGiven,
+  bartenderHobb,
 }
 
 export type LaHarparBartenderDialogueType = Record<BartenderDialogue, DialogueNode<BartenderDialogue>>
@@ -31,8 +32,10 @@ export type LaHarparBartenderDialogueType = Record<BartenderDialogue, DialogueNo
 const NS = 'dialogues/laHarparBartender'
 const PAID_FOR_WORK_FLAG = 'bartender_paid_for_work'
 const PAID_FOR_PLACE_FLAG = 'bartender_paid_for_place'
+/** She charges for the Hobb memory once. */
+const PAID_FOR_HOBB_FLAG = 'bartender_paid_hobb'
 const PAID_FOR_TRAINER_FLAG = 'bartender_paid_for_trainer'
-/** At La Harpar Friendly he answers for free. */
+/** At La Harpar Friendly she answers for free. */
 const LA_HARPAR_FRIENDLY: DialogueCondition = { type: 'reputation', reputationId: ReputationID.laHarpar, tier: ReputationTier.friendly, hidden: true }
 const LA_HARPAR_REVERED: DialogueCondition = { type: 'reputation', reputationId: ReputationID.laHarpar, tier: ReputationTier.revered, hidden: true }
 /** La Harpar's Exalted pet, given once. */
@@ -105,7 +108,7 @@ const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
           { visibilityConditions: [{ type: 'quest', questId: QuestID.lastOrders, questState: QuestState.readyToAdvance, step: 1 }], next: BartenderDialogue.questLastOrdersComplete },
           { visibilityConditions: [{ type: 'quest', questId: QuestID.lastOrders, questState: QuestState.active }], next: BartenderDialogue.questLastOrdersProgress },
           { visibilityConditions: [{ type: 'quest', questId: QuestID.lastOrders, questState: QuestState.available }], next: BartenderDialogue.questLastOrders },
-          // The 40-gold tip is paid once; after that he repeats the offer for free.
+          // The 40-gold tip is paid once; after that she repeats the offer for free.
           {
             visibilityConditions: [
               { type: 'quest', questId: QuestID.meatShortage, questState: QuestState.available },
@@ -132,6 +135,13 @@ const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
           {
             next: BartenderDialogue.anyWorkForMe2,
           },
+        ],
+      },
+      {
+        responseKey: `${NS}:default.bartenderHobb`,
+        results: [
+          { visibilityConditions: [{ type: 'quest', questId: QuestID.theQuietRoad, questState: QuestState.active }, { type: 'flag', name: PAID_FOR_HOBB_FLAG, isSet: false }], next: BartenderDialogue.bartenderHobb },
+          { visibilityConditions: [{ type: 'quest', questId: QuestID.theQuietRoad, questState: QuestState.completed }, { type: 'flag', name: PAID_FOR_HOBB_FLAG, isSet: false }], next: BartenderDialogue.bartenderHobb },
         ],
       },
       {
@@ -325,6 +335,14 @@ const LA_HARPAR_BARTENDER: LaHarparBartenderDialogueType = {
     messageKey: `${NS}:tavernCatGiven.message`,
     options: [
       { responseKey: `${NS}:tavernCatGiven.opt1`, results: [{ next: BartenderDialogue.default }] },
+    ],
+  },
+  [BartenderDialogue.bartenderHobb]: {
+    id: BartenderDialogue.bartenderHobb,
+    messageKey: `${NS}:bartenderHobb.message`,
+    options: [
+      { responseKey: `${NS}:bartenderHobb.opt1`, results: [{ next: BartenderDialogue.default, effects: [{ type: 'stat', action: 'deduct', stats: [{ stat: 'goldCoins', amount: 20 }] }, { type: 'flag', name: PAID_FOR_HOBB_FLAG }] }] },
+      { responseKey: `${NS}:bartenderHobb.opt2`, results: [{ next: BartenderDialogue.default }] },
     ],
   },
 }

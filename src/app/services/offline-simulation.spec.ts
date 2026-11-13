@@ -11,6 +11,10 @@ import { ItemType } from '../../enums/items/item-type.enum'
 import { EquipmentSlot } from '../../enums/equipment-slot.enum'
 import { KillContext, rollKills } from '../store/player/kill-rewards'
 
+import { resolveHit } from './hit-resolution'
+import { RESPAWN_DELAY_IN_MS, timePerAttackMs } from './combat-step'
+import { scaledHp, waveEnemies } from '../store/battle/waves'
+
 const HOUR_IN_MS = 60 * 60 * 1000
 
 describe('simulateOfflineKills', () => {
@@ -21,6 +25,7 @@ describe('simulateOfflineKills', () => {
     segments: [{ durationMs: HOUR_IN_MS, stats }],
     damageType: DamageElement.physical,
     isMeleeWeapon: true,
+    isRangedWeapon: false,
     hasWeaknessSkill: false,
     rollingKillMs: null,
     rng: seededRng(42),
@@ -39,6 +44,31 @@ describe('simulateOfflineKills', () => {
 
     expect(kills(false, boosted)).toBe(kills(false))
     expect(kills(true, boosted)).toBeGreaterThan(kills(true))
+  })
+
+  it("applies the ranged damage multiplier to ranged weapons only", () => {
+    const boosted = { ...stats, rangedDamageMultiplier: 2 }
+    const kills = (isRangedWeapon: boolean, s = stats) =>
+      simulateOfflineKills(input({ isMeleeWeapon: false, isRangedWeapon, segments: [{ durationMs: HOUR_IN_MS, stats: s }] })).kills.length
+
+    expect(kills(false, boosted)).toBe(kills(false))
+    expect(kills(true, boosted)).toBeGreaterThan(kills(true))
+  })
+
+  it("offline ranged-weapon damage matches the online hit", () => {
+    const ranged = { ...stats, critChance: 0, attackPower: 10, rangedDamageMultiplier: 2 }
+    const sim = input({ isMeleeWeapon: false, isRangedWeapon: true, segments: [{ durationMs: HOUR_IN_MS, stats: ranged }] })
+    // Kill time from online hits: the same hit as BattleManager builds for a ranged auto-attack.
+    const expected = waveEnemies(sim.zone, sim.wave).reduce((sum, enemy) => {
+      const online = resolveHit({
+        stats: ranged, magicDamage: 0, isMelee: false, isRanged: true, damageType: sim.damageType,
+        enemyWeakness: enemy.weakness, enemyTypes: enemy.enemyTypes, hasWeaknessSkill: false, hasSpellCritSkill: false,
+      })
+      expect(online.damage).toBe(20)
+      return sum + RESPAWN_DELAY_IN_MS + Math.ceil(scaledHp(enemy, sim.zone, sim.wave) / online.damage) * timePerAttackMs(ranged)
+    }, 0) / waveEnemies(sim.zone, sim.wave).length
+
+    expect(theoreticalKillMs(ranged, sim)).toBeCloseTo(expected, 6)
   })
 
   it('replays the same result for the same seed', () => {

@@ -104,6 +104,13 @@
     "seed": 513426195,
     "date": "2026-10-17"
   },
+  "src/assets/img/backgrounds/goat-cleft.png": {
+    "family": "zone-pixel",
+    "tier": null,
+    "subject": "looking up a narrow gap between two towering grey rock cliffs that nearly touch, a thin strip of blue sky between them at the top, a narrow stony path climbing between the cliffs, the grey rock worn smooth along the path, a large heap of brown leather backpacks, bulging sacks, small wooden crates and a broken wooden cart wheel piled against the left cliff in the foreground, a smaller heap of bags against the right cliff, crude scratched marks on the grey rock, one wooden stake with an orange rag tied to it, nobody there",
+    "seed": 4411,
+    "date": "2026-11-13"
+  },
   "src/assets/img/backgrounds/laHarparExplorationGuild.png": {
     "family": "town-painterly",
     "tier": null,
@@ -372,6 +379,24 @@
     "shinySaturation": 2.5,
     "shinyBrightness": 1.1
   },
+  "src/assets/img/enemies/goblinHoarder.png": {
+    "family": "enemy-pixel",
+    "tier": "small",
+    "subject": "a small green goblin with one head, pointy ears, two arms and two legs, ragged clothes, carrying one huge bulging brown sack bigger than itself on its back, its left hand holding the sack over its shoulder, one plain wooden club in its right hand",
+    "seed": 5522,
+    "date": "2026-11-13",
+    "shinyHue": 288,
+    "shinySaturation": 1.8
+  },
+  "src/assets/img/enemies/goblinPackrat.png": {
+    "family": "enemy-pixel",
+    "tier": "medium",
+    "subject": "a stocky green goblin with one head, pointy ears, two arms and two legs, a tall heap of stolen brown leather backpacks strapped onto its back, brown leather straps with buckles crossing its chest like armour, huge leather boots far too big for its feet, one heavy lumpy cloth sack hanging from its right hand, nothing in the left hand",
+    "seed": 5523,
+    "date": "2026-11-13",
+    "shinyHue": 288,
+    "shinySaturation": 1.8
+  },
   "src/assets/img/enemies/goblinScavenger.png": {
     "shinyHue": 288,
     "family": "enemy-pixel",
@@ -455,6 +480,15 @@
     "date": "2026-10-18",
     "shinySaturation": 1.2,
     "shinyBrightness": 1.1
+  },
+  "src/assets/img/enemies/rockViper.png": {
+    "family": "enemy-pixel",
+    "tier": "small",
+    "subject": "a single viper alone: one long slim snake coiled in loops, the front of its body raised in an S-curve with the head thrust forward, mouth open with two small fangs, dull grey-brown scales with dark brown zigzag bands along its back, one head, no legs",
+    "seed": 5521,
+    "date": "2026-11-13",
+    "shinyHue": 200,
+    "shinySaturation": 2.2
   },
   "src/assets/img/enemies/seagull.png": {
     "shinyHue": 38,
@@ -614,6 +648,13 @@
     "seed": 1199052729,
     "date": "2026-10-17"
   },
+  "src/assets/img/items/buckledHarness.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a brown leather chest armour made of many overlapping leather straps with brass buckles and rivets",
+    "seed": 1843140370,
+    "date": "2026-11-13"
+  },
   "src/assets/img/items/canopyBlossom.png": {
     "family": "item-pixel",
     "tier": null,
@@ -655,6 +696,27 @@
     "subject": "a shiny lump of hardened amber crystal with dark purple-black veins, a single faceted gemstone-like nugget",
     "seed": 31,
     "date": "2026-10-17"
+  },
+  "src/assets/img/items/corwinsLetter.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a folded cream paper letter lying flat, closed with one round green wax seal in the middle",
+    "seed": 1797920254,
+    "date": "2026-11-13"
+  },
+  "src/assets/img/items/corwinsRitualNotes.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a small stack of loose rough brown paper sheets with ragged edges, slightly fanned out, the top sheet covered in dark ink handwriting and little ink sketches",
+    "seed": 7742,
+    "date": "2026-11-13"
+  },
+  "src/assets/img/items/corwinsSecondLetter.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single rolled-up paper letter lying horizontally, tied around the middle with a brown string, one round dark red wax seal on the string",
+    "seed": 7743,
+    "date": "2026-11-13"
   },
   "src/assets/img/items/crabStew.png": {
     "family": "item-pixel",
@@ -873,6 +935,13 @@
     "seed": 202870648,
     "date": "2026-10-17"
   },
+  "src/assets/img/items/hobbsSatchel.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single worn brown leather satchel with a flap, a brass buckle and a long shoulder strap, scuffed and scratched",
+    "seed": 1556626715,
+    "date": "2026-11-13"
+  },
   "src/assets/img/items/huntersFeast.png": {
     "family": "item-pixel",
     "tier": null,
@@ -914,6 +983,13 @@
     "subject": "a simple plain brown leather vest with stitched seams and laces at the front",
     "seed": 1446249975,
     "date": "2026-10-26"
+  },
+  "src/assets/img/items/lostTradeGoods.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a small wooden crate with a broken lid, a rolled bolt of red cloth and a silver candlestick sticking out of it",
+    "seed": 1163625724,
+    "date": "2026-11-13"
   },
   "src/assets/img/items/manaRing.png": {
     "family": "item-pixel",
@@ -970,6 +1046,20 @@
     "subject": "a single empty deep purple cloth hood with a short cape collar and a thin silver trim, nobody wearing it, single object",
     "seed": 358365248,
     "date": "2026-10-26"
+  },
+  "src/assets/img/items/packLeather.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a rolled-up coil of brown leather straps with one small brass buckle",
+    "seed": 5526,
+    "date": "2026-11-13"
+  },
+  "src/assets/img/items/passPostDaybook.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a small thick leather-bound daybook wrapped in a dark brown oilcloth, the cloth tied around it with a string, one corner of the book showing",
+    "seed": 1222278940,
+    "date": "2026-11-13"
   },
   "src/assets/img/items/patronGloves.png": {
     "family": "item-pixel",
@@ -1117,6 +1207,13 @@
     "seed": 125528548,
     "date": "2026-10-26"
   },
+  "src/assets/img/items/switchbackBoots.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a pair of worn soft brown leather boots with laces",
+    "seed": 2102772139,
+    "date": "2026-11-13"
+  },
   "src/assets/img/items/talonBlade.png": {
     "family": "item-pixel",
     "tier": null,
@@ -1179,6 +1276,69 @@
     "subject": "one browned roast meat joint with a short white bone sticking out of one end, one red apple beside it, nothing underneath",
     "seed": 1268499607,
     "date": "2026-10-21"
+  },
+  "src/assets/img/items/viperVenom.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a small round glass vial closed with a cork stopper, half full of milky pale green liquid",
+    "seed": 5525,
+    "date": "2026-11-13"
+  },
+  "src/assets/img/items/viperskin.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a flat folded piece of thin grey snake hide with a fine diamond scale pattern",
+    "seed": 5524,
+    "date": "2026-11-13"
+  },
+  "src/assets/img/items/viperskinBoots.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "one pair of light low boots made of small overlapping grey snake scales, with thin brown leather straps and soft leather soles",
+    "seed": 789702868,
+    "date": "2026-11-13"
+  },
+  "src/assets/img/items/viperskinGloves.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "one pair of fingerless gloves made of small overlapping grey snake scales, with dark brown leather grip patches on the palms and a leather strap at each wrist",
+    "seed": 2076245081,
+    "date": "2026-11-13"
+  },
+  "src/assets/img/items/viperskinHood.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single empty hood made of small overlapping grey snake scales, lying flat, with brown leather straps and a buckle at the neck, nothing inside it, no person",
+    "seed": 1625612263,
+    "date": "2026-11-13"
+  },
+  "src/assets/img/items/viperskinJerkin.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single sleeveless jerkin covered in small overlapping grey snake scales, held together by worn brown leather straps with brass buckles across the chest, empty",
+    "seed": 1030420333,
+    "date": "2026-11-13"
+  },
+  "src/assets/img/items/viperskinLeggings.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "one pair of leggings covered in small overlapping grey snake scales, with brown leather straps and buckles around the thighs and a leather belt at the waist, empty",
+    "seed": 2018703681,
+    "date": "2026-11-13"
+  },
+  "src/assets/img/items/viperskinPattern.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single torn parchment scroll, partly unrolled, showing an ink sketch of a jerkin pattern, with a small strip of grey snake scale tied to it by a brown leather cord",
+    "seed": 96746914,
+    "date": "2026-11-13"
+  },
+  "src/assets/img/items/warchiefsToken.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single round flat disc of pale yellowed bone with crude scratched marks, a thin leather cord threaded through a hole at its top and tied in a loop",
+    "seed": 7741,
+    "date": "2026-11-13"
   },
   "src/assets/img/items/wharfRunnersBoots.png": {
     "family": "item-pixel",

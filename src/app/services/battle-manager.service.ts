@@ -63,6 +63,7 @@ export class BattleManagerService {
 
     // Weapon spells and auto-attacks use the equipped weapon category.
     const isMelee = magicDamage === 0 && this.playerStore.equippedWeaponCategory() === WeaponCategory.melee
+    const isRanged = magicDamage === 0 && this.playerStore.equippedWeaponCategory() === WeaponCategory.ranged
     // Ambush: melee hits use up the guaranteed crits; ranged and magic hits don't.
     const forceCrit = isMelee && this.battleStore.useEmpoweredHit()
     const hitType = damageType ?? this.playerStore.equippedWeaponDamageType()
@@ -70,6 +71,7 @@ export class BattleManagerService {
       stats: this.playerStore.stats(),
       magicDamage,
       isMelee,
+      isRanged,
       forceCrit,
       damageType: hitType,
       enemyWeakness: enemy.weakness,

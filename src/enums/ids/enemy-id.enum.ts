@@ -38,4 +38,8 @@ export enum EnemyID {
   arenaArcanist = 32,
   arenaBurrower = 33,
   arenaYad = 34,
+  // Mountain Pass — The Goat Cleft (Zone 9, side Zone off the Mountain Pass)
+  rockViper = 35,
+  goblinHoarder = 36,
+  goblinPackrat = 37,
 }
