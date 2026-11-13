@@ -697,6 +697,27 @@
     "seed": 31,
     "date": "2026-10-17"
   },
+  "src/assets/img/items/corwinsLetter.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a folded cream paper letter lying flat, closed with one round green wax seal in the middle",
+    "seed": 1797920254,
+    "date": "2026-11-13"
+  },
+  "src/assets/img/items/corwinsRitualNotes.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a small stack of loose rough brown paper sheets with ragged edges, slightly fanned out, the top sheet covered in dark ink handwriting and little ink sketches",
+    "seed": 7742,
+    "date": "2026-11-13"
+  },
+  "src/assets/img/items/corwinsSecondLetter.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single rolled-up paper letter lying horizontally, tied around the middle with a brown string, one round dark red wax seal on the string",
+    "seed": 7743,
+    "date": "2026-11-13"
+  },
   "src/assets/img/items/crabStew.png": {
     "family": "item-pixel",
     "tier": null,
@@ -914,6 +935,13 @@
     "seed": 202870648,
     "date": "2026-10-17"
   },
+  "src/assets/img/items/hobbsSatchel.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single worn brown leather satchel with a flap, a brass buckle and a long shoulder strap, scuffed and scratched",
+    "seed": 1556626715,
+    "date": "2026-11-13"
+  },
   "src/assets/img/items/huntersFeast.png": {
     "family": "item-pixel",
     "tier": null,
@@ -1024,6 +1052,13 @@
     "tier": null,
     "subject": "a rolled-up coil of brown leather straps with one small brass buckle",
     "seed": 5526,
+    "date": "2026-11-13"
+  },
+  "src/assets/img/items/passPostDaybook.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a small thick leather-bound daybook wrapped in a dark brown oilcloth, the cloth tied around it with a string, one corner of the book showing",
+    "seed": 1222278940,
     "date": "2026-11-13"
   },
   "src/assets/img/items/patronGloves.png": {
@@ -1296,6 +1331,13 @@
     "tier": null,
     "subject": "a single torn parchment scroll, partly unrolled, showing an ink sketch of a jerkin pattern, with a small strip of grey snake scale tied to it by a brown leather cord",
     "seed": 96746914,
+    "date": "2026-11-13"
+  },
+  "src/assets/img/items/warchiefsToken.png": {
+    "family": "item-pixel",
+    "tier": null,
+    "subject": "a single round flat disc of pale yellowed bone with crude scratched marks, a thin leather cord threaded through a hole at its top and tied in a loop",
+    "seed": 7741,
     "date": "2026-11-13"
   },
   "src/assets/img/items/wharfRunnersBoots.png": {
