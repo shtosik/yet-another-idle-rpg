@@ -21,6 +21,8 @@ export interface OfflineSimulationInput {
   damageType: DamageElement
   /** The equipped weapon is melee (or none). */
   isMeleeWeapon: boolean
+  /** The equipped weapon is ranged. */
+  isRangedWeapon: boolean
   hasWeaknessSkill: boolean
   /** Average ms per recent online kill; caps the rate at what the player really managed. `null` if unknown. */
   rollingKillMs: number | null
@@ -49,6 +51,7 @@ const autoAttackInput = (stats: PlayerStatsType, enemy: Enemy, input: OfflineSim
   stats,
   magicDamage: 0,
   isMelee: input.isMeleeWeapon,
+  isRanged: input.isRangedWeapon,
   damageType: input.damageType,
   enemyWeakness: enemy.weakness,
   enemyTypes: enemy.enemyTypes,

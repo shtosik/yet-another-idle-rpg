@@ -32,7 +32,7 @@ export interface EquipmentItem extends ItemData {
     stats: EquipmentItemPossibleStat[]
     slot: EquipmentSlot
     damageType?: DamageElement
-    /** Weapons only; melee when unset. Only melee auto-attacks use `meleeDamageMultiplier`. */
+    /** Weapons only; melee when unset. Melee uses `meleeDamageMultiplier`, ranged `rangedDamageMultiplier`. */
     weaponCategory?: WeaponCategory
     /** Known while equipped (not in the skill tree); leaves the spell bar when unequipped. */
     spell?: SpellID

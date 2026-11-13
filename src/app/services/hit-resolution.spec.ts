@@ -8,6 +8,7 @@ describe('resolveHit', () => {
     stats: { ...statsInitialState, ...stats },
     magicDamage: 0,
     isMelee: true,
+    isRanged: false,
     damageType: DamageElement.physical,
     enemyWeakness: undefined,
     enemyTypes: [],
@@ -46,6 +47,15 @@ describe('resolveHit', () => {
 
     expect(resolveHit(input(stats)).damage).toBe(15)
     expect(resolveHit({ ...input(stats), isMelee: false }).damage).toBe(10)
+  })
+
+  it("applies the ranged multiplier to ranged hits only", () => {
+    const stats = { attackPower: 10, meleeDamageMultiplier: 2, rangedDamageMultiplier: 1.5 }
+    const ranged = { ...input(stats), isMelee: false, isRanged: true }
+
+    expect(resolveHit(ranged).damage).toBe(15)
+    expect(resolveHit(input(stats)).damage).toBe(20)
+    expect(resolveHit({ ...ranged, magicDamage: 10 }).damage).toBe(10)
   })
 
   it('deals at least 1', () => {

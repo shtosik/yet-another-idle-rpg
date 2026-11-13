@@ -33,7 +33,7 @@ Enemy death (`handleEnemyDeath`):
 4. With auto wave progression on and the wave's kill count met, move to the next wave.
 
 Damage (`resolveHit`), in order, kept fractional throughout:
-1. Base: `attackPower` (melee hits `× meleeDamageMultiplier`), or for magic `(spellDamage + magicDamage) × magicDamageMultiplier`.
+1. Base: `attackPower` (melee hits `× meleeDamageMultiplier`, ranged hits `× rangedDamageMultiplier`), or for magic `(spellDamage + magicDamage) × magicDamageMultiplier`.
 2. Crit: `critChance` percent, `× critMulti`. Spells crit only with the `spellCrit` node.
 3. Weakness: if the `weaknesses` node is unlocked and the hit's element matches the enemy's weakness, `× extra<Element>DamageMultiplier`.
 4. Damage vs type: `× (1 + sum of damageVs<Type>)` over the enemy's `enemyTypes`.
@@ -54,7 +54,7 @@ Damage (`resolveHit`), in order, kept fractional throughout:
 - Of the current enemy, `BattleState` saves only `enemyId`, `isShinyEnemy` and `currentEnemyHp`; the computed `BattleStore.enemy` rebuilds it from `ENEMIES_DATA` with the wave-scaled max HP and shiny sprite, so data edits apply to a saved fight. On load, a fight whose `enemyId` no longer exists in the data is ended (`enemy` is `null`; combat would stall otherwise), and HP above the rebuilt max HP is clamped.
 - In an arena run, `doDamage` skips hits on a burrowed champion and passes the rest through `ArenaBossesService.modifyHit` (shields, bonuses, the Arcanist's toll; `arena.md`).
 - The weapon's `damageType` sets the auto-attack element (`PlayerStore.equippedWeaponDamageType`, default physical).
-- The weapon's `weaponCategory` (`WeaponCategory`: melee, ranged or magic; unset or no weapon = melee, `PlayerStore.equippedWeaponCategory`) decides if an auto-attack is a **melee hit**. Double Attack requires an equipped melee weapon and resolves two separate hits; Volley requires a ranged weapon and resolves three. Both stop on death, with no carry-over to another enemy. Ranged and magic-weapon (staff, wand) auto-attacks use plain `attackPower`, not `magicDamage` (owner decision).
+- The weapon's `weaponCategory` (`WeaponCategory`: melee, ranged or magic; unset or no weapon = melee, `PlayerStore.equippedWeaponCategory`) decides if an auto-attack (or weapon spell) is a **melee hit** (`meleeDamageMultiplier`) or a **ranged hit** (`rangedDamageMultiplier`); magic spells use neither. Double Attack requires an equipped melee weapon and resolves two separate hits; Volley requires a ranged weapon and resolves three. Both stop on death, with no carry-over to another enemy. Ranged and magic-weapon (staff, wand) auto-attacks use plain `attackPower`, not `magicDamage` (owner decision).
 - Stats are derived from their sources (equipment, nodes, buffs, consumables), see `player-stats-inventory-equipment.md`.
 
 ## Known issues

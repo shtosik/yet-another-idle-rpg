@@ -21,6 +21,7 @@ describe('simulateOfflineKills', () => {
     segments: [{ durationMs: HOUR_IN_MS, stats }],
     damageType: DamageElement.physical,
     isMeleeWeapon: true,
+    isRangedWeapon: false,
     hasWeaknessSkill: false,
     rollingKillMs: null,
     rng: seededRng(42),
@@ -36,6 +37,15 @@ describe('simulateOfflineKills', () => {
     const boosted = { ...stats, meleeDamageMultiplier: 2 }
     const kills = (isMeleeWeapon: boolean, s = stats) =>
       simulateOfflineKills(input({ isMeleeWeapon, segments: [{ durationMs: HOUR_IN_MS, stats: s }] })).kills.length
+
+    expect(kills(false, boosted)).toBe(kills(false))
+    expect(kills(true, boosted)).toBeGreaterThan(kills(true))
+  })
+
+  it("applies the ranged damage multiplier to ranged weapons only", () => {
+    const boosted = { ...stats, rangedDamageMultiplier: 2 }
+    const kills = (isRangedWeapon: boolean, s = stats) =>
+      simulateOfflineKills(input({ isMeleeWeapon: false, isRangedWeapon, segments: [{ durationMs: HOUR_IN_MS, stats: s }] })).kills.length
 
     expect(kills(false, boosted)).toBe(kills(false))
     expect(kills(true, boosted)).toBeGreaterThan(kills(true))
