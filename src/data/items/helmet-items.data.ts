@@ -117,6 +117,9 @@ export const HelmetItemsData: Partial<Record<ItemID, Item>> = {
     value: 72,
     type: ItemType.equipment,
     slot: EquipmentSlot.helmet,
-    stats: [{ id: 'rangedDamageMultiplier', amount: 0.06 }],
+    stats: [
+      { id: 'attackPower', amount: 2 },
+      { id: 'rangedDamageMultiplier', amount: 0.06 },
+    ],
   },
 }
