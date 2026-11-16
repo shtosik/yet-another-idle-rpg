@@ -33,6 +33,10 @@ decision.md                     approver's decision
 
 Subagents reply in text; you save each reply verbatim to its file before acting on it. Each file has one author. Every review file starts with `PASS` or `CHANGES`; the decision file starts with `APPROVE` or `ESCALATE`.
 
+Write job files only with `scripts/job.mjs`; a worktree session's Write and Edit can't reach the main checkout, and the guard hook blocks them. Write the reply to your scratchpad, then `node scripts/job.mjs save <name> <job file> <scratchpad file>`; it refuses a file name or verdict line the briefs don't use. `node scripts/job.mjs done <name> <N>` marks a step ✅.
+
+After a context summary, re-read this skill and each brief before filling it. Briefs written from memory drifted in the first run: wrong verdict words and file names, and an approver that couldn't escalate.
+
 ## 1. Worktree (once per plan)
 
 The plan is one branch, `feat/<name>`, in one worktree, `.claude/worktrees/yari-<name>` (as `scripts/worktree.mjs` prints it), with one PR into `staging`; each step is one commit on it. A plan that says "one PR per step" is wrong here: `docs/git-workflow.md` wins.
@@ -98,7 +102,7 @@ A round is one build (or rework) plus its reviews. Round 1 follows the build.
    - `blast-radius`, when the step touches a store, save, enum or derived stat: run `/blast-radius` yourself while the agents work, and write its result with a verdict line.
 5. Wait until every review file of the round exists. All `PASS`: go to 7. Any `CHANGES`: `SendMessage` to `build-<name>-<N>` naming the round's files to read; the fix is a new commit. That starts the next round.
 6. Still `CHANGES` after round 2: stop and ask the owner; no third blind round.
-7. Append ` ✅` to the step heading in `<jobs>/plan.md`. Nothing to commit: the plan is untracked.
+7. `node scripts/job.mjs done <name> <N>`. Nothing to commit: the plan is untracked.
 
 Then report the step in two lines and continue with the next ready step, unless the owner asked for one step.
 
@@ -116,4 +120,4 @@ After the last step, or when the owner says ship:
 
 ## Rework
 
-`/run-plan rework <name> step N <note>`: write the note to `<jobs>/step-<N>/round-<K>/owner.md` as `CHANGES` for the next round number, remove the step's ✅ from `<jobs>/plan.md`, then resume `build-<name>-<N>` with `SendMessage` or, in a new session, a fresh builder with the step brief plus "Read `<jobs>/step-<N>/` first". Gate as in section 6; the owner's rework round starts the round count again. Then run Finish from 3.
+`/run-plan rework <name> step N <note>`: save the note as `step-<N>/round-<K>/owner.md` with `scripts/job.mjs`, starting `CHANGES`, for the next round number; remove the step's ✅ from `<jobs>/plan.md` (a `node -e` edit, since Edit is blocked there); then resume `build-<name>-<N>` with `SendMessage` or, in a new session, a fresh builder with the step brief plus "Read `<jobs>/step-<N>/` first". Gate as in section 6; the owner's rework round starts the round count again. Then run Finish from 3.

@@ -45,6 +45,7 @@ A rule here fails a check when broken. When the owner corrects the same mistake 
 | Every `withGameStateSync` store is in `SAVED_STORES` | `npm run validate` (`scripts/validate-data.mjs`) |
 | Game rules read `GameClock`; `Date.now()` only in the allowlisted files | `npm run validate` (`scripts/validate-data.mjs`) |
 | Start a session from current `origin/staging` | `.claude/hooks/session-start.mjs` fast-forwards a `staging` checkout with no local commits (local edits stay unless origin/staging changes the same files), else reports how far it lags (Claude) |
+| `/run-plan` job files are written with `node scripts/job.mjs`, with the briefs' file names and verdict lines | `scripts/job.mjs` (tested in `job.test.mjs`); `.claude/hooks/guard.mjs` blocks Write and Edit there (Claude) |
 | Codex gets the same project skills | `npm run validate` (`scripts/sync-skills.mjs`) |
 | Data references, i18n keys, assets, doc paths, changelog format, agent and skill frontmatter, idea statuses | `npm run validate` (checks listed at the top of `scripts/validate-data.mjs`) |
 | PRs into `main` come from `release/*` or `hotfix/*` with a version bump | CI (`.github/workflows/ci.yml`) |

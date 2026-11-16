@@ -71,6 +71,11 @@ if (/^(Bash|PowerShell)$/.test(tool)) {
   }
 }
 
+// /run-plan job files: a worktree session's Write and Edit can't reach them, and hand-written ones drifted from the briefs.
+if (/^(Write|Edit)$/.test(tool) && /[\\/]\.claude[\\/]jobs[\\/]/i.test(String(input.tool_input?.file_path ?? ''))) {
+  block('Blocked: write job files with node scripts/job.mjs (Write the reply to your scratchpad, then: node scripts/job.mjs save <name> <job file> <scratchpad file>; mark a step with node scripts/job.mjs done <name> <N>). It checks the file name and verdict line.')
+}
+
 // One worktree per session: hopping between worktrees strands work and once failed 19 times in a row.
 // Worktrees live in .claude/worktrees, since the app asks the owner to approve entering any path outside it.
 const target = String(input.tool_input?.path ?? '')
