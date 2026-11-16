@@ -47,7 +47,7 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "Bash|PowerShell|EnterWorktree|.*javascript_tool",
+        "matcher": "Bash|PowerShell|EnterWorktree|Write|Edit|.*javascript_tool",
         "hooks": [
           {
             "type": "command",

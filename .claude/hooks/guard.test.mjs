@@ -85,3 +85,9 @@ test('EnterWorktree from the main checkout only into .claude/worktrees', () => {
   assert.equal(run('EnterWorktree', { path: '.CLAUDE/WORKTREES/yari-feature' }, MAIN), 0)
   assert.equal(run('EnterWorktree', { path: join(MAIN, '.claude', 'worktrees', 'yari-feature') }, MAIN), 0)
 })
+
+test('blocks Write and Edit of /run-plan job files, allows other files', () => {
+  assert.equal(run('Write', { file_path: join(MAIN, '.claude', 'jobs', 'chapter-one', 'decision.md') }), 2)
+  assert.equal(run('Edit', { file_path: join(MAIN, '.claude', 'jobs', 'chapter-one', 'plan.md') }), 2)
+  assert.equal(run('Write', { file_path: join(WORKTREE, 'scripts', 'job.mjs') }), 0)
+})
